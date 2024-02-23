@@ -25,9 +25,8 @@ public class PostgresOldBillingProfileAdapter implements OldBillingProfileStorag
     private final UserBillingProfileTypeRepository userBillingProfileTypeRepository;
     private final CompanyBillingProfileRepository companyBillingProfileRepository;
     private final IndividualBillingProfileRepository individualBillingProfileRepository;
-    private final CustomUserRewardRepository userRewardRepository;
-    private final OldChildrenKycRepository oldChildrenKycRepository;
     private final GlobalSettingsRepository globalSettingsRepository;
+    private final UserRewardViewRepository userRewardViewRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -102,7 +101,7 @@ public class PostgresOldBillingProfileAdapter implements OldBillingProfileStorag
             case INDIVIDUAL -> findIndividualBillingProfile(userId).map(OldBillingProfile::of);
         }).orElseThrow(() -> notFound("Billing profile not found for user " + userId));
 
-        final var rewardCount = userRewardRepository.getPendingInvoicesViewEntities(githubUserId).size();
+        final var rewardCount = userRewardViewRepository.findPendingPaymentRequestForRecipient(githubUserId).size();
 
         return List.of(billingProfile.rewardCount(rewardCount));
     }

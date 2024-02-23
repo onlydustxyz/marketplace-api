@@ -1,79 +1,43 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import com.vladmihalcea.hibernate.type.array.EnumArrayType;
-import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
-import lombok.*;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
-import org.hibernate.annotations.Parameter;
+import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Value;
+import onlydust.com.marketplace.project.domain.view.UserRewardStatus;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import java.math.BigDecimal;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoZonedDateTime;
-import java.util.Arrays;
-import java.util.Date;
+import javax.persistence.*;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Entity
 @Value
-@Table(name = "reward_status_data", schema = "accounting")
+@Table(name = "reward_statuses", schema = "accounting")
+@TypeDef(name = "reward_status", typeClass = PostgreSQLEnumType.class)
 @NoArgsConstructor(force = true)
-@AllArgsConstructor
-@Builder(access = AccessLevel.PRIVATE)
-@EqualsAndHashCode
-@TypeDef(name = "currency", typeClass = PostgreSQLEnumType.class)
-@TypeDef(
-        name = "network[]",
-        typeClass = EnumArrayType.class,
-        defaultForType = NetworkEnumEntity[].class,
-        parameters = {
-                @Parameter(
-                        name = AbstractArrayType.SQL_ARRAY_TYPE,
-                        value = "network"
-                )
-        }
-)
 public class RewardStatusEntity {
     @Id
     @NonNull UUID rewardId;
 
-    Boolean sponsorHasEnoughFund;
-    Date unlockDate;
-    Date invoiceReceivedAt;
-    Date paidAt;
-    @Type(type = "network[]")
-    @Column(columnDefinition = "network[]")
-    NetworkEnumEntity[] networks;
-    BigDecimal amountUsdEquivalent;
+    @Enumerated(EnumType.STRING)
+    @Type(type = "reward_status")
+    @NonNull Status status;
 
-    public static RewardStatusEntity of(RewardStatus rewardStatus) {
-        return RewardStatusEntity.builder()
-                .rewardId(rewardStatus.rewardId().value())
-                .sponsorHasEnoughFund(rewardStatus.sponsorHasEnoughFund())
-                .unlockDate(rewardStatus.unlockDate().map(ChronoZonedDateTime::toInstant).map(Date::from).orElse(null))
-                .invoiceReceivedAt(rewardStatus.invoiceReceivedAt().map(ChronoZonedDateTime::toInstant).map(Date::from).orElse(null))
-                .paidAt(rewardStatus.paidAt().map(ChronoZonedDateTime::toInstant).map(Date::from).orElse(null))
-                .networks(rewardStatus.networks().stream().map(NetworkEnumEntity::of).toArray(NetworkEnumEntity[]::new))
-                .amountUsdEquivalent(rewardStatus.amountUsdEquivalent().orElse(null))
-                .build();
+    public enum Status {
+        PENDING_BILLING_PROFILE, PENDING_VERIFICATION, PAYMENT_BLOCKED, PAYOUT_INFO_MISSING, LOCKED, PENDING_REQUEST, PROCESSING, COMPLETE
     }
 
-    public RewardStatus toRewardStatus() {
-        return new RewardStatus(RewardId.of(rewardId))
-                .sponsorHasEnoughFund(Boolean.TRUE.equals(sponsorHasEnoughFund))
-                .unlockDate(unlockDate == null ? null : ZonedDateTime.ofInstant(unlockDate.toInstant(), ZoneOffset.UTC))
-                .invoiceReceivedAt(invoiceReceivedAt == null ? null : ZonedDateTime.ofInstant(invoiceReceivedAt.toInstant(), ZoneOffset.UTC))
-                .paidAt(paidAt == null ? null : ZonedDateTime.ofInstant(paidAt.toInstant(), ZoneOffset.UTC))
-                .withAdditionalNetworks(Arrays.stream(networks).map(NetworkEnumEntity::toNetwork).collect(Collectors.toSet()))
-                .amountUsdEquivalent(amountUsdEquivalent);
+    public UserRewardStatus forUser() {
+        return switch (status) {
+            case PENDING_BILLING_PROFILE -> UserRewardStatus.missingPayoutInfo; // TODO add dedicated status
+            case PENDING_VERIFICATION -> UserRewardStatus.pendingVerification;
+            case PAYMENT_BLOCKED -> UserRewardStatus.locked;// TODO add dedicated status
+            case PAYOUT_INFO_MISSING -> UserRewardStatus.missingPayoutInfo;
+            case LOCKED -> UserRewardStatus.locked;
+            case PENDING_REQUEST -> UserRewardStatus.pendingInvoice;// TODO add dedicated status
+            case PROCESSING -> UserRewardStatus.processing;
+            case COMPLETE -> UserRewardStatus.complete;
+        };
     }
 }

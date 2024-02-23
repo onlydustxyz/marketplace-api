@@ -1,50 +1,36 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
-import lombok.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import lombok.NoArgsConstructor;
+import lombok.Value;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Data
+@Value
+@NoArgsConstructor(force = true)
 @Entity
-@TypeDef(name = "currency", typeClass = PostgreSQLEnumType.class)
 public class UserRewardViewEntity {
-
     @Id
-    @Column(name = "id")
     UUID id;
-    @Column(name = "requested_at")
     Date requestedAt;
-    @Column(name = "processed_at")
-    Date processedAt;
-    @Column(name = "name")
-    String name;
-    @Column(name = "logo_url")
-    String logoUrl;
-    @Column(name = "project_id")
-    UUID projectId;
-    @Column(name = "amount")
+    @ManyToOne
+    @JoinColumn(name = "project_id", referencedColumnName = "project_id")
+    ProjectEntity project;
     BigDecimal amount;
-    @Enumerated(EnumType.STRING)
-    @Type(type = "currency")
-    @Column(name = "currency")
-    CurrencyEnumEntity currency;
-    @Column(name = "contribution_count")
-    Integer contributionCount;
-    @Column(name = "dollars_equivalent")
+    @ManyToOne
+    CurrencyEntity currency;
     BigDecimal dollarsEquivalent;
-    @Column(name = "status")
-    String status;
-    @Column(name = "invoice_received_at")
-    Date invoiceReceivedAt;
+    Integer contributionCount;
+    @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "reward_id")
+    RewardStatusEntity status;
+    @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "reward_id")
+    RewardStatusDataEntity statusData;
 }

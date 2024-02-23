@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.configuration;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
@@ -190,12 +191,12 @@ public class PostgresConfiguration {
                                                    final ApplicationRepository applicationRepository,
                                                    final ProjectIdRepository projectIdRepository,
                                                    final UserProfileInfoRepository userProfileInfoRepository,
-                                                   final CustomUserRewardRepository customUserRewardRepository,
                                                    final OldWalletRepository oldWalletRepository,
                                                    final CustomUserPayoutInfoRepository customUserPayoutInfoRepository,
                                                    final CustomRewardRepository customRewardRepository,
                                                    final ProjectLedIdRepository projectLedIdRepository,
-                                                   final RewardStatsRepository rewardStatsRepository) {
+                                                   final RewardStatsRepository rewardStatsRepository,
+                                                   final UserRewardViewRepository userRewardViewRepository) {
         return new PostgresUserAdapter(
                 customUserRepository,
                 customContributorRepository,
@@ -209,12 +210,12 @@ public class PostgresConfiguration {
                 applicationRepository,
                 projectIdRepository,
                 userProfileInfoRepository,
-                customUserRewardRepository,
                 oldWalletRepository,
                 customUserPayoutInfoRepository,
                 customRewardRepository,
                 projectLedIdRepository,
-                rewardStatsRepository);
+                rewardStatsRepository,
+                userRewardViewRepository);
     }
 
     @Bean
@@ -225,11 +226,6 @@ public class PostgresConfiguration {
     @Bean
     public CustomProjectBudgetRepository customProjectBudgetRepository(final EntityManager entityManager) {
         return new CustomProjectBudgetRepository(entityManager);
-    }
-
-    @Bean
-    public CustomUserRewardRepository customUserRewardRepository(final EntityManager entityManager) {
-        return new CustomUserRewardRepository(entityManager);
     }
 
     @Bean
@@ -259,8 +255,9 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresRewardV2Adapter postgresRewardV2Adapter(final RewardRepository rewardRepository) {
-        return new PostgresRewardV2Adapter(rewardRepository);
+    public PostgresRewardV2Adapter postgresRewardV2Adapter(final RewardRepository rewardRepository,
+                                                           final CurrencyStorage currencyStorage) {
+        return new PostgresRewardV2Adapter(rewardRepository, currencyStorage);
     }
 
     @Bean
@@ -347,11 +344,14 @@ public class PostgresConfiguration {
     public PostgresOldBillingProfileAdapter postgresBillingProfileAdapter(final UserBillingProfileTypeRepository userBillingProfileTypeRepository,
                                                                           final IndividualBillingProfileRepository individualBillingProfileRepository,
                                                                           final CompanyBillingProfileRepository companyBillingProfileRepository,
-                                                                          final CustomUserRewardRepository customUserRewardRepository,
-                                                                          final OldChildrenKycRepository oldChildrenKycRepository,
-                                                                          final GlobalSettingsRepository globalSettingsRepository) {
-        return new PostgresOldBillingProfileAdapter(userBillingProfileTypeRepository, companyBillingProfileRepository, individualBillingProfileRepository,
-                customUserRewardRepository, oldChildrenKycRepository, globalSettingsRepository);
+                                                                          final GlobalSettingsRepository globalSettingsRepository,
+                                                                          final UserRewardViewRepository userRewardViewRepository) {
+        return new PostgresOldBillingProfileAdapter(
+                userBillingProfileTypeRepository,
+                companyBillingProfileRepository,
+                individualBillingProfileRepository,
+                globalSettingsRepository,
+                userRewardViewRepository);
     }
 
     @Bean

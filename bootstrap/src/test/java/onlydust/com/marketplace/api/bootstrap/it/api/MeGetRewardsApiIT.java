@@ -1,24 +1,16 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndividualBillingProfileEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.OldVerificationStatusEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity.BillingProfileTypeEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.UserBillingProfileTypeRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuotesRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
@@ -26,10 +18,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -38,11 +33,15 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 
 public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
-    PaymentRequestRepository paymentRequestRepository;
+    RewardRepository rewardRepository;
     @Autowired
-    CryptoUsdQuotesRepository cryptoUsdQuotesRepository;
+    RewardStatusRepository rewardStatusRepository;
     @Autowired
-    PaymentRepository paymentRepository;
+    InvoiceRewardRepository invoiceRewardRepository;
+    @Autowired
+    CurrencyRepository currencyRepository;
+    @Autowired
+    InvoiceRepository invoiceRepository;
     @Autowired
     PostgresUserAdapter postgresUserAdapter;
     @Autowired
@@ -60,14 +59,11 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
         patchBillingProfile(pierre, BillingProfileTypeEntity.COMPANY, OldVerificationStatusEntity.VERIFIED);
 
-        addQuote(CurrencyEnumEntity.eth, 1500);
-        addQuote(CurrencyEnumEntity.apt, 200);
-
-        patchReward("40fda3c6-2a3f-4cdd-ba12-0499dd232d53", 10, CurrencyEnumEntity.eth, null, "2023-07-12");
-        patchReward("e1498a17-5090-4071-a88a-6f0b0c337c3a", 50, CurrencyEnumEntity.eth, null, "2023-08-12");
-        patchReward("2ac80cc6-7e83-4eef-bc0c-932b58f683c0", 500, CurrencyEnumEntity.apt, null, null);
-        patchReward("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0", 30, CurrencyEnumEntity.op, "2023-08-14", null);
-        patchReward("5b96ca1e-4ad2-41c1-8819-520b885d9223", 9511147, CurrencyEnumEntity.strk, null, null);
+        patchReward("40fda3c6-2a3f-4cdd-ba12-0499dd232d53", 10, "ETH", 15000, null, "2023-07-12");
+        patchReward("e1498a17-5090-4071-a88a-6f0b0c337c3a", 50, "ETH", 75000, null, "2023-08-12");
+        patchReward("2ac80cc6-7e83-4eef-bc0c-932b58f683c0", 500, "APT", 100000, null, null);
+        patchReward("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0", 30, "OP", null, "2023-08-14", null);
+        patchReward("5b96ca1e-4ad2-41c1-8819-520b885d9223", 9511147, "STRK", null, null, null);
 
         postgresUserAdapter.savePayoutSettingsForUserId(pierre.user().getId(),
                 UserPayoutSettings.builder()
@@ -213,51 +209,6 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_get_my_total_reward_amounts() {
-        // When
-        client.get()
-                .uri(getApiURI(ME_GET_REWARD_TOTAL_AMOUNTS))
-                .header("Authorization", BEARER_PREFIX + pierre.jwt())
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json("""
-                        {
-                          "totalAmount": 191010.00,
-                          "details": [
-                            {
-                              "totalAmount": 60,
-                              "totalDollarsEquivalent": 90000,
-                              "currency": "ETH"
-                            },
-                            {
-                              "totalAmount": 30,
-                              "totalDollarsEquivalent": null,
-                              "currency": "OP"
-                            },
-                            {
-                              "totalAmount": 500,
-                              "totalDollarsEquivalent": 100000,
-                              "currency": "APT"
-                            },
-                            {
-                              "totalAmount": 9511147,
-                              "totalDollarsEquivalent": null,
-                              "currency": "STRK"
-                            },
-                            {
-                              "totalAmount": 1000,
-                              "totalDollarsEquivalent": 1010.00,
-                              "currency": "USDC"
-                            }
-                          ]
-                        }
-                        """);
-    }
-
-    @Test
     void should_get_my_rewards_with_pending_invoice() {
         // When
         client.get()
@@ -309,50 +260,6 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_return_pending_verification_info_then_missing_payout_info_given_first_authenticated_user_with_pending_reward() {
-        // Given
-        final long githubUserId = faker.number().randomNumber();
-        final UUID userId = UUID.randomUUID();
-        final String jwt = userAuthHelper.newFakeUser(userId, githubUserId,
-                faker.rickAndMorty().character(), faker.internet().url(), false).jwt();
-        paymentRequestRepository.save(new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId,
-                new Date(), BigDecimal.ONE, null, 1, UUID.fromString("c66b929a-664d-40b9-96c4-90d3efd32a3c"),
-                CurrencyEnumEntity.usd, BigDecimal.ONE));
-
-        // When
-        client.get()
-                .uri(getApiURI(ME_GET_REWARDS, Map.of("pageIndex", "0", "pageSize", "100")))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.rewards[0].status").isEqualTo("PENDING_VERIFICATION");
-
-        userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
-                .userId(userId)
-                .billingProfileType(BillingProfileTypeEntity.INDIVIDUAL)
-                .build());
-        individualBillingProfileRepository.save(IndividualBillingProfileEntity.builder()
-                .verificationStatus(OldVerificationStatusEntity.VERIFIED)
-                .userId(userId)
-                .id(UUID.randomUUID())
-                .build());
-
-        // When
-        client.get()
-                .uri(getApiURI(ME_GET_REWARDS, Map.of("pageIndex", "0", "pageSize", "100")))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.rewards[0].status").isEqualTo("MISSING_PAYOUT_INFO");
-    }
-
-    @Test
     void should_filter_by_date() {
         // When
         client.get()
@@ -393,7 +300,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .uri(getApiURI(ME_GET_REWARDS, Map.of(
                         "pageIndex", "0",
                         "pageSize", "100",
-                        "currencies", "ETH"
+                        "currencies", currencyRepository.findByCode("ETH").orElseThrow().id().toString()
                 )))
                 .header("Authorization", BEARER_PREFIX + pierre.jwt())
                 // Then
@@ -439,10 +346,10 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                           "'298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").doesNotExist()
                 .jsonPath("$.rewardedAmount.amount").doesNotExist()
                 .jsonPath("$.rewardedAmount.currency").doesNotExist()
-                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(2260100)
+                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(2683070)
                 .jsonPath("$.pendingAmount.amount").doesNotExist()
                 .jsonPath("$.pendingAmount.currency").doesNotExist()
-                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(1510100.0)
+                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(1792080.0)
                 .jsonPath("$.receivedRewardsCount").isEqualTo(13)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(88)
                 .jsonPath("$.rewardingProjectsCount").isEqualTo(2)
@@ -471,20 +378,40 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @SneakyThrows
-    private void patchReward(@NonNull String id, Number amount, CurrencyEnumEntity currency, String invoiceReceivedAt, String paidAt) {
-        final var paymentRequestEntity = paymentRequestRepository.findById(UUID.fromString(id)).orElseThrow();
-        if (amount != null) paymentRequestEntity.setAmount(BigDecimal.valueOf(amount.doubleValue()));
-        if (currency != null) paymentRequestEntity.setCurrency(currency);
-        if (invoiceReceivedAt != null) paymentRequestEntity.setInvoiceReceivedAt(new SimpleDateFormat("yyyy-MM-dd").parse("2023-08-14"));
-        paymentRequestRepository.save(paymentRequestEntity);
+    private void patchReward(@NonNull String id, Number amount, String currencyCode, Number usdAmount, String invoiceReceivedAt, String paidAt) {
+        final var rewardEntity = rewardRepository.findById(UUID.fromString(id)).orElseThrow();
+        final var rewardStatus = rewardStatusRepository.findById(rewardEntity.getId()).orElseThrow();
+
+        if (amount != null) rewardEntity.setAmount(BigDecimal.valueOf(amount.doubleValue()));
+        if (currencyCode != null) {
+            final var currency = currencyRepository.findByCode(currencyCode).orElseThrow();
+            final var network = switch (currencyCode) {
+                case "ETH" -> NetworkEnumEntity.ethereum;
+                case "APT" -> NetworkEnumEntity.aptos;
+                case "OP" -> NetworkEnumEntity.optimism;
+                case "STRK" -> NetworkEnumEntity.starknet;
+                default -> throw new IllegalArgumentException("Currency code %s not mapped".formatted(currencyCode));
+            };
+
+            rewardEntity.setCurrency(currency);
+            rewardStatus.setNetworks(new NetworkEnumEntity[]{network});
+        }
+        rewardStatus.setAmountUsdEquivalent(usdAmount == null ? null : BigDecimal.valueOf(usdAmount.doubleValue()));
+
+        if (invoiceReceivedAt != null) {
+            final var invoiceEntity = fakeInvoice(UUID.randomUUID(), List.of(rewardEntity.getId()));
+            invoiceRepository.save(invoiceEntity);
+            rewardEntity.setInvoice(invoiceEntity);
+            // TODO check if still needed and correctly updated when invoice is uploaded
+            rewardStatus.setInvoiceReceivedAt(new SimpleDateFormat("yyyy-MM-dd").parse(invoiceReceivedAt));
+        }
 
         if (paidAt != null) {
-            final var paymentEntity = paymentRepository.findByRequestId(UUID.fromString(id)).orElse(new PaymentEntity(UUID.randomUUID(),
-                    paymentRequestEntity.getAmount(), currency.name().toUpperCase(),
-                    JacksonUtil.toJsonNode("{}"), paymentRequestEntity.getId(), new SimpleDateFormat("yyyy-MM-dd").parse(paidAt)));
-            paymentEntity.setProcessedAt(new SimpleDateFormat("yyyy-MM-dd").parse(paidAt));
-            paymentRepository.save(paymentEntity);
+            rewardStatus.setPaidAt(new SimpleDateFormat("yyyy-MM-dd").parse(paidAt));
         }
+
+        rewardRepository.save(rewardEntity);
+        rewardStatusRepository.save(rewardStatus);
     }
 
     private void patchBillingProfile(@NonNull UserAuthHelper.AuthenticatedUser user, BillingProfileTypeEntity type, OldVerificationStatusEntity status) {
@@ -501,11 +428,38 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
         }
     }
 
-    private void addQuote(@NonNull CurrencyEnumEntity currency, @NonNull Number price) {
-        cryptoUsdQuotesRepository.save(CryptoUsdQuotesEntity.builder()
-                .currency(currency)
-                .price(BigDecimal.valueOf(price.doubleValue()))
-                .updatedAt(new Date())
-                .build());
+    @SneakyThrows
+    @Transactional
+    InvoiceEntity fakeInvoice(UUID id, List<UUID> rewardIds) {
+        final var firstName = faker.name().firstName();
+        final var lastName = faker.name().lastName();
+
+        final var rewards = invoiceRewardRepository.findAll(rewardIds);
+
+        return new InvoiceEntity(
+                id,
+                UUID.randomUUID(),
+                Invoice.Number.of(12, lastName, firstName).toString(),
+                ZonedDateTime.now().minusDays(1),
+                InvoiceEntity.Status.TO_REVIEW,
+                rewards.stream().map(InvoiceRewardEntity::baseAmount).reduce(BigDecimal.ZERO, BigDecimal::add),
+                rewards.get(0).targetCurrency(),
+                new URL("https://s3.storage.com/invoice.pdf"),
+                null,
+                new InvoiceEntity.Data(
+                        ZonedDateTime.now().plusDays(9),
+                        BigDecimal.ZERO,
+                        new Invoice.PersonalInfo(
+                                firstName,
+                                lastName,
+                                faker.address().fullAddress(),
+                                faker.address().countryCode()
+                        ),
+                        null,
+                        null,
+                        List.of(new Invoice.Wallet("ETHEREUM", "vitalik.eth")),
+                        rewards
+                )
+        );
     }
 }

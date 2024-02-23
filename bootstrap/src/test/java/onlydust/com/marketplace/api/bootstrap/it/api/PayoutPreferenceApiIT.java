@@ -9,8 +9,8 @@ import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectIdEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
@@ -46,6 +46,8 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
     ProjectIdRepository projectIdRepository;
     @Autowired
     RewardRepository rewardRepository;
+    @Autowired
+    CurrencyRepository currencyRepository;
 
     @Test
     void should_get_and_put_payout_preferences() {
@@ -67,19 +69,23 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 .json("[]");
 
         final CompanyBillingProfile companyBillingProfile = billingProfileService.createCompanyBillingProfile(userId, faker.rickAndMorty().character(), null);
-        final IndividualBillingProfile individualBillingProfile = billingProfileService.createIndividualBillingProfile(userId, faker.rickAndMorty().location(), null);
-        final SelfEmployedBillingProfile selfEmployedBillingProfile = billingProfileService.createSelfEmployedBillingProfile(userId, faker.rickAndMorty().quote(), null);
+        final IndividualBillingProfile individualBillingProfile = billingProfileService.createIndividualBillingProfile(userId,
+                faker.rickAndMorty().location(), null);
+        final SelfEmployedBillingProfile selfEmployedBillingProfile = billingProfileService.createSelfEmployedBillingProfile(userId,
+                faker.rickAndMorty().quote(), null);
 
         final List<ProjectEntity> projectEntities = Stream.of(generateStubForProject(), generateStubForProject(), generateStubForProject())
                 .sorted(Comparator.comparing(ProjectEntity::getName))
                 .toList();
 
+        final var STRK = currencyRepository.findByCode("STRK").orElseThrow();
+
         rewardRepository.save(new RewardEntity(UUID.randomUUID(), projectEntities.get(0).getId(), userId.value(), authenticatedUser.user().getGithubUserId(),
-                CurrencyEnumEntity.strk, BigDecimal.ONE, new Date(), List.of(), null));
+                STRK, BigDecimal.ONE, new Date(), List.of(), null));
         rewardRepository.save(new RewardEntity(UUID.randomUUID(), projectEntities.get(1).getId(), userId.value(), authenticatedUser.user().getGithubUserId(),
-                CurrencyEnumEntity.strk, BigDecimal.ONE, new Date(), List.of(), null));
+                STRK, BigDecimal.ONE, new Date(), List.of(), null));
         rewardRepository.save(new RewardEntity(UUID.randomUUID(), projectEntities.get(2).getId(), userId.value(), authenticatedUser.user().getGithubUserId(),
-                CurrencyEnumEntity.strk, BigDecimal.ONE, new Date(), List.of(), null));
+                STRK, BigDecimal.ONE, new Date(), List.of(), null));
 
         // When
         client.get()

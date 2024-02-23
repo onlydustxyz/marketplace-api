@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardTotalAmountEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardViewEntity;
 import onlydust.com.marketplace.project.domain.view.UserRewardTotalAmountsView;
 import onlydust.com.marketplace.project.domain.view.UserRewardView;
 import onlydust.com.marketplace.project.domain.view.UserTotalRewardView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardTotalAmountEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardViewEntity;
 
 import java.util.List;
 
@@ -13,18 +13,18 @@ public interface UserRewardMapper {
     static UserRewardView mapEntityToDomain(final UserRewardViewEntity entity) {
         return UserRewardView.builder()
                 .amount(UserRewardView.RewardAmountView.builder()
-                        .dollarsEquivalent(entity.getDollarsEquivalent())
-                        .currency(entity.getCurrency().toDomain())
+                        .dollarsEquivalent(entity.getStatusData().getAmountUsdEquivalent())
+                        .currency(entity.getCurrency().toOldDomain()) // TODO: replace with correct currency
                         .total(entity.getAmount())
                         .build())
-                .rewardedOnProjectLogoUrl(entity.getLogoUrl())
-                .rewardedOnProjectName(entity.getName())
+                .rewardedOnProjectLogoUrl(entity.getProject().getLogoUrl())
+                .rewardedOnProjectName(entity.getProject().getName())
                 .numberOfRewardedContributions(entity.getContributionCount())
                 .id(entity.getId())
                 .requestedAt(entity.getRequestedAt())
-                .processedAt(entity.getProcessedAt())
-                .projectId(entity.getProjectId())
-                .status(RewardMapper.mapStatusForUser(entity.getStatus()))
+                .processedAt(entity.getStatusData().getPaidAt())
+                .projectId(entity.getProject().getId())
+                .status(entity.getStatus().forUser())
                 .build();
     }
 

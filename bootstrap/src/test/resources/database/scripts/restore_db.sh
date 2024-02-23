@@ -19,3 +19,7 @@ if ! psql -d marketplace_db -U test -f /scripts/change_data_for_testing.sql; the
   echo "Failed to apply custom modifications for tests"
   exit 1
 fi
+
+
+# Temp migrations
+psql -d marketplace_db -U test -f /scripts/migrate_rewards.sql

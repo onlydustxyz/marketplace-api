@@ -41,7 +41,7 @@ public class UserRewardView {
     @Data
     @Builder
     public static class Filters {
-        List<Currency> currencies;
+        List<UUID> currencies;
         List<UUID> projectIds;
         Date from;
         Date to;

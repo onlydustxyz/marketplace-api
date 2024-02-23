@@ -1,11 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.project.domain.model.Reward;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -14,13 +11,12 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Value
+@Data
 @Table(name = "rewards", schema = "public")
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 @Builder(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
-@TypeDef(name = "currency", typeClass = PostgreSQLEnumType.class)
 public class RewardEntity {
     @Id
     @NonNull UUID id;
@@ -28,9 +24,8 @@ public class RewardEntity {
     @NonNull UUID requestorId;
     @NonNull Long recipientId;
 
-    @Enumerated(EnumType.STRING)
-    @Type(type = "currency")
-    @NonNull CurrencyEnumEntity currency;
+    @ManyToOne
+    @NonNull CurrencyEntity currency;
 
     @NonNull BigDecimal amount;
     @NonNull Date requestedAt;
@@ -41,13 +36,13 @@ public class RewardEntity {
     @ManyToOne
     InvoiceEntity invoice;
 
-    public static RewardEntity of(Reward reward) {
+    public static RewardEntity of(Reward reward, Currency currency) {
         return RewardEntity.builder()
                 .id(reward.id())
                 .projectId(reward.projectId())
                 .requestorId(reward.requestorId())
                 .recipientId(reward.recipientId())
-                .currency(CurrencyEnumEntity.of(reward.currency()))
+                .currency(CurrencyEntity.of(currency))
                 .amount(reward.amount())
                 .requestedAt(reward.requestedAt())
                 .rewardItems(RewardItemEntity.of(reward))
@@ -61,7 +56,7 @@ public class RewardEntity {
                 requestorId,
                 recipientId,
                 amount,
-                currency.toDomain(),
+                currency.toOldDomain(),
                 requestedAt,
                 rewardItems.stream().map(RewardItemEntity::toRewardItem).toList());
     }

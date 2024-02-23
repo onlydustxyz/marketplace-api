@@ -128,14 +128,14 @@ public class MeRestApi implements MeApi {
     @Override
     public ResponseEntity<MyRewardsPageResponse> getMyRewards(Integer pageIndex, Integer pageSize,
                                                               String sort, String direction,
-                                                              List<CurrencyContract> currencies, List<UUID> projects,
+                                                              List<UUID> currencies, List<UUID> projects,
                                                               String fromDate, String toDate) {
         final var sanitizedPageSize = sanitizePageSize(pageSize);
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final var authenticatedUser = authenticationService.getAuthenticatedUser();
         final var sortBy = getSortBy(sort);
         final var filters = UserRewardView.Filters.builder()
-                .currencies(Optional.ofNullable(currencies).orElse(List.of()).stream().map(ProjectBudgetMapper::mapCurrency).toList())
+                .currencies(Optional.ofNullable(currencies).orElse(List.of()))
                 .projectIds(Optional.ofNullable(projects).orElse(List.of()))
                 .from(isNull(fromDate) ? null : DateMapper.parse(fromDate))
                 .to(isNull(toDate) ? null : DateMapper.parse(toDate))
@@ -149,13 +149,6 @@ public class MeRestApi implements MeApi {
         return myRewardsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(myRewardsPageResponse) :
                 ResponseEntity.ok(myRewardsPageResponse);
-    }
-
-    @Override
-    public ResponseEntity<RewardTotalAmountsResponse> getMyRewardTotalAmounts() {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        return ResponseEntity.ok(MyRewardMapper.mapUserRewardTotalAmountsToResponse(
-                userFacadePort.getRewardTotalAmountsForUserId(authenticatedUser.getId())));
     }
 
     @Override

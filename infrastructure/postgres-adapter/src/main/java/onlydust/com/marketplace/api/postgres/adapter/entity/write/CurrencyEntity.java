@@ -66,6 +66,10 @@ public class CurrencyEntity {
                 .build();
     }
 
+    public onlydust.com.marketplace.project.domain.model.Currency toOldDomain() {
+        return onlydust.com.marketplace.project.domain.model.Currency.valueOf(code);
+    }
+
     public enum Type {
         FIAT, CRYPTO;
 
