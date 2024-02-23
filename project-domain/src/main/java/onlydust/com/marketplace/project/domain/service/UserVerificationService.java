@@ -77,6 +77,8 @@ public class UserVerificationService implements UserVerificationFacadePort, Outb
                 .userId(companyBillingProfile.getUserId())
                 .oldVerificationStatus(companyBillingProfile.getStatus())
                 .rawReviewDetails(childrendBillingProfileUpdated.getRawReviewDetails())
+                .externalApplicantId(childrendBillingProfileUpdated.getExternalApplicantId())
+                .parentExternalApplicantId(childrendBillingProfileUpdated.getExternalApplicantId())
                 .build();
     }
 
