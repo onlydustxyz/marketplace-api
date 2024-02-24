@@ -127,7 +127,7 @@ class BillingProfileServiceTest {
             verify(invoiceStoragePort).deleteDraftsOf(billingProfileId);
 
             final var invoiceCaptor = ArgumentCaptor.forClass(Invoice.class);
-            verify(invoiceStoragePort).save(invoiceCaptor.capture());
+            verify(invoiceStoragePort).create(invoiceCaptor.capture());
             final var invoice = invoiceCaptor.getValue();
             assertThat(invoice.id()).isEqualTo(preview.id());
             assertThat(invoice.billingProfileId()).isEqualTo(billingProfileId);
@@ -143,7 +143,9 @@ class BillingProfileServiceTest {
             // Given
             final var reward = fakeReward(Invoice.Id.random());
             invoice.rewards().add(reward);
+            invoice.status(Invoice.Status.APPROVED);
             when(invoiceStoragePort.preview(billingProfileId, rewardIds)).thenReturn(invoice);
+            when(invoiceStoragePort.get(reward.invoiceId())).thenReturn(Optional.of(invoice));
 
             // When
             assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))
@@ -208,7 +210,7 @@ class BillingProfileServiceTest {
 
             // Then
             final var invoiceCaptor = ArgumentCaptor.forClass(Invoice.class);
-            verify(invoiceStoragePort).save(invoiceCaptor.capture());
+            verify(invoiceStoragePort).update(invoiceCaptor.capture());
             verify(pdfStoragePort).upload(invoice.id() + ".pdf", pdf);
             final var invoice = invoiceCaptor.getValue();
             assertThat(invoice.url()).isEqualTo(url);
@@ -270,7 +272,7 @@ class BillingProfileServiceTest {
 
             // Then
             final var invoiceCaptor = ArgumentCaptor.forClass(Invoice.class);
-            verify(invoiceStoragePort).save(invoiceCaptor.capture());
+            verify(invoiceStoragePort).update(invoiceCaptor.capture());
             verify(pdfStoragePort).upload(invoice.id() + ".pdf", pdf);
             final var invoice = invoiceCaptor.getValue();
             assertThat(invoice.url()).isEqualTo(url);

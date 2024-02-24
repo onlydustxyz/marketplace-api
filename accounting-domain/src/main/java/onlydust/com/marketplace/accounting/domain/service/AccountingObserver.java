@@ -59,7 +59,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
         invoiceStorage.invoiceOf(rewardId).ifPresent(invoice -> {
             if (invoice.rewards().stream().allMatch(reward -> rewardStatusStorage.get(reward.id()).map(RewardStatus::isPaid)
                     .orElseThrow(() -> notFound("RewardStatus not found for reward %s".formatted(rewardId))))) {
-                invoiceStorage.save(invoice.status(Invoice.Status.PAID));
+                invoiceStorage.update(invoice.status(Invoice.Status.PAID));
             }
         });
     }

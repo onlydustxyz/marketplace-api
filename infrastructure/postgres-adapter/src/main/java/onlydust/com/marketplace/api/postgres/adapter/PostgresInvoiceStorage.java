@@ -14,8 +14,8 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OldBankAcc
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OldWalletEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.BankAccountRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.OldWalletRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.springframework.data.domain.PageRequest;
@@ -68,8 +68,8 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
 
     @Override
     @Transactional
-    public void save(final @NonNull Invoice invoice) {
-        final var entity = invoiceRepository.findById(invoice.id().value()).orElse(new InvoiceEntity().id(invoice.id().value()));
+    public void create(final @NonNull Invoice invoice) {
+        final var entity = new InvoiceEntity().id(invoice.id().value());
         entity.updateWith(invoice);
         invoiceRepository.saveAndFlush(entity);
 
@@ -78,6 +78,16 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
         paymentRequestRepository.saveAll(paymentRequests);
 
         //TODO: save invoiceId in rewards
+    }
+
+    @Override
+    @Transactional
+    public void update(final @NonNull Invoice invoice) {
+        final var entity = invoiceRepository.findById(invoice.id().value())
+                .orElseThrow(() -> notFound("Invoice %s not found".formatted(invoice.id())));
+
+        entity.updateWith(invoice);
+        invoiceRepository.save(entity);
     }
 
     @Override

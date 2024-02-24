@@ -2,7 +2,10 @@ package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.InvoiceDownload;
+import onlydust.com.marketplace.accounting.domain.model.ProjectId;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
@@ -71,9 +74,11 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
         final var invoice = invoiceStoragePort.preview(billingProfileId, rewardIds);
 
-        if (invoice.rewards().stream().map(Invoice.Reward::invoiceId).anyMatch(Objects::nonNull)) throw badRequest("Some rewards are already invoiced");
+        if (invoice.rewards().stream().map(Invoice.Reward::invoiceId).filter(Objects::nonNull)
+                .anyMatch(i -> invoiceStoragePort.get(i).orElseThrow().status().isActive()))
+            throw badRequest("Some rewards are already invoiced");
 
-        invoiceStoragePort.save(invoice);
+        invoiceStoragePort.create(invoice);
 
         return invoice;
     }
@@ -118,7 +123,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .orElseThrow(() -> notFound("Invoice %s not found for billing profile %s".formatted(invoiceId, billingProfileId)));
 
         final var url = pdfStoragePort.upload(invoice.internalFileName(), data);
-        invoiceStoragePort.save(invoice
+        invoiceStoragePort.update(invoice
                 .status(status)
                 .url(url)
                 .originalFileName(fileName));
