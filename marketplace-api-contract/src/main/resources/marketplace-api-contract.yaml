@@ -6119,6 +6119,7 @@ components:
             - firstName
             - lastName
             - address
+            - countryCode
           properties:
             firstName:
               type: string
@@ -6126,6 +6127,9 @@ components:
               type: string
             address:
               type: string
+            countryCode:
+              type: string
+              format: iso-country-code
         companyBillingProfile:
           type: object
           required:
@@ -6133,6 +6137,7 @@ components:
             - name
             - address
             - vatRegulationState
+            - countryCode
           properties:
             registrationNumber:
               type: string
@@ -6144,6 +6149,9 @@ components:
               $ref: '#/components/schemas/VatRegulationState'
             euVATNumber:
               type: string
+            countryCode:
+              type: string
+              format: iso-country-code
         destinationAccounts:
           $ref: '#/components/schemas/DestinationAccountResponse'
         rewards:

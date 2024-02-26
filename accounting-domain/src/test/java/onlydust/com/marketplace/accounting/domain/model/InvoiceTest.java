@@ -30,7 +30,7 @@ class InvoiceTest {
 
     @Nested
     class GivenAnIndividual {
-        final Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1, new Invoice.PersonalInfo("John", "Doe", "123 Main St"))
+        final Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1, new Invoice.PersonalInfo("John", "Doe", "123 Main St", "FRA"))
                 .rewards(List.of(
                         new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                 Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
@@ -65,7 +65,7 @@ class InvoiceTest {
     @Nested
     class GivenACompanyOutsideOfEurope {
         final Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1,
-                        new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", false, false, false, null))
+                        new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", "USA", false, false, false, null))
                 .rewards(List.of(
                         new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                 Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
@@ -105,7 +105,7 @@ class InvoiceTest {
     @Nested
     class GivenAFrenchCompanySubjectToVAT {
         final Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1,
-                        new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", true, true, true, "666"))
+                        new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", "FRA", true, true, true, "666"))
                 .rewards(List.of(
                         new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                 Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
@@ -146,7 +146,7 @@ class InvoiceTest {
     @Nested
     class GivenAFrenchCompanyNonSubjectToVAT {
         final Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1,
-                        new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", false, true, true, "666"))
+                        new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", "FRA", false, true, true, "666"))
                 .rewards(List.of(
                         new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                 Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
@@ -187,7 +187,7 @@ class InvoiceTest {
     @Nested
     class GivenANonFrenchEuropeanCompany {
         final Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1,
-                        new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", false, true, false, "666"))
+                        new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", "ITA", false, true, false, "666"))
                 .rewards(List.of(
                         new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                 Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),

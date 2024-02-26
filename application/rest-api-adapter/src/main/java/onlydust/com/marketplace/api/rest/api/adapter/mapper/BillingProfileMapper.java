@@ -167,7 +167,9 @@ public interface BillingProfileMapper {
         return new InvoicePreviewResponseIndividualBillingProfile()
                 .firstName(personalInfo.firstName())
                 .lastName(personalInfo.lastName())
-                .address(personalInfo.address());
+                .address(personalInfo.address())
+                .countryCode(personalInfo.countryCode())
+                ;
     }
 
     static InvoicePreviewResponseCompanyBillingProfile map(Invoice.CompanyInfo companyInfo) {
@@ -177,6 +179,7 @@ public interface BillingProfileMapper {
                 .registrationNumber(companyInfo.registrationNumber())
                 .vatRegulationState(map(companyInfo.vatRegulationState()))
                 .euVATNumber(companyInfo.euVATNumber())
+                .countryCode(companyInfo.countryCode())
                 ;
     }
 

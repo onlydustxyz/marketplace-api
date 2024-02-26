@@ -49,7 +49,7 @@ class BillingProfileServiceTest {
     final List<Invoice.Reward> rewards = List.of(fakeReward(), fakeReward(), fakeReward());
     final List<RewardId> rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
     final Invoice invoice = Invoice.of(billingProfileId, 12,
-            new Invoice.PersonalInfo("John", "Doe", "12 rue de la paix, Paris")).rewards(new ArrayList<>(rewards));
+            new Invoice.PersonalInfo("John", "Doe", "12 rue de la paix, Paris", "FRA")).rewards(new ArrayList<>(rewards));
     final InputStream pdf = new ByteArrayInputStream(faker.lorem().paragraph().getBytes());
 
     @BeforeEach

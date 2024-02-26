@@ -27,7 +27,7 @@ class InvoiceServiceTest {
     private final InvoiceService invoiceService = new InvoiceService(invoiceStoragePort, pdfStoragePort);
     private final Faker faker = new Faker();
     final Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1,
-            new Invoice.PersonalInfo("John", "Doe", "123 Main St"));
+            new Invoice.PersonalInfo("John", "Doe", "123 Main St", "FRA"));
     final InputStream pdf = new ByteArrayInputStream(faker.lorem().paragraph().getBytes());
 
     @BeforeEach

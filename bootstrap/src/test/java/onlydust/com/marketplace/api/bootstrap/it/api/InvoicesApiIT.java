@@ -141,7 +141,8 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                          "individualBillingProfile": {
                            "firstName": "Anthony",
                            "lastName": "BUISSET",
-                           "address": "771 chemin de la sine, 06140, Vence, France"
+                           "address": "771 chemin de la sine, 06140, Vence, France",
+                           "countryCode": "FRA"
                          },
                          "companyBillingProfile": null,
                          "destinationAccounts": {
@@ -294,7 +295,8 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                           "individualBillingProfile": {
                             "firstName": "Anthony",
                             "lastName": "BUISSET",
-                            "address": "771 chemin de la sine, 06140, Vence, France"
+                            "address": "771 chemin de la sine, 06140, Vence, France",
+                            "countryCode": "FRA"
                           },
                           "companyBillingProfile": null,
                           "destinationAccounts": {
@@ -727,7 +729,6 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
         ;
     }
 

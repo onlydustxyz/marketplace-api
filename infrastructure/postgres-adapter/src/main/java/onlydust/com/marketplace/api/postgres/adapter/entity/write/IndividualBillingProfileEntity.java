@@ -60,7 +60,7 @@ public class IndividualBillingProfileEntity {
     private Date updatedAt;
 
     public Invoice.PersonalInfo forInvoice() {
-        return new Invoice.PersonalInfo(firstName, lastName, address);
+        return new Invoice.PersonalInfo(firstName, lastName, address, country);
     }
 
     public enum IdDocumentTypeEnumEntity {

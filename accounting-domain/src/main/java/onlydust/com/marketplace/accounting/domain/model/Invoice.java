@@ -165,13 +165,14 @@ public class Invoice {
     public record BankAccount(@NonNull String bic, @NonNull String accountNumber) {
     }
 
-    public record PersonalInfo(@NonNull String firstName, @NonNull String lastName, @NonNull String address) {
+    public record PersonalInfo(@NonNull String firstName, @NonNull String lastName, @NonNull String address, @NonNull String countryCode) {
     }
 
     // TODO, store the vatRegulationState
     public record CompanyInfo(@NonNull String registrationNumber,
                               @NonNull String name,
                               @NonNull String address,
+                              @NonNull String countryCode,
                               @NonNull Boolean subjectToEuVAT,
                               @NonNull Boolean inEuropeanUnion,
                               @NonNull Boolean isFrance,

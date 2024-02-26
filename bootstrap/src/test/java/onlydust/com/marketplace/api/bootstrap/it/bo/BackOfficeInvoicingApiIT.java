@@ -291,7 +291,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         new Invoice.PersonalInfo(
                                 firstName,
                                 lastName,
-                                faker.address().fullAddress()
+                                faker.address().fullAddress(),
+                                faker.address().countryCode()
                         ),
                         null,
                         null,
