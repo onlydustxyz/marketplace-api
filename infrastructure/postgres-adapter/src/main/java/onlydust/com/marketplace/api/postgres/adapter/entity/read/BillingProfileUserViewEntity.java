@@ -44,6 +44,7 @@ public class BillingProfileUserViewEntity {
     String githubHtmlUrl;
     Date joinedAt;
     Date invitedAt;
+    Integer rewardCount;
 
     public BillingProfileCoworkerView toView() {
         return BillingProfileCoworkerView.builder()
@@ -55,7 +56,7 @@ public class BillingProfileUserViewEntity {
                 .githubHtmlUrl(githubHtmlUrl != null ? URI.create(githubHtmlUrl) : null)
                 .joinedAt(joinedAt != null ? ZonedDateTime.ofInstant(joinedAt.toInstant(), ZoneOffset.UTC) : null)
                 .invitedAt(invitedAt != null ? ZonedDateTime.ofInstant(invitedAt.toInstant(), ZoneOffset.UTC) : null)
-                //TODO: removable?
+                .rewardCount(rewardCount)
                 .build();
     }
 

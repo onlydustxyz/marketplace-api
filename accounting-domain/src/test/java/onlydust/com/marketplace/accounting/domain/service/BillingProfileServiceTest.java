@@ -12,6 +12,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -759,6 +760,126 @@ class BillingProfileServiceTest {
         // Then
         assertNotNull(payoutInfo);
         verify(billingProfileStoragePort).findPayoutInfoByBillingProfile(billingProfileId);
+    }
+
+    @Test
+    void should_get_coworkers_last_admin() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+
+        // When
+        when(billingProfileStorage.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStorage.findCoworkersByBillingProfile(billingProfileId, 0, 10))
+                .thenReturn(Page.<BillingProfileCoworkerView>builder().content(List.of(
+                        BillingProfileCoworkerView.builder()
+                                .githubUserId(faker.number().randomNumber(10, true))
+                                .role(BillingProfile.User.Role.ADMIN)
+                                .rewardCount(0)
+                                .build()
+                )).build());
+
+        final var coworkers = billingProfileService.getCoworkers(billingProfileId, userIAdmin, 0, 10);
+
+        // Then
+        assertThat(coworkers.getContent()).hasSize(1);
+        assertThat(coworkers.getContent().get(0).removable()).isFalse(); // Cannot remove the last admin
+    }
+
+    @Test
+    void should_get_coworkers_non_last_admin() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+
+        // When
+        when(billingProfileStorage.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStorage.findCoworkersByBillingProfile(billingProfileId, 0, 10))
+                .thenReturn(Page.<BillingProfileCoworkerView>builder().content(List.of(
+                        BillingProfileCoworkerView.builder()
+                                .githubUserId(faker.number().randomNumber(10, true))
+                                .role(BillingProfile.User.Role.ADMIN)
+                                .rewardCount(0)
+                                .build(),
+                        BillingProfileCoworkerView.builder()
+                                .githubUserId(faker.number().randomNumber(10, true))
+                                .role(BillingProfile.User.Role.ADMIN)
+                                .rewardCount(0)
+                                .build()
+                )).build());
+
+        final var coworkers = billingProfileService.getCoworkers(billingProfileId, userIAdmin, 0, 10);
+
+        // Then
+        assertThat(coworkers.getContent()).hasSize(2);
+        assertThat(coworkers.getContent().get(0).removable()).isTrue();
+        assertThat(coworkers.getContent().get(1).removable()).isTrue();
+    }
+
+    @Test
+    void should_get_coworkers_member() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+
+        // When
+        when(billingProfileStorage.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStorage.findCoworkersByBillingProfile(billingProfileId, 0, 10))
+                .thenReturn(Page.<BillingProfileCoworkerView>builder().content(List.of(
+                        BillingProfileCoworkerView.builder()
+                                .githubUserId(faker.number().randomNumber(10, true))
+                                .role(BillingProfile.User.Role.ADMIN)
+                                .rewardCount(0)
+                                .build(),
+                        BillingProfileCoworkerView.builder()
+                                .githubUserId(faker.number().randomNumber(10, true))
+                                .role(BillingProfile.User.Role.MEMBER)
+                                .rewardCount(0)
+                                .build()
+                )).build());
+
+        final var coworkers = billingProfileService.getCoworkers(billingProfileId, userIAdmin, 0, 10);
+
+        // Then
+        assertThat(coworkers.getContent()).hasSize(2);
+        assertThat(coworkers.getContent().get(0).removable()).isFalse();
+        assertThat(coworkers.getContent().get(1).removable()).isTrue();
+    }
+
+    @Test
+    void should_get_coworkers_member_with_rewards() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+
+        // When
+        when(billingProfileStorage.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStorage.findCoworkersByBillingProfile(billingProfileId, 0, 10))
+                .thenReturn(Page.<BillingProfileCoworkerView>builder().content(List.of(
+                        BillingProfileCoworkerView.builder()
+                                .githubUserId(faker.number().randomNumber(10, true))
+                                .role(BillingProfile.User.Role.ADMIN)
+                                .rewardCount(0)
+                                .build(),
+                        BillingProfileCoworkerView.builder()
+                                .githubUserId(faker.number().randomNumber(10, true))
+                                .role(BillingProfile.User.Role.ADMIN)
+                                .rewardCount(1)
+                                .build(),
+                        BillingProfileCoworkerView.builder()
+                                .githubUserId(faker.number().randomNumber(10, true))
+                                .role(BillingProfile.User.Role.MEMBER)
+                                .rewardCount(1)
+                                .build()
+                )).build());
+
+        final var coworkers = billingProfileService.getCoworkers(billingProfileId, userIAdmin, 0, 10);
+
+        // Then
+        assertThat(coworkers.getContent()).hasSize(3);
+        assertThat(coworkers.getContent().get(0).removable()).isTrue();
+        assertThat(coworkers.getContent().get(1).removable()).isFalse();
+        assertThat(coworkers.getContent().get(2).removable()).isFalse();
     }
 
 

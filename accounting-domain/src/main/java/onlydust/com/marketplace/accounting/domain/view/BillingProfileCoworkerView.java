@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain.view;
 
 import lombok.Builder;
 import lombok.Value;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.UserId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 
@@ -9,7 +10,8 @@ import java.net.URI;
 import java.time.ZonedDateTime;
 
 @Value
-@Builder
+@Builder(toBuilder = true)
+@Accessors(fluent = true)
 public class BillingProfileCoworkerView {
     UserId userId;
     Long githubUserId;
@@ -19,5 +21,7 @@ public class BillingProfileCoworkerView {
     BillingProfile.User.Role role;
     ZonedDateTime joinedAt;
     ZonedDateTime invitedAt;
+    int rewardCount;
+
     Boolean removable;
 }

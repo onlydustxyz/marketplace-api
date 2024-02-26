@@ -188,6 +188,17 @@ public class BillingProfileService implements BillingProfileFacadePort {
     public Page<BillingProfileCoworkerView> getCoworkers(BillingProfile.Id billingProfileId, UserId userId, int pageIndex, int pageSize) {
         if (!billingProfileStorage.isAdmin(billingProfileId, userId))
             throw unauthorized("User %s must be admin to list coworkers of billing profile %s".formatted(userId.value(), billingProfileId.value()));
-        return billingProfileStorage.findCoworkersByBillingProfile(billingProfileId, pageIndex, pageSize);
+        final var coworkers = billingProfileStorage.findCoworkersByBillingProfile(billingProfileId, pageIndex, pageSize);
+
+        final var adminCount = coworkers.getContent().stream().filter(coworker -> coworker.role().equals(BillingProfile.User.Role.ADMIN)).count();
+        return Page.<BillingProfileCoworkerView>builder()
+                .content(coworkers.getContent().stream().map(coworker ->
+                        coworker.toBuilder()
+                                .removable((adminCount > 1 || coworker.role().equals(BillingProfile.User.Role.MEMBER)) && coworker.rewardCount() == 0)
+                                .build()
+                ).toList())
+                .totalPageNumber(coworkers.getTotalPageNumber())
+                .totalItemNumber(coworkers.getTotalItemNumber())
+                .build();
     }
 }

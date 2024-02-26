@@ -285,18 +285,18 @@ public interface BillingProfileMapper {
 
     static BillingProfileCoworkersPageItemResponse coworkerToResponse(BillingProfileCoworkerView billingProfileCoworkerView) {
         return new BillingProfileCoworkersPageItemResponse()
-                .githubUserId(billingProfileCoworkerView.getGithubUserId())
-                .login(billingProfileCoworkerView.getLogin())
-                .avatarUrl(billingProfileCoworkerView.getAvatarUrl())
-                .htmlUrl(billingProfileCoworkerView.getGithubHtmlUrl())
+                .githubUserId(billingProfileCoworkerView.githubUserId())
+                .login(billingProfileCoworkerView.login())
+                .avatarUrl(billingProfileCoworkerView.avatarUrl())
+                .htmlUrl(billingProfileCoworkerView.githubHtmlUrl())
                 .isRegistered(true)
-                .role(switch (billingProfileCoworkerView.getRole()) {
+                .role(switch (billingProfileCoworkerView.role()) {
                     case ADMIN -> BillingProfileCoworkerRole.ADMIN;
                     case MEMBER -> BillingProfileCoworkerRole.MEMBER;
                 })
-                .removable(billingProfileCoworkerView.getRemovable())
-                .invitedAt(billingProfileCoworkerView.getInvitedAt())
-                .joinedAt(billingProfileCoworkerView.getJoinedAt());
+                .removable(billingProfileCoworkerView.removable())
+                .invitedAt(billingProfileCoworkerView.invitedAt())
+                .joinedAt(billingProfileCoworkerView.joinedAt());
 
     }
 }
