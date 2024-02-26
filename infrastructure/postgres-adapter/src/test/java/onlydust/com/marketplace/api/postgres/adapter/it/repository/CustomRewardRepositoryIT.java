@@ -1,8 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
-import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
-import onlydust.com.marketplace.project.domain.model.UserRole;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
@@ -17,6 +15,8 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuo
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
+import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
+import onlydust.com.marketplace.project.domain.model.UserRole;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -99,7 +99,7 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
                             .ignoreCodeReviews(false)
                             .build());
             paymentRequestRepository.save(new PaymentRequestEntity(rewardId, UUID.randomUUID(), githubUserId,
-                    new Date(), BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.lords));
+                    new Date(), BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.lords, BigDecimal.ONE));
 
             // When
             final RewardViewEntity userReward = customRewardRepository.findUserRewardViewEntityByd(rewardId);
@@ -195,7 +195,7 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
                             .ignoreCodeReviews(false)
                             .build());
             paymentRequestRepository.save(new PaymentRequestEntity(rewardId, UUID.randomUUID(), githubUserId,
-                    new Date(), BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.lords));
+                    new Date(), BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.lords, BigDecimal.ONE));
 
             // When
             final RewardViewEntity userReward = customRewardRepository.findUserRewardViewEntityByd(rewardId);

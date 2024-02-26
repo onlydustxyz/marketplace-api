@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.contract.model.UserPayoutSettingsRequest;
+import onlydust.com.marketplace.api.contract.model.UserPayoutSettingsResponse;
+import onlydust.com.marketplace.api.contract.model.UserPayoutSettingsResponseSepaAccount;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
@@ -288,7 +290,7 @@ public class MePayoutSettingsApiIT extends AbstractMarketplaceApiIT {
 
         // Given
         paymentRequestRepository.save(new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId,
-                new Date(), BigDecimal.ONE, null, 1, UUID.randomUUID(), CurrencyEnumEntity.op));
+                new Date(), BigDecimal.ONE, null, 1, UUID.randomUUID(), CurrencyEnumEntity.op, BigDecimal.ONE));
 
         // When
         client.get()
@@ -308,7 +310,7 @@ public class MePayoutSettingsApiIT extends AbstractMarketplaceApiIT {
 
         // Given
         paymentRequestRepository.save(new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId,
-                new Date(), BigDecimal.ONE, null, 1, UUID.randomUUID(), CurrencyEnumEntity.usd));
+                new Date(), BigDecimal.ONE, null, 1, UUID.randomUUID(), CurrencyEnumEntity.usd, BigDecimal.ONE));
 
         // When
         client.get()

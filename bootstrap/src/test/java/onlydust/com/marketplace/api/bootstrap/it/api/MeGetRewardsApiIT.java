@@ -2,12 +2,11 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CompanyBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndividualBillingProfileEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.OldVerificationStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
@@ -20,6 +19,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepos
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
+import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -72,7 +72,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
             }
             """;
     private static final String GET_USER_REWARDS_WITH_MULTI_CURRENCIES_RESPONSE_JSON = """
-           
+                       
             {
              "rewards": [
                {
@@ -190,7 +190,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
              "rewardingProjectsCount": 1
 
                       }
-           
+                       
             """;
     private static final String ME_GET_REWARDS_RESPONSE_JSON = """
             {
@@ -556,7 +556,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 faker.rickAndMorty().character(), faker.internet().url(), false).jwt();
         paymentRequestRepository.save(new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId,
                 new Date(), BigDecimal.ONE, null, 1, UUID.fromString("c66b929a-664d-40b9-96c4-90d3efd32a3c"),
-                CurrencyEnumEntity.usd));
+                CurrencyEnumEntity.usd, BigDecimal.ONE));
 
         // When
         client.get()
