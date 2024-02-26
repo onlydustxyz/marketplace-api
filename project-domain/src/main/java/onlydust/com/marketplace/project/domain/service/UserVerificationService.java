@@ -61,13 +61,17 @@ public class UserVerificationService implements UserVerificationFacadePort, Outb
     }
 
     private BillingProfileUpdated processChildrenBillingProfile(final BillingProfileUpdated childrendBillingProfileUpdated) {
-        final OldCompanyBillingProfile parentCompanyBillingProfile =
+        OldCompanyBillingProfile parentCompanyBillingProfile =
                 oldBillingProfileStoragePort.findCompanyByExternalVerificationId(childrendBillingProfileUpdated.getParentExternalApplicantId())
                         .orElseThrow(() -> new OutboxSkippingException("Parent billing profile not found for external parent id %s"
                                 .formatted(childrendBillingProfileUpdated.getParentExternalApplicantId())));
         oldBillingProfileStoragePort.saveChildrenKyc(childrendBillingProfileUpdated.getExternalApplicantId(),
                 childrendBillingProfileUpdated.getParentExternalApplicantId(),
                 childrendBillingProfileUpdated.getOldVerificationStatus());
+        final OldCompanyBillingProfile oldCompanyBillingProfile = userVerificationStoragePort.updateCompanyVerification(parentCompanyBillingProfile);
+        parentCompanyBillingProfile = parentCompanyBillingProfile.toBuilder()
+                .status(oldCompanyBillingProfile.getStatus())
+                .build();
         final OldCompanyBillingProfile updatedCompanyBillingProfile =
                 parentCompanyBillingProfile.updateStatusFromNewChildrenStatuses(oldBillingProfileStoragePort.findKycStatusesFromParentKybExternalVerificationId(childrendBillingProfileUpdated.getParentExternalApplicantId()));
         final OldCompanyBillingProfile companyBillingProfile = oldBillingProfileStoragePort.saveCompanyProfile(updatedCompanyBillingProfile);
@@ -93,7 +97,7 @@ public class UserVerificationService implements UserVerificationFacadePort, Outb
                         .map(companyBillingProfile -> companyBillingProfile.updateStatusFromNewChildrenStatuses(
                                 oldBillingProfileStoragePort.findKycStatusesFromParentKybExternalVerificationId(companyBillingProfile.getExternalApplicantId()))
                         )
-                        .map(companyBillingProfile1 -> userVerificationStoragePort.updateCompanyVerification(companyBillingProfile1))
+                        .map(userVerificationStoragePort::updateCompanyVerification)
                         .orElseThrow(() -> new OutboxSkippingException(String.format("Skipping unknown Sumsub external id %s",
                                 billingProfileUpdated.getBillingProfileId()))));
     }

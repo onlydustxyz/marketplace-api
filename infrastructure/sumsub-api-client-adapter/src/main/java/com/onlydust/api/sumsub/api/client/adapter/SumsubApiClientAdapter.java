@@ -6,10 +6,10 @@ import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubIndividualApplicants
 import com.onlydust.api.sumsub.api.client.adapter.mapper.SumsubResponseMapper;
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.OldCompanyBillingProfile;
 import onlydust.com.marketplace.project.domain.model.OldIndividualBillingProfile;
 import onlydust.com.marketplace.project.domain.port.output.UserVerificationStoragePort;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -60,8 +60,6 @@ public class SumsubApiClientAdapter implements UserVerificationStoragePort {
         final String path = String.format("/resources/applicants/-;externalUserId=%s/one", billingProfileId.toString());
         final String digest = SumsubSignatureVerifier.hmac((now + method + path).getBytes(StandardCharsets.UTF_8),
                 sumsubClientProperties.getSecretKey());
-        System.out.println("Now : %s".formatted(now));
-        System.out.println("Digest : %s".formatted(digest));
         return sumsubHttpClient.send(path, HttpMethod.GET, null, SumsubCompanyApplicantsDataDTO.class, X_APP_TOKEN, sumsubClientProperties.getAppToken(),
                         X_APP_ACCESS_TS, now, X_APP_ACCESS_SIG, digest)
                 .orElseThrow(() -> OnlyDustException.notFound(String.format("Applicants data not found on Sumsub for externalUserId = %s", billingProfileId)));

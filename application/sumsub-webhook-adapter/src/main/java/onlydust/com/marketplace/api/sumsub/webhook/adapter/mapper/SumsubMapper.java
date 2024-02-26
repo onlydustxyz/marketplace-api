@@ -52,7 +52,7 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
     private BillingProfileUpdated mapToChildrenBillingProfile(SumsubWebhookEventDTO sumsubWebhookEventDTO) {
         return BillingProfileUpdated.builder()
                 .type(applicationTypeToDomain(sumsubWebhookEventDTO.getApplicantType()))
-                .oldVerificationStatus(typeAndReviewResultToDomain(sumsubWebhookEventDTO.getType(), sumsubWebhookEventDTO.getReviewStatus(),
+                .oldVerificationStatus(typeAndReviewResultToDomain(sumsubWebhookEventDTO.getReviewStatus(),
                         sumsubWebhookEventDTO.getReviewResult()))
                 .reviewMessageForApplicant(reviewMessageForApplicantToDomain(sumsubWebhookEventDTO.getReviewResult()))
                 .rawReviewDetails(rawReviewToString(sumsubWebhookEventDTO.getReviewResult()))
@@ -66,7 +66,7 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
         return BillingProfileUpdated.builder()
                 .billingProfileId(billingProfileId)
                 .type(applicationTypeToDomain(sumsubWebhookEventDTO.getApplicantType()))
-                .oldVerificationStatus(typeAndReviewResultToDomain(sumsubWebhookEventDTO.getType(), sumsubWebhookEventDTO.getReviewStatus(),
+                .oldVerificationStatus(typeAndReviewResultToDomain(sumsubWebhookEventDTO.getReviewStatus(),
                         sumsubWebhookEventDTO.getReviewResult()))
                 .reviewMessageForApplicant(reviewMessageForApplicantToDomain(sumsubWebhookEventDTO.getReviewResult()))
                 .rawReviewDetails(rawReviewToString(sumsubWebhookEventDTO.getReviewResult()))
@@ -90,30 +90,27 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
         return null;
     }
 
-    private OldVerificationStatus typeAndReviewResultToDomain(final String type, final String reviewStatus,
+    private OldVerificationStatus typeAndReviewResultToDomain(final String reviewStatus,
                                                               final SumsubWebhookEventDTO.ReviewResultDTO reviewResult) {
-        return switch (type) {
-            case "applicantCreated" -> OldVerificationStatus.STARTED;
-            case "applicantPending" -> OldVerificationStatus.UNDER_REVIEW;
-            case "applicantOnHold" -> OldVerificationStatus.UNDER_REVIEW;
-            case "applicantReviewed" -> switch (reviewStatus) {
-                case "completed":
-                    final Optional<Answer> answer = reviewResultToAnswer(reviewResult);
-                    if (answer.isPresent()) {
-                        yield switch (answer.get()) {
-                            case RED -> {
-                                if (isAFinalRejection(reviewResult)) {
-                                    yield OldVerificationStatus.CLOSED;
-                                } else {
-                                    yield OldVerificationStatus.REJECTED;
-                                }
+        return switch (reviewStatus) {
+            case "init" -> OldVerificationStatus.STARTED;
+            case "completed" -> {
+                final Optional<Answer> answer = reviewResultToAnswer(reviewResult);
+                if (answer.isPresent()) {
+                    yield switch (answer.get()) {
+                        case RED -> {
+                            if (isAFinalRejection(reviewResult)) {
+                                yield OldVerificationStatus.CLOSED;
+                            } else {
+                                yield OldVerificationStatus.REJECTED;
                             }
-                            case GREEN -> OldVerificationStatus.VERIFIED;
-                        };
-                    }
-                default:
+                        }
+                        case GREEN -> OldVerificationStatus.VERIFIED;
+                    };
+                } else {
                     yield OldVerificationStatus.UNDER_REVIEW;
-            };
+                }
+            }
             default -> OldVerificationStatus.UNDER_REVIEW;
         };
     }
