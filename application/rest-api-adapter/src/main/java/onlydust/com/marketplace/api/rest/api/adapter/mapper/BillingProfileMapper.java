@@ -169,6 +169,7 @@ public interface BillingProfileMapper {
                 .lastName(personalInfo.lastName())
                 .address(personalInfo.address())
                 .countryCode(personalInfo.countryCode())
+                .country(personalInfo.countryName())
                 ;
     }
 
@@ -180,6 +181,7 @@ public interface BillingProfileMapper {
                 .vatRegulationState(map(companyInfo.vatRegulationState()))
                 .euVATNumber(companyInfo.euVATNumber())
                 .countryCode(companyInfo.countryCode())
+                .country(companyInfo.countryName())
                 ;
     }
 

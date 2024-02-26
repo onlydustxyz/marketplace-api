@@ -6127,6 +6127,9 @@ components:
               type: string
             address:
               type: string
+            country:
+              deprecated: true
+              type: string
             countryCode:
               type: string
               format: iso-country-code
@@ -6148,6 +6151,9 @@ components:
             vatRegulationState:
               $ref: '#/components/schemas/VatRegulationState'
             euVATNumber:
+              type: string
+            country:
+              deprecated: true
               type: string
             countryCode:
               type: string

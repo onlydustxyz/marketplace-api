@@ -166,6 +166,10 @@ public class Invoice {
     }
 
     public record PersonalInfo(@NonNull String firstName, @NonNull String lastName, @NonNull String address, @NonNull String countryCode) {
+        @Deprecated
+        public String countryName() {
+            return Country.fromIso3(countryCode).display().orElse(countryCode);
+        }
     }
 
     // TODO, store the vatRegulationState
@@ -183,6 +187,11 @@ public class Invoice {
             if (!isFrance) return VatRegulationState.REVERSE_CHARGE;
             if (!subjectToEuVAT) return VatRegulationState.NOT_APPLICABLE_FRENCH_NOT_SUBJECT;
             return VatRegulationState.APPLICABLE;
+        }
+
+        @Deprecated
+        public String countryName() {
+            return Country.fromIso3(countryCode).display().orElse(countryCode);
         }
     }
 
