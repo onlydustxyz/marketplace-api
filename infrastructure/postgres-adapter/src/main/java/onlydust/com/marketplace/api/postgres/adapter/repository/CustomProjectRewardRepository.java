@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectRewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
+import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
 import org.intellij.lang.annotations.Language;
 
 import javax.persistence.EntityManager;
@@ -48,7 +48,7 @@ public class CustomProjectRewardRepository {
                       pr.amount,
                       pr.currency,
                       (select count(id) from work_items wi where wi.payment_id = pr.id)                        contribution_count,
-                      case when pr.currency = 'usd' then pr.amount else cuq.price * pr.amount end dollars_equivalent,
+                      pr.usd_amount as dollars_equivalent,
                       case
                           when u.id is null then 'PENDING_SIGNUP'
                           when not coalesce(bpc.billing_profile_verified, false) then 'PENDING_CONTRIBUTOR'
@@ -67,7 +67,6 @@ public class CustomProjectRewardRepository {
                from payment_requests pr
                         join indexer_exp.github_accounts gu on gu.id = pr.recipient_id
                         left join iam.users u on gu.id = u.github_user_id
-                        left join crypto_usd_quotes cuq on cuq.currency = pr.currency
                         left join payments r on r.request_id = pr.id
                         left join billing_profile_check bpc on bpc.user_id = u.id
                         LEFT JOIN payout_checks ON payout_checks.github_user_id = pr.recipient_id

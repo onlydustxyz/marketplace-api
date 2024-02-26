@@ -5,13 +5,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsForUserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileEntity;
 import onlydust.com.marketplace.project.domain.model.Contact;
 import onlydust.com.marketplace.project.domain.model.UserAllocatedTimeToContribute;
 import onlydust.com.marketplace.project.domain.view.TotalEarnedPerCurrency;
 import onlydust.com.marketplace.project.domain.view.TotalsEarned;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsForUserEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileEntity;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -87,12 +87,10 @@ public class CustomUserRepository {
                                            'total_dollars_equivalent', prs.total_dollars_equivalent,
                                            'currency', prs.currency
                                              )))
-                    from (select sum(pr.amount)                                                         as total_amount,
-                                 (case when pr.currency = 'usd' then sum(pr.amount)
-                                       else sum(coalesce(cuq.price, 0) * pr.amount) end)                as total_dollars_equivalent,
-                                 pr.currency                                                            as currency
+                    from (select sum(pr.amount)                   as total_amount,
+                                 coalesce(sum(pr.usd_amount), 0)  as total_dollars_equivalent,
+                                 pr.currency                      as currency
                           from payment_requests pr
-                                   left join crypto_usd_quotes cuq on cuq.currency = pr.currency
                           where pr.recipient_id = gu.id
                           group by pr.currency) as prs)    totals_earned,
                         

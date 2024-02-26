@@ -65,8 +65,7 @@ public class CustomUserRewardRepository {
                        pr.currency,
                        coalesce(pr.invoice_received_at, i.created_at) as invoice_received_at,
                        (select count(id) from work_items wi where wi.payment_id = pr.id)           contribution_count,
-                       case when pr.currency = 'usd' then pr.amount else cuq.price * pr.amount end
-            dollars_equivalent,
+                       pr.usd_amount as dollars_equivalent,
                        case
                            when r.id is not null then 'COMPLETE'
                            
@@ -87,7 +86,6 @@ public class CustomUserRewardRepository {
                          join payment_requests pr
                               on pr.recipient_id = u.github_user_id
                          join project_details pd on pd.project_id = pr.project_id
-                         left join crypto_usd_quotes cuq on cuq.currency = pr.currency
                          left join payments r on r.request_id = pr.id
                          LEFT JOIN payout_checks ON payout_checks.github_user_id = pr.recipient_id
                          LEFT JOIN billing_profile_check bpc on bpc.user_id = u.id
@@ -135,15 +133,12 @@ public class CustomUserRewardRepository {
                                 pr.currency,
                                 pr.invoice_received_at,
                                 (select count(id) from work_items wi where wi.payment_id = pr.id) contribution_count,
-                                case
-                                    when pr.currency = 'usd' then pr.amount
-                                    else coalesce(cuq.price, 0) * pr.amount end                   dollars_equivalent,
+                                pr.usd_amount as dollars_equivalent,
                                 'PENDING_INVOICE'                                                 status
                 from payment_requests pr
                          join iam.users u
                               on pr.recipient_id = u.github_user_id
                          join project_details pd on pd.project_id = pr.project_id
-                         left join crypto_usd_quotes cuq on cuq.currency = pr.currency
                          left join payments r on r.request_id = pr.id
                          LEFT JOIN payout_checks ON payout_checks.github_user_id = pr.recipient_id
                          LEFT JOIN billing_profile_check bpc on bpc.user_id = u.id
@@ -210,14 +205,11 @@ public class CustomUserRewardRepository {
             select row_number() over (order by pr.currency) id,
                    pr.currency,
                    sum(pr.amount) total,
-                   case
-                       when pr.currency = 'usd' then sum(pr.amount)
-                       else (select price from crypto_usd_quotes cuq where cuq.currency = pr.currency) *
-                            sum(pr.amount) end dollars_equivalent
+                   sum(pr.usd_amount) dollars_equivalent
             from iam.users u
-                     join payment_requests pr
-                          on pr.recipient_id = u.github_user_id and u.id = :userId
-            group by pr.currency""";
+               join payment_requests pr on pr.recipient_id = u.github_user_id and u.id = :userId
+            group by pr.currency
+            """;
 
 
     public List<UserRewardTotalAmountEntity> getTotalAmountEntities(UUID userId) {
