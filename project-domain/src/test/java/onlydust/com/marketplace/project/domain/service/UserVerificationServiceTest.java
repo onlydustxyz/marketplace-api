@@ -393,7 +393,11 @@ public class UserVerificationServiceTest {
             // Given
             final String parentBillingProfileExternalVerificationId = faker.rickAndMorty().character();
             final BillingProfileUpdated mappedEvent =
-                    BillingProfileUpdated.builder().type(OldBillingProfileType.INDIVIDUAL).oldVerificationStatus(OldVerificationStatus.STARTED).parentExternalApplicantId(parentBillingProfileExternalVerificationId).externalApplicantId(faker.gameOfThrones().character()).rawReviewDetails(faker.rickAndMorty().location()).build();
+                    BillingProfileUpdated.builder().type(OldBillingProfileType.INDIVIDUAL)
+                            .oldVerificationStatus(OldVerificationStatus.STARTED)
+                            .parentExternalApplicantId(parentBillingProfileExternalVerificationId)
+                            .externalApplicantId(faker.gameOfThrones().character())
+                            .rawReviewDetails(faker.rickAndMorty().location()).build();
             final Event event = mock(Event.class);
             final UUID userId = UUID.randomUUID();
             final OldCompanyBillingProfile companyBillingProfile =
@@ -405,6 +409,8 @@ public class UserVerificationServiceTest {
             // When
             when(billingProfileExternalMapper.apply(event)).thenReturn(mappedEvent);
             when(oldBillingProfileStoragePort.findCompanyByExternalVerificationId(mappedEvent.getParentExternalApplicantId())).thenReturn(Optional.of(companyBillingProfile));
+            when(userVerificationStoragePort.updateCompanyVerification(companyBillingProfile))
+                    .thenReturn(updatedBillingProfile);
             when(oldBillingProfileStoragePort.findKycStatusesFromParentKybExternalVerificationId(mappedEvent.getParentExternalApplicantId())).thenReturn(List.of(OldVerificationStatus.REJECTED, OldVerificationStatus.VERIFIED));
             when(oldBillingProfileStoragePort.saveCompanyProfile(updatedBillingProfile)).thenReturn(updatedBillingProfile);
             when(userStoragePort.getUserById(userId)).thenReturn(Optional.of(user));

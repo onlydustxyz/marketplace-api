@@ -21,6 +21,8 @@ public class SumsubCompanyApplicantsDataDTO {
     InfoDTO info;
     @JsonProperty("questionnaires")
     List<QuestionnaireDTO> questionnaires;
+    @JsonProperty("review")
+    ReviewDTO review;
 
     @Data
     @NoArgsConstructor
@@ -52,5 +54,32 @@ public class SumsubCompanyApplicantsDataDTO {
         @JsonProperty("id")
         String id;
         JsonNode sections;
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @Data
+    public static class ReviewDTO {
+        @JsonProperty("reviewResult")
+        ReviewResultDTO result;
+        @JsonProperty("reviewStatus")
+        String status;
+    }
+
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @Data
+    public static class ReviewResultDTO {
+        @JsonProperty("moderationComment")
+        String moderationComment;
+        @JsonProperty("clientComment")
+        String clientComment;
+        @JsonProperty("reviewAnswer")
+        String reviewAnswer;
+        @JsonProperty("rejectLabels")
+        List<String> rejectLabels;
+        @JsonProperty("reviewRejectType")
+        String reviewRejectType;
+        @JsonProperty("buttonIds")
+        List<String> buttonIds;
     }
 }

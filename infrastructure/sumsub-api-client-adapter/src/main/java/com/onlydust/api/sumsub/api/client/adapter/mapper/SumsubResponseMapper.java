@@ -5,10 +5,11 @@ import com.onlydust.api.sumsub.api.client.adapter.SumsubClientProperties;
 import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubCompanyApplicantsDataDTO;
 import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubCompanyChecksDTO;
 import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubIndividualApplicantsDataDTO;
-import onlydust.com.marketplace.project.domain.model.OldCountry;
-import onlydust.com.marketplace.project.domain.model.OldCompanyBillingProfile;
-import onlydust.com.marketplace.project.domain.model.OldIndividualBillingProfile;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.project.domain.model.OldCompanyBillingProfile;
+import onlydust.com.marketplace.project.domain.model.OldCountry;
+import onlydust.com.marketplace.project.domain.model.OldIndividualBillingProfile;
+import onlydust.com.marketplace.project.domain.model.OldVerificationStatus;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -105,6 +106,11 @@ public class SumsubResponseMapper {
                                                                 OldCompanyBillingProfile companyBillingProfile,
                                                                 SumsubClientProperties sumsubClientProperties) {
         OldCompanyBillingProfile updatedCompanyBillingProfile = companyBillingProfile;
+        if (nonNull(applicantsData.getReview()) && nonNull(applicantsData.getReview().getStatus())) {
+            updatedCompanyBillingProfile = updatedCompanyBillingProfile.toBuilder()
+                    .status(typeAndReviewResultToDomain(applicantsData.getReview().getStatus(), applicantsData.getReview().getResult()))
+                    .build();
+        }
         if (nonNull(applicantsData.getInfo()) && nonNull(applicantsData.getInfo()
                 .getCompanyInfo())) {
             updatedCompanyBillingProfile = updatedCompanyBillingProfile.toBuilder()
@@ -166,5 +172,49 @@ public class SumsubResponseMapper {
             case "yes" -> true;
             default -> null;
         };
+    }
+
+    private OldVerificationStatus typeAndReviewResultToDomain(final String reviewStatus,
+                                                              final SumsubCompanyApplicantsDataDTO.ReviewResultDTO reviewResult) {
+        return switch (reviewStatus) {
+            case "init" -> OldVerificationStatus.STARTED;
+            case "completed" -> {
+                final Optional<Answer> answer = reviewResultToAnswer(reviewResult);
+                if (answer.isPresent()) {
+                    yield switch (answer.get()) {
+                        case RED -> {
+                            if (isAFinalRejection(reviewResult)) {
+                                yield OldVerificationStatus.CLOSED;
+                            } else {
+                                yield OldVerificationStatus.REJECTED;
+                            }
+                        }
+                        case GREEN -> OldVerificationStatus.VERIFIED;
+                    };
+                } else {
+                    yield OldVerificationStatus.UNDER_REVIEW;
+                }
+            }
+            default -> OldVerificationStatus.UNDER_REVIEW;
+        };
+    }
+
+    private enum Answer {
+        GREEN, RED;
+    }
+
+    private Optional<Answer> reviewResultToAnswer(final SumsubCompanyApplicantsDataDTO.ReviewResultDTO reviewResult) {
+        if (nonNull(reviewResult) && nonNull(reviewResult.getReviewAnswer())) {
+            return switch (reviewResult.getReviewAnswer()) {
+                case "RED" -> Optional.of(Answer.RED);
+                case "GREEN" -> Optional.of(Answer.GREEN);
+                default -> throw OnlyDustException.internalServerError(String.format("Invalid Sumsub answer %s", reviewResult.getReviewAnswer()));
+            };
+        }
+        return Optional.empty();
+    }
+
+    private Boolean isAFinalRejection(final SumsubCompanyApplicantsDataDTO.ReviewResultDTO reviewResult) {
+        return nonNull(reviewResult) && nonNull(reviewResult.getReviewRejectType()) && reviewResult.getReviewRejectType().equals("FINAL");
     }
 }
