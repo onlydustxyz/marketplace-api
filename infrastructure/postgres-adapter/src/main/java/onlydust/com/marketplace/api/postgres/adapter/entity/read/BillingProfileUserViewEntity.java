@@ -45,6 +45,7 @@ public class BillingProfileUserViewEntity {
     Date joinedAt;
     Date invitedAt;
     Integer rewardCount;
+    Integer billingProfileAdminCount;
 
     public BillingProfileCoworkerView toView() {
         return BillingProfileCoworkerView.builder()
@@ -57,6 +58,7 @@ public class BillingProfileUserViewEntity {
                 .joinedAt(joinedAt != null ? ZonedDateTime.ofInstant(joinedAt.toInstant(), ZoneOffset.UTC) : null)
                 .invitedAt(invitedAt != null ? ZonedDateTime.ofInstant(invitedAt.toInstant(), ZoneOffset.UTC) : null)
                 .rewardCount(rewardCount)
+                .billingProfileAdminCount(billingProfileAdminCount)
                 .build();
     }
 

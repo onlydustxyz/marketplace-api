@@ -3,7 +3,10 @@ package onlydust.com.marketplace.api.rest.api.adapter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.ProjectId;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
@@ -160,8 +163,8 @@ public class BillingProfileRestApi implements BillingProfilesApi {
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
 
-        final Page<BillingProfileCoworkerView> cowrokersPage = billingProfileFacadePort.getCoworkers(BillingProfile.Id.of(billingProfileId),
+        final Page<BillingProfileCoworkerView> coworkers = billingProfileFacadePort.getCoworkers(BillingProfile.Id.of(billingProfileId),
                 UserId.of(authenticatedUser.getId()), sanitizedPageIndex, sanitizedPageSize);
-        return ResponseEntity.ok(BillingProfileMapper.coworkersPageToResponse(cowrokersPage, pageIndex));
+        return ResponseEntity.ok(BillingProfileMapper.coworkersPageToResponse(coworkers, pageIndex));
     }
 }

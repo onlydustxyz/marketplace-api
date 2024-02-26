@@ -769,13 +769,14 @@ class BillingProfileServiceTest {
         final UserId userIAdmin = UserId.of(UUID.randomUUID());
 
         // When
-        when(billingProfileStorage.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
-        when(billingProfileStorage.findCoworkersByBillingProfile(billingProfileId, 0, 10))
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStoragePort.findCoworkersByBillingProfile(billingProfileId, 0, 10))
                 .thenReturn(Page.<BillingProfileCoworkerView>builder().content(List.of(
                         BillingProfileCoworkerView.builder()
                                 .githubUserId(faker.number().randomNumber(10, true))
                                 .role(BillingProfile.User.Role.ADMIN)
                                 .rewardCount(0)
+                                .billingProfileAdminCount(1)
                                 .build()
                 )).build());
 
@@ -793,18 +794,20 @@ class BillingProfileServiceTest {
         final UserId userIAdmin = UserId.of(UUID.randomUUID());
 
         // When
-        when(billingProfileStorage.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
-        when(billingProfileStorage.findCoworkersByBillingProfile(billingProfileId, 0, 10))
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStoragePort.findCoworkersByBillingProfile(billingProfileId, 0, 10))
                 .thenReturn(Page.<BillingProfileCoworkerView>builder().content(List.of(
                         BillingProfileCoworkerView.builder()
                                 .githubUserId(faker.number().randomNumber(10, true))
                                 .role(BillingProfile.User.Role.ADMIN)
                                 .rewardCount(0)
+                                .billingProfileAdminCount(2)
                                 .build(),
                         BillingProfileCoworkerView.builder()
                                 .githubUserId(faker.number().randomNumber(10, true))
                                 .role(BillingProfile.User.Role.ADMIN)
                                 .rewardCount(0)
+                                .billingProfileAdminCount(2)
                                 .build()
                 )).build());
 
@@ -823,18 +826,20 @@ class BillingProfileServiceTest {
         final UserId userIAdmin = UserId.of(UUID.randomUUID());
 
         // When
-        when(billingProfileStorage.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
-        when(billingProfileStorage.findCoworkersByBillingProfile(billingProfileId, 0, 10))
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStoragePort.findCoworkersByBillingProfile(billingProfileId, 0, 10))
                 .thenReturn(Page.<BillingProfileCoworkerView>builder().content(List.of(
                         BillingProfileCoworkerView.builder()
                                 .githubUserId(faker.number().randomNumber(10, true))
                                 .role(BillingProfile.User.Role.ADMIN)
                                 .rewardCount(0)
+                                .billingProfileAdminCount(1)
                                 .build(),
                         BillingProfileCoworkerView.builder()
                                 .githubUserId(faker.number().randomNumber(10, true))
                                 .role(BillingProfile.User.Role.MEMBER)
                                 .rewardCount(0)
+                                .billingProfileAdminCount(1)
                                 .build()
                 )).build());
 
@@ -853,23 +858,26 @@ class BillingProfileServiceTest {
         final UserId userIAdmin = UserId.of(UUID.randomUUID());
 
         // When
-        when(billingProfileStorage.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
-        when(billingProfileStorage.findCoworkersByBillingProfile(billingProfileId, 0, 10))
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStoragePort.findCoworkersByBillingProfile(billingProfileId, 0, 10))
                 .thenReturn(Page.<BillingProfileCoworkerView>builder().content(List.of(
                         BillingProfileCoworkerView.builder()
                                 .githubUserId(faker.number().randomNumber(10, true))
                                 .role(BillingProfile.User.Role.ADMIN)
                                 .rewardCount(0)
+                                .billingProfileAdminCount(2)
                                 .build(),
                         BillingProfileCoworkerView.builder()
                                 .githubUserId(faker.number().randomNumber(10, true))
                                 .role(BillingProfile.User.Role.ADMIN)
                                 .rewardCount(1)
+                                .billingProfileAdminCount(2)
                                 .build(),
                         BillingProfileCoworkerView.builder()
                                 .githubUserId(faker.number().randomNumber(10, true))
                                 .role(BillingProfile.User.Role.MEMBER)
                                 .rewardCount(1)
+                                .billingProfileAdminCount(2)
                                 .build()
                 )).build());
 

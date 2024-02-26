@@ -22,6 +22,9 @@ public class BillingProfileCoworkerView {
     ZonedDateTime joinedAt;
     ZonedDateTime invitedAt;
     int rewardCount;
+    int billingProfileAdminCount;
 
-    Boolean removable;
+    public boolean removable() {
+        return (role == BillingProfile.User.Role.MEMBER || billingProfileAdminCount > 1) && rewardCount == 0;
+    }
 }
