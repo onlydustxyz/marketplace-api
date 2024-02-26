@@ -1,8 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
-import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
-import onlydust.com.marketplace.project.domain.model.UserRole;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
@@ -17,6 +15,8 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuo
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
+import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
+import onlydust.com.marketplace.project.domain.model.UserRole;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -112,7 +112,7 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
 
         @Test
         @Order(2)
-        void should_return_processing_for_an_individual() {
+        void should_return_pending_invoice_for_an_individual() {
             // Given
             postgresUserAdapter.savePayoutSettingsForUserId(userId,
                     UserPayoutSettings.builder()
@@ -124,7 +124,7 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
             final RewardViewEntity projectReward = customRewardRepository.findProjectRewardViewEntityByd(rewardId);
 
             // Then
-            Assertions.assertEquals("PROCESSING", userReward.getStatus());
+            Assertions.assertEquals("PENDING_INVOICE", userReward.getStatus());
             Assertions.assertEquals("PROCESSING", projectReward.getStatus());
         }
 

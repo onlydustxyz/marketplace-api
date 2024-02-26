@@ -134,7 +134,7 @@ public class CustomRewardRepository {
                                      when pr.currency = 'usd' then not payout_checks.has_bank_account
                                end) then 'MISSING_PAYOUT_INFO'
                            when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'
-                           when bpc.type = 'COMPANY' and pr.invoice_received_at is null then 'PENDING_INVOICE'
+                           when coalesce(pr.invoice_received_at, i.created_at) is null then 'PENDING_INVOICE'
                            else 'PROCESSING'
                            end                                                                     status,
                        r.receipt,
@@ -157,6 +157,7 @@ public class CustomRewardRepository {
                          left join payments r on r.request_id = pr.id
                          LEFT JOIN payout_checks ON payout_checks.github_user_id = pr.recipient_id
                          LEFT JOIN billing_profile_check bpc on bpc.user_id = u.id
+                         LEFT JOIN accounting.invoices i on i.id = pr.invoice_id and i.status in ('TO_REVIEW', 'APPROVED', 'PAID')
                 where pr.id = :rewardId""";
     private static final String COUNT_REWARD_ITEMS = """
             select count(distinct wi.id)
