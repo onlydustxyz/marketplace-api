@@ -3,8 +3,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.project.domain.model.OldCountry;
 import onlydust.com.marketplace.project.domain.model.OldCompanyBillingProfile;
+import onlydust.com.marketplace.project.domain.model.OldCountry;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -100,6 +100,7 @@ public class CompanyBillingProfileEntity {
                 registrationNumber,
                 name,
                 address,
+                country,
                 subjectToEuVAT,
                 OldCountry.fromIso3(country).inEuropeanUnion(),
                 OldCountry.fromIso3(country).isFrance(),

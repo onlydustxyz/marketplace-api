@@ -165,13 +165,18 @@ public class Invoice {
     public record BankAccount(@NonNull String bic, @NonNull String accountNumber) {
     }
 
-    public record PersonalInfo(@NonNull String firstName, @NonNull String lastName, @NonNull String address) {
+    public record PersonalInfo(@NonNull String firstName, @NonNull String lastName, @NonNull String address, @NonNull String countryCode) {
+        @Deprecated
+        public String countryName() {
+            return Country.fromIso3(countryCode).display().orElse(countryCode);
+        }
     }
 
     // TODO, store the vatRegulationState
     public record CompanyInfo(@NonNull String registrationNumber,
                               @NonNull String name,
                               @NonNull String address,
+                              @NonNull String countryCode,
                               @NonNull Boolean subjectToEuVAT,
                               @NonNull Boolean inEuropeanUnion,
                               @NonNull Boolean isFrance,
@@ -182,6 +187,11 @@ public class Invoice {
             if (!isFrance) return VatRegulationState.REVERSE_CHARGE;
             if (!subjectToEuVAT) return VatRegulationState.NOT_APPLICABLE_FRENCH_NOT_SUBJECT;
             return VatRegulationState.APPLICABLE;
+        }
+
+        @Deprecated
+        public String countryName() {
+            return Country.fromIso3(countryCode).display().orElse(countryCode);
         }
     }
 

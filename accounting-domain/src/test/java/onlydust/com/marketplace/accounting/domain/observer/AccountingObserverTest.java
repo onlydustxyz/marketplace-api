@@ -148,7 +148,7 @@ public class AccountingObserverTest {
                     .withAdditionalNetworks(Set.of(Network.ETHEREUM, Network.OPTIMISM));
 
             Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1,
-                    new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", false, false, false, null));
+                    new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", "FRA", false, false, false, null));
             invoice = invoice.rewards(List.of(
                     new Invoice.Reward(rewardId, ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                             Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id()),
