@@ -30,10 +30,12 @@ public class WebSecurityConfiguration {
 
     @Bean
     public WebSecurityAdapter apiSecurityConfiguration(final AuthenticationFilter authenticationFilter,
-                                                       final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter,
+                                                       final ApiKeyAuthenticationFilter indexerApiKeyAuthenticationFilter,
+                                                       final ApiKeyAuthenticationFilter backOfficeApiKeyAuthenticationFilter,
                                                        final QueryParamTokenAuthenticationFilter queryParamTokenAuthenticationFilter,
                                                        final DelegatedAuthenticationEntryPoint delegatedAuthenticationEntryPoint) {
-        return new WebSecurityAdapter(authenticationFilter, apiKeyAuthenticationFilter, queryParamTokenAuthenticationFilter,
+        return new WebSecurityAdapter(authenticationFilter, indexerApiKeyAuthenticationFilter, backOfficeApiKeyAuthenticationFilter,
+                queryParamTokenAuthenticationFilter,
                 delegatedAuthenticationEntryPoint);
     }
 
@@ -73,13 +75,23 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public ApiKeyAuthenticationFilter apiKeyAuthenticationFilter(final ApiKeyAuthenticationService apiKeyAuthenticationService) {
-        return new ApiKeyAuthenticationFilter(apiKeyAuthenticationService);
+    public ApiKeyAuthenticationFilter indexerApiKeyAuthenticationFilter(final ApiKeyAuthenticationService indexerApiKeyAuthenticationService) {
+        return new ApiKeyAuthenticationFilter(indexerApiKeyAuthenticationService);
     }
 
     @Bean
-    public ApiKeyAuthenticationService apiKeyAuthenticationService(final ApiKeyAuthenticationService.Config apiKeyAuthenticationConfig) {
-        return new ApiKeyAuthenticationService(apiKeyAuthenticationConfig);
+    public ApiKeyAuthenticationService indexerApiKeyAuthenticationService(final ApiKeyAuthenticationService.Config indexerApiKeyAuthenticationConfig) {
+        return new ApiKeyAuthenticationService(indexerApiKeyAuthenticationConfig);
+    }
+
+    @Bean
+    public ApiKeyAuthenticationFilter backOfficeApiKeyAuthenticationFilter(final ApiKeyAuthenticationService backOfficeApiKeyAuthenticationService) {
+        return new ApiKeyAuthenticationFilter(backOfficeApiKeyAuthenticationService);
+    }
+
+    @Bean
+    public ApiKeyAuthenticationService backOfficeApiKeyAuthenticationService(final ApiKeyAuthenticationService.Config backOfficeApiKeyAuthenticationConfig) {
+        return new ApiKeyAuthenticationService(backOfficeApiKeyAuthenticationConfig);
     }
 
     @Bean
@@ -107,5 +119,23 @@ public class WebSecurityConfiguration {
     @Data
     public static class WebCorsProperties {
         private String[] hosts;
+    }
+    
+    @Bean
+    @ConfigurationProperties("application.web.machine-to-machine")
+    public ApiKeyAuthenticationService.Config indexerApiKeyAuthenticationConfig() {
+        return new ApiKeyAuthenticationService.Config();
+    }
+
+    @Bean
+    @ConfigurationProperties("application.web.back-office")
+    public ApiKeyAuthenticationService.Config backOfficeApiKeyAuthenticationConfig() {
+        return new ApiKeyAuthenticationService.Config();
+    }
+
+    @Bean
+    @ConfigurationProperties("application.web.back-office-invoice-token")
+    public QueryParamTokenAuthenticationService.Config queryParamTokenAuthenticationConfig() {
+        return new QueryParamTokenAuthenticationService.Config();
     }
 }

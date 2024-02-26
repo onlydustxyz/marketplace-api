@@ -88,7 +88,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected WireMockServer indexerApiWireMockServer;
 
     @Autowired
-    ApiKeyAuthenticationService.Config config;
+    ApiKeyAuthenticationService.Config backOfficeApiKeyAuthenticationConfig;
 
     @Autowired
     UserRepository userRepository;
@@ -160,7 +160,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String EXTERNAL_INVOICE = "/bo/v1/external/invoices/%s";
 
     protected String apiKey() {
-        return config.getApiKey();
+        return backOfficeApiKeyAuthenticationConfig.getApiKey();
     }
 
     protected URI getApiURI(final String path) {

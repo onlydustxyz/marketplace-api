@@ -4,14 +4,12 @@ import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.project.domain.service.BackofficeService;
 import onlydust.com.marketplace.project.domain.service.RewardV2Service;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -53,17 +51,5 @@ public class BackofficeConfiguration {
     @Bean
     public BackofficeFacadePort backofficeFacadePort(final BackofficeStoragePort backofficeStoragePort) {
         return new BackofficeService(backofficeStoragePort);
-    }
-
-    @Bean
-    @ConfigurationProperties("application.web.back-office")
-    public ApiKeyAuthenticationService.Config apiKeyAuthenticationConfig() {
-        return new ApiKeyAuthenticationService.Config();
-    }
-
-    @Bean
-    @ConfigurationProperties("application.web.back-office-invoice-token")
-    public QueryParamTokenAuthenticationService.Config queryParamTokenAuthenticationConfig() {
-        return new QueryParamTokenAuthenticationService.Config();
     }
 }

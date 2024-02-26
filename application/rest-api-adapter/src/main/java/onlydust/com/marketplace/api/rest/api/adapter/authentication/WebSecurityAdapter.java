@@ -18,7 +18,8 @@ import org.springframework.security.web.authentication.AnonymousAuthenticationFi
 public class WebSecurityAdapter extends WebSecurityConfigurerAdapter {
 
     private final AuthenticationFilter authenticationFilter;
-    private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
+    private final ApiKeyAuthenticationFilter indexerApiKeyAuthenticationFilter;
+    private final ApiKeyAuthenticationFilter backOfficeApiKeyAuthenticationFilter;
     private final QueryParamTokenAuthenticationFilter queryParamTokenAuthenticationFilter;
     private final DelegatedAuthenticationEntryPoint delegatedAuthenticationEntryPoint;
 
@@ -51,7 +52,8 @@ public class WebSecurityAdapter extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(authenticationFilter, AnonymousAuthenticationFilter.class)
-                .addFilterAfter(apiKeyAuthenticationFilter, AuthenticationFilter.class)
+                .addFilterAfter(indexerApiKeyAuthenticationFilter, AuthenticationFilter.class)
+                .addFilterAfter(backOfficeApiKeyAuthenticationFilter, AuthenticationFilter.class)
                 .addFilterAfter(queryParamTokenAuthenticationFilter, AuthenticationFilter.class)
                 .exceptionHandling().authenticationEntryPoint(delegatedAuthenticationEntryPoint);
     }
