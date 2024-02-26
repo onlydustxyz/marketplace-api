@@ -48,7 +48,7 @@ public class CustomRewardRepository {
                 pr.amount,
                 pr.currency,
                 (select count(id) from work_items wi where wi.payment_id = pr.id)           contribution_count,
-                case when pr.currency = 'usd' then pr.amount else cuq.price * pr.amount end dollars_equivalent,
+                pr.usd_amount                                                               dollars_equivalent,
                 case
                 when r.id is not null then 'COMPLETE'
                 when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'
@@ -80,7 +80,6 @@ public class CustomRewardRepository {
                 left join iam.users u on pr.recipient_id = u.github_user_id
                 left join iam.users u_requestor on u_requestor.id = pr.requestor_id
                 left join indexer_exp.github_accounts gu_requestor on gu_requestor.id = u_requestor.github_user_id
-                left join crypto_usd_quotes cuq on cuq.currency = pr.currency
                 left join payments r on r.request_id = pr.id
                 left join billing_profile_check bpc on bpc.user_id = u.id
                 LEFT JOIN payout_checks ON payout_checks.github_user_id = pr.recipient_id
@@ -121,7 +120,7 @@ public class CustomRewardRepository {
                        pr.amount,
                        pr.currency,
                        (select count(id) from work_items wi where wi.payment_id = pr.id)           contribution_count,
-                       case when pr.currency = 'usd' then pr.amount else cuq.price * pr.amount end dollars_equivalent,
+                       pr.usd_amount                                                               dollars_equivalent,
                        case
                            when r.id is not null then 'COMPLETE'
                            when not coalesce(bpc.billing_profile_verified, false) then 'PENDING_VERIFICATION'
@@ -153,7 +152,6 @@ public class CustomRewardRepository {
                          left join iam.users u on pr.recipient_id = u.github_user_id
                          left join iam.users u_requestor on u_requestor.id = pr.requestor_id
                          left join indexer_exp.github_accounts gu_requestor on gu_requestor.id = u_requestor.github_user_id
-                         left join crypto_usd_quotes cuq on cuq.currency = pr.currency
                          left join payments r on r.request_id = pr.id
                          LEFT JOIN payout_checks ON payout_checks.github_user_id = pr.recipient_id
                          LEFT JOIN billing_profile_check bpc on bpc.user_id = u.id

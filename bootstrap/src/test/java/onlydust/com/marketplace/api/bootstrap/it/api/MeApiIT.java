@@ -489,7 +489,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         final UserEntity user = authenticatedUser.user();
         paymentRequestRepository.save(new PaymentRequestEntity(UUID.randomUUID(), user.getId(), user.getGithubUserId(), new Date(), BigDecimal.ONE, null,
-                0, UUID.randomUUID(), CurrencyEnumEntity.usdc));
+                0, UUID.randomUUID(), CurrencyEnumEntity.usdc, BigDecimal.ONE));
 
         // When
         client.get()

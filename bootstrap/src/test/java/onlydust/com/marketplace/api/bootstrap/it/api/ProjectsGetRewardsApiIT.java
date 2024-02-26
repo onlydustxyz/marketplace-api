@@ -364,22 +364,12 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
         final String jwt = userAuthHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
-        cryptoUsdQuotesRepository.save(CryptoUsdQuotesEntity.builder()
-                .currency(CurrencyEnumEntity.eth)
-                .price(BigDecimal.valueOf(1500L))
-                .updatedAt(new Date())
-                .build());
-        cryptoUsdQuotesRepository.save(CryptoUsdQuotesEntity.builder()
-                .currency(CurrencyEnumEntity.apt)
-                .price(BigDecimal.valueOf(200))
-                .updatedAt(new Date())
-                .build());
-
         final PaymentRequestEntity paymentRequestEntity = paymentRequestRepository.findById(
                         UUID.fromString("40fda3c6-2a3f-4cdd-ba12-0499dd232d53"))
                 .orElseThrow();
         paymentRequestEntity.setCurrency(CurrencyEnumEntity.eth);
         paymentRequestEntity.setAmount(BigDecimal.valueOf(10));
+        paymentRequestEntity.setUsdAmount(BigDecimal.valueOf(15000));
         paymentRequestRepository.save(paymentRequestEntity);
         paymentRepository.save(new PaymentEntity(UUID.randomUUID(), paymentRequestEntity.getAmount(), "ETH",
                 JacksonUtil.toJsonNode("{}"), paymentRequestEntity.getId(), new Date()));
@@ -389,6 +379,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .orElseThrow();
         paymentRequestEntity2.setCurrency(CurrencyEnumEntity.eth);
         paymentRequestEntity2.setAmount(BigDecimal.valueOf(50));
+        paymentRequestEntity2.setUsdAmount(BigDecimal.valueOf(75000));
         paymentRequestRepository.save(paymentRequestEntity2);
 
         final PaymentRequestEntity paymentRequestEntity3 = paymentRequestRepository.findById(
@@ -396,6 +387,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .orElseThrow();
         paymentRequestEntity3.setCurrency(CurrencyEnumEntity.apt);
         paymentRequestEntity3.setAmount(BigDecimal.valueOf(500));
+        paymentRequestEntity3.setUsdAmount(BigDecimal.valueOf(100000));
         paymentRequestRepository.save(paymentRequestEntity3);
 
         final PaymentRequestEntity paymentRequestEntity4 = paymentRequestRepository.findById(
@@ -403,6 +395,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .orElseThrow();
         paymentRequestEntity4.setCurrency(CurrencyEnumEntity.apt);
         paymentRequestEntity4.setAmount(BigDecimal.valueOf(30));
+        paymentRequestEntity4.setUsdAmount(BigDecimal.valueOf(6000));
         paymentRequestRepository.save(paymentRequestEntity4);
 
         // When
@@ -415,6 +408,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(HttpStatus.OK)
                 .expectBody()
+                .consumeWith(System.out::println)
                 .jsonPath("$.rewards[0].id").isEqualTo("2ac80cc6-7e83-4eef-bc0c-932b58f683c0")
                 .jsonPath("$.rewards[0].status").isEqualTo("PENDING_CONTRIBUTOR")
                 .jsonPath("$.rewards[0].amount.currency").isEqualTo("APT")
@@ -542,7 +536,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[?(@.rewardedUserLogin != 'gregcha')]").doesNotExist()
                 .jsonPath("$.remainingBudget.amount").doesNotExist()
                 .jsonPath("$.remainingBudget.currency").doesNotExist()
-                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(80142242)
+                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(142242)
                 .jsonPath("$.spentAmount.amount").doesNotExist()
                 .jsonPath("$.spentAmount.currency").doesNotExist()
                 .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(13500)
@@ -581,7 +575,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[?(@.requestedAt > '2023-09-26')]").doesNotExist()
                 .jsonPath("$.remainingBudget.amount").doesNotExist()
                 .jsonPath("$.remainingBudget.currency").doesNotExist()
-                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(80142242)
+                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(142242)
                 .jsonPath("$.spentAmount.amount").doesNotExist()
                 .jsonPath("$.spentAmount.currency").doesNotExist()
                 .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(3000)

@@ -48,9 +48,10 @@ public class PaymentRequestEntity {
     CurrencyEnumEntity currency;
     @ManyToOne
     InvoiceEntity invoice;
+    BigDecimal usdAmount;
 
     public PaymentRequestEntity(UUID id, UUID requestorId, Long recipientId, Date requestedAt, BigDecimal amount, Date invoiceReceivedAt, Integer hoursWorked
-            , UUID projectId, CurrencyEnumEntity currency) {
-        this(id, requestorId, recipientId, requestedAt, amount, invoiceReceivedAt, hoursWorked, projectId, currency, null);
+            , UUID projectId, CurrencyEnumEntity currency, BigDecimal usdAmount) {
+        this(id, requestorId, recipientId, requestedAt, amount, invoiceReceivedAt, hoursWorked, projectId, currency, null, usdAmount);
     }
 }

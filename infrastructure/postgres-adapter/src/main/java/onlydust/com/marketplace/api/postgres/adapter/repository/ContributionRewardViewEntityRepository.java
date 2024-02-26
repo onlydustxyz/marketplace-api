@@ -39,7 +39,7 @@ public interface ContributionRewardViewEntityRepository extends JpaRepository<Co
                    r.processed_at,
                    pr.amount,
                    pr.currency,
-                   CASE WHEN pr.currency = 'usd' THEN pr.amount else COALESCE(cuq.price, 0) * pr.amount END dollars_equivalent,
+                   pr.usd_amount as dollars_equivalent,
                    case
                        when r.id is not null then 'COMPLETE'
                        when not coalesce(bpc.billing_profile_verified, false) then 'PENDING_VERIFICATION'
@@ -69,7 +69,6 @@ public interface ContributionRewardViewEntityRepository extends JpaRepository<Co
                      JOIN indexer_exp.github_accounts requestor ON requestor.id = u.github_user_id
                      JOIN indexer_exp.github_accounts recipient ON recipient.id = pr.recipient_id
                      LEFT JOIN payments r ON r.request_id = pr.id
-                     LEFT JOIN crypto_usd_quotes cuq ON cuq.currency = pr.currency
                      LEFT JOIN payout_checks ON payout_checks.github_user_id = pr.recipient_id
                      LEFT JOIN billing_profile_check bpc on bpc.user_id = u.id
             WHERE c.id = :contributionId

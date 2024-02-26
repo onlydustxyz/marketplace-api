@@ -6,6 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.contract.ProjectsApi;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.ContributionType;
 import onlydust.com.marketplace.project.domain.model.CreateAndCloseIssueCommand;
 import onlydust.com.marketplace.project.domain.model.Project;
@@ -14,12 +19,6 @@ import onlydust.com.marketplace.project.domain.port.input.ContributionFacadePort
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectRewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
-import onlydust.com.marketplace.project.domain.view.*;
-import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.view.*;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.io.Resource;
@@ -35,14 +34,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapProjectBudgetsViewToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectContributorsMapper.mapProjectContributorsLinkViewPageToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectContributorsMapper.mapSortBy;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectRewardMapper.getSortBy;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectRewardMapper.mapProjectRewardPageToResponse;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 
 @RestController
 @Tags(@Tag(name = "Projects"))
@@ -57,6 +56,7 @@ public class ProjectsRestApi implements ProjectsApi {
     private final RewardFacadePort rewardFacadePort;
     private final RewardFacadePort rewardFacadePortV2;
     private final ContributionFacadePort contributionsFacadePort;
+
 
     @Override
     public ResponseEntity<ProjectResponse> getProject(final UUID projectId, final Boolean includeAllAvailableRepos) {

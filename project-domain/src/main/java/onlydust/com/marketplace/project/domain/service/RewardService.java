@@ -42,7 +42,9 @@ public class RewardService implements RewardFacadePort {
         }
 
         indexerPort.indexUser(command.getRecipientId());
-        return rewardServicePort.create(projectLeadId, command);
+        final var rewardId = rewardServicePort.create(projectLeadId, command);
+        projectRewardStoragePort.updateUsdAmount(rewardId);
+        return rewardId;
     }
 
     @Override

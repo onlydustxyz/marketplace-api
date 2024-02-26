@@ -74,4 +74,9 @@ public class PostgresProjectRewardV2Adapter implements ProjectRewardStoragePort 
         // TODO
         return null;
     }
+
+    @Override
+    public void updateUsdAmount(UUID rewardId) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 }

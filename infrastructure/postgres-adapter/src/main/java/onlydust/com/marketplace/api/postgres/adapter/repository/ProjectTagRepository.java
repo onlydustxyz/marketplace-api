@@ -116,28 +116,16 @@ public interface ProjectTagRepository extends JpaRepository<ProjectTagEntity, Pr
             """, nativeQuery = true)
     void updateFastAndFurious(@Param("now") Date now);
 
-@Modifying
+    @Modifying
     @Query(value = """
             with big_whale as (SELECT pr.project_id,
-                                      SUM(
-                                              CASE
-                                                  WHEN pr.currency = 'usd' THEN pr.amount
-                                                  ELSE pr.amount * COALESCE(cuq.price, 0)
-                                                  END
-                                      ) AS total_rewards_in_usd
+                                      SUM(pr.usd_amount) AS total_rewards_in_usd
                                FROM payment_requests pr
                                         LEFT JOIN
                                     project_details pd ON pr.project_id = pd.project_id
-                                        LEFT JOIN
-                                    crypto_usd_quotes cuq ON pr.currency = cuq.currency
                                WHERE pr.requested_at > cast(:now as timestamp) - INTERVAL '3 months'
                                GROUP BY pr.project_id, pd.name
-                               HAVING SUM(
-                                              CASE
-                                                  WHEN pr.currency = 'usd' THEN pr.amount
-                                                  ELSE pr.amount * COALESCE(cuq.price, 0)
-                                                  END
-                                      ) > 5000
+                               HAVING SUM(pr.usd_amount) > 5000
                                ORDER BY total_rewards_in_usd DESC)
              insert into projects_tags (project_id, tag)
              select bw.project_id, 'BIG_WHALE'

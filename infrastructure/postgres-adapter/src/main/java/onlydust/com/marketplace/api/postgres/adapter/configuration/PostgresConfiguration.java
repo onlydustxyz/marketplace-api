@@ -68,7 +68,10 @@ public class PostgresConfiguration {
                                                  final ApplicationRepository applicationRepository,
                                                  final ContributionViewEntityRepository contributionViewEntityRepository,
                                                  final HiddenContributorRepository hiddenContributorRepository,
-                                                 final ProjectTagRepository projectTagRepository) {
+                                                 final ProjectTagRepository projectTagRepository,
+                                                 final PaymentRequestRepository paymentRequestRepository,
+                                                 final HistoricalQuoteRepository historicalQuoteRepository,
+                                                 final CurrencyRepository currencyRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -92,7 +95,10 @@ public class PostgresConfiguration {
                 applicationRepository,
                 contributionViewEntityRepository,
                 hiddenContributorRepository,
-                projectTagRepository
+                projectTagRepository,
+                paymentRequestRepository,
+                historicalQuoteRepository,
+                currencyRepository
         );
     }
 
@@ -119,7 +125,10 @@ public class PostgresConfiguration {
                                                            final ApplicationRepository applicationRepository,
                                                            final ContributionViewEntityRepository contributionViewEntityRepository,
                                                            final HiddenContributorRepository hiddenContributorRepository,
-                                                           final ProjectTagRepository projectTagRepository) {
+                                                           final ProjectTagRepository projectTagRepository,
+                                                           final PaymentRequestRepository paymentRequestRepository,
+                                                           final HistoricalQuoteRepository historicalQuoteRepository,
+                                                           final CurrencyRepository currencyRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -143,7 +152,10 @@ public class PostgresConfiguration {
                 applicationRepository,
                 contributionViewEntityRepository,
                 hiddenContributorRepository,
-                projectTagRepository
+                projectTagRepository,
+                paymentRequestRepository,
+                historicalQuoteRepository,
+                currencyRepository
         );
     }
 
