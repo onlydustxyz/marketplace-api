@@ -3,19 +3,24 @@ package onlydust.com.marketplace.api.rest.api.adapter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.ProjectId;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.api.contract.BillingProfilesApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BillingProfileMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.PayoutInfoMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
+import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.User;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -32,6 +37,8 @@ import java.util.stream.Collectors;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BillingProfileMapper.map;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
@@ -148,5 +155,16 @@ public class BillingProfileRestApi implements BillingProfilesApi {
         billingProfileFacadePort.updatePayoutInfo(BillingProfile.Id.of(billingProfileId), UserId.of(authenticatedUser.getId()),
                 PayoutInfoMapper.mapToDomain(billingProfilePayoutInfoRequest));
         return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<BillingProfileCoworkersPageResponse> getCoworkers(UUID billingProfileId, Integer pageIndex, Integer pageSize) {
+        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+
+        final Page<BillingProfileCoworkerView> coworkers = billingProfileFacadePort.getCoworkers(BillingProfile.Id.of(billingProfileId),
+                UserId.of(authenticatedUser.getId()), sanitizedPageIndex, sanitizedPageSize);
+        return ResponseEntity.ok(BillingProfileMapper.coworkersPageToResponse(coworkers, pageIndex));
     }
 }

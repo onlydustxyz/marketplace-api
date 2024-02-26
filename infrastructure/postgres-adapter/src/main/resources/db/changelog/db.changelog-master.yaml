@@ -131,3 +131,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000063_add_payout_preference_table.sql
   - include:
       file: db/changelog/changelogs/00000064_add_usd_amount.sql
+  - include:
+      file: db/changelog/changelogs/00000065_coworkers.sql

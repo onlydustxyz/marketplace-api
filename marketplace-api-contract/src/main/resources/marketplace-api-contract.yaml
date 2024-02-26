@@ -2795,6 +2795,16 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/BillingProfileId'
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
       responses:
         "200":
           description: 'Coworkers'
@@ -6026,9 +6036,27 @@ components:
           description: True if the invitation is accepted
 
     BillingProfileCoworkersPageResponse:
-      type: array
-      items:
-        $ref: '#/components/schemas/BillingProfileCoworkersPageItemResponse'
+      type: object
+      required:
+        - totalPageNumber
+        - totalItemNumber
+        - hasMore
+        - nextPageIndex
+        - coworkers
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        coworkers:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillingProfileCoworkersPageItemResponse'
 
     BillingProfileCoworkersPageItemResponse:
       type: object

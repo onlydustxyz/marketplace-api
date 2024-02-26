@@ -11,6 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
@@ -61,7 +62,7 @@ public class BillingProfileEntity {
         }
     }
 
-    public static BillingProfileEntity fromDomain(final BillingProfile billingProfile, final UserId ownerId) {
+    public static BillingProfileEntity fromDomain(final BillingProfile billingProfile, final UserId ownerId, final ZonedDateTime ownerJoinedAt) {
         return BillingProfileEntity.builder()
                 .id(billingProfile.id().value())
                 .name(billingProfile.name())
@@ -74,6 +75,7 @@ public class BillingProfileEntity {
                         .billingProfileId(billingProfile.id().value())
                         .userId(ownerId.value())
                         .role(BillingProfileUserEntity.Role.ADMIN)
+                        .joinedAt(Date.from(ownerJoinedAt.toInstant()))
                         .build())
                 )
                 .build();
