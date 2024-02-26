@@ -8,6 +8,7 @@ import onlydust.com.backoffice.api.contract.model.InvoicePage;
 import onlydust.com.backoffice.api.contract.model.PatchInvoiceRequest;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,7 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 @AllArgsConstructor
 public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicingManagementApi {
     private final InvoiceFacadePort invoiceFacadePort;
+    private final QueryParamTokenAuthenticationService.Config queryParamTokenAuthenticationConfig;
     final static Integer MAX_PAGE_SIZE = Integer.MAX_VALUE;
 
     @Override
@@ -41,7 +43,8 @@ public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicing
                 sanitizedPageSize
         );
 
-        final var response = mapInvoicePageToContract(page, pageIndex);
+        final var response = mapInvoicePageToContract(page, pageIndex, queryParamTokenAuthenticationConfig.getBaseUrl(),
+                queryParamTokenAuthenticationConfig.getToken());
 
         return page.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :

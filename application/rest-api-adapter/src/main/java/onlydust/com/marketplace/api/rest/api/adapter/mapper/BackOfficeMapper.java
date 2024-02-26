@@ -13,6 +13,7 @@ import onlydust.com.marketplace.project.domain.model.Currency;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.view.backoffice.*;
 
+import java.net.URI;
 import java.time.ZoneOffset;
 
 import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.ETHEREUM;
@@ -250,9 +251,9 @@ public interface BackOfficeMapper {
     }
 
 
-    static InvoicePage mapInvoicePageToContract(final Page<Invoice> page, int pageIndex) {
+    static InvoicePage mapInvoicePageToContract(final Page<Invoice> page, final int pageIndex, final String baseUri, final String token) {
         return new InvoicePage()
-                .invoices(page.getContent().stream().map(BackOfficeMapper::mapInvoice).toList())
+                .invoices(page.getContent().stream().map(i -> mapInvoice(i, baseUri, token)).toList())
                 .totalPageNumber(page.getTotalPageNumber())
                 .totalItemNumber(page.getTotalItemNumber())
                 .hasMore(hasMore(pageIndex, page.getTotalPageNumber()))
@@ -260,7 +261,7 @@ public interface BackOfficeMapper {
     }
 
     @SneakyThrows
-    static InvoicePageItemResponse mapInvoice(final Invoice invoice) {
+    static InvoicePageItemResponse mapInvoice(final Invoice invoice, final String baseUri, final String token) {
         return new InvoicePageItemResponse()
                 .id(invoice.id().value())
                 .status(mapInvoiceStatus(invoice.status()))
@@ -268,7 +269,8 @@ public interface BackOfficeMapper {
                 .dueAt(invoice.dueAt())
                 .amount(invoice.totalAfterTax().getValue())
                 .currencyId(invoice.totalAfterTax().getCurrency().id().value())
-                .rewardIds(invoice.rewards().stream().map(Invoice.Reward::id).map(UuidWrapper::value).toList());
+                .rewardIds(invoice.rewards().stream().map(Invoice.Reward::id).map(UuidWrapper::value).toList())
+                .downloadUrl(URI.create("%s/invoices/%s?token=%s".formatted(baseUri, invoice.id().value(), token)));
     }
 
     static InvoiceStatus mapInvoiceStatus(final Invoice.Status status) throws OnlyDustException {

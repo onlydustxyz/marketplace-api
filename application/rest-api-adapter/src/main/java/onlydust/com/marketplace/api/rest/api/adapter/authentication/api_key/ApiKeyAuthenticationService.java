@@ -22,5 +22,7 @@ public class ApiKeyAuthenticationService {
     @Data
     public static class Config {
         String apiKey;
+        String invoiceDownloadToken;
+        String baseUrl;
     }
 }

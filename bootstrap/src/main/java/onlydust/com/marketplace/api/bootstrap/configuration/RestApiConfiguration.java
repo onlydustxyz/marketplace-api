@@ -5,12 +5,10 @@ import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.service.GithubAccountService;
 import onlydust.com.marketplace.project.domain.service.RewardService;
 import onlydust.com.marketplace.project.domain.service.RewardV2Service;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -77,13 +75,6 @@ public class RestApiConfiguration {
     public EventsRestApi eventsRestApi(final ContributionObserverPort contributionObserverPort) {
         return new EventsRestApi(contributionObserverPort);
     }
-
-    @Bean
-    @ConfigurationProperties("application.web.machine-to-machine")
-    public ApiKeyAuthenticationService.Config apiKeyAuthenticationConfig() {
-        return new ApiKeyAuthenticationService.Config();
-    }
-
 
     @Bean
     public EcosystemsRestApi ecosystemsRestApi(final EcosystemFacadePort ecosystemFacadePort) {

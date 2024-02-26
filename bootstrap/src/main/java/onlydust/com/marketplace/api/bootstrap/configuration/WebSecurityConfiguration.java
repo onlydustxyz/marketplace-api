@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
-import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationFilter;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
@@ -11,6 +10,9 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0J
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtVerifier;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Properties;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0UserInfoService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationFilter;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
+import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,9 +30,12 @@ public class WebSecurityConfiguration {
 
     @Bean
     public WebSecurityAdapter apiSecurityConfiguration(final AuthenticationFilter authenticationFilter,
-                                                       final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter,
+                                                       final ApiKeyAuthenticationFilter indexerApiKeyAuthenticationFilter,
+                                                       final ApiKeyAuthenticationFilter backOfficeApiKeyAuthenticationFilter,
+                                                       final QueryParamTokenAuthenticationFilter queryParamTokenAuthenticationFilter,
                                                        final DelegatedAuthenticationEntryPoint delegatedAuthenticationEntryPoint) {
-        return new WebSecurityAdapter(authenticationFilter, apiKeyAuthenticationFilter,
+        return new WebSecurityAdapter(authenticationFilter, indexerApiKeyAuthenticationFilter, backOfficeApiKeyAuthenticationFilter,
+                queryParamTokenAuthenticationFilter,
                 delegatedAuthenticationEntryPoint);
     }
 
@@ -70,13 +75,33 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public ApiKeyAuthenticationFilter apiKeyAuthenticationFilter(final ApiKeyAuthenticationService apiKeyAuthenticationService) {
-        return new ApiKeyAuthenticationFilter(apiKeyAuthenticationService);
+    public ApiKeyAuthenticationFilter indexerApiKeyAuthenticationFilter(final ApiKeyAuthenticationService indexerApiKeyAuthenticationService) {
+        return new ApiKeyAuthenticationFilter(indexerApiKeyAuthenticationService);
     }
 
     @Bean
-    public ApiKeyAuthenticationService apiKeyAuthenticationService(final ApiKeyAuthenticationService.Config apiKeyAuthenticationConfig) {
-        return new ApiKeyAuthenticationService(apiKeyAuthenticationConfig);
+    public ApiKeyAuthenticationService indexerApiKeyAuthenticationService(final ApiKeyAuthenticationService.Config indexerApiKeyAuthenticationConfig) {
+        return new ApiKeyAuthenticationService(indexerApiKeyAuthenticationConfig);
+    }
+
+    @Bean
+    public ApiKeyAuthenticationFilter backOfficeApiKeyAuthenticationFilter(final ApiKeyAuthenticationService backOfficeApiKeyAuthenticationService) {
+        return new ApiKeyAuthenticationFilter(backOfficeApiKeyAuthenticationService);
+    }
+
+    @Bean
+    public ApiKeyAuthenticationService backOfficeApiKeyAuthenticationService(final ApiKeyAuthenticationService.Config backOfficeApiKeyAuthenticationConfig) {
+        return new ApiKeyAuthenticationService(backOfficeApiKeyAuthenticationConfig);
+    }
+
+    @Bean
+    public QueryParamTokenAuthenticationFilter queryParamTokenAuthenticationFilter(final QueryParamTokenAuthenticationService queryParamTokenAuthenticationService) {
+        return new QueryParamTokenAuthenticationFilter(queryParamTokenAuthenticationService);
+    }
+
+    @Bean
+    public QueryParamTokenAuthenticationService queryParamTokenAuthenticationService(final QueryParamTokenAuthenticationService.Config queryParamTokenAuthenticationConfig) {
+        return new QueryParamTokenAuthenticationService(queryParamTokenAuthenticationConfig);
     }
 
     @Bean
@@ -94,5 +119,23 @@ public class WebSecurityConfiguration {
     @Data
     public static class WebCorsProperties {
         private String[] hosts;
+    }
+    
+    @Bean
+    @ConfigurationProperties("application.web.machine-to-machine")
+    public ApiKeyAuthenticationService.Config indexerApiKeyAuthenticationConfig() {
+        return new ApiKeyAuthenticationService.Config();
+    }
+
+    @Bean
+    @ConfigurationProperties("application.web.back-office")
+    public ApiKeyAuthenticationService.Config backOfficeApiKeyAuthenticationConfig() {
+        return new ApiKeyAuthenticationService.Config();
+    }
+
+    @Bean
+    @ConfigurationProperties("application.web.back-office-invoice-token")
+    public QueryParamTokenAuthenticationService.Config queryParamTokenAuthenticationConfig() {
+        return new QueryParamTokenAuthenticationService.Config();
     }
 }
