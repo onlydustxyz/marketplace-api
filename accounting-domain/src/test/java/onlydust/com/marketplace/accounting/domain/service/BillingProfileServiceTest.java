@@ -6,6 +6,7 @@ import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
@@ -773,8 +774,10 @@ class BillingProfileServiceTest {
         when(billingProfileStoragePort.findCoworkersByBillingProfile(billingProfileId, 0, 10))
                 .thenReturn(Page.<BillingProfileCoworkerView>builder().content(List.of(
                         BillingProfileCoworkerView.builder()
-                                .githubUserId(faker.number().randomNumber(10, true))
+                                .githubUserId(GithubUserId.of(faker.number().randomNumber(10, true)))
                                 .role(BillingProfile.User.Role.ADMIN)
+                                .joinedAt(ZonedDateTime.now())
+                                .invitedAt(null)
                                 .rewardCount(0)
                                 .billingProfileAdminCount(1)
                                 .build()
@@ -798,14 +801,18 @@ class BillingProfileServiceTest {
         when(billingProfileStoragePort.findCoworkersByBillingProfile(billingProfileId, 0, 10))
                 .thenReturn(Page.<BillingProfileCoworkerView>builder().content(List.of(
                         BillingProfileCoworkerView.builder()
-                                .githubUserId(faker.number().randomNumber(10, true))
+                                .githubUserId(GithubUserId.of(faker.number().randomNumber(10, true)))
                                 .role(BillingProfile.User.Role.ADMIN)
+                                .joinedAt(ZonedDateTime.now())
+                                .invitedAt(null)
                                 .rewardCount(0)
                                 .billingProfileAdminCount(2)
                                 .build(),
                         BillingProfileCoworkerView.builder()
-                                .githubUserId(faker.number().randomNumber(10, true))
+                                .githubUserId(GithubUserId.of(faker.number().randomNumber(10, true)))
                                 .role(BillingProfile.User.Role.ADMIN)
+                                .joinedAt(ZonedDateTime.now())
+                                .invitedAt(null)
                                 .rewardCount(0)
                                 .billingProfileAdminCount(2)
                                 .build()
@@ -830,14 +837,18 @@ class BillingProfileServiceTest {
         when(billingProfileStoragePort.findCoworkersByBillingProfile(billingProfileId, 0, 10))
                 .thenReturn(Page.<BillingProfileCoworkerView>builder().content(List.of(
                         BillingProfileCoworkerView.builder()
-                                .githubUserId(faker.number().randomNumber(10, true))
+                                .githubUserId(GithubUserId.of(faker.number().randomNumber(10, true)))
                                 .role(BillingProfile.User.Role.ADMIN)
+                                .joinedAt(ZonedDateTime.now())
+                                .invitedAt(null)
                                 .rewardCount(0)
                                 .billingProfileAdminCount(1)
                                 .build(),
                         BillingProfileCoworkerView.builder()
-                                .githubUserId(faker.number().randomNumber(10, true))
+                                .githubUserId(GithubUserId.of(faker.number().randomNumber(10, true)))
                                 .role(BillingProfile.User.Role.MEMBER)
+                                .joinedAt(ZonedDateTime.now())
+                                .invitedAt(null)
                                 .rewardCount(0)
                                 .billingProfileAdminCount(1)
                                 .build()
@@ -862,20 +873,26 @@ class BillingProfileServiceTest {
         when(billingProfileStoragePort.findCoworkersByBillingProfile(billingProfileId, 0, 10))
                 .thenReturn(Page.<BillingProfileCoworkerView>builder().content(List.of(
                         BillingProfileCoworkerView.builder()
-                                .githubUserId(faker.number().randomNumber(10, true))
+                                .githubUserId(GithubUserId.of(faker.number().randomNumber(10, true)))
                                 .role(BillingProfile.User.Role.ADMIN)
+                                .joinedAt(ZonedDateTime.now())
+                                .invitedAt(null)
                                 .rewardCount(0)
                                 .billingProfileAdminCount(2)
                                 .build(),
                         BillingProfileCoworkerView.builder()
-                                .githubUserId(faker.number().randomNumber(10, true))
+                                .githubUserId(GithubUserId.of(faker.number().randomNumber(10, true)))
                                 .role(BillingProfile.User.Role.ADMIN)
+                                .joinedAt(ZonedDateTime.now())
+                                .invitedAt(null)
                                 .rewardCount(1)
                                 .billingProfileAdminCount(2)
                                 .build(),
                         BillingProfileCoworkerView.builder()
-                                .githubUserId(faker.number().randomNumber(10, true))
+                                .githubUserId(GithubUserId.of(faker.number().randomNumber(10, true)))
                                 .role(BillingProfile.User.Role.MEMBER)
+                                .joinedAt(ZonedDateTime.now())
+                                .invitedAt(null)
                                 .rewardCount(1)
                                 .billingProfileAdminCount(2)
                                 .build()
@@ -888,6 +905,42 @@ class BillingProfileServiceTest {
         assertThat(coworkers.getContent().get(0).removable()).isTrue();
         assertThat(coworkers.getContent().get(1).removable()).isFalse();
         assertThat(coworkers.getContent().get(2).removable()).isFalse();
+    }
+
+    @Test
+    void should_get_invited_coworkers() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+
+        // When
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStoragePort.findCoworkersByBillingProfile(billingProfileId, 0, 10))
+                .thenReturn(Page.<BillingProfileCoworkerView>builder().content(List.of(
+                        BillingProfileCoworkerView.builder()
+                                .githubUserId(GithubUserId.of(faker.number().randomNumber(10, true)))
+                                .role(BillingProfile.User.Role.ADMIN)
+                                .joinedAt(null)
+                                .invitedAt(ZonedDateTime.now())
+                                .rewardCount(null)
+                                .billingProfileAdminCount(null)
+                                .build(),
+                        BillingProfileCoworkerView.builder()
+                                .githubUserId(GithubUserId.of(faker.number().randomNumber(10, true)))
+                                .role(BillingProfile.User.Role.MEMBER)
+                                .joinedAt(null)
+                                .invitedAt(ZonedDateTime.now())
+                                .rewardCount(null)
+                                .billingProfileAdminCount(null)
+                                .build()
+                )).build());
+
+        final var coworkers = billingProfileService.getCoworkers(billingProfileId, userIAdmin, 0, 10);
+
+        // Then
+        assertThat(coworkers.getContent()).hasSize(2);
+        assertThat(coworkers.getContent().get(0).removable()).isTrue();
+        assertThat(coworkers.getContent().get(1).removable()).isTrue();
     }
 
 

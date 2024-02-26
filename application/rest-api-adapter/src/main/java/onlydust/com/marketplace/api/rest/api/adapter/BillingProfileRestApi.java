@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
@@ -166,5 +167,19 @@ public class BillingProfileRestApi implements BillingProfilesApi {
         final Page<BillingProfileCoworkerView> coworkers = billingProfileFacadePort.getCoworkers(BillingProfile.Id.of(billingProfileId),
                 UserId.of(authenticatedUser.getId()), sanitizedPageIndex, sanitizedPageSize);
         return ResponseEntity.ok(BillingProfileMapper.coworkersPageToResponse(coworkers, pageIndex));
+    }
+
+    @Override
+    public ResponseEntity<Void> inviteCoworker(UUID billingProfileId, BillingProfileCoworkerInvitationRequest invitationRequest) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        billingProfileFacadePort.inviteCoworker(
+                BillingProfile.Id.of(billingProfileId),
+                UserId.of(authenticatedUser.getId()),
+                GithubUserId.of(invitationRequest.getGithubUserId()),
+                switch (invitationRequest.getRole()) {
+                    case ADMIN -> BillingProfile.User.Role.ADMIN;
+                    case MEMBER -> BillingProfile.User.Role.MEMBER;
+                });
+        return ResponseEntity.noContent().build();
     }
 }

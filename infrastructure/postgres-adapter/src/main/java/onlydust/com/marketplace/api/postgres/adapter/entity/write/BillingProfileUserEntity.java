@@ -40,7 +40,6 @@ public class BillingProfileUserEntity {
     Role role;
 
     Date joinedAt;
-    Date invitedAt;
 
     @CreationTimestamp
     @Column(name = "tech_created_at", nullable = false, updatable = false)

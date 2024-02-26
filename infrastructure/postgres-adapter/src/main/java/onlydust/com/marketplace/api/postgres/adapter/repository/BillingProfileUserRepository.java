@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface BillingProfileUserRepository extends JpaRepository<BillingProfileUserEntity, UUID> {
+public interface BillingProfileUserRepository extends JpaRepository<BillingProfileUserEntity, BillingProfileUserEntity.PrimaryKey> {
 
     Optional<BillingProfileUserEntity> findByBillingProfileIdAndUserId(UUID billingProfileId, UUID userId);
 }

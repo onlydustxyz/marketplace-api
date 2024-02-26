@@ -1,9 +1,12 @@
 package onlydust.com.marketplace.accounting.domain.view;
 
+import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.Value;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 
 import java.net.URI;
@@ -14,17 +17,32 @@ import java.time.ZonedDateTime;
 @Accessors(fluent = true)
 public class BillingProfileCoworkerView {
     UserId userId;
-    Long githubUserId;
+    GithubUserId githubUserId;
     String login;
     URI githubHtmlUrl;
     String avatarUrl;
     BillingProfile.User.Role role;
     ZonedDateTime joinedAt;
     ZonedDateTime invitedAt;
-    int rewardCount;
-    int billingProfileAdminCount;
+
+    @Getter(AccessLevel.NONE)
+    Integer rewardCount;
+    @Getter(AccessLevel.NONE)
+    Integer billingProfileAdminCount;
 
     public boolean removable() {
-        return (role == BillingProfile.User.Role.MEMBER || billingProfileAdminCount > 1) && rewardCount == 0;
+        return !hasJoined() || (!isLastAdmin() && !hasInvoicedRewards());
+    }
+
+    private boolean hasInvoicedRewards() {
+        return rewardCount != null && rewardCount > 0;
+    }
+
+    private boolean isLastAdmin() {
+        return role == BillingProfile.User.Role.ADMIN && billingProfileAdminCount != null && billingProfileAdminCount <= 1;
+    }
+
+    private boolean hasJoined() {
+        return joinedAt != null;
     }
 }
