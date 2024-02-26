@@ -3,8 +3,10 @@ package onlydust.com.marketplace.accounting.domain.port.out;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
+import onlydust.com.marketplace.kernel.pagination.Page;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -38,4 +40,6 @@ public interface BillingProfileStoragePort {
     Optional<PayoutInfo> findPayoutInfoByBillingProfile(BillingProfile.Id billingProfileId);
 
     void savePayoutInfoForBillingProfile(PayoutInfo payoutInfo, BillingProfile.Id billingProfileId);
+
+    Page<BillingProfileCoworkerView> findCoworkersByBillingProfile(BillingProfile.Id billingProfileId, int pageIndex, int pageSize);
 }

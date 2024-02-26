@@ -386,9 +386,11 @@ public class PostgresConfiguration {
                                                                      final BillingProfileRepository billingProfileRepository,
                                                                      final PayoutInfoRepository payoutInfoRepository,
                                                                      final WalletRepository walletRepository,
-                                                                     final BillingProfileUserRepository billingProfileUserRepository) {
+                                                                     final BillingProfileUserRepository billingProfileUserRepository,
+                                                                 final BillingProfileUserViewRepository billingProfileUserViewRepository) {
         return new PostgresBillingProfileAdapter(companyBillingProfileRepository, individualBillingProfileRepository, globalSettingsRepository,
-                billingProfileRepository, kybRepository, kycRepository, payoutInfoRepository, walletRepository, billingProfileUserRepository);
+                billingProfileRepository, kybRepository, kycRepository, payoutInfoRepository, walletRepository, billingProfileUserRepository,
+                billingProfileUserViewRepository);
     }
 
     @Bean

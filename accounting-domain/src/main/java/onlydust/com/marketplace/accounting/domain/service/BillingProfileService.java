@@ -13,6 +13,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserve
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -181,5 +182,12 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
             throw unauthorized("User %s must be admin to edit payout info of billing profile %s".formatted(userId.value(), billingProfileId.value()));
         billingProfileStoragePort.savePayoutInfoForBillingProfile(payoutInfo, billingProfileId);
+    }
+
+    @Override
+    public Page<BillingProfileCoworkerView> getCoworkers(BillingProfile.Id billingProfileId, UserId userId, int pageIndex, int pageSize) {
+        if (!billingProfileStorage.isAdmin(billingProfileId, userId))
+            throw unauthorized("User %s must be admin to list coworkers of billing profile %s".formatted(userId.value(), billingProfileId.value()));
+        return billingProfileStorage.findCoworkersByBillingProfile(billingProfileId, pageIndex, pageSize);
     }
 }

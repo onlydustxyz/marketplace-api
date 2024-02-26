@@ -4,6 +4,7 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.contract.model.VerificationStatus;
@@ -19,6 +20,8 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
 
 public interface BillingProfileMapper {
 
@@ -269,5 +272,31 @@ public interface BillingProfileMapper {
         billingProfileResponse.setKyb(isNull(billingProfileView.getKyb()) ? null : kybToResponse(billingProfileView.getKyb()));
         billingProfileResponse.setKyc(isNull(billingProfileView.getKyc()) ? null : kycToResponse(billingProfileView.getKyc()));
         return billingProfileResponse;
+    }
+
+    static BillingProfileCoworkersPageResponse coworkersPageToResponse(Page<BillingProfileCoworkerView> coworkersPage, int pageIndex) {
+        return new BillingProfileCoworkersPageResponse()
+                .coworkers(coworkersPage.getContent().stream().map(BillingProfileMapper::coworkerToResponse).toList())
+                .totalPageNumber(coworkersPage.getTotalPageNumber())
+                .totalItemNumber(coworkersPage.getTotalItemNumber())
+                .hasMore(hasMore(pageIndex, coworkersPage.getTotalPageNumber()))
+                .nextPageIndex(nextPageIndex(pageIndex, coworkersPage.getTotalPageNumber()));
+    }
+
+    static BillingProfileCoworkersPageItemResponse coworkerToResponse(BillingProfileCoworkerView billingProfileCoworkerView) {
+        return new BillingProfileCoworkersPageItemResponse()
+                .githubUserId(billingProfileCoworkerView.getGithubUserId())
+                .login(billingProfileCoworkerView.getLogin())
+                .avatarUrl(billingProfileCoworkerView.getAvatarUrl())
+                .htmlUrl(billingProfileCoworkerView.getGithubHtmlUrl())
+                .isRegistered(true)
+                .role(switch (billingProfileCoworkerView.getRole()) {
+                    case ADMIN -> BillingProfileCoworkerRole.ADMIN;
+                    case MEMBER -> BillingProfileCoworkerRole.MEMBER;
+                })
+                .removable(billingProfileCoworkerView.getRemovable())
+                .invitedAt(billingProfileCoworkerView.getInvitedAt())
+                .joinedAt(billingProfileCoworkerView.getJoinedAt());
+
     }
 }

@@ -6,12 +6,17 @@ import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.OldCompanyBillingProfile;
 import onlydust.com.marketplace.project.domain.model.OldIndividualBillingProfile;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
@@ -19,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import static java.time.ZonedDateTime.now;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
@@ -32,6 +38,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     private final @NonNull PayoutInfoRepository payoutInfoRepository;
     private final @NonNull WalletRepository walletRepository;
     private final @NonNull BillingProfileUserRepository billingProfileUserRepository;
+    private final @NonNull BillingProfileUserViewRepository billingProfileUserViewRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -76,7 +83,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional
     public void save(IndividualBillingProfile billingProfile) {
-        billingProfileRepository.save(BillingProfileEntity.fromDomain(billingProfile, billingProfile.owner().id()));
+        billingProfileRepository.save(BillingProfileEntity.fromDomain(billingProfile, billingProfile.owner().id(), now()));
         final Optional<KycEntity> optionalKycEntity = kycRepository.findByBillingProfileId(billingProfile.id().value());
         if (optionalKycEntity.isEmpty()) {
             kycRepository.save(KycEntity.fromDomain(billingProfile.kyc(), billingProfile.id()));
@@ -86,7 +93,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional
     public void save(SelfEmployedBillingProfile billingProfile) {
-        billingProfileRepository.save(BillingProfileEntity.fromDomain(billingProfile, billingProfile.owner().id()));
+        billingProfileRepository.save(BillingProfileEntity.fromDomain(billingProfile, billingProfile.owner().id(), now()));
         final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfile.id().value());
         if (optionalKybEntity.isEmpty()) {
             kybRepository.save(KybEntity.fromDomain(billingProfile.kyb(), billingProfile.id()));
@@ -98,7 +105,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     public void save(CompanyBillingProfile billingProfile) {
         // TODO : manage add/remove members -> waiting to start the feature on coworkers
         billingProfileRepository.save(BillingProfileEntity.fromDomain(billingProfile,
-                billingProfile.members().stream().map(BillingProfile.User::id).toList().get(0)));
+                billingProfile.members().stream().map(BillingProfile.User::id).toList().get(0), now()));
         final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfile.id().value());
         if (optionalKybEntity.isEmpty()) {
             kybRepository.save(KybEntity.fromDomain(billingProfile.kyb(), billingProfile.id()));
@@ -195,5 +202,17 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
         payoutInfoRepository.findById(billingProfileId.value())
                 .ifPresent(payoutInfoEntity -> walletRepository.deleteByBillingProfileId(billingProfileId.value()));
         payoutInfoRepository.save(PayoutInfoEntity.toEntity(billingProfileId, payoutInfo));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<BillingProfileCoworkerView> findCoworkersByBillingProfile(BillingProfile.Id billingProfileId, int pageIndex, int pageSize) {
+        final var page = billingProfileUserViewRepository.findByBillingProfileId(billingProfileId.value(),
+                PageRequest.of(pageIndex, pageSize, Sort.by("user_id")));
+        return Page.<BillingProfileCoworkerView>builder()
+                .content(page.getContent().stream().map(BillingProfileUserViewEntity::toView).toList())
+                .totalItemNumber(page.getNumberOfElements())
+                .totalPageNumber(page.getTotalPages())
+                .build();
     }
 }

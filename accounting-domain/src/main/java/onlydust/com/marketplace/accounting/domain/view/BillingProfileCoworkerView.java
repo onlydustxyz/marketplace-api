@@ -1,0 +1,23 @@
+package onlydust.com.marketplace.accounting.domain.view;
+
+import lombok.Builder;
+import lombok.Value;
+import onlydust.com.marketplace.accounting.domain.model.UserId;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+
+import java.net.URI;
+import java.time.ZonedDateTime;
+
+@Value
+@Builder
+public class BillingProfileCoworkerView {
+    UserId userId;
+    Long githubUserId;
+    String login;
+    URI githubHtmlUrl;
+    String avatarUrl;
+    BillingProfile.User.Role role;
+    ZonedDateTime joinedAt;
+    ZonedDateTime invitedAt;
+    Boolean removable;
+}
