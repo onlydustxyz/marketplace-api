@@ -112,7 +112,7 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
 
         @Test
         @Order(2)
-        void should_return_processing_for_an_individual() {
+        void should_return_pending_invoice_for_an_individual() {
             // Given
             postgresUserAdapter.savePayoutSettingsForUserId(userId,
                     UserPayoutSettings.builder()
@@ -124,7 +124,7 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
             final RewardViewEntity projectReward = customRewardRepository.findProjectRewardViewEntityByd(rewardId);
 
             // Then
-            Assertions.assertEquals("PROCESSING", userReward.getStatus());
+            Assertions.assertEquals("PENDING_INVOICE", userReward.getStatus());
             Assertions.assertEquals("PROCESSING", projectReward.getStatus());
         }
 
