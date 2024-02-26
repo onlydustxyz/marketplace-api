@@ -8,19 +8,24 @@ import onlydust.com.marketplace.api.contract.model.RewardItemRequest;
 import onlydust.com.marketplace.api.contract.model.RewardRequest;
 import onlydust.com.marketplace.api.contract.model.RewardType;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.RequestRewardResponseDTO;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.IMPERSONATION_HEADER;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
@@ -29,6 +34,8 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     AuthenticationService authenticationService;
+    @Autowired
+    PaymentRequestRepository paymentRequestRepository;
 
     @Test
     public void should_be_unauthorized() {
@@ -134,6 +141,17 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
 
         final var newRewardId = UUID.randomUUID();
 
+        paymentRequestRepository.saveAndFlush(PaymentRequestEntity.builder()
+                .id(newRewardId)
+                .projectId(projectId)
+                .requestorId(pierre.user().getId())
+                .recipientId(pierre.user().getGithubUserId())
+                .amount(BigDecimal.valueOf(12.95))
+                .currency(CurrencyEnumEntity.eth)
+                .requestedAt(new Date())
+                .hoursWorked(0)
+                .build());
+
         // When
         rustApiWireMockServer.stubFor(WireMock.post(
                         WireMock.urlEqualTo("/api/payments"))
@@ -193,6 +211,8 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                 .isEqualTo(200)
                 .expectBody()
                 .jsonPath("$.id").isEqualTo(newRewardId.toString());
+
+        assertThat(paymentRequestRepository.findById(newRewardId).orElseThrow().getUsdAmount()).isEqualByComparingTo(BigDecimal.valueOf(23076.641));
     }
 
     @Test
@@ -407,6 +427,17 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
 
         final var newRewardId = UUID.randomUUID();
 
+        paymentRequestRepository.saveAndFlush(PaymentRequestEntity.builder()
+                .id(newRewardId)
+                .projectId(projectId)
+                .requestorId(userAuthHelper.authenticatePierre().user().getId())
+                .recipientId(11111L)
+                .amount(BigDecimal.valueOf(111.47))
+                .currency(CurrencyEnumEntity.usdc)
+                .requestedAt(new Date())
+                .hoursWorked(0)
+                .build());
+
         // When
         rustApiWireMockServer.stubFor(WireMock.post(
                         WireMock.urlEqualTo("/api/payments"))
@@ -467,6 +498,8 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                 .isEqualTo(200)
                 .expectBody()
                 .jsonPath("$.id").isEqualTo(newRewardId.toString());
+
+        assertThat(paymentRequestRepository.findById(newRewardId).orElseThrow().getUsdAmount()).isEqualTo(BigDecimal.valueOf(112.5847));
     }
 
 

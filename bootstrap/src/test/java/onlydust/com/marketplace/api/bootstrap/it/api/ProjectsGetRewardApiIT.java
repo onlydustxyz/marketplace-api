@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
@@ -107,6 +106,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
         final PaymentRequestEntity paymentRequestEntity = paymentRequestRepository.findById(rewardId).orElseThrow();
         paymentRequestEntity.setAmount(BigDecimal.valueOf(100));
         paymentRequestEntity.setCurrency(CurrencyEnumEntity.strk);
+        paymentRequestEntity.setUsdAmount(null);
         paymentRequestRepository.save(paymentRequestEntity);
 
         client.get()
@@ -184,9 +184,8 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
 
         paymentRequestEntity.setAmount(BigDecimal.valueOf(200));
         paymentRequestEntity.setCurrency(CurrencyEnumEntity.eth);
+        paymentRequestEntity.setUsdAmount(BigDecimal.valueOf(309532));
         paymentRequestRepository.save(paymentRequestEntity);
-        cryptoUsdQuotesRepository.save(new CryptoUsdQuotesEntity(CurrencyEnumEntity.eth, BigDecimal.valueOf(1547.66),
-                new Date()));
 
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_REWARD, projectId, rewardId)))

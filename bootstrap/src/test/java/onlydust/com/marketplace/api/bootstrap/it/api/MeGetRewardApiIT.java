@@ -115,6 +115,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
         final PaymentRequestEntity paymentRequestEntity = paymentRequestRepository.findById(rewardId).orElseThrow();
         paymentRequestEntity.setAmount(BigDecimal.valueOf(100));
         paymentRequestEntity.setCurrency(CurrencyEnumEntity.strk);
+        paymentRequestEntity.setUsdAmount(null);
         paymentRequestRepository.save(paymentRequestEntity);
         final UUID paymentId = UUID.randomUUID();
         final Date processedAt = new SimpleDateFormat("yyyy-MM-dd").parse("2023-09-20");

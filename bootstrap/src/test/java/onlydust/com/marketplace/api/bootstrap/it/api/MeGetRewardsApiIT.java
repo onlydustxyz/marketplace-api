@@ -7,7 +7,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.CompanyBilling
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndividualBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.OldVerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
@@ -358,22 +357,13 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 companyBillingProfileRepository.findByUserId(authenticatedUser.user().getId()).orElseThrow();
         companyBillingProfileEntity.setVerificationStatus(OldVerificationStatusEntity.VERIFIED);
         companyBillingProfileRepository.save(companyBillingProfileEntity);
-        cryptoUsdQuotesRepository.save(CryptoUsdQuotesEntity.builder()
-                .currency(CurrencyEnumEntity.eth)
-                .price(BigDecimal.valueOf(1500L))
-                .updatedAt(new Date())
-                .build());
-        cryptoUsdQuotesRepository.save(CryptoUsdQuotesEntity.builder()
-                .currency(CurrencyEnumEntity.apt)
-                .price(BigDecimal.valueOf(200))
-                .updatedAt(new Date())
-                .build());
 
         final PaymentRequestEntity paymentRequestEntity = paymentRequestRepository.findById(
                         UUID.fromString("40fda3c6-2a3f-4cdd-ba12-0499dd232d53"))
                 .orElseThrow();
         paymentRequestEntity.setCurrency(CurrencyEnumEntity.eth);
         paymentRequestEntity.setAmount(BigDecimal.valueOf(10));
+        paymentRequestEntity.setUsdAmount(BigDecimal.valueOf(15000));
         paymentRequestRepository.save(paymentRequestEntity);
         paymentRepository.save(new PaymentEntity(UUID.randomUUID(), paymentRequestEntity.getAmount(), "ETH",
                 JacksonUtil.toJsonNode("{}"), paymentRequestEntity.getId(), new Date()));
@@ -383,6 +373,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .orElseThrow();
         paymentRequestEntity2.setCurrency(CurrencyEnumEntity.eth);
         paymentRequestEntity2.setAmount(BigDecimal.valueOf(50));
+        paymentRequestEntity2.setUsdAmount(BigDecimal.valueOf(75000));
         paymentRequestRepository.save(paymentRequestEntity2);
 
         final PaymentRequestEntity paymentRequestEntity3 = paymentRequestRepository.findById(
@@ -390,6 +381,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .orElseThrow();
         paymentRequestEntity3.setCurrency(CurrencyEnumEntity.apt);
         paymentRequestEntity3.setAmount(BigDecimal.valueOf(500));
+        paymentRequestEntity3.setUsdAmount(BigDecimal.valueOf(100000));
         paymentRequestRepository.save(paymentRequestEntity3);
 
         final PaymentRequestEntity paymentRequestEntity4 = paymentRequestRepository.findById(
@@ -397,6 +389,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .orElseThrow();
         paymentRequestEntity4.setCurrency(CurrencyEnumEntity.op);
         paymentRequestEntity4.setAmount(BigDecimal.valueOf(30));
+        paymentRequestEntity4.setUsdAmount(null);
         paymentRequestRepository.save(paymentRequestEntity4);
 
         final PaymentRequestEntity paymentRequestEntity5 = paymentRequestRepository.findById(
@@ -404,6 +397,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .orElseThrow();
         paymentRequestEntity5.setCurrency(CurrencyEnumEntity.strk);
         paymentRequestEntity5.setAmount(BigDecimal.valueOf(9511147));
+        paymentRequestEntity5.setUsdAmount(null);
         paymentRequestRepository.save(paymentRequestEntity5);
 
 
@@ -653,10 +647,10 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[?(@.amount.currency != 'ETH')]").doesNotExist()
                 .jsonPath("$.rewardedAmount.amount").isEqualTo(1500)
                 .jsonPath("$.rewardedAmount.currency").isEqualTo("ETH")
-                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(2250000.00)
+                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(2672970.0)
                 .jsonPath("$.pendingAmount.amount").isEqualTo(1000)
                 .jsonPath("$.pendingAmount.currency").isEqualTo("ETH")
-                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(1500000.00)
+                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(1781980.00)
                 .jsonPath("$.receivedRewardsCount").isEqualTo(2)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(2)
                 .jsonPath("$.rewardingProjectsCount").isEqualTo(2)
@@ -689,10 +683,10 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                           "'298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").doesNotExist()
                 .jsonPath("$.rewardedAmount.amount").doesNotExist()
                 .jsonPath("$.rewardedAmount.currency").doesNotExist()
-                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(2260100)
+                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(2683070)
                 .jsonPath("$.pendingAmount.amount").doesNotExist()
                 .jsonPath("$.pendingAmount.currency").doesNotExist()
-                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(1510100.0)
+                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(1792080.0)
                 .jsonPath("$.receivedRewardsCount").isEqualTo(13)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(88)
                 .jsonPath("$.rewardingProjectsCount").isEqualTo(2)
@@ -719,8 +713,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(19662)
-                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(10100)
+                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(2692632)
+                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(1792080)
         ;
     }
 }

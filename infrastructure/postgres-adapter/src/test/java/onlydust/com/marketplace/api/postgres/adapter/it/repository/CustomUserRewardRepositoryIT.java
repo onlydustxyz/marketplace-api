@@ -4,7 +4,6 @@ import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
@@ -93,31 +92,25 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                         .ignoreIssues(false)
                         .ignoreCodeReviews(false)
                         .build());
-        cryptoUsdQuotesRepository.saveAll(List.of(
-                new CryptoUsdQuotesEntity(CurrencyEnumEntity.eth, BigDecimal.valueOf(1000), new Date()),
-                new CryptoUsdQuotesEntity(CurrencyEnumEntity.usdc, BigDecimal.valueOf(1.01), new Date()),
-                new CryptoUsdQuotesEntity(CurrencyEnumEntity.lords, BigDecimal.valueOf(0.33), new Date()),
-                new CryptoUsdQuotesEntity(CurrencyEnumEntity.apt, BigDecimal.valueOf(0.55), new Date()),
-                new CryptoUsdQuotesEntity(CurrencyEnumEntity.op, BigDecimal.valueOf(10), new Date())));
 
         final UUID rewardPaid = UUID.randomUUID();
         paymentRequestRepository.saveAll(List.of(
                 new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId, new Date(),
-                        BigDecimal.valueOf(10000), null, 1, projectId, CurrencyEnumEntity.usd, BigDecimal.ONE),
+                        BigDecimal.valueOf(10000), null, 1, projectId, CurrencyEnumEntity.usd, BigDecimal.valueOf(10000)),
                 new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId, new Date(),
-                        BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.eth, BigDecimal.ONE),
+                        BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.eth, BigDecimal.valueOf(1000)),
                 new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId, new Date(),
-                        BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.lords, BigDecimal.ONE),
+                        BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.lords, BigDecimal.valueOf(0.33)),
                 new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId, new Date(),
-                        BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.usdc, BigDecimal.ONE),
+                        BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.usdc, BigDecimal.valueOf(1.01)),
                 new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId, new Date(),
-                        BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.apt, BigDecimal.ONE),
+                        BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.apt, BigDecimal.valueOf(0.55)),
                 new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId, new Date(),
-                        BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.op, BigDecimal.ONE),
+                        BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.op, BigDecimal.valueOf(10)),
                 new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId, new Date(),
-                        BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.strk, BigDecimal.ONE),
+                        BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.strk, null),
                 new PaymentRequestEntity(rewardPaid, UUID.randomUUID(), githubUserId, new Date(), BigDecimal.ONE,
-                        null, 1, projectId, CurrencyEnumEntity.strk, BigDecimal.ONE)));
+                        null, 1, projectId, CurrencyEnumEntity.strk, null)));
         paymentRepository.save(new PaymentEntity(UUID.randomUUID(), BigDecimal.ONE, "STRK",
                 JacksonUtil.toJsonNode("{}"), rewardPaid, new Date()));
 
@@ -236,19 +229,19 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                     UserPayoutSettings.builder().starknetAddress(StarkNet.accountAddress("0x01")).build());
             paymentRequestRepository.saveAll(List.of(new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(),
                             individualIgithubUserId, new Date(), BigDecimal.valueOf(10000), null, 1, projectId,
-                            CurrencyEnumEntity.usd, BigDecimal.ONE),
+                            CurrencyEnumEntity.usd, BigDecimal.valueOf(10000)),
                     new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), individualIgithubUserId, new Date(),
-                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.eth, BigDecimal.ONE),
+                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.eth, BigDecimal.valueOf(1000)),
                     new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), individualIgithubUserId, new Date(),
-                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.apt, BigDecimal.ONE),
+                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.apt, BigDecimal.valueOf(0.55)),
                     new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), individualIgithubUserId, new Date(),
-                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.op, BigDecimal.ONE),
+                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.op, BigDecimal.valueOf(10)),
                     new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), individualIgithubUserId, new Date(),
-                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.strk, BigDecimal.ONE),
+                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.strk, null),
                     new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), individualIgithubUserId, new Date(),
-                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.lords, BigDecimal.ONE),
+                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.lords, BigDecimal.valueOf(0.33)),
                     new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), individualIgithubUserId, new Date(),
-                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.usdc, BigDecimal.ONE)
+                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.usdc, BigDecimal.valueOf(1.01))
             ));
 
 
@@ -435,19 +428,19 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                     UserPayoutSettings.builder().ethWallet(Ethereum.wallet("vitalik.eth")).build());
             paymentRequestRepository.saveAll(List.of(new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(),
                             companyGithubUserId, new Date(), BigDecimal.valueOf(10000), null, 1, projectId,
-                            CurrencyEnumEntity.usd, BigDecimal.ONE),
+                            CurrencyEnumEntity.usd, BigDecimal.valueOf(10000)),
                     new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), companyGithubUserId, new Date(),
-                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.eth, BigDecimal.ONE),
+                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.eth, BigDecimal.valueOf(1000)),
                     new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), companyGithubUserId, new Date(),
-                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.apt, BigDecimal.ONE),
+                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.apt, BigDecimal.valueOf(0.55)),
                     new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), companyGithubUserId, new Date(),
-                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.op, BigDecimal.ONE),
+                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.op, BigDecimal.valueOf(10)),
                     new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), companyGithubUserId, new Date(),
-                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.strk, BigDecimal.ONE),
+                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.strk, null),
                     new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), companyGithubUserId, new Date(),
-                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.lords, BigDecimal.ONE),
+                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.lords, BigDecimal.valueOf(0.33)),
                     new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), companyGithubUserId, new Date(),
-                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.usdc, BigDecimal.ONE)
+                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.usdc, BigDecimal.valueOf(1.01))
             ));
 
             // When
