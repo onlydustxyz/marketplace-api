@@ -69,7 +69,8 @@ public class BillingProfileService implements BillingProfileFacadePort {
     @Override
     @Transactional
     public Invoice previewInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull List<RewardId> rewardIds) {
-        if (!billingProfileStoragePort.oldIsAdmin(userId, billingProfileId)) throw unauthorized("User is not allowed to generate invoice for this billing profile");
+        if (!billingProfileStoragePort.oldIsAdmin(userId, billingProfileId))
+            throw unauthorized("User is not allowed to generate invoice for this billing profile");
 
         invoiceStoragePort.deleteDraftsOf(billingProfileId);
 
@@ -87,7 +88,8 @@ public class BillingProfileService implements BillingProfileFacadePort {
     @Override
     public Page<Invoice> invoicesOf(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull Integer pageNumber,
                                     final @NonNull Integer pageSize, final @NonNull Invoice.Sort sort, final @NonNull SortDirection direction) {
-        if (!billingProfileStoragePort.oldIsAdmin(userId, billingProfileId)) throw unauthorized("User is not allowed to view invoices for this billing profile");
+        if (!billingProfileStoragePort.oldIsAdmin(userId, billingProfileId))
+            throw unauthorized("User is not allowed to view invoices for this billing profile");
 
         return invoiceStoragePort.invoicesOf(billingProfileId, pageNumber, pageSize, sort, direction);
     }
@@ -186,9 +188,9 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
     @Override
     public Page<BillingProfileCoworkerView> getCoworkers(BillingProfile.Id billingProfileId, UserId userId, int pageIndex, int pageSize) {
-        if (!billingProfileStorage.isAdmin(billingProfileId, userId))
+        if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
             throw unauthorized("User %s must be admin to list coworkers of billing profile %s".formatted(userId.value(), billingProfileId.value()));
-        final var coworkers = billingProfileStorage.findCoworkersByBillingProfile(billingProfileId, pageIndex, pageSize);
+        final var coworkers = billingProfileStoragePort.findCoworkersByBillingProfile(billingProfileId, pageIndex, pageSize);
 
         final var adminCount = coworkers.getContent().stream().filter(coworker -> coworker.role().equals(BillingProfile.User.Role.ADMIN)).count();
         return Page.<BillingProfileCoworkerView>builder()
