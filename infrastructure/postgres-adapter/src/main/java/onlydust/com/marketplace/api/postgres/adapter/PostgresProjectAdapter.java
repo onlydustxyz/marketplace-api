@@ -1,11 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.port.output.ProjectRewardStoragePort;
-import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.project.domain.view.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HiddenContributorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEcosystemEntity;
@@ -13,14 +8,14 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
+import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.port.output.ProjectRewardStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.view.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -67,6 +62,9 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
     private final ContributionViewEntityRepository contributionViewEntityRepository;
     private final HiddenContributorRepository hiddenContributorRepository;
     private final ProjectTagRepository projectTagRepository;
+    private final PaymentRequestRepository paymentRequestRepository;
+    private final HistoricalQuoteRepository historicalQuoteRepository;
+    private final CurrencyRepository currencyRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -480,6 +478,24 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
                 .totalItemNumber(count)
                 .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
                 .build();
+    }
+
+    @Override
+    public void updateUsdAmount(UUID rewardId) {
+        final var paymentRequest = paymentRequestRepository.findById(rewardId)
+                .orElseThrow(() -> OnlyDustException.notFound("Payment request %s not found".formatted(rewardId)));
+        final var currency = currencyRepository.findByCode(paymentRequest.getCurrency().toString().toUpperCase())
+                .orElseThrow(() -> OnlyDustException.notFound("Currency %s not found".formatted(paymentRequest.getCurrency())));
+        final var usd = currencyRepository.findByCode("USD")
+                .orElseThrow(() -> OnlyDustException.notFound("Currency USD not found"));
+
+        final var usdAmount = historicalQuoteRepository.findFirstByBaseIdAndTargetIdAndTimestampLessThanEqualOrderByTimestampDesc(currency.id(), usd.id(),
+                        paymentRequest.getRequestedAt().toInstant())
+                .orElseThrow(() -> OnlyDustException.notFound("No usd quote found for %s at %s".formatted(paymentRequest.getCurrency(),
+                        paymentRequest.getRequestedAt())));
+
+        paymentRequest.setUsdAmount(paymentRequest.getAmount().multiply(usdAmount.getPrice()));
+        paymentRequestRepository.save(paymentRequest);
     }
 
     @Override
