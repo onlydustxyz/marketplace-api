@@ -38,6 +38,7 @@ public interface BillingProfileMapper {
             billingProfileResponse.setId(companyBillingProfile.id().value());
             billingProfileResponse.setName(companyBillingProfile.name());
             billingProfileResponse.setIsSwitchableToSelfEmployed(companyBillingProfile.isSwitchableToSelfEmployed());
+            billingProfileResponse.setStatus(verificationStatusToResponse(companyBillingProfile.status()));
             return billingProfileResponse;
         } else if (billingProfile instanceof SelfEmployedBillingProfile selfEmployedBillingProfile) {
             billingProfileResponse.setType(BillingProfileType.SELF_EMPLOYED);
@@ -45,6 +46,7 @@ public interface BillingProfileMapper {
             billingProfileResponse.setId(selfEmployedBillingProfile.id().value());
             billingProfileResponse.setName(selfEmployedBillingProfile.name());
             billingProfileResponse.setIsSwitchableToSelfEmployed(selfEmployedBillingProfile.isSwitchableToCompany());
+            billingProfileResponse.setStatus(verificationStatusToResponse(selfEmployedBillingProfile.status()));
             return billingProfileResponse;
         } else {
             throw OnlyDustException.internalServerError("Failed to cast billing profile to billing profile type");
@@ -61,6 +63,7 @@ public interface BillingProfileMapper {
         billingProfileResponse.setCurrentYearPaymentAmount(individualBillingProfile.currentYearPaymentAmount().getValue());
         billingProfileResponse.setCurrentYearPaymentLimit(individualBillingProfile.currentYearPaymentLimit().getValue());
         billingProfileResponse.setIsSwitchableToSelfEmployed(false);
+        billingProfileResponse.setStatus(verificationStatusToResponse(individualBillingProfile.status()));
         return billingProfileResponse;
     }
 
@@ -82,7 +85,7 @@ public interface BillingProfileMapper {
             case DRIVER_LICENSE -> KYCResponse.IdDocumentTypeEnum.DRIVER_LICENSE;
             case RESIDENCE_PERMIT -> KYCResponse.IdDocumentTypeEnum.RESIDENCE_PERMIT;
         });
-        response.setStatus(verificationStatusToResponse(kyc.getStatus()));
+        response.setId(kyc.getId());
         response.setUsCitizen(kyc.getUsCitizen());
         response.setValidUntil(DateMapper.toZoneDateTime(kyc.getValidUntil()));
         return response;
@@ -96,7 +99,7 @@ public interface BillingProfileMapper {
         response.setAddress(kyb.getAddress());
         response.setCountry(isNull(kyb.getCountry()) ? null : kyb.getCountry().display().orElse(null));
         response.setName(kyb.getName());
-        response.setStatus(verificationStatusToResponse(kyb.getStatus()));
+        response.setId(kyb.getId());
         response.setEuVATNumber(kyb.getEuVATNumber());
         response.setRegistrationDate(DateMapper.toZoneDateTime(kyb.getRegistrationDate()));
         response.setRegistrationNumber(kyb.getRegistrationNumber());
