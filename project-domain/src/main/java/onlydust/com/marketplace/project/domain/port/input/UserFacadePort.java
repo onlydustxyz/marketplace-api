@@ -39,8 +39,6 @@ public interface UserFacadePort {
                                             int pageIndex, int sanitizedPageSize,
                                             UserRewardView.SortBy sortBy, SortDirection sortDirection);
 
-    UserRewardTotalAmountsView getRewardTotalAmountsForUserId(UUID userId);
-
     UserPayoutSettings updatePayoutSettings(UUID userId, UserPayoutSettings userPayoutSettings);
 
     RewardView getRewardByIdForRecipientId(UUID rewardId, Long recipientId);

@@ -10,34 +10,30 @@ import java.util.UUID;
 
 public interface RewardStatsRepository extends JpaRepository<RewardStatsEntity, CurrencyEnumEntity> {
     @Query(value = """
-            WITH work_item_ids AS (SELECT wi.payment_id, JSONB_AGG(DISTINCT wi.id) as ids FROM work_items wi GROUP BY wi.payment_id)
-            SELECT 
-                pr.currency,
-                COALESCE(SUM(pr.amount), 0)      AS processed_amount,
-                COALESCE(SUM(pr.usd_amount), 0)  AS processed_usd_amount,
-                COALESCE(SUM(pr.amount) FILTER ( WHERE COALESCE(p.total_paid, 0) < pr.amount ), 0)     AS pending_amount,
-                COALESCE(SUM(pr.usd_amount) FILTER ( WHERE COALESCE(p.total_paid, 0) < pr.amount ), 0) AS pending_usd_amount,
-                JSONB_AGG(pr.id) AS reward_ids,
-                COALESCE(JSONB_AGG(wii.ids) FILTER ( WHERE wii.ids IS NOT NULL ), '[]') AS reward_item_ids,
-                JSONB_AGG(pr.project_id) AS project_ids
-            FROM payment_requests pr
-            JOIN iam.users u on u.github_user_id = pr.recipient_id
-            LEFT JOIN work_item_ids wii ON wii.payment_id = pr.id
-            LEFT JOIN ( 
-                SELECT p.request_id, SUM(amount) as total_paid 
-                FROM payments p 
-                GROUP BY p.request_id 
-            ) p ON p.request_id = pr.id
-            WHERE 
-                u.id = :userId AND
-                (COALESCE(:currencies) IS NULL OR CAST(pr.currency AS TEXT) IN (:currencies)) AND
-                (COALESCE(:projectIds) IS NULL OR pr.project_id IN (:projectIds)) AND
-                (:fromDate IS NULL OR pr.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD')) AND
-                (:toDate IS NULL OR pr.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
-            GROUP BY 
-                pr.currency
+            WITH reward_item_ids AS (SELECT ri.reward_id, JSONB_AGG(DISTINCT ri.id) as ids
+                                     FROM reward_items ri
+                                     GROUP BY ri.reward_id)
+            SELECT r.currency_id                                                                        as currency_id,
+                   COALESCE(SUM(r.amount), 0)                                                           AS processed_amount,
+                   COALESCE(SUM(rsd.amount_usd_equivalent), 0)                                          AS processed_usd_amount,
+                   COALESCE(SUM(r.amount) FILTER ( WHERE rs.status != 'COMPLETE' ), 0)                  AS pending_amount,
+                   COALESCE(SUM(rsd.amount_usd_equivalent) FILTER ( WHERE rs.status != 'COMPLETE' ), 0) AS pending_usd_amount,
+                   JSONB_AGG(r.id)                                                                      AS reward_ids,
+                   COALESCE(JSONB_AGG(wii.ids) FILTER ( WHERE wii.ids IS NOT NULL ), '[]')              AS reward_item_ids,
+                   JSONB_AGG(r.project_id)                                                              AS project_ids
+            FROM rewards r
+                     JOIN accounting.reward_status_data rsd ON rsd.reward_id = r.id
+                     JOIN accounting.reward_statuses rs ON rs.reward_id = r.id
+                     JOIN iam.users u on u.github_user_id = r.recipient_id
+                     LEFT JOIN reward_item_ids wii ON wii.reward_id = r.id
+            WHERE u.id = :userId
+              AND (COALESCE(:currencyIds) IS NULL OR r.currency_id IN (:currencyIds))
+              AND (COALESCE(:projectIds) IS NULL OR r.project_id IN (:projectIds))
+              AND (:fromDate IS NULL OR r.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD'))
+              AND (:toDate IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
+            GROUP BY r.currency_id
             """, nativeQuery = true)
-    List<RewardStatsEntity> findByUser(UUID userId, List<String> currencies, List<UUID> projectIds, String fromDate,
+    List<RewardStatsEntity> findByUser(UUID userId, List<UUID> currencyIds, List<UUID> projectIds, String fromDate,
                                        String toDate);
 
 

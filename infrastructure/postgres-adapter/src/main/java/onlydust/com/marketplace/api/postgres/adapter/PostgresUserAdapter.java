@@ -1,10 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.model.Currency;
-import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
-import onlydust.com.marketplace.project.domain.view.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
@@ -21,6 +17,12 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
+import onlydust.com.marketplace.project.domain.model.Currency;
+import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
+import onlydust.com.marketplace.project.domain.view.*;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -49,12 +51,12 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final ApplicationRepository applicationRepository;
     private final ProjectIdRepository projectIdRepository;
     private final UserProfileInfoRepository userProfileInfoRepository;
-    private final CustomUserRewardRepository customUserRewardRepository;
     private final OldWalletRepository oldWalletRepository;
     private final CustomUserPayoutInfoRepository customUserPayoutInfoRepository;
     private final CustomRewardRepository customRewardRepository;
     private final ProjectLedIdRepository projectLedIdRepository;
     private final RewardStatsRepository rewardStatsRepository;
+    private final UserRewardViewRepository userRewardViewRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -250,40 +252,36 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Transactional(readOnly = true)
     public UserRewardsPageView findRewardsForUserId(UUID userId, UserRewardView.Filters filters,
                                                     int pageIndex, int pageSize,
-                                                    UserRewardView.SortBy sortBy, SortDirection sortDirection) {
+                                                    UserRewardView.SortBy sort, SortDirection sortDirection) {
 
         final var format = new SimpleDateFormat("yyyy-MM-dd");
         final var fromDate = isNull(filters.getFrom()) ? null : format.format(filters.getFrom());
         final var toDate = isNull(filters.getTo()) ? null : format.format(filters.getTo());
-        final var currencies =
-                filters.getCurrencies().stream().map(CurrencyEnumEntity::of).map(CurrencyEnumEntity::toString).toList();
 
-        final var count = customUserRewardRepository.getCount(userId, currencies, filters.getProjectIds(), fromDate,
-                toDate);
-        final var userRewardViews = customUserRewardRepository.getViewEntities(userId,
-                        currencies, filters.getProjectIds(), fromDate, toDate,
-                        sortBy, sortDirection, pageIndex, pageSize)
-                .stream().map(UserRewardMapper::mapEntityToDomain)
-                .toList();
-        final var rewardsStats = rewardStatsRepository.findByUser(userId, currencies, filters.getProjectIds(),
+        final var pageRequest = PageRequest.of(pageIndex, pageSize,
+                UserRewardViewRepository.sortBy(sort, sortDirection == SortDirection.asc ? Direction.ASC : Direction.DESC));
+
+        final var page = userRewardViewRepository.find(userId, filters.getCurrencies(), filters.getProjectIds(), fromDate, toDate, pageRequest);
+
+        final var rewardsStats = rewardStatsRepository.findByUser(userId, filters.getCurrencies(), filters.getProjectIds(),
                 fromDate, toDate);
 
         return UserRewardsPageView.builder()
                 .rewards(Page.<UserRewardView>builder()
-                        .content(userRewardViews)
-                        .totalItemNumber(count)
-                        .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
+                        .content(page.getContent().stream().map(UserRewardMapper::mapEntityToDomain).toList())
+                        .totalItemNumber((int) page.getTotalElements())
+                        .totalPageNumber(page.getTotalPages())
                         .build())
                 .rewardedAmount(rewardsStats.size() == 1 ?
                         new Money(rewardsStats.get(0).getProcessedAmount(),
-                                rewardsStats.get(0).getCurrency().toDomain(),
+                                Currency.valueOf(rewardsStats.get(0).getCurrency().code()),
                                 rewardsStats.get(0).getProcessedUsdAmount()) :
                         new Money(null, null,
                                 rewardsStats.stream().map(RewardStatsEntity::getProcessedUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,
                                         BigDecimal::add)))
                 .pendingAmount(rewardsStats.size() == 1 ?
                         new Money(rewardsStats.get(0).getPendingAmount(),
-                                rewardsStats.get(0).getCurrency().toDomain(),
+                                Currency.valueOf(rewardsStats.get(0).getCurrency().code()),
                                 rewardsStats.get(0).getPendingUsdAmount()) :
                         new Money(null, null,
                                 rewardsStats.stream().map(RewardStatsEntity::getPendingUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,
@@ -292,12 +290,6 @@ public class PostgresUserAdapter implements UserStoragePort {
                 .rewardedContributionsCount(rewardsStats.stream().map(RewardStatsEntity::getRewardItemIds).flatMap(Collection::stream).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .rewardingProjectsCount(rewardsStats.stream().map(RewardStatsEntity::getProjectIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .build();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public UserRewardTotalAmountsView findRewardTotalAmountsForUserId(UUID userId) {
-        return UserRewardMapper.mapTotalAmountEntitiesToDomain(customUserRewardRepository.getTotalAmountEntities(userId));
     }
 
     @Override
@@ -325,7 +317,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Override
     @Transactional(readOnly = true)
     public List<UserRewardView> findPendingInvoiceRewardsForRecipientId(Long githubUserId) {
-        return customUserRewardRepository.getPendingInvoicesViewEntities(githubUserId)
+        return userRewardViewRepository.findPendingPaymentRequestForRecipient(githubUserId)
                 .stream().map(UserRewardMapper::mapEntityToDomain).toList();
     }
 

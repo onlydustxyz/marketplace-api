@@ -1,14 +1,14 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface RewardStatusRepository extends JpaRepository<RewardStatusEntity, UUID> {
-    List<RewardStatusEntity> findByPaidAtIsNull();
+public interface RewardStatusRepository extends JpaRepository<RewardStatusDataEntity, UUID> {
+    List<RewardStatusDataEntity> findByPaidAtIsNull();
 
     @Query(value = """
             SELECT * FROM accounting.reward_status_data rsd
@@ -19,5 +19,5 @@ public interface RewardStatusRepository extends JpaRepository<RewardStatusEntity
             WHERE COALESCE(ibp.id, cbp.id) IS NOT NULL AND
             rsd.paid_at IS NULL
             """, nativeQuery = true)
-    List<RewardStatusEntity> findNotPaidByBillingProfile(UUID billingProfileId);
+    List<RewardStatusDataEntity> findNotPaidByBillingProfile(UUID billingProfileId);
 }

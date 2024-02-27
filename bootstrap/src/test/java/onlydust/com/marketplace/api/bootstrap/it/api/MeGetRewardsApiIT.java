@@ -1,460 +1,219 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
+import lombok.NonNull;
+import lombok.SneakyThrows;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.CompanyBillingProfileEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndividualBillingProfileEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.OldVerificationStatusEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.UserBillingProfileTypeRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuotesRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity.BillingProfileTypeEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
-    private static final String GET_MY_REWARD_AMOUNTS_JSON_RESPONSE = """
-            {
-              "totalAmount": 191010.00,
-              "details": [
-                {
-                  "totalAmount": 60,
-                  "totalDollarsEquivalent": 90000,
-                  "currency": "ETH"
-                },
-                {
-                  "totalAmount": 30,
-                  "totalDollarsEquivalent": null,
-                  "currency": "OP"
-                },
-                {
-                  "totalAmount": 500,
-                  "totalDollarsEquivalent": 100000,
-                  "currency": "APT"
-                },
-                {
-                  "totalAmount": 9511147,
-                  "totalDollarsEquivalent": null,
-                  "currency": "STRK"
-                },
-                {
-                  "totalAmount": 1000,
-                  "totalDollarsEquivalent": 1010.00,
-                  "currency": "USDC"
-                }
-              ]
-            }
-            """;
-    private static final String GET_USER_REWARDS_WITH_MULTI_CURRENCIES_RESPONSE_JSON = """
-                       
-            {
-             "rewards": [
-               {
-                 "requestedAt": "2023-09-19T07:38:22.018458Z",
-                 "processedAt": null,
-                 "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                 "status": "MISSING_PAYOUT_INFO",
-                 "unlockDate": null,
-                 "amount": {
-                   "total": 500,
-                   "currency": "APT",
-                   "dollarsEquivalent": 100000
-                 },
-                 "numberOfRewardedContributions": 25,
-                 "rewardedOnProjectName": "QA new contributions",
-                 "rewardedOnProjectLogoUrl": null,
-                 "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
-               },
-               {
-                 "requestedAt": "2023-09-20T08:46:52.77875Z",
-                 "processedAt": null,
-                 "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                 "status": "PENDING_INVOICE",
-                 "unlockDate": null,
-                 "amount": {
-                   "total": 50,
-                   "currency": "ETH",
-                   "dollarsEquivalent": 75000
-                 },
-                 "numberOfRewardedContributions": 1,
-                 "rewardedOnProjectName": "QA new contributions",
-                 "rewardedOnProjectLogoUrl": null,
-                 "id": "e1498a17-5090-4071-a88a-6f0b0c337c3a"
-               },
-               {
-                 "requestedAt": "2023-09-19T07:40:26.971981Z",
-                 "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                 "status": "COMPLETE",
-                 "unlockDate": null,
-                 "amount": {
-                   "total": 10,
-                   "currency": "ETH",
-                   "dollarsEquivalent": 15000
-                 },
-                 "numberOfRewardedContributions": 25,
-                 "rewardedOnProjectName": "QA new contributions",
-                 "rewardedOnProjectLogoUrl": null,
-                 "id": "40fda3c6-2a3f-4cdd-ba12-0499dd232d53"
-               },
-               {
-                 "requestedAt": "2023-09-19T07:38:52.590518Z",
-                 "processedAt": null,
-                 "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                 "status": "PENDING_INVOICE",
-                 "unlockDate": null,
-                 "amount": {
-                   "total": 1000,
-                   "currency": "USDC",
-                   "dollarsEquivalent": 1010.00
-                 },
-                 "numberOfRewardedContributions": 25,
-                 "rewardedOnProjectName": "QA new contributions",
-                 "rewardedOnProjectLogoUrl": null,
-                 "id": "85f8358c-5339-42ac-a577-16d7760d1e28"
-               },
-               {
-                 "requestedAt": "2023-09-19T07:39:54.45638Z",
-                 "processedAt": null,
-                 "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                 "status": "MISSING_PAYOUT_INFO",
-                 "unlockDate": "2024-08-23T00:00:00Z",
-                 "amount": {
-                   "total": 30,
-                   "currency": "OP",
-                   "dollarsEquivalent": null
-                 },
-                 "numberOfRewardedContributions": 25,
-                 "rewardedOnProjectName": "QA new contributions",
-                 "rewardedOnProjectLogoUrl": null,
-                 "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"
-               },
-               {
-                 "requestedAt": "2023-09-19T07:39:23.730967Z",
-                 "processedAt": null,
-                 "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                 "status": "MISSING_PAYOUT_INFO",
-                 "unlockDate": null,
-                 "amount": {
-                   "total": 9511147,
-                   "currency": "STRK",
-                   "dollarsEquivalent": null
-                 },
-                 "numberOfRewardedContributions": 25,
-                 "rewardedOnProjectName": "QA new contributions",
-                 "rewardedOnProjectLogoUrl": null,
-                 "id": "5b96ca1e-4ad2-41c1-8819-520b885d9223"
-               }
-             ],
-             "hasMore": false,
-             "totalPageNumber": 1,
-             "totalItemNumber": 6,
-             "nextPageIndex": 0,
-             "rewardedAmount": {
-               "amount": null,
-               "currency": null,
-               "usdEquivalent": 191010.00
-             },
-             "pendingAmount": {
-               "amount": null,
-               "currency": null,
-               "usdEquivalent": 176010.00
-             },
-             "receivedRewardsCount": 6,
-             "rewardedContributionsCount": 26,
-             "rewardingProjectsCount": 1
-
-                      }
-                       
-            """;
-    private static final String ME_GET_REWARDS_RESPONSE_JSON = """
-            {
-              "rewards": [
-                {
-                  "requestedAt": "2023-09-19T07:40:26.971981Z",
-                  "processedAt": null,
-                  "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                  "status": "PENDING_VERIFICATION",
-                  "unlockDate": null,
-                  "amount": {
-                    "total": 1000,
-                    "currency": "USDC",
-                    "dollarsEquivalent": 1010.00
-                  },
-                  "numberOfRewardedContributions": 25,
-                  "rewardedOnProjectName": "QA new contributions",
-                  "rewardedOnProjectLogoUrl": null,
-                  "id": "40fda3c6-2a3f-4cdd-ba12-0499dd232d53"
-                },
-                {
-                  "requestedAt": "2023-09-19T07:39:54.45638Z",
-                  "processedAt": null,
-                  "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                  "status": "PENDING_VERIFICATION",
-                  "unlockDate": null,
-                  "amount": {
-                    "total": 1000,
-                    "currency": "USDC",
-                    "dollarsEquivalent": 1010.00
-                  },
-                  "numberOfRewardedContributions": 25,
-                  "rewardedOnProjectName": "QA new contributions",
-                  "rewardedOnProjectLogoUrl": null,
-                  "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"
-                },
-                {
-                  "requestedAt": "2023-09-19T07:39:23.730967Z",
-                  "processedAt": null,
-                  "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                  "status": "PENDING_VERIFICATION",
-                  "unlockDate": null,
-                  "amount": {
-                    "total": 1000,
-                    "currency": "USDC",
-                    "dollarsEquivalent": 1010.00
-                  },
-                  "numberOfRewardedContributions": 25,
-                  "rewardedOnProjectName": "QA new contributions",
-                  "rewardedOnProjectLogoUrl": null,
-                  "id": "5b96ca1e-4ad2-41c1-8819-520b885d9223"
-                },
-                {
-                  "requestedAt": "2023-09-19T07:38:52.590518Z",
-                  "processedAt": null,
-                  "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                  "status": "PENDING_VERIFICATION",
-                  "unlockDate": null,
-                  "amount": {
-                    "total": 1000,
-                    "currency": "USDC",
-                    "dollarsEquivalent": 1010.00
-                  },
-                  "numberOfRewardedContributions": 25,
-                  "rewardedOnProjectName": "QA new contributions",
-                  "rewardedOnProjectLogoUrl": null,
-                  "id": "85f8358c-5339-42ac-a577-16d7760d1e28"
-                },
-                {
-                  "requestedAt": "2023-09-19T07:38:22.018458Z",
-                  "processedAt": null,
-                  "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                  "status": "PENDING_VERIFICATION",
-                  "unlockDate": null,
-                  "amount": {
-                    "total": 1000,
-                    "currency": "USDC",
-                    "dollarsEquivalent": 1010.00
-                  },
-                  "numberOfRewardedContributions": 25,
-                  "rewardedOnProjectName": "QA new contributions",
-                  "rewardedOnProjectLogoUrl": null,
-                  "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
-                },
-                {
-                  "requestedAt": "2023-09-20T08:46:52.77875Z",
-                  "processedAt": null,
-                  "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                  "status": "PENDING_VERIFICATION",
-                  "unlockDate": null,
-                  "amount": {
-                    "total": 1000,
-                    "currency": "USDC",
-                    "dollarsEquivalent": 1010.00
-                  },
-                  "numberOfRewardedContributions": 1,
-                  "rewardedOnProjectName": "QA new contributions",
-                  "rewardedOnProjectLogoUrl": null,
-                  "id": "e1498a17-5090-4071-a88a-6f0b0c337c3a"
-                }
-              ],
-              "hasMore": false,
-              "totalPageNumber": 1,
-              "totalItemNumber": 6,
-              "nextPageIndex": 0,
-              "rewardedAmount": {
-                "amount": 6000,
-                "currency": "USDC",
-                "usdEquivalent": 6060.00
-              },
-              "pendingAmount": {
-                "amount": 6000,
-                "currency": "USDC",
-                "usdEquivalent": 6060.00
-              },
-              "receivedRewardsCount": 6,
-              "rewardedContributionsCount": 26,
-              "rewardingProjectsCount": 1
-            }            
-            """;
-
     @Autowired
-    PaymentRequestRepository paymentRequestRepository;
+    RewardRepository rewardRepository;
     @Autowired
-    CryptoUsdQuotesRepository cryptoUsdQuotesRepository;
+    RewardStatusRepository rewardStatusRepository;
     @Autowired
-    PaymentRepository paymentRepository;
+    InvoiceRewardRepository invoiceRewardRepository;
+    @Autowired
+    CurrencyRepository currencyRepository;
+    @Autowired
+    InvoiceRepository invoiceRepository;
     @Autowired
     PostgresUserAdapter postgresUserAdapter;
-
-    @Test
-    @Order(1)
-    void should_get_my_rewards() {
-        // Given
-        final String jwt = userAuthHelper.authenticatePierre().jwt();
-
-        // When
-        client.get()
-                .uri(getApiURI(ME_GET_REWARDS, Map.of("pageIndex", "0", "pageSize", "100000", "sort", "CONTRIBUTION"
-                        , "direction", "DESC")))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(ME_GET_REWARDS_RESPONSE_JSON);
-    }
-
     @Autowired
     UserBillingProfileTypeRepository userBillingProfileTypeRepository;
     @Autowired
     CompanyBillingProfileRepository companyBillingProfileRepository;
+    @Autowired
+    IndividualBillingProfileRepository individualBillingProfileRepository;
 
-    @Order(2)
-    @Test
-    void should_get_my_rewards_given_multi_currencies() {
-        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.authenticatePierre();
-        final String jwt = authenticatedUser.jwt();
-        final UserBillingProfileTypeEntity userBillingProfileTypeEntity =
-                userBillingProfileTypeRepository.findById(authenticatedUser.user().getId()).orElseThrow();
-        userBillingProfileTypeEntity.setBillingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.COMPANY);
-        userBillingProfileTypeRepository.save(userBillingProfileTypeEntity);
-        final CompanyBillingProfileEntity companyBillingProfileEntity =
-                companyBillingProfileRepository.findByUserId(authenticatedUser.user().getId()).orElseThrow();
-        companyBillingProfileEntity.setVerificationStatus(OldVerificationStatusEntity.VERIFIED);
-        companyBillingProfileRepository.save(companyBillingProfileEntity);
+    UserAuthHelper.AuthenticatedUser pierre;
 
-        final PaymentRequestEntity paymentRequestEntity = paymentRequestRepository.findById(
-                        UUID.fromString("40fda3c6-2a3f-4cdd-ba12-0499dd232d53"))
-                .orElseThrow();
-        paymentRequestEntity.setCurrency(CurrencyEnumEntity.eth);
-        paymentRequestEntity.setAmount(BigDecimal.valueOf(10));
-        paymentRequestEntity.setUsdAmount(BigDecimal.valueOf(15000));
-        paymentRequestRepository.save(paymentRequestEntity);
-        paymentRepository.save(new PaymentEntity(UUID.randomUUID(), paymentRequestEntity.getAmount(), "ETH",
-                JacksonUtil.toJsonNode("{}"), paymentRequestEntity.getId(), new Date()));
+    @BeforeEach
+    void setup() {
+        pierre = userAuthHelper.authenticatePierre();
 
-        final PaymentRequestEntity paymentRequestEntity2 = paymentRequestRepository.findById(
-                        UUID.fromString("e1498a17-5090-4071-a88a-6f0b0c337c3a"))
-                .orElseThrow();
-        paymentRequestEntity2.setCurrency(CurrencyEnumEntity.eth);
-        paymentRequestEntity2.setAmount(BigDecimal.valueOf(50));
-        paymentRequestEntity2.setUsdAmount(BigDecimal.valueOf(75000));
-        paymentRequestRepository.save(paymentRequestEntity2);
+        patchBillingProfile(pierre, BillingProfileTypeEntity.COMPANY, OldVerificationStatusEntity.VERIFIED);
 
-        final PaymentRequestEntity paymentRequestEntity3 = paymentRequestRepository.findById(
-                        UUID.fromString("2ac80cc6-7e83-4eef-bc0c-932b58f683c0"))
-                .orElseThrow();
-        paymentRequestEntity3.setCurrency(CurrencyEnumEntity.apt);
-        paymentRequestEntity3.setAmount(BigDecimal.valueOf(500));
-        paymentRequestEntity3.setUsdAmount(BigDecimal.valueOf(100000));
-        paymentRequestRepository.save(paymentRequestEntity3);
+        patchReward("40fda3c6-2a3f-4cdd-ba12-0499dd232d53", 10, "ETH", 15000, null, "2023-07-12");
+        patchReward("e1498a17-5090-4071-a88a-6f0b0c337c3a", 50, "ETH", 75000, null, "2023-08-12");
+        patchReward("2ac80cc6-7e83-4eef-bc0c-932b58f683c0", 500, "APT", 100000, null, null);
+        patchReward("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0", 30, "OP", null, "2023-08-14", null);
+        patchReward("5b96ca1e-4ad2-41c1-8819-520b885d9223", 9511147, "STRK", null, null, null);
 
-        final PaymentRequestEntity paymentRequestEntity4 = paymentRequestRepository.findById(
-                        UUID.fromString("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"))
-                .orElseThrow();
-        paymentRequestEntity4.setCurrency(CurrencyEnumEntity.op);
-        paymentRequestEntity4.setAmount(BigDecimal.valueOf(30));
-        paymentRequestEntity4.setUsdAmount(null);
-        paymentRequestRepository.save(paymentRequestEntity4);
-
-        final PaymentRequestEntity paymentRequestEntity5 = paymentRequestRepository.findById(
-                        UUID.fromString("5b96ca1e-4ad2-41c1-8819-520b885d9223"))
-                .orElseThrow();
-        paymentRequestEntity5.setCurrency(CurrencyEnumEntity.strk);
-        paymentRequestEntity5.setAmount(BigDecimal.valueOf(9511147));
-        paymentRequestEntity5.setUsdAmount(null);
-        paymentRequestRepository.save(paymentRequestEntity5);
-
-
-        // When
-        client.get()
-                .uri(getApiURI(String.format(ME_GET_REWARDS), Map.of("pageIndex", "0", "pageSize",
-                        "20", "sort", "AMOUNT", "direction", "DESC")))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                .exchange()
-                // Then
-                .expectStatus()
-                .isEqualTo(HttpStatus.OK)
-                .expectBody()
-                .json(GET_USER_REWARDS_WITH_MULTI_CURRENCIES_RESPONSE_JSON);
-
-    }
-
-    @Test
-    @Order(3)
-    void should_get_my_total_reward_amounts_given_multi_currencies() {
-        // Given
-        final String jwt = userAuthHelper.authenticatePierre().jwt();
-
-        // When
-        client.get()
-                .uri(getApiURI(ME_GET_REWARD_TOTAL_AMOUNTS))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(GET_MY_REWARD_AMOUNTS_JSON_RESPONSE);
-    }
-
-    @Test
-    @Order(4)
-    void should_get_my_rewards_with_pending_invoice() throws ParseException {
-        // Given
-        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
-        final String jwt = pierre.jwt();
         postgresUserAdapter.savePayoutSettingsForUserId(pierre.user().getId(),
                 UserPayoutSettings.builder()
                         .ethWallet(Ethereum.wallet("vitalik.eth"))
                         .aptosAddress(Aptos.accountAddress("0x" + faker.random().hex(40)))
                         .build());
+    }
 
-        paymentRepository.save(
-                PaymentEntity.builder().id(UUID.randomUUID()).amount(BigDecimal.ONE)
-                        .processedAt(new Date()).currencyCode("FAKE").requestId(UUID.fromString("85f8358c-5339-42ac" +
-                                                                                                "-a577-16d7760d1e28"))
-                        .receipt(JacksonUtil.toJsonNode("{}")).build());
+    @Test
+    void should_list_my_rewards() {
+        // When
+        client.get()
+                .uri(getApiURI(String.format(ME_GET_REWARDS), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "20",
+                        "sort", "AMOUNT",
+                        "direction", "DESC")
+                ))
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isEqualTo(HttpStatus.OK)
+                .expectBody()
+                .json("""
+                        {
+                          "rewards": [
+                            {
+                              "requestedAt": "2023-09-19T07:38:22.018458Z",
+                              "processedAt": null,
+                              "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                              "status": "PENDING_INVOICE",
+                              "unlockDate": null,
+                              "amount": {
+                                "total": 500,
+                                "currency": "APT",
+                                "dollarsEquivalent": 100000
+                              },
+                              "numberOfRewardedContributions": 25,
+                              "rewardedOnProjectName": "QA new contributions",
+                              "rewardedOnProjectLogoUrl": null,
+                              "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
+                            },
+                            {
+                              "requestedAt": "2023-09-20T08:46:52.77875Z",
+                              "processedAt": "2023-08-12T00:00:00Z",
+                              "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                              "status": "COMPLETE",
+                              "unlockDate": null,
+                              "amount": {
+                                "total": 50,
+                                "currency": "ETH",
+                                "dollarsEquivalent": 75000
+                              },
+                              "numberOfRewardedContributions": 1,
+                              "rewardedOnProjectName": "QA new contributions",
+                              "rewardedOnProjectLogoUrl": null,
+                              "id": "e1498a17-5090-4071-a88a-6f0b0c337c3a"
+                            },
+                            {
+                              "requestedAt": "2023-09-19T07:40:26.971981Z",
+                              "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                              "status": "COMPLETE",
+                              "unlockDate": null,
+                              "amount": {
+                                "total": 10,
+                                "currency": "ETH",
+                                "dollarsEquivalent": 15000
+                              },
+                              "numberOfRewardedContributions": 25,
+                              "rewardedOnProjectName": "QA new contributions",
+                              "rewardedOnProjectLogoUrl": null,
+                              "id": "40fda3c6-2a3f-4cdd-ba12-0499dd232d53"
+                            },
+                            {
+                              "requestedAt": "2023-09-19T07:38:52.590518Z",
+                              "processedAt": null,
+                              "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                              "status": "PENDING_INVOICE",
+                              "unlockDate": null,
+                              "amount": {
+                                "total": 1000,
+                                "currency": "USDC",
+                                "dollarsEquivalent": 1010.00
+                              },
+                              "numberOfRewardedContributions": 25,
+                              "rewardedOnProjectName": "QA new contributions",
+                              "rewardedOnProjectLogoUrl": null,
+                              "id": "85f8358c-5339-42ac-a577-16d7760d1e28"
+                            },
+                            {
+                              "requestedAt": "2023-09-19T07:39:54.45638Z",
+                              "processedAt": null,
+                              "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                              "status": "MISSING_PAYOUT_INFO",
+                              "unlockDate": "2024-08-23T00:00:00Z",
+                              "amount": {
+                                "total": 30,
+                                "currency": "OP",
+                                "dollarsEquivalent": null
+                              },
+                              "numberOfRewardedContributions": 25,
+                              "rewardedOnProjectName": "QA new contributions",
+                              "rewardedOnProjectLogoUrl": null,
+                              "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"
+                            },
+                            {
+                              "requestedAt": "2023-09-19T07:39:23.730967Z",
+                              "processedAt": null,
+                              "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                              "status": "MISSING_PAYOUT_INFO",
+                              "unlockDate": null,
+                              "amount": {
+                                "total": 9511147,
+                                "currency": "STRK",
+                                "dollarsEquivalent": null
+                              },
+                              "numberOfRewardedContributions": 25,
+                              "rewardedOnProjectName": "QA new contributions",
+                              "rewardedOnProjectLogoUrl": null,
+                              "id": "5b96ca1e-4ad2-41c1-8819-520b885d9223"
+                            }
+                          ],
+                          "hasMore": false,
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 6,
+                          "nextPageIndex": 0,
+                          "rewardedAmount": {
+                            "amount": null,
+                            "currency": null,
+                            "usdEquivalent": 191010.00
+                          },
+                          "pendingAmount": {
+                            "amount": null,
+                            "currency": null,
+                            "usdEquivalent": 101010.00
+                          },
+                          "receivedRewardsCount": 6,
+                          "rewardedContributionsCount": 26,
+                          "rewardingProjectsCount": 1
+                        }
+                        """);
+    }
 
+    @Test
+    void should_get_my_rewards_with_pending_invoice() {
         // When
         client.get()
                 .uri(getApiURI(ME_REWARDS_PENDING_INVOICE))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -480,117 +239,28 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
                             },
                             {
-                              "requestedAt": "2023-09-20T08:46:52.77875Z",
+                              "requestedAt": "2023-09-19T07:38:52.590518Z",
                               "processedAt": null,
                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                               "status": "PENDING_INVOICE",
                               "unlockDate": null,
                               "amount": {
-                                "total": 50,
-                                "currency": "ETH",
-                                "dollarsEquivalent": 75000
-                              },
-                              "numberOfRewardedContributions": 1,
-                              "rewardedOnProjectName": "QA new contributions",
-                              "rewardedOnProjectLogoUrl": null,
-                              "id": "e1498a17-5090-4071-a88a-6f0b0c337c3a"
-                            }
-                          ]
-                        }
-                        """);
-
-        final PaymentRequestEntity reward2 = paymentRequestRepository.findById(UUID.fromString("8fe07ae1-cf3b-4401" +
-                                                                                               "-8958-a9e0b0aec7b0")).orElseThrow();
-        reward2.setInvoiceReceivedAt(new SimpleDateFormat("yyyy-MM-dd").parse("2023-08-14"));
-        paymentRequestRepository.save(reward2);
-
-        final PaymentRequestEntity reward3 = paymentRequestRepository.findById(UUID.fromString("e1498a17-5090-4071" +
-                                                                                               "-a88a-6f0b0c337c3a")).orElseThrow();
-        paymentRepository.save(new PaymentEntity(UUID.randomUUID(), BigDecimal.ONE, "OP",
-                JacksonUtil.toJsonNode("{}"), reward3.getId(), new SimpleDateFormat("yyyy-MM-dd").parse("2023-08-12")));
-
-
-        client.get()
-                .uri(getApiURI(ME_REWARDS_PENDING_INVOICE))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json("""
-                        {
-                          "rewards": [{
-                              "requestedAt": "2023-09-19T07:38:22.018458Z",
-                              "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                              "status": "PENDING_INVOICE",
-                              "amount": {
-                                "total": 500,
-                                "currency": "APT",
-                                "dollarsEquivalent": 100000
+                                "total": 1000,
+                                "currency": "USDC",
+                                "dollarsEquivalent": 1010.00
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
                               "rewardedOnProjectLogoUrl": null,
-                              "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
-                            }]
+                              "id": "85f8358c-5339-42ac-a577-16d7760d1e28"
                             }
-                         """);
-    }
-
-    @Autowired
-    IndividualBillingProfileRepository individualBillingProfileRepository;
-
-    @Test
-    void should_return_pending_verification_info_then_missing_payout_info_given_first_authenticated_user_with_pending_reward() {
-        // Given
-        final long githubUserId = faker.number().randomNumber();
-        final UUID userId = UUID.randomUUID();
-        final String jwt = userAuthHelper.newFakeUser(userId, githubUserId,
-                faker.rickAndMorty().character(), faker.internet().url(), false).jwt();
-        paymentRequestRepository.save(new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId,
-                new Date(), BigDecimal.ONE, null, 1, UUID.fromString("c66b929a-664d-40b9-96c4-90d3efd32a3c"),
-                CurrencyEnumEntity.usd, BigDecimal.ONE));
-
-        // When
-        client.get()
-                .uri(getApiURI(ME_GET_REWARDS, Map.of("pageIndex", "0", "pageSize", "100")))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.rewards[0].status").isEqualTo("PENDING_VERIFICATION");
-
-        userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
-                .userId(userId)
-                .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.INDIVIDUAL)
-                .build());
-        individualBillingProfileRepository.save(IndividualBillingProfileEntity.builder()
-                .verificationStatus(OldVerificationStatusEntity.VERIFIED)
-                .userId(userId)
-                .id(UUID.randomUUID())
-                .build());
-
-        // When
-        client.get()
-                .uri(getApiURI(ME_GET_REWARDS, Map.of("pageIndex", "0", "pageSize", "100")))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.rewards[0].status").isEqualTo("MISSING_PAYOUT_INFO");
+                          ]
+                        }
+                        """);
     }
 
     @Test
-    @Order(5)
     void should_filter_by_date() {
-        // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
-
         // When
         client.get()
                 .uri(getApiURI(ME_GET_REWARDS, Map.of(
@@ -599,7 +269,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         "fromDate", "2023-09-20",
                         "toDate", "2023-09-20"
                 )))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -611,33 +281,28 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 // we do not have any incorrect date
                 .jsonPath("$.rewards[?(@.requestedAt < '2023-09-20')]").doesNotExist()
                 .jsonPath("$.rewards[?(@.requestedAt > '2023-09-21')]").doesNotExist()
-                .jsonPath("$.rewardedAmount.amount").doesNotExist()
-                .jsonPath("$.rewardedAmount.currency").doesNotExist()
-                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(9090)
-                .jsonPath("$.pendingAmount.amount").doesNotExist()
-                .jsonPath("$.pendingAmount.currency").doesNotExist()
-                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(9090)
-                .jsonPath("$.receivedRewardsCount").isEqualTo(10)
-                .jsonPath("$.rewardedContributionsCount").isEqualTo(85)
+                .jsonPath("$.rewardedAmount.amount").isEqualTo(50)
+                .jsonPath("$.rewardedAmount.currency").isEqualTo("ETH")
+                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(75000)
+                .jsonPath("$.pendingAmount.amount").isEqualTo(0)
+                .jsonPath("$.pendingAmount.currency").isEqualTo("ETH")
+                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(0)
+                .jsonPath("$.receivedRewardsCount").isEqualTo(1)
+                .jsonPath("$.rewardedContributionsCount").isEqualTo(1)
                 .jsonPath("$.rewardingProjectsCount").isEqualTo(1)
         ;
     }
 
-
     @Test
-    @Order(6)
     void should_filter_by_currency() {
-        // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
-
         // When
         client.get()
                 .uri(getApiURI(ME_GET_REWARDS, Map.of(
                         "pageIndex", "0",
                         "pageSize", "100",
-                        "currencies", "ETH"
+                        "currencies", currencyRepository.findByCode("ETH").orElseThrow().id().toString()
                 )))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -645,21 +310,19 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.rewards[?(@.amount.currency == 'ETH')]").exists()
                 .jsonPath("$.rewards[?(@.amount.currency != 'ETH')]").doesNotExist()
-                .jsonPath("$.rewardedAmount.amount").isEqualTo(1500)
+                .jsonPath("$.rewardedAmount.amount").isEqualTo(60)
                 .jsonPath("$.rewardedAmount.currency").isEqualTo("ETH")
-                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(2672970.0)
-                .jsonPath("$.pendingAmount.amount").isEqualTo(1000)
+                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(90000.00)
+                .jsonPath("$.pendingAmount.amount").isEqualTo(0)
                 .jsonPath("$.pendingAmount.currency").isEqualTo("ETH")
-                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(1781980.00)
+                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(0.00)
                 .jsonPath("$.receivedRewardsCount").isEqualTo(2)
-                .jsonPath("$.rewardedContributionsCount").isEqualTo(2)
-                .jsonPath("$.rewardingProjectsCount").isEqualTo(2)
+                .jsonPath("$.rewardedContributionsCount").isEqualTo(26)
+                .jsonPath("$.rewardingProjectsCount").isEqualTo(1)
         ;
     }
 
-
     @Test
-    @Order(7)
     void should_filter_by_projects() {
         // Given
         final String jwt = userAuthHelper.authenticateAnthony().jwt();
@@ -693,28 +356,110 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
         ;
     }
 
-
     @Test
-    @Order(8)
     void should_get_rewards_when_no_usd_equivalent() {
-        // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
-        cryptoUsdQuotesRepository.deleteById(CurrencyEnumEntity.eth);
-
         // When
         client.get()
                 .uri(getApiURI(ME_GET_REWARDS, Map.of(
                         "pageIndex", "0",
                         "pageSize", "10"
                 )))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(2692632)
-                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(1792080)
+                .jsonPath("$.rewards[?(@.amount.currency == 'STRK' && @.amount.dollarsEquivalent == null)]").exists()
+                .jsonPath("$.rewards[?(@.amount.currency == 'STRK' && @.amount.dollarsEquivalent != null)]").doesNotExist()
+                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(191010)
+                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(101010)
         ;
+    }
+
+    @SneakyThrows
+    private void patchReward(@NonNull String id, Number amount, String currencyCode, Number usdAmount, String invoiceReceivedAt, String paidAt) {
+        final var rewardEntity = rewardRepository.findById(UUID.fromString(id)).orElseThrow();
+        final var rewardStatus = rewardStatusRepository.findById(rewardEntity.getId()).orElseThrow();
+
+        if (amount != null) rewardEntity.setAmount(BigDecimal.valueOf(amount.doubleValue()));
+        if (currencyCode != null) {
+            final var currency = currencyRepository.findByCode(currencyCode).orElseThrow();
+            final var network = switch (currencyCode) {
+                case "ETH" -> NetworkEnumEntity.ethereum;
+                case "APT" -> NetworkEnumEntity.aptos;
+                case "OP" -> NetworkEnumEntity.optimism;
+                case "STRK" -> NetworkEnumEntity.starknet;
+                default -> throw new IllegalArgumentException("Currency code %s not mapped".formatted(currencyCode));
+            };
+
+            rewardEntity.setCurrency(currency);
+            rewardStatus.setNetworks(new NetworkEnumEntity[]{network});
+        }
+        rewardStatus.setAmountUsdEquivalent(usdAmount == null ? null : BigDecimal.valueOf(usdAmount.doubleValue()));
+
+        if (invoiceReceivedAt != null) {
+            final var invoiceEntity = fakeInvoice(UUID.randomUUID(), List.of(rewardEntity.getId()));
+            invoiceRepository.save(invoiceEntity);
+            rewardEntity.setInvoice(invoiceEntity);
+            // TODO check if still needed and correctly updated when invoice is uploaded
+            rewardStatus.setInvoiceReceivedAt(new SimpleDateFormat("yyyy-MM-dd").parse(invoiceReceivedAt));
+        }
+
+        if (paidAt != null) {
+            rewardStatus.setPaidAt(new SimpleDateFormat("yyyy-MM-dd").parse(paidAt));
+        }
+
+        rewardRepository.save(rewardEntity);
+        rewardStatusRepository.save(rewardStatus);
+    }
+
+    private void patchBillingProfile(@NonNull UserAuthHelper.AuthenticatedUser user, BillingProfileTypeEntity type, OldVerificationStatusEntity status) {
+        if (type != null) {
+            final var entity = userBillingProfileTypeRepository.findById(user.user().getId()).orElseThrow();
+            entity.setBillingProfileType(type);
+            userBillingProfileTypeRepository.save(entity);
+        }
+
+        if (status != null) {
+            final var entity = companyBillingProfileRepository.findByUserId(user.user().getId()).orElseThrow();
+            entity.setVerificationStatus(status);
+            companyBillingProfileRepository.save(entity);
+        }
+    }
+
+    @SneakyThrows
+    @Transactional
+    InvoiceEntity fakeInvoice(UUID id, List<UUID> rewardIds) {
+        final var firstName = faker.name().firstName();
+        final var lastName = faker.name().lastName();
+
+        final var rewards = invoiceRewardRepository.findAll(rewardIds);
+
+        return new InvoiceEntity(
+                id,
+                UUID.randomUUID(),
+                Invoice.Number.of(12, lastName, firstName).toString(),
+                ZonedDateTime.now().minusDays(1),
+                InvoiceEntity.Status.TO_REVIEW,
+                rewards.stream().map(InvoiceRewardEntity::baseAmount).reduce(BigDecimal.ZERO, BigDecimal::add),
+                rewards.get(0).targetCurrency(),
+                new URL("https://s3.storage.com/invoice.pdf"),
+                null,
+                new InvoiceEntity.Data(
+                        ZonedDateTime.now().plusDays(9),
+                        BigDecimal.ZERO,
+                        new Invoice.PersonalInfo(
+                                firstName,
+                                lastName,
+                                faker.address().fullAddress(),
+                                faker.address().countryCode()
+                        ),
+                        null,
+                        null,
+                        List.of(new Invoice.Wallet("ETHEREUM", "vitalik.eth")),
+                        rewards
+                )
+        );
     }
 }

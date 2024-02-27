@@ -4,6 +4,7 @@ import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -24,7 +25,8 @@ import static org.mockito.Mockito.*;
 class InvoiceServiceTest {
     private final InvoiceStoragePort invoiceStoragePort = mock(InvoiceStoragePort.class);
     private final PdfStoragePort pdfStoragePort = mock(PdfStoragePort.class);
-    private final InvoiceService invoiceService = new InvoiceService(invoiceStoragePort, pdfStoragePort);
+    private final BillingProfileObserver billingProfileObserver = mock(BillingProfileObserver.class);
+    private final InvoiceService invoiceService = new InvoiceService(invoiceStoragePort, pdfStoragePort, billingProfileObserver);
     private final Faker faker = new Faker();
     final Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1,
             new Invoice.PersonalInfo("John", "Doe", "123 Main St", "FRA"));
@@ -32,7 +34,7 @@ class InvoiceServiceTest {
 
     @BeforeEach
     void setUp() {
-        reset(invoiceStoragePort, pdfStoragePort);
+        reset(invoiceStoragePort, pdfStoragePort, billingProfileObserver);
     }
 
     @Test
@@ -74,6 +76,10 @@ class InvoiceServiceTest {
         verify(invoiceStoragePort).update(invoiceCaptor.capture());
         final var updatedInvoice = invoiceCaptor.getValue();
         assertThat(updatedInvoice.status()).isEqualTo(status);
+
+        if (status == Invoice.Status.REJECTED) {
+            verify(billingProfileObserver).onInvoiceRejected(invoice.id());
+        }
     }
 
     @Test

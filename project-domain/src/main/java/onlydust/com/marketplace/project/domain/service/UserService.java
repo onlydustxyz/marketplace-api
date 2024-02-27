@@ -12,8 +12,8 @@ import onlydust.com.marketplace.project.domain.port.input.AccountingUserObserver
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserObserverPort;
-import onlydust.com.marketplace.project.domain.port.output.OldBillingProfileStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
+import onlydust.com.marketplace.project.domain.port.output.OldBillingProfileStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.view.*;
@@ -179,11 +179,6 @@ public class UserService implements UserFacadePort {
                                                    int pageIndex, int pageSize,
                                                    UserRewardView.SortBy sortBy, SortDirection sortDirection) {
         return userStoragePort.findRewardsForUserId(userId, filters, pageIndex, pageSize, sortBy, sortDirection);
-    }
-
-    @Override
-    public UserRewardTotalAmountsView getRewardTotalAmountsForUserId(UUID userId) {
-        return userStoragePort.findRewardTotalAmountsForUserId(userId);
     }
 
     @Override

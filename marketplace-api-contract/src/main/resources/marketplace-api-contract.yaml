@@ -309,7 +309,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/CurrencyContract'
+              $ref: '#/components/schemas/CurrencyId'
         - in: query
           name: projects
           schema:
@@ -365,28 +365,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MyRewardsListResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
-  /api/v1/me/rewards/amounts:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Me
-      summary: Get caller's rewarded total amounts
-      operationId: getMyRewardTotalAmounts
-      description: |
-        Get caller's rewarded total amounts
-      responses:
-        "200":
-          description: 'My reward total amounts'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RewardTotalAmountsResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -3311,6 +3289,11 @@ components:
       type: string
       description: OnlyDust project pretty ID that is computed from its name. This ID CAN change over time.
       example: my-awesome-project
+
+    CurrencyId:
+      type: string
+      format: uuid
+      description: Currency ID
 
     SponsorId:
       type: string

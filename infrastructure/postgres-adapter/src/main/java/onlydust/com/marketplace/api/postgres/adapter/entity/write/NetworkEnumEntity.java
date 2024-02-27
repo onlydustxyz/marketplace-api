@@ -4,7 +4,7 @@ import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 
 public enum NetworkEnumEntity {
-    ethereum, aptos, starknet, optimism;
+    sepa, ethereum, aptos, starknet, optimism;
 
     public static NetworkEnumEntity of(Blockchain blockchain) {
         return switch (blockchain) {
@@ -21,6 +21,7 @@ public enum NetworkEnumEntity {
             case aptos -> Blockchain.APTOS;
             case starknet -> Blockchain.STARKNET;
             case optimism -> Blockchain.OPTIMISM;
+            default -> throw new IllegalStateException("No blockchain equivalent found for network %s".formatted(this.name()));
         };
     }
 
@@ -30,6 +31,7 @@ public enum NetworkEnumEntity {
             case aptos -> Network.APTOS;
             case starknet -> Network.STARKNET;
             case optimism -> Network.OPTIMISM;
+            case sepa -> Network.SEPA;
         };
     }
 

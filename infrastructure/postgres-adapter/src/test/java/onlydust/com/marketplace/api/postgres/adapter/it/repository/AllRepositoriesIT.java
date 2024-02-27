@@ -1,11 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
-import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.*;
@@ -19,6 +17,9 @@ import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
+import onlydust.com.marketplace.project.domain.model.OldAccountNumber;
+import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
+import onlydust.com.marketplace.project.domain.model.UserRole;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -341,43 +342,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .build();
 
         assertIsSaved(expected, sponsorRepository);
-    }
-
-    @Test
-    void should_create_reward() {
-        // Given
-        final UUID projectId = UUID.randomUUID();
-        final UUID userId = UUID.randomUUID();
-        projectIdRepository.save(ProjectIdEntity.builder().id(projectId).build());
-        userRepository.save(UserEntity.builder()
-                .id(userId)
-                .githubUserId(faker.number().randomNumber())
-                .createdAt(new Date())
-                .lastSeenAt(new Date())
-                .githubLogin(faker.rickAndMorty().character())
-                .githubAvatarUrl(faker.internet().url())
-                .githubEmail(faker.internet().emailAddress())
-                .roles(new UserRole[]{UserRole.USER})
-                .build());
-
-        final RewardEntity expected = RewardEntity.of(new Reward(
-                UUID.randomUUID(),
-                projectId,
-                userId,
-                faker.number().randomNumber(),
-                BigDecimal.valueOf(faker.number().randomNumber()),
-                Currency.USDC,
-                new Date(),
-                List.of(Reward.Item.builder()
-                        .id(faker.pokemon().name())
-                        .number(faker.number().randomNumber())
-                        .repoId(faker.number().randomNumber())
-                        .type(Reward.Item.Type.PULL_REQUEST)
-                        .build()
-                )
-        ));
-
-        assertIsSaved(expected, rewardRepository);
     }
 
     private <Entity, ID> void assertIsSaved(Entity expected, JpaRepository<Entity, ID> repository) {
