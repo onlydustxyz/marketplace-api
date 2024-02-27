@@ -270,7 +270,7 @@ public interface BackOfficeMapper {
                 .amount(invoice.totalAfterTax().getValue())
                 .currencyId(invoice.totalAfterTax().getCurrency().id().value())
                 .rewardIds(invoice.rewards().stream().map(Invoice.Reward::id).map(UuidWrapper::value).toList())
-                .downloadUrl(URI.create("%s/invoices/%s?token=%s".formatted(baseUri, invoice.id().value(), token)));
+                .downloadUrl(URI.create("%s/bo/v1/external/invoices/%s?token=%s".formatted(baseUri, invoice.id().value(), token)));
     }
 
     static InvoiceStatus mapInvoiceStatus(final Invoice.Status status) throws OnlyDustException {
