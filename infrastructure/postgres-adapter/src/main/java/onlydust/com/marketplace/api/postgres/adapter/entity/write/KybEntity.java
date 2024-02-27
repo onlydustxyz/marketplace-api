@@ -3,9 +3,10 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Country;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -30,6 +31,9 @@ public class KybEntity {
     @Id
     UUID id;
     UUID billingProfileId;
+    @OneToOne
+    @JoinColumn(name = "billingProfile", insertable = false, updatable = false)
+    BillingProfileEntity billingProfile;
     @Type(type = "verification_status")
     @Enumerated(EnumType.STRING)
     VerificationStatusEntity verificationStatus;
@@ -91,5 +95,20 @@ public class KybEntity {
                 .applicantId(kyb.getExternalApplicantId())
                 .ownerId(kyb.getOwnerId().value())
                 .build();
+    }
+
+    public Invoice.CompanyInfo forInvoice() {
+        final var country = Country.fromIso3(this.country);
+
+        return new Invoice.CompanyInfo(
+                registrationNumber,
+                name,
+                address,
+                country.iso3Code(),
+                subjectToEuVAT,
+                country.inEuropeanUnion(),
+                country.isFrance(),
+                euVATNumber
+        );
     }
 }

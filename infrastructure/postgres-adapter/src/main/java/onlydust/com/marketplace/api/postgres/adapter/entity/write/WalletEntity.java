@@ -35,6 +35,10 @@ public class WalletEntity {
     @Type(type = "network")
     NetworkEnumEntity network;
 
+    @ManyToOne
+    @JoinColumn(name = "billingProfileId", insertable = false, updatable = false)
+    BillingProfileEntity billingProfile;
+
     @Column(name = "address", nullable = false)
     String address;
     @Column(name = "type", nullable = false)

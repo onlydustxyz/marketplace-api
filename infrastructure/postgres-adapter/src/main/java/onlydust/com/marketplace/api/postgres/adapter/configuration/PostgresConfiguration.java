@@ -365,22 +365,15 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    InvoiceStoragePort invoicePreviewStoragePort(final @NonNull CompanyBillingProfileRepository companyBillingProfileRepository,
-                                                 final @NonNull IndividualBillingProfileRepository individualBillingProfileRepository,
+    InvoiceStoragePort invoicePreviewStoragePort(final @NonNull BillingProfileRepository billingProfileRepository,
                                                  final @NonNull InvoiceRewardRepository invoiceRewardRepository,
-                                                 final @NonNull OldWalletRepository oldWalletRepository,
-                                                 final @NonNull BankAccountRepository bankAccountRepository,
                                                  final @NonNull InvoiceRepository invoiceRepository,
-                                                 final @NonNull PaymentRequestRepository paymentRequestRepository,
                                                  final @NonNull RewardRepository rewardRepository) {
-        return new PostgresInvoiceStorage(companyBillingProfileRepository, individualBillingProfileRepository, invoiceRewardRepository,
-                oldWalletRepository, bankAccountRepository, invoiceRepository, paymentRequestRepository, rewardRepository);
+        return new PostgresInvoiceStorage(billingProfileRepository, invoiceRewardRepository, invoiceRepository, rewardRepository);
     }
 
     @Bean
-    public BillingProfileStoragePort accountingBillingProfileStorage(final CompanyBillingProfileRepository companyBillingProfileRepository,
-                                                                     final IndividualBillingProfileRepository individualBillingProfileRepository,
-                                                                     final GlobalSettingsRepository globalSettingsRepository,
+    public BillingProfileStoragePort accountingBillingProfileStorage(final GlobalSettingsRepository globalSettingsRepository,
                                                                      final KycRepository kycRepository,
                                                                      final KybRepository kybRepository,
                                                                      final BillingProfileRepository billingProfileRepository,
@@ -390,7 +383,7 @@ public class PostgresConfiguration {
                                                                      final BillingProfileUserViewRepository billingProfileUserViewRepository,
                                                                      final ChildrenKycRepository childrenKycRepository,
                                                                      final BillingProfileUserInvitationRepository billingProfileUserInvitationRepository) {
-        return new PostgresBillingProfileAdapter(companyBillingProfileRepository, individualBillingProfileRepository, globalSettingsRepository,
+        return new PostgresBillingProfileAdapter(globalSettingsRepository,
                 billingProfileRepository, kybRepository, kycRepository, payoutInfoRepository, walletRepository, billingProfileUserRepository,
                 billingProfileUserViewRepository, childrenKycRepository, billingProfileUserInvitationRepository);
     }

@@ -86,7 +86,7 @@ public class IndividualBillingProfileEntity {
         }
     }
 
-    public OldIndividualBillingProfile toDomain(@NonNull Date invoiceMandateLatestVersionDate) {
+    public OldIndividualBillingProfile toDomain() {
         return OldIndividualBillingProfile.builder()
                 .id(this.id)
                 .status(this.verificationStatus.toDomain())

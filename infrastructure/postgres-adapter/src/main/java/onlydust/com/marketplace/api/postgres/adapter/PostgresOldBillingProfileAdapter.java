@@ -45,9 +45,7 @@ public class PostgresOldBillingProfileAdapter implements OldBillingProfileStorag
     @Override
     @Transactional(readOnly = true)
     public Optional<OldIndividualBillingProfile> findIndividualBillingProfile(UUID userId) {
-        return individualBillingProfileRepository.findByUserId(userId).map(
-                entity -> entity.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate())
-        );
+        return individualBillingProfileRepository.findByUserId(userId).map(IndividualBillingProfileEntity::toDomain);
     }
 
     @Override
