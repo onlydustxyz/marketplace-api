@@ -251,7 +251,7 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
                             "title": "%s"
                         }
                         """, description, title)))
-                .willReturn(permanentRedirect("/repos/%s/%s/new-issues".formatted(owner, repoName))));
+                .willReturn(permanentRedirect("https://api.github.com/repos/%s/%s/new-issues".formatted(owner, repoName))));
 
         dustyBotApiWireMockServer.stubFor(post(urlEqualTo(String.format("/repos/%s/%s/new-issues", owner, repoName)))
                 .withHeader("Authorization", equalTo("Bearer " + githubDustyBotConfig.getPersonalAccessToken()))
