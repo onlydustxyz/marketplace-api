@@ -1064,4 +1064,134 @@ class BillingProfileServiceTest {
         verify(billingProfileStoragePort, never()).deleteCoworkerInvitation(eq(billingProfileId), eq(invitedGithubUserId));
     }
 
+    @Test
+    void should_remove_user() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final GithubUserId callerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        final GithubUserId removedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        final UserId removedUserId = UserId.of(UUID.randomUUID());
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStoragePort.getCoworker(billingProfileId, removedGithubUserId)).thenReturn(Optional.of(
+                BillingProfileCoworkerView.builder()
+                        .userId(removedUserId)
+                        .githubUserId(removedGithubUserId)
+                        .role(BillingProfile.User.Role.MEMBER)
+                        .joinedAt(ZonedDateTime.now())
+                        .rewardCount(0)
+                        .build()
+        ));
+
+        // When
+        billingProfileService.removeCoworker(billingProfileId, userIAdmin, callerGithubUserId, removedGithubUserId);
+
+        // Then
+        verify(billingProfileStoragePort).deleteCoworker(eq(billingProfileId), eq(removedUserId));
+    }
+
+    @Test
+    void should_remove_user_when_caller_is_user() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final GithubUserId removedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(false);
+        when(billingProfileStoragePort.getCoworker(billingProfileId, removedGithubUserId)).thenReturn(Optional.of(
+                BillingProfileCoworkerView.builder()
+                        .userId(userIAdmin)
+                        .githubUserId(removedGithubUserId)
+                        .role(BillingProfile.User.Role.MEMBER)
+                        .joinedAt(ZonedDateTime.now())
+                        .rewardCount(0)
+                        .build()
+        ));
+
+        // When
+        billingProfileService.removeCoworker(billingProfileId, userIAdmin, removedGithubUserId, removedGithubUserId);
+
+        // Then
+        verify(billingProfileStoragePort).deleteCoworker(eq(billingProfileId), eq(userIAdmin));
+    }
+
+    @Test
+    void should_not_remove_user_when_not_found() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final GithubUserId callerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        final GithubUserId removedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        final UserId invitedUserId = UserId.of(UUID.randomUUID());
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStoragePort.getCoworker(billingProfileId, removedGithubUserId)).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> billingProfileService.removeCoworker(billingProfileId, userIAdmin, callerGithubUserId, removedGithubUserId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Coworker %d not found for billing profile %s".formatted(removedGithubUserId.value(), billingProfileId.value()));
+
+        // Then
+        verify(billingProfileStoragePort, never()).deleteCoworker(eq(billingProfileId), eq(invitedUserId));
+    }
+
+    @Test
+    void should_not_remove_user_when_not_removable() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final GithubUserId callerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        final GithubUserId removedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        final UserId invitedUserId = UserId.of(UUID.randomUUID());
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStoragePort.getCoworker(billingProfileId, removedGithubUserId)).thenReturn(Optional.of(
+                BillingProfileCoworkerView.builder()
+                        .userId(invitedUserId)
+                        .githubUserId(removedGithubUserId)
+                        .role(BillingProfile.User.Role.MEMBER)
+                        .joinedAt(ZonedDateTime.now())
+                        .rewardCount(10)
+                        .build()
+        ));
+
+        // When
+        assertThatThrownBy(() -> billingProfileService.removeCoworker(billingProfileId, userIAdmin, callerGithubUserId, removedGithubUserId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Coworker %d cannot be removed from billing profile %s".formatted(removedGithubUserId.value(), billingProfileId.value()));
+
+        // Then
+        verify(billingProfileStoragePort, never()).deleteCoworker(eq(billingProfileId), eq(invitedUserId));
+    }
+
+    @Test
+    void should_not_remove_user_when_caller_is_not_admin_and_not_removed_user() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final GithubUserId callerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        final GithubUserId removedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        final UserId invitedUserId = UserId.of(UUID.randomUUID());
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(false);
+        when(billingProfileStoragePort.getCoworker(billingProfileId, removedGithubUserId)).thenReturn(Optional.of(
+                BillingProfileCoworkerView.builder()
+                        .userId(invitedUserId)
+                        .githubUserId(removedGithubUserId)
+                        .role(BillingProfile.User.Role.MEMBER)
+                        .joinedAt(ZonedDateTime.now())
+                        .rewardCount(10)
+                        .build()
+        ));
+
+        // When
+        assertThatThrownBy(() -> billingProfileService.removeCoworker(billingProfileId, userIAdmin, callerGithubUserId, removedGithubUserId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("User %s must be admin to remove coworker %d from billing profile %s".formatted(userIAdmin, removedGithubUserId.value(),
+                        billingProfileId.value()));
+
+        // Then
+        verify(billingProfileStoragePort, never()).deleteCoworker(eq(billingProfileId), eq(invitedUserId));
+    }
+
 }

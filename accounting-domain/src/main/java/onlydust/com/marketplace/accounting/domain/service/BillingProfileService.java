@@ -170,29 +170,29 @@ public class BillingProfileService implements BillingProfileFacadePort {
     @Override
     public BillingProfileView getBillingProfile(BillingProfile.Id billingProfileId, UserId userId) {
         if (!billingProfileStoragePort.isUserMemberOf(billingProfileId, userId)) {
-            throw unauthorized("User %s is not a member of billing profile %s".formatted(userId.value(), billingProfileId.value()));
+            throw unauthorized("User %s is not a member of billing profile %s".formatted(userId, billingProfileId));
         }
-        return billingProfileStoragePort.findById(billingProfileId).orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId.value())));
+        return billingProfileStoragePort.findById(billingProfileId).orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
     }
 
     @Override
     public PayoutInfo getPayoutInfo(BillingProfile.Id billingProfileId, UserId userId) {
         if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
-            throw unauthorized("User %s must be admin to read payout info of billing profile %s".formatted(userId.value(), billingProfileId.value()));
+            throw unauthorized("User %s must be admin to read payout info of billing profile %s".formatted(userId, billingProfileId));
         return billingProfileStoragePort.findPayoutInfoByBillingProfile(billingProfileId).orElseGet(() -> PayoutInfo.builder().build());
     }
 
     @Override
     public void updatePayoutInfo(BillingProfile.Id billingProfileId, UserId userId, PayoutInfo payoutInfo) {
         if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
-            throw unauthorized("User %s must be admin to edit payout info of billing profile %s".formatted(userId.value(), billingProfileId.value()));
+            throw unauthorized("User %s must be admin to edit payout info of billing profile %s".formatted(userId, billingProfileId));
         billingProfileStoragePort.savePayoutInfoForBillingProfile(payoutInfo, billingProfileId);
     }
 
     @Override
     public Page<BillingProfileCoworkerView> getCoworkers(BillingProfile.Id billingProfileId, UserId userId, int pageIndex, int pageSize) {
         if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
-            throw unauthorized("User %s must be admin to list coworkers of billing profile %s".formatted(userId.value(), billingProfileId.value()));
+            throw unauthorized("User %s must be admin to list coworkers of billing profile %s".formatted(userId, billingProfileId));
         return billingProfileStoragePort.findCoworkersByBillingProfile(billingProfileId, pageIndex, pageSize);
     }
 
@@ -200,7 +200,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     @Transactional
     public void inviteCoworker(BillingProfile.Id billingProfileId, UserId invitedBy, GithubUserId invitedGithubUserId, BillingProfile.User.Role role) {
         if (!billingProfileStoragePort.isAdmin(billingProfileId, invitedBy))
-            throw unauthorized("User %s must be admin to invite coworker to billing profile %s".formatted(invitedBy.value(), billingProfileId.value()));
+            throw unauthorized("User %s must be admin to invite coworker to billing profile %s".formatted(invitedBy, billingProfileId));
 
         indexerPort.indexUser(invitedGithubUserId.value());
         billingProfileStoragePort.saveCoworkerInvitation(billingProfileId, invitedBy, invitedGithubUserId, role, ZonedDateTime.now());
@@ -211,7 +211,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     public void acceptCoworkerInvitation(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId) {
         final BillingProfileCoworkerView invited = billingProfileStoragePort.getInvitedCoworker(billingProfileId, invitedGithubUserId)
                 .orElseThrow(() -> notFound("Invitation not found for billing profile %s and user %s"
-                        .formatted(billingProfileId.value(), invitedGithubUserId.value())));
+                        .formatted(billingProfileId, invitedGithubUserId)));
         billingProfileStoragePort.saveCoworker(billingProfileId, invited.userId(), invited.role(), ZonedDateTime.now());
         billingProfileStoragePort.deleteCoworkerInvitation(billingProfileId, invitedGithubUserId);
     }
@@ -221,8 +221,28 @@ public class BillingProfileService implements BillingProfileFacadePort {
     public void rejectCoworkerInvitation(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId) {
         billingProfileStoragePort.getInvitedCoworker(billingProfileId, invitedGithubUserId)
                 .orElseThrow(() -> notFound("Invitation not found for billing profile %s and user %s"
-                        .formatted(billingProfileId.value(), invitedGithubUserId.value())));
+                        .formatted(billingProfileId, invitedGithubUserId)));
 
         billingProfileStoragePort.deleteCoworkerInvitation(billingProfileId, invitedGithubUserId);
+    }
+
+    @Override
+    @Transactional
+    public void removeCoworker(BillingProfile.Id billingProfileId, UserId removeByUserId, GithubUserId removeByGithubUserId, GithubUserId githubUserId) {
+        if (!removeByGithubUserId.equals(githubUserId) && !billingProfileStoragePort.isAdmin(billingProfileId, removeByUserId))
+            throw unauthorized("User %s must be admin to remove coworker %s from billing profile %s".formatted(removeByUserId, githubUserId, billingProfileId));
+
+        final var coworker = billingProfileStoragePort.getCoworker(billingProfileId, githubUserId)
+                .orElseThrow(() -> notFound("Coworker %s not found for billing profile %s"
+                        .formatted(githubUserId, billingProfileId)));
+
+        if (!coworker.removable())
+            throw forbidden("Coworker %s cannot be removed from billing profile %s".formatted(githubUserId, billingProfileId));
+
+        if (coworker.hasJoined()) {
+            billingProfileStoragePort.deleteCoworker(billingProfileId, coworker.userId());
+        } else {
+            billingProfileStoragePort.deleteCoworkerInvitation(billingProfileId, coworker.githubUserId());
+        }
     }
 }

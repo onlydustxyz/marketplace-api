@@ -136,6 +136,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String BILLING_PROFILES_GET_COWORKERS = "/api/v1/billing-profiles/%s/coworkers";
     protected static final String BILLING_PROFILES_POST_COWORKER_INVITATIONS = "/api/v1/billing-profiles/%s/coworkers";
     protected static final String ME_BILLING_PROFILES_POST_COWORKER_INVITATIONS = "/api/v1/me/billing-profiles/%s/invitations";
+    protected static final String BILLING_PROFILES_DELETE_COWORKER = "/api/v1/billing-profiles/%s/coworkers/%s";
 
     static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:14.3-alpine")
             .withDatabaseName("marketplace_db")

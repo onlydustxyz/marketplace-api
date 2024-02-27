@@ -4,4 +4,9 @@ public record GithubUserId(long value) {
     public static GithubUserId of(long value) {
         return new GithubUserId(value);
     }
+
+    @Override
+    public String toString() {
+        return value + "";
+    }
 }

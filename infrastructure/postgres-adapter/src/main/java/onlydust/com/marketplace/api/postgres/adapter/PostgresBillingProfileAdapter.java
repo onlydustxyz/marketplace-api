@@ -6,7 +6,6 @@ import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
@@ -297,5 +296,16 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     public Optional<BillingProfileCoworkerView> getInvitedCoworker(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId) {
         return billingProfileUserViewRepository.findInvitedUserByBillingProfileIdAndGithubId(billingProfileId.value(), invitedGithubUserId.value())
                 .map(BillingProfileUserViewEntity::toView);
+    }
+
+    @Override
+    public Optional<BillingProfileCoworkerView> getCoworker(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId) {
+        return billingProfileUserViewRepository.findUserByBillingProfileIdAndGithubId(billingProfileId.value(), invitedGithubUserId.value())
+                .map(BillingProfileUserViewEntity::toView);
+    }
+
+    @Override
+    public void deleteCoworker(BillingProfile.Id billingProfileId, UserId userId) {
+        billingProfileUserRepository.deleteById(new BillingProfileUserEntity.PrimaryKey(userId.value(), billingProfileId.value()));
     }
 }
