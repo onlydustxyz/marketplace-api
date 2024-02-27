@@ -6,11 +6,11 @@ info:
 servers:
   - url: 'http://localhost:9999'
     description: Local
-  - url: 'https://develop-api.onlydust.com'
+  - url: 'https://develop-bo-api.onlydust.com'
     description: Develop
-  - url: 'https://staging-api.onlydust.com'
+  - url: 'https://staging-bo-api.onlydust.com'
     description: Staging
-  - url: 'https://api.onlydust.com'
+  - url: 'https://bo-api.onlydust.com'
     description: Production
 
 paths:
@@ -43,7 +43,16 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/InvoiceId'
-          style: simple
+          style: form
+        - in: query
+          name: internalStatuses
+          required: false
+          schema:
+            type: array
+            default: [ TO_REVIEW, REJECTED, APPROVED, PAID ]
+            items:
+              $ref: '#/components/schemas/InvoiceInternalStatus'
+          style: form
       responses:
         "200":
           description: 'Invoice page'
@@ -470,7 +479,7 @@ paths:
             items:
               type: string
               format: uuid
-          style: simple
+          style: form
         - in: query
           name: sponsorIds
           required: false
@@ -479,7 +488,7 @@ paths:
             items:
               type: string
               format: uuid
-          style: simple
+          style: form
       responses:
         "200":
           description: 'Sponsor page'
@@ -616,7 +625,7 @@ paths:
             items:
               type: string
               format: uuid
-          style: simple
+          style: form
         - in: query
           name: ecosystemIds
           required: false
@@ -625,7 +634,7 @@ paths:
             items:
               type: string
               format: uuid
-          style: simple
+          style: form
       responses:
         "200":
           description: 'Ecosystem page'
@@ -692,7 +701,7 @@ paths:
             items:
               type: string
               format: uuid
-          style: simple
+          style: form
       responses:
         "200":
           description: 'Github repository page'
@@ -733,7 +742,7 @@ paths:
             items:
               type: string
               format: uuid
-          style: simple
+          style: form
       responses:
         "200":
           description: 'Budget page'
@@ -774,7 +783,7 @@ paths:
             items:
               type: string
               format: uuid
-          style: simple
+          style: form
         - in: query
           name: projectIds
           required: false
@@ -783,7 +792,7 @@ paths:
             items:
               type: string
               format: uuid
-          style: simple
+          style: form
       responses:
         "200":
           description: 'Project Lead Invitation page'
@@ -867,7 +876,7 @@ paths:
             items:
               type: string
               format: uuid
-          style: simple
+          style: form
         - in: query
           name: paymentIds
           required: false
@@ -876,7 +885,7 @@ paths:
             items:
               type: string
               format: uuid
-          style: simple
+          style: form
       responses:
         "200":
           description: 'Payment page'
@@ -918,7 +927,7 @@ paths:
             items:
               type: string
               format: uuid
-          style: simple
+          style: form
       responses:
         "200":
           description: 'Project page'
@@ -1842,6 +1851,7 @@ components:
       required:
         - id
         - status
+        - internalStatus
         - createdAt
         - dueAt
         - amount
@@ -1853,6 +1863,8 @@ components:
           $ref: '#/components/schemas/InvoiceId'
         status:
           $ref: '#/components/schemas/InvoiceStatus'
+        internalStatus:
+          $ref: '#/components/schemas/InvoiceInternalStatus'
         createdAt:
           type: string
           format: date-time
@@ -1870,6 +1882,14 @@ components:
         downloadUrl:
           type: string
           format: uri
+
+    InvoiceInternalStatus:
+      type: string
+      enum:
+        - TO_REVIEW
+        - REJECTED
+        - APPROVED
+        - PAID
 
     InvoiceStatus:
       type: string

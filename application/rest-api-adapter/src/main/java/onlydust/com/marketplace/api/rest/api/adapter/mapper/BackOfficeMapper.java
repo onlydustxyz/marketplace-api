@@ -4,7 +4,6 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
@@ -16,6 +15,7 @@ import onlydust.com.marketplace.project.domain.view.backoffice.*;
 import java.net.URI;
 import java.time.ZoneOffset;
 
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.ETHEREUM;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
@@ -265,6 +265,7 @@ public interface BackOfficeMapper {
         return new InvoicePageItemResponse()
                 .id(invoice.id().value())
                 .status(mapInvoiceStatus(invoice.status()))
+                .internalStatus(mapInvoiceInternalStatus(invoice.status()))
                 .createdAt(invoice.createdAt())
                 .dueAt(invoice.dueAt())
                 .amount(invoice.totalAfterTax().getValue())
@@ -273,19 +274,38 @@ public interface BackOfficeMapper {
                 .downloadUrl(URI.create("%s/bo/v1/external/invoices/%s?token=%s".formatted(baseUri, invoice.id().value(), token)));
     }
 
-    static InvoiceStatus mapInvoiceStatus(final Invoice.Status status) throws OnlyDustException {
+    static InvoiceStatus mapInvoiceStatus(final Invoice.Status status) {
         return switch (status) {
-            case DRAFT -> throw OnlyDustException.internalServerError("Unknown invoice status: %s".formatted(status));
+            case DRAFT -> throw internalServerError("Unknown invoice status: %s".formatted(status));
             case TO_REVIEW, APPROVED -> InvoiceStatus.PROCESSING;
             case PAID -> InvoiceStatus.COMPLETE;
             case REJECTED -> InvoiceStatus.REJECTED;
         };
     }
 
-    static Invoice.Status mapInvoiceStatus(final PatchInvoiceRequest.StatusEnum status) throws OnlyDustException {
+    static InvoiceInternalStatus mapInvoiceInternalStatus(final Invoice.Status status) {
+        return switch (status) {
+            case DRAFT -> throw internalServerError("Unknown invoice status: %s".formatted(status));
+            case TO_REVIEW -> InvoiceInternalStatus.TO_REVIEW;
+            case APPROVED -> InvoiceInternalStatus.APPROVED;
+            case PAID -> InvoiceInternalStatus.PAID;
+            case REJECTED -> InvoiceInternalStatus.REJECTED;
+        };
+    }
+
+    static Invoice.Status mapInvoiceStatus(final PatchInvoiceRequest.StatusEnum status) {
         return switch (status) {
             case APPROVED -> Invoice.Status.APPROVED;
             case REJECTED -> Invoice.Status.REJECTED;
+        };
+    }
+
+    static Invoice.Status mapInvoiceStatus(final InvoiceInternalStatus status) {
+        return switch (status) {
+            case TO_REVIEW -> Invoice.Status.TO_REVIEW;
+            case APPROVED -> Invoice.Status.APPROVED;
+            case REJECTED -> Invoice.Status.REJECTED;
+            case PAID -> Invoice.Status.PAID;
         };
     }
 

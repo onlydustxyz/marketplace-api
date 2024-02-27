@@ -6067,6 +6067,8 @@ components:
         - $ref: '#/components/schemas/ContributorResponse'
         - type: object
           properties:
+            id:
+              $ref: '#/components/schemas/UserId'
             role:
               $ref: '#/components/schemas/BillingProfileCoworkerRole'
             joinedAt:

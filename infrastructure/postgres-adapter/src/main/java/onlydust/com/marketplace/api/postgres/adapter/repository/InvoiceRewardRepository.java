@@ -16,20 +16,13 @@ public interface InvoiceRewardRepository extends JpaRepository<InvoiceRewardEnti
                 pr.amount            as amount,
                 c.id                 as currency_id,
                 usd.id               as target_currency_id,
-                hq.price * pr.amount as base_amount,
+                pr.usd_amount        as base_amount,
                 pr.invoice_id        as invoice_id
             FROM
                 payment_requests pr
                 JOIN currencies c ON UPPER(CAST(pr.currency AS TEXT)) = c.code
                 JOIN currencies usd ON usd.code = 'USD'
                 JOIN project_details p ON pr.project_id = p.project_id
-                JOIN LATERAL (
-                    SELECT * FROM accounting.historical_quotes
-                    WHERE base_id = c.id AND
-                    target_id = usd.id
-                    ORDER BY timestamp DESC
-                    LIMIT 1
-                ) hq ON true
             WHERE
                 pr.id IN :rewardIds
             """, nativeQuery = true)

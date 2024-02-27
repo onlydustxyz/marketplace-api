@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.project.domain.model.Currency;
 import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
-import onlydust.com.marketplace.project.domain.port.output.IndexerPort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectRewardStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.RewardServicePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;

@@ -21,8 +21,9 @@ public class InvoiceService implements InvoiceFacadePort {
     private final @NonNull PdfStoragePort pdfStoragePort;
 
     @Override
-    public Page<Invoice> findAllExceptDrafts(final @NonNull List<Invoice.Id> invoiceIds, final @NonNull Integer pageIndex, final @NonNull Integer pageSize) {
-        return invoiceStoragePort.findAllExceptDrafts(invoiceIds, pageIndex, pageSize);
+    public Page<Invoice> findAll(final @NonNull List<Invoice.Id> ids, final @NonNull List<Invoice.Status> statuses, final @NonNull Integer pageIndex,
+                                 final @NonNull Integer pageSize) {
+        return invoiceStoragePort.findAll(ids, statuses, pageIndex, pageSize);
     }
 
     @Override

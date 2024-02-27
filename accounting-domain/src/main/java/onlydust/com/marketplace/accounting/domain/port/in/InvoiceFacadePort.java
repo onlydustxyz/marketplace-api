@@ -8,7 +8,8 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import java.util.List;
 
 public interface InvoiceFacadePort {
-    Page<Invoice> findAllExceptDrafts(final @NonNull List<Invoice.Id> invoiceIds, final @NonNull Integer pageIndex, final @NonNull Integer pageSize);
+    Page<Invoice> findAll(final @NonNull List<Invoice.Id> ids, final @NonNull List<Invoice.Status> statuses, final @NonNull Integer pageIndex,
+                          final @NonNull Integer pageSize);
 
     void update(Invoice.Id id, Invoice.Status status);
 

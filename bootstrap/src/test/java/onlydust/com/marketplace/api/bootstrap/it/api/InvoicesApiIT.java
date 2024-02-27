@@ -69,7 +69,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
-                          "type": "INDIVIDUAL"
+                          "type": "COMPANY"
                         }
                         """)
                 // Then
@@ -77,21 +77,16 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful();
 
-        billingProfileId = client.get()
-                .uri(ME_BILLING_PROFILES)
-                .header("Authorization", BEARER_PREFIX + antho.jwt())
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody(MyBillingProfilesResponse.class)
-                .returnResult()
-                .getResponseBody().getBillingProfiles().get(0).getId();
+        final var companyBillingProfile = companyBillingProfileRepository.findByUserId(antho.user().getId()).orElseThrow();
+        companyBillingProfile.setName("My company");
+        companyBillingProfile.setCountry("FRA");
+        companyBillingProfile.setAddress("My address");
+        companyBillingProfile.setRegistrationNumber("123456");
+        companyBillingProfile.setSubjectToEuVAT(true);
+        companyBillingProfile.setVerificationStatus(OldVerificationStatusEntity.VERIFIED);
+        companyBillingProfileRepository.save(companyBillingProfile);
 
-
-        final var kyc = individualBillingProfileRepository.findById(billingProfileId).orElseThrow();
-        kyc.setVerificationStatus(OldVerificationStatusEntity.VERIFIED);
-        individualBillingProfileRepository.save(kyc);
+        billingProfileId = companyBillingProfile.getId();
     }
 
 
@@ -136,54 +131,57 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.dueAt").isNotEmpty()
                 .json("""
                         {
-                         "number": "OD-BUISSET-ANTHONY-001",
-                         "billingProfileType": "INDIVIDUAL",
-                         "individualBillingProfile": {
-                           "firstName": "Anthony",
-                           "lastName": "BUISSET",
-                           "address": "771 chemin de la sine, 06140, Vence, France",
-                           "countryCode": "FRA"
-                         },
-                         "companyBillingProfile": null,
-                         "destinationAccounts": {
-                           "bankAccount": null,
-                           "wallets": [
-                             {
-                               "address": "abuisset.eth",
-                               "network": "ethereum"
-                             }
-                           ]
-                         },
-                         "rewards": [
-                           {
-                             "id": "966cd55c-7de8-45c4-8bba-b388c38ca15d",
-                             "date": "2023-06-02T08:48:04.697886Z",
-                             "projectName": "kaaper",
-                             "amount": {
-                               "amount": 1000,
-                               "currency": "ETH",
-                               "target": {
-                                 "amount": 1781980.00,
-                                 "currency": "USD",
-                                 "conversionRate": 1781.98
-                               }
-                             }
-                           }
-                         ],
-                         "usdToEurConversionRate": 0.92,
-                         "totalBeforeTax": {
-                           "amount": 1781980.00,
-                           "currency": "USD"
-                         },
-                         "taxRate": 0,
-                         "totalTax": {
-                           "amount": 0.00,
-                           "currency": "USD"
-                         },
-                         "totalAfterTax": {
-                           "amount": 1781980.00,
-                           "currency": "USD"
-                         }
+                          "number": "OD-MYCOMPANY-001",
+                          "billingProfileType": "COMPANY",
+                          "individualBillingProfile": null,
+                          "companyBillingProfile": {
+                            "registrationNumber": "123456",
+                            "name": "My company",
+                            "address": "My address",
+                            "vatRegulationState": "VAT_APPLICABLE",
+                            "euVATNumber": null,
+                            "country": "France",
+                            "countryCode": "FRA"
+                          },
+                          "destinationAccounts": {
+                            "bankAccount": null,
+                            "wallets": [
+                              {
+                                "address": "abuisset.eth",
+                                "network": "ethereum"
+                              }
+                            ]
+                          },
+                          "rewards": [
+                            {
+                              "id": "966cd55c-7de8-45c4-8bba-b388c38ca15d",
+                              "date": "2023-06-02T08:48:04.697886Z",
+                              "projectName": "kaaper",
+                              "amount": {
+                                "amount": 1000,
+                                "currency": "ETH",
+                                "target": {
+                                  "amount": 1781980.00,
+                                  "currency": "USD",
+                                  "conversionRate": 1781.98
+                                }
+                              }
+                            }
+                          ],
+                          "totalBeforeTax": {
+                            "amount": 1781980.00,
+                            "currency": "USD"
+                          },
+                          "taxRate": 0.2,
+                          "totalTax": {
+                            "amount": 356396.000,
+                            "currency": "USD"
+                          },
+                          "totalAfterTax": {
+                            "amount": 2138376.000,
+                            "currency": "USD"
+                          },
+                          "usdToEurConversionRate": 0.92
                         }
                         """
                 );
@@ -263,7 +261,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectHeader()
-                .contentDisposition(ContentDisposition.attachment().filename("OD-BUISSET-ANTHONY-001.pdf").build())
+                .contentDisposition(ContentDisposition.attachment().filename("OD-MYCOMPANY-001.pdf").build())
                 .expectBody().returnResult().getResponseBody();
 
         assertThat(data).isEqualTo(pdfData);
@@ -290,15 +288,18 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.dueAt").isNotEmpty()
                 .json("""
                         {
-                          "number": "OD-BUISSET-ANTHONY-002",
-                          "billingProfileType": "INDIVIDUAL",
-                          "individualBillingProfile": {
-                            "firstName": "Anthony",
-                            "lastName": "BUISSET",
-                            "address": "771 chemin de la sine, 06140, Vence, France",
+                          "number": "OD-MYCOMPANY-002",
+                          "billingProfileType": "COMPANY",
+                          "individualBillingProfile": null,
+                          "companyBillingProfile": {
+                            "registrationNumber": "123456",
+                            "name": "My company",
+                            "address": "My address",
+                            "vatRegulationState": "VAT_APPLICABLE",
+                            "euVATNumber": null,
+                            "country": "France",
                             "countryCode": "FRA"
                           },
-                          "companyBillingProfile": null,
                           "destinationAccounts": {
                             "bankAccount": null,
                             "wallets": [
@@ -309,20 +310,6 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                             ]
                           },
                           "rewards": [
-                            {
-                              "id": "79209029-c488-4284-aa3f-bce8870d3a66",
-                              "date": "2023-06-02T08:49:08.444047Z",
-                              "projectName": "kaaper",
-                              "amount": {
-                                "amount": 1000,
-                                "currency": "USDC",
-                                "target": {
-                                  "amount": 1010.00,
-                                  "currency": "USD",
-                                  "conversionRate": 1.01
-                                }
-                              }
-                            },
                             {
                               "id": "d22f75ab-d9f5-4dc6-9a85-60dcd7452028",
                               "date": "2023-09-20T07:59:16.657487Z",
@@ -336,22 +323,36 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                                   "conversionRate": 1.01
                                 }
                               }
+                            },
+                            {
+                              "id": "79209029-c488-4284-aa3f-bce8870d3a66",
+                              "date": "2023-06-02T08:49:08.444047Z",
+                              "projectName": "kaaper",
+                              "amount": {
+                                "amount": 1000,
+                                "currency": "USDC",
+                                "target": {
+                                  "amount": 1010.00,
+                                  "currency": "USD",
+                                  "conversionRate": 1.01
+                                }
+                              }
                             }
                           ],
-                          "usdToEurConversionRate": 0.92,
                           "totalBeforeTax": {
                             "amount": 2020.00,
                             "currency": "USD"
                           },
-                          "taxRate": 0,
+                          "taxRate": 0.2,
                           "totalTax": {
-                            "amount": 0.00,
+                            "amount": 404.000,
                             "currency": "USD"
                           },
                           "totalAfterTax": {
-                            "amount": 2020.00,
+                            "amount": 2424.000,
                             "currency": "USD"
-                          }
+                          },
+                          "usdToEurConversionRate": 0.92
                         }
                         """
                 );
@@ -448,7 +449,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectHeader()
-                .contentDisposition(ContentDisposition.attachment().filename("OD-BUISSET-ANTHONY-002.pdf").build())
+                .contentDisposition(ContentDisposition.attachment().filename("OD-MYCOMPANY-002.pdf").build())
                 .expectBody().returnResult().getResponseBody();
 
         assertThat(data).isEqualTo(pdfData);
@@ -517,7 +518,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.number").isEqualTo("OD-BUISSET-ANTHONY-003");
+                .jsonPath("$.number").isEqualTo("OD-MYCOMPANY-003");
 
         client.get()
                 .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(billingProfileId), Map.of(
@@ -529,7 +530,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.number").isEqualTo("OD-BUISSET-ANTHONY-003");
+                .jsonPath("$.number").isEqualTo("OD-MYCOMPANY-003");
     }
 
     @Test
@@ -641,7 +642,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
-                          "type": "COMPANY"
+                          "type": "INDIVIDUAL"
                         }
                         """)
                 // Then
@@ -649,17 +650,21 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful();
 
-        final var companyBillingProfile = companyBillingProfileRepository.findByUserId(antho.user().getId()).orElseThrow();
-        companyBillingProfile.setName("My company");
-        companyBillingProfile.setCountry("FRA");
-        companyBillingProfile.setAddress("My address");
-        companyBillingProfile.setRegistrationNumber("123456");
-        companyBillingProfile.setSubjectToEuVAT(true);
-        companyBillingProfileRepository.save(companyBillingProfile);
+        final var individualBillingProfileId = client.get()
+                .uri(ME_BILLING_PROFILES)
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(MyBillingProfilesResponse.class)
+                .returnResult()
+                .getResponseBody().getBillingProfiles().get(0).getId();
+
 
         // Generate another preview for the same rewards
         client.get()
-                .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(companyBillingProfile.getId()), Map.of(
+                .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(individualBillingProfileId), Map.of(
                         "rewardIds", "dd7d445f-6915-4955-9bae-078173627b05"
                 )))
                 .header("Authorization", BEARER_PREFIX + antho.jwt())
@@ -687,28 +692,28 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "invoices": [
-                            {
-                              "number": "OD-BUISSET-ANTHONY-001",
-                              "totalAfterTax": {
-                                "amount": 1781980.00,
-                                "currency": "USD"
-                              },
-                              "status": "PROCESSING"
-                            },
-                            {
-                              "number": "OD-BUISSET-ANTHONY-002",
-                              "totalAfterTax": {
-                                "amount": 2020.00,
-                                "currency": "USD"
-                              },
-                              "status": "COMPLETE"
-                            }
-                          ],
-                          "hasMore": false,
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 2,
-                          "nextPageIndex": 0
+                           "invoices": [
+                             {
+                               "number": "OD-MYCOMPANY-002",
+                               "totalAfterTax": {
+                                 "amount": 2424.000,
+                                 "currency": "USD"
+                               },
+                               "status": "COMPLETE"
+                             },
+                             {
+                               "number": "OD-MYCOMPANY-001",
+                               "totalAfterTax": {
+                                 "amount": 2138376.000,
+                                 "currency": "USD"
+                               },
+                               "status": "PROCESSING"
+                             }
+                           ],
+                           "hasMore": false,
+                           "totalPageNumber": 1,
+                           "totalItemNumber": 2,
+                           "nextPageIndex": 0
                         }
                         """)
         ;

@@ -251,6 +251,16 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
                             "title": "%s"
                         }
                         """, description, title)))
+                .willReturn(permanentRedirect("/repos/%s/%s/new-issues".formatted(owner, repoName))));
+
+        dustyBotApiWireMockServer.stubFor(post(urlEqualTo(String.format("/repos/%s/%s/new-issues", owner, repoName)))
+                .withHeader("Authorization", equalTo("Bearer " + githubDustyBotConfig.getPersonalAccessToken()))
+                .withRequestBody(equalToJson(String.format("""
+                        {
+                            "body": "%s",
+                            "title": "%s"
+                        }
+                        """, description, title)))
                 .willReturn(okJson(CREATE_ISSUE_RESPONSE_JSON)));
 
         dustyBotApiWireMockServer.stubFor(post(urlEqualTo(String.format("/repos/%s/%s/issues/%s", owner, repoName, 25)))

@@ -15,9 +15,12 @@ import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.RoundingMode;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.nullsLast;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
@@ -281,7 +284,11 @@ public interface BillingProfileMapper {
 
     static BillingProfileCoworkersPageResponse coworkersPageToResponse(Page<BillingProfileCoworkerView> coworkersPage, int pageIndex) {
         return new BillingProfileCoworkersPageResponse()
-                .coworkers(coworkersPage.getContent().stream().map(BillingProfileMapper::coworkerToResponse).toList())
+                .coworkers(coworkersPage.getContent().stream()
+                        .map(BillingProfileMapper::coworkerToResponse)
+                        .sorted(Comparator.comparing(BillingProfileCoworkersPageItemResponse::getJoinedAt, nullsLast(naturalOrder()))
+                                .thenComparing(BillingProfileCoworkersPageItemResponse::getInvitedAt, nullsLast(naturalOrder())))
+                        .toList())
                 .totalPageNumber(coworkersPage.getTotalPageNumber())
                 .totalItemNumber(coworkersPage.getTotalItemNumber())
                 .hasMore(hasMore(pageIndex, coworkersPage.getTotalPageNumber()))
@@ -290,11 +297,12 @@ public interface BillingProfileMapper {
 
     static BillingProfileCoworkersPageItemResponse coworkerToResponse(BillingProfileCoworkerView billingProfileCoworkerView) {
         return new BillingProfileCoworkersPageItemResponse()
-                .githubUserId(billingProfileCoworkerView.githubUserId())
+                .githubUserId(billingProfileCoworkerView.githubUserId() != null ? billingProfileCoworkerView.githubUserId().value() : null)
                 .login(billingProfileCoworkerView.login())
                 .avatarUrl(billingProfileCoworkerView.avatarUrl())
                 .htmlUrl(billingProfileCoworkerView.githubHtmlUrl())
-                .isRegistered(true)
+                .isRegistered(billingProfileCoworkerView.userId() != null)
+                .id(billingProfileCoworkerView.userId() != null ? billingProfileCoworkerView.userId().value() : null)
                 .role(switch (billingProfileCoworkerView.role()) {
                     case ADMIN -> BillingProfileCoworkerRole.ADMIN;
                     case MEMBER -> BillingProfileCoworkerRole.MEMBER;

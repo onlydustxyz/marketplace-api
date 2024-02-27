@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileUserEntity;
@@ -31,14 +32,14 @@ public class BillingProfileUserViewEntity {
     @Id
     UUID billingProfileId;
     @Id
-    UUID userId;
+    Long githubUserId;
 
     @Column(name = "role", nullable = false)
     @Type(type = "billing_profile_type")
     @Enumerated(EnumType.STRING)
     BillingProfileUserEntity.Role role;
 
-    Long githubUserId;
+    UUID userId;
     String githubLogin;
     String githubAvatarUrl;
     String githubHtmlUrl;
@@ -49,10 +50,10 @@ public class BillingProfileUserViewEntity {
 
     public BillingProfileCoworkerView toView() {
         return BillingProfileCoworkerView.builder()
-                .userId(UserId.of(userId))
+                .userId(userId != null ? UserId.of(userId) : null)
                 .role(role.toDomain())
                 .login(githubLogin)
-                .githubUserId(githubUserId)
+                .githubUserId(githubUserId != null ? GithubUserId.of(githubUserId) : null)
                 .avatarUrl(githubAvatarUrl)
                 .githubHtmlUrl(githubHtmlUrl != null ? URI.create(githubHtmlUrl) : null)
                 .joinedAt(joinedAt != null ? ZonedDateTime.ofInstant(joinedAt.toInstant(), ZoneOffset.UTC) : null)
@@ -64,7 +65,7 @@ public class BillingProfileUserViewEntity {
 
     @EqualsAndHashCode
     public static class PrimaryKey implements Serializable {
-        UUID userId;
         UUID billingProfileId;
+        Long githubUserId;
     }
 }
