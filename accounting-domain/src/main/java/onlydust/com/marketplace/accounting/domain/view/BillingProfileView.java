@@ -5,6 +5,7 @@ import lombok.Getter;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 
 @Builder(toBuilder = true)
 @Getter
@@ -15,4 +16,5 @@ public class BillingProfileView {
     Kyc kyc;
     Kyb kyb;
     BillingProfile.User me;
+    VerificationStatus verificationStatus;
 }

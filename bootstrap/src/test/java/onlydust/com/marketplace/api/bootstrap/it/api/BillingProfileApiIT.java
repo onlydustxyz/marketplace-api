@@ -123,7 +123,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.id").isNotEmpty();
 
 
-        /// When
+        // When
         client.post()
                 .uri(getApiURI(BILLING_PROFILES_POST))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -162,7 +162,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_BILLING_PROFILES_V2))
+                .uri(getApiURI(ME_BILLING_PROFILES))
                 .header("Authorization", "Bearer " + jwt)
                 // Then
                 .exchange()

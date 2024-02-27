@@ -6,7 +6,6 @@ import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
@@ -26,7 +25,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.time.ZonedDateTime.now;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
 public class PostgresBillingProfileAdapter implements BillingProfileStoragePort {
@@ -137,9 +135,11 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     public Optional<BillingProfileView> findById(BillingProfile.Id billingProfileId) {
         return billingProfileRepository.findById(billingProfileId.value()).map(billingProfileEntity -> switch (billingProfileEntity.getType()) {
             case INDIVIDUAL -> {
-                BillingProfileView billingProfileView = BillingProfileView.builder().type(BillingProfile.Type.INDIVIDUAL)
+                BillingProfileView billingProfileView = BillingProfileView.builder()
+                        .type(BillingProfile.Type.INDIVIDUAL)
                         .id(billingProfileId)
                         .name(billingProfileEntity.getName())
+                        .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
                         .build();
                 final Optional<KycEntity> optionalKycEntity = kycRepository.findByBillingProfileId(billingProfileId.value());
                 if (optionalKycEntity.isPresent()) {
@@ -153,6 +153,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                 BillingProfileView billingProfileView = BillingProfileView.builder().type(BillingProfile.Type.COMPANY)
                         .id(billingProfileId)
                         .name(billingProfileEntity.getName())
+                        .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
                         .build();
                 final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
                 if (optionalKybEntity.isPresent()) {
@@ -166,6 +167,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                 BillingProfileView billingProfileView = BillingProfileView.builder().type(BillingProfile.Type.SELF_EMPLOYED)
                         .id(billingProfileId)
                         .name(billingProfileEntity.getName())
+                        .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
                         .build();
                 final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
                 if (optionalKybEntity.isPresent()) {
@@ -219,7 +221,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional
     public void updateBillingProfileStatus(BillingProfile.Id billingProfileId, VerificationStatus status) {
-        billingProfileRepository.updateBillingProfileVerificationStatus(billingProfileId.value(), VerificationStatusEntity.fromDomain(status));
+        billingProfileRepository.updateBillingProfileVerificationStatus(billingProfileId.value(), VerificationStatusEntity.fromDomain(status).name());
     }
 
     @Override

@@ -282,6 +282,7 @@ public interface BillingProfileMapper {
         billingProfileResponse.setType(map(billingProfileView.getType()));
         billingProfileResponse.setKyb(isNull(billingProfileView.getKyb()) ? null : kybToResponse(billingProfileView.getKyb()));
         billingProfileResponse.setKyc(isNull(billingProfileView.getKyc()) ? null : kycToResponse(billingProfileView.getKyc()));
+        billingProfileResponse.setStatus(verificationStatusToResponse(billingProfileView.getVerificationStatus()));
         return billingProfileResponse;
     }
 

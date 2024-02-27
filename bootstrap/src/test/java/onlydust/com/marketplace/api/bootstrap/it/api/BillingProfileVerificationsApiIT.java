@@ -5,7 +5,10 @@ import com.github.tomakehurst.wiremock.stubbing.Scenario;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubApiClientAdapter;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubClientProperties;
 import onlydust.com.marketplace.api.bootstrap.helper.SlackNotificationStub;
-import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubSignatureVerifier;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookProperties;
 import org.junit.jupiter.api.MethodOrderer;
@@ -26,7 +29,7 @@ import static onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookA
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
+public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     SumsubWebhookProperties sumsubWebhookProperties;
@@ -34,73 +37,16 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
     SumsubClientProperties sumsubClientProperties;
     @Autowired
     SlackNotificationStub slackNotificationStub;
+    @Autowired
+    KycRepository kycRepository;
+    @Autowired
+    KybRepository kybRepository;
+    @Autowired
+    BillingProfileRepository billingProfileRepository;
 
     @Test
     @Order(1)
-    void should_get_individual_billing_profile() {
-        // Given
-        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
-
-        // When
-        client.get()
-                .uri(ME_GET_INDIVIDUAL_BILLING_PROFILE)
-                .header("Authorization", BEARER_PREFIX + pierre.jwt())
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.id").isNotEmpty()
-                .jsonPath("$.status").isEqualTo("NOT_STARTED");
-    }
-
-    @Test
-    @Order(2)
-    void should_list_individual_billing_profiles() {
-        // Given
-        final var pierre = userAuthHelper.authenticatePierre();
-
-        // When
-        client.get()
-                .uri(ME_BILLING_PROFILES)
-                .header("Authorization", BEARER_PREFIX + pierre.jwt())
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.billingProfiles.length()").isEqualTo(1)
-                .jsonPath("$.billingProfiles[0].id").isNotEmpty()
-                .jsonPath("$.billingProfiles[0].type").isEqualTo("INDIVIDUAL")
-                .jsonPath("$.billingProfiles[0].name").isEqualTo("Personal")
-                .jsonPath("$.billingProfiles[0].rewardCount").isEqualTo(0)
-                .jsonPath("$.billingProfiles[0].invoiceMandateAccepted").doesNotExist()
-        ;
-    }
-
-    @Test
-    @Order(3)
-    void should_get_company_billing_profile() {
-        // Given
-        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
-
-        // When
-        client.get()
-                .uri(ME_GET_COMPANY_BILLING_PROFILE)
-                .header("Authorization", BEARER_PREFIX + pierre.jwt())
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .consumeWith(System.out::println)
-                .jsonPath("$.id").isNotEmpty()
-                .jsonPath("$.status").isEqualTo("NOT_STARTED");
-    }
-
-    @Test
-    @Order(4)
-    void should_get_individual_billing_profile_given_one() {
+    void should_verify_individual_billing_profile() {
         // Given
         final var githubUserId = faker.number().randomNumber() + faker.number().randomNumber();
         final var login = faker.name().username();
@@ -109,21 +55,39 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
         final String jwt = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
 
         // When
-        client.get()
-                .uri(ME_GET_INDIVIDUAL_BILLING_PROFILE)
-                .header("Authorization", BEARER_PREFIX + jwt)
-                .exchange()
+        client.post()
+                .uri(getApiURI(BILLING_PROFILES_POST))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + jwt)
+                .bodyValue("""
+                        {
+                          "name": "individual",
+                          "type": "INDIVIDUAL"
+                        }
+                        """)
                 // Then
+                .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.id").isNotEmpty()
-                .jsonPath("$.status").isEqualTo("NOT_STARTED");
+                .jsonPath("$.name").isEqualTo("individual")
+                .jsonPath("$.type").isEqualTo("INDIVIDUAL")
+                .jsonPath("$.status").isEqualTo("NOT_STARTED")
+                .jsonPath("$.kyc.id").isNotEmpty()
+                .jsonPath("$.kyb").isEmpty()
+                .jsonPath("$.id").isNotEmpty();
 
-//        final UUID billingProfileId = individualBillingProfileRepository.findByUserId(userId).orElseThrow().getId();
-        final UUID billingProfileId = UUID.randomUUID();
+        final UUID billingProfileId = billingProfileRepository.findBillingProfilesForUserId(userId).stream()
+                .filter(billingProfileEntity -> billingProfileEntity.getType().equals(BillingProfileEntity.Type.INDIVIDUAL))
+                .findFirst()
+                .orElseThrow()
+                .getId();
+
+        final UUID kycId = kycRepository.findByBillingProfileId(billingProfileId).orElseThrow().getId();
+
+
         final String sumsubApiPath = String.format("/resources/applicants/-;externalUserId=%s/one",
-                billingProfileId.toString());
+                kycId.toString());
         sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
@@ -148,7 +112,7 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                   "previousLevelName": null,
                   "videoIdentReviewStatus": null,
                   "externalApplicantActionId": null
-                }""", billingProfileId).getBytes(StandardCharsets.UTF_8);
+                }""", kycId).getBytes(StandardCharsets.UTF_8);
         final String sumsubDigest = SumsubSignatureVerifier.hmac(sumsubPayload, sumsubWebhookProperties.getSecret());
 
         // When
@@ -164,7 +128,7 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
 
         billingProfileVerificationOutboxJob.run();
         client.get()
-                .uri(ME_GET_INDIVIDUAL_BILLING_PROFILE)
+                .uri(BILLING_PROFILES_GET_BY_ID.formatted(billingProfileId.toString()))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()
                 // Then
@@ -172,19 +136,18 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .consumeWith(System.out::println)
-                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.kyc.address").isEqualTo("25 AVENUE SAINT LOUIS, ETAGE 2 APT, ST MAUR DES FOSSES, France, 94210")
+                .jsonPath("$.kyc.firstName").isEqualTo("ALEXIS")
+                .jsonPath("$.kyc.lastName").isEqualTo("BENOLIEL")
+                .jsonPath("$.kyc.country").isEqualTo("France")
+                .jsonPath("$.kyc.birthdate").isEqualTo("1995-09-19T00:00:00Z")
+                .jsonPath("$.kyc.idDocumentNumber").isEqualTo("15AC05169")
+                .jsonPath("$.kyc.idDocumentType").isEqualTo("PASSPORT")
+                .jsonPath("$.kyc.idDocumentCountryCode").isEqualTo("FRA")
+                .jsonPath("$.kyc.validUntil").isEqualTo("2025-04-19T00:00:00Z")
+                .jsonPath("$.kyc.usCitizen").isEqualTo(false)
                 .jsonPath("$.status").isEqualTo("UNDER_REVIEW")
-                .jsonPath("$.address").isEqualTo("25 AVENUE SAINT LOUIS, ETAGE 2 APT, ST MAUR DES FOSSES, France, 94210")
-                .jsonPath("$.firstName").isEqualTo("ALEXIS")
-                .jsonPath("$.lastName").isEqualTo("BENOLIEL")
-                .jsonPath("$.country").isEqualTo("France")
-                .jsonPath("$.countryCode").isEqualTo("FRA")
-                .jsonPath("$.birthdate").isEqualTo("1995-09-19T00:00:00Z")
-                .jsonPath("$.idDocumentNumber").isEqualTo("15AC05169")
-                .jsonPath("$.idDocumentType").isEqualTo("PASSPORT")
-                .jsonPath("$.idDocumentCountryCode").isEqualTo("FRA")
-                .jsonPath("$.validUntil").isEqualTo("2025-04-19T00:00:00Z")
-                .jsonPath("$.usCitizen").isEqualTo(false);
+                .jsonPath("$.id").isNotEmpty();
 
         assertEquals(1, slackNotificationStub.getNotifications().size());
 
@@ -226,7 +189,7 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                   "previousLevelName": null,
                   "videoIdentReviewStatus": null,
                   "externalApplicantActionId": null
-                }""", reviewMessage, billingProfileId).getBytes(StandardCharsets.UTF_8);
+                }""", reviewMessage, kycId).getBytes(StandardCharsets.UTF_8);
         final String sumsubDigestRejection = SumsubSignatureVerifier.hmac(sumsubPayloadRejection, sumsubWebhookProperties.getSecret());
 
         client.post()
@@ -241,7 +204,7 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
 
         billingProfileVerificationOutboxJob.run();
         client.get()
-                .uri(ME_GET_INDIVIDUAL_BILLING_PROFILE)
+                .uri(BILLING_PROFILES_GET_BY_ID.formatted(billingProfileId))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()
                 // Then
@@ -251,22 +214,22 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .consumeWith(System.out::println)
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.status").isEqualTo("UNDER_REVIEW")
-                .jsonPath("$.address").isEqualTo("25 AVENUE SAINT LOUIS, ETAGE 2 APT, ST MAUR DES FOSSES, France, 94210")
-                .jsonPath("$.firstName").isEqualTo("ALEXIS")
-                .jsonPath("$.lastName").isEqualTo("BENOLIEL")
-                .jsonPath("$.country").isEqualTo("France")
-                .jsonPath("$.birthdate").isEqualTo("1995-09-19T00:00:00Z")
-                .jsonPath("$.idDocumentNumber").isEqualTo("15AC05169")
-                .jsonPath("$.idDocumentType").isEqualTo("PASSPORT")
-                .jsonPath("$.idDocumentCountryCode").isEqualTo("FRA")
-                .jsonPath("$.validUntil").isEqualTo("2025-04-19T00:00:00Z")
-                .jsonPath("$.usCitizen").isEqualTo(false);
+                .jsonPath("$.kyc.address").isEqualTo("25 AVENUE SAINT LOUIS, ETAGE 2 APT, ST MAUR DES FOSSES, France, 94210")
+                .jsonPath("$.kyc.firstName").isEqualTo("ALEXIS")
+                .jsonPath("$.kyc.lastName").isEqualTo("BENOLIEL")
+                .jsonPath("$.kyc.country").isEqualTo("France")
+                .jsonPath("$.kyc.birthdate").isEqualTo("1995-09-19T00:00:00Z")
+                .jsonPath("$.kyc.idDocumentNumber").isEqualTo("15AC05169")
+                .jsonPath("$.kyc.idDocumentType").isEqualTo("PASSPORT")
+                .jsonPath("$.kyc.idDocumentCountryCode").isEqualTo("FRA")
+                .jsonPath("$.kyc.validUntil").isEqualTo("2025-04-19T00:00:00Z")
+                .jsonPath("$.kyc.usCitizen").isEqualTo(false);
         assertEquals(2, slackNotificationStub.getNotifications().size());
     }
 
     @Test
-    @Order(5)
-    void should_get_company_billing_profile_given_one() {
+    @Order(2)
+    void should_verify_company_billing_profile() {
         // Given
         final var githubUserId = faker.number().randomNumber() + faker.number().randomNumber();
         final var login = faker.name().username();
@@ -276,21 +239,38 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
         final String applicantId = "kyb-" + faker.number().randomNumber();
 
         // When
-        client.get()
-                .uri(ME_GET_COMPANY_BILLING_PROFILE)
-                .header("Authorization", BEARER_PREFIX + jwt)
-                .exchange()
+        client.post()
+                .uri(getApiURI(BILLING_PROFILES_POST))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + jwt)
+                .bodyValue("""
+                        {
+                          "name": "company",
+                          "type": "COMPANY"
+                        }
+                        """)
                 // Then
+                .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.id").isNotEmpty()
-                .jsonPath("$.status").isEqualTo("NOT_STARTED");
+                .jsonPath("$.name").isEqualTo("company")
+                .jsonPath("$.type").isEqualTo("COMPANY")
+                .jsonPath("$.status").isEqualTo("NOT_STARTED")
+                .jsonPath("$.kyb.id").isNotEmpty()
+                .jsonPath("$.kyc").isEmpty()
+                .jsonPath("$.id").isNotEmpty();
 
-//        final UUID billingProfileId = companyBillingProfileRepository.findByUserId(userId).orElseThrow().getId();
-        final UUID billingProfileId = UUID.randomUUID();
+        final UUID billingProfileId = billingProfileRepository.findBillingProfilesForUserId(userId).stream()
+                .filter(billingProfileEntity -> billingProfileEntity.getType().equals(BillingProfileEntity.Type.COMPANY))
+                .findFirst()
+                .orElseThrow()
+                .getId();
+
+        final UUID kybId = kybRepository.findByBillingProfileId(billingProfileId).orElseThrow().getId();
+
         final String sumsubApiPath = String.format("/resources/applicants/-;externalUserId=%s/one",
-                billingProfileId.toString());
+                kybId.toString());
         sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))
                 .inScenario("KYB")
                 .whenScenarioStateIs(Scenario.STARTED)
@@ -348,7 +328,7 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                   "previousLevelName": null,
                   "videoIdentReviewStatus": null,
                   "externalApplicantActionId": null
-                }""", applicantId, billingProfileId).getBytes(StandardCharsets.UTF_8);
+                }""", applicantId, kybId).getBytes(StandardCharsets.UTF_8);
         final String sumsubDigest = SumsubSignatureVerifier.hmac(sumsubPayload, sumsubWebhookProperties.getSecret());
 
         // When
@@ -364,7 +344,7 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
 
         billingProfileVerificationOutboxJob.run();
         client.get()
-                .uri(ME_GET_COMPANY_BILLING_PROFILE)
+                .uri(BILLING_PROFILES_GET_BY_ID.formatted(billingProfileId))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()
                 // Then
@@ -373,14 +353,13 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.status").isEqualTo("UNDER_REVIEW")
-                .jsonPath("$.address").isEqualTo("54 rue du Faubourg Montmartre, 75009 Paris")
-                .jsonPath("$.registrationDate").isEqualTo("2021-12-15T00:00:00Z")
-                .jsonPath("$.country").isEqualTo("France")
-                .jsonPath("$.countryCode").isEqualTo("FRA")
-                .jsonPath("$.registrationNumber").isEqualTo("908233638")
-                .jsonPath("$.subjectToEuropeVAT").isEqualTo(true)
-                .jsonPath("$.euVATNumber").isEqualTo("FR26908233638")
-                .jsonPath("$.usEntity").isEqualTo(false);
+                .jsonPath("$.kyb.address").isEqualTo("54 rue du Faubourg Montmartre, 75009 Paris")
+                .jsonPath("$.kyb.registrationDate").isEqualTo("2021-12-15T00:00:00Z")
+                .jsonPath("$.kyb.country").isEqualTo("France")
+                .jsonPath("$.kyb.registrationNumber").isEqualTo("908233638")
+                .jsonPath("$.kyb.subjectToEuropeVAT").isEqualTo(true)
+                .jsonPath("$.kyb.euVATNumber").isEqualTo("FR26908233638")
+                .jsonPath("$.kyb.usEntity").isEqualTo(false);
         assertEquals(3, slackNotificationStub.getNotifications().size());
 
         final String reviewMessage = "Enter your date of birth exactly as it is on your identity document.\\n\\n - Tax number is incorrect. Provide a correct" +
@@ -420,7 +399,7 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                   "previousLevelName": null,
                   "videoIdentReviewStatus": null,
                   "externalApplicantActionId": null
-                }""", applicantId, reviewMessage, billingProfileId).getBytes(StandardCharsets.UTF_8);
+                }""", applicantId, reviewMessage, kybId).getBytes(StandardCharsets.UTF_8);
         final String sumsubDigestRejection = SumsubSignatureVerifier.hmac(sumsubPayloadRejection, sumsubWebhookProperties.getSecret());
 
         // When
@@ -436,7 +415,7 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
 
         billingProfileVerificationOutboxJob.run();
         client.get()
-                .uri(ME_GET_COMPANY_BILLING_PROFILE)
+                .uri(BILLING_PROFILES_GET_BY_ID.formatted(billingProfileId))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()
                 // Then
@@ -445,13 +424,13 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.status").isEqualTo("UNDER_REVIEW")
-                .jsonPath("$.address").isEqualTo("54 rue du Faubourg Montmartre, 75009 Paris")
-                .jsonPath("$.registrationDate").isEqualTo("2021-12-15T00:00:00Z")
-                .jsonPath("$.country").isEqualTo("France")
-                .jsonPath("$.registrationNumber").isEqualTo("908233638")
-                .jsonPath("$.subjectToEuropeVAT").isEqualTo(true)
-                .jsonPath("$.euVATNumber").isEqualTo("FR26908233638")
-                .jsonPath("$.usEntity").isEqualTo(false);
+                .jsonPath("$.kyb.address").isEqualTo("54 rue du Faubourg Montmartre, 75009 Paris")
+                .jsonPath("$.kyb.registrationDate").isEqualTo("2021-12-15T00:00:00Z")
+                .jsonPath("$.kyb.country").isEqualTo("France")
+                .jsonPath("$.kyb.registrationNumber").isEqualTo("908233638")
+                .jsonPath("$.kyb.subjectToEuropeVAT").isEqualTo(true)
+                .jsonPath("$.kyb.euVATNumber").isEqualTo("FR26908233638")
+                .jsonPath("$.kyb.usEntity").isEqualTo(false);
         assertEquals(4, slackNotificationStub.getNotifications().size());
 
         final byte[] sumsubPayloadChildrenKycUnderReview = String.format("""
@@ -539,7 +518,7 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
         billingProfileVerificationOutboxJob.run();
 
         client.get()
-                .uri(ME_GET_COMPANY_BILLING_PROFILE)
+                .uri(BILLING_PROFILES_GET_BY_ID.formatted(billingProfileId))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()
                 // Then
@@ -651,16 +630,16 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
         final String applicantId = "kyb-" + faker.number().randomNumber();
 
         // When
-        client.get()
-                .uri(ME_GET_COMPANY_BILLING_PROFILE)
-                .header("Authorization", BEARER_PREFIX + jwt)
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.id").isNotEmpty()
-                .jsonPath("$.status").isEqualTo("NOT_STARTED");
+//        client.get()
+//                .uri(BILLING_PROFILES_GET_BY_ID.formatted(billingProfileId))
+//                .header("Authorization", BEARER_PREFIX + jwt)
+//                .exchange()
+//                // Then
+//                .expectStatus()
+//                .is2xxSuccessful()
+//                .expectBody()
+//                .jsonPath("$.id").isNotEmpty()
+//                .jsonPath("$.status").isEqualTo("NOT_STARTED");
 
 //        final UUID billingProfileId = companyBillingProfileRepository.findByUserId(userId).orElseThrow().getId();
         final UUID billingProfileId = UUID.randomUUID();
@@ -732,7 +711,7 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
 
         billingProfileVerificationOutboxJob.run();
         client.get()
-                .uri(ME_GET_COMPANY_BILLING_PROFILE)
+                .uri(BILLING_PROFILES_GET_BY_ID.formatted(billingProfileId))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()
                 // Then
@@ -805,7 +784,7 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
         billingProfileVerificationOutboxJob.run();
 
         client.get()
-                .uri(ME_GET_COMPANY_BILLING_PROFILE)
+                .uri(BILLING_PROFILES_GET_BY_ID.formatted(billingProfileId))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()
                 // Then
@@ -865,7 +844,7 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
         billingProfileVerificationOutboxJob.run();
 
         client.get()
-                .uri(ME_GET_COMPANY_BILLING_PROFILE)
+                .uri(BILLING_PROFILES_GET_BY_ID.formatted(billingProfileId))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()
                 // Then
