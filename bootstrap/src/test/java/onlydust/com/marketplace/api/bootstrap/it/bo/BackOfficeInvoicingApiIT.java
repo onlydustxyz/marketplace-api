@@ -97,7 +97,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "rewardIds": [
                                 "061e2c7e-bda4-49a8-9914-2e76926f70c2"
                               ],
-                              "downloadUrl": "https://local-bo-api.onlydust.com/invoices/16ca82f4-4671-4036-8666-ce0930824558?token=BO_TOKEN"
+                              "downloadUrl": "https://local-bo-api.onlydust.com/bo/v1/external/invoices/16ca82f4-4671-4036-8666-ce0930824558?token=BO_TOKEN"
                             },
                             {
                               "id": "51d37fff-ed4c-474a-b846-af18edda6b8a",
@@ -108,7 +108,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 "d067b24d-115a-45e9-92de-94dd1d01b184",
                                 "ee28315c-7a84-4052-9308-c2236eeafda1"
                               ],
-                              "downloadUrl": "https://local-bo-api.onlydust.com/invoices/51d37fff-ed4c-474a-b846-af18edda6b8a?token=BO_TOKEN"
+                              "downloadUrl": "https://local-bo-api.onlydust.com/bo/v1/external/invoices/51d37fff-ed4c-474a-b846-af18edda6b8a?token=BO_TOKEN"
                             },
                             {
                               "id": "3fcd930b-b84d-4ce5-82cd-eca91b8a7553",
@@ -120,7 +120,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 "5083ac1f-4325-4d47-9760-cbc9ab82f25c",
                                 "e6ee79ae-b3f0-4f4e-b7e3-9e643bc27236"
                               ],
-                              "downloadUrl": "https://local-bo-api.onlydust.com/invoices/3fcd930b-b84d-4ce5-82cd-eca91b8a7553?token=BO_TOKEN"
+                              "downloadUrl": "https://local-bo-api.onlydust.com/bo/v1/external/invoices/3fcd930b-b84d-4ce5-82cd-eca91b8a7553?token=BO_TOKEN"
                             }
                           ]
                         }
