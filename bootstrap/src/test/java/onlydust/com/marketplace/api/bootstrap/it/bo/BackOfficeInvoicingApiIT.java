@@ -92,6 +92,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                             {
                               "id": "16ca82f4-4671-4036-8666-ce0930824558",
                               "status": "PROCESSING",
+                              "internalStatus": "TO_REVIEW",
                               "amount": 1010.00,
                               "currencyId": "f35155b5-6107-4677-85ac-23f8c2a63193",
                               "rewardIds": [
@@ -102,6 +103,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                             {
                               "id": "51d37fff-ed4c-474a-b846-af18edda6b8a",
                               "status": "PROCESSING",
+                              "internalStatus": "TO_REVIEW",
                               "amount": 2777.50,
                               "currencyId": "f35155b5-6107-4677-85ac-23f8c2a63193",
                               "rewardIds": [
@@ -113,6 +115,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                             {
                               "id": "3fcd930b-b84d-4ce5-82cd-eca91b8a7553",
                               "status": "PROCESSING",
+                              "internalStatus": "TO_REVIEW",
                               "amount": 4765.00,
                               "currencyId": "f35155b5-6107-4677-85ac-23f8c2a63193",
                               "rewardIds": [
@@ -158,6 +161,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "invoices": [
                             {
                               "status": "PROCESSING",
+                              "internalStatus": "APPROVED",
                               "rewardIds": [
                                 "d067b24d-115a-45e9-92de-94dd1d01b184",
                                 "ee28315c-7a84-4052-9308-c2236eeafda1"
@@ -165,6 +169,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                             },
                             {
                               "status": "PROCESSING",
+                              "internalStatus": "TO_REVIEW",
                               "rewardIds": [
                                 "d506a05d-3739-452f-928d-45ea81d33079",
                                 "5083ac1f-4325-4d47-9760-cbc9ab82f25c",
@@ -173,6 +178,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                             },
                             {
                               "status": "PROCESSING",
+                              "internalStatus": "TO_REVIEW",
                               "rewardIds": [
                                 "061e2c7e-bda4-49a8-9914-2e76926f70c2"
                               ]
@@ -228,9 +234,51 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                             },
                             {
                               "status": "PROCESSING",
+                              "internalStatus": "TO_REVIEW",
                               "rewardIds": [
                                 "061e2c7e-bda4-49a8-9914-2e76926f70c2"
                               ]
+                            }
+                          ]
+                        }
+                        """)
+        ;
+    }
+
+
+    @Test
+    void should_filter_invoices_by_status() {
+        client
+                .patch()
+                .uri(getApiURI(INVOICE.formatted(invoices.get(0).id())))
+                .header("Api-Key", apiKey())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "status": "REJECTED"
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .isNoContent()
+        ;
+
+        client
+                .get()
+                .uri(getApiURI(INVOICES, Map.of("pageIndex", "0", "pageSize", "10", "internalStatuses", "TO_REVIEW")))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "invoices": [
+                            {
+                              "internalStatus": "TO_REVIEW"
+                            },
+                            {
+                              "internalStatus": "TO_REVIEW"
                             }
                           ]
                         }

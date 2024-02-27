@@ -123,11 +123,11 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     }
 
     @Override
-    public Page<Invoice> findAllExceptDrafts(final @NonNull List<Invoice.Id> invoiceIds, Integer pageIndex, Integer pageSize) {
+    public Page<Invoice> findAll(final @NonNull List<Invoice.Id> ids, final @NonNull List<Invoice.Status> statuses, Integer pageIndex, Integer pageSize) {
         final var pageRequest = PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        final var page = invoiceIds.isEmpty() ? invoiceRepository.findAllByStatusNot(InvoiceEntity.Status.DRAFT, pageRequest) :
-                invoiceRepository.findAllByIdInAndStatusNot(invoiceIds.stream().map(Invoice.Id::value).toList(), InvoiceEntity.Status.DRAFT, pageRequest);
+        final var page = ids.isEmpty() ? invoiceRepository.findAllByStatusIn(statuses.stream().map(InvoiceEntity.Status::of).toList(), pageRequest) :
+                invoiceRepository.findAllByIdInAndStatusNot(ids.stream().map(Invoice.Id::value).toList(), InvoiceEntity.Status.DRAFT, pageRequest);
 
         return Page.<Invoice>builder()
                 .content(page.getContent().stream().map(InvoiceEntity::toDomain).toList())

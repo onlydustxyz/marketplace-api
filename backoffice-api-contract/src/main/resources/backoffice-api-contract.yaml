@@ -44,6 +44,15 @@ paths:
             items:
               $ref: '#/components/schemas/InvoiceId'
           style: simple
+        - in: query
+          name: internalStatuses
+          required: false
+          schema:
+            type: array
+            default: [ TO_REVIEW, REJECTED, APPROVED, PAID ]
+            items:
+              $ref: '#/components/schemas/InvoiceInternalStatus'
+          style: simple
       responses:
         "200":
           description: 'Invoice page'
@@ -1842,6 +1851,7 @@ components:
       required:
         - id
         - status
+        - internalStatus
         - createdAt
         - dueAt
         - amount
@@ -1853,6 +1863,8 @@ components:
           $ref: '#/components/schemas/InvoiceId'
         status:
           $ref: '#/components/schemas/InvoiceStatus'
+        internalStatus:
+          $ref: '#/components/schemas/InvoiceInternalStatus'
         createdAt:
           type: string
           format: date-time
@@ -1870,6 +1882,14 @@ components:
         downloadUrl:
           type: string
           format: uri
+
+    InvoiceInternalStatus:
+      type: string
+      enum:
+        - TO_REVIEW
+        - REJECTED
+        - APPROVED
+        - PAID
 
     InvoiceStatus:
       type: string
