@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.io.IOException;
 import java.net.URI;
@@ -30,7 +29,7 @@ public class GithubHttpClient {
         try {
             return objectMapper.readValue(data, classType);
         } catch (IOException e) {
-            throw OnlyDustException.internalServerError("Unable to deserialize github response", e);
+            throw internalServerError("Unable to deserialize github response", e);
         }
     }
 
@@ -41,7 +40,7 @@ public class GithubHttpClient {
                     "Bearer " + personalAccessToken).GET();
             return httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofByteArray());
         } catch (IOException | InterruptedException e) {
-            throw OnlyDustException.internalServerError("Unable to fetch github API:" + uri, e);
+            throw internalServerError("Unable to fetch github API:" + uri, e);
         }
     }
 
@@ -56,7 +55,7 @@ public class GithubHttpClient {
         return switch (httpResponse.statusCode()) {
             case 200 -> Optional.of(decode(httpResponse.body(), responseClass));
             case 403, 404 -> Optional.empty();
-            default -> throw OnlyDustException.internalServerError("Unable to fetch github API: " + path, null);
+            default -> throw internalServerError("Unable to fetch github API: " + path, null);
         };
     }
 
@@ -71,13 +70,18 @@ public class GithubHttpClient {
                             .build(), HttpResponse.BodyHandlers.ofByteArray());
             return switch (httpResponse.statusCode()) {
                 case 200, 201, 204, 206 -> Optional.of(decode(httpResponse.body(), responseClass));
+                case 301, 302, 307, 308 -> {
+                    final var location = httpResponse.headers().firstValue("Location")
+                            .orElseThrow(() -> internalServerError("%d status received without Location header".formatted(httpResponse.statusCode())));
+                    yield post(location, requestBody, responseClass);
+                }
                 case 403, 404 ->
                     // Should be considered as an internal server error because it happens due to wrong github PAT or
                     // rate limiting exceeded,
                     // but never due to a user action
-                        throw OnlyDustException.internalServerError(deserializeErrorMessage(httpResponse));
-                default -> throw OnlyDustException.internalServerError("Unable to fetch github API: " + path + " for " +
-                                                                       "error message " + deserializeErrorMessage(httpResponse), null);
+                        throw internalServerError(deserializeErrorMessage(httpResponse));
+                default -> throw internalServerError("Unable to fetch github API: " + path + " for " +
+                                                     "error message " + deserializeErrorMessage(httpResponse), null);
             };
         } catch (JsonProcessingException e) {
             throw internalServerError("Fail to serialize request", e);
