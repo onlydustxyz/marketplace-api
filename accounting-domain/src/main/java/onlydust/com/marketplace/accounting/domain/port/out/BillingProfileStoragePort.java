@@ -12,6 +12,7 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface BillingProfileStoragePort {
     boolean oldIsAdmin(UserId userId, BillingProfile.Id billingProfileId);
@@ -43,6 +44,22 @@ public interface BillingProfileStoragePort {
     void savePayoutInfoForBillingProfile(PayoutInfo payoutInfo, BillingProfile.Id billingProfileId);
 
     Page<BillingProfileCoworkerView> findCoworkersByBillingProfile(BillingProfile.Id billingProfileId, int pageIndex, int pageSize);
+
+    Optional<Kyc> findKycById(UUID verificationId);
+
+    void saveKyc(Kyc kyc);
+
+    void updateBillingProfileStatus(BillingProfile.Id billingProfileId, VerificationStatus status);
+
+    Optional<Kyb> findKybById(UUID verificationId);
+
+    void saveKyb(Kyb kyb);
+
+    List<VerificationStatus> findAllChildrenKycStatuesFromParentKyb(Kyb parentKyb);
+
+    Optional<Kyb> findKybByParentExternalId(String parentExternalApplicantId);
+
+    void saveChildrenKyc(String externalApplicantId, String parentExternalApplicantId, VerificationStatus verificationStatus);
 
     void saveCoworkerInvitation(BillingProfile.Id billingProfileId, UserId invitedBy, GithubUserId invitedUser, BillingProfile.User.Role role,
                                 ZonedDateTime invitedAt);

@@ -3,13 +3,13 @@ package onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationType;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.dto.SumsubWebhookEventDTO;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.jobs.OutboxSkippingException;
 import onlydust.com.marketplace.kernel.model.Event;
-import onlydust.com.marketplace.project.domain.model.OldBillingProfileType;
-import onlydust.com.marketplace.project.domain.model.OldVerificationStatus;
-import onlydust.com.marketplace.project.domain.model.notification.BillingProfileUpdated;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -19,7 +19,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Slf4j
-public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
+public class SumsubMapper implements Function<Event, BillingProfileVerificationUpdated> {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -33,7 +33,7 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
         Closed - user is a terrorist babay
     * */
     @Override
-    public BillingProfileUpdated apply(Event event) {
+    public BillingProfileVerificationUpdated apply(Event event) {
         try {
             if (event instanceof SumsubWebhookEventDTO sumsubWebhookEventDTO) {
                 if (nonNull(sumsubWebhookEventDTO.getApplicantMemberOf()) && sumsubWebhookEventDTO.getApplicantMemberOf().size() == 1 &&
@@ -43,16 +43,16 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
                     return mapToParentBillingProfile(sumsubWebhookEventDTO);
                 }
             }
-        } catch (Exception ignored) {
-
+        } catch (Exception exception) {
+            LOGGER.warn("Failed to map Sumsub event to DTO",exception);
         }
         throw new OutboxSkippingException(String.format("Invalid sumsub event format %s", event));
     }
 
-    private BillingProfileUpdated mapToChildrenBillingProfile(SumsubWebhookEventDTO sumsubWebhookEventDTO) {
-        return BillingProfileUpdated.builder()
+    private BillingProfileVerificationUpdated mapToChildrenBillingProfile(SumsubWebhookEventDTO sumsubWebhookEventDTO) {
+        return BillingProfileVerificationUpdated.builder()
                 .type(applicationTypeToDomain(sumsubWebhookEventDTO.getApplicantType()))
-                .oldVerificationStatus(typeAndReviewResultToDomain(sumsubWebhookEventDTO.getReviewStatus(),
+                .verificationStatus(typeAndReviewResultToDomain(sumsubWebhookEventDTO.getReviewStatus(),
                         sumsubWebhookEventDTO.getReviewResult()))
                 .reviewMessageForApplicant(reviewMessageForApplicantToDomain(sumsubWebhookEventDTO.getReviewResult()))
                 .rawReviewDetails(rawReviewToString(sumsubWebhookEventDTO.getReviewResult()))
@@ -61,12 +61,12 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
                 .build();
     }
 
-    private BillingProfileUpdated mapToParentBillingProfile(SumsubWebhookEventDTO sumsubWebhookEventDTO) {
-        final UUID billingProfileId = UUID.fromString(sumsubWebhookEventDTO.getExternalUserId());
-        return BillingProfileUpdated.builder()
-                .billingProfileId(billingProfileId)
+    private BillingProfileVerificationUpdated mapToParentBillingProfile(SumsubWebhookEventDTO sumsubWebhookEventDTO) {
+        final UUID verificationId = UUID.fromString(sumsubWebhookEventDTO.getExternalUserId());
+        return BillingProfileVerificationUpdated.builder()
+                .verificationId(verificationId)
                 .type(applicationTypeToDomain(sumsubWebhookEventDTO.getApplicantType()))
-                .oldVerificationStatus(typeAndReviewResultToDomain(sumsubWebhookEventDTO.getReviewStatus(),
+                .verificationStatus(typeAndReviewResultToDomain(sumsubWebhookEventDTO.getReviewStatus(),
                         sumsubWebhookEventDTO.getReviewResult()))
                 .reviewMessageForApplicant(reviewMessageForApplicantToDomain(sumsubWebhookEventDTO.getReviewResult()))
                 .rawReviewDetails(rawReviewToString(sumsubWebhookEventDTO.getReviewResult()))
@@ -74,10 +74,10 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
                 .build();
     }
 
-    private OldBillingProfileType applicationTypeToDomain(final String applicationType) {
+    private VerificationType applicationTypeToDomain(final String applicationType) {
         return switch (applicationType) {
-            case "individual" -> OldBillingProfileType.INDIVIDUAL;
-            case "company" -> OldBillingProfileType.COMPANY;
+            case "individual" -> VerificationType.KYC;
+            case "company" -> VerificationType.KYB;
             default -> throw OnlyDustException.internalServerError(String.format("Invalid application type from sumsub : %s",
                     applicationType));
         };
@@ -90,28 +90,28 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
         return null;
     }
 
-    private OldVerificationStatus typeAndReviewResultToDomain(final String reviewStatus,
-                                                              final SumsubWebhookEventDTO.ReviewResultDTO reviewResult) {
+    private VerificationStatus typeAndReviewResultToDomain(final String reviewStatus,
+                                                           final SumsubWebhookEventDTO.ReviewResultDTO reviewResult) {
         return switch (reviewStatus) {
-            case "init" -> OldVerificationStatus.STARTED;
+            case "init" -> VerificationStatus.STARTED;
             case "completed" -> {
                 final Optional<Answer> answer = reviewResultToAnswer(reviewResult);
                 if (answer.isPresent()) {
                     yield switch (answer.get()) {
                         case RED -> {
                             if (isAFinalRejection(reviewResult)) {
-                                yield OldVerificationStatus.CLOSED;
+                                yield VerificationStatus.CLOSED;
                             } else {
-                                yield OldVerificationStatus.REJECTED;
+                                yield VerificationStatus.REJECTED;
                             }
                         }
-                        case GREEN -> OldVerificationStatus.VERIFIED;
+                        case GREEN -> VerificationStatus.VERIFIED;
                     };
                 } else {
-                    yield OldVerificationStatus.UNDER_REVIEW;
+                    yield VerificationStatus.UNDER_REVIEW;
                 }
             }
-            default -> OldVerificationStatus.UNDER_REVIEW;
+            default -> VerificationStatus.UNDER_REVIEW;
         };
     }
 

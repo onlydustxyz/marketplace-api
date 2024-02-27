@@ -8,9 +8,9 @@ import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.CurrencyService;
 import onlydust.com.marketplace.api.infrastructure.accounting.AccountingServiceAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserVerificationEventEntity;
-import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
+import onlydust.com.marketplace.kernel.port.output.*;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
@@ -271,33 +271,11 @@ public class DomainConfiguration {
         return new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider, starknetERC20Provider);
     }
 
-    @Bean
-    public UserVerificationFacadePort userVerificationFacadePort(final OutboxPort userVerificationOutbox,
-                                                                 final OldBillingProfileStoragePort oldBillingProfileStoragePort,
-                                                                 final UserVerificationStoragePort userVerificationStoragePort,
-                                                                 final AccountingUserObserverPort accountingUserObserverPort,
-                                                                 final NotificationPort notificationPort,
-                                                                 final UserStoragePort userStoragePort, final WebhookPort webhookNotificationPort) {
-        return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), oldBillingProfileStoragePort, userVerificationStoragePort,
-                accountingUserObserverPort, notificationPort, userStoragePort, webhookNotificationPort);
-    }
 
     @Bean
-    public OutboxConsumer userVerificationOutboxConsumer(final OutboxPort userVerificationOutbox,
-                                                         final OldBillingProfileStoragePort oldBillingProfileStoragePort,
-                                                         final UserVerificationStoragePort userVerificationStoragePort,
-                                                         final AccountingUserObserverPort accountingUserObserverPort,
-                                                         final NotificationPort notificationPort,
-                                                         final UserStoragePort userStoragePort,
-                                                         final WebhookPort webhookNotificationPort) {
-        return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), oldBillingProfileStoragePort, userVerificationStoragePort,
-                accountingUserObserverPort, notificationPort, userStoragePort, webhookNotificationPort);
-    }
-
-    @Bean
-    OutboxConsumerJob billingProfileOutboxJob(final PostgresOutboxAdapter<UserVerificationEventEntity> userVerificationOutbox,
-                                              final OutboxConsumer userVerificationOutboxConsumer) {
-        return new OutboxConsumerJob(userVerificationOutbox, userVerificationOutboxConsumer);
+    OutboxConsumerJob billingProfileVerificationOutboxJob(final PostgresOutboxAdapter<BillingProfileVerificationEventEntity> billingProfileVerificationOutbox,
+                                              final OutboxConsumer billingProfileVerificationOutboxConsumer) {
+        return new OutboxConsumerJob(billingProfileVerificationOutbox, billingProfileVerificationOutboxConsumer);
     }
 
     @Bean

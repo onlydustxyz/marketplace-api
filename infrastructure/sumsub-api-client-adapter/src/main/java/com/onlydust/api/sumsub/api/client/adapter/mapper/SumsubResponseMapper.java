@@ -5,11 +5,10 @@ import com.onlydust.api.sumsub.api.client.adapter.SumsubClientProperties;
 import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubCompanyApplicantsDataDTO;
 import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubCompanyChecksDTO;
 import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubIndividualApplicantsDataDTO;
+import onlydust.com.marketplace.accounting.domain.model.Country;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.project.domain.model.OldCompanyBillingProfile;
-import onlydust.com.marketplace.project.domain.model.OldCountry;
-import onlydust.com.marketplace.project.domain.model.OldIndividualBillingProfile;
-import onlydust.com.marketplace.project.domain.model.OldVerificationStatus;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,25 +31,25 @@ public class SumsubResponseMapper {
         }
     }
 
-    public OldIndividualBillingProfile updateIndividualBillingProfile(final SumsubIndividualApplicantsDataDTO sumsubIndividualApplicantsDataDTO,
-                                                                      final OldIndividualBillingProfile individualBillingProfile,
-                                                                      final SumsubClientProperties sumsubClientProperties) {
+    public Kyc updateKyc(final SumsubIndividualApplicantsDataDTO sumsubIndividualApplicantsDataDTO,
+                         final Kyc kyc,
+                         final SumsubClientProperties sumsubClientProperties) {
 
-        OldIndividualBillingProfile updatedIndividualBillingProfile = individualBillingProfile;
+        Kyc updatedKyc = kyc;
         if (nonNull(sumsubIndividualApplicantsDataDTO.getInfo())) {
-            updatedIndividualBillingProfile = updatedIndividualBillingProfile.toBuilder()
+            updatedKyc = updatedKyc.toBuilder()
                     .firstName(sumsubIndividualApplicantsDataDTO.getInfo().getFirstName())
                     .lastName(sumsubIndividualApplicantsDataDTO.getInfo().getLastName())
                     .birthdate(mapDate(sumsubIndividualApplicantsDataDTO.getInfo().getBirthdate()))
                     .build();
             if (nonNull(sumsubIndividualApplicantsDataDTO.getInfo().getAddresses()) && !sumsubIndividualApplicantsDataDTO.getInfo().getAddresses().isEmpty()) {
-                updatedIndividualBillingProfile = updatedIndividualBillingProfile.toBuilder()
+                updatedKyc = updatedKyc.toBuilder()
                         .address(sumsubIndividualApplicantsDataDTO.getInfo().getAddresses().get(0).getFormattedAddress())
                         .build();
                 final String countryIso3 = sumsubIndividualApplicantsDataDTO.getInfo().getAddresses().get(0).getCountry();
                 if (nonNull(countryIso3)) {
-                    updatedIndividualBillingProfile = updatedIndividualBillingProfile.toBuilder()
-                            .oldCountry(OldCountry.fromIso3(countryIso3))
+                    updatedKyc = updatedKyc.toBuilder()
+                            .country(Country.fromIso3(countryIso3))
                             .build();
                 }
             }
@@ -64,12 +63,12 @@ public class SumsubResponseMapper {
                                 .findFirst();
                 if (optionalIdDocument.isPresent()) {
                     final SumsubIndividualApplicantsDataDTO.IdDocumentDTO idDocumentDTO = optionalIdDocument.get();
-                    updatedIndividualBillingProfile = updatedIndividualBillingProfile.toBuilder()
+                    updatedKyc = updatedKyc.toBuilder()
                             .idDocumentType(switch (idDocumentDTO.getType()) {
-                                case "PASSPORT" -> OldIndividualBillingProfile.OldIdDocumentTypeEnum.PASSPORT;
-                                case "ID_CARD" -> OldIndividualBillingProfile.OldIdDocumentTypeEnum.ID_CARD;
-                                case "RESIDENCE_PERMIT" -> OldIndividualBillingProfile.OldIdDocumentTypeEnum.RESIDENCE_PERMIT;
-                                case "DRIVERS" -> OldIndividualBillingProfile.OldIdDocumentTypeEnum.DRIVER_LICENSE;
+                                case "PASSPORT" -> Kyc.IdDocumentTypeEnum.PASSPORT;
+                                case "ID_CARD" -> Kyc.IdDocumentTypeEnum.ID_CARD;
+                                case "RESIDENCE_PERMIT" -> Kyc.IdDocumentTypeEnum.RESIDENCE_PERMIT;
+                                case "DRIVERS" -> Kyc.IdDocumentTypeEnum.DRIVER_LICENSE;
                                 default -> null;
                             })
                             .idDocumentNumber(idDocumentDTO.getNumber())
@@ -90,7 +89,7 @@ public class SumsubResponseMapper {
                         final JsonNode personalStatusVerification = questionnaireDTO.getSections().get("personalStatusVerifi");
                         if (personalStatusVerification.has("items") && personalStatusVerification.get("items").has("areYouConsideredAUsP") &&
                             personalStatusVerification.get("items").get("areYouConsideredAUsP").has("value")) {
-                            updatedIndividualBillingProfile = updatedIndividualBillingProfile.toBuilder()
+                            updatedKyc = updatedKyc.toBuilder()
                                     .usCitizen(mapBoolean(personalStatusVerification.get("items").get("areYouConsideredAUsP").get("value").textValue()))
                                     .build();
                         }
@@ -98,25 +97,20 @@ public class SumsubResponseMapper {
                 }
             }
         }
-        return updatedIndividualBillingProfile;
+        return updatedKyc;
     }
 
-    public OldCompanyBillingProfile updateCompanyBillingProfile(SumsubCompanyApplicantsDataDTO applicantsData,
-                                                                SumsubCompanyChecksDTO companyChecks,
-                                                                OldCompanyBillingProfile companyBillingProfile,
-                                                                SumsubClientProperties sumsubClientProperties) {
-        OldCompanyBillingProfile updatedCompanyBillingProfile = companyBillingProfile;
-        if (nonNull(applicantsData.getReview()) && nonNull(applicantsData.getReview().getStatus())) {
-            updatedCompanyBillingProfile = updatedCompanyBillingProfile.toBuilder()
-                    .status(typeAndReviewResultToDomain(applicantsData.getReview().getStatus(), applicantsData.getReview().getResult()))
-                    .build();
-        }
+    public Kyb updateKyb(SumsubCompanyApplicantsDataDTO applicantsData,
+                         SumsubCompanyChecksDTO companyChecks,
+                         Kyb kyb,
+                         SumsubClientProperties sumsubClientProperties) {
+        Kyb updatedKyb = kyb;
         if (nonNull(applicantsData.getInfo()) && nonNull(applicantsData.getInfo()
                 .getCompanyInfo())) {
-            updatedCompanyBillingProfile = updatedCompanyBillingProfile.toBuilder()
+            updatedKyb = updatedKyb.toBuilder()
                     .name(applicantsData.getInfo().getCompanyInfo().getName())
                     .registrationNumber(applicantsData.getInfo().getCompanyInfo().getRegistrationNumber())
-                    .oldCountry(OldCountry.fromIso3(applicantsData.getInfo().getCompanyInfo().getCountry()))
+                    .country(Country.fromIso3(applicantsData.getInfo().getCompanyInfo().getCountry()))
                     .build();
         }
         if (nonNull(applicantsData.getQuestionnaires()) && !applicantsData.getQuestionnaires().isEmpty()) {
@@ -129,17 +123,17 @@ public class SumsubResponseMapper {
                     && questionnaireDTO.getSections().has("usAndEuropeanComplia") && questionnaireDTO.getSections().get("usAndEuropeanComplia").has("items")) {
                     final JsonNode items = questionnaireDTO.getSections().get("usAndEuropeanComplia").get("items");
                     if (items.has("whatIsYourEuVatRegis") && items.get("whatIsYourEuVatRegis").has("value")) {
-                        updatedCompanyBillingProfile = updatedCompanyBillingProfile.toBuilder()
+                        updatedKyb = updatedKyb.toBuilder()
                                 .euVATNumber(items.get("whatIsYourEuVatRegis").get("value").asText())
                                 .build();
                     }
                     if (items.has("isYourEntityAUsPerso") && items.get("isYourEntityAUsPerso").has("value")) {
-                        updatedCompanyBillingProfile = updatedCompanyBillingProfile.toBuilder()
+                        updatedKyb = updatedKyb.toBuilder()
                                 .usEntity(mapBoolean(items.get("isYourEntityAUsPerso").get("value").asText()))
                                 .build();
                     }
                     if (items.has("isYourCompanySubject") && items.get("isYourCompanySubject").has("value")) {
-                        updatedCompanyBillingProfile = updatedCompanyBillingProfile.toBuilder()
+                        updatedKyb = updatedKyb.toBuilder()
                                 .subjectToEuropeVAT(mapBoolean(items.get("isYourCompanySubject").get("value").asText()))
                                 .build();
                     }
@@ -155,7 +149,7 @@ public class SumsubResponseMapper {
                 if (optionalCompanyChecksDTO.isPresent()) {
                     final SumsubCompanyChecksDTO.CompanyChecksDTO companyChecksDTO = optionalCompanyChecksDTO.get();
                     if (nonNull(companyChecksDTO.getInfo())) {
-                        updatedCompanyBillingProfile = updatedCompanyBillingProfile.toBuilder()
+                        updatedKyb = updatedKyb.toBuilder()
                                 .address(companyChecksDTO.getInfo().getOfficeAddress())
                                 .registrationDate(mapDate(companyChecksDTO.getInfo().getIncorporatedOn()))
                                 .build();
@@ -163,7 +157,7 @@ public class SumsubResponseMapper {
                 }
             }
         }
-        return updatedCompanyBillingProfile;
+        return updatedKyb;
     }
 
     private static Boolean mapBoolean(final String boolStr) {
@@ -172,49 +166,5 @@ public class SumsubResponseMapper {
             case "yes" -> true;
             default -> null;
         };
-    }
-
-    private OldVerificationStatus typeAndReviewResultToDomain(final String reviewStatus,
-                                                              final SumsubCompanyApplicantsDataDTO.ReviewResultDTO reviewResult) {
-        return switch (reviewStatus) {
-            case "init" -> OldVerificationStatus.STARTED;
-            case "completed" -> {
-                final Optional<Answer> answer = reviewResultToAnswer(reviewResult);
-                if (answer.isPresent()) {
-                    yield switch (answer.get()) {
-                        case RED -> {
-                            if (isAFinalRejection(reviewResult)) {
-                                yield OldVerificationStatus.CLOSED;
-                            } else {
-                                yield OldVerificationStatus.REJECTED;
-                            }
-                        }
-                        case GREEN -> OldVerificationStatus.VERIFIED;
-                    };
-                } else {
-                    yield OldVerificationStatus.UNDER_REVIEW;
-                }
-            }
-            default -> OldVerificationStatus.UNDER_REVIEW;
-        };
-    }
-
-    private enum Answer {
-        GREEN, RED;
-    }
-
-    private Optional<Answer> reviewResultToAnswer(final SumsubCompanyApplicantsDataDTO.ReviewResultDTO reviewResult) {
-        if (nonNull(reviewResult) && nonNull(reviewResult.getReviewAnswer())) {
-            return switch (reviewResult.getReviewAnswer()) {
-                case "RED" -> Optional.of(Answer.RED);
-                case "GREEN" -> Optional.of(Answer.GREEN);
-                default -> throw OnlyDustException.internalServerError(String.format("Invalid Sumsub answer %s", reviewResult.getReviewAnswer()));
-            };
-        }
-        return Optional.empty();
-    }
-
-    private Boolean isAFinalRejection(final SumsubCompanyApplicantsDataDTO.ReviewResultDTO reviewResult) {
-        return nonNull(reviewResult) && nonNull(reviewResult.getReviewRejectType()) && reviewResult.getReviewRejectType().equals("FINAL");
     }
 }

@@ -22,7 +22,7 @@ public class IndividualBillingProfile extends BillingProfile {
     public IndividualBillingProfile(@NonNull String name, @NonNull UserId ownerId) {
         super(name);
         this.owner = new User(ownerId, User.Role.ADMIN);
-        this.kyc = Kyc.initForUser(ownerId);
+        this.kyc = Kyc.initForUserAndBillingProfile(ownerId, this.id());
         this.currentYearPaymentAmount = PositiveAmount.ZERO;
     }
 

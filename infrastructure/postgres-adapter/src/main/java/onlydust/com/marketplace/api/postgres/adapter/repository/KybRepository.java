@@ -9,4 +9,6 @@ import java.util.UUID;
 public interface KybRepository extends JpaRepository<KybEntity, UUID> {
 
     Optional<KybEntity> findByBillingProfileId(UUID billingProfileId);
+
+    Optional<KybEntity> findByApplicantId(String applicantId);
 }

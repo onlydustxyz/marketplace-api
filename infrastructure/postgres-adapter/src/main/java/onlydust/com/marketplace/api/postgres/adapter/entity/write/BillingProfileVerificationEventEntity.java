@@ -12,11 +12,11 @@ import javax.persistence.Table;
 @Entity
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Table(name = "user_verification_outbox_events", schema = "public")
+@Table(name = "billing_profile_verification_outbox_events", schema = "public")
 @EntityListeners(AuditingEntityListener.class)
-public class UserVerificationEventEntity extends EventEntity {
+public class BillingProfileVerificationEventEntity extends EventEntity {
 
-    public UserVerificationEventEntity(Event event) {
+    public BillingProfileVerificationEventEntity(Event event) {
         super(event);
     }
 }

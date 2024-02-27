@@ -16,7 +16,7 @@ public class SelfEmployedBillingProfile extends BillingProfile {
     public SelfEmployedBillingProfile(@NonNull String name, @NonNull UserId ownerId) {
         super(name);
         this.owner = new User(ownerId, User.Role.ADMIN);
-        this.kyb = Kyb.initForUser(ownerId);
+        this.kyb = Kyb.initForUserAndBillingProfile(ownerId, this.id());
     }
 
     @Override

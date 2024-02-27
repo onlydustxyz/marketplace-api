@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.project.domain.port.output;
+package onlydust.com.marketplace.kernel.port.output;
 
 import onlydust.com.marketplace.kernel.model.Event;
 

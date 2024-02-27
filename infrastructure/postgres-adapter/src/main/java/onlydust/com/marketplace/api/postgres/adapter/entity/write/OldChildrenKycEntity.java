@@ -17,16 +17,16 @@ import java.util.Date;
 @EqualsAndHashCode
 @Data
 @Builder(toBuilder = true)
-@Table(name = "children_kyc", schema = "accounting")
+@Table(name = "children_kyc", schema = "public")
 @EntityListeners(AuditingEntityListener.class)
 @TypeDef(name = "verification_status", typeClass = PostgreSQLEnumType.class)
-public class ChildrenKycEntity {
+public class OldChildrenKycEntity {
     @Id
     String applicantId;
     String parentApplicantId;
     @Type(type = "verification_status")
     @Enumerated(EnumType.STRING)
-    VerificationStatusEntity verificationStatus;
+    OldVerificationStatusEntity verificationStatus;
     @CreationTimestamp
     @Column(name = "tech_created_at", nullable = false, updatable = false)
     @EqualsAndHashCode.Exclude

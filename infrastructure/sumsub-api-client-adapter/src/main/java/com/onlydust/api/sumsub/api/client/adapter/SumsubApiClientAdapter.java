@@ -6,17 +6,17 @@ import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubIndividualApplicants
 import com.onlydust.api.sumsub.api.client.adapter.mapper.SumsubResponseMapper;
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileVerificationProviderPort;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.project.domain.model.OldCompanyBillingProfile;
-import onlydust.com.marketplace.project.domain.model.OldIndividualBillingProfile;
-import onlydust.com.marketplace.project.domain.port.output.UserVerificationStoragePort;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.UUID;
 
 @AllArgsConstructor
-public class SumsubApiClientAdapter implements UserVerificationStoragePort {
+public class SumsubApiClientAdapter implements BillingProfileVerificationProviderPort {
 
     public static final String X_APP_TOKEN = "X-App-Token";
     public static final String X_APP_ACCESS_TS = "X-App-Access-Ts";
@@ -26,21 +26,21 @@ public class SumsubApiClientAdapter implements UserVerificationStoragePort {
     private final SumsubResponseMapper sumsubResponseMapper = new SumsubResponseMapper();
 
     @Override
-    public OldCompanyBillingProfile updateCompanyVerification(OldCompanyBillingProfile companyBillingProfile) {
-        final SumsubCompanyApplicantsDataDTO applicantsDataFromCompanyBillingProfileId =
-                getApplicantsDataFromCompanyBillingProfileId(companyBillingProfile.getId());
-        final SumsubCompanyChecksDTO companyChecksFromSumsubApplicantId =
-                getCompanyChecksFromSumsubApplicantId(applicantsDataFromCompanyBillingProfileId.getId());
-        return sumsubResponseMapper.updateCompanyBillingProfile(applicantsDataFromCompanyBillingProfileId, companyChecksFromSumsubApplicantId,
-                companyBillingProfile, sumsubClientProperties);
+    public Kyc getUpdatedKyc(Kyc kyc) {
+        final SumsubIndividualApplicantsDataDTO applicantsDataFromIndividualBillingProfileId =
+                getApplicantsDataFromIndividualBillingProfileId(kyc.getId());
+        return sumsubResponseMapper.updateKyc(applicantsDataFromIndividualBillingProfileId, kyc,
+                sumsubClientProperties);
     }
 
     @Override
-    public OldIndividualBillingProfile updateIndividualVerification(OldIndividualBillingProfile individualBillingProfile) {
-        final SumsubIndividualApplicantsDataDTO applicantsDataFromIndividualBillingProfileId =
-                getApplicantsDataFromIndividualBillingProfileId(individualBillingProfile.getId());
-        return sumsubResponseMapper.updateIndividualBillingProfile(applicantsDataFromIndividualBillingProfileId, individualBillingProfile,
-                sumsubClientProperties);
+    public Kyb getUpdatedKyb(Kyb kyb) {
+        final SumsubCompanyApplicantsDataDTO applicantsDataFromCompanyBillingProfileId =
+                getApplicantsDataFromCompanyBillingProfileId(kyb.getId());
+        final SumsubCompanyChecksDTO companyChecksFromSumsubApplicantId =
+                getCompanyChecksFromSumsubApplicantId(applicantsDataFromCompanyBillingProfileId.getId());
+        return sumsubResponseMapper.updateKyb(applicantsDataFromCompanyBillingProfileId, companyChecksFromSumsubApplicantId,
+                kyb, sumsubClientProperties);
     }
 
     private SumsubIndividualApplicantsDataDTO getApplicantsDataFromIndividualBillingProfileId(final UUID billingProfileId) {

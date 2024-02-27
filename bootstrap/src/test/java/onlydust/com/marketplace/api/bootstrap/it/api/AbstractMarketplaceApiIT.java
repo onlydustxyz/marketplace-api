@@ -183,7 +183,7 @@ public class AbstractMarketplaceApiIT {
     @Autowired
     OutboxConsumerJob trackingOutboxJob;
     @Autowired
-    OutboxConsumerJob billingProfileOutboxJob;
+    OutboxConsumerJob billingProfileVerificationOutboxJob;
 
 
     @BeforeAll

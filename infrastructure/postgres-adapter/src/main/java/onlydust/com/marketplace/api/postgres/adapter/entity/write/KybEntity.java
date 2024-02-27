@@ -58,6 +58,7 @@ public class KybEntity {
     public Kyb toDomain() {
         return Kyb.builder()
                 .id(this.id)
+                .billingProfileId(BillingProfile.Id.of(this.billingProfileId))
                 .status(this.verificationStatus.toDomain())
                 .usEntity(this.usEntity)
                 .address(this.address)
@@ -73,10 +74,10 @@ public class KybEntity {
                 .build();
     }
 
-    public static KybEntity fromDomain(final Kyb kyb, final BillingProfile.Id billingProfileId) {
+    public static KybEntity fromDomain(final Kyb kyb) {
         return KybEntity.builder()
                 .id(kyb.getId())
-                .billingProfileId(billingProfileId.value())
+                .billingProfileId(kyb.getBillingProfileId().value())
                 .usEntity(kyb.getUsEntity())
                 .address(kyb.getAddress())
                 .country(kyb.getCountry() == null ? null : kyb.getCountry().iso3Code())

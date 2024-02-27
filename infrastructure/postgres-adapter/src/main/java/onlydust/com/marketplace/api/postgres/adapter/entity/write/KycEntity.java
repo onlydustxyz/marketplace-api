@@ -33,7 +33,7 @@ public class KycEntity {
     UUID id;
     UUID billingProfileId;
     UUID ownerId;
-    @Type(type = "billing_profile_type")
+    @Type(type = "verification_status")
     @Enumerated(EnumType.STRING)
     VerificationStatusEntity verificationStatus;
     String firstName;
@@ -87,6 +87,7 @@ public class KycEntity {
     public Kyc toDomain() {
         return Kyc.builder()
                 .id(this.id)
+                .billingProfileId(BillingProfile.Id.of(this.billingProfileId))
                 .status(this.verificationStatus.toDomain())
                 .idDocumentType(isNull(this.idDocumentType) ? null : this.idDocumentType.toDomain())
                 .address(this.address)
@@ -104,10 +105,10 @@ public class KycEntity {
                 .build();
     }
 
-    public static KycEntity fromDomain(final Kyc kyc, final BillingProfile.Id billingProfileId) {
+    public static KycEntity fromDomain(final Kyc kyc) {
         return KycEntity.builder()
                 .id(kyc.getId())
-                .billingProfileId(billingProfileId.value())
+                .billingProfileId(kyc.getBillingProfileId().value())
                 .address(kyc.getAddress())
                 .birthdate(kyc.getBirthdate())
                 .country(kyc.getCountry() == null ? null : kyc.getCountry().iso3Code())

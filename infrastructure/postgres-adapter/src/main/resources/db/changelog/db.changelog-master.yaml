@@ -137,3 +137,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000066_coworker_invitations.sql
   - include:
       file: db/changelog/changelogs/00000067_remove_mandate_for_individuals.sql
+  - include:
+      file: db/changelog/changelogs/00000068_migrating_billing_profile_tables.sql

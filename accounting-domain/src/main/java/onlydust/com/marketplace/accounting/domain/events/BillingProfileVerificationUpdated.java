@@ -1,11 +1,12 @@
-package onlydust.com.marketplace.project.domain.model.notification;
+package onlydust.com.marketplace.accounting.domain.events;
 
 import lombok.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationType;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.kernel.jobs.OutboxSkippingException;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.EventType;
-import onlydust.com.marketplace.project.domain.model.OldBillingProfileType;
-import onlydust.com.marketplace.project.domain.model.OldVerificationStatus;
 
 import java.util.UUID;
 
@@ -16,24 +17,23 @@ import static java.util.Objects.nonNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@EventType("BillingProfileUpdated")
-public class BillingProfileUpdated extends Event {
-    UUID billingProfileId;
-    OldBillingProfileType type;
-    OldVerificationStatus oldVerificationStatus;
+@EventType("BillingProfileVerificationUpdated")
+public class BillingProfileVerificationUpdated extends Event {
+    UUID verificationId;
+    @NonNull
+    VerificationType type;
+    @NonNull
+    VerificationStatus verificationStatus;
     String reviewMessageForApplicant;
-    UUID userId;
-    Long githubUserId;
-    String githubUserEmail;
-    String githubLogin;
-    String githubAvatarUrl;
+    UserId userId;
     String rawReviewDetails;
+    @NonNull
     String externalApplicantId;
     String parentExternalApplicantId;
 
-    public boolean isLinkedToAParentBillingProfile() {
+    public boolean isAChildrenKYC() {
         if (nonNull(this.parentExternalApplicantId)) {
-            if (this.type.equals(OldBillingProfileType.INDIVIDUAL)) {
+            if (this.type.equals(VerificationType.KYC)) {
                 return true;
             } else {
                 throw new OutboxSkippingException("Invalid children billing profile for type %s and external parent id %s"

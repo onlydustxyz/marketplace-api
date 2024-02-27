@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.webhook.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import onlydust.com.marketplace.project.domain.model.notification.BillingProfileUpdated;
+import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 
 import java.util.UUID;
 
@@ -38,12 +38,13 @@ public class UserBillingProfileVerificationStatusUpdatedEventDTO {
         String verificationStatus;
     }
 
-    public static UserBillingProfileVerificationStatusUpdatedEventDTO of(BillingProfileUpdated billingProfileUpdated, String environment) {
+    public static UserBillingProfileVerificationStatusUpdatedEventDTO of(BillingProfileVerificationUpdated billingProfileVerificationUpdated, String environment) {
+        // TODO : migrate to billing profile event
         return UserBillingProfileVerificationStatusUpdatedEventDTO.builder()
                 .environment(environment)
                 .payload(Payload.builder()
-                        .userId(billingProfileUpdated.getUserId())
-                        .verificationStatus(billingProfileUpdated.getOldVerificationStatus().name())
+//                        .userId(billingProfileVerificationUpdated.getUserId())
+//                        .verificationStatus(billingProfileVerificationUpdated.getOldVerificationStatus().name())
                         .build())
                 .build();
     }

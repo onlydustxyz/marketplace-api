@@ -1,8 +1,6 @@
 package onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper;
 
-import onlydust.com.marketplace.project.domain.model.OldBillingProfileType;
-import onlydust.com.marketplace.project.domain.model.OldVerificationStatus;
-import onlydust.com.marketplace.project.domain.model.notification.BillingProfileUpdated;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.dto.SumsubWebhookEventDTO;
 import org.junit.jupiter.api.Test;
 
@@ -36,37 +34,37 @@ public class SumsubMapperTest {
     // - completed
     @Test
     void should_map_type_and_review_result_to_domain() {
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("init", null, null)).getOldVerificationStatus(),
-                OldVerificationStatus.STARTED);
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("pending", null, null)).getOldVerificationStatus(),
-                OldVerificationStatus.UNDER_REVIEW);
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("completed", null, null)).getOldVerificationStatus(),
-                OldVerificationStatus.UNDER_REVIEW);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("init", null, null)).getVerificationStatus(),
+                VerificationStatus.STARTED);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("pending", null, null)).getVerificationStatus(),
+                VerificationStatus.UNDER_REVIEW);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("completed", null, null)).getVerificationStatus(),
+                VerificationStatus.UNDER_REVIEW);
 
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("init", null, null)).getOldVerificationStatus(),
-                OldVerificationStatus.STARTED);
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("pending", null, null)).getOldVerificationStatus(),
-                OldVerificationStatus.UNDER_REVIEW);
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("completed", "GREEN", null)).getOldVerificationStatus(),
-                OldVerificationStatus.VERIFIED);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("init", null, null)).getVerificationStatus(),
+                VerificationStatus.STARTED);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("pending", null, null)).getVerificationStatus(),
+                VerificationStatus.UNDER_REVIEW);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("completed", "GREEN", null)).getVerificationStatus(),
+                VerificationStatus.VERIFIED);
 
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("prechecked", null, null)).getOldVerificationStatus(),
-                OldVerificationStatus.UNDER_REVIEW);
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("queued", null, null)).getOldVerificationStatus(),
-                OldVerificationStatus.UNDER_REVIEW);
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("onHold", "GREEN", null)).getOldVerificationStatus(),
-                OldVerificationStatus.UNDER_REVIEW);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("prechecked", null, null)).getVerificationStatus(),
+                VerificationStatus.UNDER_REVIEW);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("queued", null, null)).getVerificationStatus(),
+                VerificationStatus.UNDER_REVIEW);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("onHold", "GREEN", null)).getVerificationStatus(),
+                VerificationStatus.UNDER_REVIEW);
 
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("init", null, null)).getOldVerificationStatus(),
-                OldVerificationStatus.STARTED);
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("pending", null, null)).getOldVerificationStatus(),
-                OldVerificationStatus.UNDER_REVIEW);
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("completed", "GREEN", null)).getOldVerificationStatus(),
-                OldVerificationStatus.VERIFIED);
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("completed", "RED", "RETRY")).getOldVerificationStatus(),
-                OldVerificationStatus.REJECTED);
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("completed", "RED", "FINAL")).getOldVerificationStatus(),
-                OldVerificationStatus.CLOSED);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("init", null, null)).getVerificationStatus(),
+                VerificationStatus.STARTED);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("pending", null, null)).getVerificationStatus(),
+                VerificationStatus.UNDER_REVIEW);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("completed", "GREEN", null)).getVerificationStatus(),
+                VerificationStatus.VERIFIED);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("completed", "RED", "RETRY")).getVerificationStatus(),
+                VerificationStatus.REJECTED);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("completed", "RED", "FINAL")).getVerificationStatus(),
+                VerificationStatus.CLOSED);
     }
 
 
@@ -75,6 +73,7 @@ public class SumsubMapperTest {
         sumsubWebhookEventDTO.setApplicantType("individual");
         sumsubWebhookEventDTO.setExternalUserId(externalId.toString());
         sumsubWebhookEventDTO.setReviewStatus(reviewStatus);
+        sumsubWebhookEventDTO.setApplicantId("fake-applicant-id");
         final SumsubWebhookEventDTO.ReviewResultDTO reviewResultDTO = new SumsubWebhookEventDTO.ReviewResultDTO();
         reviewResultDTO.setReviewAnswer(reviewResult);
         if (nonNull(decision)) {
@@ -82,10 +81,5 @@ public class SumsubMapperTest {
         }
         sumsubWebhookEventDTO.setReviewResult(reviewResultDTO);
         return sumsubWebhookEventDTO;
-    }
-
-    private BillingProfileUpdated expectedStatus(final OldVerificationStatus oldVerificationStatus) {
-        return BillingProfileUpdated.builder()
-                .billingProfileId(externalId).type(OldBillingProfileType.INDIVIDUAL).oldVerificationStatus(oldVerificationStatus).build();
     }
 }
