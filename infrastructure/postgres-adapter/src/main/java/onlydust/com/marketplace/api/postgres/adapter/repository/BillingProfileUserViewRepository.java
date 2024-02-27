@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface BillingProfileUserViewRepository extends JpaRepository<BillingProfileUserViewEntity, BillingProfileUserViewEntity.PrimaryKey> {
@@ -30,7 +31,7 @@ public interface BillingProfileUserViewRepository extends JpaRepository<BillingP
                 SELECT COUNT(r.id) as user_reward_count
                 FROM accounting.invoices i
                 LEFT JOIN rewards r ON r.recipient_id = u.github_user_id AND r.invoice_id = i.id
-                WHERE i.billing_profile_id = bpu.billing_profile_id AND i.status != 'DRAFT' AND i.status != 'REJECTED') reward_count ON true
+                WHERE i.billing_profile_id = bpu.billing_profile_id) reward_count ON true
             LEFT JOIN LATERAL (
                 SELECT COUNT(admins.user_id) as billing_profile_admin_count
                 FROM accounting.billing_profiles_users admins
@@ -45,7 +46,7 @@ public interface BillingProfileUserViewRepository extends JpaRepository<BillingP
                 bpui.role,
                 u.id as user_id,
                 ga.login as github_login,
-                ga.avatar_url as github_avatar_url,
+                user_avatar_url(bpui.github_user_id, COALESCE(ga.avatar_url, u.github_avatar_url)) as github_avatar_url,
                 ga.html_url as github_html_url,
                 NULL as joined_at,
                 bpui.invited_at,
@@ -57,4 +58,24 @@ public interface BillingProfileUserViewRepository extends JpaRepository<BillingP
             WHERE bpui.billing_profile_id = :billingProfileId
             """, nativeQuery = true)
     Page<BillingProfileUserViewEntity> findByBillingProfileId(UUID billingProfileId, Pageable pageable);
+
+    @Query(value = """
+            SELECT
+                bpui.billing_profile_id,
+                bpui.github_user_id,
+                bpui.role,
+                u.id as user_id,
+                ga.login as github_login,
+                user_avatar_url(bpui.github_user_id, COALESCE(ga.avatar_url, u.github_avatar_url)) as github_avatar_url,
+                ga.html_url as github_html_url,
+                NULL as joined_at,
+                bpui.invited_at,
+                NULL as reward_count,
+                NULL as billing_profile_admin_count
+            FROM accounting.billing_profiles_user_invitations bpui
+            LEFT JOIN iam.users u ON u.github_user_id = bpui.github_user_id
+            LEFT JOIN indexer_exp.github_accounts ga ON ga.id = bpui.github_user_id
+            WHERE bpui.billing_profile_id = :billingProfileId AND bpui.github_user_id = :githubUserId
+            """, nativeQuery = true)
+    Optional<BillingProfileUserViewEntity> findInvitedUserByBillingProfileIdAndGithubId(UUID billingProfileId, Long githubUserId);
 }

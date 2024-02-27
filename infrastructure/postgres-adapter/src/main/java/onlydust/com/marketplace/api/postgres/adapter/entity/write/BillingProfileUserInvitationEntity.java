@@ -37,6 +37,8 @@ public class BillingProfileUserInvitationEntity {
     UUID invitedBy;
 
     @EqualsAndHashCode
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class PrimaryKey implements Serializable {
         UUID billingProfileId;
         Long githubUserId;

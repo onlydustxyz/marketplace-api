@@ -197,11 +197,32 @@ public class BillingProfileService implements BillingProfileFacadePort {
     }
 
     @Override
+    @Transactional
     public void inviteCoworker(BillingProfile.Id billingProfileId, UserId invitedBy, GithubUserId invitedGithubUserId, BillingProfile.User.Role role) {
         if (!billingProfileStoragePort.isAdmin(billingProfileId, invitedBy))
-            throw unauthorized("User %s must be admin to list coworkers of billing profile %s".formatted(invitedBy.value(), billingProfileId.value()));
+            throw unauthorized("User %s must be admin to invite coworker to billing profile %s".formatted(invitedBy.value(), billingProfileId.value()));
 
         indexerPort.indexUser(invitedGithubUserId.value());
         billingProfileStoragePort.saveCoworkerInvitation(billingProfileId, invitedBy, invitedGithubUserId, role, ZonedDateTime.now());
+    }
+
+    @Override
+    @Transactional
+    public void acceptCoworkerInvitation(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId) {
+        final BillingProfileCoworkerView invited = billingProfileStoragePort.getInvitedCoworker(billingProfileId, invitedGithubUserId)
+                .orElseThrow(() -> notFound("Invitation not found for billing profile %s and user %s"
+                        .formatted(billingProfileId.value(), invitedGithubUserId.value())));
+        billingProfileStoragePort.saveCoworker(billingProfileId, invited.userId(), invited.role(), ZonedDateTime.now());
+        billingProfileStoragePort.deleteCoworkerInvitation(billingProfileId, invitedGithubUserId);
+    }
+
+    @Override
+    @Transactional
+    public void rejectCoworkerInvitation(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId) {
+        billingProfileStoragePort.getInvitedCoworker(billingProfileId, invitedGithubUserId)
+                .orElseThrow(() -> notFound("Invitation not found for billing profile %s and user %s"
+                        .formatted(billingProfileId.value(), invitedGithubUserId.value())));
+
+        billingProfileStoragePort.deleteCoworkerInvitation(billingProfileId, invitedGithubUserId);
     }
 }

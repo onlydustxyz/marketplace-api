@@ -832,6 +832,39 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/me/billing-profiles/{billingProfileId}/invitations:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Accept or reject coworker invitation
+      operationId: acceptOrRejectCoworkerInvitation
+      description: |
+        Accept or reject coworker invitation. Caller must be the invited coworker.
+      parameters:
+        - in: path
+          name: billingProfileId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BillingProfileId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingProfileCoworkerInvitationUpdateRequest'
+      responses:
+        "204":
+          description: 'Invitation accepted/rejected'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v2/me/billing-profiles:
     get:
       security:
@@ -2843,44 +2876,6 @@ paths:
       responses:
         "204":
           description: 'Coworker invited'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "403":
-          $ref: '#/components/responses/ProjectForbiddenError'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
-  /api/v1/billing-profiles/{billingProfileId}/coworkers/{githubUserId}/invitation:
-    put:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - BillingProfiles
-      summary: Accept or reject coworker invitation
-      operationId: acceptOrRejectCoworkerInvitation
-      description: |
-        Accept or reject coworker invitation. Caller must be the invited coworker.
-      parameters:
-        - in: path
-          name: billingProfileId
-          required: true
-          schema:
-            $ref: '#/components/schemas/BillingProfileId'
-        - in: path
-          name: githubUserId
-          required: true
-          schema:
-            $ref: '#/components/schemas/GithubUserId'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BillingProfileCoworkerInvitationUpdateRequest'
-      responses:
-        "204":
-          description: 'Invitation accepted'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":

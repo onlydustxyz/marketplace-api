@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
@@ -381,5 +382,21 @@ public class MeRestApi implements MeApi {
         payoutPreferenceFacadePort.setPayoutPreference(ProjectId.of(payoutPreferenceRequest.getProjectId()),
                 BillingProfile.Id.of(payoutPreferenceRequest.getBillingProfileId()), UserId.of(authenticatedUser.getId()));
         return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> acceptOrRejectCoworkerInvitation(UUID billingProfileId, BillingProfileCoworkerInvitationUpdateRequest invitationUpdateRequest) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+
+        if (Boolean.TRUE.equals(invitationUpdateRequest.getAccepted())) {
+            billingProfileFacadePort.acceptCoworkerInvitation(
+                    BillingProfile.Id.of(billingProfileId),
+                    GithubUserId.of(authenticatedUser.getGithubUserId()));
+        } else {
+            billingProfileFacadePort.rejectCoworkerInvitation(
+                    BillingProfile.Id.of(billingProfileId),
+                    GithubUserId.of(authenticatedUser.getGithubUserId()));
+        }
+        return ResponseEntity.noContent().build();
     }
 }
