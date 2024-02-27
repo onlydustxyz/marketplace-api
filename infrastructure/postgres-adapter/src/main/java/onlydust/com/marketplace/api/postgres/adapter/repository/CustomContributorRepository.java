@@ -2,11 +2,11 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.project.domain.view.ProjectContributorsLinkView;
-import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectContributorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
+import onlydust.com.marketplace.kernel.pagination.SortDirection;
+import onlydust.com.marketplace.project.domain.view.ProjectContributorsLinkView;
 import org.intellij.lang.annotations.Language;
 
 import javax.persistence.EntityManager;
@@ -135,10 +135,26 @@ public class CustomContributorRepository {
             FROM indexer_exp.github_accounts ga
                 LEFT JOIN iam.users u on u.github_user_id = ga.id
             WHERE
-                EXISTS(select 1 from indexer_exp.repos_contributors rc 
-                join indexer_exp.github_repos gr on gr.id = rc.repo_id and gr.visibility = 'PUBLIC'
-                where rc.repo_id in :reposIds and rc.contributor_id = ga.id)
+                EXISTS(select 1
+                       from indexer_exp.repos_contributors rc
+                       join indexer_exp.github_repos gr on gr.id = rc.repo_id and gr.visibility = 'PUBLIC'
+                       where rc.repo_id in :reposIds and rc.contributor_id = ga.id)
                 AND ga.login ilike '%' || :login ||'%'
+            ORDER BY ga.login
+            LIMIT :limit
+            """;
+
+    protected static final String FIND_ALL_CONTRIBUTORS = """
+            SELECT
+                ga.id as github_user_id,
+                ga.login,
+                user_avatar_url(ga.id, ga.avatar_url) as avatar_url,
+                ga.html_url,
+                u.github_user_id IS NOT NULL as is_registered
+            FROM indexer_exp.github_accounts ga
+                LEFT JOIN iam.users u on u.github_user_id = ga.id
+            WHERE
+                ga.login ilike '%' || :login ||'%'
             ORDER BY ga.login
             LIMIT :limit
             """;
@@ -199,6 +215,14 @@ public class CustomContributorRepository {
         return entityManager
                 .createNativeQuery(FIND_REPOS_CONTRIBUTORS, ContributorViewEntity.class)
                 .setParameter("reposIds", reposIds)
+                .setParameter("login", login != null ? login : "")
+                .setParameter("limit", limit)
+                .getResultList();
+    }
+
+    public List<ContributorViewEntity> findAllContributorsByLogin(String login, int limit) {
+        return entityManager
+                .createNativeQuery(FIND_ALL_CONTRIBUTORS, ContributorViewEntity.class)
                 .setParameter("login", login != null ? login : "")
                 .setParameter("limit", limit)
                 .getResultList();

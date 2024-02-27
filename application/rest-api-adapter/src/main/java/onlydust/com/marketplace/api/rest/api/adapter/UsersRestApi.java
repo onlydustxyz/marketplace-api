@@ -6,11 +6,10 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.UsersApi;
 import onlydust.com.marketplace.api.contract.model.ContributorSearchResponse;
 import onlydust.com.marketplace.api.contract.model.PublicUserProfileResponse;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributorSearchResponseMapper;
 import onlydust.com.marketplace.project.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributorSearchResponseMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,16 +46,12 @@ public class UsersRestApi implements UsersApi {
     }
 
     @Override
-    public ResponseEntity<ContributorSearchResponse> searchContributors(UUID projectId, List<Long> repoIds,
+    public ResponseEntity<ContributorSearchResponse> searchContributors(UUID projectId,
+                                                                        List<Long> repoIds,
                                                                         String login,
                                                                         Integer maxInternalContributorCountToTriggerExternalSearch,
                                                                         Integer maxInternalContributorCountToReturn,
                                                                         Boolean externalSearchOnly) {
-
-        if (projectId == null && repoIds == null && login == null) {
-            throw OnlyDustException.badRequest("At least one of projectId, repoIds and login query param must be " +
-                                               "provided");
-        }
         final var contributors = contributorFacadePort.searchContributors(
                 projectId,
                 repoIds != null ? new HashSet<>(repoIds) : null,
