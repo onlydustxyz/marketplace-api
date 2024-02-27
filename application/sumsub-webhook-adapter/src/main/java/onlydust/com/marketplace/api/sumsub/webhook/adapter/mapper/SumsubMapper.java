@@ -43,8 +43,8 @@ public class SumsubMapper implements Function<Event, BillingProfileVerificationU
                     return mapToParentBillingProfile(sumsubWebhookEventDTO);
                 }
             }
-        } catch (Exception ignored) {
-
+        } catch (Exception exception) {
+            LOGGER.warn("Failed to map Sumsub event to DTO",exception);
         }
         throw new OutboxSkippingException(String.format("Invalid sumsub event format %s", event));
     }

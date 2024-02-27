@@ -73,6 +73,7 @@ public class SumsubMapperTest {
         sumsubWebhookEventDTO.setApplicantType("individual");
         sumsubWebhookEventDTO.setExternalUserId(externalId.toString());
         sumsubWebhookEventDTO.setReviewStatus(reviewStatus);
+        sumsubWebhookEventDTO.setApplicantId("fake-applicant-id");
         final SumsubWebhookEventDTO.ReviewResultDTO reviewResultDTO = new SumsubWebhookEventDTO.ReviewResultDTO();
         reviewResultDTO.setReviewAnswer(reviewResult);
         if (nonNull(decision)) {
