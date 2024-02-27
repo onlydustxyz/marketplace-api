@@ -5785,6 +5785,7 @@ components:
       type: object
       required:
         - id
+        - status
         - type
         - name
         - me
@@ -5793,6 +5794,8 @@ components:
           $ref: '#/components/schemas/BillingProfileId'
         type:
           $ref: '#/components/schemas/BillingProfileType'
+        status:
+          $ref: '#/components/schemas/VerificationStatus'
         name:
           type: string
         currentYearPaymentLimit:
@@ -5903,10 +5906,11 @@ components:
     KYCResponse:
       type: object
       required:
-        - status
+        - id
       properties:
-        status:
-          $ref: '#/components/schemas/VerificationStatus'
+        id:
+          type: string
+          format: uuid
         firstName:
           type: string
         lastName:
@@ -5938,10 +5942,11 @@ components:
     KYBResponse:
       type: object
       required:
-        - status
+        - id
       properties:
-        status:
-          $ref: '#/components/schemas/VerificationStatus'
+        id:
+          type: string
+          format: uuid
         name:
           type: string
         registrationNumber:
