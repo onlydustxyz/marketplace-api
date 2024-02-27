@@ -5,6 +5,7 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.InvoiceDownload;
 import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -19,6 +20,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 public class InvoiceService implements InvoiceFacadePort {
     private final @NonNull InvoiceStoragePort invoiceStoragePort;
     private final @NonNull PdfStoragePort pdfStoragePort;
+    private final @NonNull BillingProfileObserver billingProfileObserver;
 
     @Override
     public Page<Invoice> findAll(final @NonNull List<Invoice.Id> ids, final @NonNull List<Invoice.Status> statuses, final @NonNull Integer pageIndex,
@@ -36,6 +38,10 @@ public class InvoiceService implements InvoiceFacadePort {
             throw forbidden("Cannot update invoice to status %s".formatted(status));
 
         invoiceStoragePort.update(invoice.status(status));
+
+        if (status == Invoice.Status.REJECTED) {
+            billingProfileObserver.onInvoiceRejected(id);
+        }
     }
 
     @Override

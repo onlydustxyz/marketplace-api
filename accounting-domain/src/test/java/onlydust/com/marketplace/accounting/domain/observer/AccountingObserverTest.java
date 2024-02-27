@@ -299,6 +299,90 @@ public class AccountingObserverTest {
     }
 
     @Nested
+    class OnInvoiceUploaded {
+        Invoice invoice;
+
+        @BeforeEach
+        void setUp() {
+            invoice = Invoice.of(BillingProfile.Id.random(), 1,
+                    new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", "FRA", false, false, false, null)
+            );
+
+            invoice.rewards(List.of(
+                    new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id()),
+                    new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id()),
+                    new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id())
+            ));
+
+            when(invoiceStorage.get(invoice.id())).thenReturn(Optional.of(invoice));
+        }
+
+        @Test
+        public void should_update_reward_status_data() {
+            // Given
+            when(rewardStatusStorage.get(any())).then(invocation -> {
+                final var rewardId = invocation.getArgument(0, RewardId.class);
+                return Optional.of(new RewardStatus(rewardId));
+            });
+
+            // When
+            accountingObserver.onInvoiceUploaded(BillingProfile.Id.random(), invoice.id(), true);
+
+            // Then
+            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
+            verify(rewardStatusStorage, times(3)).save(rewardStatusCaptor.capture());
+            final var rewardStatuses = rewardStatusCaptor.getAllValues();
+            assertThat(rewardStatuses).hasSize(3);
+            assertThat(rewardStatuses).allMatch(r -> r.invoiceReceivedAt().orElseThrow().equals(invoice.createdAt()));
+        }
+    }
+
+    @Nested
+    class OnInvoiceRejected {
+        Invoice invoice;
+
+        @BeforeEach
+        void setUp() {
+            invoice = Invoice.of(BillingProfile.Id.random(), 1,
+                    new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", "FRA", false, false, false, null)
+            );
+
+            invoice.rewards(List.of(
+                    new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id()),
+                    new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id()),
+                    new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id())
+            ));
+
+            when(invoiceStorage.get(invoice.id())).thenReturn(Optional.of(invoice));
+        }
+
+        @Test
+        public void should_update_reward_status_data() {
+            // Given
+            when(rewardStatusStorage.get(any())).then(invocation -> {
+                final var rewardId = invocation.getArgument(0, RewardId.class);
+                return Optional.of(new RewardStatus(rewardId).invoiceReceivedAt(invoice.createdAt()));
+            });
+
+            // When
+            accountingObserver.onInvoiceRejected(invoice.id());
+
+            // Then
+            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
+            verify(rewardStatusStorage, times(3)).save(rewardStatusCaptor.capture());
+            final var rewardStatuses = rewardStatusCaptor.getAllValues();
+            assertThat(rewardStatuses).hasSize(3);
+            assertThat(rewardStatuses).allMatch(r -> r.invoiceReceivedAt().isEmpty());
+        }
+    }
+
+    @Nested
     class UpdateUsdEquivalent {
         final RewardId rewardId = RewardId.random();
 

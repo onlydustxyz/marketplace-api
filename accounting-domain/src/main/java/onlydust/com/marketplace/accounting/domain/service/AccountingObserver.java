@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 
@@ -14,7 +16,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.intern
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
-public class AccountingObserver implements AccountingObserverPort, RewardStatusFacadePort {
+public class AccountingObserver implements AccountingObserverPort, RewardStatusFacadePort, BillingProfileObserver {
     private final RewardStatusStorage rewardStatusStorage;
     private final RewardUsdEquivalentStorage rewardUsdEquivalentStorage;
     private final QuoteStorage quoteStorage;
@@ -94,5 +96,30 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
         rewardStatusStorage.notPaid().forEach(rewardStatus ->
                 rewardStatusStorage.save(rewardStatus.amountUsdEquivalent(usdEquivalent(rewardStatus.rewardId())))
         );
+    }
+
+    @Override
+    public void onInvoiceUploaded(BillingProfile.Id billingProfileId, Invoice.Id invoiceId, boolean isExternal) {
+        final var invoice = invoiceStorage.get(invoiceId).orElseThrow(() -> notFound("Invoice %s not found".formatted(invoiceId)));
+        invoice.rewards().forEach(reward -> {
+            final var rewardStatus = rewardStatusStorage.get(reward.id())
+                    .orElseThrow(() -> notFound("RewardStatus not found for reward %s".formatted(reward.id())));
+            rewardStatusStorage.save(rewardStatus.invoiceReceivedAt(invoice.createdAt()));
+        });
+    }
+
+    @Override
+    public void onInvoiceRejected(Invoice.Id invoiceId) {
+        final var invoice = invoiceStorage.get(invoiceId).orElseThrow(() -> notFound("Invoice %s not found".formatted(invoiceId)));
+        invoice.rewards().forEach(reward -> {
+            final var rewardStatus = rewardStatusStorage.get(reward.id())
+                    .orElseThrow(() -> notFound("RewardStatus not found for reward %s".formatted(reward.id())));
+            rewardStatusStorage.save(rewardStatus.invoiceReceivedAt(null));
+        });
+    }
+
+    @Override
+    public void onBillingProfileUpdated(BillingProfileVerificationUpdated billingProfileVerificationUpdated) {
+        // TODO ?
     }
 }

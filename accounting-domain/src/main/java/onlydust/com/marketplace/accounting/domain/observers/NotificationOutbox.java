@@ -19,7 +19,10 @@ public class NotificationOutbox implements BillingProfileObserver {
     }
 
     @Override
-    public void onBillingProfileUpdated(BillingProfileVerificationUpdated billingProfileVerificationUpdated) {
+    public void onInvoiceRejected(Invoice.Id invoiceId) {
+    }
 
+    @Override
+    public void onBillingProfileUpdated(BillingProfileVerificationUpdated billingProfileVerificationUpdated) {
     }
 }
