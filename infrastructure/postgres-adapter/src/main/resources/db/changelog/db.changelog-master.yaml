@@ -133,3 +133,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000064_add_usd_amount.sql
   - include:
       file: db/changelog/changelogs/00000065_coworkers.sql
+  - include:
+      file: db/changelog/changelogs/00000066_coworker_invitations.sql

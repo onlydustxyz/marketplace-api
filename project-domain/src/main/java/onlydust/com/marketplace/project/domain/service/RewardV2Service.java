@@ -2,11 +2,11 @@ package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.AccountingServicePort;
-import onlydust.com.marketplace.project.domain.port.output.IndexerPort;
 import onlydust.com.marketplace.project.domain.port.output.RewardStoragePort;
 
 import javax.transaction.Transactional;

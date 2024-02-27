@@ -2,11 +2,11 @@ package onlydust.com.marketplace.project.domain.service;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.project.domain.model.Currency;
 import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.output.AccountingServicePort;
-import onlydust.com.marketplace.project.domain.port.output.IndexerPort;
 import onlydust.com.marketplace.project.domain.port.output.RewardStoragePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;

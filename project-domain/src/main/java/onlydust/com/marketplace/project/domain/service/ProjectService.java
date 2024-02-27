@@ -5,6 +5,7 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
+import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
@@ -102,7 +103,7 @@ public class ProjectService implements ProjectFacadePort, ProjectRewardFacadePor
                 command.getGithubUserIdsAsProjectLeadersToInvite(),
                 ProjectVisibility.PUBLIC,
                 command.getImageUrl(),
-                ProjectRewardSettings.defaultSettings(dateProvider.now()),command.getEcosystemIds());
+                ProjectRewardSettings.defaultSettings(dateProvider.now()), command.getEcosystemIds());
 
         eventStoragePort.saveEvent(new ProjectCreatedOldEvent(projectId));
 
@@ -145,7 +146,7 @@ public class ProjectService implements ProjectFacadePort, ProjectRewardFacadePor
                 command.getGithubRepoIds(),
                 command.getGithubUserIdsAsProjectLeadersToInvite(),
                 command.getProjectLeadersToKeep(), command.getImageUrl(),
-                command.getRewardSettings(),command.getEcosystemIds());
+                command.getRewardSettings(), command.getEcosystemIds());
 
         projectObserverPort.onProjectDetailsUpdated(command.getId());
         invitedLeaderGithubIds.forEach(leaderId -> projectObserverPort.onLeaderInvited(command.getId(), leaderId));

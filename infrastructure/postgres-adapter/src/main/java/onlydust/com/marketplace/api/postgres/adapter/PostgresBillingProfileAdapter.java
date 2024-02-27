@@ -3,8 +3,9 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
@@ -39,6 +40,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     private final @NonNull WalletRepository walletRepository;
     private final @NonNull BillingProfileUserRepository billingProfileUserRepository;
     private final @NonNull BillingProfileUserViewRepository billingProfileUserViewRepository;
+    private final @NonNull BillingProfileUserInvitationRepository billingProfileUserInvitationRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -214,5 +216,17 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                 .totalItemNumber(page.getNumberOfElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();
+    }
+
+    @Override
+    public void saveCoworkerInvitation(BillingProfile.Id billingProfileId, UserId invitedBy, GithubUserId invitedUser, BillingProfile.User.Role role,
+                                       ZonedDateTime invitedAt) {
+        billingProfileUserInvitationRepository.save(BillingProfileUserInvitationEntity.builder()
+                .billingProfileId(billingProfileId.value())
+                .invitedBy(invitedBy.value())
+                .githubUserId(invitedUser.value())
+                .invitedAt(Date.from(invitedAt.toInstant()))
+                .role(BillingProfileUserEntity.Role.fromDomain(role))
+                .build());
     }
 }

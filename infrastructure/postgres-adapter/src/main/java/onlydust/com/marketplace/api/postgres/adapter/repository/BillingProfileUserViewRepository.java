@@ -13,14 +13,14 @@ public interface BillingProfileUserViewRepository extends JpaRepository<BillingP
     @Query(value = """
             SELECT
                 bpu.billing_profile_id,
-                bpu.user_id,
-                bpu.role,
                 u.github_user_id,
+                bpu.role,
+                bpu.user_id,
                 COALESCE(ga.login, u.github_login) as github_login,
                 user_avatar_url(u.github_user_id, COALESCE(ga.avatar_url, u.github_avatar_url)) as github_avatar_url,
                 ga.html_url as github_html_url,
                 bpu.joined_at,
-                bpu.invited_at,
+                NULL as invited_at,
                 COALESCE(reward_count.user_reward_count, 0) as reward_count,
                 COALESCE(admin_count.billing_profile_admin_count, 0) as billing_profile_admin_count
             FROM accounting.billing_profiles_users bpu
@@ -36,6 +36,25 @@ public interface BillingProfileUserViewRepository extends JpaRepository<BillingP
                 FROM accounting.billing_profiles_users admins
                 WHERE admins.billing_profile_id = bpu.billing_profile_id AND admins.role = 'ADMIN') admin_count ON true
             WHERE bpu.billing_profile_id = :billingProfileId
+                        
+            UNION
+                        
+            SELECT
+                bpui.billing_profile_id,
+                bpui.github_user_id,
+                bpui.role,
+                u.id as user_id,
+                ga.login as github_login,
+                ga.avatar_url as github_avatar_url,
+                ga.html_url as github_html_url,
+                NULL as joined_at,
+                bpui.invited_at,
+                NULL as reward_count,
+                NULL as billing_profile_admin_count
+            FROM accounting.billing_profiles_user_invitations bpui
+            LEFT JOIN iam.users u ON u.github_user_id = bpui.github_user_id
+            LEFT JOIN indexer_exp.github_accounts ga ON ga.id = bpui.github_user_id
+            WHERE bpui.billing_profile_id = :billingProfileId
             """, nativeQuery = true)
     Page<BillingProfileUserViewEntity> findByBillingProfileId(UUID billingProfileId, Pageable pageable);
 }

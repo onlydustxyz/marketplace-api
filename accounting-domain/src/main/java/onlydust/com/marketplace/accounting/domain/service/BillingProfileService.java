@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.InvoiceDownload;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
@@ -19,6 +20,7 @@ import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
+import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import org.jetbrains.annotations.NotNull;
 
 import javax.transaction.Transactional;
@@ -37,6 +39,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     private final @NonNull BillingProfileStoragePort billingProfileStoragePort;
     private final @NonNull PdfStoragePort pdfStoragePort;
     private final @NonNull BillingProfileObserver billingProfileObserver;
+    private final @NonNull IndexerPort indexerPort;
 
 
     @Override
@@ -191,5 +194,14 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
             throw unauthorized("User %s must be admin to list coworkers of billing profile %s".formatted(userId.value(), billingProfileId.value()));
         return billingProfileStoragePort.findCoworkersByBillingProfile(billingProfileId, pageIndex, pageSize);
+    }
+
+    @Override
+    public void inviteCoworker(BillingProfile.Id billingProfileId, UserId invitedBy, GithubUserId invitedGithubUserId, BillingProfile.User.Role role) {
+        if (!billingProfileStoragePort.isAdmin(billingProfileId, invitedBy))
+            throw unauthorized("User %s must be admin to list coworkers of billing profile %s".formatted(invitedBy.value(), billingProfileId.value()));
+
+        indexerPort.indexUser(invitedGithubUserId.value());
+        billingProfileStoragePort.saveCoworkerInvitation(billingProfileId, invitedBy, invitedGithubUserId, role, ZonedDateTime.now());
     }
 }
