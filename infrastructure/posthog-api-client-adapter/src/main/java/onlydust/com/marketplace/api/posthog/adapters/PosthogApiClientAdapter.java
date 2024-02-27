@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.project.domain.model.notification.UserSignedUp;
-import onlydust.com.marketplace.project.domain.port.output.WebhookPort;
+import onlydust.com.marketplace.kernel.port.output.WebhookPort;
 import onlydust.com.marketplace.api.posthog.client.PosthogHttpClient;
 import onlydust.com.marketplace.api.posthog.dto.EventDTO;
 import onlydust.com.marketplace.api.posthog.properties.PosthogProperties;

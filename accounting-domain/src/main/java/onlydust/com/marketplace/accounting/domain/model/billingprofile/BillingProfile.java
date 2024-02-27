@@ -19,10 +19,13 @@ public abstract class BillingProfile {
     protected final Id id;
     @NonNull
     protected final String name;
+    @NonNull
+    protected final VerificationStatus status;
 
     protected BillingProfile(@NonNull String name) {
         this.id = Id.random();
         this.name = name;
+        this.status = VerificationStatus.NOT_STARTED;
     }
 
     public abstract Type type();

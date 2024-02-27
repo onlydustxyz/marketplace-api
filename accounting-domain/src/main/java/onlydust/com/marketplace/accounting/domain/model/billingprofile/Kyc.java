@@ -18,6 +18,7 @@ public class Kyc {
     UserId ownerId;
     @NonNull
     VerificationStatus status;
+    BillingProfile.Id billingProfileId;
     String firstName;
     String lastName;
     Date birthdate;
@@ -31,10 +32,11 @@ public class Kyc {
     String reviewMessageForApplicant;
     String externalApplicantId;
 
-    public static Kyc initForUser(final UserId userId) {
+    public static Kyc initForUserAndBillingProfile(final UserId userId, final BillingProfile.Id billingProfileId) {
         return Kyc.builder()
                 .id(UUID.randomUUID())
                 .status(VerificationStatus.NOT_STARTED)
+                .billingProfileId(billingProfileId)
                 .ownerId(userId)
                 .build();
     }

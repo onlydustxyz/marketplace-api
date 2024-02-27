@@ -1,14 +1,16 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface BillingProfileRepository extends JpaRepository<BillingProfileEntity, UUID>{
+public interface BillingProfileRepository extends JpaRepository<BillingProfileEntity, UUID> {
 
     @Query(value = """
             select bp.* from accounting.billing_profiles bp
@@ -23,4 +25,12 @@ public interface BillingProfileRepository extends JpaRepository<BillingProfileEn
             """, nativeQuery = true)
     List<BillingProfileEntity> findBillingProfilesForUserId(@Param("userId") UUID userId);
 
+
+    @Modifying
+    @Query(value = """
+                    update accounting.billing_profiles
+                    set verification_status = :verificationStatus
+                    where id = :billingProfileId
+            """, nativeQuery = true)
+    void updateBillingProfileVerificationStatus(UUID billingProfileId, VerificationStatusEntity verificationStatus);
 }

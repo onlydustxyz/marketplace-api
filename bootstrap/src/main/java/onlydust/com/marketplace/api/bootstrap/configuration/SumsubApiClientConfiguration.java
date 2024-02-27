@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubApiClientAdapter;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubClientProperties;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubHttpClient;
-import onlydust.com.marketplace.project.domain.port.output.UserVerificationStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileVerificationProviderPort;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +18,7 @@ public class SumsubApiClientConfiguration {
     }
 
     @Bean
-    public UserVerificationStoragePort userVerificationStoragePort(final SumsubClientProperties sumsubClientProperties) {
+    public BillingProfileVerificationProviderPort billingProfileVerificationProviderPort(final SumsubClientProperties sumsubClientProperties) {
         return new SumsubApiClientAdapter(sumsubClientProperties, new SumsubHttpClient(sumsubClientProperties));
     }
 }

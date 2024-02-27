@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.accounting.domain.port.out;
 
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
@@ -11,6 +11,7 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface BillingProfileStoragePort {
     boolean oldIsAdmin(UserId userId, BillingProfile.Id billingProfileId);
@@ -42,4 +43,20 @@ public interface BillingProfileStoragePort {
     void savePayoutInfoForBillingProfile(PayoutInfo payoutInfo, BillingProfile.Id billingProfileId);
 
     Page<BillingProfileCoworkerView> findCoworkersByBillingProfile(BillingProfile.Id billingProfileId, int pageIndex, int pageSize);
+
+    Optional<Kyc> findKycById(UUID verificationId);
+
+    void saveKyc(Kyc kyc);
+
+    void updateBillingProfileStatus(BillingProfile.Id billingProfileId, VerificationStatus status);
+
+    Optional<Kyb> findKybById(UUID verificationId);
+
+    void saveKyb(Kyb kyb);
+
+    List<VerificationStatus> findAllChildrenKycStatuesFromParentKyb(Kyb parentKyb);
+
+    Optional<Kyb> findKybByParentExternalId(String parentExternalApplicantId);
+
+    void saveChildrenKyc(String externalApplicantId, String parentExternalApplicantId, VerificationStatus verificationStatus);
 }

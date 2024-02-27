@@ -1,10 +1,16 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.port.output.OldBillingProfileStoragePort;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CompanyBillingProfileEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndividualBillingProfileEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.OldVerificationStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.project.domain.model.OldBillingProfile;
+import onlydust.com.marketplace.project.domain.model.OldBillingProfileType;
+import onlydust.com.marketplace.project.domain.model.OldCompanyBillingProfile;
+import onlydust.com.marketplace.project.domain.model.OldIndividualBillingProfile;
+import onlydust.com.marketplace.project.domain.port.output.OldBillingProfileStoragePort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -20,7 +26,7 @@ public class PostgresOldBillingProfileAdapter implements OldBillingProfileStorag
     private final CompanyBillingProfileRepository companyBillingProfileRepository;
     private final IndividualBillingProfileRepository individualBillingProfileRepository;
     private final CustomUserRewardRepository userRewardRepository;
-    private final ChildrenKycRepository childrenKycRepository;
+    private final OldChildrenKycRepository oldChildrenKycRepository;
     private final GlobalSettingsRepository globalSettingsRepository;
 
     @Override
@@ -84,35 +90,6 @@ public class PostgresOldBillingProfileAdapter implements OldBillingProfileStorag
                 .build());
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<OldCompanyBillingProfile> findCompanyProfileById(UUID billingProfileId) {
-        return companyBillingProfileRepository.findById(billingProfileId).map(
-                entity -> entity.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate())
-        );
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<OldIndividualBillingProfile> findIndividualProfileById(UUID billingProfileId) {
-        return individualBillingProfileRepository.findById(billingProfileId).map(
-                entity -> entity.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate())
-        );
-    }
-
-    @Override
-    @Transactional
-    public OldCompanyBillingProfile saveCompanyProfile(OldCompanyBillingProfile companyBillingProfile) {
-        return companyBillingProfileRepository.save(CompanyBillingProfileEntity.fromDomain(companyBillingProfile))
-                .toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate());
-    }
-
-    @Override
-    @Transactional
-    public OldIndividualBillingProfile saveIndividualProfile(OldIndividualBillingProfile individualBillingProfile) {
-        return individualBillingProfileRepository.save(IndividualBillingProfileEntity.fromDomain(individualBillingProfile))
-                .toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate());
-    }
 
     @Override
     @Transactional(readOnly = true)
@@ -140,46 +117,5 @@ public class PostgresOldBillingProfileAdapter implements OldBillingProfileStorag
                     .map(e -> e.getVerificationStatus().equals(OldVerificationStatusEntity.VERIFIED))
                     .orElse(false);
         };
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<OldCompanyBillingProfile> findCompanyByExternalVerificationId(String billingProfileExternalVerificationId) {
-        return companyBillingProfileRepository.findByApplicantId(billingProfileExternalVerificationId).map(
-                entity -> entity.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate())
-        );
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<OldVerificationStatus> findKycStatusesFromParentKybExternalVerificationId(String billingProfileExternalVerificationId) {
-        return childrenKycRepository.findAllByParentApplicantId(billingProfileExternalVerificationId)
-                .stream()
-                .map(ChildrenKycEntity::getVerificationStatus)
-                .map(verificationStatusEntity -> switch (verificationStatusEntity) {
-                    case REJECTED -> OldVerificationStatus.REJECTED;
-                    case VERIFIED -> OldVerificationStatus.VERIFIED;
-                    case UNDER_REVIEW -> OldVerificationStatus.UNDER_REVIEW;
-                    case CLOSED -> OldVerificationStatus.CLOSED;
-                    case NOT_STARTED -> OldVerificationStatus.NOT_STARTED;
-                    case STARTED -> OldVerificationStatus.STARTED;
-                }).toList();
-    }
-
-    @Override
-    @Transactional
-    public void saveChildrenKyc(String externalApplicantId, String parentExternalApplicantId, OldVerificationStatus oldVerificationStatus) {
-        childrenKycRepository.save(ChildrenKycEntity.builder()
-                .applicantId(externalApplicantId)
-                .parentApplicantId(parentExternalApplicantId)
-                .verificationStatus(switch (oldVerificationStatus) {
-                    case REJECTED -> OldVerificationStatusEntity.REJECTED;
-                    case UNDER_REVIEW -> OldVerificationStatusEntity.UNDER_REVIEW;
-                    case STARTED -> OldVerificationStatusEntity.STARTED;
-                    case CLOSED -> OldVerificationStatusEntity.CLOSED;
-                    case VERIFIED -> OldVerificationStatusEntity.VERIFIED;
-                    case NOT_STARTED -> OldVerificationStatusEntity.NOT_STARTED;
-                })
-                .build());
     }
 }

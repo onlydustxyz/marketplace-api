@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import onlydust.com.marketplace.project.domain.port.output.WebhookPort;
+import onlydust.com.marketplace.kernel.port.output.WebhookPort;
 import onlydust.com.marketplace.api.webhook.Config;
 import onlydust.com.marketplace.api.webhook.MakeWebhookHttpClient;
 import onlydust.com.marketplace.api.webhook.adapters.MakeWebhookAdapter;

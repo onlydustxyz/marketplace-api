@@ -18,6 +18,8 @@ public class Kyb {
     UserId ownerId;
     @NonNull
     VerificationStatus status;
+    @NonNull
+    BillingProfile.Id billingProfileId;
     String name;
     String registrationNumber;
     Date registrationDate;
@@ -29,10 +31,11 @@ public class Kyb {
     String reviewMessageForApplicant;
     String externalApplicantId;
 
-    public static Kyb initForUser(final UserId userId) {
+    public static Kyb initForUserAndBillingProfile(final UserId userId, final BillingProfile.Id billingProfileId) {
         return Kyb.builder()
                 .id(UUID.randomUUID())
                 .ownerId(userId)
+                .billingProfileId(billingProfileId)
                 .status(VerificationStatus.NOT_STARTED)
                 .build();
     }

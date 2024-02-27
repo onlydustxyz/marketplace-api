@@ -20,7 +20,7 @@ public class CompanyBillingProfile extends BillingProfile {
     public CompanyBillingProfile(@NonNull String name, @NonNull UserId firstAdmin) {
         super(name);
         this.members = new HashSet<>(Set.of(new User(firstAdmin, User.Role.ADMIN)));
-        this.kyb = Kyb.initForUser(firstAdmin);
+        this.kyb = Kyb.initForUserAndBillingProfile(firstAdmin, this.id());
     }
 
     @Override

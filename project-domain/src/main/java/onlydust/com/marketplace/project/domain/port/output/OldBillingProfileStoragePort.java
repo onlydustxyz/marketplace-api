@@ -21,21 +21,8 @@ public interface OldBillingProfileStoragePort {
 
     void updateBillingProfileType(UUID userId, OldBillingProfileType oldBillingProfileType);
 
-    Optional<OldCompanyBillingProfile> findCompanyProfileById(UUID billingProfileId);
-
-    Optional<OldIndividualBillingProfile> findIndividualProfileById(UUID billingProfileId);
-
-    OldCompanyBillingProfile saveCompanyProfile(OldCompanyBillingProfile companyBillingProfile);
-
-    OldIndividualBillingProfile saveIndividualProfile(OldIndividualBillingProfile individualBillingProfile);
-
     List<OldBillingProfile> all(UUID userId, Long githubUserId);
 
     Boolean hasValidBillingProfileForUserAndType(UUID userId, OldBillingProfileType oldBillingProfileType);
 
-    Optional<OldCompanyBillingProfile> findCompanyByExternalVerificationId(String billingProfileExternalVerificationId);
-
-    List<OldVerificationStatus> findKycStatusesFromParentKybExternalVerificationId(String billingProfileExternalVerificationId);
-
-    void saveChildrenKyc(String externalApplicantId, String parentExternalApplicantId, OldVerificationStatus oldVerificationStatus);
 }

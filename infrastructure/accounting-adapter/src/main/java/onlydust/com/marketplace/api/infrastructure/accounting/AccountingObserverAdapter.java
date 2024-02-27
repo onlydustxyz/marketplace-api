@@ -7,7 +7,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.project.domain.model.OldCompanyBillingProfile;
 import onlydust.com.marketplace.project.domain.model.OldIndividualBillingProfile;
 import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
-import onlydust.com.marketplace.project.domain.model.notification.BillingProfileUpdated;
+import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.project.domain.port.input.AccountingUserObserverPort;
 
 import java.util.UUID;
@@ -16,12 +16,6 @@ import java.util.UUID;
 public class AccountingObserverAdapter implements AccountingUserObserverPort {
     final RewardStatusStorage rewardStatusStorage;
     final RewardStatusFacadePort rewardStatusFacadePort;
-
-    final
-    @Override
-    public void onBillingProfileUpdated(BillingProfileUpdated event) {
-        refreshRewardsUsdEquivalentOf(BillingProfile.Id.of(event.getBillingProfileId()));
-    }
 
     @Override
     public void onBillingProfilePayoutSettingsUpdated(UUID billingProfileId, UserPayoutSettings payoutSettings) {

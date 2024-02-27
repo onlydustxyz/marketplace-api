@@ -1,8 +1,9 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
-import onlydust.com.marketplace.project.domain.port.output.NotificationPort;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.slack.SlackProperties;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
+import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +18,7 @@ public class SlackConfiguration {
     }
 
     @Bean
-    public NotificationPort notificationPort(final SlackProperties slackProperties) {
-        return new SlackApiAdapter(slackProperties);
+    public NotificationPort notificationPort(final SlackProperties slackProperties, final UserStoragePort userStoragePort) {
+        return new SlackApiAdapter(slackProperties, userStoragePort);
     }
 }

@@ -3,9 +3,11 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -27,6 +29,7 @@ import static java.util.Objects.isNull;
 @Table(name = "billing_profiles", schema = "accounting")
 @EntityListeners(AuditingEntityListener.class)
 @TypeDef(name = "billing_profile_type", typeClass = PostgreSQLEnumType.class)
+@TypeDef(name = "verification_status", typeClass = PostgreSQLEnumType.class)
 public class BillingProfileEntity {
     @Id
     UUID id;
@@ -35,6 +38,9 @@ public class BillingProfileEntity {
     @Enumerated(EnumType.STRING)
     Type type;
     Date invoiceMandateAcceptedAt;
+    @org.hibernate.annotations.Type(type = "verification_status")
+    @Enumerated(EnumType.STRING)
+    VerificationStatusEntity verificationStatus;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "billingProfileId")
     Set<BillingProfileUserEntity> users;
