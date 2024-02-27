@@ -73,7 +73,7 @@ public class GithubHttpClient {
                 case 301, 302, 307, 308 -> {
                     final var location = httpResponse.headers().firstValue("Location")
                             .orElseThrow(() -> internalServerError("%d status received without Location header".formatted(httpResponse.statusCode())));
-                    yield post(location, requestBody, responseClass);
+                    yield post(URI.create(location).getPath(), requestBody, responseClass);
                 }
                 case 403, 404 ->
                     // Should be considered as an internal server error because it happens due to wrong github PAT or
