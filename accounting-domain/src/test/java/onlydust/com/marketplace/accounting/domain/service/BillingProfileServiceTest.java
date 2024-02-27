@@ -945,5 +945,99 @@ class BillingProfileServiceTest {
         assertThat(coworkers.getContent().get(1).removable()).isTrue();
     }
 
+    @Test
+    void should_invite_coworker() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final GithubUserId githubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+
+        // When
+        billingProfileService.inviteCoworker(billingProfileId, userIAdmin, githubUserId, BillingProfile.User.Role.MEMBER);
+
+        // Then
+        verify(indexerPort).indexUser(githubUserId.value());
+        verify(billingProfileStoragePort).saveCoworkerInvitation(eq(billingProfileId), eq(userIAdmin), eq(githubUserId), eq(BillingProfile.User.Role.MEMBER),
+                any());
+    }
+
+    @Test
+    void should_prevent_non_admin_to_invite_coworker() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final GithubUserId githubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(false);
+
+        // When
+        assertThatThrownBy(() -> billingProfileService.inviteCoworker(billingProfileId, userIAdmin, githubUserId, BillingProfile.User.Role.MEMBER))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("User %s must be admin to invite coworker to billing profile %s".formatted(userIAdmin.value(), billingProfileId.value()));
+
+        // Then
+        verify(indexerPort, never()).indexUser(any());
+        verify(billingProfileStoragePort, never()).saveCoworkerInvitation(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void should_accept_invitation() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final GithubUserId invitedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        final UserId invitedUserId = UserId.of(UUID.randomUUID());
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStoragePort.getInvitedCoworker(billingProfileId, invitedGithubUserId)).thenReturn(Optional.of(
+                BillingProfileCoworkerView.builder()
+                        .userId(invitedUserId)
+                        .githubUserId(invitedGithubUserId)
+                        .role(BillingProfile.User.Role.MEMBER)
+                        .invitedAt(ZonedDateTime.now())
+                        .build()
+        ));
+
+        // When
+        billingProfileService.acceptCoworkerInvitation(billingProfileId, invitedGithubUserId);
+
+        // Then
+        verify(billingProfileStoragePort).saveCoworker(eq(billingProfileId), eq(invitedUserId), eq(BillingProfile.User.Role.MEMBER), any());
+        verify(billingProfileStoragePort).deleteCoworkerInvitation(eq(billingProfileId), eq(invitedGithubUserId));
+    }
+
+    @Test
+    void should_not_accept_invitation_when_not_found() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final GithubUserId invitedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        final UserId invitedUserId = UserId.of(UUID.randomUUID());
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStoragePort.getInvitedCoworker(billingProfileId, invitedGithubUserId)).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> billingProfileService.acceptCoworkerInvitation(billingProfileId, invitedGithubUserId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Invitation not found for billing profile %s and user %s".formatted(billingProfileId.value(), invitedGithubUserId.value()));
+
+        // Then
+        verify(billingProfileStoragePort, never()).saveCoworker(eq(billingProfileId), eq(invitedUserId), eq(BillingProfile.User.Role.MEMBER), any());
+        verify(billingProfileStoragePort, never()).deleteCoworkerInvitation(eq(billingProfileId), eq(invitedGithubUserId));
+    }
+
+    @Test
+    void should_reject_invitation() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final GithubUserId invitedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+
+        // When
+        billingProfileService.rejectCoworkerInvitation(billingProfileId, invitedGithubUserId);
+
+        // Then
+        verify(billingProfileStoragePort).deleteCoworkerInvitation(eq(billingProfileId), eq(invitedGithubUserId));
+    }
 
 }

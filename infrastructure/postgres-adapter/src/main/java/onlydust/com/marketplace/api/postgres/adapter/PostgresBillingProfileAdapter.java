@@ -277,4 +277,25 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                 .role(BillingProfileUserEntity.Role.fromDomain(role))
                 .build());
     }
+
+    @Override
+    public void deleteCoworkerInvitation(BillingProfile.Id billingProfileId, GithubUserId invitedUser) {
+        billingProfileUserInvitationRepository.deleteById(new BillingProfileUserInvitationEntity.PrimaryKey(billingProfileId.value(), invitedUser.value()));
+    }
+
+    @Override
+    public void saveCoworker(BillingProfile.Id billingProfileId, UserId invitedUser, BillingProfile.User.Role role, ZonedDateTime acceptedAt) {
+        billingProfileUserRepository.save(BillingProfileUserEntity.builder()
+                .billingProfileId(billingProfileId.value())
+                .userId(invitedUser.value())
+                .role(BillingProfileUserEntity.Role.fromDomain(role))
+                .joinedAt(Date.from(acceptedAt.toInstant()))
+                .build());
+    }
+
+    @Override
+    public Optional<BillingProfileCoworkerView> getInvitedCoworker(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId) {
+        return billingProfileUserViewRepository.findInvitedUserByBillingProfileIdAndGithubId(billingProfileId.value(), invitedGithubUserId.value())
+                .map(BillingProfileUserViewEntity::toView);
+    }
 }
