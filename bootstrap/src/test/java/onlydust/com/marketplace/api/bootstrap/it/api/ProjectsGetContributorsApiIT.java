@@ -1,11 +1,9 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IgnoredContributionsRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuotesRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -15,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -1116,8 +1113,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     IgnoredContributionsRepository ignoredContributionsRepository;
     @Autowired
     PaymentRequestRepository paymentRequestRepository;
-    @Autowired
-    CryptoUsdQuotesRepository cryptoUsdQuotesRepository;
 
     @Test
     @Order(1)
@@ -1303,35 +1298,29 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                                                                                                "-8958-a9e0b0aec7b0")).orElseThrow();
         reward1.setCurrency(CurrencyEnumEntity.eth);
         reward1.setAmount(BigDecimal.valueOf(20.5));
+        reward1.setUsdAmount(BigDecimal.valueOf(31426.5));
         paymentRequestRepository.save(reward1);
 
         final PaymentRequestEntity reward2 = paymentRequestRepository.findById(UUID.fromString("e1498a17-5090-4071" +
                                                                                                "-a88a-6f0b0c337c3a")).orElseThrow();
         reward2.setCurrency(CurrencyEnumEntity.apt);
         reward2.setAmount(BigDecimal.valueOf(2000));
+        reward2.setUsdAmount(BigDecimal.valueOf(1120));
         paymentRequestRepository.save(reward2);
 
         final PaymentRequestEntity reward3 = paymentRequestRepository.findById(UUID.fromString("40fda3c6-2a3f-4cdd" +
                                                                                                "-ba12-0499dd232d53")).orElseThrow();
         reward3.setCurrency(CurrencyEnumEntity.op);
         reward3.setAmount(BigDecimal.valueOf(450));
+        reward3.setUsdAmount(BigDecimal.valueOf(643.5));
         paymentRequestRepository.save(reward3);
 
         final PaymentRequestEntity reward4 = paymentRequestRepository.findById(UUID.fromString("5b96ca1e-4ad2-41c1" +
                                                                                                "-8819-520b885d9223")).orElseThrow();
         reward4.setCurrency(CurrencyEnumEntity.strk);
         reward4.setAmount(BigDecimal.valueOf(500000));
+        reward4.setUsdAmount(null);
         paymentRequestRepository.save(reward4);
-        cryptoUsdQuotesRepository.deleteAll();
-        cryptoUsdQuotesRepository.save(new CryptoUsdQuotesEntity(CurrencyEnumEntity.eth, BigDecimal.valueOf(1533),
-                new Date()));
-        cryptoUsdQuotesRepository.save(new CryptoUsdQuotesEntity(CurrencyEnumEntity.op, BigDecimal.valueOf(1.43),
-                new Date()));
-        cryptoUsdQuotesRepository.save(new CryptoUsdQuotesEntity(CurrencyEnumEntity.apt, BigDecimal.valueOf(0.56),
-                new Date()));
-        cryptoUsdQuotesRepository.save(new CryptoUsdQuotesEntity(CurrencyEnumEntity.usdc, BigDecimal.valueOf(1.01),
-                new Date()));
-
 
         // When
         client.get()
