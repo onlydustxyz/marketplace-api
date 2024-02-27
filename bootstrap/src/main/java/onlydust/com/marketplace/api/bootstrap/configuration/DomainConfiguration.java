@@ -12,6 +12,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserVerificati
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
+import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;

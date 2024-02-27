@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
-import onlydust.com.marketplace.project.domain.port.output.IndexerPort;
 import onlydust.com.marketplace.api.indexer.api.client.adapter.IndexerApiClientAdapter;
 import onlydust.com.marketplace.api.indexer.api.client.adapter.IndexerApiHttpClient;
+import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

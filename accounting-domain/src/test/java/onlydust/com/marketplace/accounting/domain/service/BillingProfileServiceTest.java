@@ -18,6 +18,7 @@ import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
+import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -42,8 +43,9 @@ class BillingProfileServiceTest {
     final BillingProfileStoragePort billingProfileStoragePort = mock(BillingProfileStoragePort.class);
     final PdfStoragePort pdfStoragePort = mock(PdfStoragePort.class);
     final BillingProfileObserver billingProfileObserver = mock(BillingProfileObserver.class);
+    final IndexerPort indexerPort = mock(IndexerPort.class);
     final BillingProfileService billingProfileService = new BillingProfileService(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort,
-            billingProfileObserver);
+            billingProfileObserver, indexerPort);
     final UserId userId = UserId.random();
     final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
     final Currency ETH = Currencies.ETH;

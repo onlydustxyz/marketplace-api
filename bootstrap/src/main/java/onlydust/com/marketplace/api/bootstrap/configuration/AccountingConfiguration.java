@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.*;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.*;
 import onlydust.com.marketplace.api.infrastructure.accounting.AccountingObserverAdapter;
+import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,8 +44,9 @@ public class AccountingConfiguration {
     public BillingProfileFacadePort billingProfileFacadePort(final @NonNull InvoiceStoragePort invoiceStoragePort,
                                                              final @NonNull BillingProfileStoragePort billingProfileStoragePort,
                                                              final @NonNull PdfStoragePort pdfStoragePort,
-                                                             final @NonNull BillingProfileObserver billingProfileObserver) {
-        return new BillingProfileService(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort, billingProfileObserver);
+                                                             final @NonNull BillingProfileObserver billingProfileObserver,
+                                                             final @NonNull IndexerPort indexerPort) {
+        return new BillingProfileService(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort, billingProfileObserver, indexerPort);
     }
 
     @Bean

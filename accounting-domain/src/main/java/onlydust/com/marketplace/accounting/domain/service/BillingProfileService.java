@@ -20,6 +20,7 @@ import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
+import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import org.jetbrains.annotations.NotNull;
 
 import javax.transaction.Transactional;
@@ -38,6 +39,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     private final @NonNull BillingProfileStoragePort billingProfileStoragePort;
     private final @NonNull PdfStoragePort pdfStoragePort;
     private final @NonNull BillingProfileObserver billingProfileObserver;
+    private final @NonNull IndexerPort indexerPort;
 
 
     @Override
@@ -199,7 +201,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (!billingProfileStoragePort.isAdmin(billingProfileId, invitedBy))
             throw unauthorized("User %s must be admin to list coworkers of billing profile %s".formatted(invitedBy.value(), billingProfileId.value()));
 
-        //TODO: index invited user
+        indexerPort.indexUser(invitedGithubUserId.value());
         billingProfileStoragePort.saveCoworkerInvitation(billingProfileId, invitedBy, invitedGithubUserId, role, ZonedDateTime.now());
     }
 }
