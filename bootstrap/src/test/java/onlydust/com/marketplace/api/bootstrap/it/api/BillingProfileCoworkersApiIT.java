@@ -338,6 +338,159 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
+                          "accepted": false
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+
+        // When
+        client.post()
+                .uri(getApiURI(ME_BILLING_PROFILES_POST_COWORKER_INVITATIONS.formatted(companyBillingProfile.id().value().toString())))
+                .header("Authorization", "Bearer " + userAuthHelper.authenticateOlivier().jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "accepted": false
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // Then
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_COWORKERS.formatted(companyBillingProfile.id().value().toString()),
+                        Map.of("pageIndex", "0", "pageSize", "50")))
+                .header("Authorization", "Bearer " + jwt)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.coworkers.length()").isEqualTo(2)
+                .jsonPath("$.coworkers[0].id").isEqualTo(authenticatedUser.user().getId().toString())
+                .jsonPath("$.coworkers[0].githubUserId").isEqualTo(authenticatedUser.user().getGithubUserId())
+                .jsonPath("$.coworkers[0].joinedAt").isNotEmpty()
+                .jsonPath("$.coworkers[0].invitedAt").isEqualTo(null)
+                .jsonPath("$.coworkers[1].id").isEqualTo(null)
+                .jsonPath("$.coworkers[1].githubUserId").isEqualTo(123456789999L)
+                .jsonPath("$.coworkers[1].joinedAt").isEqualTo(null)
+                .jsonPath("$.coworkers[1].invitedAt").isNotEmpty()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "coworkers": [
+                            {
+                              "login": "boss.armstrong",
+                              "htmlUrl": null,
+                              "avatarUrl": "https://www.plop.org",
+                              "isRegistered": true,
+                              "role": "ADMIN",
+                              "removable": false
+                            },
+                            {
+                              "githubUserId": 123456789999,
+                              "login": null,
+                              "htmlUrl": null,
+                              "avatarUrl": null,
+                              "isRegistered": false,
+                              "role": "ADMIN",
+                              "removable": true
+                            }
+                          ]
+                        }
+                        """);
+
+        // When
+        client.post()
+                .uri(getApiURI(BILLING_PROFILES_POST_COWORKER_INVITATIONS.formatted(companyBillingProfile.id().value().toString())))
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "githubUserId": 595505,
+                          "role": "MEMBER"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // Then
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_COWORKERS.formatted(companyBillingProfile.id().value().toString()),
+                        Map.of("pageIndex", "0", "pageSize", "50")))
+                .header("Authorization", "Bearer " + jwt)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.coworkers.length()").isEqualTo(3)
+                .jsonPath("$.coworkers[0].id").isEqualTo(authenticatedUser.user().getId().toString())
+                .jsonPath("$.coworkers[0].githubUserId").isEqualTo(authenticatedUser.user().getGithubUserId())
+                .jsonPath("$.coworkers[0].joinedAt").isNotEmpty()
+                .jsonPath("$.coworkers[0].invitedAt").isEqualTo(null)
+                .jsonPath("$.coworkers[1].id").isEqualTo(null)
+                .jsonPath("$.coworkers[1].githubUserId").isEqualTo(123456789999L)
+                .jsonPath("$.coworkers[1].joinedAt").isEqualTo(null)
+                .jsonPath("$.coworkers[1].invitedAt").isNotEmpty()
+                .jsonPath("$.coworkers[2].id").isEqualTo("e461c019-ba23-4671-9b6c-3a5a18748af9")
+                .jsonPath("$.coworkers[2].githubUserId").isEqualTo(595505)
+                .jsonPath("$.coworkers[2].joinedAt").isEqualTo(null)
+                .jsonPath("$.coworkers[2].invitedAt").isNotEmpty()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 3,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "coworkers": [
+                            {
+                              "login": "boss.armstrong",
+                              "htmlUrl": null,
+                              "avatarUrl": "https://www.plop.org",
+                              "isRegistered": true,
+                              "role": "ADMIN",
+                              "removable": false
+                            },
+                            {
+                              "githubUserId": 123456789999,
+                              "login": null,
+                              "htmlUrl": null,
+                              "avatarUrl": null,
+                              "isRegistered": false,
+                              "role": "ADMIN",
+                              "removable": true
+                            },
+                            {
+                              "githubUserId": 595505,
+                              "login": "ofux",
+                              "htmlUrl": "https://github.com/ofux",
+                              "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
+                              "isRegistered": true,
+                              "id": "e461c019-ba23-4671-9b6c-3a5a18748af9",
+                              "role": "MEMBER",
+                              "joinedAt": null,
+                              "removable": true
+                            }
+                          ]
+                        }
+                        """);
+
+        // When
+        client.post()
+                .uri(getApiURI(ME_BILLING_PROFILES_POST_COWORKER_INVITATIONS.formatted(companyBillingProfile.id().value().toString())))
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
                           "accepted": true
                         }
                         """)
@@ -377,8 +530,8 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.coworkers[0].invitedAt").isEqualTo(null)
                 .jsonPath("$.coworkers[1].id").isEqualTo("e461c019-ba23-4671-9b6c-3a5a18748af9")
                 .jsonPath("$.coworkers[1].githubUserId").isEqualTo(595505)
-                .jsonPath("$.coworkers[0].joinedAt").isNotEmpty()
-                .jsonPath("$.coworkers[0].invitedAt").isEqualTo(null)
+                .jsonPath("$.coworkers[1].joinedAt").isNotEmpty()
+                .jsonPath("$.coworkers[1].invitedAt").isEqualTo(null)
                 .jsonPath("$.coworkers[2].id").isEqualTo(null)
                 .jsonPath("$.coworkers[2].githubUserId").isEqualTo(123456789999L)
                 .jsonPath("$.coworkers[2].joinedAt").isEqualTo(null)

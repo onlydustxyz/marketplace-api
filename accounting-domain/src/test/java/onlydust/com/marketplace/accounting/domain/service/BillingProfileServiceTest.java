@@ -1032,12 +1032,36 @@ class BillingProfileServiceTest {
         // Given
         final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
         final GithubUserId invitedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        when(billingProfileStoragePort.getInvitedCoworker(billingProfileId, invitedGithubUserId)).thenReturn(Optional.of(
+                BillingProfileCoworkerView.builder()
+                        .githubUserId(invitedGithubUserId)
+                        .role(BillingProfile.User.Role.MEMBER)
+                        .invitedAt(ZonedDateTime.now())
+                        .build()
+        ));
 
         // When
         billingProfileService.rejectCoworkerInvitation(billingProfileId, invitedGithubUserId);
 
         // Then
         verify(billingProfileStoragePort).deleteCoworkerInvitation(eq(billingProfileId), eq(invitedGithubUserId));
+    }
+
+    @Test
+    void should_not_reject_invitation_when_not_found() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final GithubUserId invitedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        when(billingProfileStoragePort.getInvitedCoworker(billingProfileId, invitedGithubUserId)).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> billingProfileService.rejectCoworkerInvitation(billingProfileId, invitedGithubUserId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Invitation not found for billing profile %s and user %s".formatted(billingProfileId.value(), invitedGithubUserId.value()));
+
+        // Then
+        verify(billingProfileStoragePort, never()).deleteCoworkerInvitation(eq(billingProfileId), eq(invitedGithubUserId));
     }
 
 }

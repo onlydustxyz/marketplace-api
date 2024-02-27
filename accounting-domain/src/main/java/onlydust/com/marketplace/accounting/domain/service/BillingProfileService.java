@@ -219,6 +219,10 @@ public class BillingProfileService implements BillingProfileFacadePort {
     @Override
     @Transactional
     public void rejectCoworkerInvitation(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId) {
+        billingProfileStoragePort.getInvitedCoworker(billingProfileId, invitedGithubUserId)
+                .orElseThrow(() -> notFound("Invitation not found for billing profile %s and user %s"
+                        .formatted(billingProfileId.value(), invitedGithubUserId.value())));
+
         billingProfileStoragePort.deleteCoworkerInvitation(billingProfileId, invitedGithubUserId);
     }
 }
