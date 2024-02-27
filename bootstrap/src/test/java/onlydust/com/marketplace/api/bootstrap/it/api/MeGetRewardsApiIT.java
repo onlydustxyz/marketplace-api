@@ -8,7 +8,6 @@ import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.OldVerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity.BillingProfileTypeEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
@@ -46,10 +45,6 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     PostgresUserAdapter postgresUserAdapter;
     @Autowired
     UserBillingProfileTypeRepository userBillingProfileTypeRepository;
-    @Autowired
-    CompanyBillingProfileRepository companyBillingProfileRepository;
-    @Autowired
-    IndividualBillingProfileRepository individualBillingProfileRepository;
 
     UserAuthHelper.AuthenticatedUser pierre;
 
@@ -57,7 +52,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     void setup() {
         pierre = userAuthHelper.authenticatePierre();
 
-        patchBillingProfile(pierre, BillingProfileTypeEntity.COMPANY, OldVerificationStatusEntity.VERIFIED);
+        // TODO
+//        patchBillingProfile(pierre, BillingProfileTypeEntity.COMPANY, OldVerificationStatusEntity.VERIFIED);
 
         patchReward("40fda3c6-2a3f-4cdd-ba12-0499dd232d53", 10, "ETH", 15000, null, "2023-07-12");
         patchReward("e1498a17-5090-4071-a88a-6f0b0c337c3a", 50, "ETH", 75000, null, "2023-08-12");
@@ -413,20 +409,20 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
         rewardRepository.save(rewardEntity);
         rewardStatusRepository.save(rewardStatus);
     }
-
-    private void patchBillingProfile(@NonNull UserAuthHelper.AuthenticatedUser user, BillingProfileTypeEntity type, OldVerificationStatusEntity status) {
-        if (type != null) {
-            final var entity = userBillingProfileTypeRepository.findById(user.user().getId()).orElseThrow();
-            entity.setBillingProfileType(type);
-            userBillingProfileTypeRepository.save(entity);
-        }
-
-        if (status != null) {
-            final var entity = companyBillingProfileRepository.findByUserId(user.user().getId()).orElseThrow();
-            entity.setVerificationStatus(status);
-            companyBillingProfileRepository.save(entity);
-        }
-    }
+// TODO
+//    private void patchBillingProfile(@NonNull UserAuthHelper.AuthenticatedUser user, BillingProfileTypeEntity type, OldVerificationStatusEntity status) {
+//        if (type != null) {
+//            final var entity = userBillingProfileTypeRepository.findById(user.user().getId()).orElseThrow();
+//            entity.setBillingProfileType(type);
+//            userBillingProfileTypeRepository.save(entity);
+//        }
+//
+//        if (status != null) {
+//            final var entity = companyBillingProfileRepository.findByUserId(user.user().getId()).orElseThrow();
+//            entity.setVerificationStatus(status);
+//            companyBillingProfileRepository.save(entity);
+//        }
+//    }
 
     @SneakyThrows
     @Transactional

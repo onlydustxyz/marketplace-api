@@ -7,11 +7,8 @@ import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.BillingProfileInvoicesPageResponse;
 import onlydust.com.marketplace.api.contract.model.MyBillingProfilesResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.OldVerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
 import org.apache.commons.lang3.mutable.MutableObject;
@@ -41,10 +38,6 @@ import static org.springframework.web.reactive.function.BodyInserters.fromResour
 public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     PdfStoragePort pdfStoragePort;
-    @Autowired
-    IndividualBillingProfileRepository individualBillingProfileRepository;
-    @Autowired
-    CompanyBillingProfileRepository companyBillingProfileRepository;
     @Autowired
     GlobalSettingsRepository globalSettingsRepository;
     @Autowired
@@ -77,16 +70,17 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful();
 
-        final var companyBillingProfile = companyBillingProfileRepository.findByUserId(antho.user().getId()).orElseThrow();
-        companyBillingProfile.setName("My company");
-        companyBillingProfile.setCountry("FRA");
-        companyBillingProfile.setAddress("My address");
-        companyBillingProfile.setRegistrationNumber("123456");
-        companyBillingProfile.setSubjectToEuVAT(true);
-        companyBillingProfile.setVerificationStatus(OldVerificationStatusEntity.VERIFIED);
-        companyBillingProfileRepository.save(companyBillingProfile);
-
-        billingProfileId = companyBillingProfile.getId();
+        // TODO
+//        final var companyBillingProfile = companyBillingProfileRepository.findByUserId(antho.user().getId()).orElseThrow();
+//        companyBillingProfile.setName("My company");
+//        companyBillingProfile.setCountry("FRA");
+//        companyBillingProfile.setAddress("My address");
+//        companyBillingProfile.setRegistrationNumber("123456");
+//        companyBillingProfile.setSubjectToEuVAT(true);
+//        companyBillingProfile.setVerificationStatus(OldVerificationStatusEntity.VERIFIED);
+//        companyBillingProfileRepository.save(companyBillingProfile);
+//
+//        billingProfileId = companyBillingProfile.getId();
     }
 
 

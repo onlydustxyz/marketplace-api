@@ -133,13 +133,11 @@ public class DomainConfiguration {
                                          final ProjectStoragePort projectStoragePort,
                                          final GithubSearchPort githubSearchPort,
                                          final ImageStoragePort imageStoragePort,
-                                         final OldBillingProfileStoragePort oldBillingProfileStoragePort,
                                          final AccountingUserObserverPort accountingUserObserverPort) {
         return new UserService(projectObserverPort, userObserverPort, postgresUserAdapter, dateProvider,
                 projectStoragePort,
                 githubSearchPort,
                 imageStoragePort,
-                oldBillingProfileStoragePort,
                 accountingUserObserverPort);
     }
 

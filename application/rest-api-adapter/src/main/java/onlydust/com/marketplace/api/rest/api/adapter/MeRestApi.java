@@ -318,36 +318,10 @@ public class MeRestApi implements MeApi {
     }
 
     @Override
-    public ResponseEntity<CompanyBillingProfileResponse> getMyCompanyBillingProfile() {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        return ResponseEntity.ok(OldBillingProfileMapper.companyDomainToResponse(userFacadePort.getCompanyBillingProfile(authenticatedUser.getId())));
-    }
-
-    @Override
-    public ResponseEntity<IndividualBillingProfileResponse> getMyIndividualBillingProfile() {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        return ResponseEntity.ok(OldBillingProfileMapper.individualDomainToResponse(userFacadePort.getIndividualBillingProfile(authenticatedUser.getId())));
-    }
-
-    @Override
-    public ResponseEntity<Void> oldUpdateMyBillingProfileType(BillingProfileTypeRequest billingProfileTypeRequest) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        userFacadePort.updateBillingProfileType(authenticatedUser.getId(), OldBillingProfileMapper.billingProfileToDomain(billingProfileTypeRequest));
-        return ResponseEntity.noContent().build();
-    }
-
-    @Override
     public ResponseEntity<Void> updateMyGithubProfileData() {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         userFacadePort.updateGithubProfile(authenticatedUser);
         return ResponseEntity.ok().build();
-    }
-
-    public ResponseEntity<MyBillingProfilesResponse> oldGetMyBillingProfiles() {
-        final var authenticatedUser = authenticationService.getAuthenticatedUser();
-        final var billingProfiles = userFacadePort.oldGetBillingProfiles(authenticatedUser.getId(), authenticatedUser.getGithubUserId());
-        return ResponseEntity.ok(new MyBillingProfilesResponse()
-                .billingProfiles(billingProfiles.stream().map(OldBillingProfileMapper::map).toList()));
     }
 
     @Override

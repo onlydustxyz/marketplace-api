@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface BillingProfileStoragePort {
-    boolean oldIsAdmin(UserId userId, BillingProfile.Id billingProfileId);
 
     void updateInvoiceMandateAcceptanceDate(BillingProfile.Id billingProfileId, ZonedDateTime now);
 

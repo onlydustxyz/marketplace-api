@@ -1,10 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndividualBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.OldVerificationStatusEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserBillingProfileTypeRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,8 +50,6 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     UserBillingProfileTypeRepository userBillingProfileTypeRepository;
-    @Autowired
-    IndividualBillingProfileRepository individualBillingProfileRepository;
 
     @Test
     void should_return_contribution_details_when_found() {
@@ -64,9 +59,10 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
         final UserBillingProfileTypeEntity userBillingProfileTypeEntity = userBillingProfileTypeRepository.findById(authenticatedUser.user().getId()).orElseThrow();
         userBillingProfileTypeEntity.setBillingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.INDIVIDUAL);
         userBillingProfileTypeRepository.save(userBillingProfileTypeEntity);
-        final IndividualBillingProfileEntity individualBillingProfileEntity = individualBillingProfileRepository.findByUserId(authenticatedUser.user().getId()).orElseThrow();
-        individualBillingProfileEntity.setVerificationStatus(OldVerificationStatusEntity.VERIFIED);
-        individualBillingProfileRepository.save(individualBillingProfileEntity);
+        // TODO
+//        final IndividualBillingProfileEntity individualBillingProfileEntity = individualBillingProfileRepository.findByUserId(authenticatedUser.user().getId()).orElseThrow();
+//        individualBillingProfileEntity.setVerificationStatus(OldVerificationStatusEntity.VERIFIED);
+//        individualBillingProfileRepository.save(individualBillingProfileEntity);
 
         // When
         client.get()

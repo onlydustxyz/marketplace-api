@@ -44,10 +44,6 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
     CustomUserPayoutInfoRepository customUserPayoutInfoRepository;
     @Autowired
     UserBillingProfileTypeRepository userBillingProfileTypeRepository;
-    @Autowired
-    IndividualBillingProfileRepository individualBillingProfileRepository;
-    @Autowired
-    CompanyBillingProfileRepository companyBillingProfileRepository;
 
 
     @Nested
@@ -78,11 +74,13 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
                     .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.INDIVIDUAL)
                     .userId(userId)
                     .build());
-            individualBillingProfileRepository.save(IndividualBillingProfileEntity.builder()
-                    .id(UUID.randomUUID())
-                    .userId(userId)
-                    .verificationStatus(OldVerificationStatusEntity.VERIFIED)
-                    .build());
+
+            // TODO
+//            individualBillingProfileRepository.save(IndividualBillingProfileEntity.builder()
+//                    .id(UUID.randomUUID())
+//                    .userId(userId)
+//                    .verificationStatus(OldVerificationStatusEntity.VERIFIED)
+//                    .build());
             projectRepository.save(
                     ProjectEntity.builder()
                             .id(projectId)
@@ -174,11 +172,12 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
                     .userId(userId)
                     .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.COMPANY)
                     .build());
-            companyBillingProfileRepository.save(CompanyBillingProfileEntity.builder()
-                    .userId(userId)
-                    .verificationStatus(OldVerificationStatusEntity.VERIFIED)
-                    .id(UUID.randomUUID())
-                    .build());
+            // TODO
+//            companyBillingProfileRepository.save(CompanyBillingProfileEntity.builder()
+//                    .userId(userId)
+//                    .verificationStatus(OldVerificationStatusEntity.VERIFIED)
+//                    .id(UUID.randomUUID())
+//                    .build());
             projectRepository.save(
                     ProjectEntity.builder()
                             .id(projectId)

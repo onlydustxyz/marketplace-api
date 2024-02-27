@@ -6,8 +6,6 @@ import com.onlydust.api.sumsub.api.client.adapter.SumsubApiClientAdapter;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubClientProperties;
 import onlydust.com.marketplace.api.bootstrap.helper.SlackNotificationStub;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubSignatureVerifier;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookProperties;
 import org.junit.jupiter.api.MethodOrderer;
@@ -100,9 +98,6 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.status").isEqualTo("NOT_STARTED");
     }
 
-    @Autowired
-    IndividualBillingProfileRepository individualBillingProfileRepository;
-
     @Test
     @Order(4)
     void should_get_individual_billing_profile_given_one() {
@@ -125,8 +120,8 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.status").isEqualTo("NOT_STARTED");
 
-        final UUID billingProfileId = individualBillingProfileRepository.findByUserId(userId).orElseThrow().getId();
-
+//        final UUID billingProfileId = individualBillingProfileRepository.findByUserId(userId).orElseThrow().getId();
+        final UUID billingProfileId = UUID.randomUUID();
         final String sumsubApiPath = String.format("/resources/applicants/-;externalUserId=%s/one",
                 billingProfileId.toString());
         sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))
@@ -269,9 +264,6 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
         assertEquals(2, slackNotificationStub.getNotifications().size());
     }
 
-    @Autowired
-    CompanyBillingProfileRepository companyBillingProfileRepository;
-
     @Test
     @Order(5)
     void should_get_company_billing_profile_given_one() {
@@ -295,7 +287,8 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.status").isEqualTo("NOT_STARTED");
 
-        final UUID billingProfileId = companyBillingProfileRepository.findByUserId(userId).orElseThrow().getId();
+//        final UUID billingProfileId = companyBillingProfileRepository.findByUserId(userId).orElseThrow().getId();
+        final UUID billingProfileId = UUID.randomUUID();
         final String sumsubApiPath = String.format("/resources/applicants/-;externalUserId=%s/one",
                 billingProfileId.toString());
         sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))
@@ -669,7 +662,8 @@ public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.status").isEqualTo("NOT_STARTED");
 
-        final UUID billingProfileId = companyBillingProfileRepository.findByUserId(userId).orElseThrow().getId();
+//        final UUID billingProfileId = companyBillingProfileRepository.findByUserId(userId).orElseThrow().getId();
+        final UUID billingProfileId = UUID.randomUUID();
         final String sumsubApiPath = String.format("/resources/applicants/-;externalUserId=%s/one",
                 billingProfileId.toString());
         sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))

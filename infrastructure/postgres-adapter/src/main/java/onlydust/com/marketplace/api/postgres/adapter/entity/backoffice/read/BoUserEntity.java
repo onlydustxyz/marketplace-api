@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import onlydust.com.marketplace.project.domain.model.OldVerificationStatus;
 import onlydust.com.marketplace.project.domain.view.backoffice.UserView;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -63,7 +62,6 @@ public class BoUserEntity {
     List<String> languages;
     String tcAcceptedAt;
     ZonedDateTime onboardingCompletedAt;
-    String verificationStatus;
     Boolean usEntity;
 
     public UserView toView() {
@@ -105,15 +103,6 @@ public class BoUserEntity {
                 .tcAcceptedAt(tcAcceptedAt)
                 .onboardingCompletedAt(onboardingCompletedAt)
                 .usEntity(usEntity)
-                .oldVerificationStatus(switch (this.verificationStatus) {
-                    case "NOT_STARTED" -> OldVerificationStatus.NOT_STARTED;
-                    case "STARTED" -> OldVerificationStatus.STARTED;
-                    case "UNDER_REVIEW" -> OldVerificationStatus.UNDER_REVIEW;
-                    case "VERIFIED" -> OldVerificationStatus.VERIFIED;
-                    case "REJECTED" -> OldVerificationStatus.REJECTED;
-                    case "CLOSED" -> OldVerificationStatus.CLOSED;
-                    default -> OldVerificationStatus.NOT_STARTED;
-                })
                 .build();
     }
 }

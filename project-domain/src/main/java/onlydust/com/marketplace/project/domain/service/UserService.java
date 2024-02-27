@@ -13,7 +13,6 @@ import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
-import onlydust.com.marketplace.project.domain.port.output.OldBillingProfileStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.view.*;
@@ -37,7 +36,6 @@ public class UserService implements UserFacadePort {
     private final ProjectStoragePort projectStoragePort;
     private final GithubSearchPort githubSearchPort;
     private final ImageStoragePort imageStoragePort;
-    private final OldBillingProfileStoragePort oldBillingProfileStoragePort;
     private final AccountingUserObserverPort accountingUserObserverPort;
 
     @Override
@@ -48,10 +46,9 @@ public class UserService implements UserFacadePort {
                 .map(user -> {
                     final var payoutInformationById = userStoragePort.getPayoutSettingsById(user.getId());
                     user.setHasValidPayoutInfos(payoutInformationById.isValid());
-                    user.setOldBillingProfileType(oldBillingProfileStoragePort.getBillingProfileTypeForUser(user.getId()).orElse(OldBillingProfileType.INDIVIDUAL));
                     if (payoutInformationById.hasPendingPayments()) {
-                        user.setHasValidBillingProfile(oldBillingProfileStoragePort.hasValidBillingProfileForUserAndType(user.getId(),
-                                user.getOldBillingProfileType()));
+                        // TODO : check billing profile statuses
+                        user.setHasValidBillingProfile(false);
                     }
                     if (!readOnly)
                         userStoragePort.updateUserLastSeenAt(user.getId(), dateProvider.now());
@@ -69,7 +66,6 @@ public class UserService implements UserFacadePort {
                             .githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl())
                             .githubLogin(githubUserIdentity.getGithubLogin())
                             .githubEmail(githubUserIdentity.getEmail())
-                            .oldBillingProfileType(OldBillingProfileType.INDIVIDUAL)
                             .build();
                     final User createdUser = userStoragePort.createUser(user);
                     user = user.toBuilder()
@@ -140,11 +136,6 @@ public class UserService implements UserFacadePort {
                         .githubEmail(githubUserProfile.getEmail())
                         .build()).orElseThrow(() -> OnlyDustException.notFound(String.format("Github user %s to update was not found",
                         user.getGithubUserId()))));
-    }
-
-    @Override
-    public List<OldBillingProfile> oldGetBillingProfiles(UUID id, Long githubUserId) {
-        return oldBillingProfileStoragePort.all(id, githubUserId);
     }
 
     @Override
@@ -246,40 +237,5 @@ public class UserService implements UserFacadePort {
             return false;
         }
         return true;
-    }
-
-    @Override
-    @Transactional
-    public OldCompanyBillingProfile getCompanyBillingProfile(UUID userId) {
-        return oldBillingProfileStoragePort.findCompanyProfileForUser(userId)
-                .orElseGet(() -> {
-                    OldCompanyBillingProfile newCompanyBillingProfile = OldCompanyBillingProfile.initForUser(userId);
-                    oldBillingProfileStoragePort.saveCompanyProfileForUser(newCompanyBillingProfile);
-                    oldBillingProfileStoragePort.saveProfileTypeForUser(OldBillingProfileType.COMPANY, userId);
-                    return newCompanyBillingProfile;
-                });
-    }
-
-    @Override
-    @Transactional
-    public OldIndividualBillingProfile getIndividualBillingProfile(UUID userId) {
-        return oldBillingProfileStoragePort.findIndividualBillingProfile(userId)
-                .orElseGet(() -> {
-                    OldIndividualBillingProfile individualBillingProfile = OldIndividualBillingProfile.initForUser(userId);
-                    oldBillingProfileStoragePort.saveIndividualProfileForUser(individualBillingProfile);
-                    oldBillingProfileStoragePort.saveProfileTypeForUser(OldBillingProfileType.INDIVIDUAL, userId);
-                    return individualBillingProfile;
-                });
-    }
-
-    @Override
-    @Transactional
-    public void updateBillingProfileType(UUID userId, OldBillingProfileType oldBillingProfileType) {
-        oldBillingProfileStoragePort.updateBillingProfileType(userId, oldBillingProfileType);
-        if (oldBillingProfileType.equals(OldBillingProfileType.COMPANY)) {
-            accountingUserObserverPort.onBillingProfileSelected(userId, getCompanyBillingProfile(userId));
-        } else {
-            accountingUserObserverPort.onBillingProfileSelected(userId, getIndividualBillingProfile(userId));
-        }
     }
 }

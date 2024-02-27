@@ -78,7 +78,7 @@ public class BillingProfileVerificationService implements BillingProfileVerifica
                 .build();
     }
 
-    private VerificationStatus computeBillingProfileStatusFromKybAndChildrenKycs(VerificationStatus kybStatus, List<VerificationStatus> childrenKycStatus) {
+    protected VerificationStatus computeBillingProfileStatusFromKybAndChildrenKycs(VerificationStatus kybStatus, List<VerificationStatus> childrenKycStatus) {
         if (isNull(childrenKycStatus) || childrenKycStatus.isEmpty()) {
             return kybStatus;
         }

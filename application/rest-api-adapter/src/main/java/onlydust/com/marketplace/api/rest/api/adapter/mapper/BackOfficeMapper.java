@@ -209,14 +209,6 @@ public interface BackOfficeMapper {
                         .tcAcceptedAt(user.getTcAcceptedAt())
                         .onboardingCompletedAt(user.getOnboardingCompletedAt())
                         .usEntity(user.getUsEntity())
-                        .verificationStatus(switch (user.getOldVerificationStatus()) {
-                            case NOT_STARTED -> VerificationStatus.NOT_STARTED;
-                            case STARTED -> VerificationStatus.STARTED;
-                            case REJECTED -> VerificationStatus.REJECTED;
-                            case UNDER_REVIEW -> VerificationStatus.UNDER_REVIEW;
-                            case CLOSED -> VerificationStatus.CLOSED;
-                            case VERIFIED -> VerificationStatus.VERIFIED;
-                        })
                 ).toList())
                 .totalPageNumber(userPage.getTotalPageNumber())
                 .totalItemNumber(userPage.getTotalItemNumber())

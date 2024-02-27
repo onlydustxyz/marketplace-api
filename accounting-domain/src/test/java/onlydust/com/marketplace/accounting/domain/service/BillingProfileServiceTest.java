@@ -65,7 +65,7 @@ class BillingProfileServiceTest {
     class GivenCallerIsNotTheBillingProfileAdmin {
         @BeforeEach
         void setup() {
-            when(billingProfileStoragePort.oldIsAdmin(userId, billingProfileId)).thenReturn(false);
+            when(billingProfileStoragePort.isAdmin(billingProfileId, userId)).thenReturn(false);
         }
 
         @Test
@@ -115,7 +115,7 @@ class BillingProfileServiceTest {
     class GivenUserIsBillingProfileAdmin {
         @BeforeEach
         void setup() {
-            when(billingProfileStoragePort.oldIsAdmin(userId, billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.isAdmin(billingProfileId, userId)).thenReturn(true);
         }
 
         @Test
@@ -175,7 +175,7 @@ class BillingProfileServiceTest {
         void should_prevent_invoice_upload_if_billing_profile_does_not_match() {
             // Given
             final var otherBillingProfileId = BillingProfile.Id.random();
-            when(billingProfileStoragePort.oldIsAdmin(userId, otherBillingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.isAdmin(otherBillingProfileId, userId)).thenReturn(true);
             when(billingProfileStoragePort.isMandateAccepted(otherBillingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
@@ -189,7 +189,7 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_if_mandate_is_not_accepted() {
             // Given
-            when(billingProfileStoragePort.oldIsAdmin(userId, billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.isAdmin(billingProfileId, userId)).thenReturn(true);
             when(billingProfileStoragePort.isMandateAccepted(billingProfileId)).thenReturn(false);
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
@@ -239,7 +239,7 @@ class BillingProfileServiceTest {
         void should_prevent_external_invoice_upload_if_billing_profile_does_not_match() {
             // Given
             final var otherBillingProfileId = BillingProfile.Id.random();
-            when(billingProfileStoragePort.oldIsAdmin(userId, otherBillingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.isAdmin(otherBillingProfileId, userId)).thenReturn(true);
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
             // When
@@ -252,7 +252,7 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_external_invoice_upload_if_mandate_is_accepted() {
             // Given
-            when(billingProfileStoragePort.oldIsAdmin(userId, billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.isAdmin(billingProfileId, userId)).thenReturn(true);
             when(billingProfileStoragePort.isMandateAccepted(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
@@ -319,7 +319,7 @@ class BillingProfileServiceTest {
         void should_prevent_invoice_download_if_billing_profile_does_not_match() {
             // Given
             final var otherBillingProfileId = BillingProfile.Id.random();
-            when(billingProfileStoragePort.oldIsAdmin(userId, otherBillingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.isAdmin(otherBillingProfileId, userId)).thenReturn(true);
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
             // When

@@ -2,7 +2,10 @@ package onlydust.com.marketplace.project.domain.port.input;
 
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
-import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
+import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
+import onlydust.com.marketplace.project.domain.model.UserProfile;
 import onlydust.com.marketplace.project.domain.view.*;
 
 import java.io.InputStream;
@@ -52,13 +55,6 @@ public interface UserFacadePort {
 
     URL saveAvatarImage(InputStream imageInputStream);
 
-    OldCompanyBillingProfile getCompanyBillingProfile(UUID userId);
-
-    OldIndividualBillingProfile getIndividualBillingProfile(UUID userId);
-
-    void updateBillingProfileType(UUID userId, OldBillingProfileType oldBillingProfileType);
-
     void updateGithubProfile(User authenticatedUser);
 
-    List<OldBillingProfile> oldGetBillingProfiles(UUID id, Long githubUserId);
 }

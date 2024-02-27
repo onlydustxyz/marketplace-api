@@ -6,8 +6,6 @@ import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserBillingProfileTypeRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
@@ -464,10 +462,6 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     PaymentRequestRepository paymentRequestRepository;
     @Autowired
     UserBillingProfileTypeRepository userBillingProfileTypeRepository;
-    @Autowired
-    CompanyBillingProfileRepository companyBillingProfileRepository;
-    @Autowired
-    IndividualBillingProfileRepository individualBillingProfileRepository;
 
     @Test
     void should_return_has_valid_billing_profile() {
@@ -506,11 +500,6 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .userId(user.getId())
                 .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.COMPANY)
                 .build());
-        companyBillingProfileRepository.save(CompanyBillingProfileEntity.builder()
-                .verificationStatus(OldVerificationStatusEntity.VERIFIED)
-                .id(UUID.randomUUID())
-                .userId(user.getId())
-                .build());
 
         // When
         client.get()
@@ -538,12 +527,6 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.hasValidBillingProfile").isEqualTo(false);
-
-        individualBillingProfileRepository.save(IndividualBillingProfileEntity.builder()
-                .verificationStatus(OldVerificationStatusEntity.VERIFIED)
-                .userId(user.getId())
-                .id(UUID.randomUUID())
-                .build());
 
         // When
         client.get()

@@ -709,107 +709,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/me/billing-profiles/individual:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Me
-      summary: Get my individual billing profile
-      operationId: getMyIndividualBillingProfile
-      description: |
-        Get my individual billing profile
-      responses:
-        "200":
-          description: 'My individual billing profile'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/IndividualBillingProfileResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "403":
-          $ref: '#/components/responses/ProjectForbiddenError'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-  /api/v1/me/billing-profiles/company:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Me
-      summary: Get my company billing profile
-      operationId: getMyCompanyBillingProfile
-      description: |
-        Get my company billing profile
-      responses:
-        "200":
-          description: 'My company billing profile'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CompanyBillingProfileResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "403":
-          $ref: '#/components/responses/ProjectForbiddenError'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
-  /api/v1/me/billing-profiles:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Me
-      summary: Get my billing profiles
-      operationId: oldGetMyBillingProfiles
-      description: |
-        Get my billing profiles
-      responses:
-        "200":
-          description: 'User billing profiles'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MyBillingProfilesResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "403":
-          $ref: '#/components/responses/ProjectForbiddenError'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-    patch:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Me
-      summary: Update user billing profile type
-      operationId: oldUpdateMyBillingProfileType
-      description: |
-        Update user billing profile type
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BillingProfileTypeRequest'
-      responses:
-        "204":
-          description: 'User billing profile type updated'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "403":
-          $ref: '#/components/responses/ProjectForbiddenError'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
   /api/v1/me/billing-profiles/{billingProfileId}/invitations:
     post:
       security:
@@ -843,7 +742,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v2/me/billing-profiles:
+  /api/v1/me/billing-profiles:
     get:
       security:
         - bearerAuth: [ ]
@@ -5828,81 +5727,6 @@ components:
         kyb:
           $ref: '#/components/schemas/KYBResponse'
 
-    CompanyBillingProfileResponse:
-      type: object
-      required:
-        - id
-        - status
-      properties:
-        id:
-          type: string
-          format: uuid
-        status:
-          $ref: '#/components/schemas/VerificationStatus'
-        name:
-          type: string
-        registrationNumber:
-          type: string
-        registrationDate:
-          type: string
-          format: date-time
-        address:
-          type: string
-        country:
-          deprecated: true
-          type: string
-        countryCode:
-          type: string
-          format: iso-country-code
-        usEntity:
-          type: boolean
-        subjectToEuropeVAT:
-          type: boolean
-        euVATNumber:
-          type: string
-
-    IndividualBillingProfileResponse:
-      type: object
-      required:
-        - id
-        - status
-      properties:
-        id:
-          type: string
-          format: uuid
-        status:
-          $ref: '#/components/schemas/VerificationStatus'
-        firstName:
-          type: string
-        lastName:
-          type: string
-        birthdate:
-          type: string
-          format: date-time
-        address:
-          type: string
-        country:
-          type: string
-          deprecated: true
-        countryCode:
-          type: string
-          format: iso-country-code
-        usCitizen:
-          type: boolean
-        idDocumentType:
-          type: string
-          enum:
-            - PASSPORT
-            - ID_CARD
-            - RESIDENCE_PERMIT
-            - DRIVER_LICENSE
-        idDocumentNumber:
-          type: string
-        validUntil:
-          type: string
-          format: date-time
-        idDocumentCountryCode:
-          type: string
     KYCResponse:
       type: object
       required:
