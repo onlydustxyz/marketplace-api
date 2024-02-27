@@ -5,6 +5,8 @@ import onlydust.com.backoffice.api.contract.model.CurrencyResponse;
 import onlydust.com.backoffice.api.contract.model.CurrencyType;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.HistoricalQuoteRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.RewardStatusRepository;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -32,10 +34,18 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
     @Autowired
     private CurrencyRepository currencyRepository;
 
+    @Autowired
+    private RewardRepository rewardRepository;
+
+    @Autowired
+    private RewardStatusRepository rewardStatusRepository;
+
     @Test
     @Order(0)
     void cleanup() {
         historicalQuoteRepository.deleteAll();
+        rewardStatusRepository.deleteAll();
+        rewardRepository.deleteAll();
         currencyRepository.deleteAll();
     }
 
