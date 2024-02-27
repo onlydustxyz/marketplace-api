@@ -69,4 +69,8 @@ public interface BillingProfileStoragePort {
     void saveCoworker(BillingProfile.Id billingProfileId, UserId invitedUser, BillingProfile.User.Role role, ZonedDateTime acceptedAt);
 
     Optional<BillingProfileCoworkerView> getInvitedCoworker(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId);
+
+    Optional<BillingProfileCoworkerView> getCoworker(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId);
+
+    void deleteCoworker(BillingProfile.Id billingProfileId, UserId userId);
 }

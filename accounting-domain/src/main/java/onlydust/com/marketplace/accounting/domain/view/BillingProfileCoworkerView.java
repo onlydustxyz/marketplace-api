@@ -42,7 +42,7 @@ public class BillingProfileCoworkerView {
         return role == BillingProfile.User.Role.ADMIN && billingProfileAdminCount != null && billingProfileAdminCount <= 1;
     }
 
-    private boolean hasJoined() {
+    public boolean hasJoined() {
         return joinedAt != null;
     }
 }
