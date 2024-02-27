@@ -4,11 +4,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeInvoicingManagementApi;
+import onlydust.com.backoffice.api.contract.model.InvoiceInternalStatus;
 import onlydust.com.backoffice.api.contract.model.InvoicePage;
 import onlydust.com.backoffice.api.contract.model.PatchInvoiceRequest;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -32,13 +34,16 @@ public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicing
     private final InvoiceFacadePort invoiceFacadePort;
     private final QueryParamTokenAuthenticationService.Config queryParamTokenAuthenticationConfig;
     final static Integer MAX_PAGE_SIZE = Integer.MAX_VALUE;
+    final static List<InvoiceInternalStatus> ALL_STATUSES = List.of(InvoiceInternalStatus.values());
 
     @Override
-    public ResponseEntity<InvoicePage> getInvoicePage(Integer pageIndex, Integer pageSize, List<UUID> invoiceIds) {
+    public ResponseEntity<InvoicePage> getInvoicePage(Integer pageIndex, Integer pageSize, List<UUID> invoiceIds,
+                                                      List<InvoiceInternalStatus> internalStatuses) {
         final int sanitizedPageSize = sanitizePageSize(pageSize, MAX_PAGE_SIZE);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
-        final var page = invoiceFacadePort.findAllExceptDrafts(
+        final var page = invoiceFacadePort.findAll(
                 Optional.ofNullable(invoiceIds).orElse(List.of()).stream().map(Invoice.Id::of).toList(),
+                Optional.ofNullable(internalStatuses).orElse(ALL_STATUSES).stream().map(BackOfficeMapper::mapInvoiceStatus).toList(),
                 sanitizedPageIndex,
                 sanitizedPageSize
         );
