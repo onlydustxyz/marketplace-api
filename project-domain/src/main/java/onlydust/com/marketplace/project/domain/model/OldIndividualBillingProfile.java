@@ -1,8 +1,9 @@
 package onlydust.com.marketplace.project.domain.model;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NonNull;
 
-import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -28,17 +29,6 @@ public class OldIndividualBillingProfile {
     String reviewMessageForApplicant;
     String externalApplicantId;
 
-    @Getter(AccessLevel.NONE)
-    ZonedDateTime invoiceMandateAcceptedAt;
-    @Getter(AccessLevel.NONE)
-    ZonedDateTime invoiceMandateLatestVersionDate;
-
-    public boolean isInvoiceMandateAccepted() {
-        return invoiceMandateAcceptedAt != null &&
-               invoiceMandateLatestVersionDate != null &&
-               invoiceMandateAcceptedAt.isAfter(invoiceMandateLatestVersionDate);
-    }
-
     public static OldIndividualBillingProfile initForUser(final UUID userId) {
         return OldIndividualBillingProfile.builder()
                 .id(UUID.randomUUID())
@@ -53,5 +43,4 @@ public class OldIndividualBillingProfile {
         RESIDENCE_PERMIT,
         DRIVER_LICENSE
     }
-
 }
