@@ -12,9 +12,8 @@ public class OldBillingProfile {
     final @NonNull UUID id;
     final @NonNull OldBillingProfileType type;
     final @NonNull String name;
-    final boolean invoiceMandateAccepted;
+    final Boolean invoiceMandateAccepted;
     @NonNull Integer rewardCount = 0;
-
 
     public static OldBillingProfile of(OldCompanyBillingProfile billingProfile) {
         return new OldBillingProfile(billingProfile.getId(),
@@ -27,6 +26,6 @@ public class OldBillingProfile {
         return new OldBillingProfile(billingProfile.getId(),
                 OldBillingProfileType.INDIVIDUAL,
                 "Personal",
-                billingProfile.isInvoiceMandateAccepted());
+                null);
     }
 }

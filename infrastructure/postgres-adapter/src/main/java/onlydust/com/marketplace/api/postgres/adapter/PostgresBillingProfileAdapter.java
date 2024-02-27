@@ -14,8 +14,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileU
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.project.domain.model.OldCompanyBillingProfile;
-import onlydust.com.marketplace.project.domain.model.OldIndividualBillingProfile;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,17 +53,10 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional
     public void updateInvoiceMandateAcceptanceDate(@NonNull final BillingProfile.Id billingProfileId, @NonNull final ZonedDateTime acceptanceDate) {
-        companyBillingProfileRepository.findById(billingProfileId.value())
-                .ifPresentOrElse(companyBillingProfileEntity -> {
-                    companyBillingProfileEntity.setInvoiceMandateAcceptedAt(Date.from(acceptanceDate.toInstant()));
-                    companyBillingProfileRepository.save(companyBillingProfileEntity);
-                }, () -> individualBillingProfileRepository.findById(billingProfileId.value())
-                        .ifPresentOrElse(individualBillingProfileEntity -> {
-                            individualBillingProfileEntity.setInvoiceMandateAcceptedAt(Date.from(acceptanceDate.toInstant()));
-                            individualBillingProfileRepository.save(individualBillingProfileEntity);
-                        }, () -> {
-                            throw notFound("Billing profile %s not found".formatted(billingProfileId));
-                        }));
+        final var billingProfile = companyBillingProfileRepository.findById(billingProfileId.value())
+                .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
+        billingProfile.setInvoiceMandateAcceptedAt(Date.from(acceptanceDate.toInstant()));
+        companyBillingProfileRepository.save(billingProfile);
     }
 
     @Override
@@ -121,15 +112,14 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     public boolean isMandateAccepted(BillingProfile.Id billingProfileId) {
-        return companyBillingProfileRepository.findById(billingProfileId.value())
-                .map(entity -> entity.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate()))
-                .map(OldCompanyBillingProfile::isInvoiceMandateAccepted)
-                .orElseGet(() -> individualBillingProfileRepository.findById(billingProfileId.value())
-                        .map(entity -> entity.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate()))
-                        .map(OldIndividualBillingProfile::isInvoiceMandateAccepted)
-                        .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId))));
-    }
+        if (individualBillingProfileRepository.findById(billingProfileId.value()).isPresent()) return true;
 
+        final var billingProfile = companyBillingProfileRepository.findById(billingProfileId.value())
+                .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
+
+        return billingProfile.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate())
+                .isInvoiceMandateAccepted();
+    }
 
     @Override
     @Transactional(readOnly = true)
