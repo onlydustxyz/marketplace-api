@@ -23,6 +23,10 @@ import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.view.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
+import onlydust.com.marketplace.project.domain.model.Currency;
+import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
+import onlydust.com.marketplace.project.domain.view.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -325,8 +329,14 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Transactional(readOnly = true)
     public List<Contributor> searchContributorsByLogin(Set<Long> reposIds, String login,
                                                        int maxContributorCountToReturn) {
-        return customContributorRepository.findReposContributorsByLogin(reposIds, login, maxContributorCountToReturn)
-                .stream()
+        List<ContributorViewEntity> contributors;
+        if (reposIds == null || reposIds.isEmpty()) {
+            contributors = customContributorRepository.findAllContributorsByLogin(login, maxContributorCountToReturn);
+        } else {
+            contributors = customContributorRepository.findReposContributorsByLogin(reposIds, login, maxContributorCountToReturn);
+        }
+
+        return contributors.stream()
                 .map(entity -> Contributor.builder()
                         .id(GithubUserIdentity.builder()
                                 .githubUserId(entity.getGithubUserId())

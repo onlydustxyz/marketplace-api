@@ -19,6 +19,7 @@ import java.util.UUID;
 
 @AllArgsConstructor
 public class ContributorService implements ContributorFacadePort {
+    private static final int MAX_INTERNAL_CONTRIBUTOR_COUNT_TO_RETURN = 200;
     private final ProjectStoragePort projectStorage;
     private final GithubSearchPort githubSearchPort;
     private final UserStoragePort userStoragePort;
@@ -31,6 +32,8 @@ public class ContributorService implements ContributorFacadePort {
                                                                          int maxInternalContributorCountToTriggerExternalSearch,
                                                                          int maxInternalContributorCountToReturn,
                                                                          boolean externalSearchOnly) {
+
+        maxInternalContributorCountToReturn = Math.min(maxInternalContributorCountToReturn, MAX_INTERNAL_CONTRIBUTOR_COUNT_TO_RETURN);
 
         final List<Contributor> internalContributors = externalSearchOnly ? List.of() :
                 searchInternalContributors(projectId, repoIds, login, maxInternalContributorCountToReturn);
@@ -81,8 +84,7 @@ public class ContributorService implements ContributorFacadePort {
             searchInRepoIds.addAll(projectStorage.getProjectRepoIds(projectId));
         }
 
-        return searchInRepoIds.isEmpty() ? List.of() :
-                userStoragePort.searchContributorsByLogin(searchInRepoIds, login, maxInternalContributorCountToReturn);
+        return userStoragePort.searchContributorsByLogin(searchInRepoIds, login, maxInternalContributorCountToReturn);
     }
 
     private List<Contributor> getExternalContributors(String login) {

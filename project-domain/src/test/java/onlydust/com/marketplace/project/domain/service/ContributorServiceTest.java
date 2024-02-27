@@ -142,6 +142,29 @@ public class ContributorServiceTest {
     }
 
     @Test
+    void should_work_without_project_id_and_without_repo_ids() {
+        // Given
+        final List<Contributor> internalContributors = List.of(
+                contributorFaker.contributor(),
+                contributorFaker.contributor(),
+                contributorFaker.contributor(),
+                contributorFaker.contributor(),
+                contributorFaker.contributor()
+        );
+
+        // When
+        when(userStoragePort.searchContributorsByLogin(eq(Set.of()), eq(null), eq(100))).thenReturn(internalContributors);
+        final var contributors = contributorService.searchContributors(null, null, null, 5, 100,
+                false);
+
+        // Then
+        verify(githubSearchPort, never()).searchUsersByLogin(anyString());
+        verify(userStoragePort, never()).getUserByGithubId(anyLong());
+        assertThat(contributors.getLeft()).containsExactlyElementsOf(internalContributors);
+        assertThat(contributors.getRight()).isEmpty();
+    }
+
+    @Test
     void should_work_with_externalSearchOnly() {
         // Given
         final String login = faker.name().username();
