@@ -26,7 +26,7 @@ public class JobScheduler {
     private final CurrencyFacadePort currencyFacadePort;
     private final UserFacadePort userFacadePort;
     private final Properties cronProperties;
-    private final OutboxConsumerJob billingProfileOutboxJob;
+    private final OutboxConsumerJob billingProfileVerificationOutboxJob;
     private final AccountingObserver accountingObserver;
 
     @Scheduled(fixedDelayString = "${application.cron.notification-job-delay}")
@@ -74,7 +74,7 @@ public class JobScheduler {
     @Scheduled(fixedDelayString = "${application.cron.billing-profile-verification-job}")
     public void verifyBillingProfile() {
         LOGGER.debug("Verifying billing profiles");
-        billingProfileOutboxJob.run();
+        billingProfileVerificationOutboxJob.run();
     }
 
     @Scheduled(fixedDelayString = "${application.cron.refresh-reward-usd-equivalents-job-delay}")

@@ -3,11 +3,9 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -72,6 +70,7 @@ public class BillingProfileEntity {
         return BillingProfileEntity.builder()
                 .id(billingProfile.id().value())
                 .name(billingProfile.name())
+                .verificationStatus(VerificationStatusEntity.fromDomain(billingProfile.status()))
                 .type(switch (billingProfile.type()) {
                     case COMPANY -> Type.COMPANY;
                     case SELF_EMPLOYED -> Type.SELF_EMPLOYED;
