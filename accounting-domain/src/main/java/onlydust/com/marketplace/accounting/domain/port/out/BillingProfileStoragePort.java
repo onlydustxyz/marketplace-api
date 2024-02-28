@@ -15,8 +15,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface BillingProfileStoragePort {
-    boolean oldIsAdmin(UserId userId, BillingProfile.Id billingProfileId);
-
     void updateInvoiceMandateAcceptanceDate(BillingProfile.Id billingProfileId, ZonedDateTime now);
 
     void save(IndividualBillingProfile billingProfile);
@@ -26,8 +24,6 @@ public interface BillingProfileStoragePort {
     void save(CompanyBillingProfile billingProfile);
 
     void savePayoutPreference(BillingProfile.Id billingProfileId, UserId userId, ProjectId projectId);
-
-    boolean isMandateAccepted(BillingProfile.Id billingProfileId);
 
     Optional<ShortBillingProfileView> findIndividualBillingProfileForUser(UserId ownerId);
 

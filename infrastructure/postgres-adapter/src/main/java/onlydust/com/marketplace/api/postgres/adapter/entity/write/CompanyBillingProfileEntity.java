@@ -12,6 +12,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -56,7 +57,7 @@ public class CompanyBillingProfileEntity {
     @EqualsAndHashCode.Exclude
     private Date updatedAt;
 
-    public OldCompanyBillingProfile toDomain(@NonNull Date invoiceMandateLatestVersionDate) {
+    public OldCompanyBillingProfile toDomain(@NonNull ZonedDateTime invoiceMandateLatestVersionDate) {
         return OldCompanyBillingProfile.builder()
                 .id(this.id)
                 .status(this.verificationStatus.toDomain())
@@ -72,7 +73,7 @@ public class CompanyBillingProfileEntity {
                 .reviewMessageForApplicant(this.reviewMessage)
                 .externalApplicantId(this.applicantId)
                 .invoiceMandateAcceptedAt(this.invoiceMandateAcceptedAt != null ? this.invoiceMandateAcceptedAt.toInstant().atZone(UTC) : null)
-                .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate.toInstant().atZone(UTC))
+                .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                 .build();
     }
 

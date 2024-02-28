@@ -4,22 +4,7 @@ alter table rewards
 drop view accounting.reward_statuses;
 
 CREATE VIEW accounting.reward_statuses AS
-WITH selected_billing_profile AS
-         (SELECT ubpt.user_id,
-                 ubpt.billing_profile_type = 'INDIVIDUAL' as is_individual,
-                 CASE
-                     WHEN ubpt.billing_profile_type = 'INDIVIDUAL' THEN ibp.verification_status = 'VERIFIED'
-                     ELSE cbp.verification_status = 'VERIFIED'
-                     END                                  as verified,
-                 CASE
-                     WHEN ubpt.billing_profile_type = 'INDIVIDUAL' THEN ibp.us_citizen
-                     ELSE cbp.us_entity
-                     END                                  as us_resident
-          FROM user_billing_profile_types ubpt
-                   LEFT JOIN individual_billing_profiles ibp on ibp.user_id = ubpt.user_id
-                   LEFT JOIN company_billing_profiles cbp on cbp.user_id = ubpt.user_id),
-
-     user_payout_networks AS
+WITH user_payout_networks AS
          (SELECT coalesce(w.user_id, ba.user_id)                                      AS user_id,
                  CASE WHEN w.user_id IS NOT NULL THEN array_agg(w.network) END ||
                  CASE WHEN ba.user_id IS NOT NULL THEN '{sepa, swift}'::network[] END AS networks
@@ -38,22 +23,25 @@ WITH selected_billing_profile AS
 
      aggregated_reward_status_data AS
          (SELECT reward_id,
-                 bp.is_individual,
-                 bp.verified                         as kycb_verified,
-                 bp.us_resident                      as us_recipient,
-                 c.code                              as reward_currency,
-                 coalesce(yutpr.yearly_usd_total, 0) as current_year_usd_total,
-                 rs.amount_usd_equivalent            as reward_usd_equivalent,
-                 upn.networks @> rs.networks         as payout_info_filled,
+                 bp.type = 'INDIVIDUAL'                  as is_individual,
+                 bp.verification_status = 'VERIFIED'     as kycb_verified,
+                 coalesce(kyc.us_citizen, kyb.us_entity) as us_recipient,
+                 c.code                                  as reward_currency,
+                 coalesce(yutpr.yearly_usd_total, 0)     as current_year_usd_total,
+                 rs.amount_usd_equivalent                as reward_usd_equivalent,
+                 upn.networks @> rs.networks             as payout_info_filled,
                  rs.sponsor_has_enough_fund,
                  rs.unlock_date,
-                 rs.invoice_received_at              as payment_requested_at,
+                 rs.invoice_received_at                  as payment_requested_at,
                  rs.paid_at
           FROM accounting.reward_status_data rs
                    JOIN rewards r on r.id = rs.reward_id
                    JOIN currencies c on c.id = r.currency_id
                    LEFT JOIN iam.users u on u.github_user_id = r.recipient_id
-                   LEFT JOIN selected_billing_profile bp on bp.user_id = u.id
+                   LEFT JOIN accounting.payout_preferences pp on pp.project_id = r.project_id and pp.user_id = u.id
+                   LEFT JOIN accounting.billing_profiles bp ON bp.id = pp.billing_profile_id
+                   LEFT JOIN accounting.kyc kyc on kyc.billing_profile_id = bp.id
+                   LEFT JOIN accounting.kyb kyb on kyb.billing_profile_id = bp.id
                    LEFT JOIN user_payout_networks upn on upn.user_id = u.id
                    LEFT JOIN yearly_usd_total_per_recipient yutpr on yutpr.recipient_id = r.recipient_id)
 
