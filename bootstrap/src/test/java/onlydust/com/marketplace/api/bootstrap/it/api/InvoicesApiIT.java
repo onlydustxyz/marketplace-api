@@ -5,9 +5,12 @@ import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.BillingProfileInvoicesPageResponse;
+import onlydust.com.marketplace.api.contract.model.BillingProfileResponse;
 import onlydust.com.marketplace.api.contract.model.MyBillingProfilesResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
@@ -46,42 +49,54 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     InvoiceRepository invoiceRepository;
     @Autowired
     EntityManagerFactory entityManagerFactory;
+    @Autowired
+    BillingProfileRepository billingProfileRepository;
 
     UserAuthHelper.AuthenticatedUser antho;
     UserAuthHelper.AuthenticatedUser olivier;
     UUID billingProfileId;
+
+    private static final UUID PROJECT_ID = UUID.fromString("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
 
     @BeforeEach
     void setUp() {
         antho = userAuthHelper.authenticateAnthony();
         olivier = userAuthHelper.authenticateOlivier();
 
-        // TODO
-//        client.patch()
-//                .uri(getApiURI(ME_PATCH_BILLING_PROFILE_TYPE))
-//                .header("Authorization", "Bearer " + antho.jwt())
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .bodyValue("""
-//                        {
-//                          "type": "COMPANY"
-//                        }
-//                        """)
-//                // Then
-//                .exchange()
-//                .expectStatus()
-//                .is2xxSuccessful();
+        billingProfileId = client.post()
+                .uri(getApiURI(BILLING_PROFILES_POST))
+                .header("Authorization", "Bearer " + antho.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "name": "company",
+                          "type": "COMPANY"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(BillingProfileResponse.class).returnResult().getResponseBody().getId();
 
-        // TODO
-//        final var companyBillingProfile = companyBillingProfileRepository.findByUserId(antho.user().getId()).orElseThrow();
-//        companyBillingProfile.setName("My company");
-//        companyBillingProfile.setCountry("FRA");
-//        companyBillingProfile.setAddress("My address");
-//        companyBillingProfile.setRegistrationNumber("123456");
-//        companyBillingProfile.setSubjectToEuVAT(true);
-//        companyBillingProfile.setVerificationStatus(OldVerificationStatusEntity.VERIFIED);
-//        companyBillingProfileRepository.save(companyBillingProfile);
-//
-//        billingProfileId = companyBillingProfile.getId();
+        client.put()
+                .uri(getApiURI(ME_PUT_PAYOUT_PREFERENCES))
+                .header("Authorization", "Bearer " + antho.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "billingProfileId": "%s",
+                          "projectId": "%s"
+                        }
+                        """.formatted(billingProfileId, PROJECT_ID))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        final var billingProfile = billingProfileRepository.findById(billingProfileId).orElseThrow();
+        billingProfile.setVerificationStatus(VerificationStatusEntity.VERIFIED);
+        billingProfileRepository.save(billingProfile);
     }
 
 
@@ -631,20 +646,19 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful();
 
         // Then switch billing profile type
-        // TODO
-//        client.patch()
-//                .uri(getApiURI(ME_PATCH_BILLING_PROFILE_TYPE))
-//                .header("Authorization", "Bearer " + antho.jwt())
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .bodyValue("""
-//                        {
-//                          "type": "INDIVIDUAL"
-//                        }
-//                        """)
-//                // Then
-//                .exchange()
-//                .expectStatus()
-//                .is2xxSuccessful();
+        client.patch()
+                .uri(getApiURI(ME_PATCH_BILLING_PROFILE_TYPE))
+                .header("Authorization", "Bearer " + antho.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "type": "INDIVIDUAL"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
 
         final var individualBillingProfileId = client.get()
                 .uri(ME_BILLING_PROFILES)

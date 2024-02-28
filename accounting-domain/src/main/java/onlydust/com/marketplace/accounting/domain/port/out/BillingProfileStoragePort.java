@@ -26,8 +26,6 @@ public interface BillingProfileStoragePort {
 
     void savePayoutPreference(BillingProfile.Id billingProfileId, UserId userId, ProjectId projectId);
 
-    boolean isMandateAccepted(BillingProfile.Id billingProfileId);
-
     Optional<ShortBillingProfileView> findIndividualBillingProfileForUser(UserId ownerId);
 
     List<ShortBillingProfileView> findAllBillingProfilesForUser(UserId userId);
@@ -68,4 +66,8 @@ public interface BillingProfileStoragePort {
     void saveCoworker(BillingProfile.Id billingProfileId, UserId invitedUser, BillingProfile.User.Role role, ZonedDateTime acceptedAt);
 
     Optional<BillingProfileCoworkerView> getInvitedCoworker(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId);
+
+    Optional<BillingProfileCoworkerView> getCoworker(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId);
+
+    void deleteCoworker(BillingProfile.Id billingProfileId, UserId userId);
 }

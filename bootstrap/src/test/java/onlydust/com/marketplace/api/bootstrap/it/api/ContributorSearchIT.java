@@ -105,19 +105,6 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_fetch_external_contributors_even_without_project_nor_repo() {
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
-        client.get()
-                .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, "login", login))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
-                .exchange()
-                .expectStatus().is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.internalContributors.length()").isEqualTo(0)
-                .jsonPath("$.externalContributors.length()").isEqualTo(5);
-    }
-
-    @Test
     void should_fetch_external_contributors_when_externalSearchOnly_is_true() {
         final String jwt = userAuthHelper.authenticateAnthony().jwt();
         client.get()
@@ -167,13 +154,16 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_return_400_when_no_param_is_provided() {
+    void should_return_all_when_no_param_is_provided() {
         final String jwt = userAuthHelper.authenticateAnthony().jwt();
         client.get()
-                .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS))
+                .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, "maxInternalContributorCountToReturn", "5000"))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .exchange()
-                .expectStatus().isBadRequest();
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.internalContributors.length()").isEqualTo(200)
+                .jsonPath("$.externalContributors.length()").isEqualTo(0);
     }
 
     @Test

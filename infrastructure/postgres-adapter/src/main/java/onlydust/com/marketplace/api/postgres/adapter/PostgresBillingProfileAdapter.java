@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.time.ZonedDateTime.now;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
 public class PostgresBillingProfileAdapter implements BillingProfileStoragePort {
@@ -43,11 +44,10 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional
     public void updateInvoiceMandateAcceptanceDate(@NonNull final BillingProfile.Id billingProfileId, @NonNull final ZonedDateTime acceptanceDate) {
-        // TODO
-//        final var billingProfile = companyBillingProfileRepository.findById(billingProfileId.value())
-//                .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
-//        billingProfile.setInvoiceMandateAcceptedAt(Date.from(acceptanceDate.toInstant()));
-//        companyBillingProfileRepository.save(billingProfile);
+        final var billingProfile = billingProfileRepository.findById(billingProfileId.value())
+                .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
+        billingProfile.setInvoiceMandateAcceptedAt(Date.from(acceptanceDate.toInstant()));
+        billingProfileRepository.save(billingProfile);
     }
 
     @Override
@@ -102,20 +102,6 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     }
 
     @Override
-    public boolean isMandateAccepted(BillingProfile.Id billingProfileId) {
-
-        // TODO
-//        if (individualBillingProfileRepository.findById(billingProfileId.value()).isPresent()) return true;
-//
-//        final var billingProfile = companyBillingProfileRepository.findById(billingProfileId.value())
-//                .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
-//
-//        return billingProfile.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate())
-//                .isInvoiceMandateAccepted();
-        return false;
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public boolean isUserMemberOf(BillingProfile.Id billingProfileId, UserId userId) {
         return billingProfileRepository.findBillingProfilesForUserId(userId.value()).stream()
@@ -133,6 +119,8 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional(readOnly = true)
     public Optional<BillingProfileView> findById(BillingProfile.Id billingProfileId) {
+        final var invoiceMandateLatestVersionDate = globalSettingsRepository.get().getInvoiceMandateLatestVersionDate();
+
         return billingProfileRepository.findById(billingProfileId.value()).map(billingProfileEntity -> switch (billingProfileEntity.getType()) {
             case INDIVIDUAL -> {
                 BillingProfileView billingProfileView = BillingProfileView.builder()
@@ -153,6 +141,8 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                 BillingProfileView billingProfileView = BillingProfileView.builder().type(BillingProfile.Type.COMPANY)
                         .id(billingProfileId)
                         .name(billingProfileEntity.getName())
+                        .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
+                        .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                         .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
                         .build();
                 final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
@@ -167,6 +157,8 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                 BillingProfileView billingProfileView = BillingProfileView.builder().type(BillingProfile.Type.SELF_EMPLOYED)
                         .id(billingProfileId)
                         .name(billingProfileEntity.getName())
+                        .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
+                        .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                         .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
                         .build();
                 final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
@@ -292,5 +284,16 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     public Optional<BillingProfileCoworkerView> getInvitedCoworker(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId) {
         return billingProfileUserViewRepository.findInvitedUserByBillingProfileIdAndGithubId(billingProfileId.value(), invitedGithubUserId.value())
                 .map(BillingProfileUserViewEntity::toView);
+    }
+
+    @Override
+    public Optional<BillingProfileCoworkerView> getCoworker(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId) {
+        return billingProfileUserViewRepository.findUserByBillingProfileIdAndGithubId(billingProfileId.value(), invitedGithubUserId.value())
+                .map(BillingProfileUserViewEntity::toView);
+    }
+
+    @Override
+    public void deleteCoworker(BillingProfile.Id billingProfileId, UserId userId) {
+        billingProfileUserRepository.deleteById(new BillingProfileUserEntity.PrimaryKey(userId.value(), billingProfileId.value()));
     }
 }

@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import lombok.*;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -21,6 +22,10 @@ public class BankAccountEntity {
 
     @Id
     UUID billingProfileId;
+    @OneToOne
+    @JoinColumn(name = "billingProfile", insertable = false, updatable = false)
+    BillingProfileEntity billingProfile;
+
     String bic;
     String number;
     @CreationTimestamp
@@ -32,5 +37,7 @@ public class BankAccountEntity {
     @EqualsAndHashCode.Exclude
     private Date updatedAt;
 
-
+    public Invoice.BankAccount forInvoice() {
+        return new Invoice.BankAccount(bic, number);
+    }
 }

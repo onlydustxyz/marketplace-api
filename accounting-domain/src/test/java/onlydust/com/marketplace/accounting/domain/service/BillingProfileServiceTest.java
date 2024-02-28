@@ -81,8 +81,10 @@ class BillingProfileServiceTest {
 
         @Test
         void should_prevent_invoice_upload() {
+            // Given
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
+
             // When
-            when(billingProfileStoragePort.isMandateAccepted(billingProfileId)).thenReturn(true);
             assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
@@ -161,7 +163,7 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_if_not_found() {
             // Given
-            when(billingProfileStoragePort.isMandateAccepted(billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
 
             // When
@@ -176,7 +178,7 @@ class BillingProfileServiceTest {
             // Given
             final var otherBillingProfileId = BillingProfile.Id.random();
             when(billingProfileStoragePort.isAdmin(otherBillingProfileId, userId)).thenReturn(true);
-            when(billingProfileStoragePort.isMandateAccepted(otherBillingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.findById(otherBillingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(otherBillingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
             // When
@@ -186,103 +188,19 @@ class BillingProfileServiceTest {
                     .hasMessage("Invoice %s not found for billing profile %s".formatted(invoice.id(), otherBillingProfileId));
         }
 
-        @Test
-        void should_prevent_invoice_upload_if_mandate_is_not_accepted() {
-            // Given
-            when(billingProfileStoragePort.isAdmin(billingProfileId, userId)).thenReturn(true);
-            when(billingProfileStoragePort.isMandateAccepted(billingProfileId)).thenReturn(false);
-            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
-
-            // When
-            assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
-                    // Then
-                    .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("Invoice mandate has not been accepted for billing profile %s".formatted(billingProfileId));
-        }
-
-        @SneakyThrows
-        @Test
-        void should_upload_invoice_and_save_url() {
-            // Given
-            when(billingProfileStoragePort.isMandateAccepted(billingProfileId)).thenReturn(true);
-            final var url = new URL("https://" + faker.internet().url());
-            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
-            when(pdfStoragePort.upload(invoice.id() + ".pdf", pdf)).thenReturn(url);
-
-            // When
-            billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf);
-
-            // Then
-            final var invoiceCaptor = ArgumentCaptor.forClass(Invoice.class);
-            verify(invoiceStoragePort).update(invoiceCaptor.capture());
-            verify(pdfStoragePort).upload(invoice.id() + ".pdf", pdf);
-            final var invoice = invoiceCaptor.getValue();
-            assertThat(invoice.url()).isEqualTo(url);
-            verify(billingProfileObserver).onInvoiceUploaded(billingProfileId, invoice.id(), false);
-            assertThat(invoice.originalFileName()).isNull();
-            assertThat(invoice.status()).isEqualTo(APPROVED);
-        }
-
-        @Test
-        void should_prevent_external_invoice_upload_if_not_found() {
-            // Given
-            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
-
-            // When
-            assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf))
-                    // Then
-                    .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("Invoice %s not found for billing profile %s".formatted(invoice.id(), billingProfileId));
-        }
 
         @Test
         void should_prevent_external_invoice_upload_if_billing_profile_does_not_match() {
             // Given
             final var otherBillingProfileId = BillingProfile.Id.random();
             when(billingProfileStoragePort.isAdmin(otherBillingProfileId, userId)).thenReturn(true);
-            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
+            when(billingProfileStoragePort.findById(otherBillingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(otherBillingProfileId).type(BillingProfile.Type.COMPANY).build()));
 
             // When
             assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, otherBillingProfileId, invoice.id(), "foo.pdf", pdf))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Invoice %s not found for billing profile %s".formatted(invoice.id(), otherBillingProfileId));
-        }
-
-        @Test
-        void should_prevent_external_invoice_upload_if_mandate_is_accepted() {
-            // Given
-            when(billingProfileStoragePort.isAdmin(billingProfileId, userId)).thenReturn(true);
-            when(billingProfileStoragePort.isMandateAccepted(billingProfileId)).thenReturn(true);
-            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
-
-            // When
-            assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf))
-                    // Then
-                    .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("External invoice upload is forbidden when mandate has been accepted (billing profile %s)".formatted(billingProfileId));
-        }
-
-        @SneakyThrows
-        @Test
-        void should_upload_external_invoice_and_save_url() {
-            // Given
-            final var url = new URL("https://" + faker.internet().url());
-            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
-            when(pdfStoragePort.upload(invoice.id() + ".pdf", pdf)).thenReturn(url);
-
-            // When
-            billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf);
-
-            // Then
-            final var invoiceCaptor = ArgumentCaptor.forClass(Invoice.class);
-            verify(invoiceStoragePort).update(invoiceCaptor.capture());
-            verify(pdfStoragePort).upload(invoice.id() + ".pdf", pdf);
-            final var invoice = invoiceCaptor.getValue();
-            assertThat(invoice.url()).isEqualTo(url);
-            verify(billingProfileObserver).onInvoiceUploaded(billingProfileId, invoice.id(), true);
-            assertThat(invoice.originalFileName()).isEqualTo("foo.pdf");
-            assertThat(invoice.status()).isEqualTo(TO_REVIEW);
         }
 
         @SneakyThrows
@@ -342,6 +260,96 @@ class BillingProfileServiceTest {
             // Then
             assertThat(invoiceDownload.fileName()).isEqualTo(invoice.number() + ".pdf");
             assertThat(invoiceDownload.data()).isEqualTo(pdf);
+        }
+
+        @Nested
+        class GivenTheMandateIsAccepted {
+            @BeforeEach
+            void setup() {
+                when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
+                when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
+            }
+
+            @Test
+            void should_prevent_external_invoice_upload() {
+                // When
+                assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf))
+                        // Then
+                        .isInstanceOf(OnlyDustException.class)
+                        .hasMessage("External invoice upload is forbidden when mandate has been accepted (billing profile %s)".formatted(billingProfileId));
+            }
+
+            @SneakyThrows
+            @Test
+            void should_upload_generated_invoice_and_save_url() {
+                // Given
+                final var url = new URL("https://" + faker.internet().url());
+                when(pdfStoragePort.upload(invoice.id() + ".pdf", pdf)).thenReturn(url);
+
+                // When
+                billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf);
+
+                // Then
+                final var invoiceCaptor = ArgumentCaptor.forClass(Invoice.class);
+                verify(invoiceStoragePort).update(invoiceCaptor.capture());
+                verify(pdfStoragePort).upload(invoice.id() + ".pdf", pdf);
+                final var invoice = invoiceCaptor.getValue();
+                assertThat(invoice.url()).isEqualTo(url);
+                verify(billingProfileObserver).onInvoiceUploaded(billingProfileId, invoice.id(), false);
+                assertThat(invoice.originalFileName()).isNull();
+                assertThat(invoice.status()).isEqualTo(APPROVED);
+            }
+        }
+
+        @Nested
+        class GivenTheMandateIsNotAccepted {
+            @BeforeEach
+            void setup() {
+                when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.COMPANY).build()));
+                when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
+            }
+
+            @Test
+            void should_prevent_generated_invoice_upload() {
+                // When
+                assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
+                        // Then
+                        .isInstanceOf(OnlyDustException.class)
+                        .hasMessage("Invoice mandate has not been accepted for billing profile %s".formatted(billingProfileId));
+            }
+
+            @SneakyThrows
+            @Test
+            void should_upload_external_invoice_and_save_url() {
+                // Given
+                final var url = new URL("https://" + faker.internet().url());
+                when(pdfStoragePort.upload(invoice.id() + ".pdf", pdf)).thenReturn(url);
+
+                // When
+                billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf);
+
+                // Then
+                final var invoiceCaptor = ArgumentCaptor.forClass(Invoice.class);
+                verify(invoiceStoragePort).update(invoiceCaptor.capture());
+                verify(pdfStoragePort).upload(invoice.id() + ".pdf", pdf);
+                final var invoice = invoiceCaptor.getValue();
+                assertThat(invoice.url()).isEqualTo(url);
+                verify(billingProfileObserver).onInvoiceUploaded(billingProfileId, invoice.id(), true);
+                assertThat(invoice.originalFileName()).isEqualTo("foo.pdf");
+                assertThat(invoice.status()).isEqualTo(TO_REVIEW);
+            }
+
+            @Test
+            void should_prevent_external_invoice_upload_if_not_found() {
+                // Given
+                when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
+
+                // When
+                assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf))
+                        // Then
+                        .isInstanceOf(OnlyDustException.class)
+                        .hasMessage("Invoice %s not found for billing profile %s".formatted(invoice.id(), billingProfileId));
+            }
         }
     }
 
@@ -1062,6 +1070,136 @@ class BillingProfileServiceTest {
 
         // Then
         verify(billingProfileStoragePort, never()).deleteCoworkerInvitation(eq(billingProfileId), eq(invitedGithubUserId));
+    }
+
+    @Test
+    void should_remove_user() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final GithubUserId callerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        final GithubUserId removedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        final UserId removedUserId = UserId.of(UUID.randomUUID());
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStoragePort.getCoworker(billingProfileId, removedGithubUserId)).thenReturn(Optional.of(
+                BillingProfileCoworkerView.builder()
+                        .userId(removedUserId)
+                        .githubUserId(removedGithubUserId)
+                        .role(BillingProfile.User.Role.MEMBER)
+                        .joinedAt(ZonedDateTime.now())
+                        .rewardCount(0)
+                        .build()
+        ));
+
+        // When
+        billingProfileService.removeCoworker(billingProfileId, userIAdmin, callerGithubUserId, removedGithubUserId);
+
+        // Then
+        verify(billingProfileStoragePort).deleteCoworker(eq(billingProfileId), eq(removedUserId));
+    }
+
+    @Test
+    void should_remove_user_when_caller_is_user() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final GithubUserId removedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(false);
+        when(billingProfileStoragePort.getCoworker(billingProfileId, removedGithubUserId)).thenReturn(Optional.of(
+                BillingProfileCoworkerView.builder()
+                        .userId(userIAdmin)
+                        .githubUserId(removedGithubUserId)
+                        .role(BillingProfile.User.Role.MEMBER)
+                        .joinedAt(ZonedDateTime.now())
+                        .rewardCount(0)
+                        .build()
+        ));
+
+        // When
+        billingProfileService.removeCoworker(billingProfileId, userIAdmin, removedGithubUserId, removedGithubUserId);
+
+        // Then
+        verify(billingProfileStoragePort).deleteCoworker(eq(billingProfileId), eq(userIAdmin));
+    }
+
+    @Test
+    void should_not_remove_user_when_not_found() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final GithubUserId callerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        final GithubUserId removedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        final UserId invitedUserId = UserId.of(UUID.randomUUID());
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStoragePort.getCoworker(billingProfileId, removedGithubUserId)).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> billingProfileService.removeCoworker(billingProfileId, userIAdmin, callerGithubUserId, removedGithubUserId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Coworker %d not found for billing profile %s".formatted(removedGithubUserId.value(), billingProfileId.value()));
+
+        // Then
+        verify(billingProfileStoragePort, never()).deleteCoworker(eq(billingProfileId), eq(invitedUserId));
+    }
+
+    @Test
+    void should_not_remove_user_when_not_removable() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final GithubUserId callerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        final GithubUserId removedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        final UserId invitedUserId = UserId.of(UUID.randomUUID());
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStoragePort.getCoworker(billingProfileId, removedGithubUserId)).thenReturn(Optional.of(
+                BillingProfileCoworkerView.builder()
+                        .userId(invitedUserId)
+                        .githubUserId(removedGithubUserId)
+                        .role(BillingProfile.User.Role.MEMBER)
+                        .joinedAt(ZonedDateTime.now())
+                        .rewardCount(10)
+                        .build()
+        ));
+
+        // When
+        assertThatThrownBy(() -> billingProfileService.removeCoworker(billingProfileId, userIAdmin, callerGithubUserId, removedGithubUserId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Coworker %d cannot be removed from billing profile %s".formatted(removedGithubUserId.value(), billingProfileId.value()));
+
+        // Then
+        verify(billingProfileStoragePort, never()).deleteCoworker(eq(billingProfileId), eq(invitedUserId));
+    }
+
+    @Test
+    void should_not_remove_user_when_caller_is_not_admin_and_not_removed_user() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final GithubUserId callerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        final GithubUserId removedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        final UserId invitedUserId = UserId.of(UUID.randomUUID());
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(false);
+        when(billingProfileStoragePort.getCoworker(billingProfileId, removedGithubUserId)).thenReturn(Optional.of(
+                BillingProfileCoworkerView.builder()
+                        .userId(invitedUserId)
+                        .githubUserId(removedGithubUserId)
+                        .role(BillingProfile.User.Role.MEMBER)
+                        .joinedAt(ZonedDateTime.now())
+                        .rewardCount(10)
+                        .build()
+        ));
+
+        // When
+        assertThatThrownBy(() -> billingProfileService.removeCoworker(billingProfileId, userIAdmin, callerGithubUserId, removedGithubUserId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("User %s must be admin to remove coworker %d from billing profile %s".formatted(userIAdmin, removedGithubUserId.value(),
+                        billingProfileId.value()));
+
+        // Then
+        verify(billingProfileStoragePort, never()).deleteCoworker(eq(billingProfileId), eq(invitedUserId));
     }
 
 }

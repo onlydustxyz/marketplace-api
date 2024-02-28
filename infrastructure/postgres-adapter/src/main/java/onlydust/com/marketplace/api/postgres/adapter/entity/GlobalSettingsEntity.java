@@ -6,6 +6,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 @Entity
@@ -25,4 +27,8 @@ public class GlobalSettingsEntity {
 
     @Column(name = "invoice_mandate_latest_version_date", nullable = false)
     private Date invoiceMandateLatestVersionDate;
+
+    public ZonedDateTime getInvoiceMandateLatestVersionDate() {
+        return invoiceMandateLatestVersionDate.toInstant().atZone(ZoneOffset.UTC);
+    }
 }

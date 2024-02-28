@@ -182,4 +182,15 @@ public class BillingProfileRestApi implements BillingProfilesApi {
                 });
         return ResponseEntity.noContent().build();
     }
+
+    @Override
+    public ResponseEntity<Void> removeCoworker(UUID billingProfileId, Long githubUserId) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        billingProfileFacadePort.removeCoworker(
+                BillingProfile.Id.of(billingProfileId),
+                UserId.of(authenticatedUser.getId()),
+                GithubUserId.of(authenticatedUser.getGithubUserId()),
+                GithubUserId.of(githubUserId));
+        return ResponseEntity.noContent().build();
+    }
 }
