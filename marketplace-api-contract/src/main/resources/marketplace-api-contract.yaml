@@ -1406,7 +1406,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/CurrencyContract'
+              $ref: '#/components/schemas/CurrencyId'
         - in: query
           name: contributors
           description: Contributor filter
@@ -1626,88 +1626,6 @@ paths:
 
 
   /api/v2/projects/{projectId}/rewards:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Projects
-      summary: Get project rewards
-      operationId: getProjectRewardsV2
-      description: |
-        Get the list of all rewards granted from this project. Only project leaders can access this information.
-      parameters:
-        - in: path
-          name: projectId
-          required: true
-          schema:
-            $ref: '#/components/schemas/ProjectId'
-        - in: query
-          name: currencies
-          description: Currency filter
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/CurrencyContract'
-        - in: query
-          name: contributors
-          description: Contributor filter
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/GithubUserId'
-        - in: query
-          name: fromDate
-          description: Date filter
-          schema:
-            type: string
-            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
-        - in: query
-          name: toDate
-          description: Date filter
-          schema:
-            type: string
-            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
-        - in: query
-          name: sort
-          description: Sort order
-          schema:
-            enum:
-              - REQUESTED_AT
-              - CONTRIBUTION
-              - AMOUNT
-              - STATUS
-        - in: query
-          name: direction
-          schema:
-            type: string
-            enum:
-              - ASC
-              - DESC
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: 'List of rewards'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RewardsPageResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "403":
-          $ref: '#/components/responses/ProjectForbiddenError'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
     post:
       security:
         - bearerAuth: [ ]

@@ -155,8 +155,8 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
-    public RewardView getRewardByIdForRecipientId(UUID rewardId, Long recipientId) {
-        final RewardView reward = userStoragePort.findRewardById(rewardId);
+    public RewardDetailsView getRewardByIdForRecipientId(UUID rewardId, Long recipientId) {
+        final RewardDetailsView reward = userStoragePort.findRewardById(rewardId);
         if (!reward.getTo().getGithubUserId().equals(recipientId)) {
             throw OnlyDustException.forbidden("Only recipient user can read it's own reward");
         }

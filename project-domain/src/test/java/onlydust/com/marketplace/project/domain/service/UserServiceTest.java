@@ -371,17 +371,17 @@ public class UserServiceTest {
         // Given
         final UUID rewardId = UUID.randomUUID();
         final long recipientId = 1L;
-        final RewardView expectedReward =
-                RewardView.builder().id(rewardId).to(GithubUserIdentity.builder().githubUserId(recipientId).build()).build();
+        final RewardDetailsView expectedReward =
+                RewardDetailsView.builder().id(rewardId).to(GithubUserIdentity.builder().githubUserId(recipientId).build()).build();
 
         // When
         when(userStoragePort.findRewardById(rewardId))
                 .thenReturn(expectedReward);
-        final RewardView rewardView = userService.getRewardByIdForRecipientId(rewardId, recipientId);
+        final RewardDetailsView rewardDetailsView = userService.getRewardByIdForRecipientId(rewardId, recipientId);
 
         // Then
-        assertNotNull(rewardView);
-        assertEquals(expectedReward, rewardView);
+        assertNotNull(rewardDetailsView);
+        assertEquals(expectedReward, rewardDetailsView);
     }
 
     @Test
@@ -389,8 +389,8 @@ public class UserServiceTest {
         // Given
         final UUID rewardId = UUID.randomUUID();
         final long recipientId = 1L;
-        final RewardView expectedReward =
-                RewardView.builder().id(rewardId).to(GithubUserIdentity.builder().githubUserId(2L).build()).build();
+        final RewardDetailsView expectedReward =
+                RewardDetailsView.builder().id(rewardId).to(GithubUserIdentity.builder().githubUserId(2L).build()).build();
 
         // When
         when(userStoragePort.findRewardById(rewardId))

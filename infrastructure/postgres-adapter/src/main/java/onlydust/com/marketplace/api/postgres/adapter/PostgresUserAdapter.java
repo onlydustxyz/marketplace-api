@@ -8,7 +8,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLea
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper;
-import onlydust.com.marketplace.api.postgres.adapter.mapper.UserRewardMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -51,7 +50,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final CustomRewardRepository customRewardRepository;
     private final ProjectLedIdRepository projectLedIdRepository;
     private final RewardStatsRepository rewardStatsRepository;
-    private final UserRewardViewRepository userRewardViewRepository;
+    private final RewardViewRepository rewardViewRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -231,16 +230,16 @@ public class PostgresUserAdapter implements UserStoragePort {
         final var toDate = isNull(filters.getTo()) ? null : format.format(filters.getTo());
 
         final var pageRequest = PageRequest.of(pageIndex, pageSize,
-                UserRewardViewRepository.sortBy(sort, sortDirection == SortDirection.asc ? Direction.ASC : Direction.DESC));
+                RewardViewRepository.sortBy(sort, sortDirection == SortDirection.asc ? Direction.ASC : Direction.DESC));
 
-        final var page = userRewardViewRepository.find(userId, filters.getCurrencies(), filters.getProjectIds(), fromDate, toDate, pageRequest);
+        final var page = rewardViewRepository.findUserRewards(userId, filters.getCurrencies(), filters.getProjectIds(), fromDate, toDate, pageRequest);
 
         final var rewardsStats = rewardStatsRepository.findByUser(userId, filters.getCurrencies(), filters.getProjectIds(),
                 fromDate, toDate);
 
         return UserRewardsPageView.builder()
                 .rewards(Page.<UserRewardView>builder()
-                        .content(page.getContent().stream().map(UserRewardMapper::mapEntityToDomain).toList())
+                        .content(page.getContent().stream().map(RewardViewEntity::toUserReward).toList())
                         .totalItemNumber((int) page.getTotalElements())
                         .totalPageNumber(page.getTotalPages())
                         .build())
@@ -266,8 +265,10 @@ public class PostgresUserAdapter implements UserStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public RewardView findRewardById(UUID rewardId) {
-        return RewardMapper.rewardWithReceiptToDomain(customRewardRepository.findUserRewardViewEntityByd(rewardId));
+    public RewardDetailsView findRewardById(UUID rewardId) {
+        return rewardViewRepository.findById(rewardId)
+                .orElseThrow(() -> notFound(format("Reward with id %s not found", rewardId)))
+                .toDomain();
     }
 
     @Override
@@ -289,8 +290,8 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Override
     @Transactional(readOnly = true)
     public List<UserRewardView> findPendingInvoiceRewardsForRecipientId(Long githubUserId) {
-        return userRewardViewRepository.findPendingPaymentRequestForRecipient(githubUserId)
-                .stream().map(UserRewardMapper::mapEntityToDomain).toList();
+        return rewardViewRepository.findPendingPaymentRequestForRecipient(githubUserId)
+                .stream().map(RewardViewEntity::toUserReward).toList();
     }
 
     @Override

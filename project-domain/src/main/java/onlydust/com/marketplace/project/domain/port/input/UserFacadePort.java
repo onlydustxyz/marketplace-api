@@ -39,7 +39,7 @@ public interface UserFacadePort {
                                             int pageIndex, int sanitizedPageSize,
                                             UserRewardView.SortBy sortBy, SortDirection sortDirection);
 
-    RewardView getRewardByIdForRecipientId(UUID rewardId, Long recipientId);
+    RewardDetailsView getRewardByIdForRecipientId(UUID rewardId, Long recipientId);
 
     Page<RewardItemView> getRewardItemsPageByIdForRecipientId(UUID rewardId, Long recipientId, int pageIndex,
                                                               int pageSize);

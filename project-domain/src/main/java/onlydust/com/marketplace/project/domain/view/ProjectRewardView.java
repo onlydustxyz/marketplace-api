@@ -18,8 +18,8 @@ public class ProjectRewardView {
     Date processedAt;
     String rewardedUserLogin;
     String rewardedUserAvatar;
-    RewardStatusView status;
-    RewardAmountView amount;
+    Status status;
+    Amount amount;
 
     public Date getUnlockDate() {
         return amount.currency.unlockDate();
@@ -27,13 +27,13 @@ public class ProjectRewardView {
 
     @Data
     @Builder
-    public static class RewardAmountView {
+    public static class Amount {
         BigDecimal total;
         Currency currency;
         BigDecimal dollarsEquivalent;
     }
 
-    public enum RewardStatusView {
+    public enum Status {
         pendingSignup, processing, complete, locked, pendingContributor
     }
 
@@ -45,7 +45,7 @@ public class ProjectRewardView {
     @Data
     public static class Filters {
         @Builder.Default
-        List<Currency> currencies = List.of();
+        List<UUID> currencies = List.of();
         @Builder.Default
         List<Long> contributors = List.of();
         Date from;

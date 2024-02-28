@@ -159,7 +159,7 @@ public class ProjectsRestApi implements ProjectsApi {
 
     @Override
     public ResponseEntity<RewardsPageResponse> getProjectRewards(UUID projectId, Integer pageIndex, Integer pageSize,
-                                                                 List<CurrencyContract> currencies,
+                                                                 List<UUID> currencies,
                                                                  List<Long> contributors,
                                                                  String fromDate, String toDate,
                                                                  String sort, String direction) {
@@ -168,7 +168,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final ProjectRewardView.SortBy sortBy = getSortBy(sort);
         final var filters = ProjectRewardView.Filters.builder()
-                .currencies(Optional.ofNullable(currencies).orElse(List.of()).stream().map(ProjectBudgetMapper::mapCurrency).toList())
+                .currencies(Optional.ofNullable(currencies).orElse(List.of()))
                 .contributors(Optional.ofNullable(contributors).orElse(List.of()))
                 .from(isNull(fromDate) ? null : DateMapper.parse(fromDate))
                 .to(isNull(fromDate) ? null : DateMapper.parse(toDate))
@@ -183,16 +183,6 @@ public class ProjectsRestApi implements ProjectsApi {
         return rewardsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardsPageResponse) :
                 ResponseEntity.ok(rewardsPageResponse);
-    }
-
-    @Override
-    public ResponseEntity<RewardsPageResponse> getProjectRewardsV2(UUID projectId, Integer pageIndex, Integer pageSize,
-                                                                   List<CurrencyContract> currencies,
-                                                                   List<Long> contributors,
-                                                                   String fromDate, String toDate,
-                                                                   String sort, String direction) {
-        // TODO
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
     @Override
@@ -248,9 +238,9 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<RewardDetailsResponse> getProjectReward(UUID projectId, UUID rewardId) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        final RewardView rewardView = projectRewardFacadePort.getRewardByIdForProjectLead(projectId, rewardId,
+        final RewardDetailsView rewardDetailsView = projectRewardFacadePort.getRewardByIdForProjectLead(projectId, rewardId,
                 authenticatedUser.getId());
-        return ResponseEntity.ok(RewardMapper.rewardDetailsToResponse(rewardView));
+        return ResponseEntity.ok(RewardMapper.rewardDetailsToResponse(rewardDetailsView));
     }
 
     @Override

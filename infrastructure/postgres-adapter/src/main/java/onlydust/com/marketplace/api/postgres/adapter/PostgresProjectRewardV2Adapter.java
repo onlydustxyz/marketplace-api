@@ -63,7 +63,7 @@ public class PostgresProjectRewardV2Adapter implements ProjectRewardStoragePort 
 
     @Override
     @Transactional
-    public RewardView getProjectReward(UUID rewardId) {
+    public RewardDetailsView getProjectReward(UUID rewardId) {
         // TODO
         return null;
     }

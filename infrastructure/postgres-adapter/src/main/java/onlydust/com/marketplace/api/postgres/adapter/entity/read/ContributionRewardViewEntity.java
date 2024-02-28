@@ -1,25 +1,20 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.EqualsAndHashCode;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.view.ContributionRewardView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
 
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@TypeDef(name = "currency", typeClass = PostgreSQLEnumType.class)
 public class ContributionRewardViewEntity {
 
     @Id
@@ -27,9 +22,8 @@ public class ContributionRewardViewEntity {
     Date requestedAt;
     Date processedAt;
     BigDecimal amount;
-    @Enumerated(EnumType.STRING)
-    @Type(type = "currency")
-    CurrencyEnumEntity currency;
+    @ManyToOne
+    CurrencyEntity currency;
     BigDecimal dollarsEquivalent;
     String status;
 
@@ -55,7 +49,7 @@ public class ContributionRewardViewEntity {
 
         return ContributionRewardView.builder()
                 .id(id)
-                .currency(currency.toDomain())
+                .currency(currency.toOldDomain())
                 .amount(amount)
                 .dollarsEquivalent(dollarsEquivalent)
                 .status(RewardMapper.mapStatusForUser(status))

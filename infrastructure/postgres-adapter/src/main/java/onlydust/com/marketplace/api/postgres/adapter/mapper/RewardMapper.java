@@ -1,137 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import onlydust.com.marketplace.project.domain.model.ContributionType;
-import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
-import onlydust.com.marketplace.project.domain.model.Project;
-import onlydust.com.marketplace.project.domain.view.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardItemViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CryptoReceiptJsonEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CryptoReceiptJsonEntity.Crypto;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.FiatReceiptJsonEntity;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.project.domain.view.*;
-
-import static java.util.Objects.isNull;
+import onlydust.com.marketplace.project.domain.model.ContributionType;
+import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
+import onlydust.com.marketplace.project.domain.view.RewardItemStatus;
+import onlydust.com.marketplace.project.domain.view.RewardItemView;
+import onlydust.com.marketplace.project.domain.view.UserRewardView;
 
 public interface RewardMapper {
-    ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-    static RewardView rewardToDomain(RewardViewEntity rewardViewEntityByd) {
-        return RewardView.builder()
-                .id(rewardViewEntityByd.getId())
-                .to(GithubUserIdentity.builder()
-                        .githubAvatarUrl(rewardViewEntityByd.getRecipientAvatarUrl())
-                        .githubLogin(rewardViewEntityByd.getRecipientLogin())
-                        .githubUserId(rewardViewEntityByd.getRecipientId())
-                        .build())
-                .amount(rewardViewEntityByd.getAmount())
-                .createdAt(rewardViewEntityByd.getRequestedAt())
-                .processedAt(rewardViewEntityByd.getProcessedAt())
-                .currency(rewardViewEntityByd.getCurrency().toDomain())
-                .dollarsEquivalent(rewardViewEntityByd.getDollarsEquivalent())
-                .status(mapStatusForUser(rewardViewEntityByd.getStatus()))
-                .from(GithubUserIdentity.builder()
-                        .githubUserId(rewardViewEntityByd.getRequestorId())
-                        .githubLogin(rewardViewEntityByd.getRequestorLogin())
-                        .githubAvatarUrl(rewardViewEntityByd.getRequestorAvatarUrl())
-                        .build())
-                .project(Project.builder()
-                        .id(rewardViewEntityByd.getProjectId())
-                        .slug(rewardViewEntityByd.getProjectKey())
-                        .name(rewardViewEntityByd.getProjectName())
-                        .shortDescription(rewardViewEntityByd.getProjectShortDescription())
-                        .longDescription(rewardViewEntityByd.getProjectLongDescription())
-                        .logoUrl(rewardViewEntityByd.getProjectLogoUrl())
-                        .moreInfoUrl(rewardViewEntityByd.getProjectTelegramLink())
-                        .hiring(rewardViewEntityByd.getProjectHiring())
-                        .visibility(rewardViewEntityByd.getProjectVisibility().toDomain())
-                        .build())
-                .build();
-    }
-
-    static RewardView rewardWithReceiptToDomain(RewardViewEntity rewardViewEntityByd) {
-        return RewardView.builder()
-                .id(rewardViewEntityByd.getId())
-                .to(GithubUserIdentity.builder()
-                        .githubAvatarUrl(rewardViewEntityByd.getRecipientAvatarUrl())
-                        .githubLogin(rewardViewEntityByd.getRecipientLogin())
-                        .githubUserId(rewardViewEntityByd.getRecipientId())
-                        .build())
-                .amount(rewardViewEntityByd.getAmount())
-                .createdAt(rewardViewEntityByd.getRequestedAt())
-                .processedAt(rewardViewEntityByd.getProcessedAt())
-                .currency(rewardViewEntityByd.getCurrency().toDomain())
-                .dollarsEquivalent(rewardViewEntityByd.getDollarsEquivalent())
-                .status(mapStatusForUser(rewardViewEntityByd.getStatus()))
-                .from(GithubUserIdentity.builder()
-                        .githubUserId(rewardViewEntityByd.getRequestorId())
-                        .githubLogin(rewardViewEntityByd.getRequestorLogin())
-                        .githubAvatarUrl(rewardViewEntityByd.getRequestorAvatarUrl())
-                        .build())
-                .receipt(receiptToDomain(rewardViewEntityByd.getReceipt()))
-                .project(Project.builder()
-                        .id(rewardViewEntityByd.getProjectId())
-                        .slug(rewardViewEntityByd.getProjectKey())
-                        .name(rewardViewEntityByd.getProjectName())
-                        .shortDescription(rewardViewEntityByd.getProjectShortDescription())
-                        .longDescription(rewardViewEntityByd.getProjectLongDescription())
-                        .logoUrl(rewardViewEntityByd.getProjectLogoUrl())
-                        .moreInfoUrl(rewardViewEntityByd.getProjectTelegramLink())
-                        .hiring(rewardViewEntityByd.getProjectHiring())
-                        .visibility(rewardViewEntityByd.getProjectVisibility().toDomain())
-                        .build())
-                .build();
-    }
-
-    private static ReceiptView receiptToDomain(final JsonNode receipt) {
-        if (isNull(receipt)) {
-            return null;
-        }
-
-        try {
-            if (receipt.has("Sepa")) {
-                final FiatReceiptJsonEntity fiatReceiptJsonEntity =
-                        OBJECT_MAPPER.treeToValue(receipt.get("Sepa"),
-                                FiatReceiptJsonEntity.class);
-                return ReceiptView.builder()
-                        .iban(fiatReceiptJsonEntity.getRecipientIban())
-                        .transactionReference(fiatReceiptJsonEntity.getTransactionReference())
-                        .type(ReceiptView.Type.FIAT)
-                        .build();
-            } else if (receipt.has(Crypto.Ethereum.name())) {
-                return cryptoReceiptEntityToDomain(Crypto.Ethereum, receipt);
-            } else if (receipt.has(Crypto.Aptos.name())) {
-                return cryptoReceiptEntityToDomain(Crypto.Aptos, receipt);
-            } else if (receipt.has(Crypto.Optimism.name())) {
-                return cryptoReceiptEntityToDomain(Crypto.Optimism, receipt);
-            } else if (receipt.has(Crypto.Starknet.name())) {
-                return cryptoReceiptEntityToDomain(Crypto.Starknet, receipt);
-            }
-        } catch (JsonProcessingException e) {
-            throw OnlyDustException.internalServerError("Failed to deserialized payment receipt", e);
-        }
-
-        throw OnlyDustException.internalServerError("Invalid payment receipt format");
-    }
-
-    private static ReceiptView cryptoReceiptEntityToDomain(final Crypto crypto,
-                                                           final JsonNode receipt) throws JsonProcessingException {
-        final CryptoReceiptJsonEntity cryptoReceiptJsonEntity = OBJECT_MAPPER.treeToValue(receipt.get(
-                crypto.name()), CryptoReceiptJsonEntity.class);
-        return ReceiptView.builder()
-                .transactionReference(cryptoReceiptJsonEntity.getTransactionHash())
-                .ens(cryptoReceiptJsonEntity.getRecipientEns())
-                .walletAddress(cryptoReceiptJsonEntity.getRecipientAddress())
-                .type(ReceiptView.Type.CRYPTO)
-                .blockchain(crypto.toDomain())
-                .build();
-    }
-
-
     static RewardItemView itemToDomain(RewardItemViewEntity rewardItemViewEntity) {
         return RewardItemView.builder()
                 .id(rewardItemViewEntity.getId())
@@ -176,24 +52,24 @@ public interface RewardMapper {
         };
     }
 
-    static UserRewardStatus mapStatusForUser(String status) {
+    static UserRewardView.Status mapStatusForUser(String status) {
         return switch (status) {
-            case "PENDING_INVOICE" -> UserRewardStatus.pendingInvoice;
-            case "COMPLETE" -> UserRewardStatus.complete;
-            case "MISSING_PAYOUT_INFO" -> UserRewardStatus.missingPayoutInfo;
-            case "PENDING_VERIFICATION" -> UserRewardStatus.pendingVerification;
-            case "LOCKED" -> UserRewardStatus.locked;
-            default -> UserRewardStatus.processing;
+            case "PENDING_INVOICE" -> UserRewardView.Status.pendingInvoice;
+            case "COMPLETE" -> UserRewardView.Status.complete;
+            case "MISSING_PAYOUT_INFO" -> UserRewardView.Status.missingPayoutInfo;
+            case "PENDING_VERIFICATION" -> UserRewardView.Status.pendingVerification;
+            case "LOCKED" -> UserRewardView.Status.locked;
+            default -> UserRewardView.Status.processing;
         };
     }
 
-    static ProjectRewardView.RewardStatusView mapStatusForProject(String status) {
+    static ProjectRewardView.Status mapStatusForProject(String status) {
         return switch (status) {
-            case "PENDING_SIGNUP" -> ProjectRewardView.RewardStatusView.pendingSignup;
-            case "PENDING_CONTRIBUTOR" -> ProjectRewardView.RewardStatusView.pendingContributor;
-            case "COMPLETE" -> ProjectRewardView.RewardStatusView.complete;
-            case "LOCKED" -> ProjectRewardView.RewardStatusView.locked;
-            default -> ProjectRewardView.RewardStatusView.processing;
+            case "PENDING_SIGNUP" -> ProjectRewardView.Status.pendingSignup;
+            case "PENDING_CONTRIBUTOR" -> ProjectRewardView.Status.pendingContributor;
+            case "COMPLETE" -> ProjectRewardView.Status.complete;
+            case "LOCKED" -> ProjectRewardView.Status.locked;
+            default -> ProjectRewardView.Status.processing;
         };
     }
 }

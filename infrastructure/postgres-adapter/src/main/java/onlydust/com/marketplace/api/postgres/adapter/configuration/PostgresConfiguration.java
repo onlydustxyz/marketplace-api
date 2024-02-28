@@ -54,7 +54,6 @@ public class PostgresConfiguration {
                                                  final ProjectRepoRepository projectRepoRepository,
                                                  final CustomProjectRepository customProjectRepository,
                                                  final CustomContributorRepository customContributorRepository,
-                                                 final CustomProjectRewardRepository customProjectRewardRepository,
                                                  final CustomProjectBudgetRepository customProjectBudgetRepository,
                                                  final ProjectLeadViewRepository projectLeadViewRepository,
                                                  final CustomRewardRepository customRewardRepository,
@@ -72,7 +71,8 @@ public class PostgresConfiguration {
                                                  final ProjectTagRepository projectTagRepository,
                                                  final PaymentRequestRepository paymentRequestRepository,
                                                  final HistoricalQuoteRepository historicalQuoteRepository,
-                                                 final CurrencyRepository currencyRepository) {
+                                                 final CurrencyRepository currencyRepository,
+                                                 final RewardViewRepository rewardViewRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -81,7 +81,6 @@ public class PostgresConfiguration {
                 projectRepoRepository,
                 customProjectRepository,
                 customContributorRepository,
-                customProjectRewardRepository,
                 customProjectBudgetRepository,
                 projectLeadViewRepository,
                 customRewardRepository,
@@ -99,7 +98,8 @@ public class PostgresConfiguration {
                 projectTagRepository,
                 paymentRequestRepository,
                 historicalQuoteRepository,
-                currencyRepository
+                currencyRepository,
+                rewardViewRepository
         );
     }
 
@@ -111,7 +111,6 @@ public class PostgresConfiguration {
                                                            final ProjectRepoRepository projectRepoRepository,
                                                            final CustomProjectRepository customProjectRepository,
                                                            final CustomContributorRepository customContributorRepository,
-                                                           final CustomProjectRewardRepository customProjectRewardRepository,
                                                            final CustomProjectBudgetRepository customProjectBudgetRepository,
                                                            final ProjectLeadViewRepository projectLeadViewRepository,
                                                            final CustomRewardRepository customRewardRepository,
@@ -129,7 +128,8 @@ public class PostgresConfiguration {
                                                            final ProjectTagRepository projectTagRepository,
                                                            final PaymentRequestRepository paymentRequestRepository,
                                                            final HistoricalQuoteRepository historicalQuoteRepository,
-                                                           final CurrencyRepository currencyRepository) {
+                                                           final CurrencyRepository currencyRepository,
+                                                           final RewardViewRepository rewardViewRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -138,7 +138,6 @@ public class PostgresConfiguration {
                 projectRepoRepository,
                 customProjectRepository,
                 customContributorRepository,
-                customProjectRewardRepository,
                 customProjectBudgetRepository,
                 projectLeadViewRepository,
                 customRewardRepository,
@@ -156,7 +155,8 @@ public class PostgresConfiguration {
                 projectTagRepository,
                 paymentRequestRepository,
                 historicalQuoteRepository,
-                currencyRepository
+                currencyRepository,
+                rewardViewRepository
         );
     }
 
@@ -193,7 +193,7 @@ public class PostgresConfiguration {
                                                    final CustomRewardRepository customRewardRepository,
                                                    final ProjectLedIdRepository projectLedIdRepository,
                                                    final RewardStatsRepository rewardStatsRepository,
-                                                   final UserRewardViewRepository userRewardViewRepository) {
+                                                   final RewardViewRepository rewardViewRepository) {
         return new PostgresUserAdapter(
                 customUserRepository,
                 customContributorRepository,
@@ -209,12 +209,7 @@ public class PostgresConfiguration {
                 customRewardRepository,
                 projectLedIdRepository,
                 rewardStatsRepository,
-                userRewardViewRepository);
-    }
-
-    @Bean
-    public CustomProjectRewardRepository customProjectRewardRepository(final EntityManager entityManager) {
-        return new CustomProjectRewardRepository(entityManager);
+                rewardViewRepository);
     }
 
     @Bean

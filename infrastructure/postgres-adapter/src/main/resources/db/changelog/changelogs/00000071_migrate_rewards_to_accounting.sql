@@ -12,6 +12,8 @@ alter table accounting.reward_status_data
     add column networks accounting.network[] not null default '{}';
 
 -- Re-create views
+CREATE TYPE reward_status_as_project_lead AS ENUM ('PENDING_SIGNUP', 'PENDING_CONTRIBUTOR', 'PROCESSING', 'COMPLETE');
+
 CREATE VIEW accounting.reward_statuses AS
 WITH billing_profile_payout_networks AS
          (SELECT coalesce(w.billing_profile_id, ba.billing_profile_id)                                      AS billing_profile_id,
@@ -32,6 +34,7 @@ WITH billing_profile_payout_networks AS
 
      aggregated_reward_status_data AS
          (SELECT reward_id,
+                 u.id IS NOT NULL                        as is_registered,
                  bp.type = 'INDIVIDUAL'                  as is_individual,
                  bp.verification_status = 'VERIFIED'     as kycb_verified,
                  coalesce(kyc.us_citizen, kyb.us_entity) as us_recipient,
@@ -67,7 +70,14 @@ SELECT reward_id,
            WHEN s.payment_requested_at IS NULL THEN 'PENDING_REQUEST'::reward_status
            ELSE 'PROCESSING'::reward_status
            END
-           as status
+           as status_for_user,
+       CASE
+           WHEN s.paid_at IS NOT NULL THEN 'COMPLETE'::reward_status_as_project_lead
+           WHEN NOT s.is_registered THEN 'PENDING_SIGNUP'::reward_status_as_project_lead
+           WHEN s.payment_requested_at IS NULL THEN 'PENDING_CONTRIBUTOR'::reward_status_as_project_lead
+           ELSE 'PROCESSING'::reward_status_as_project_lead
+           END
+           as status_for_project_lead
 FROM aggregated_reward_status_data s
 ;
 

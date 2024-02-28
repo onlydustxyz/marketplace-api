@@ -12,12 +12,13 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class RewardView {
+public class RewardDetailsView {
     UUID id;
     Currency currency;
     BigDecimal amount;
     BigDecimal dollarsEquivalent;
-    UserRewardStatus status;
+    UserRewardView.Status statusForUser;
+    ProjectRewardView.Status statusForProjectLead;
     GithubUserIdentity from;
     GithubUserIdentity to;
     Date createdAt;

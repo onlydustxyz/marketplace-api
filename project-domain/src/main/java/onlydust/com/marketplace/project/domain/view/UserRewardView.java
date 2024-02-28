@@ -19,8 +19,8 @@ public class UserRewardView {
     Date processedAt;
     String rewardedOnProjectName;
     String rewardedOnProjectLogoUrl;
-    UserRewardStatus status;
-    RewardAmountView amount;
+    Status status;
+    Amount amount;
 
     public Date getUnlockDate() {
         return amount.currency.unlockDate();
@@ -28,7 +28,7 @@ public class UserRewardView {
 
     @Data
     @Builder
-    public static class RewardAmountView {
+    public static class Amount {
         BigDecimal total;
         Currency currency;
         BigDecimal dollarsEquivalent;
@@ -45,5 +45,9 @@ public class UserRewardView {
         List<UUID> projectIds;
         Date from;
         Date to;
+    }
+
+    public enum Status {
+        pendingInvoice, processing, complete, missingPayoutInfo, locked, pendingVerification
     }
 }

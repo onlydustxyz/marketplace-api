@@ -40,7 +40,7 @@ public interface UserStoragePort {
                                              int pageIndex, int pageSize,
                                              UserRewardView.SortBy sortBy, SortDirection sortDirection);
 
-    RewardView findRewardById(UUID rewardId);
+    RewardDetailsView findRewardById(UUID rewardId);
 
     Page<RewardItemView> findRewardItemsPageById(UUID rewardId, int pageIndex, int pageSize);
 

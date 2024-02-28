@@ -1,74 +1,105 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
-import lombok.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Value;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
+import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
+import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
+import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.project.domain.view.UserRewardView;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Data
+@Value
+@NoArgsConstructor(force = true)
 @Entity
-@TypeDef(name = "currency", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "project_visibility", typeClass = PostgreSQLEnumType.class)
 public class RewardViewEntity {
-
     @Id
-    @Column(name = "id")
     UUID id;
-    @Column(name = "requested_at")
     Date requestedAt;
-    @Column(name = "processed_at")
-    Date processedAt;
-    @Column(name = "amount")
+    @ManyToOne
+    @JoinColumn(name = "project_id", referencedColumnName = "project_id")
+    @NonNull ProjectEntity project;
     BigDecimal amount;
-    @Enumerated(EnumType.STRING)
-    @Type(type = "currency")
-    @Column(name = "currency")
-    CurrencyEnumEntity currency;
-    @Column(name = "contribution_count")
-    Integer contributionCount;
-    @Column(name = "dollars_equivalent")
+    @ManyToOne
+    @NonNull CurrencyEntity currency;
     BigDecimal dollarsEquivalent;
-    @Column(name = "status")
-    String status;
-
-    @Column(name = "requestor_login")
-    String requestorLogin;
-    @Column(name = "requestor_avatar_url")
-    String requestorAvatarUrl;
-    @Column(name = "requestor_id")
-    Long requestorId;
-
-    @Column(name = "recipient_login")
-    String recipientLogin;
-    @Column(name = "recipient_avatar_url")
-    String recipientAvatarUrl;
-    @Column(name = "recipient_id")
+    Integer contributionCount;
     Long recipientId;
-    @Column(name = "receipt", columnDefinition = "jsonb")
-    @Type(type = "com.vladmihalcea.hibernate.type.json.JsonType")
-    JsonNode receipt;
+    String recipientLogin;
+    String recipientAvatarUrl;
+    Long requestorId;
+    String requestorLogin;
+    String requestorAvatarUrl;
+    @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "reward_id")
+    @NonNull RewardStatusEntity status;
+    @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "reward_id")
+    @NonNull RewardStatusDataEntity statusData;
 
-    UUID projectId;
-    String projectKey;
-    String projectName;
-    String projectShortDescription;
-    String projectLongDescription;
-    String projectLogoUrl;
-    String projectTelegramLink;
-    Boolean projectHiring;
-    @Enumerated(EnumType.STRING)
-    @Type(type = "project_visibility")
-    ProjectVisibilityEnumEntity projectVisibility;
+    public RewardDetailsView toDomain() {
+        return RewardDetailsView.builder()
+                .id(id)
+                .to(GithubUserIdentity.builder()
+                        .githubAvatarUrl(recipientAvatarUrl)
+                        .githubLogin(recipientLogin)
+                        .githubUserId(recipientId)
+                        .build())
+                .amount(amount)
+                .createdAt(requestedAt)
+                .processedAt(statusData.getPaidAt())
+                .currency(currency.toOldDomain())
+                .dollarsEquivalent(dollarsEquivalent)
+                .statusForUser(status.forUser())
+                .statusForProjectLead(status.forProjectLead())
+                .from(GithubUserIdentity.builder()
+                        .githubUserId(requestorId)
+                        .githubLogin(requestorLogin)
+                        .githubAvatarUrl(requestorAvatarUrl)
+                        .build())
+                .project(project.toDomain())
+                .build();
+    }
+
+    public UserRewardView toUserReward() {
+        return UserRewardView.builder()
+                .id(id)
+                .projectId(project.getId())
+                .requestedAt(requestedAt)
+                .processedAt(statusData.getPaidAt())
+                .rewardedOnProjectName(project.getName())
+                .rewardedOnProjectLogoUrl(project.getLogoUrl())
+                .status(status.forUser())
+                .amount(UserRewardView.Amount.builder()
+                        .total(amount)
+                        .currency(currency.toOldDomain())
+                        .dollarsEquivalent(dollarsEquivalent)
+                        .build())
+                .build();
+    }
+
+    public ProjectRewardView toProjectReward() {
+        return ProjectRewardView.builder()
+                .id(id)
+                .numberOfRewardedContributions(contributionCount)
+                .requestedAt(requestedAt)
+                .processedAt(statusData.getPaidAt())
+                .rewardedUserLogin(requestorLogin)
+                .rewardedUserAvatar(requestorAvatarUrl)
+                .status(status.forProjectLead())
+                .amount(ProjectRewardView.Amount.builder()
+                        .total(amount)
+                        .currency(currency.toOldDomain())
+                        .dollarsEquivalent(dollarsEquivalent)
+                        .build())
+                .build();
+    }
 }
