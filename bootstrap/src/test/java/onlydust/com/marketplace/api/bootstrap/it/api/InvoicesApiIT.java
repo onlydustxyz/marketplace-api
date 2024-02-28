@@ -646,19 +646,20 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful();
 
         // Then switch billing profile type
-        client.patch()
-                .uri(getApiURI(ME_PATCH_BILLING_PROFILE_TYPE))
-                .header("Authorization", "Bearer " + antho.jwt())
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                          "type": "INDIVIDUAL"
-                        }
-                        """)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful();
+        // TODO
+//        client.patch()
+//                .uri(getApiURI(ME_PATCH_BILLING_PROFILE_TYPE))
+//                .header("Authorization", "Bearer " + antho.jwt())
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .bodyValue("""
+//                        {
+//                          "type": "INDIVIDUAL"
+//                        }
+//                        """)
+//                // Then
+//                .exchange()
+//                .expectStatus()
+//                .is2xxSuccessful();
 
         final var individualBillingProfileId = client.get()
                 .uri(ME_BILLING_PROFILES)

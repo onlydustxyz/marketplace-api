@@ -352,14 +352,12 @@ public class PostgresConfiguration {
 
     @Bean
     InvoiceStoragePort invoicePreviewStoragePort(
-                                                 final @NonNull InvoiceRewardRepository invoiceRewardRepository,
-                                                 final @NonNull OldWalletRepository oldWalletRepository,
-                                                 final @NonNull BankAccountRepository bankAccountRepository,
-                                                 final @NonNull InvoiceRepository invoiceRepository,
-                                                 final @NonNull PaymentRequestRepository paymentRequestRepository,
-                                                 final @NonNull RewardRepository rewardRepository) {
-        return new PostgresInvoiceStorage( invoiceRewardRepository,
-                oldWalletRepository, bankAccountRepository, invoiceRepository, paymentRequestRepository, rewardRepository);
+            final @NonNull BillingProfileRepository billingProfileRepository,
+            final @NonNull InvoiceRewardRepository invoiceRewardRepository,
+            final @NonNull InvoiceRepository invoiceRepository,
+            final @NonNull RewardRepository rewardRepository) {
+        return new PostgresInvoiceStorage(billingProfileRepository, invoiceRewardRepository,
+                invoiceRepository, rewardRepository);
     }
 
     @Bean
@@ -373,7 +371,7 @@ public class PostgresConfiguration {
                                                                      final BillingProfileUserViewRepository billingProfileUserViewRepository,
                                                                      final ChildrenKycRepository childrenKycRepository,
                                                                      final BillingProfileUserInvitationRepository billingProfileUserInvitationRepository) {
-        return new PostgresBillingProfileAdapter( globalSettingsRepository,
+        return new PostgresBillingProfileAdapter(globalSettingsRepository,
                 billingProfileRepository, kybRepository, kycRepository, payoutInfoRepository, walletRepository, billingProfileUserRepository,
                 billingProfileUserViewRepository, childrenKycRepository, billingProfileUserInvitationRepository);
     }

@@ -32,7 +32,7 @@ public class KybEntity {
     UUID id;
     UUID billingProfileId;
     @OneToOne
-    @JoinColumn(name = "billingProfile", insertable = false, updatable = false)
+    @JoinColumn(name = "billingProfileId", insertable = false, updatable = false)
     BillingProfileEntity billingProfile;
     @Type(type = "verification_status")
     @Enumerated(EnumType.STRING)
