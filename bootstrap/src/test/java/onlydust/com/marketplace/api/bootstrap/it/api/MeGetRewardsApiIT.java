@@ -8,11 +8,7 @@ import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity.BillingProfileTypeEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
-import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
-import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
-import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,11 +57,11 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
         patchReward("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0", 30, "OP", null, "2023-08-14", null);
         patchReward("5b96ca1e-4ad2-41c1-8819-520b885d9223", 9511147, "STRK", null, null, null);
 
-        postgresUserAdapter.savePayoutSettingsForUserId(pierre.user().getId(),
-                UserPayoutSettings.builder()
-                        .ethWallet(Ethereum.wallet("vitalik.eth"))
-                        .aptosAddress(Aptos.accountAddress("0x" + faker.random().hex(40)))
-                        .build());
+//        postgresUserAdapter.savePayoutSettingsForUserId(pierre.user().getId(),
+//                UserPayoutSettings.builder()
+//                        .ethWallet(Ethereum.wallet("vitalik.eth"))
+//                        .aptosAddress(Aptos.accountAddress("0x" + faker.random().hex(40)))
+//                        .build());
     }
 
     @Test

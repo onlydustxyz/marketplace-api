@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.*;
@@ -13,17 +12,10 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
-import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
-import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
-import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
-import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
-import onlydust.com.marketplace.project.domain.model.OldAccountNumber;
-import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
 import onlydust.com.marketplace.project.domain.model.UserRole;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -34,7 +26,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 @Transactional
 public class AllRepositoriesIT extends AbstractPostgresIT {
@@ -55,10 +46,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     UserProfileInfoRepository userProfileInfoRepository;
     @Autowired
     ContactInformationRepository contactInformationRepository;
-    @Autowired
-    OldWalletRepository oldWalletRepository;
-    @Autowired
-    BankAccountRepository bankAccountRepository;
     @Autowired
     CryptoUsdQuotesRepository cryptoUsdQuotesRepository;
     @Autowired
@@ -294,33 +281,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     }
 
     @Test
-    void should_create_wallet() {
-        // Given
-        oldWalletRepository.deleteAll();
-        final OldWalletEntity expected = OldWalletEntity.builder()
-                .network(NetworkEnumEntity.ethereum)
-                .userId(UUID.randomUUID())
-                .address(faker.address().fullAddress())
-                .type(WalletTypeEnumEntity.address)
-                .build();
-
-        assertIsSaved(expected, oldWalletRepository);
-    }
-
-    @Test
-    void should_create_bank_account() {
-        // Given
-        bankAccountRepository.deleteAll();
-        final OldBankAccountEntity expected = OldBankAccountEntity.builder()
-                .bic(faker.pokemon().location())
-                .userId(UUID.randomUUID())
-                .iban("FR1014508000702139488771C56")
-                .build();
-
-        assertIsSaved(expected, bankAccountRepository);
-    }
-
-    @Test
     void should_create_crypto_usd_quotes() {
         // Given
         final CryptoUsdQuotesEntity expected = CryptoUsdQuotesEntity.builder()
@@ -351,50 +311,5 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
         // Then
         assertEquals(1, repository.findAll().size());
         assertEquals(expected, result);
-    }
-
-
-    @Test
-    @Transactional(propagation = Propagation.NEVER)
-    void should_save_and_read_and_update_user_payout_info() {
-        // Given
-        final UUID userId = UUID.randomUUID();
-        userRepository.save(UserEntity.builder()
-                .id(userId)
-                .githubUserId(1L)
-                .createdAt(new Date())
-                .lastSeenAt(new Date())
-                .githubLogin(faker.rickAndMorty().character())
-                .githubAvatarUrl(faker.internet().url())
-                .githubEmail(faker.internet().emailAddress())
-                .roles(new UserRole[]{UserRole.USER})
-                .build());
-        final UserPayoutSettings userPayoutSettings = UserPayoutSettings.builder()
-                .aptosAddress(Aptos.accountAddress("0x01"))
-                .starknetAddress(StarkNet.accountAddress("0x02"))
-                .ethWallet(Ethereum.wallet("0x03"))
-                .optimismAddress(Optimism.accountAddress("0x04"))
-                .sepaAccount(UserPayoutSettings.SepaAccount.builder()
-                        .bic(faker.hacker().abbreviation())
-                        .accountNumber(OldAccountNumber.of("FR1014508000702139488771C56"))
-                        .build())
-                .build();
-
-        // When
-        postgresUserAdapter.savePayoutSettingsForUserId(userId, userPayoutSettings);
-        final UserPayoutSettings payoutInformationById = postgresUserAdapter.getPayoutSettingsById(userId);
-
-        // Then
-        assertEquals(userPayoutSettings, payoutInformationById);
-
-        final UserPayoutSettings userPayoutSettingsUpdated =
-                postgresUserAdapter.savePayoutSettingsForUserId(userId, userPayoutSettings.toBuilder()
-                        .ethWallet(null)
-                        .aptosAddress(null)
-                        .sepaAccount(null)
-                        .build());
-        assertNull(userPayoutSettingsUpdated.getEthWallet());
-        assertNull(userPayoutSettingsUpdated.getAptosAddress());
-        assertNull(userPayoutSettingsUpdated.getSepaAccount());
     }
 }

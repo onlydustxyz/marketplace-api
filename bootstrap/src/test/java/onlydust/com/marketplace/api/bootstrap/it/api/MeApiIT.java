@@ -3,7 +3,8 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.bootstrap.helper.Auth0ApiClientStub;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserBillingProfileTypeRepository;
@@ -26,9 +27,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class MeApiIT extends AbstractMarketplaceApiIT {
-
-    @Autowired
-    UserPayoutInfoRepository userPayoutInfoRepository;
     @Autowired
     ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
     @Autowired

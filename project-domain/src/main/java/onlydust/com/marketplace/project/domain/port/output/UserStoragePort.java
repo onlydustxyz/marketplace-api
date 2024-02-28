@@ -2,8 +2,10 @@ package onlydust.com.marketplace.project.domain.port.output;
 
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
+import onlydust.com.marketplace.project.domain.model.Contributor;
 import onlydust.com.marketplace.project.domain.model.Currency;
-import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.project.domain.model.UserProfile;
 import onlydust.com.marketplace.project.domain.view.*;
 
 import java.time.ZonedDateTime;
@@ -26,8 +28,6 @@ public interface UserStoragePort {
 
     void updateUserLastSeenAt(UUID userId, Date lastSeenAt);
 
-    UserPayoutSettings getPayoutSettingsById(UUID id);
-
     void updateOnboardingWizardDisplayDate(UUID userId, Date date);
 
     void updateTermsAndConditionsAcceptanceDate(UUID userId, Date date);
@@ -35,8 +35,6 @@ public interface UserStoragePort {
     UUID acceptProjectLeaderInvitation(Long githubUserId, UUID projectId);
 
     UUID createApplicationOnProject(UUID userId, UUID projectId);
-
-    UserPayoutSettings savePayoutSettingsForUserId(UUID userId, UserPayoutSettings userPayoutSettings);
 
     UserRewardsPageView findRewardsForUserId(UUID userId, UserRewardView.Filters filters,
                                              int pageIndex, int pageSize,

@@ -5,11 +5,9 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserPayoutInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper;
-import onlydust.com.marketplace.api.postgres.adapter.mapper.UserPayoutInfoMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserRewardMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
@@ -23,10 +21,6 @@ import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.view.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
-import onlydust.com.marketplace.project.domain.model.Currency;
-import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
-import onlydust.com.marketplace.project.domain.view.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -48,15 +42,12 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final UserRepository userRepository;
     private final UserViewRepository userViewRepository;
     private final GlobalSettingsRepository globalSettingsRepository;
-    private final UserPayoutInfoRepository userPayoutInfoRepository;
     private final OnboardingRepository onboardingRepository;
     private final ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
     private final ProjectLeadRepository projectLeadRepository;
     private final ApplicationRepository applicationRepository;
     private final ProjectIdRepository projectIdRepository;
     private final UserProfileInfoRepository userProfileInfoRepository;
-    private final OldWalletRepository oldWalletRepository;
-    private final CustomUserPayoutInfoRepository customUserPayoutInfoRepository;
     private final CustomRewardRepository customRewardRepository;
     private final ProjectLedIdRepository projectLedIdRepository;
     private final RewardStatsRepository rewardStatsRepository;
@@ -162,16 +153,6 @@ public class PostgresUserAdapter implements UserStoragePort {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public UserPayoutSettings getPayoutSettingsById(UUID userId) {
-        final Optional<UserPayoutInfoEntity> userPayoutInfoEntity = userPayoutInfoRepository.findByUserId(userId);
-        final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(userId);
-        return UserPayoutInfoMapper.mapEntityToDomain(userPayoutInfoEntity.orElseGet(UserPayoutInfoEntity::new),
-                userPayoutInfoValidationEntity);
-    }
-
-    @Override
     @Transactional
     public void updateOnboardingWizardDisplayDate(UUID userId, Date date) {
         onboardingRepository.findById(userId)
@@ -237,19 +218,6 @@ public class PostgresUserAdapter implements UserStoragePort {
                                 .build())
                 );
         return applicationId;
-    }
-
-    @Transactional
-    @Override
-    public UserPayoutSettings savePayoutSettingsForUserId(UUID userId,
-                                                          UserPayoutSettings userPayoutSettings) {
-        final UserPayoutInfoEntity userPayoutInfoEntity = UserPayoutInfoMapper.mapDomainToEntity(userId,
-                userPayoutSettings);
-        userPayoutInfoRepository.findById(userId).ifPresent(entity -> oldWalletRepository.deleteByUserId(userId));
-        final UserPayoutInfoEntity saved = userPayoutInfoRepository.save(userPayoutInfoEntity);
-        final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(userId);
-        return UserPayoutInfoMapper.mapEntityToDomain(saved, userPayoutInfoValidationEntity);
     }
 
     @Override

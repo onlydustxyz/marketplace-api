@@ -8,7 +8,6 @@ import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.port.input.AccountingUserObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserObserverPort;
@@ -36,7 +35,6 @@ public class UserService implements UserFacadePort {
     private final ProjectStoragePort projectStoragePort;
     private final GithubSearchPort githubSearchPort;
     private final ImageStoragePort imageStoragePort;
-    private final AccountingUserObserverPort accountingUserObserverPort;
 
     @Override
     @Transactional
@@ -44,12 +42,6 @@ public class UserService implements UserFacadePort {
         return userStoragePort
                 .getUserByGithubId(githubUserIdentity.getGithubUserId())
                 .map(user -> {
-                    final var payoutInformationById = userStoragePort.getPayoutSettingsById(user.getId());
-                    user.setHasValidPayoutInfos(payoutInformationById.isValid());
-                    if (payoutInformationById.hasPendingPayments()) {
-                        // TODO : check billing profile statuses
-                        user.setHasValidBillingProfile(false);
-                    }
                     if (!readOnly)
                         userStoragePort.updateUserLastSeenAt(user.getId(), dateProvider.now());
 
@@ -98,11 +90,6 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
-    public UserPayoutSettings getPayoutSettingsForUserId(UUID userId) {
-        return userStoragePort.getPayoutSettingsById(userId);
-    }
-
-    @Override
     public void refreshActiveUserProfiles(ZonedDateTime since) {
         final var activeUsers = userStoragePort.getUsersLastSeenSince(since);
 
@@ -136,11 +123,6 @@ public class UserService implements UserFacadePort {
                         .githubEmail(githubUserProfile.getEmail())
                         .build()).orElseThrow(() -> OnlyDustException.notFound(String.format("Github user %s to update was not found",
                         user.getGithubUserId()))));
-    }
-
-    @Override
-    public UserPayoutSettings updatePayoutSettings(UUID userId, UserPayoutSettings userPayoutSettings) {
-        return userStoragePort.savePayoutSettingsForUserId(userId, userPayoutSettings);
     }
 
     @Override

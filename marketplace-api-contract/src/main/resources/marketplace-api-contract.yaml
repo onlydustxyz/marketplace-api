@@ -178,54 +178,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/me/payout-settings:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Me
-      summary: Caller payout settings
-      operationId: getMyPayoutSettings
-      description: |
-        Get payout settings of the caller
-      responses:
-        "200":
-          description: 'Payout settings'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserPayoutSettingsResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-    put:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Me
-      summary: Update caller payout settings
-      operationId: putMyPayoutSettings
-      description: |
-        Set payout settings of the caller
-      requestBody:
-        description: 'Payout settings'
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserPayoutSettingsRequest'
-      responses:
-        "200":
-          description: 'Payout information'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserPayoutSettingsResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
   /api/v1/me/project-leader-invitations/{projectId}:
     put:
       security:

@@ -4,7 +4,6 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.model.User;
-import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
 import onlydust.com.marketplace.project.domain.model.UserProfile;
 import onlydust.com.marketplace.project.domain.view.*;
 
@@ -26,8 +25,6 @@ public interface UserFacadePort {
 
     UserProfileView updateProfile(UUID userId, UserProfile userProfile);
 
-    UserPayoutSettings getPayoutSettingsForUserId(UUID id);
-
     void refreshActiveUserProfiles(ZonedDateTime since);
 
     void markUserAsOnboarded(UUID userId);
@@ -41,8 +38,6 @@ public interface UserFacadePort {
     UserRewardsPageView getRewardsForUserId(UUID userId, UserRewardView.Filters filters,
                                             int pageIndex, int sanitizedPageSize,
                                             UserRewardView.SortBy sortBy, SortDirection sortDirection);
-
-    UserPayoutSettings updatePayoutSettings(UUID userId, UserPayoutSettings userPayoutSettings);
 
     RewardView getRewardByIdForRecipientId(UUID rewardId, Long recipientId);
 

@@ -184,15 +184,12 @@ public class PostgresConfiguration {
                                                    final UserRepository userRepository,
                                                    final UserViewRepository userViewRepository,
                                                    final GlobalSettingsRepository globalSettingsRepository,
-                                                   final UserPayoutInfoRepository userPayoutInfoRepository,
                                                    final OnboardingRepository onboardingRepository,
                                                    final ProjectLeaderInvitationRepository projectLeaderInvitationRepository,
                                                    final ProjectLeadRepository projectLeadRepository,
                                                    final ApplicationRepository applicationRepository,
                                                    final ProjectIdRepository projectIdRepository,
                                                    final UserProfileInfoRepository userProfileInfoRepository,
-                                                   final OldWalletRepository oldWalletRepository,
-                                                   final CustomUserPayoutInfoRepository customUserPayoutInfoRepository,
                                                    final CustomRewardRepository customRewardRepository,
                                                    final ProjectLedIdRepository projectLedIdRepository,
                                                    final RewardStatsRepository rewardStatsRepository,
@@ -203,15 +200,12 @@ public class PostgresConfiguration {
                 userRepository,
                 userViewRepository,
                 globalSettingsRepository,
-                userPayoutInfoRepository,
                 onboardingRepository,
                 projectLeaderInvitationRepository,
                 projectLeadRepository,
                 applicationRepository,
                 projectIdRepository,
                 userProfileInfoRepository,
-                oldWalletRepository,
-                customUserPayoutInfoRepository,
                 customRewardRepository,
                 projectLedIdRepository,
                 rewardStatsRepository,
@@ -226,11 +220,6 @@ public class PostgresConfiguration {
     @Bean
     public CustomProjectBudgetRepository customProjectBudgetRepository(final EntityManager entityManager) {
         return new CustomProjectBudgetRepository(entityManager);
-    }
-
-    @Bean
-    public CustomUserPayoutInfoRepository customUserPayoutInfoRepository(final EntityManager entityManager) {
-        return new CustomUserPayoutInfoRepository(entityManager);
     }
 
     @Bean
