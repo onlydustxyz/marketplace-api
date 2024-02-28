@@ -20,7 +20,7 @@ public class ContributionRewardViewEntity {
     @Id
     UUID id;
     Date requestedAt;
-    Date processedAt;
+    Date paidAt;
     BigDecimal amount;
     @ManyToOne
     CurrencyEntity currency;
@@ -56,7 +56,7 @@ public class ContributionRewardViewEntity {
                 .from(requestor)
                 .to(recipient)
                 .createdAt(requestedAt)
-                .processedAt(processedAt)
+                .processedAt(paidAt)
                 .build();
     }
 }

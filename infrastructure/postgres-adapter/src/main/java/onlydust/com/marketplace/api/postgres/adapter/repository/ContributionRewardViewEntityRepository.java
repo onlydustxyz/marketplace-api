@@ -16,7 +16,7 @@ public interface ContributionRewardViewEntityRepository extends JpaRepository<Co
                    r.amount,
                    r.currency_id,
                    rsd.amount_usd_equivalent                           AS dollars_equivalent,
-                   rs.status                                           AS status,
+                   rs.status_for_user                                  AS status,
                    requestor.login                                     AS requestor_login,
                    user_avatar_url(requestor.id, requestor.avatar_url) AS requestor_avatar_url,
                    requestor.id                                        AS requestor_id,

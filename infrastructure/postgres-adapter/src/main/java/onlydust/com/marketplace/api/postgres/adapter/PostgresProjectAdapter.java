@@ -457,7 +457,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
     @Override
     @Transactional(readOnly = true)
     public RewardDetailsView getProjectReward(UUID rewardId) {
-        return rewardViewRepository.findById(rewardId).orElseThrow().toDomain();
+        return rewardViewRepository.find(rewardId).orElseThrow().toDomain();
     }
 
     @Override

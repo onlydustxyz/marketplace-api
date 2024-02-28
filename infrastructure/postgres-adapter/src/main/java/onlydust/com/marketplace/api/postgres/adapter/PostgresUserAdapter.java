@@ -266,7 +266,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Override
     @Transactional(readOnly = true)
     public RewardDetailsView findRewardById(UUID rewardId) {
-        return rewardViewRepository.findById(rewardId)
+        return rewardViewRepository.find(rewardId)
                 .orElseThrow(() -> notFound(format("Reward with id %s not found", rewardId)))
                 .toDomain();
     }

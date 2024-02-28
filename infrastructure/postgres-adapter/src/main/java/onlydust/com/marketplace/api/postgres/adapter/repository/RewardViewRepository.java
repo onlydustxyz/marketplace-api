@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UUID> {
@@ -45,7 +46,13 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                 r.project_id, 
                 r.amount, 
                 r.currency_id, 
-                rsd.amount_usd_equivalent
+                rsd.amount_usd_equivalent,
+                github_recipient.id,
+                github_recipient.login,
+                github_recipient.avatar_url,
+                github_requestor.id,
+                github_requestor.login,
+                github_requestor.avatar_url
             """, nativeQuery = true)
     Page<RewardViewEntity> findUserRewards(UUID userId, List<UUID> currencyIds, List<UUID> projectIds, String fromDate, String toDate, Pageable pageable);
 
@@ -80,7 +87,13 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                 r.project_id, 
                 r.amount, 
                 r.currency_id, 
-                rsd.amount_usd_equivalent
+                rsd.amount_usd_equivalent,
+                github_recipient.id,
+                github_recipient.login,
+                github_recipient.avatar_url,
+                github_requestor.id,
+                github_requestor.login,
+                github_requestor.avatar_url
             """, nativeQuery = true)
     Page<RewardViewEntity> findProjectRewards(UUID projectId, List<UUID> currencyIds, List<Long> contributorIds, String fromDate, String toDate,
                                               Pageable pageable);
@@ -92,10 +105,47 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                    r.amount                     AS amount,
                    r.currency_id                AS currency_id,
                    rsd.amount_usd_equivalent    AS dollars_equivalent,
+                   count(*)                     AS contribution_count,
+                   github_recipient.id          AS recipient_id,
+                   github_recipient.login       AS recipient_login,
+                   user_avatar_url(r.recipient_id, github_recipient.avatar_url)  AS recipient_avatar_url,
+                   github_requestor.id          AS requestor_id,
+                   github_requestor.login       AS requestor_login,
+                   user_avatar_url(github_requestor.id, github_requestor.avatar_url)  AS requestor_avatar_url
+            from rewards r
+                 JOIN accounting.reward_status_data rsd ON rsd.reward_id = r.id
+                 JOIN reward_items ri ON ri.reward_id = r.id
+                 JOIN indexer_exp.github_accounts github_recipient ON github_recipient.id = r.recipient_id
+                 JOIN iam.users requestor ON requestor.id = r.requestor_id
+                 JOIN indexer_exp.github_accounts github_requestor ON github_requestor.id = requestor.github_user_id
+            WHERE r.id = :rewardId
+            GROUP BY 
+                r.id, 
+                r.requested_at, 
+                r.project_id, 
+                r.amount, 
+                r.currency_id, 
+                rsd.amount_usd_equivalent,
+                github_recipient.id,
+                github_recipient.login,
+                github_recipient.avatar_url,
+                github_requestor.id,
+                github_requestor.login,
+                github_requestor.avatar_url
+            """, nativeQuery = true)
+    Optional<RewardViewEntity> find(UUID rewardId);
+
+    @Query(value = """
+            SELECT r.id                         AS id,
+                   r.requested_at               AS requested_at,
+                   r.project_id                 AS project_id,
+                   r.amount                     AS amount,
+                   r.currency_id                AS currency_id,
+                   rsd.amount_usd_equivalent    AS dollars_equivalent,
                    count(*)                     AS contribution_count
             from rewards r 
                  JOIN accounting.reward_status_data rsd ON rsd.reward_id = r.id
-                 JOIN accounting.reward_statuses rs ON rs.reward_id = r.id AND rs.status = 'PENDING_REQUEST'
+                 JOIN accounting.reward_statuses rs ON rs.reward_id = r.id AND rs.status_for_user = 'PENDING_REQUEST'
                  JOIN reward_items ri ON ri.reward_id = r.id
             WHERE r.recipient_id = :githubUserId
             GROUP BY 

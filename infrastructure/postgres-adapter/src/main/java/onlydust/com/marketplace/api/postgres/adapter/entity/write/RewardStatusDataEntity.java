@@ -32,13 +32,13 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode
 @TypeDef(name = "currency", typeClass = PostgreSQLEnumType.class)
 @TypeDef(
-        name = "network[]",
+        name = "accounting.network[]",
         typeClass = EnumArrayType.class,
         defaultForType = NetworkEnumEntity[].class,
         parameters = {
                 @Parameter(
                         name = AbstractArrayType.SQL_ARRAY_TYPE,
-                        value = "network"
+                        value = "accounting.network"
                 )
         }
 )
@@ -50,8 +50,8 @@ public class RewardStatusDataEntity {
     Date unlockDate;
     Date invoiceReceivedAt;
     Date paidAt;
-    @Type(type = "network[]")
-    @Column(columnDefinition = "network[]")
+    @Type(type = "accounting.network[]")
+    @Column(columnDefinition = "accounting.network[]")
     NetworkEnumEntity[] networks;
     BigDecimal amountUsdEquivalent;
 
