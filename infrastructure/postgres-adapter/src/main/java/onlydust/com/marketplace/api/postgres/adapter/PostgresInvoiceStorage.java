@@ -43,7 +43,6 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
                 .stream()
                 .map(InvoiceRewardEntity::forInvoice).toList();
 
-        // TODO filter in domain using SponsorAccount network
         preview.wallets(billingProfile.getWallets().stream().map(WalletEntity::forInvoice).toList());
         preview.bankAccount(billingProfile.getBankAccount().map(BankAccountEntity::forInvoice).orElse(null));
 

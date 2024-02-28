@@ -170,6 +170,10 @@ public class Currency implements Cloneable {
         public final static String USD_STR = "USD";
         public final static String ETH_STR = "ETH";
         public final static String APT_STR = "APT";
+        public final static String STRK_STR = "STRK";
+        public final static String OP_STR = "OP";
+        public final static String USDC_STR = "USDC";
+        public final static String LORDS_STR = "LORDS";
 
         public final static Code EUR = Code.of(EUR_STR);
         public final static Code USD = Code.of(USD_STR);

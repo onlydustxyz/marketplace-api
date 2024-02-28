@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
@@ -457,7 +458,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         ),
                         null,
                         null,
-                        List.of(new Invoice.Wallet("ETHEREUM", "vitalik.eth")),
+                        List.of(new Invoice.Wallet(Network.ETHEREUM, "vitalik.eth")),
                         rewards
                 )
         );
