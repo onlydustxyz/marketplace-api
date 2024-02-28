@@ -57,7 +57,7 @@ public class WalletEntity {
 
 
     public Invoice.Wallet forInvoice() {
-        return new Invoice.Wallet(network.toString(), address);
+        return new Invoice.Wallet(network.toNetwork(), address);
     }
 
     @EqualsAndHashCode
