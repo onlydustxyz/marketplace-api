@@ -225,7 +225,7 @@ public class MeRestApi implements MeApi {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final RewardDetailsView rewardDetailsView = userFacadePort.getRewardByIdForRecipientId(rewardId,
                 authenticatedUser.getGithubUserId());
-        return ResponseEntity.ok(RewardMapper.rewardDetailsToResponse(rewardDetailsView));
+        return ResponseEntity.ok(RewardMapper.rewardDetailsToResponse(rewardDetailsView, true));
     }
 
     @Override

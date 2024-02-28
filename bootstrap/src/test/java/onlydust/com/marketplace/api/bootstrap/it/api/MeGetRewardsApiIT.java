@@ -3,12 +3,14 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
+import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +40,11 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     InvoiceRepository invoiceRepository;
     @Autowired
-    PostgresUserAdapter postgresUserAdapter;
+    BillingProfileStoragePort billingProfileStoragePort;
     @Autowired
-    UserBillingProfileTypeRepository userBillingProfileTypeRepository;
+    PayoutPreferenceRepository payoutPreferenceRepository;
+    @Autowired
+    BillingProfileRepository billingProfileRepository;
 
     UserAuthHelper.AuthenticatedUser pierre;
 
@@ -48,8 +52,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     void setup() {
         pierre = userAuthHelper.authenticatePierre();
 
-        // TODO
-//        patchBillingProfile(pierre, BillingProfileTypeEntity.COMPANY, OldVerificationStatusEntity.VERIFIED);
+        patchBillingProfile("20282367-56b0-42d3-81d3-5e4b38f67e3e", BillingProfileEntity.Type.COMPANY, VerificationStatusEntity.VERIFIED);
 
         patchReward("40fda3c6-2a3f-4cdd-ba12-0499dd232d53", 10, "ETH", 15000, null, "2023-07-12");
         patchReward("e1498a17-5090-4071-a88a-6f0b0c337c3a", 50, "ETH", 75000, null, "2023-08-12");
@@ -57,11 +60,10 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
         patchReward("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0", 30, "OP", null, "2023-08-14", null);
         patchReward("5b96ca1e-4ad2-41c1-8819-520b885d9223", 9511147, "STRK", null, null, null);
 
-//        postgresUserAdapter.savePayoutSettingsForUserId(pierre.user().getId(),
-//                UserPayoutSettings.builder()
-//                        .ethWallet(Ethereum.wallet("vitalik.eth"))
-//                        .aptosAddress(Aptos.accountAddress("0x" + faker.random().hex(40)))
-//                        .build());
+        billingProfileStoragePort.savePayoutInfoForBillingProfile(PayoutInfo.builder()
+                .ethWallet(Ethereum.wallet("vitalik.eth"))
+                .aptosAddress(Aptos.accountAddress("0x" + faker.random().hex(40)))
+                .build(), BillingProfile.Id.of("20282367-56b0-42d3-81d3-5e4b38f67e3e"));
     }
 
     @Test
@@ -405,20 +407,18 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
         rewardRepository.save(rewardEntity);
         rewardStatusRepository.save(rewardStatus);
     }
-// TODO
-//    private void patchBillingProfile(@NonNull UserAuthHelper.AuthenticatedUser user, BillingProfileTypeEntity type, OldVerificationStatusEntity status) {
-//        if (type != null) {
-//            final var entity = userBillingProfileTypeRepository.findById(user.user().getId()).orElseThrow();
-//            entity.setBillingProfileType(type);
-//            userBillingProfileTypeRepository.save(entity);
-//        }
-//
-//        if (status != null) {
-//            final var entity = companyBillingProfileRepository.findByUserId(user.user().getId()).orElseThrow();
-//            entity.setVerificationStatus(status);
-//            companyBillingProfileRepository.save(entity);
-//        }
-//    }
+
+    private void patchBillingProfile(@NonNull String billingProfileId,
+                                     BillingProfileEntity.Type type,
+                                     VerificationStatusEntity status) {
+
+        final var billingProfile = billingProfileRepository.findById(UUID.fromString(billingProfileId)).orElseThrow();
+
+        if (type != null) billingProfile.setType(type);
+        if (status != null) billingProfile.setVerificationStatus(status);
+
+        billingProfileRepository.save(billingProfile);
+    }
 
     @SneakyThrows
     @Transactional

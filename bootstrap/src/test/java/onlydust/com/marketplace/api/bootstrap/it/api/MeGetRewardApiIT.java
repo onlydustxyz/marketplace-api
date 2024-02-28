@@ -2,10 +2,14 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.PayoutPreferenceEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.UserBillingProfileTypeRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.PayoutPreferenceRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuotesRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
@@ -33,7 +37,11 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     CryptoUsdQuotesRepository cryptoUsdQuotesRepository;
     @Autowired
-    UserBillingProfileTypeRepository userBillingProfileTypeRepository;
+    BillingProfileRepository billingProfileRepository;
+    @Autowired
+    PayoutPreferenceRepository payoutPreferenceRepository;
+    @Autowired
+    RewardRepository rewardRepository;
 
     @Test
     void should_return_a_403_given_user_not_linked_to_reward() {
@@ -58,11 +66,14 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
         final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.authenticatePierre();
         final String jwt = authenticatedUser.jwt();
         final UUID rewardId = UUID.fromString("2ac80cc6-7e83-4eef-bc0c-932b58f683c0");
-        // TODO
-//        final CompanyBillingProfileEntity companyBillingProfileEntity =
-//                companyBillingProfileRepository.findByUserId(authenticatedUser.user().getId()).orElseThrow();
-//        companyBillingProfileEntity.setVerificationStatus(OldVerificationStatusEntity.VERIFIED);
-//        companyBillingProfileRepository.save(companyBillingProfileEntity);
+
+        final var reward = rewardRepository.findById(rewardId).orElseThrow();
+        final var billingProfileId =
+                payoutPreferenceRepository.findById(PayoutPreferenceEntity.PrimaryKey.builder().projectId(reward.getProjectId()).userId(authenticatedUser.user().getId()).build()).orElseThrow().getBillingProfileId();
+        final var billingProfile = billingProfileRepository.findById(billingProfileId).orElseThrow();
+        billingProfile.setVerificationStatus(VerificationStatusEntity.VERIFIED);
+        billingProfileRepository.save(billingProfile);
+
         // When
         client.get()
                 .uri(getApiURI(String.format(ME_REWARD, rewardId)))

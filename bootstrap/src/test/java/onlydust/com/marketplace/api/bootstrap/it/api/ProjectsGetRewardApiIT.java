@@ -1,21 +1,11 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuotesRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.math.BigDecimal;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -23,14 +13,8 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 
 
 public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
-
-
     @Autowired
-    PaymentRequestRepository paymentRequestRepository;
-    @Autowired
-    PaymentRepository paymentRepository;
-    @Autowired
-    CryptoUsdQuotesRepository cryptoUsdQuotesRepository;
+    BillingProfileRepository billingProfileRepository;
 
     @Test
     void should_return_a_403_given_not_project_lead_to_get_reward() {
@@ -57,6 +41,10 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final UUID rewardId = UUID.fromString("85f8358c-5339-42ac-a577-16d7760d1e28");
 
+        final var billingProfile = billingProfileRepository.findById(UUID.fromString("20282367-56b0-42d3-81d3-5e4b38f67e3e")).orElseThrow();
+        billingProfile.setVerificationStatus(VerificationStatusEntity.VERIFIED);
+        billingProfileRepository.save(billingProfile);
+
         // When
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_REWARD, projectId, rewardId)))
@@ -72,7 +60,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                           "currency": "USDC",
                           "amount": 1000,
                           "dollarsEquivalent": 1010.00,
-                          "status": "PROCESSING",
+                          "status": "PENDING_CONTRIBUTOR",
                           "unlockDate": null,
                           "from": {
                             "githubUserId": 16590657,
@@ -101,122 +89,6 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                           "receipt": null
                         }
                         """);
-
-
-        final PaymentRequestEntity paymentRequestEntity = paymentRequestRepository.findById(rewardId).orElseThrow();
-        paymentRequestEntity.setAmount(BigDecimal.valueOf(100));
-        paymentRequestEntity.setCurrency(CurrencyEnumEntity.strk);
-        paymentRequestEntity.setUsdAmount(null);
-        paymentRequestRepository.save(paymentRequestEntity);
-
-        client.get()
-                .uri(getApiURI(String.format(PROJECTS_REWARD, projectId, rewardId)))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json("""
-                        {
-                            "id": "85f8358c-5339-42ac-a577-16d7760d1e28",
-                            "currency": "STRK",
-                            "amount": 100,
-                            "dollarsEquivalent": null,
-                            "status": "PROCESSING",
-                            "from": {
-                                "githubUserId": 16590657,
-                                "login": "PierreOucif",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                                "isRegistered": null
-                            },
-                            "to": {
-                                "githubUserId": 16590657,
-                                "login": "PierreOucif",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                                "isRegistered": null
-                            },
-                            "createdAt": "2023-09-19T07:38:52.590518Z",
-                            "processedAt": null
-                        }
-                        """);
-
-        final Date processedAt = new SimpleDateFormat("yyyy-MM-dd").parse("2023-09-20");
-        paymentRepository.save(PaymentEntity.builder()
-                .id(UUID.randomUUID())
-                .amount(paymentRequestEntity.getAmount())
-                .requestId(paymentRequestEntity.getId())
-                .processedAt(processedAt)
-                .currencyCode(paymentRequestEntity.getCurrency().name())
-                .receipt(JacksonUtil.toJsonNode("{}"))
-                .build());
-
-        client.get()
-                .uri(getApiURI(String.format(PROJECTS_REWARD, projectId, rewardId)))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(String.format("""
-                        {
-                            "id": "85f8358c-5339-42ac-a577-16d7760d1e28",
-                            "currency": "STRK",
-                            "amount": 100,
-                            "dollarsEquivalent": null,
-                            "status": "COMPLETE",
-                            "from": {
-                                "githubUserId": 16590657,
-                                "login": "PierreOucif",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                                "isRegistered": null
-                            },
-                            "to": {
-                                "githubUserId": 16590657,
-                                "login": "PierreOucif",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                                "isRegistered": null
-                            },
-                            "createdAt": "2023-09-19T07:38:52.590518Z",
-                            "processedAt": "%s"
-                        }""", DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
-
-        paymentRequestEntity.setAmount(BigDecimal.valueOf(200));
-        paymentRequestEntity.setCurrency(CurrencyEnumEntity.eth);
-        paymentRequestEntity.setUsdAmount(BigDecimal.valueOf(309532));
-        paymentRequestRepository.save(paymentRequestEntity);
-
-        client.get()
-                .uri(getApiURI(String.format(PROJECTS_REWARD, projectId, rewardId)))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(String.format("""
-                        {
-                            "id": "85f8358c-5339-42ac-a577-16d7760d1e28",
-                            "currency": "ETH",
-                            "amount": 200,
-                            "dollarsEquivalent": 309532,
-                            "status": "COMPLETE",
-                            "from": {
-                                "githubUserId": 16590657,
-                                "login": "PierreOucif",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                                "isRegistered": null
-                            },
-                            "to": {
-                                "githubUserId": 16590657,
-                                "login": "PierreOucif",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                                "isRegistered": null
-                            },
-                            "createdAt": "2023-09-19T07:38:52.590518Z",
-                            "processedAt": "%s"
-                        }""", DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
     }
 
 

@@ -37,8 +37,8 @@ public interface RewardMapper {
                 .build();
     }
 
-    static RewardDetailsResponse rewardDetailsToResponse(RewardDetailsView rewardDetailsView) {
-        return new RewardDetailsResponse()
+    static RewardDetailsResponse rewardDetailsToResponse(RewardDetailsView rewardDetailsView, boolean forUser) {
+        final var response = new RewardDetailsResponse()
                 .from(new ContributorResponse()
                         .githubUserId(rewardDetailsView.getFrom().getGithubUserId())
                         .avatarUrl(rewardDetailsView.getFrom().getGithubAvatarUrl())
@@ -54,12 +54,19 @@ public interface RewardMapper {
                 .processedAt(DateMapper.toZoneDateTime(rewardDetailsView.getProcessedAt()))
                 .amount(rewardDetailsView.getAmount())
                 .currency(mapCurrency(rewardDetailsView.getCurrency()))
-                .status(mapRewardStatus(rewardDetailsView.getStatusForUser()))
                 .unlockDate(DateMapper.toZoneDateTime(rewardDetailsView.getUnlockDate()))
                 .dollarsEquivalent(rewardDetailsView.getDollarsEquivalent())
                 .id(rewardDetailsView.getId())
                 .receipt(receiptToResponse(rewardDetailsView.getReceipt()))
                 .project(ProjectMapper.mapShortProjectResponse(rewardDetailsView.getProject()));
+
+        if (forUser) {
+            response.status(mapRewardStatus(rewardDetailsView.getStatusForUser()));
+        } else {
+            response.status(mapRewardStatus(rewardDetailsView.getStatusForProjectLead()));
+        }
+
+        return response;
     }
 
     @NonNull
@@ -71,6 +78,17 @@ public interface RewardMapper {
             case processing -> RewardStatus.PROCESSING;
             case locked -> RewardStatus.LOCKED;
             case pendingVerification -> RewardStatus.PENDING_VERIFICATION;
+        };
+    }
+
+    @NonNull
+    private static RewardStatus mapRewardStatus(ProjectRewardView.Status rewardView) {
+        return switch (rewardView) {
+            case complete -> RewardStatus.COMPLETE;
+            case pendingContributor -> RewardStatus.PENDING_CONTRIBUTOR;
+            case pendingSignup -> RewardStatus.PENDING_SIGNUP;
+            case processing -> RewardStatus.PROCESSING;
+            case locked -> RewardStatus.LOCKED;
         };
     }
 

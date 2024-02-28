@@ -83,6 +83,7 @@ public class RewardViewEntity {
                         .currency(currency.toOldDomain())
                         .dollarsEquivalent(dollarsEquivalent)
                         .build())
+                .numberOfRewardedContributions(contributionCount)
                 .build();
     }
 
@@ -100,6 +101,7 @@ public class RewardViewEntity {
                         .currency(currency.toOldDomain())
                         .dollarsEquivalent(dollarsEquivalent)
                         .build())
+                .numberOfRewardedContributions(contributionCount)
                 .build();
     }
 }

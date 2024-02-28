@@ -8,12 +8,12 @@ import onlydust.com.marketplace.api.contract.model.BillingProfileInvoicesPageRes
 import onlydust.com.marketplace.api.contract.model.BillingProfileResponse;
 import onlydust.com.marketplace.api.contract.model.MyBillingProfilesResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.WalletEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.WalletTypeEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -44,13 +45,15 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     GlobalSettingsRepository globalSettingsRepository;
     @Autowired
-    PaymentRepository paymentRepository;
-    @Autowired
     InvoiceRepository invoiceRepository;
     @Autowired
     EntityManagerFactory entityManagerFactory;
     @Autowired
     BillingProfileRepository billingProfileRepository;
+    @Autowired
+    WalletRepository walletRepository;
+    @Autowired
+    KybRepository kybRepository;
 
     UserAuthHelper.AuthenticatedUser antho;
     UserAuthHelper.AuthenticatedUser olivier;
@@ -96,7 +99,26 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
 
         final var billingProfile = billingProfileRepository.findById(billingProfileId).orElseThrow();
         billingProfile.setVerificationStatus(VerificationStatusEntity.VERIFIED);
+        final var kyb = billingProfile.getKyb();
+        kyb.setBillingProfileId(billingProfileId);
+        kyb.setOwnerId(antho.user().getId());
+        kyb.setName("My company");
+        kyb.setCountry("FRA");
+        kyb.setAddress("My address");
+        kyb.setRegistrationNumber("123456");
+        kyb.setSubjectToEuVAT(true);
+        kyb.setVerificationStatus(VerificationStatusEntity.VERIFIED);
         billingProfileRepository.save(billingProfile);
+        kybRepository.save(kyb);
+
+        walletRepository.saveAll(List.of(
+                WalletEntity.builder()
+                        .billingProfileId(billingProfileId)
+                        .address("abuisset.eth")
+                        .network(NetworkEnumEntity.ethereum)
+                        .type(WalletTypeEnumEntity.name)
+                        .build()
+        ));
     }
 
 
@@ -544,7 +566,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    @Order(2)
+    @Order(4)
     void should_prevent_invoice_preview_on_invoiced_rewards() {
         // Given
         final var rewardAlreadyInvoiced = "966cd55c-7de8-45c4-8bba-b388c38ca15d";

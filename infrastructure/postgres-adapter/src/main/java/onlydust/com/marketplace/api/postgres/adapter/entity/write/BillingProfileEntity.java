@@ -23,7 +23,7 @@ import static java.util.Objects.isNull;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Builder(toBuilder = true)
 @Table(name = "billing_profiles", schema = "accounting")
@@ -32,6 +32,7 @@ import static java.util.Objects.isNull;
 @TypeDef(name = "verification_status", typeClass = PostgreSQLEnumType.class)
 public class BillingProfileEntity {
     @Id
+    @EqualsAndHashCode.Include
     UUID id;
     String name;
     @org.hibernate.annotations.Type(type = "billing_profile_type")
