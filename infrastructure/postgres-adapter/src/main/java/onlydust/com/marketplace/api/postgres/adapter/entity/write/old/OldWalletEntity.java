@@ -40,7 +40,7 @@ public class OldWalletEntity {
     WalletTypeEnumEntity type;
 
     public Invoice.Wallet forInvoice() {
-        return new Invoice.Wallet(network.toString(), address);
+        return new Invoice.Wallet(network.toNetwork(), address);
     }
 
     @EqualsAndHashCode
