@@ -65,7 +65,11 @@ public class BillingProfileVerificationService implements BillingProfileVerifica
     private BillingProfileVerificationUpdated updateBillingProfileWithKyb(BillingProfileVerificationUpdated billingProfileVerificationUpdated) {
         final Kyb updatedKyb = billingProfileStoragePort.findKybById(billingProfileVerificationUpdated.getVerificationId())
                 .map(billingProfileVerificationProviderPort::getUpdatedKyb)
-                .map(kyb -> kyb.toBuilder().status(billingProfileVerificationUpdated.getVerificationStatus()).build())
+                .map(kyb -> kyb.toBuilder()
+                        .status(billingProfileVerificationUpdated.getVerificationStatus())
+                        .externalApplicantId(billingProfileVerificationUpdated.getExternalApplicantId())
+                        .reviewMessageForApplicant(billingProfileVerificationUpdated.getReviewMessageForApplicant())
+                        .build())
                 .orElseThrow(() -> new OutboxSkippingException("Kyb %s not found".formatted(billingProfileVerificationUpdated.getVerificationId())));
         billingProfileStoragePort.saveKyb(updatedKyb);
         final List<VerificationStatus> childrenKycStatus = billingProfileStoragePort.findAllChildrenKycStatuesFromParentKyb(updatedKyb);
@@ -96,7 +100,12 @@ public class BillingProfileVerificationService implements BillingProfileVerifica
     private BillingProfileVerificationUpdated updateBillingProfileWithKyc(BillingProfileVerificationUpdated billingProfileVerificationUpdated) {
         final Kyc updatedKyc = billingProfileStoragePort.findKycById(billingProfileVerificationUpdated.getVerificationId())
                 .map(billingProfileVerificationProviderPort::getUpdatedKyc)
-                .map(kyc -> kyc.toBuilder().status(billingProfileVerificationUpdated.getVerificationStatus()).build())
+                .map(kyc -> kyc.toBuilder()
+                        .status(billingProfileVerificationUpdated.getVerificationStatus())
+                        .externalApplicantId(billingProfileVerificationUpdated.getExternalApplicantId())
+                        .reviewMessageForApplicant(billingProfileVerificationUpdated.getReviewMessageForApplicant())
+                        .build()
+                )
                 .orElseThrow(() -> new OutboxSkippingException("Kyc %s not found".formatted(billingProfileVerificationUpdated.getVerificationId())));
         billingProfileStoragePort.saveKyc(updatedKyc);
         billingProfileStoragePort.updateBillingProfileStatus(updatedKyc.getBillingProfileId(), updatedKyc.getStatus());

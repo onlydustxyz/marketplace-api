@@ -57,7 +57,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.name").isEqualTo("company")
                 .jsonPath("$.type").isEqualTo("COMPANY")
-                .jsonPath("$.kyb.status").isEqualTo("NOT_STARTED")
+                .jsonPath("$.status").isEqualTo("NOT_STARTED")
                 .jsonPath("$.id").isNotEmpty();
 
         client.post()
@@ -77,7 +77,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.name").isEqualTo("company")
                 .jsonPath("$.type").isEqualTo("COMPANY")
-                .jsonPath("$.kyb.status").isEqualTo("NOT_STARTED")
+                .jsonPath("$.status").isEqualTo("NOT_STARTED")
                 .jsonPath("$.id").isNotEmpty();
 
 
@@ -99,7 +99,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.name").isEqualTo("self_employed")
                 .jsonPath("$.type").isEqualTo("SELF_EMPLOYED")
-                .jsonPath("$.kyb.status").isEqualTo("NOT_STARTED")
+                .jsonPath("$.status").isEqualTo("NOT_STARTED")
                 .jsonPath("$.id").isNotEmpty();
 
         client.post()
@@ -119,7 +119,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.name").isEqualTo("self_employed")
                 .jsonPath("$.type").isEqualTo("SELF_EMPLOYED")
-                .jsonPath("$.kyb.status").isEqualTo("NOT_STARTED")
+                .jsonPath("$.status").isEqualTo("NOT_STARTED")
                 .jsonPath("$.id").isNotEmpty();
 
 
@@ -207,7 +207,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.name").isEqualTo(companyBillingProfile.name())
                 .jsonPath("$.id").isEqualTo(companyBillingProfile.id().value().toString())
                 .jsonPath("$.type").isEqualTo(companyBillingProfile.type().name())
-                .jsonPath("$.kyb.status").isEqualTo(companyBillingProfile.kyb().getStatus().name())
+                .jsonPath("$.status").isEqualTo(companyBillingProfile.status().name())
                 .jsonPath("$.kyc").isEmpty();
 
         // When
@@ -222,7 +222,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.name").isEqualTo(selfEmployedBillingProfile.name())
                 .jsonPath("$.id").isEqualTo(selfEmployedBillingProfile.id().value().toString())
                 .jsonPath("$.type").isEqualTo(selfEmployedBillingProfile.type().name())
-                .jsonPath("$.kyb.status").isEqualTo(selfEmployedBillingProfile.kyb().getStatus().name())
+                .jsonPath("$.status").isEqualTo(selfEmployedBillingProfile.kyb().getStatus().name())
                 .jsonPath("$.kyc").isEmpty();
 
         // When

@@ -107,14 +107,12 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_GET_CONTRIBUTED_PROJECTS = "/api/v1/me/contributed-projects";
     protected static final String ME_GET_CONTRIBUTED_REPOS = "/api/v1/me/contributed-repos";
     protected static final String ME_GET_REWARDING_PROJECTS = "/api/v1/me/rewarding-projects";
-    protected static final String ME_GET_REWARD_TOTAL_AMOUNTS = "/api/v1/me/rewards/amounts";
     protected static final String ME_REWARDS_PENDING_INVOICE = "/api/v1/me/rewards/pending-invoice";
     protected static final String ME_REWARD = "/api/v1/me/rewards/%s";
     protected static final String ME_REWARD_ITEMS = "/api/v1/me/rewards/%s/reward-items";
     protected static final String ME_GET_REWARD_CURRENCIES = "/api/v1/me/reward-currencies";
     protected static final String ME_POST_MARK_INVOICE_AS_RECEIVED = "/api/v1/me/invoices";
     protected static final String ME_BILLING_PROFILES = "/api/v1/me/billing-profiles";
-    protected static final String ME_PATCH_BILLING_PROFILE_TYPE = "/api/v1/me/billing-profiles";
     protected static final String ME_GET_PROFILE_GITHUB = "/api/v1/me/profile/github";
     protected static final String USERS_GET = "/api/v1/users";
     protected static final String USERS_GET_BY_LOGIN = "/api/v1/users/login";

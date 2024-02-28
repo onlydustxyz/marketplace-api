@@ -93,6 +93,7 @@ public class BillingProfileVerificationServiceTest {
                     .verificationId(verificationId)
                     .type(VerificationType.KYC)
                     .externalApplicantId(faker.rickAndMorty().location())
+                    .reviewMessageForApplicant(faker.gameOfThrones().character())
                     .build();
             final Event event = mock(Event.class);
             final Kyc initialKyc = Kyc.builder()
@@ -104,6 +105,8 @@ public class BillingProfileVerificationServiceTest {
             final Kyc kycWithDataFromExternalSource = initialKyc.toBuilder()
                     .lastName(faker.name().lastName())
                     .firstName(faker.name().firstName())
+                    .externalApplicantId(billingProfileVerificationUpdated.getExternalApplicantId())
+                    .reviewMessageForApplicant(billingProfileVerificationUpdated.getReviewMessageForApplicant())
                     .build();
             final BillingProfileVerificationUpdated updatedEvent = billingProfileVerificationUpdated.toBuilder()
                     .userId(initialKyc.getOwnerId())
@@ -169,6 +172,7 @@ public class BillingProfileVerificationServiceTest {
                     .verificationStatus(VerificationStatus.UNDER_REVIEW)
                     .verificationId(verificationId)
                     .externalApplicantId(faker.rickAndMorty().location())
+                    .reviewMessageForApplicant(faker.gameOfThrones().character())
                     .type(VerificationType.KYB)
                     .build();
             final Event event = mock(Event.class);
@@ -182,6 +186,8 @@ public class BillingProfileVerificationServiceTest {
                     .name(faker.rickAndMorty().character()).build();
             final Kyb updateKyb = kybWithDataFromExternalSource.toBuilder()
                     .status(billingProfileVerificationUpdated.getVerificationStatus())
+                    .externalApplicantId(billingProfileVerificationUpdated.getExternalApplicantId())
+                    .reviewMessageForApplicant(billingProfileVerificationUpdated.getReviewMessageForApplicant())
                     .build();
             final BillingProfileVerificationUpdated updatedEvent = billingProfileVerificationUpdated.toBuilder()
                     .userId(initialKyb.getOwnerId())
@@ -214,6 +220,7 @@ public class BillingProfileVerificationServiceTest {
                     .verificationId(verificationId)
                     .type(VerificationType.KYB)
                     .externalApplicantId(faker.rickAndMorty().location())
+                    .reviewMessageForApplicant(faker.gameOfThrones().character())
                     .build();
             final Event event = mock(Event.class);
             final Kyb initialKyb = Kyb.builder()
@@ -226,6 +233,8 @@ public class BillingProfileVerificationServiceTest {
                     .name(faker.rickAndMorty().character()).build();
             final Kyb updateKyb = kybWithDataFromExternalSource.toBuilder()
                     .status(billingProfileVerificationUpdated.getVerificationStatus())
+                    .reviewMessageForApplicant(billingProfileVerificationUpdated.getReviewMessageForApplicant())
+                    .externalApplicantId(billingProfileVerificationUpdated.getExternalApplicantId())
                     .build();
             final BillingProfileVerificationUpdated updatedEvent = billingProfileVerificationUpdated.toBuilder()
                     .userId(updateKyb.getOwnerId())

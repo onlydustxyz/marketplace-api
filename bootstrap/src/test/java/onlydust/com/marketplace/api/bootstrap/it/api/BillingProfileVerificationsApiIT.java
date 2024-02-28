@@ -531,93 +531,6 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
         assertEquals(6, slackNotificationStub.getNotifications().size());
     }
 
-
-    @Test
-    @Order(6)
-    void should_update_user_billing_profile_type() {
-        // Given
-        final var githubUserId = faker.number().randomNumber() + faker.number().randomNumber();
-        final var login = faker.name().username();
-        final var avatarUrl = faker.internet().avatar();
-        final var userId = UUID.randomUUID();
-        final String jwt = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
-
-        // When
-        client.get()
-                .uri(getApiURI(ME_GET))
-                .header("Authorization", "Bearer " + jwt)
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.billingProfileType").isEqualTo("INDIVIDUAL");
-
-        // When
-        client.patch()
-                .uri(getApiURI(ME_PATCH_BILLING_PROFILE_TYPE))
-                .header("Authorization", "Bearer " + jwt)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "type": "COMPANY"
-                        }
-                        """)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful();
-
-        // When
-        client.get()
-                .uri(getApiURI(ME_GET))
-                .header("Authorization", "Bearer " + jwt)
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.billingProfileType").isEqualTo("COMPANY");
-    }
-
-
-    @Test
-    @Order(7)
-    void should_list_company_billing_profiles() {
-        // Given
-        final var pierre = userAuthHelper.authenticatePierre();
-
-        client.patch()
-                .uri(getApiURI(ME_PATCH_BILLING_PROFILE_TYPE))
-                .header("Authorization", "Bearer " + pierre.jwt())
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "type": "COMPANY"
-                        }
-                        """)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful();
-
-        // When
-        client.get()
-                .uri(ME_BILLING_PROFILES)
-                .header("Authorization", BEARER_PREFIX + pierre.jwt())
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.billingProfiles.length()").isEqualTo(1)
-                .jsonPath("$.billingProfiles[0].id").isNotEmpty()
-                .jsonPath("$.billingProfiles[0].type").isEqualTo("COMPANY")
-                .jsonPath("$.billingProfiles[0].name").isEqualTo("Test")
-                .jsonPath("$.billingProfiles[0].rewardCount").isEqualTo(0)
-        ;
-    }
-
     @Test
     @Order(10)
     void should_get_company_billing_profile_given_a_closed_children_kyc_fixed() {
@@ -630,43 +543,59 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
         final String applicantId = "kyb-" + faker.number().randomNumber();
 
         // When
-//        client.get()
-//                .uri(BILLING_PROFILES_GET_BY_ID.formatted(billingProfileId))
-//                .header("Authorization", BEARER_PREFIX + jwt)
-//                .exchange()
-//                // Then
-//                .expectStatus()
-//                .is2xxSuccessful()
-//                .expectBody()
-//                .jsonPath("$.id").isNotEmpty()
-//                .jsonPath("$.status").isEqualTo("NOT_STARTED");
+        client.post()
+                .uri(getApiURI(BILLING_PROFILES_POST))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + jwt)
+                .bodyValue("""
+                        {
+                          "name": "company2",
+                          "type": "COMPANY"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.name").isEqualTo("company2")
+                .jsonPath("$.type").isEqualTo("COMPANY")
+                .jsonPath("$.status").isEqualTo("NOT_STARTED")
+                .jsonPath("$.kyb.id").isNotEmpty()
+                .jsonPath("$.kyc").isEmpty()
+                .jsonPath("$.id").isNotEmpty();
 
-//        final UUID billingProfileId = companyBillingProfileRepository.findByUserId(userId).orElseThrow().getId();
-        final UUID billingProfileId = UUID.randomUUID();
+        final UUID billingProfileId = billingProfileRepository.findBillingProfilesForUserId(userId).stream()
+                .filter(billingProfileEntity -> billingProfileEntity.getType().equals(BillingProfileEntity.Type.COMPANY))
+                .findFirst()
+                .orElseThrow()
+                .getId();
+
+        final UUID kybId = kybRepository.findByBillingProfileId(billingProfileId).orElseThrow().getId();
         final String sumsubApiPath = String.format("/resources/applicants/-;externalUserId=%s/one",
-                billingProfileId.toString());
+                kybId.toString());
         sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))
-                .inScenario("KYB")
-                .whenScenarioStateIs(Scenario.STARTED)
+//                .inScenario("KYB")
+//                .whenScenarioStateIs(Scenario.STARTED)
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
-                .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_COMPANY_UNDER_REVIEW_RESPONSE_JSON.formatted(applicantId)))
-                .willSetStateTo("UNDER_REVIEW_1"));
-        sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))
-                .inScenario("KYB")
-                .whenScenarioStateIs("UNDER_REVIEW_1")
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
-                .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_COMPANY_UNDER_REVIEW_RESPONSE_JSON.formatted(applicantId)))
-                .willSetStateTo("VERIFIED"));
-
-        sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))
-                .inScenario("KYB")
-                .whenScenarioStateIs("VERIFIED")
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
-                .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_COMPANY_VERIFIED_RESPONSE_JSON.formatted(applicantId)))
-                .willSetStateTo("DONE"));
+                .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_COMPANY_UNDER_REVIEW_RESPONSE_JSON.formatted(applicantId))));
+//                .willSetStateTo("UNDER_REVIEW_1"));
+//        sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))
+//                .inScenario("KYB")
+//                .whenScenarioStateIs("UNDER_REVIEW_1")
+//                .withHeader("Content-Type", equalTo("application/json"))
+//                .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
+//                .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_COMPANY_UNDER_REVIEW_RESPONSE_JSON.formatted(applicantId)))
+//                .willSetStateTo("VERIFIED"));
+//
+//        sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))
+//                .inScenario("KYB")
+//                .whenScenarioStateIs("VERIFIED")
+//                .withHeader("Content-Type", equalTo("application/json"))
+//                .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
+//                .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_COMPANY_VERIFIED_RESPONSE_JSON.formatted(applicantId)))
+//                .willSetStateTo("DONE"));
 
         final String sumsubApiChecksPath = String.format("/resources/checks/latest?type=COMPANY&applicantId=%s",
                 applicantId);
@@ -695,7 +624,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                   "previousLevelName": null,
                   "videoIdentReviewStatus": null,
                   "externalApplicantActionId": null
-                }""", applicantId, billingProfileId).getBytes(StandardCharsets.UTF_8);
+                }""", applicantId, kybId).getBytes(StandardCharsets.UTF_8);
         final String sumsubDigest = SumsubSignatureVerifier.hmac(sumsubPayload, sumsubWebhookProperties.getSecret());
 
         // When
@@ -720,13 +649,13 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.status").isEqualTo("UNDER_REVIEW")
-                .jsonPath("$.address").isEqualTo("54 rue du Faubourg Montmartre, 75009 Paris")
-                .jsonPath("$.registrationDate").isEqualTo("2021-12-15T00:00:00Z")
-                .jsonPath("$.country").isEqualTo("France")
-                .jsonPath("$.registrationNumber").isEqualTo("908233638")
-                .jsonPath("$.subjectToEuropeVAT").isEqualTo(true)
-                .jsonPath("$.euVATNumber").isEqualTo("FR26908233638")
-                .jsonPath("$.usEntity").isEqualTo(false);
+                .jsonPath("$.kyb.address").isEqualTo("54 rue du Faubourg Montmartre, 75009 Paris")
+                .jsonPath("$.kyb.registrationDate").isEqualTo("2021-12-15T00:00:00Z")
+                .jsonPath("$.kyb.country").isEqualTo("France")
+                .jsonPath("$.kyb.registrationNumber").isEqualTo("908233638")
+                .jsonPath("$.kyb.subjectToEuropeVAT").isEqualTo(true)
+                .jsonPath("$.kyb.euVATNumber").isEqualTo("FR26908233638")
+                .jsonPath("$.kyb.usEntity").isEqualTo(false);
 
         final byte[] sumsubPayloadChildrenKycClosed = String.format("""
                 {
@@ -836,6 +765,59 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .header(X_OD_API, sumsubWebhookProperties.getOdApiHeader())
                 .header(X_SUMSUB_PAYLOAD_DIGEST, sumsubDigestChildrenKycVerified)
                 .bodyValue(sumsubPayloadChildrenKycVerified)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+
+        billingProfileVerificationOutboxJob.run();
+
+        client.get()
+                .uri(BILLING_PROFILES_GET_BY_ID.formatted(billingProfileId))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.status").isEqualTo("UNDER_REVIEW");
+
+        final byte[] sumsubPayloadKybVerified = String.format("""
+                {
+                  "type": "applicantReviewed",
+                  "clientId": "onlydust",
+                  "levelName": "basic-kyb-level",
+                  "applicantId": "%s",
+                  "createdAtMs": "2024-02-02 17:23:16.368",
+                  "sandboxMode": false,
+                  "inspectionId": "65bd228a2a99e9196014ccc6",
+                  "reviewResult": {
+                       "buttonIds": null,
+                       "rejectLabels": null,
+                       "reviewAnswer": "GREEN",
+                       "clientComment": null,
+                       "reviewRejectType": null,
+                       "moderationComment": null
+                     },
+                  "reviewStatus": "completed",
+                  "applicantType": "company",
+                  "correlationId": "0727edcd2fd452f64b7dd9f76516d815",
+                  "externalUserId": "%s",
+                  "applicantActionId": null,
+                  "applicantMemberOf": null,
+                  "previousLevelName": null,
+                  "videoIdentReviewStatus": null,
+                  "externalApplicantActionId": null
+                }""", applicantId, kybId).getBytes(StandardCharsets.UTF_8);
+        final String sumsubDigestKybVerified = SumsubSignatureVerifier.hmac(sumsubPayloadKybVerified, sumsubWebhookProperties.getSecret());
+
+        // When
+        client.post()
+                .uri(getApiURI("/api/v1/sumsub/webhook"))
+                .header(X_OD_API, sumsubWebhookProperties.getOdApiHeader())
+                .header(X_SUMSUB_PAYLOAD_DIGEST, sumsubDigestKybVerified)
+                .bodyValue(sumsubPayloadKybVerified)
                 .exchange()
                 // Then
                 .expectStatus()
