@@ -15,6 +15,28 @@ servers:
 
 paths:
   # BackofficeInvoicingManagement ===============================================================
+  /bo/v1/me:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeMe
+      summary: Get my information
+      operationId: getMe
+      description: |
+        Get my information
+      responses:
+        "200":
+          description: 'Me'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /bo/v1/invoices:
     get:
       security:
@@ -1110,6 +1132,10 @@ paths:
 
 components:
   securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
     apiKey:
       type: apiKey
       in: header
@@ -1179,6 +1205,31 @@ components:
           format: uuid
           description: The error id
           example: 4f7c660e-6cf1-4424-b240-e630c4c19069
+
+    MeResponse:
+      type: object
+      required:
+        - email
+        - name
+        - roles
+      properties:
+        email:
+          type: string
+        name:
+          type: string
+        avatarUrl:
+          type: string
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/BackofficeUserRole'
+
+    BackofficeUserRole:
+      type: string
+      enum:
+        - BO_ADMIN
+        - BO_READER
+
     GithubRepositoryPage:
       type: object
       required:

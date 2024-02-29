@@ -6,13 +6,16 @@ import lombok.Data;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationFilter;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.Auth0OnlyDustAppAuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtVerifier;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Properties;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0UserInfoService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.backoffice.Auth0OnlyDustBackofficeAuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationFilter;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.user.domain.port.input.BackofficeUserFacadePort;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,11 +55,23 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public JwtService jwtServiceAuth0(final ObjectMapper objectMapper,
-                                      final UserFacadePort userFacadePort,
-                                      final JWTVerifier jwtVerifier,
-                                      final Auth0UserInfoService auth0UserInfoService) {
-        return new Auth0JwtService(objectMapper, userFacadePort, auth0UserInfoService, jwtVerifier);
+    public JwtService jwtServiceAuth0(final JWTVerifier jwtVerifier,
+                                      final Auth0UserInfoService auth0UserInfoService,
+                                      final Auth0OnlyDustAppAuthenticationService appAuthenticationService,
+                                      final Auth0OnlyDustBackofficeAuthenticationService backofficeAuthenticationService
+    ) {
+        return new Auth0JwtService(auth0UserInfoService, jwtVerifier, appAuthenticationService, backofficeAuthenticationService);
+    }
+
+    @Bean
+    public Auth0OnlyDustAppAuthenticationService appAuthenticationService(final ObjectMapper objectMapper,
+                                                                          final UserFacadePort userFacadePort) {
+        return new Auth0OnlyDustAppAuthenticationService(objectMapper, userFacadePort);
+    }
+
+    @Bean
+    public Auth0OnlyDustBackofficeAuthenticationService backofficeAuthenticationService(final BackofficeUserFacadePort backofficeUserFacadePort) {
+        return new Auth0OnlyDustBackofficeAuthenticationService(backofficeUserFacadePort);
     }
 
     @Bean
@@ -70,8 +85,13 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public AuthenticationService authenticationService(final AuthenticationContext authenticationContext) {
-        return new AuthenticationService(authenticationContext);
+    public AuthenticatedAppUserService authenticatedAppUserService(final AuthenticationContext authenticationContext) {
+        return new AuthenticatedAppUserService(authenticationContext);
+    }
+
+    @Bean
+    public AuthenticatedBackofficeUserService authenticatedBackofficeUserService(final AuthenticationContext authenticationContext) {
+        return new AuthenticatedBackofficeUserService(authenticationContext);
     }
 
     @Bean
@@ -120,7 +140,7 @@ public class WebSecurityConfiguration {
     public static class WebCorsProperties {
         private String[] hosts;
     }
-    
+
     @Bean
     @ConfigurationProperties("application.web.machine-to-machine")
     public ApiKeyAuthenticationService.Config indexerApiKeyAuthenticationConfig() {

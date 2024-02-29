@@ -12,7 +12,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentReq
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -33,7 +33,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
     public ProjectRepository projectRepository;
 
     @Autowired
-    AuthenticationService authenticationService;
+    AuthenticatedAppUserService authenticatedAppUserService;
     @Autowired
     PaymentRequestRepository paymentRequestRepository;
 

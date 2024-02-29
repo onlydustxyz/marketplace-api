@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.rest.api.adapter.authentication;
+package onlydust.com.marketplace.api.rest.api.adapter.authentication.app;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -9,7 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 @EqualsAndHashCode
 @ToString
 @AllArgsConstructor
-public class OnlyDustGrantedAuthority implements GrantedAuthority {
+public class OnlyDustAppGrantedAuthority implements GrantedAuthority {
 
     private final UserRole role;
 

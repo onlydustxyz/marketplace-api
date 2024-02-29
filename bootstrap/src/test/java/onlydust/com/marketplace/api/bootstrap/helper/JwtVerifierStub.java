@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.bootstrap.helper;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtClaims;
 
 import java.util.Base64;
 import java.util.Map;
@@ -29,32 +28,32 @@ public class JwtVerifierStub implements JWTVerifier {
         return verify(jwt.getToken());
     }
 
-    public String tokenFor(String githubWithUserId, long expiresInMilliseconds) {
-        final String token = "token-for-%s".formatted(githubWithUserId);
+    public String tokenFor(String sub, long expiresInMilliseconds) {
+        final String token = "token-for-%s".formatted(sub);
 
         final DecodedJWT decodedJWT = mock(DecodedJWT.class);
-        when(decodedJWT.getSubject()).thenReturn(githubWithUserId);
+        when(decodedJWT.getSubject()).thenReturn(sub);
         when(decodedJWT.getToken()).thenReturn(token);
         when(decodedJWT.getPayload()).thenReturn(Base64.getUrlEncoder().encodeToString(String.format("""
-                {
-                  "iss": "https://onlydust-hackathon.eu.auth0.com/",
-                  "aud": "62GDg2a6pCjnAln1FccD55eCKLJtj4T5",
-                  "iat": 1696947933,
-                  "exp": %d,
-                  "sub": "%s",
-                  "azp": "gfOdiFOltYYUMYeBzNpeNAjMHmb9fWoV",
-                  "scope": "openid profile email"
-                }
-                """,
+                        {
+                          "iss": "https://onlydust-hackathon.eu.auth0.com/",
+                          "aud": "62GDg2a6pCjnAln1FccD55eCKLJtj4T5",
+                          "iat": 1696947933,
+                          "exp": %d,
+                          "sub": "%s",
+                          "azp": "gfOdiFOltYYUMYeBzNpeNAjMHmb9fWoV",
+                          "scope": "openid profile email"
+                        }
+                        """,
                 TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() + expiresInMilliseconds),
-                githubWithUserId).getBytes()));
+                sub).getBytes()));
 
         decodedJWTPerToken.put(token, decodedJWT);
         return token;
     }
 
-    public String tokenFor(String githubWithUserId) {
-        return tokenFor(githubWithUserId, 10_000L);
+    public String tokenFor(String sub) {
+        return tokenFor(sub, 10_000L);
     }
 
     public String tokenFor(Long githubUserId) {

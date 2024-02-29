@@ -1,50 +1,33 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0;
 
 import com.auth0.jwt.interfaces.JWTVerifier;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
-import onlydust.com.marketplace.project.domain.model.User;
-import onlydust.com.marketplace.project.domain.model.UserRole;
-import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.JwtService;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustAuthentication;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustGrantedAuthority;
+import org.springframework.security.core.Authentication;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @AllArgsConstructor
 public class Auth0JwtService implements JwtService {
-    private final ObjectMapper objectMapper;
-    private final UserFacadePort userFacadePort;
     private final Auth0UserInfoService userInfoService;
     private final JWTVerifier jwtVerifier;
 
+    private final AuthenticationService appAuthenticationService;
+    private final AuthenticationService backofficeAuthenticationService;
+
     @Override
-    public Optional<OnlyDustAuthentication> getAuthenticationFromJwt(final String accessToken,
-                                                                     final String impersonationHeader) {
+    public Optional<Authentication> getAuthenticationFromJwt(final String accessToken,
+                                                             final String impersonationHeader) {
         try {
             jwtVerifier.verify(accessToken);
             final var userClaims = userInfoService.getUserInfo(accessToken);
-            final var user = getUserFromClaims(userClaims, false);
-
-            if (impersonationHeader != null && !impersonationHeader.isEmpty()) {
-                return getAuthenticationFromImpersonationHeader(accessToken, user, impersonationHeader);
-            }
-
-            return Optional.of(Auth0Authentication.builder()
-                    .authorities(user.getRoles().stream().map(OnlyDustGrantedAuthority::new).collect(Collectors.toList()))
-                    .credentials(accessToken)
-                    .isAuthenticated(true)
-                    .user(user)
-                    .principal(user.getGithubUserId().toString())
-                    .impersonating(false)
-                    .build());
+            return switch (userClaims.connection()) {
+                case GITHUB -> appAuthenticationService.getAuthentication(userClaims, accessToken, impersonationHeader);
+                case GOOGLE -> backofficeAuthenticationService.getAuthentication(userClaims, accessToken, impersonationHeader);
+            };
         } catch (IOException e) {
             LOGGER.error("Unable to deserialize Jwt token", e);
             return Optional.empty();
@@ -53,45 +36,4 @@ public class Auth0JwtService implements JwtService {
             return Optional.empty();
         }
     }
-
-    private User getUserFromClaims(final Auth0JwtClaims jwtClaims, final boolean isImpersonated) {
-        final Long githubUserId = Long.valueOf(jwtClaims.getGithubWithUserId().replaceFirst("github\\|", ""));
-        return this.userFacadePort.getUserByGithubIdentity(GithubUserIdentity.builder()
-                .githubUserId(githubUserId)
-                .githubLogin(jwtClaims.getGithubLogin())
-                .githubAvatarUrl(jwtClaims.getGithubAvatarUrl())
-                .email(jwtClaims.getEmail())
-                .build(), isImpersonated);
-    }
-
-    private Optional<OnlyDustAuthentication> getAuthenticationFromImpersonationHeader(final String accessToken,
-                                                                                      final User impersonator,
-                                                                                      final String impersonationHeader) {
-        if (!impersonator.getRoles().contains(UserRole.ADMIN)) {
-            LOGGER.warn("User {} is not allowed to impersonate", impersonator.getGithubLogin());
-            return Optional.empty();
-        }
-        final Auth0JwtClaims claims;
-        try {
-            claims = objectMapper.readValue(impersonationHeader, Auth0JwtClaims.class);
-        } catch (JsonProcessingException e) {
-            LOGGER.warn("Invalid impersonation header: {}", impersonationHeader);
-            return Optional.empty();
-        }
-
-        final User impersonated = getUserFromClaims(claims, true);
-
-        LOGGER.info("User {} is impersonating {}", impersonator, impersonated);
-
-        return Optional.of(Auth0Authentication.builder()
-                .authorities(impersonated.getRoles().stream().map(OnlyDustGrantedAuthority::new).collect(Collectors.toList()))
-                .credentials(accessToken)
-                .isAuthenticated(true)
-                .user(impersonated)
-                .principal(impersonated.getGithubUserId().toString())
-                .impersonating(true)
-                .impersonator(impersonator)
-                .build());
-    }
-
 }

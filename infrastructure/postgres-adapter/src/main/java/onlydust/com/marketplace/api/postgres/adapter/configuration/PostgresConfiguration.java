@@ -411,4 +411,9 @@ public class PostgresConfiguration {
                                                                            final RewardRepository rewardRepository) {
         return new PostgresPayoutPreferenceAdapter(payoutPreferenceRepository, payoutPreferenceViewRepository, rewardRepository);
     }
+
+    @Bean
+    public PostgresBackofficeUserAdapter postgresBackofficeUserAdapter(final BackofficeUserRepository backofficeUserRepository) {
+        return new PostgresBackofficeUserAdapter(backofficeUserRepository);
+    }
 }

@@ -4,7 +4,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePo
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.service.GithubAccountService;
 import onlydust.com.marketplace.project.domain.service.RewardService;
@@ -21,7 +21,7 @@ public class RestApiConfiguration {
     public ProjectsRestApi projectRestApi(final ProjectFacadePort projectFacadePort,
                                           final ProjectRewardFacadePort projectRewardFacadePort,
                                           final ProjectRewardFacadePort projectRewardFacadePortV2,
-                                          final AuthenticationService authenticationService,
+                                          final AuthenticatedAppUserService authenticatedAppUserService,
                                           final RewardService rewardService,
                                           final RewardV2Service rewardV2Service,
                                           final ContributionFacadePort contributionFacadePort) {
@@ -29,7 +29,7 @@ public class RestApiConfiguration {
                 projectFacadePort,
                 projectRewardFacadePort,
                 projectRewardFacadePortV2,
-                authenticationService,
+                authenticatedAppUserService,
                 rewardService,
                 rewardV2Service,
                 contributionFacadePort);
@@ -42,21 +42,21 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public MeRestApi meRestApi(final AuthenticationService authenticationService,
+    public MeRestApi meRestApi(final AuthenticatedAppUserService authenticatedAppUserService,
                                final UserFacadePort userFacadePort,
                                final RewardFacadePort rewardFacadePort,
                                final ContributorFacadePort contributorFacadePort,
                                final GithubAccountService githubAccountService,
                                final BillingProfileFacadePort billingProfileFacadePort,
                                final PayoutPreferenceFacadePort payoutPreferenceFacadePort) {
-        return new MeRestApi(authenticationService, userFacadePort, rewardFacadePort, contributorFacadePort,
+        return new MeRestApi(authenticatedAppUserService, userFacadePort, rewardFacadePort, contributorFacadePort,
                 githubAccountService, billingProfileFacadePort, payoutPreferenceFacadePort);
     }
 
     @Bean
-    public TechnologiesRestApi technologiesRestApi(final AuthenticationService authenticationService,
+    public TechnologiesRestApi technologiesRestApi(final AuthenticatedAppUserService authenticatedAppUserService,
                                                    final TechnologiesPort technologiesPort) {
-        return new TechnologiesRestApi(technologiesPort, authenticationService);
+        return new TechnologiesRestApi(technologiesPort, authenticatedAppUserService);
     }
 
     @Bean
@@ -65,10 +65,10 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    BillingProfileRestApi billingProfileRestApi(final AuthenticationService authenticationService,
+    BillingProfileRestApi billingProfileRestApi(final AuthenticatedAppUserService authenticatedAppUserService,
                                                 final BillingProfileFacadePort billingProfileFacadePort,
                                                 final CurrencyFacadePort currencyFacadePort) {
-        return new BillingProfileRestApi(authenticationService, billingProfileFacadePort, currencyFacadePort);
+        return new BillingProfileRestApi(authenticatedAppUserService, billingProfileFacadePort, currencyFacadePort);
     }
 
     @Bean

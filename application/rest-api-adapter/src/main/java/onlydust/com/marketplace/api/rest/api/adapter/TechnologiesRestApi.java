@@ -6,9 +6,9 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.TechnologiesApi;
 import onlydust.com.marketplace.api.contract.model.AllTechnologiesResponse;
 import onlydust.com.marketplace.api.contract.model.SuggestTechnologyRequest;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.TechnologiesPort;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class TechnologiesRestApi implements TechnologiesApi {
     private final TechnologiesPort technologiesPort;
-    private final AuthenticationService authenticationService;
+    private final AuthenticatedAppUserService authenticatedAppUserService;
 
     @Override
     public ResponseEntity<AllTechnologiesResponse> getTechnologies() {
@@ -28,7 +28,7 @@ public class TechnologiesRestApi implements TechnologiesApi {
 
     @Override
     public ResponseEntity<Void> suggestTechnology(SuggestTechnologyRequest request) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         technologiesPort.suggest(request.getTechnology(), authenticatedUser);
         return new ResponseEntity<>(HttpStatus.CREATED);
