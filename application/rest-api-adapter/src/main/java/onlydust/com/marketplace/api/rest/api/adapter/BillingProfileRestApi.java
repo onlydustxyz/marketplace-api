@@ -17,7 +17,7 @@ import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerVie
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.api.contract.BillingProfilesApi;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BillingProfileMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.PayoutInfoMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
@@ -46,7 +46,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @Tags(@Tag(name = "BillingProfile"))
 @AllArgsConstructor
 public class BillingProfileRestApi implements BillingProfilesApi {
-    private final AuthenticationService authenticationService;
+    private final AuthenticatedAppUserService authenticatedAppUserService;
     private final BillingProfileFacadePort billingProfileFacadePort;
     private final CurrencyFacadePort currencyFacadePort;
 
@@ -56,7 +56,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
                                                                           Integer pageSize,
                                                                           String sort,
                                                                           String direction) {
-        final var authenticatedUser = authenticationService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var page = billingProfileFacadePort.invoicesOf(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId), pageIndex,
                 pageSize, map(sort), SortDirectionMapper.requestToDomain(direction));
         return ok(map(page, pageIndex));
@@ -64,7 +64,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
 
     @Override
     public ResponseEntity<InvoicePreviewResponse> previewNewInvoiceForRewardIds(UUID billingProfileId, List<UUID> rewardIds) {
-        final var authenticatedUser = authenticationService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var preview = billingProfileFacadePort.previewInvoice(
                 UserId.of(authenticatedUser.getId()),
                 BillingProfile.Id.of(billingProfileId),
@@ -76,7 +76,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
 
     @Override
     public ResponseEntity<Void> uploadInvoice(UUID billingProfileId, UUID invoiceId, String fileName, Resource pdf) {
-        final var authenticatedUser = authenticationService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         try {
             if (fileName != null && !fileName.trim().isEmpty()) {
@@ -97,7 +97,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
 
     @Override
     public ResponseEntity<Resource> downloadInvoice(UUID billingProfileId, UUID invoiceId) {
-        final var authenticatedUser = authenticationService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var invoice = billingProfileFacadePort.downloadInvoice(
                 UserId.of(authenticatedUser.getId()),
                 BillingProfile.Id.of(billingProfileId),
@@ -111,7 +111,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
 
     @Override
     public ResponseEntity<Void> acceptOrDeclineInvoiceMandate(UUID billingProfileId, InvoiceMandateRequest invoiceMandateRequest) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         if (Boolean.TRUE.equals(invoiceMandateRequest.getHasAcceptedInvoiceMandate())) {
             billingProfileFacadePort.updateInvoiceMandateAcceptanceDate(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId));
         }
@@ -120,7 +120,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
 
     @Override
     public ResponseEntity<BillingProfileResponse> createBillingProfile(BillingProfileRequest billingProfileRequest) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final Set<ProjectId> projectIds = isNull(billingProfileRequest.getSelectForProjects()) ? Set.of() :
                 billingProfileRequest.getSelectForProjects().stream().map(ProjectId::of).collect(Collectors.toSet());
         final BillingProfileResponse billingProfileResponse = BillingProfileMapper.billingProfileToResponse(switch (billingProfileRequest.getType()) {
@@ -137,7 +137,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
 
     @Override
     public ResponseEntity<BillingProfileResponse> getBillingProfile(UUID billingProfileId) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final BillingProfileView billingProfileView = billingProfileFacadePort.getBillingProfile(BillingProfile.Id.of(billingProfileId),
                 UserId.of(authenticatedUser.getId()));
         return ResponseEntity.ok(BillingProfileMapper.billingProfileViewToResponse(billingProfileView));
@@ -145,14 +145,14 @@ public class BillingProfileRestApi implements BillingProfilesApi {
 
     @Override
     public ResponseEntity<BillingProfilePayoutInfoResponse> getPayoutInfo(UUID billingProfileId) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         PayoutInfo payoutInfo = billingProfileFacadePort.getPayoutInfo(BillingProfile.Id.of(billingProfileId), UserId.of(authenticatedUser.getId()));
         return ResponseEntity.ok(PayoutInfoMapper.mapToResponse(payoutInfo));
     }
 
     @Override
     public ResponseEntity<Void> setPayoutInfo(UUID billingProfileId, BillingProfilePayoutInfoRequest billingProfilePayoutInfoRequest) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         billingProfileFacadePort.updatePayoutInfo(BillingProfile.Id.of(billingProfileId), UserId.of(authenticatedUser.getId()),
                 PayoutInfoMapper.mapToDomain(billingProfilePayoutInfoRequest));
         return ResponseEntity.ok().build();
@@ -162,7 +162,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     public ResponseEntity<BillingProfileCoworkersPageResponse> getCoworkers(UUID billingProfileId, Integer pageIndex, Integer pageSize) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         final Page<BillingProfileCoworkerView> coworkers = billingProfileFacadePort.getCoworkers(BillingProfile.Id.of(billingProfileId),
                 UserId.of(authenticatedUser.getId()), sanitizedPageIndex, sanitizedPageSize);
@@ -171,7 +171,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
 
     @Override
     public ResponseEntity<Void> inviteCoworker(UUID billingProfileId, BillingProfileCoworkerInvitationRequest invitationRequest) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         billingProfileFacadePort.inviteCoworker(
                 BillingProfile.Id.of(billingProfileId),
                 UserId.of(authenticatedUser.getId()),

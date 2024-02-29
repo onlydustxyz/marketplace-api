@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication.token;
 
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustAuthentication;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustGrantedAuthority;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.OnlyDustAppAuthentication;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.OnlyDustAppGrantedAuthority;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.model.UserRole;
 import org.springframework.security.core.GrantedAuthority;
@@ -9,11 +9,11 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.Collection;
 import java.util.List;
 
-public record QueryParamTokenAuthentication(String token) implements OnlyDustAuthentication {
+public record QueryParamTokenAuthentication(String token) implements OnlyDustAppAuthentication {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new OnlyDustGrantedAuthority(UserRole.UNSAFE_INTERNAL_SERVICE));
+        return List.of(new OnlyDustAppGrantedAuthority(UserRole.UNSAFE_INTERNAL_SERVICE));
     }
 
     @Override

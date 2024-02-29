@@ -12,7 +12,7 @@ import onlydust.com.marketplace.accounting.domain.view.PayoutPreferenceView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.contract.MeApi;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -51,7 +51,7 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 @AllArgsConstructor
 public class MeRestApi implements MeApi {
 
-    private final AuthenticationService authenticationService;
+    private final AuthenticatedAppUserService authenticatedAppUserService;
     private final UserFacadePort userFacadePort;
     private final RewardFacadePort rewardFacadePort;
     private final ContributorFacadePort contributorFacadePort;
@@ -61,14 +61,14 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final GetMeResponse getMeResponse = userToGetMeResponse(authenticatedUser);
         return ResponseEntity.ok(getMeResponse);
     }
 
     @Override
     public ResponseEntity<UserPayoutSettingsResponse> getMyPayoutSettings() {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final UserPayoutSettings view = userFacadePort.getPayoutSettingsForUserId(authenticatedUser.getId());
         final UserPayoutSettingsResponse userPayoutSettingsResponse = userPayoutSettingsToResponse(view);
         return ResponseEntity.ok(userPayoutSettingsResponse);
@@ -76,7 +76,7 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<UserPayoutSettingsResponse> putMyPayoutSettings(UserPayoutSettingsRequest userPayoutSettingsRequest) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final UserPayoutSettings view = userFacadePort.updatePayoutSettings(authenticatedUser.getId(),
                 userPayoutSettingsToDomain(userPayoutSettingsRequest));
         return ResponseEntity.ok(userPayoutSettingsToResponse(view));
@@ -84,7 +84,7 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<Void> patchMe(PatchMeContract patchMeContract) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         if (Boolean.TRUE.equals(patchMeContract.getHasSeenOnboardingWizard())) {
             userFacadePort.markUserAsOnboarded(authenticatedUser.getId());
         }
@@ -96,21 +96,21 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<Void> acceptInvitationToLeadProject(UUID projectId) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         userFacadePort.acceptInvitationToLeadProject(authenticatedUser.getGithubUserId(), projectId);
         return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> applyOnProject(ApplicationRequest applicationRequest) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         userFacadePort.applyOnProject(authenticatedUser.getId(), applicationRequest.getProjectId());
         return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<PrivateUserProfileResponse> getMyProfile() {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final UserProfileView userProfileView = userFacadePort.getProfileById(authenticatedUser.getId());
         final PrivateUserProfileResponse userProfileResponse = userProfileToPrivateResponse(userProfileView);
         return ResponseEntity.ok(userProfileResponse);
@@ -118,7 +118,7 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<PrivateUserProfileResponse> setMyProfile(UserProfileRequest userProfileRequest) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final UserProfileView updatedProfile = userFacadePort.updateProfile(authenticatedUser.getId(),
                 userProfileRequestToDomain(userProfileRequest));
         final PrivateUserProfileResponse userProfileResponse = userProfileToPrivateResponse(updatedProfile);
@@ -132,7 +132,7 @@ public class MeRestApi implements MeApi {
                                                               String fromDate, String toDate) {
         final var sanitizedPageSize = sanitizePageSize(pageSize);
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
-        final var authenticatedUser = authenticationService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var sortBy = getSortBy(sort);
         final var filters = UserRewardView.Filters.builder()
                 .currencies(Optional.ofNullable(currencies).orElse(List.of()).stream().map(ProjectBudgetMapper::mapCurrency).toList())
@@ -153,7 +153,7 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<RewardTotalAmountsResponse> getMyRewardTotalAmounts() {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         return ResponseEntity.ok(MyRewardMapper.mapUserRewardTotalAmountsToResponse(
                 userFacadePort.getRewardTotalAmountsForUserId(authenticatedUser.getId())));
     }
@@ -169,7 +169,7 @@ public class MeRestApi implements MeApi {
                                                                        String direction,
                                                                        Integer page,
                                                                        Integer pageSize) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(page);
 
@@ -203,7 +203,7 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<ProjectListResponse> getMyContributedProjects(List<Long> repositories) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         final var filters = ContributionView.Filters.builder()
                 .repos(Optional.ofNullable(repositories).orElse(List.of()))
@@ -219,7 +219,7 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<ProjectListResponse> getMyRewardingProjects() {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         final var projects = contributorFacadePort.rewardingProjects(authenticatedUser.getGithubUserId());
 
@@ -230,7 +230,7 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<ContributedReposResponse> getMyContributedRepos(List<UUID> projects) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         final var filters = ContributionView.Filters.builder()
                 .projects(Optional.ofNullable(projects).orElse(List.of()))
@@ -247,7 +247,7 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<RewardDetailsResponse> getMyReward(UUID rewardId) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final RewardView rewardView = userFacadePort.getRewardByIdForRecipientId(rewardId,
                 authenticatedUser.getGithubUserId());
         return ResponseEntity.ok(RewardMapper.rewardDetailsToResponse(rewardView));
@@ -258,7 +258,7 @@ public class MeRestApi implements MeApi {
                                                                         Integer pageSize) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final Page<RewardItemView> page = userFacadePort.getRewardItemsPageByIdForRecipientId(rewardId,
                 authenticatedUser.getGithubUserId(), sanitizedPageIndex, sanitizedPageSize);
         final RewardItemsPageResponse rewardItemsPageResponse = RewardMapper.pageToResponse(sanitizedPageIndex, page);
@@ -269,7 +269,7 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<MyRewardsListResponse> getMyRewardsPendingInvoice() {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final List<UserRewardView> rewardViews =
                 userFacadePort.getPendingInvoiceRewardsForRecipientId(authenticatedUser.getGithubUserId());
         return ResponseEntity.ok(MyRewardMapper.listToResponse(rewardViews));
@@ -277,14 +277,14 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<CurrencyListResponse> getMyRewardCurrencies() {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var currencies = contributorFacadePort.getRewardCurrencies(authenticatedUser.getGithubUserId());
         return ResponseEntity.ok(new CurrencyListResponse().currencies(currencies.stream().map(ProjectBudgetMapper::mapCurrency).toList()));
     }
 
     @Override
     public ResponseEntity<List<GithubOrganizationResponse>> searchGithubUserOrganizations() {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         final List<GithubAccount> githubAccounts =
                 githubOrganizationFacadePort.getOrganizationsForAuthenticatedUser(authenticatedUser);
@@ -294,7 +294,7 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<Void> claimProject(UUID projectId) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         userFacadePort.claimProjectForAuthenticatedUser(
                 projectId, authenticatedUser
         );
@@ -318,39 +318,39 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<Void> markInvoiceAsReceived() {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         rewardFacadePort.markInvoiceAsReceived(authenticatedUser.getGithubUserId());
         return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<CompanyBillingProfileResponse> getMyCompanyBillingProfile() {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         return ResponseEntity.ok(OldBillingProfileMapper.companyDomainToResponse(userFacadePort.getCompanyBillingProfile(authenticatedUser.getId())));
     }
 
     @Override
     public ResponseEntity<IndividualBillingProfileResponse> getMyIndividualBillingProfile() {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         return ResponseEntity.ok(OldBillingProfileMapper.individualDomainToResponse(userFacadePort.getIndividualBillingProfile(authenticatedUser.getId())));
     }
 
     @Override
     public ResponseEntity<Void> oldUpdateMyBillingProfileType(BillingProfileTypeRequest billingProfileTypeRequest) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         userFacadePort.updateBillingProfileType(authenticatedUser.getId(), OldBillingProfileMapper.billingProfileToDomain(billingProfileTypeRequest));
         return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> updateMyGithubProfileData() {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         userFacadePort.updateGithubProfile(authenticatedUser);
         return ResponseEntity.ok().build();
     }
 
     public ResponseEntity<MyBillingProfilesResponse> oldGetMyBillingProfiles() {
-        final var authenticatedUser = authenticationService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var billingProfiles = userFacadePort.oldGetBillingProfiles(authenticatedUser.getId(), authenticatedUser.getGithubUserId());
         return ResponseEntity.ok(new MyBillingProfilesResponse()
                 .billingProfiles(billingProfiles.stream().map(OldBillingProfileMapper::map).toList()));
@@ -358,7 +358,7 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<MyBillingProfilesResponse> getMyBillingProfiles() {
-        final var authenticatedUser = authenticationService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final List<ShortBillingProfileView> shortBillingProfileViews = billingProfileFacadePort.getBillingProfilesForUser(UserId.of(authenticatedUser.getId()));
         final MyBillingProfilesResponse myBillingProfilesResponse = BillingProfileMapper.myBillingProfileToResponse(shortBillingProfileViews);
         return ResponseEntity.ok(myBillingProfilesResponse);
@@ -367,7 +367,7 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<List<PayoutPreferencesItemResponse>> getMyPayoutPreferences() {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final List<PayoutPreferenceView> payoutPreferences = payoutPreferenceFacadePort.getPayoutPreferences(UserId.of(authenticatedUser.getId()));
         final List<PayoutPreferencesItemResponse> response = isNull(payoutPreferences) ? List.of() : payoutPreferences.stream()
                 .map(PayoutPreferenceMapper::mapToResponse)
@@ -377,7 +377,7 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<Void> setMyPayoutPreferenceForProject(PayoutPreferenceRequest payoutPreferenceRequest) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         payoutPreferenceFacadePort.setPayoutPreference(ProjectId.of(payoutPreferenceRequest.getProjectId()),
                 BillingProfile.Id.of(payoutPreferenceRequest.getBillingProfileId()), UserId.of(authenticatedUser.getId()));
         return ResponseEntity.ok().build();
