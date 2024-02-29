@@ -39,6 +39,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     private final @NonNull BillingProfileUserViewRepository billingProfileUserViewRepository;
     private final @NonNull ChildrenKycRepository childrenKycRepository;
     private final @NonNull BillingProfileUserInvitationRepository billingProfileUserInvitationRepository;
+    private final @NonNull PayoutPreferenceRepository payoutPreferenceRepository;
 
 
     @Override
@@ -60,8 +61,12 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional(readOnly = true)
     public List<ShortBillingProfileView> findAllBillingProfilesForUser(UserId userId) {
+        final var invoiceMandateLatestVersionDate = globalSettingsRepository.get().getInvoiceMandateLatestVersionDate();
         return billingProfileRepository.findBillingProfilesForUserId(userId.value())
-                .stream().map(BillingProfileEntity::toView).toList();
+                .stream()
+                .map(BillingProfileEntity::toView)
+                .peek(bp -> bp.setInvoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate))
+                .toList();
     }
 
     @Override
@@ -98,7 +103,13 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     public void savePayoutPreference(BillingProfile.Id billingProfileId, UserId userId, ProjectId projectId) {
-
+        payoutPreferenceRepository.save(PayoutPreferenceEntity.builder()
+                .billingProfileId(billingProfileId.value())
+                .id(PayoutPreferenceEntity.PrimaryKey.builder()
+                        .userId(userId.value())
+                        .projectId(projectId.value())
+                        .build())
+                .build());
     }
 
     @Override

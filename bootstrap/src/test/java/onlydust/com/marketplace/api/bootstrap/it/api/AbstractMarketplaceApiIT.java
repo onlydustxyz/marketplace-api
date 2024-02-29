@@ -111,7 +111,6 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_REWARD = "/api/v1/me/rewards/%s";
     protected static final String ME_REWARD_ITEMS = "/api/v1/me/rewards/%s/reward-items";
     protected static final String ME_GET_REWARD_CURRENCIES = "/api/v1/me/reward-currencies";
-    protected static final String ME_POST_MARK_INVOICE_AS_RECEIVED = "/api/v1/me/invoices";
     protected static final String ME_BILLING_PROFILES = "/api/v1/me/billing-profiles";
     protected static final String ME_GET_PROFILE_GITHUB = "/api/v1/me/profile/github";
     protected static final String USERS_GET = "/api/v1/users";

@@ -266,6 +266,7 @@ public interface BillingProfileMapper {
                 .map(view -> new ShortBillingProfileResponse()
                         .name(view.getName())
                         .id(view.getId().value())
+                        .invoiceMandateAccepted(view.isInvoiceMandateAccepted())
                         .type(switch (view.getType()) {
                             case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
                             case COMPANY -> BillingProfileType.COMPANY;

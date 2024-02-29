@@ -35,9 +35,9 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
         final var billingProfile = billingProfileRepository.findById(billingProfileId.value())
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
 
-        final var preview = billingProfile.getType() == BillingProfileEntity.Type.COMPANY ?
-                Invoice.of(billingProfileId, sequenceNumber, billingProfile.getKyb().forInvoice()) :
-                Invoice.of(billingProfileId, sequenceNumber, billingProfile.getKyc().forInvoice());
+        final var preview = billingProfile.getType() == BillingProfileEntity.Type.INDIVIDUAL ?
+                Invoice.of(billingProfileId, sequenceNumber, billingProfile.getKyc().forInvoice()) :
+                Invoice.of(billingProfileId, sequenceNumber, billingProfile.getKyb().forInvoice());
 
         final var rewards = invoiceRewardRepository.findAll(rewardIds.stream().map(RewardId::value).toList())
                 .stream()

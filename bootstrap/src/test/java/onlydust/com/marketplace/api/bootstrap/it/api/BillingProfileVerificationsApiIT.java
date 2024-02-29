@@ -267,7 +267,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .orElseThrow()
                 .getId();
 
-        final UUID kybId = kybRepository.findByBillingProfileId(billingProfileId).orElseThrow().getId();
+        final UUID kybId = kybRepository.findByBillingProfileId(billingProfileId).orElseThrow().id();
 
         final String sumsubApiPath = String.format("/resources/applicants/-;externalUserId=%s/one",
                 kybId.toString());
@@ -571,7 +571,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .orElseThrow()
                 .getId();
 
-        final UUID kybId = kybRepository.findByBillingProfileId(billingProfileId).orElseThrow().getId();
+        final UUID kybId = kybRepository.findByBillingProfileId(billingProfileId).orElseThrow().id();
         final String sumsubApiPath = String.format("/resources/applicants/-;externalUserId=%s/one",
                 kybId.toString());
         sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))

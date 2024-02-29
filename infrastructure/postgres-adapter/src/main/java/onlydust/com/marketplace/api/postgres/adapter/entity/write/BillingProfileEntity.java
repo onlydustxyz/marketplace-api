@@ -115,6 +115,7 @@ public class BillingProfileEntity {
                 .id(BillingProfile.Id.of(this.id))
                 .name(this.name)
                 .type(this.type.toDomain())
+                .invoiceMandateAcceptedAt(this.getInvoiceMandateAcceptedAt())
                 .build();
     }
 }

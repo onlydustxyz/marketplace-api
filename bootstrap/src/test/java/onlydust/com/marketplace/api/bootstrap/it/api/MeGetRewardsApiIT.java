@@ -434,7 +434,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 Invoice.Number.of(12, lastName, firstName).toString(),
                 ZonedDateTime.now().minusDays(1),
                 InvoiceEntity.Status.TO_REVIEW,
-                rewards.stream().map(InvoiceRewardEntity::baseAmount).reduce(BigDecimal.ZERO, BigDecimal::add),
+                rewards.stream().map(InvoiceRewardEntity::targetAmount).reduce(BigDecimal.ZERO, BigDecimal::add),
                 rewards.get(0).targetCurrency(),
                 new URL("https://s3.storage.com/invoice.pdf"),
                 null,

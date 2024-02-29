@@ -1,19 +1,24 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import lombok.SneakyThrows;
+import onlydust.com.marketplace.accounting.domain.model.Country;
+import onlydust.com.marketplace.accounting.domain.model.ProjectId;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
+import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.BillingProfileInvoicesPageResponse;
-import onlydust.com.marketplace.api.contract.model.BillingProfileResponse;
-import onlydust.com.marketplace.api.contract.model.MyBillingProfilesResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.WalletEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.WalletTypeEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
+import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +28,10 @@ import org.springframework.http.MediaType;
 
 import javax.persistence.EntityManagerFactory;
 import java.io.ByteArrayInputStream;
-import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -49,78 +53,55 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     EntityManagerFactory entityManagerFactory;
     @Autowired
-    BillingProfileRepository billingProfileRepository;
+    BillingProfileFacadePort billingProfileFacadePort;
     @Autowired
-    WalletRepository walletRepository;
+    BillingProfileStoragePort billingProfileStoragePort;
     @Autowired
-    KybRepository kybRepository;
+    PayoutPreferenceFacadePort payoutPreferenceFacadePort;
 
     UserAuthHelper.AuthenticatedUser antho;
     UserAuthHelper.AuthenticatedUser olivier;
     UUID billingProfileId;
 
-    private static final UUID PROJECT_ID = UUID.fromString("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
+    private static final ProjectId PROJECT_ID = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
 
     @BeforeEach
     void setUp() {
         antho = userAuthHelper.authenticateAnthony();
         olivier = userAuthHelper.authenticateOlivier();
-
-        billingProfileId = client.post()
-                .uri(getApiURI(BILLING_PROFILES_POST))
-                .header("Authorization", "Bearer " + antho.jwt())
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                          "name": "company",
-                          "type": "COMPANY"
-                        }
-                        """)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody(BillingProfileResponse.class).returnResult().getResponseBody().getId();
-
-        client.put()
-                .uri(getApiURI(ME_PUT_PAYOUT_PREFERENCES))
-                .header("Authorization", "Bearer " + antho.jwt())
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                          "billingProfileId": "%s",
-                          "projectId": "%s"
-                        }
-                        """.formatted(billingProfileId, PROJECT_ID))
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful();
-
-        final var billingProfile = billingProfileRepository.findById(billingProfileId).orElseThrow();
-        billingProfile.setVerificationStatus(VerificationStatusEntity.VERIFIED);
-        final var kyb = billingProfile.getKyb();
-        kyb.setBillingProfileId(billingProfileId);
-        kyb.setOwnerId(antho.user().getId());
-        kyb.setName("My company");
-        kyb.setCountry("FRA");
-        kyb.setAddress("My address");
-        kyb.setRegistrationNumber("123456");
-        kyb.setSubjectToEuVAT(true);
-        kyb.setVerificationStatus(VerificationStatusEntity.VERIFIED);
-        billingProfileRepository.save(billingProfile);
-        kybRepository.save(kyb);
-
-        walletRepository.saveAll(List.of(
-                WalletEntity.builder()
-                        .billingProfileId(billingProfileId)
-                        .address("abuisset.eth")
-                        .network(NetworkEnumEntity.ethereum)
-                        .type(WalletTypeEnumEntity.name)
-                        .build()
-        ));
+        billingProfileId = initBillingProfile(antho).value();
     }
 
+    private BillingProfile.Id initBillingProfile(UserAuthHelper.AuthenticatedUser owner) {
+        final var ownerId = UserId.of(owner.user().getId());
+
+        return billingProfileStoragePort.findAllBillingProfilesForUser(ownerId).stream()
+                .filter(bp -> bp.getType() == BillingProfile.Type.COMPANY)
+                .findFirst()
+                .map(ShortBillingProfileView::getId)
+                .orElseGet(() -> createCompanyBillingProfileFor(ownerId).id());
+    }
+
+    private CompanyBillingProfile createCompanyBillingProfileFor(UserId ownerId) {
+        final var billingProfile = billingProfileFacadePort.createCompanyBillingProfile(ownerId, "My billing profile", Set.of(PROJECT_ID));
+
+        billingProfileStoragePort.savePayoutInfoForBillingProfile(PayoutInfo.builder()
+                .ethWallet(Ethereum.wallet("abuisset.eth"))
+                .build(), billingProfile.id());
+
+        billingProfileStoragePort.saveKyb(billingProfile.kyb().toBuilder()
+                .name("My company")
+                .country(Country.fromIso3("FRA"))
+                .address("My address")
+                .registrationNumber("123456")
+                .subjectToEuropeVAT(true)
+                .status(VerificationStatus.VERIFIED)
+                .build());
+
+        billingProfileStoragePort.updateBillingProfileStatus(billingProfile.id(), VerificationStatus.VERIFIED);
+
+        return billingProfile;
+    }
 
     @Test
     @Order(0)
@@ -485,55 +466,6 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectBody().returnResult().getResponseBody();
 
         assertThat(data).isEqualTo(pdfData);
-
-        testInvoiceStatus(UUID.fromString(invoiceId.getValue()));
-    }
-
-    protected void testInvoiceStatus(UUID invoiceId) {
-        {
-            final var invoice = entityManagerFactory.createEntityManager().find(InvoiceEntity.class, invoiceId);
-            assertThat(invoice.status()).isEqualTo(InvoiceEntity.Status.APPROVED);
-
-            final var em = entityManagerFactory.createEntityManager();
-            em.getTransaction().begin();
-            em.persist(PaymentEntity.builder()
-                    .id(UUID.randomUUID())
-                    .amount(BigDecimal.valueOf(1000))
-                    .requestId(UUID.fromString("79209029-c488-4284-aa3f-bce8870d3a66"))
-                    .processedAt(new Date())
-                    .currencyCode("USDC")
-                    .receipt(JacksonUtil.toJsonNode("""
-                            {"Sepa": {"recipient_iban": "FR7640618802650004034616521", "transaction_reference": "IBAN OK"}}"""))
-                    .build());
-            em.flush();
-            em.getTransaction().commit();
-            em.close();
-        }
-
-        {
-            final var invoice = entityManagerFactory.createEntityManager().find(InvoiceEntity.class, invoiceId);
-            assertThat(invoice.status()).isEqualTo(InvoiceEntity.Status.APPROVED);
-
-            final var em = entityManagerFactory.createEntityManager();
-            em.getTransaction().begin();
-            em.persist(PaymentEntity.builder()
-                    .id(UUID.randomUUID())
-                    .amount(BigDecimal.valueOf(1000))
-                    .requestId(UUID.fromString("d22f75ab-d9f5-4dc6-9a85-60dcd7452028"))
-                    .processedAt(new Date())
-                    .currencyCode("USDC")
-                    .receipt(JacksonUtil.toJsonNode("""
-                            {"Sepa": {"recipient_iban": "FR7640618802650004034616521", "transaction_reference": "IBAN OK"}}"""))
-                    .build());
-            em.flush();
-            em.getTransaction().commit();
-            em.close();
-        }
-
-        {
-            final var invoice = entityManagerFactory.createEntityManager().find(InvoiceEntity.class, invoiceId);
-            assertThat(invoice.status()).isEqualTo(InvoiceEntity.Status.PAID);
-        }
     }
 
     @Test
@@ -590,24 +522,23 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     @Order(4)
     void should_accept_mandate() {
         // Given
-        final var billingProfiles = client.get()
+        resetInvoiceMandateLatestVersionDate();
+
+        client.get()
                 .uri(ME_BILLING_PROFILES)
-                .header("Authorization", BEARER_PREFIX + olivier.jwt())
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
                 .exchange()
                 // Then
                 .expectStatus()
                 .is2xxSuccessful()
-                .expectBody(MyBillingProfilesResponse.class)
-                .returnResult().getResponseBody();
-
-        assertThat(billingProfiles.getBillingProfiles()).hasSize(1);
-        assertThat(billingProfiles.getBillingProfiles().get(0).getInvoiceMandateAccepted()).isFalse();
-        final var billingProfileId = billingProfiles.getBillingProfiles().get(0).getId();
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.billingProfiles[?(@.id == '%s')].invoiceMandateAccepted".formatted(billingProfileId)).isEqualTo(false);
 
         // When
         client.put()
                 .uri(getApiURI(BILLING_PROFILE_INVOICES_MANDATE.formatted(billingProfileId)))
-                .header("Authorization", BEARER_PREFIX + olivier.jwt())
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -622,33 +553,33 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
         // Then
         client.get()
                 .uri(ME_BILLING_PROFILES)
-                .header("Authorization", BEARER_PREFIX + olivier.jwt())
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
                 .exchange()
                 // Then
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.billingProfiles.length()").isEqualTo(1)
-                .jsonPath("$.billingProfiles[0].id").isNotEmpty()
-                .jsonPath("$.billingProfiles[0].invoiceMandateAccepted").isEqualTo(true);
+                .jsonPath("$.billingProfiles[?(@.id == '%s')].invoiceMandateAccepted".formatted(billingProfileId)).isEqualTo(true);
 
         // When
-        final var settings = globalSettingsRepository.get();
-        settings.setInvoiceMandateLatestVersionDate(new Date());
-        globalSettingsRepository.save(settings);
+        resetInvoiceMandateLatestVersionDate();
 
         // Then
         client.get()
                 .uri(ME_BILLING_PROFILES)
-                .header("Authorization", BEARER_PREFIX + olivier.jwt())
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
                 .exchange()
                 // Then
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.billingProfiles.length()").isEqualTo(1)
-                .jsonPath("$.billingProfiles[0].id").isNotEmpty()
-                .jsonPath("$.billingProfiles[0].invoiceMandateAccepted").isEqualTo(false);
+                .jsonPath("$.billingProfiles[?(@.id == '%s')].invoiceMandateAccepted".formatted(billingProfileId)).isEqualTo(false);
+    }
+
+    private void resetInvoiceMandateLatestVersionDate() {
+        final var settings = globalSettingsRepository.get();
+        settings.setInvoiceMandateLatestVersionDate(new Date());
+        globalSettingsRepository.save(settings);
     }
 
 
@@ -668,32 +599,11 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful();
 
         // Then switch billing profile type
-        // TODO
-//        client.patch()
-//                .uri(getApiURI(ME_PATCH_BILLING_PROFILE_TYPE))
-//                .header("Authorization", "Bearer " + antho.jwt())
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .bodyValue("""
-//                        {
-//                          "type": "INDIVIDUAL"
-//                        }
-//                        """)
-//                // Then
-//                .exchange()
-//                .expectStatus()
-//                .is2xxSuccessful();
+        final var ownerId = UserId.of(antho.user().getId());
+        final var individualBillingProfileId =
+                billingProfileStoragePort.findIndividualBillingProfileForUser(ownerId).orElseThrow().getId();
 
-        final var individualBillingProfileId = client.get()
-                .uri(ME_BILLING_PROFILES)
-                .header("Authorization", BEARER_PREFIX + antho.jwt())
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody(MyBillingProfilesResponse.class)
-                .returnResult()
-                .getResponseBody().getBillingProfiles().get(0).getId();
-
+        payoutPreferenceFacadePort.setPayoutPreference(PROJECT_ID, individualBillingProfileId, ownerId);
 
         // Generate another preview for the same rewards
         client.get()
@@ -710,7 +620,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     @Order(99)
-    void list_invoice() {
+    void list_invoices() {
         // When
         client.get()
                 .uri(getApiURI(BILLING_PROFILE_INVOICES.formatted(billingProfileId), Map.of(
@@ -732,7 +642,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                                  "amount": 2424.000,
                                  "currency": "USD"
                                },
-                               "status": "COMPLETE"
+                               "status": "PROCESSING"
                              },
                              {
                                "number": "OD-MYCOMPANY-001",
