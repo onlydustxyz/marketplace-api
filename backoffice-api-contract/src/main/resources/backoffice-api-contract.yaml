@@ -602,6 +602,33 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/rewards/batch-payments/{batchPaymentId}:
+    put:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Update batch payment with transaction hash
+      operationId: createBatchPayments
+      description: |
+        Update batch payment with transaction hash
+      requestBody:
+        description: Transaction hash
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchPaymentRequest'
+      responses:
+        "204":
+          description: 'Batch payment processed'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+
+
   # BackofficeSponsorManagement ===============================================================
   /bo/v1/sponsors:
     get:
@@ -2133,6 +2160,8 @@ components:
       properties:
         amount:
           type: number
+        dollarsEquivalent:
+          type: number
         currency:
           $ref: '#/components/schemas/Currency'
 
@@ -2516,7 +2545,7 @@ components:
         id:
           $ref: '#/components/schemas/RewardId'
         recipient:
-          $ref: '#/components/schemas/RewardRecipientResponse'
+          $ref: '#/components/schemas/RecipientResponse'
         requestedAt:
           type: string
           format: date-time
@@ -2530,6 +2559,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SponsorLinkResponse'
+        amount:
+          $ref: '#/components/schemas/MoneyResponse'
 
     ProjectLinkResponse:
       type: object
@@ -2553,21 +2584,6 @@ components:
         avatarUrl:
           type: string
 
-    RewardRecipientResponse:
-      type: object
-      required:
-        - githubLogin
-        - email
-      properties:
-        githubLogin:
-          type: string
-        firstName:
-          type: string
-        lastName:
-          type: string
-        email:
-          type: string
-
     PostBatchPaymentRequest:
       type: object
       required: 
@@ -2584,15 +2600,33 @@ components:
 
     BatchPaymentsResponse:
       type: object
+      required:
+        - id
+        - csv
+        - rewardCount
+        - totalAmounts
+        - blockchain
       properties:
         id:
           $ref: '#/components/schemas/BatchPaymentId'
         csv:
           type: string
+        blockchain:
+          $ref: '#/components/schemas/BlockchainContract'
         rewardCount:
           type: integer
           format: int64
-        totalAmount:
+        totalAmounts:
+          items:
+            $ref: '#/components/schemas/MoneyResponse'
+
+    BatchPaymentRequest:
+      type: object
+      required:
+        - transactionHash
+      properties:
+        transactionHash:
+          type: string
           
 
 
