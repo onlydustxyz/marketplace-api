@@ -1,23 +1,21 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
 import onlydust.com.marketplace.project.domain.model.OldAccountNumber;
 import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
 import onlydust.com.marketplace.project.domain.view.backoffice.PaymentView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -30,16 +28,14 @@ import java.util.UUID;
 @Data
 @Entity
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-@TypeDef(name = "currency", typeClass = PostgreSQLEnumType.class)
 public class BoPaymentEntity {
     @Id
     UUID id;
     UUID budgetId;
     UUID projectId;
     BigDecimal amount;
-    @Enumerated(EnumType.STRING)
-    @Type(type = "currency")
-    CurrencyEnumEntity currency;
+    @ManyToOne
+    CurrencyEntity currency;
     Long recipientId;
     UUID requestorId;
     @Type(type = "jsonb")
@@ -50,7 +46,7 @@ public class BoPaymentEntity {
     Integer issuesCount;
     Integer dustyIssuesCount;
     Integer codeReviewsCount;
-//    @Type(type = "jsonb")
+    //    @Type(type = "jsonb")
 //    Identity recipientIdentity;
 //    @Type(type = "jsonb")
 //    Location recipientLocation;
@@ -110,7 +106,7 @@ public class BoPaymentEntity {
                 .budgetId(budgetId)
                 .projectId(projectId)
                 .amount(amount)
-                .currency(currency.toDomain())
+                .currency(currency.toOldDomain())
                 .recipientId(recipientId)
                 .requestorId(requestorId)
                 .items(items)

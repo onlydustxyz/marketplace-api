@@ -14,77 +14,71 @@ public interface BoPaymentRepository extends JpaRepository<BoPaymentEntity, UUID
 
     @Query(value = """
             SELECT
-            	pr.id,
-            	pr.project_id,
+            	r.id,
+            	r.project_id,
             	b.id as budget_id,
-            	pr.amount,
-            	pr.currency,
-            	pr.recipient_id,
-            	pr.requestor_id,
+            	r.amount,
+            	c.id as currency_id,
+            	r.recipient_id,
+            	r.requestor_id,
             	Items.urls AS items,
-            	pr.requested_at,
-            	Payments.processed_at,
+            	r.requested_at,
+            	rsd.paid_at as processed_at,
             	Counters.*,
             	upi.identity as recipient_identity,
             	upi.location as recipient_location,
             	user_wallets.wallets as recipient_wallets,
-            	ba.iban as recipient_iban,
+            	ba.number as recipient_iban,
             	ba.bic as recipient_bic
             FROM
-            	payment_requests pr
-            	INNER JOIN projects_budgets pb on pb.project_id = pr.project_id
-            	INNER JOIN budgets b on b.id = pb.budget_id AND b.currency = pr.currency
-            	LEFT JOIN iam.users u ON u.github_user_id = pr.recipient_id
+            	rewards r
+            	INNER JOIN projects_budgets pb on pb.project_id = r.project_id
+            	INNER JOIN currencies c on r.currency_id = c.id
+            	INNER JOIN budgets b on b.id = pb.budget_id AND UPPER(CAST(b.currency AS TEXT)) = c.code
+            	LEFT JOIN iam.users u ON u.github_user_id = r.recipient_id
             	LEFT JOIN user_payout_info upi ON upi.user_id = u.id
-            	LEFT JOIN bank_accounts ba ON ba.user_id = u.id
+            	LEFT JOIN accounting.payout_preferences pp on pp.project_id = r.project_id AND pp.user_id = u.id
+            	LEFT JOIN accounting.bank_accounts ba ON ba.billing_profile_id = pp.billing_profile_id
             	LEFT JOIN (
             	    SELECT
-            	        user_id,
+            	        billing_profile_id,
             	        jsonb_agg(jsonb_build_object('network', network, 'type', type, 'address', address)) AS wallets
                     FROM
-                        wallets
+                        accounting.wallets
                     GROUP BY 
-                        user_id
-            	) user_wallets ON user_wallets.user_id = u.id
-            	LEFT JOIN (
-            	    SELECT 
-            	        request_id,
-            	        max(processed_at) as processed_at
-                    FROM
-                        payments
-                    GROUP BY 
-                        request_id
-            	) Payments on (pr.id = Payments.request_id)
+                        billing_profile_id
+            	) user_wallets ON user_wallets.billing_profile_id = pp.billing_profile_id
+            	LEFT JOIN accounting.reward_status_data rsd ON rsd.reward_id = r.id
             	INNER JOIN (
             		SELECT
             			jsonb_agg(coalesce(pr.html_url, i.html_url)) AS urls,
-            			wi.payment_id
+            			ri.reward_id
             		FROM
-            			work_items wi
-            			LEFT JOIN indexer_exp.github_pull_requests pr on pr.repo_id = wi.repo_id AND pr.number = wi.number
-            			LEFT JOIN indexer_exp.github_issues i on i.repo_id = wi.repo_id AND i.number = wi.number
+            			reward_items ri
+            			LEFT JOIN indexer_exp.github_pull_requests pr on pr.repo_id = ri.repo_id AND pr.number = ri.number
+            			LEFT JOIN indexer_exp.github_issues i on i.repo_id = ri.repo_id AND i.number = ri.number
             		GROUP BY
-            			wi.payment_id
-            	) Items ON (pr.id = Items.payment_id)
+            			ri.reward_id
+            	) Items ON (r.id = Items.reward_id)
             	INNER JOIN (
             		SELECT
-            			payment_id,
+            			reward_id,
             			count(prs) AS pull_requests_count,
             			count(issues) AS issues_count,
             			count(dusty_issues) AS dusty_issues_count,
             			count(code_reviews) AS code_reviews_count
             		FROM
-            			work_items
-            			LEFT JOIN indexer_exp.github_pull_requests prs ON work_items.id = CAST(prs.id AS TEXT)
-            			LEFT JOIN indexer_exp.github_issues issues ON work_items.id = CAST(issues.id AS TEXT) AND issues.author_id != 129528947
-            			LEFT JOIN indexer_exp.github_issues dusty_issues ON work_items.id = CAST(dusty_issues.id AS TEXT) AND dusty_issues.author_id = 129528947
-            			LEFT JOIN indexer_exp.github_code_reviews code_reviews ON work_items.id = code_reviews.id
+            			reward_items
+            			LEFT JOIN indexer_exp.github_pull_requests prs ON reward_items.id = CAST(prs.id AS TEXT)
+            			LEFT JOIN indexer_exp.github_issues issues ON reward_items.id = CAST(issues.id AS TEXT) AND issues.author_id != 129528947
+            			LEFT JOIN indexer_exp.github_issues dusty_issues ON reward_items.id = CAST(dusty_issues.id AS TEXT) AND dusty_issues.author_id = 129528947
+            			LEFT JOIN indexer_exp.github_code_reviews code_reviews ON reward_items.id = code_reviews.id
             		GROUP BY
-            			payment_id
-            	) Counters ON (pr.id = Counters.payment_id)
+            			reward_id
+            	) Counters ON (r.id = Counters.reward_id)
             WHERE 
-                (COALESCE(:projectIds) IS NULL OR pr.project_id in (:projectIds)) AND
-                (COALESCE(:paymentIds) IS NULL OR pr.id in (:paymentIds))
+                (COALESCE(:projectIds) IS NULL OR r.project_id in (:projectIds)) AND
+                (COALESCE(:paymentIds) IS NULL OR r.id in (:paymentIds))
             """, nativeQuery = true)
     @NotNull
     Page<BoPaymentEntity> findAll(final List<UUID> projectIds, final List<UUID> paymentIds,
