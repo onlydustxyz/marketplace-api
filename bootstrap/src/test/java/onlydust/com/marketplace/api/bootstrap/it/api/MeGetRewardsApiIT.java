@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
+import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;

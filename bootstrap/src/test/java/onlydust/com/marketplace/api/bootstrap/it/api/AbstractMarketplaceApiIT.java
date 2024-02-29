@@ -10,6 +10,7 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
@@ -334,7 +335,7 @@ public class AbstractMarketplaceApiIT {
                         ),
                         null,
                         null,
-                        List.of(new Invoice.Wallet("ETHEREUM", "vitalik.eth")),
+                        List.of(new Invoice.Wallet(Network.ETHEREUM, "vitalik.eth")),
                         rewards
                 )
         );

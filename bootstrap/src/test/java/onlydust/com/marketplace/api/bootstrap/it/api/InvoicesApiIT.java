@@ -161,7 +161,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                             "wallets": [
                               {
                                 "address": "abuisset.eth",
-                                "network": "ethereum"
+                                "network": "ETHEREUM"
                               }
                             ]
                           },
@@ -318,7 +318,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                             "wallets": [
                               {
                                 "address": "abuisset.eth",
-                                "network": "ethereum"
+                                "network": "ETHEREUM"
                               }
                             ]
                           },

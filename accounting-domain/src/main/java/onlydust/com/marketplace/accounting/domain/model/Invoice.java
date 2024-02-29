@@ -101,7 +101,16 @@ public class Invoice {
     }
 
     public Optional<BankAccount> bankAccount() {
-        return Optional.ofNullable(bankAccount);
+        return Optional.ofNullable(bankAccount).filter(b -> networks().contains(Network.SEPA));
+    }
+
+    public List<Wallet> wallets() {
+        return wallets.stream().filter(w -> networks().contains(w.network())).toList();
+    }
+
+    private List<Network> networks() {
+        // TODO use SponsorAccount network
+        return rewards.stream().map(Reward::network).toList();
     }
 
     public String externalFileName() {
@@ -159,7 +168,7 @@ public class Invoice {
         APPLICABLE, NOT_APPLICABLE_NON_UE, NOT_APPLICABLE_FRENCH_NOT_SUBJECT, REVERSE_CHARGE
     }
 
-    public record Wallet(@NonNull String network, @NonNull String address) {
+    public record Wallet(@NonNull Network network, @NonNull String address) {
     }
 
     public record BankAccount(@NonNull String bic, @NonNull String accountNumber) {
@@ -197,6 +206,17 @@ public class Invoice {
 
     public record Reward(@NonNull RewardId id, @NonNull ZonedDateTime createdAt, @NonNull String projectName,
                          @NonNull Money amount, @NonNull Money target, Invoice.Id invoiceId) {
+        public Network network() {
+            return switch (amount.currency.code().toString()) {
+                case Currency.Code.USD_STR, Currency.Code.EUR_STR -> Network.SEPA;
+                case Currency.Code.APT_STR -> Network.APTOS;
+                case Currency.Code.ETH_STR, Currency.Code.LORDS_STR, Currency.Code.USDC_STR -> Network.ETHEREUM;
+                case Currency.Code.OP_STR -> Network.OPTIMISM;
+                case Currency.Code.STRK_STR -> Network.STARKNET;
+
+                default -> throw new IllegalArgumentException("Currency %s not supported".formatted(amount.currency.code()));
+            };
+        }
     }
 
     public enum Sort {

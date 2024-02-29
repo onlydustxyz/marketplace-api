@@ -162,7 +162,7 @@ public interface BillingProfileMapper {
 
     static WalletResponse map(Invoice.Wallet wallet) {
         return new WalletResponse()
-                .network(wallet.network())
+                .network(wallet.network().toString())
                 .address(wallet.address());
     }
 
