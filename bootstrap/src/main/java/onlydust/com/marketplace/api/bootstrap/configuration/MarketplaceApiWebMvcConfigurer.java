@@ -20,6 +20,9 @@ public class MarketplaceApiWebMvcConfigurer implements WebMvcConfigurer {
         registry.addMapping("/api/**")
                 .allowedMethods("GET", "PUT", "POST", "DELETE", "PATCH")
                 .allowedOrigins(this.webCorsProperties.getHosts());
+        registry.addMapping("/bo/**")
+                .allowedMethods("GET", "PUT", "POST", "DELETE", "PATCH")
+                .allowedOrigins(this.webCorsProperties.getHosts());
     }
 }
 
