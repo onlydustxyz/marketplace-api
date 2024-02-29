@@ -7,7 +7,7 @@ import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.CurrencyContract;
 import onlydust.com.marketplace.api.contract.model.RewardRequest;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -24,7 +24,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
     public ProjectRepository projectRepository;
 
     @Autowired
-    AuthenticationService authenticationService;
+    AuthenticatedAppUserService authenticatedAppUserService;
 
     @Test
     public void should_be_unauthorized() {

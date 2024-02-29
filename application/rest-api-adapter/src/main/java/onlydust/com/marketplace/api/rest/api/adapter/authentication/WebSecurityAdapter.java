@@ -12,6 +12,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 
+import static onlydust.com.marketplace.user.domain.model.BackofficeUser.Role.BO_ADMIN;
+import static onlydust.com.marketplace.user.domain.model.BackofficeUser.Role.BO_READER;
+
 @EnableWebSecurity
 @AllArgsConstructor
 @Configuration
@@ -31,11 +34,19 @@ public class WebSecurityAdapter extends WebSecurityConfigurerAdapter {
                 .and().cors()
                 .and().csrf().disable()
                 .authorizeRequests()
+
+                .antMatchers("/bo/v1/external/**").hasAuthority(UserRole.UNSAFE_INTERNAL_SERVICE.name())
+                .antMatchers(HttpMethod.GET, "/bo/v1/**").hasAnyAuthority(UserRole.INTERNAL_SERVICE.name(), BO_READER.name())
+                .antMatchers(HttpMethod.OPTIONS, "/bo/v1/**").hasAnyAuthority(UserRole.INTERNAL_SERVICE.name(), BO_READER.name())
+                .antMatchers(HttpMethod.HEAD, "/bo/v1/**").hasAnyAuthority(UserRole.INTERNAL_SERVICE.name(), BO_READER.name())
+                .antMatchers(HttpMethod.POST, "/bo/v1/**").hasAnyAuthority(UserRole.INTERNAL_SERVICE.name(), BO_ADMIN.name())
+                .antMatchers(HttpMethod.PUT, "/bo/v1/**").hasAnyAuthority(UserRole.INTERNAL_SERVICE.name(), BO_ADMIN.name())
+                .antMatchers(HttpMethod.PATCH, "/bo/v1/**").hasAnyAuthority(UserRole.INTERNAL_SERVICE.name(), BO_ADMIN.name())
+                .antMatchers(HttpMethod.DELETE, "/bo/v1/**").hasAnyAuthority(UserRole.INTERNAL_SERVICE.name(), BO_ADMIN.name())
+
                 .antMatchers("/api/v1/me/**").hasAuthority(UserRole.USER.name())
                 .antMatchers("/api/v1/billing-profiles/**").hasAuthority(UserRole.USER.name())
                 .antMatchers("/api/v1/events/**").hasAuthority(UserRole.INTERNAL_SERVICE.name())
-                .antMatchers("/bo/v1/external/**").hasAuthority(UserRole.UNSAFE_INTERNAL_SERVICE.name())
-                .antMatchers("/bo/v1/**").hasAuthority(UserRole.INTERNAL_SERVICE.name())
                 .antMatchers(HttpMethod.POST, "/api/v1/projects/**").hasAuthority(UserRole.USER.name())
                 .antMatchers(HttpMethod.GET, "/api/v1/users/search").hasAuthority(UserRole.USER.name())
                 .antMatchers(HttpMethod.GET, "/api/v1/projects/**").permitAll()

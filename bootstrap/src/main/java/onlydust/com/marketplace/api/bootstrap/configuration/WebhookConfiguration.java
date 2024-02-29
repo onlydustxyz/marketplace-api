@@ -29,7 +29,7 @@ public class WebhookConfiguration {
 
     @Bean
     public WebhookPort webhookNotificationPort(final MakeWebhookHttpClient makeWebhookHttpClient,
-                                   final Config webhookHttpClientProperties) {
+                                               final Config webhookHttpClientProperties) {
         return new MakeWebhookAdapter(makeWebhookHttpClient, webhookHttpClientProperties);
     }
 }

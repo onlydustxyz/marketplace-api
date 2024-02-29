@@ -1,25 +1,21 @@
-package onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0;
+package onlydust.com.marketplace.api.rest.api.adapter.authentication.backoffice;
 
 import lombok.Builder;
 import lombok.Value;
-import onlydust.com.marketplace.project.domain.model.User;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustAuthentication;
+import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 
 @Value
 @Builder
-public class Auth0Authentication implements OnlyDustAuthentication {
+public class Auth0OnlyDustBackofficeAuthentication implements OnlyDustBackofficeAuthentication {
     String credentials;
-    User user;
+    BackofficeUser user;
     String principal;
     Collection<? extends GrantedAuthority> authorities;
     @Builder.Default
     Boolean isAuthenticated = false;
-
-    User impersonator;
-    boolean impersonating;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -54,15 +50,5 @@ public class Auth0Authentication implements OnlyDustAuthentication {
     @Override
     public String getName() {
         return this.principal;
-    }
-
-    @Override
-    public boolean isImpersonating() {
-        return impersonating;
-    }
-
-    @Override
-    public User getImpersonator() {
-        return impersonator;
     }
 }

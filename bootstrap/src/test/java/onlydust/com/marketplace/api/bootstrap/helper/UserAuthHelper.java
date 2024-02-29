@@ -4,10 +4,10 @@ import com.auth0.jwt.interfaces.JWTVerifier;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.project.domain.model.UserRole;
-import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
+import onlydust.com.marketplace.project.domain.model.UserRole;
+import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 
 import java.util.Date;
 import java.util.UUID;
@@ -55,14 +55,18 @@ public class UserAuthHelper {
     }
 
     public void mockAuth0UserInfo(Long githubUserId, String login, String name, String avatarUrl, String email) {
+        mockAuth0UserInfo("github|%d".formatted(githubUserId), login, name, avatarUrl, email);
+    }
+
+    public void mockAuth0UserInfo(String sub, String nickname, String name, String avatarUrl, String email) {
         auth0WireMockServer.stubFor(
                 get(urlPathEqualTo("/"))
-                        .withHeader("Authorization", containing("Bearer token-for-github|%d".formatted(githubUserId)))
+                        .withHeader("Authorization", containing("Bearer token-for-%s".formatted(sub)))
                         .willReturn(ok()
                                 .withHeader("Content-Type", "application/json")
                                 .withBody("""
                                         {
-                                            "sub": "github|%d",
+                                            "sub": "%s",
                                             "nickname": "%s",
                                             "name": "%s",
                                             "picture": "%s",
@@ -70,7 +74,7 @@ public class UserAuthHelper {
                                             "email": "%s",
                                             "email_verified": true
                                         }
-                                        """.formatted(githubUserId, login, name, avatarUrl, email)
+                                        """.formatted(sub, nickname, name, avatarUrl, email)
                                 )));
     }
 
