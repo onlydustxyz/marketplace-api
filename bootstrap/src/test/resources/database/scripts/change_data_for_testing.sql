@@ -9,16 +9,6 @@ create table if not exists auth.user_providers
     id uuid primary key
 );
 
-
-insert into currencies (id, code, name, type, decimals)
-values ('562bbf65-8a71-4d30-ad63-520c0d68ba27', 'USDC', 'USD Coin', 'CRYPTO', 6),
-       ('71bdfcf4-74ee-486b-8cfe-5d841dd93d5c', 'ETH', 'Ether', 'CRYPTO', 18),
-       ('b9593e4e-61d3-440b-88ff-3410fd72a1eb', 'EUR', 'Euro', 'FIAT', 2)
-on conflict do nothing;
-
-insert into erc20(currency_id, blockchain, address, name, symbol, decimals, total_supply)
-values ('562bbf65-8a71-4d30-ad63-520c0d68ba27', 'ethereum', '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', 'USD Coin', 'USDC', 6, 0);
-
 INSERT INTO accounting.historical_quotes(timestamp, base_id, target_id, price)
 SELECT now(), c.id, usd.id, cuq.price
 FROM crypto_usd_quotes cuq
@@ -35,3 +25,15 @@ SELECT now(), usd.id, eur.id, 0.92
 FROM currencies usd
          JOIN currencies eur ON eur.code = 'EUR'
 WHERE usd.code = 'USD';
+
+insert into currencies (id, type, name, code, logo_url, decimals, description)
+values ('48388edb-fda2-4a32-b228-28152a147500', 'CRYPTO', 'Aptos Coin', 'APT', null, 8, null),
+       ('00ca98a5-0197-4b76-a208-4bfc55ea8256', 'CRYPTO', 'Optimism', 'OP', null, 18, null);
+
+insert into accounting.payout_preferences (billing_profile_id, project_id, user_id)
+select distinct bpu.billing_profile_id,
+                r.project_id,
+                u.id
+from rewards r
+         join iam.users u on u.github_user_id = r.recipient_id
+         join accounting.billing_profiles_users bpu on bpu.user_id = u.id;

@@ -11,10 +11,6 @@ import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.port.output.*;
-import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
-import onlydust.com.marketplace.kernel.port.output.IndexerPort;
-import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
-import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.IndexerApiOutboxConsumer;
 import onlydust.com.marketplace.project.domain.job.WebhookNotificationOutboxConsumer;
@@ -132,15 +128,14 @@ public class DomainConfiguration {
                                          final DateProvider dateProvider,
                                          final ProjectStoragePort projectStoragePort,
                                          final GithubSearchPort githubSearchPort,
-                                         final ImageStoragePort imageStoragePort,
-                                         final OldBillingProfileStoragePort oldBillingProfileStoragePort,
-                                         final AccountingUserObserverPort accountingUserObserverPort) {
-        return new UserService(projectObserverPort, userObserverPort, postgresUserAdapter, dateProvider,
+                                         final ImageStoragePort imageStoragePort) {
+        return new UserService(projectObserverPort,
+                userObserverPort,
+                postgresUserAdapter,
+                dateProvider,
                 projectStoragePort,
                 githubSearchPort,
-                imageStoragePort,
-                oldBillingProfileStoragePort,
-                accountingUserObserverPort);
+                imageStoragePort);
     }
 
     @Bean
@@ -274,7 +269,7 @@ public class DomainConfiguration {
 
     @Bean
     OutboxConsumerJob billingProfileVerificationOutboxJob(final PostgresOutboxAdapter<BillingProfileVerificationEventEntity> billingProfileVerificationOutbox,
-                                              final OutboxConsumer billingProfileVerificationOutboxConsumer) {
+                                                          final OutboxConsumer billingProfileVerificationOutboxConsumer) {
         return new OutboxConsumerJob(billingProfileVerificationOutbox, billingProfileVerificationOutboxConsumer);
     }
 

@@ -141,3 +141,7 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000068_migrating_billing_profile_tables.sql
   - include:
       file: db/changelog/changelogs/00000070_migrating_kyc_kyb_events.sql
+  - include:
+      file: db/changelog/changelogs/00000071_migrate_rewards_to_accounting.sql
+  - include:
+      file: db/changelog/changelogs/00000072_migrating_billing_profiles_to_accounting.sql

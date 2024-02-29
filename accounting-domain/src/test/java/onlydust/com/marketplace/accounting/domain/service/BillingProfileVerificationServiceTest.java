@@ -93,6 +93,7 @@ public class BillingProfileVerificationServiceTest {
                     .verificationId(verificationId)
                     .type(VerificationType.KYC)
                     .externalApplicantId(faker.rickAndMorty().location())
+                    .reviewMessageForApplicant(faker.gameOfThrones().character())
                     .build();
             final Event event = mock(Event.class);
             final Kyc initialKyc = Kyc.builder()
@@ -104,6 +105,8 @@ public class BillingProfileVerificationServiceTest {
             final Kyc kycWithDataFromExternalSource = initialKyc.toBuilder()
                     .lastName(faker.name().lastName())
                     .firstName(faker.name().firstName())
+                    .externalApplicantId(billingProfileVerificationUpdated.getExternalApplicantId())
+                    .reviewMessageForApplicant(billingProfileVerificationUpdated.getReviewMessageForApplicant())
                     .build();
             final BillingProfileVerificationUpdated updatedEvent = billingProfileVerificationUpdated.toBuilder()
                     .userId(initialKyc.getOwnerId())
@@ -169,6 +172,7 @@ public class BillingProfileVerificationServiceTest {
                     .verificationStatus(VerificationStatus.UNDER_REVIEW)
                     .verificationId(verificationId)
                     .externalApplicantId(faker.rickAndMorty().location())
+                    .reviewMessageForApplicant(faker.gameOfThrones().character())
                     .type(VerificationType.KYB)
                     .build();
             final Event event = mock(Event.class);
@@ -182,6 +186,8 @@ public class BillingProfileVerificationServiceTest {
                     .name(faker.rickAndMorty().character()).build();
             final Kyb updateKyb = kybWithDataFromExternalSource.toBuilder()
                     .status(billingProfileVerificationUpdated.getVerificationStatus())
+                    .externalApplicantId(billingProfileVerificationUpdated.getExternalApplicantId())
+                    .reviewMessageForApplicant(billingProfileVerificationUpdated.getReviewMessageForApplicant())
                     .build();
             final BillingProfileVerificationUpdated updatedEvent = billingProfileVerificationUpdated.toBuilder()
                     .userId(initialKyb.getOwnerId())
@@ -214,6 +220,7 @@ public class BillingProfileVerificationServiceTest {
                     .verificationId(verificationId)
                     .type(VerificationType.KYB)
                     .externalApplicantId(faker.rickAndMorty().location())
+                    .reviewMessageForApplicant(faker.gameOfThrones().character())
                     .build();
             final Event event = mock(Event.class);
             final Kyb initialKyb = Kyb.builder()
@@ -226,6 +233,8 @@ public class BillingProfileVerificationServiceTest {
                     .name(faker.rickAndMorty().character()).build();
             final Kyb updateKyb = kybWithDataFromExternalSource.toBuilder()
                     .status(billingProfileVerificationUpdated.getVerificationStatus())
+                    .reviewMessageForApplicant(billingProfileVerificationUpdated.getReviewMessageForApplicant())
+                    .externalApplicantId(billingProfileVerificationUpdated.getExternalApplicantId())
                     .build();
             final BillingProfileVerificationUpdated updatedEvent = billingProfileVerificationUpdated.toBuilder()
                     .userId(updateKyb.getOwnerId())
@@ -320,5 +329,106 @@ public class BillingProfileVerificationServiceTest {
             verify(webhookPort).send(updatedEvent);
             billingProfileObserver.onBillingProfileUpdated(updatedEvent);
         }
+
+
+        @Test
+        void should_update_status_given_no_children() {
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(), VerificationStatus.STARTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.UNDER_REVIEW, List.of(), VerificationStatus.UNDER_REVIEW);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.REJECTED, List.of(), VerificationStatus.REJECTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.CLOSED, List.of(), VerificationStatus.CLOSED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.VERIFIED, List.of(), VerificationStatus.VERIFIED);
+        }
+
+        @Test
+        void should_update_status_from_children_statuses_given_one_children() {
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.STARTED), VerificationStatus.STARTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.UNDER_REVIEW), VerificationStatus.STARTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.REJECTED), VerificationStatus.REJECTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.CLOSED), VerificationStatus.CLOSED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.VERIFIED), VerificationStatus.STARTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.UNDER_REVIEW, List.of(VerificationStatus.STARTED), VerificationStatus.STARTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.UNDER_REVIEW, List.of(VerificationStatus.UNDER_REVIEW), VerificationStatus.UNDER_REVIEW);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.UNDER_REVIEW, List.of(VerificationStatus.REJECTED), VerificationStatus.REJECTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.UNDER_REVIEW, List.of(VerificationStatus.CLOSED), VerificationStatus.CLOSED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.UNDER_REVIEW, List.of(VerificationStatus.VERIFIED), VerificationStatus.UNDER_REVIEW);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.REJECTED, List.of(VerificationStatus.STARTED), VerificationStatus.REJECTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.REJECTED, List.of(VerificationStatus.UNDER_REVIEW), VerificationStatus.REJECTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.REJECTED, List.of(VerificationStatus.REJECTED), VerificationStatus.REJECTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.REJECTED, List.of(VerificationStatus.CLOSED), VerificationStatus.CLOSED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.REJECTED, List.of(VerificationStatus.VERIFIED), VerificationStatus.REJECTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.CLOSED, List.of(VerificationStatus.STARTED), VerificationStatus.CLOSED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.CLOSED, List.of(VerificationStatus.UNDER_REVIEW), VerificationStatus.CLOSED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.CLOSED, List.of(VerificationStatus.REJECTED), VerificationStatus.CLOSED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.CLOSED, List.of(VerificationStatus.CLOSED), VerificationStatus.CLOSED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.CLOSED, List.of(VerificationStatus.VERIFIED), VerificationStatus.CLOSED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.VERIFIED, List.of(VerificationStatus.STARTED), VerificationStatus.STARTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.VERIFIED, List.of(VerificationStatus.UNDER_REVIEW), VerificationStatus.UNDER_REVIEW);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.VERIFIED, List.of(VerificationStatus.REJECTED), VerificationStatus.REJECTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.VERIFIED, List.of(VerificationStatus.CLOSED), VerificationStatus.CLOSED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.VERIFIED, List.of(VerificationStatus.VERIFIED), VerificationStatus.VERIFIED);
+        }
+
+        @Test
+        void should_update_status_from_children_statuses_given_two_children() {
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.NOT_STARTED, VerificationStatus.STARTED),
+                    VerificationStatus.NOT_STARTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.UNDER_REVIEW, VerificationStatus.STARTED),
+                    VerificationStatus.STARTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.REJECTED, VerificationStatus.UNDER_REVIEW),
+                    VerificationStatus.REJECTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.CLOSED, VerificationStatus.REJECTED),
+                    VerificationStatus.CLOSED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.VERIFIED, VerificationStatus.UNDER_REVIEW),
+                    VerificationStatus.STARTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.UNDER_REVIEW, List.of(VerificationStatus.STARTED, VerificationStatus.STARTED),
+                    VerificationStatus.STARTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.UNDER_REVIEW, List.of(VerificationStatus.NOT_STARTED, VerificationStatus.STARTED),
+                    VerificationStatus.NOT_STARTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.UNDER_REVIEW, List.of(VerificationStatus.REJECTED, VerificationStatus.UNDER_REVIEW),
+                    VerificationStatus.REJECTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.UNDER_REVIEW, List.of(VerificationStatus.CLOSED, VerificationStatus.UNDER_REVIEW),
+                    VerificationStatus.CLOSED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.UNDER_REVIEW, List.of(VerificationStatus.VERIFIED, VerificationStatus.UNDER_REVIEW),
+                    VerificationStatus.UNDER_REVIEW);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.REJECTED, List.of(VerificationStatus.STARTED, VerificationStatus.UNDER_REVIEW),
+                    VerificationStatus.REJECTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.REJECTED, List.of(VerificationStatus.UNDER_REVIEW, VerificationStatus.UNDER_REVIEW),
+                    VerificationStatus.REJECTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.REJECTED, List.of(VerificationStatus.REJECTED, VerificationStatus.UNDER_REVIEW),
+                    VerificationStatus.REJECTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.REJECTED, List.of(VerificationStatus.CLOSED, VerificationStatus.STARTED),
+                    VerificationStatus.CLOSED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.REJECTED, List.of(VerificationStatus.VERIFIED, VerificationStatus.UNDER_REVIEW),
+                    VerificationStatus.REJECTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.CLOSED, List.of(VerificationStatus.STARTED, VerificationStatus.UNDER_REVIEW),
+                    VerificationStatus.CLOSED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.CLOSED, List.of(VerificationStatus.UNDER_REVIEW, VerificationStatus.REJECTED),
+                    VerificationStatus.CLOSED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.CLOSED, List.of(VerificationStatus.REJECTED, VerificationStatus.STARTED),
+                    VerificationStatus.CLOSED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.CLOSED, List.of(VerificationStatus.CLOSED, VerificationStatus.VERIFIED),
+                    VerificationStatus.CLOSED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.CLOSED, List.of(VerificationStatus.VERIFIED, VerificationStatus.STARTED),
+                    VerificationStatus.CLOSED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.VERIFIED, List.of(VerificationStatus.STARTED, VerificationStatus.VERIFIED),
+                    VerificationStatus.STARTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.VERIFIED, List.of(VerificationStatus.UNDER_REVIEW, VerificationStatus.VERIFIED),
+                    VerificationStatus.UNDER_REVIEW);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.VERIFIED, List.of(VerificationStatus.REJECTED, VerificationStatus.STARTED),
+                    VerificationStatus.REJECTED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.VERIFIED, List.of(VerificationStatus.CLOSED, VerificationStatus.STARTED),
+                    VerificationStatus.CLOSED);
+            assertUpdatedStatusIsEqualsTo(VerificationStatus.VERIFIED, List.of(VerificationStatus.VERIFIED, VerificationStatus.VERIFIED),
+                    VerificationStatus.VERIFIED);
+        }
+
+
+        public void assertUpdatedStatusIsEqualsTo(final VerificationStatus parentStatus, final List<VerificationStatus> childrenStatuses,
+                                                  final VerificationStatus expectedVerificationStatus) {
+            assertEquals(expectedVerificationStatus, billingProfileVerificationService.computeBillingProfileStatusFromKybAndChildrenKycs(parentStatus,
+                    childrenStatuses));
+        }
     }
+
 }

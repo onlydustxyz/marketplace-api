@@ -6,11 +6,16 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
 import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
 import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
+import lombok.NonNull;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 import org.junit.jupiter.api.BeforeAll;
@@ -24,6 +29,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -31,8 +37,15 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.MountableFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URI;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -98,7 +111,6 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_PATCH = "/api/v1/me";
     protected static final String ME_GET_PROFILE = "/api/v1/me/profile";
     protected static final String ME_PUT_PROFILE = "/api/v1/me/profile";
-    protected static final String ME_PAYOUT_SETTINGS = "/api/v1/me/payout-settings";
     protected static final String ME_ACCEPT_PROJECT_LEADER_INVITATION = "/api/v1/me/project-leader-invitations/%s";
     protected static final String ME_CLAIM_PROJECT = "/api/v1/me/project-claims/%s";
     protected static final String ME_APPLY_TO_PROJECT = "/api/v1/me/applications";
@@ -111,12 +123,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_REWARD = "/api/v1/me/rewards/%s";
     protected static final String ME_REWARD_ITEMS = "/api/v1/me/rewards/%s/reward-items";
     protected static final String ME_GET_REWARD_CURRENCIES = "/api/v1/me/reward-currencies";
-    protected static final String ME_POST_MARK_INVOICE_AS_RECEIVED = "/api/v1/me/invoices";
     protected static final String ME_BILLING_PROFILES = "/api/v1/me/billing-profiles";
-    protected static final String ME_BILLING_PROFILES_V2 = "/api/v2/me/billing-profiles";
-    protected static final String ME_GET_INDIVIDUAL_BILLING_PROFILE = "/api/v1/me/billing-profiles/individual";
-    protected static final String ME_GET_COMPANY_BILLING_PROFILE = "/api/v1/me/billing-profiles/company";
-    protected static final String ME_PATCH_BILLING_PROFILE_TYPE = "/api/v1/me/billing-profiles";
     protected static final String ME_GET_PROFILE_GITHUB = "/api/v1/me/profile/github";
     protected static final String USERS_GET = "/api/v1/users";
     protected static final String USERS_GET_BY_LOGIN = "/api/v1/users/login";
@@ -186,6 +193,18 @@ public class AbstractMarketplaceApiIT {
     @Autowired
     OutboxConsumerJob billingProfileVerificationOutboxJob;
 
+    @Autowired
+    RewardRepository rewardRepository;
+    @Autowired
+    RewardStatusRepository rewardStatusRepository;
+    @Autowired
+    InvoiceRewardRepository invoiceRewardRepository;
+    @Autowired
+    CurrencyRepository currencyRepository;
+    @Autowired
+    InvoiceRepository invoiceRepository;
+    @Autowired
+    BillingProfileRepository billingProfileRepository;
 
     @BeforeAll
     static void beforeAll() throws IOException, InterruptedException {
@@ -249,4 +268,88 @@ public class AbstractMarketplaceApiIT {
                 .toUri();
     }
 
+
+    @SneakyThrows
+    protected void patchReward(@NonNull String id, Number amount, String currencyCode, Number usdAmount, String invoiceReceivedAt, String paidAt) {
+        final var rewardEntity = rewardRepository.findById(UUID.fromString(id)).orElseThrow();
+        final var rewardStatus = rewardStatusRepository.findById(rewardEntity.id()).orElseThrow();
+
+        if (amount != null) rewardEntity.amount(BigDecimal.valueOf(amount.doubleValue()));
+        if (currencyCode != null) {
+            final var currency = currencyRepository.findByCode(currencyCode).orElseThrow();
+            final var network = switch (currencyCode) {
+                case "ETH" -> NetworkEnumEntity.ethereum;
+                case "APT" -> NetworkEnumEntity.aptos;
+                case "OP" -> NetworkEnumEntity.optimism;
+                case "STRK" -> NetworkEnumEntity.starknet;
+                default -> throw new IllegalArgumentException("Currency code %s not mapped".formatted(currencyCode));
+            };
+
+            rewardEntity.currency(currency);
+            rewardStatus.networks(new NetworkEnumEntity[]{network});
+        }
+        rewardStatus.amountUsdEquivalent(usdAmount == null ? null : BigDecimal.valueOf(usdAmount.doubleValue()));
+
+        if (invoiceReceivedAt != null) {
+            final var invoiceEntity = fakeInvoice(UUID.randomUUID(), List.of(rewardEntity.id()));
+            invoiceRepository.save(invoiceEntity);
+            rewardEntity.invoice(invoiceEntity);
+            // TODO check if still needed and correctly updated when invoice is uploaded
+            rewardStatus.invoiceReceivedAt(new SimpleDateFormat("yyyy-MM-dd").parse(invoiceReceivedAt));
+        }
+
+        if (paidAt != null) {
+            rewardStatus.paidAt(new SimpleDateFormat("yyyy-MM-dd").parse(paidAt));
+        }
+
+        rewardRepository.save(rewardEntity);
+        rewardStatusRepository.save(rewardStatus);
+    }
+
+    @SneakyThrows
+    @Transactional
+    protected InvoiceEntity fakeInvoice(UUID id, List<UUID> rewardIds) {
+        final var firstName = faker.name().firstName();
+        final var lastName = faker.name().lastName();
+
+        final var rewards = invoiceRewardRepository.findAll(rewardIds);
+
+        return new InvoiceEntity(
+                id,
+                UUID.randomUUID(),
+                Invoice.Number.of(12, lastName, firstName).toString(),
+                ZonedDateTime.now().minusDays(1),
+                InvoiceEntity.Status.TO_REVIEW,
+                rewards.stream().map(InvoiceRewardEntity::targetAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add),
+                rewards.get(0).targetCurrency(),
+                new URL("https://s3.storage.com/invoice.pdf"),
+                null,
+                new InvoiceEntity.Data(
+                        ZonedDateTime.now().plusDays(9),
+                        BigDecimal.ZERO,
+                        new Invoice.PersonalInfo(
+                                firstName,
+                                lastName,
+                                faker.address().fullAddress(),
+                                faker.address().countryCode()
+                        ),
+                        null,
+                        null,
+                        List.of(new Invoice.Wallet(Network.ETHEREUM, "vitalik.eth")),
+                        rewards
+                )
+        );
+    }
+
+    protected void patchBillingProfile(@NonNull String billingProfileId,
+                                       BillingProfileEntity.Type type,
+                                       VerificationStatusEntity status) {
+
+        final var billingProfile = billingProfileRepository.findById(UUID.fromString(billingProfileId)).orElseThrow();
+
+        if (type != null) billingProfile.setType(type);
+        if (status != null) billingProfile.setVerificationStatus(status);
+
+        billingProfileRepository.save(billingProfile);
+    }
 }

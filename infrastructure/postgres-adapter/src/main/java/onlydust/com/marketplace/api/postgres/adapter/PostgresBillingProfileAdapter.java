@@ -39,6 +39,8 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     private final @NonNull BillingProfileUserViewRepository billingProfileUserViewRepository;
     private final @NonNull ChildrenKycRepository childrenKycRepository;
     private final @NonNull BillingProfileUserInvitationRepository billingProfileUserInvitationRepository;
+    private final @NonNull PayoutPreferenceRepository payoutPreferenceRepository;
+
 
     @Override
     @Transactional
@@ -59,8 +61,12 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional(readOnly = true)
     public List<ShortBillingProfileView> findAllBillingProfilesForUser(UserId userId) {
+        final var invoiceMandateLatestVersionDate = globalSettingsRepository.get().getInvoiceMandateLatestVersionDate();
         return billingProfileRepository.findBillingProfilesForUserId(userId.value())
-                .stream().map(BillingProfileEntity::toView).toList();
+                .stream()
+                .map(BillingProfileEntity::toView)
+                .peek(bp -> bp.setInvoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate))
+                .toList();
     }
 
     @Override
@@ -97,7 +103,13 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     public void savePayoutPreference(BillingProfile.Id billingProfileId, UserId userId, ProjectId projectId) {
-
+        payoutPreferenceRepository.save(PayoutPreferenceEntity.builder()
+                .billingProfileId(billingProfileId.value())
+                .id(PayoutPreferenceEntity.PrimaryKey.builder()
+                        .userId(userId.value())
+                        .projectId(projectId.value())
+                        .build())
+                .build());
     }
 
     @Override
@@ -122,9 +134,11 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
         return billingProfileRepository.findById(billingProfileId.value()).map(billingProfileEntity -> switch (billingProfileEntity.getType()) {
             case INDIVIDUAL -> {
-                BillingProfileView billingProfileView = BillingProfileView.builder().type(BillingProfile.Type.INDIVIDUAL)
+                BillingProfileView billingProfileView = BillingProfileView.builder()
+                        .type(BillingProfile.Type.INDIVIDUAL)
                         .id(billingProfileId)
                         .name(billingProfileEntity.getName())
+                        .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
                         .build();
                 final Optional<KycEntity> optionalKycEntity = kycRepository.findByBillingProfileId(billingProfileId.value());
                 if (optionalKycEntity.isPresent()) {
@@ -140,6 +154,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                         .name(billingProfileEntity.getName())
                         .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                         .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
+                        .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
                         .build();
                 final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
                 if (optionalKybEntity.isPresent()) {
@@ -155,6 +170,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                         .name(billingProfileEntity.getName())
                         .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                         .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
+                        .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
                         .build();
                 final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
                 if (optionalKybEntity.isPresent()) {
@@ -208,7 +224,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional
     public void updateBillingProfileStatus(BillingProfile.Id billingProfileId, VerificationStatus status) {
-        billingProfileRepository.updateBillingProfileVerificationStatus(billingProfileId.value(), VerificationStatusEntity.fromDomain(status));
+        billingProfileRepository.updateBillingProfileVerificationStatus(billingProfileId.value(), VerificationStatusEntity.fromDomain(status).name());
     }
 
     @Override

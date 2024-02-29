@@ -14,9 +14,9 @@ public interface RewardStatusRepository extends JpaRepository<RewardStatusDataEn
             SELECT * FROM accounting.reward_status_data rsd
             JOIN public.rewards r on r.id = rsd.reward_id
             JOIN iam.users u on r.recipient_id = u.github_user_id
-            LEFT JOIN individual_billing_profiles ibp on ibp.user_id = u.id AND ibp.id = :billingProfileId
-            LEFT JOIN company_billing_profiles cbp on cbp.user_id = u.id AND cbp.id = :billingProfileId
-            WHERE COALESCE(ibp.id, cbp.id) IS NOT NULL AND
+            JOIN accounting.payout_preferences pp ON pp.project_id = r.project_id AND pp.user_id = u.id
+            JOIN accounting.billing_profiles bp ON bp.id = pp.billing_profile_id
+            WHERE bp.id = :billingProfileId AND
             rsd.paid_at IS NULL
             """, nativeQuery = true)
     List<RewardStatusDataEntity> findNotPaidByBillingProfile(UUID billingProfileId);

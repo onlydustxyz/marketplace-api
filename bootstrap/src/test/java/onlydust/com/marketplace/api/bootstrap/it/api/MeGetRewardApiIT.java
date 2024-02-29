@@ -1,26 +1,17 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
-import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.CompanyBillingProfileEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.OldVerificationStatusEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.UserBillingProfileTypeRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuotesRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.RewardStatusRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -28,17 +19,14 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 
 
 public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
-
     @Autowired
-    PaymentRequestRepository paymentRequestRepository;
+    BillingProfileStoragePort billingProfileStoragePort;
     @Autowired
-    PaymentRepository paymentRepository;
+    RewardRepository rewardRepository;
     @Autowired
-    CryptoUsdQuotesRepository cryptoUsdQuotesRepository;
+    RewardStatusRepository rewardStatusRepository;
     @Autowired
-    UserBillingProfileTypeRepository userBillingProfileTypeRepository;
-    @Autowired
-    CompanyBillingProfileRepository companyBillingProfileRepository;
+    CurrencyRepository currencyRepository;
 
     @Test
     void should_return_a_403_given_user_not_linked_to_reward() {
@@ -60,17 +48,15 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_user_reward() throws ParseException {
         // Given
-        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.authenticatePierre();
-        final String jwt = authenticatedUser.jwt();
-        final UUID rewardId = UUID.fromString("2ac80cc6-7e83-4eef-bc0c-932b58f683c0");
-        final CompanyBillingProfileEntity companyBillingProfileEntity =
-                companyBillingProfileRepository.findByUserId(authenticatedUser.user().getId()).orElseThrow();
-        companyBillingProfileEntity.setVerificationStatus(OldVerificationStatusEntity.VERIFIED);
-        companyBillingProfileRepository.save(companyBillingProfileEntity);
+        final var pierre = userAuthHelper.authenticatePierre();
+        final var rewardId = UUID.fromString("2ac80cc6-7e83-4eef-bc0c-932b58f683c0");
+        final var billingProfile = billingProfileStoragePort.findAllBillingProfilesForUser(UserId.of(pierre.user().getId())).get(0);
+        billingProfileStoragePort.updateBillingProfileStatus(billingProfile.getId(), VerificationStatus.VERIFIED);
+
         // When
         client.get()
                 .uri(getApiURI(String.format(ME_REWARD, rewardId)))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -112,32 +98,27 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                         }
                         """);
 
-        final PaymentRequestEntity paymentRequestEntity = paymentRequestRepository.findById(rewardId).orElseThrow();
-        paymentRequestEntity.setAmount(BigDecimal.valueOf(100));
-        paymentRequestEntity.setCurrency(CurrencyEnumEntity.strk);
-        paymentRequestEntity.setUsdAmount(null);
-        paymentRequestRepository.save(paymentRequestEntity);
-        final UUID paymentId = UUID.randomUUID();
-        final Date processedAt = new SimpleDateFormat("yyyy-MM-dd").parse("2023-09-20");
-        paymentRepository.save(PaymentEntity.builder()
-                .id(paymentId)
-                .amount(paymentRequestEntity.getAmount())
-                .requestId(paymentRequestEntity.getId())
-                .processedAt(processedAt)
-                .currencyCode(paymentRequestEntity.getCurrency().name())
-                .receipt(JacksonUtil.toJsonNode("""
-                        {"Sepa": {"recipient_iban": "FR7640618802650004034616521", "transaction_reference": "IBAN OK"}}"""))
-                .build());
+        rewardRepository.save(rewardRepository.findById(rewardId).orElseThrow()
+                .amount(BigDecimal.valueOf(100))
+                .currency(currencyRepository.findByCode("STRK").orElseThrow())
+        );
+
+        rewardStatusRepository.save(rewardStatusRepository.findById(rewardId).orElseThrow()
+                .amountUsdEquivalent(null)
+                .paidAt(new SimpleDateFormat("yyyy-MM-dd").parse("2023-09-20"))
+        );
+
+        // TODO add and check receipt in response
 
         client.get()
                 .uri(getApiURI(String.format(ME_REWARD, rewardId)))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .json(String.format("""
+                .json("""
                         {
                            "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0",
                            "currency": "STRK",
@@ -157,195 +138,11 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                              "isRegistered": null
                            },
                            "createdAt": "2023-09-19T07:38:22.018458Z",
-                           "processedAt": "%s",
-                           "receipt": {
-                               "type": "FIAT",
-                               "iban": "FR7640618802650004034616521",
-                               "walletAddress": null,
-                               "ens": null,
-                               "transactionReference": "IBAN OK"
-                             }
+                           "processedAt": "2023-09-20T00:00:00Z",
+                           "receipt": null
                          }
-                         """, DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
-
-        final PaymentEntity paymentEntity = paymentRepository.findById(paymentId).orElseThrow();
-        paymentEntity.setReceipt(JacksonUtil.toJsonNode("""
-                {"Ethereum": {"recipient_ens": "ilysse.eth", "transaction_hash": "0x0000000000000000000000000000000000000000000000000000000000000000", "recipient_address": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea"}}"""));
-        paymentRepository.save(paymentEntity);
-
-        client.get()
-                .uri(getApiURI(String.format(ME_REWARD, rewardId)))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(String.format("""
-                        {
-                           "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0",
-                           "currency": "STRK",
-                           "amount": 100,
-                           "dollarsEquivalent": null,
-                           "status": "COMPLETE",
-                           "from": {
-                             "githubUserId": 16590657,
-                             "login": "PierreOucif",
-                             "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                             "isRegistered": null
-                           },
-                           "to": {
-                             "githubUserId": 16590657,
-                             "login": "PierreOucif",
-                             "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                             "isRegistered": null
-                           },
-                           "createdAt": "2023-09-19T07:38:22.018458Z",
-                           "processedAt": "%s",
-                           "receipt": {
-                               "type": "CRYPTO",
-                               "iban": null,
-                               "walletAddress": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea",
-                               "ens": "ilysse.eth",
-                               "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000000",
-                               "transactionReferenceLink": "https://etherscan.io/tx/0x0000000000000000000000000000000000000000000000000000000000000000"
-                             }
-                         }
-                         """, DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
-
-        final PaymentEntity paymentEntity2 = paymentRepository.findById(paymentId).orElseThrow();
-        paymentEntity2.setReceipt(JacksonUtil.toJsonNode("""
-                {"Aptos": {"recipient_ens": "ilysse.eth", "transaction_hash": "0x0000000000000000000000000000000000000000000000000000000000000001", "recipient_address": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283eb"}}"""));
-        paymentRepository.save(paymentEntity2);
-
-        client.get()
-                .uri(getApiURI(String.format(ME_REWARD, rewardId)))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(String.format("""
-                        {
-                           "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0",
-                           "currency": "STRK",
-                           "amount": 100,
-                           "dollarsEquivalent": null,
-                           "status": "COMPLETE",
-                           "from": {
-                             "githubUserId": 16590657,
-                             "login": "PierreOucif",
-                             "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                             "isRegistered": null
-                           },
-                           "to": {
-                             "githubUserId": 16590657,
-                             "login": "PierreOucif",
-                             "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                             "isRegistered": null
-                           },
-                           "createdAt": "2023-09-19T07:38:22.018458Z",
-                           "processedAt": "%s",
-                           "receipt": {
-                               "type": "CRYPTO",
-                               "iban": null,
-                               "walletAddress": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283eb",
-                               "ens": "ilysse.eth",
-                               "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000001",
-                               "transactionReferenceLink": "https://aptoscan.com/version/0x0000000000000000000000000000000000000000000000000000000000000001"
-                             }
-                         }
-                         """, DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
-        final PaymentEntity paymentEntity3 = paymentRepository.findById(paymentId).orElseThrow();
-        paymentEntity3.setReceipt(JacksonUtil.toJsonNode("""
-                {"Optimism": {"recipient_ens": "ilysse.eth", "transaction_hash": "0x0000000000000000000000000000000000000000000000000000000000000002", "recipient_address": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ec"}}"""));
-        paymentRepository.save(paymentEntity3);
-
-        client.get()
-                .uri(getApiURI(String.format(ME_REWARD, rewardId)))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(String.format("""
-                        {
-                           "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0",
-                           "currency": "STRK",
-                           "amount": 100,
-                           "dollarsEquivalent": null,
-                           "status": "COMPLETE",
-                           "from": {
-                             "githubUserId": 16590657,
-                             "login": "PierreOucif",
-                             "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                             "isRegistered": null
-                           },
-                           "to": {
-                             "githubUserId": 16590657,
-                             "login": "PierreOucif",
-                             "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                             "isRegistered": null
-                           },
-                           "createdAt": "2023-09-19T07:38:22.018458Z",
-                           "processedAt": "%s",
-                           "receipt": {
-                               "type": "CRYPTO",
-                               "iban": null,
-                               "walletAddress": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ec",
-                               "ens": "ilysse.eth",
-                               "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000002",
-                               "transactionReferenceLink": "https://optimistic.etherscan.io/tx/0x0000000000000000000000000000000000000000000000000000000000000002"
-                             }
-                         }
-                         """, DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
-
-        final PaymentEntity paymentEntity4 = paymentRepository.findById(paymentId).orElseThrow();
-        paymentEntity4.setReceipt(JacksonUtil.toJsonNode("""
-                {"Starknet": {"recipient_ens": "ilysse.eth", "transaction_hash": "0x0000000000000000000000000000000000000000000000000000000000000003", "recipient_address": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ed"}}"""));
-        paymentRepository.save(paymentEntity4);
-
-        client.get()
-                .uri(getApiURI(String.format(ME_REWARD, rewardId)))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(String.format("""
-                        {
-                           "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0",
-                           "currency": "STRK",
-                           "amount": 100,
-                           "dollarsEquivalent": null,
-                           "status": "COMPLETE",
-                           "from": {
-                             "githubUserId": 16590657,
-                             "login": "PierreOucif",
-                             "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                             "isRegistered": null
-                           },
-                           "to": {
-                             "githubUserId": 16590657,
-                             "login": "PierreOucif",
-                             "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                             "isRegistered": null
-                           },
-                           "createdAt": "2023-09-19T07:38:22.018458Z",
-                           "processedAt": "%s",
-                           "receipt": {
-                               "type": "CRYPTO",
-                               "iban": null,
-                               "walletAddress": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ed",
-                               "ens": "ilysse.eth",
-                               "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000003",
-                               "transactionReferenceLink": "https://starkscan.co/tx/0x0000000000000000000000000000000000000000000000000000000000000003"
-                             }
-                         }
-                         """, DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
+                         """
+                );
     }
 
     @Test

@@ -2,9 +2,9 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
+import onlydust.com.marketplace.project.domain.model.Project;
 import org.hibernate.annotations.*;
 
 import javax.persistence.CascadeType;
@@ -86,4 +86,17 @@ public class ProjectEntity {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "projectId")
     Set<ProjectEcosystemEntity> ecosystems;
 
+    public Project toDomain() {
+        return Project.builder()
+                .id(id)
+                .slug(key)
+                .name(name)
+                .shortDescription(shortDescription)
+                .longDescription(longDescription)
+                .logoUrl(logoUrl)
+                .moreInfoUrl(moreInfos.stream().findFirst().map(ProjectMoreInfoEntity::getUrl).orElse(null))
+                .hiring(hiring)
+                .visibility(visibility.toDomain())
+                .build();
+    }
 }

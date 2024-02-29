@@ -4,6 +4,7 @@ import com.vladmihalcea.hibernate.type.array.EnumArrayType;
 import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
 import org.hibernate.annotations.Parameter;
@@ -30,15 +31,16 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Builder(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
+@Accessors(fluent = true, chain = true)
 @TypeDef(name = "currency", typeClass = PostgreSQLEnumType.class)
 @TypeDef(
-        name = "network[]",
+        name = "accounting.network[]",
         typeClass = EnumArrayType.class,
         defaultForType = NetworkEnumEntity[].class,
         parameters = {
                 @Parameter(
                         name = AbstractArrayType.SQL_ARRAY_TYPE,
-                        value = "network"
+                        value = "accounting.network"
                 )
         }
 )
@@ -50,8 +52,8 @@ public class RewardStatusDataEntity {
     Date unlockDate;
     Date invoiceReceivedAt;
     Date paidAt;
-    @Type(type = "network[]")
-    @Column(columnDefinition = "network[]")
+    @Type(type = "accounting.network[]")
+    @Column(columnDefinition = "accounting.network[]")
     NetworkEnumEntity[] networks;
     BigDecimal amountUsdEquivalent;
 

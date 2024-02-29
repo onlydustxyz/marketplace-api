@@ -5,7 +5,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HiddenContributorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
@@ -46,7 +45,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
     private final ProjectRepoRepository projectRepoRepository;
     private final CustomProjectRepository customProjectRepository;
     private final CustomContributorRepository customContributorRepository;
-    private final CustomProjectRewardRepository customProjectRewardRepository;
     private final CustomProjectBudgetRepository customProjectBudgetRepository;
     private final ProjectLeadViewRepository projectLeadViewRepository;
     private final CustomRewardRepository customRewardRepository;
@@ -65,6 +63,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
     private final PaymentRequestRepository paymentRequestRepository;
     private final HistoricalQuoteRepository historicalQuoteRepository;
     private final CurrencyRepository currencyRepository;
+    private final RewardViewRepository rewardViewRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -404,30 +403,23 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
     @Override
     @Transactional(readOnly = true)
     public ProjectRewardsPageView findRewards(UUID projectId, ProjectRewardView.Filters filters,
-                                              ProjectRewardView.SortBy sortBy, SortDirection sortDirection,
+                                              ProjectRewardView.SortBy sort, SortDirection sortDirection,
                                               int pageIndex, int pageSize) {
-        final var currencies = filters.getCurrencies().stream().map(CurrencyEnumEntity::of).map(Enum::name).toList();
         final var format = new SimpleDateFormat("yyyy-MM-dd");
         final var fromDate = isNull(filters.getFrom()) ? null : format.format(filters.getFrom());
         final var toDate = isNull(filters.getTo()) ? null : format.format(filters.getTo());
 
-        final Integer count = customProjectRewardRepository.getCount(projectId, currencies, filters.getContributors(),
-                fromDate, toDate);
-        final List<ProjectRewardView> projectRewardViews = customProjectRewardRepository.getViewEntities(projectId,
-                        currencies, filters.getContributors(),
-                        fromDate, toDate,
-                        sortBy, sortDirection, pageIndex, pageSize)
-                .stream().map(ProjectRewardMapper::mapEntityToDomain)
-                .toList();
+        final var pageRequest = PageRequest.of(pageIndex, pageSize,
+                RewardViewRepository.sortBy(sort, sortDirection == SortDirection.asc ? Sort.Direction.ASC : Sort.Direction.DESC));
 
-        final var budgetStats = budgetStatsRepository.findByProject(projectId, currencies, filters.getContributors(),
-                fromDate, toDate);
+        final var page = rewardViewRepository.findProjectRewards(projectId, filters.getCurrencies(), filters.getContributors(), fromDate, toDate, pageRequest);
+        final var budgetStats = budgetStatsRepository.findByProject(projectId, filters.getCurrencies(), filters.getContributors(), fromDate, toDate);
 
         return ProjectRewardsPageView.builder().
                 rewards(Page.<ProjectRewardView>builder()
-                        .content(projectRewardViews)
-                        .totalItemNumber(count)
-                        .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
+                        .content(page.getContent().stream().map(RewardViewEntity::toProjectReward).toList())
+                        .totalItemNumber((int) page.getTotalElements())
+                        .totalPageNumber(page.getTotalPages())
                         .build())
                 .remainingBudget(budgetStats.size() == 1 ?
                         new Money(budgetStats.get(0).getRemainingAmount(),
@@ -460,8 +452,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
 
     @Override
     @Transactional(readOnly = true)
-    public RewardView getProjectReward(UUID rewardId) {
-        return RewardMapper.rewardToDomain(customRewardRepository.findProjectRewardViewEntityByd(rewardId));
+    public RewardDetailsView getProjectReward(UUID rewardId) {
+        return rewardViewRepository.find(rewardId).orElseThrow().toDomain();
     }
 
     @Override

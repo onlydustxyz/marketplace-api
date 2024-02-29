@@ -8,12 +8,10 @@ import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.port.input.AccountingUserObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
-import onlydust.com.marketplace.project.domain.port.output.OldBillingProfileStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.view.*;
@@ -37,8 +35,6 @@ public class UserService implements UserFacadePort {
     private final ProjectStoragePort projectStoragePort;
     private final GithubSearchPort githubSearchPort;
     private final ImageStoragePort imageStoragePort;
-    private final OldBillingProfileStoragePort oldBillingProfileStoragePort;
-    private final AccountingUserObserverPort accountingUserObserverPort;
 
     @Override
     @Transactional
@@ -46,13 +42,6 @@ public class UserService implements UserFacadePort {
         return userStoragePort
                 .getUserByGithubId(githubUserIdentity.getGithubUserId())
                 .map(user -> {
-                    final var payoutInformationById = userStoragePort.getPayoutSettingsById(user.getId());
-                    user.setHasValidPayoutInfos(payoutInformationById.isValid());
-                    user.setOldBillingProfileType(oldBillingProfileStoragePort.getBillingProfileTypeForUser(user.getId()).orElse(OldBillingProfileType.INDIVIDUAL));
-                    if (payoutInformationById.hasPendingPayments()) {
-                        user.setHasValidBillingProfile(oldBillingProfileStoragePort.hasValidBillingProfileForUserAndType(user.getId(),
-                                user.getOldBillingProfileType()));
-                    }
                     if (!readOnly)
                         userStoragePort.updateUserLastSeenAt(user.getId(), dateProvider.now());
 
@@ -69,7 +58,6 @@ public class UserService implements UserFacadePort {
                             .githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl())
                             .githubLogin(githubUserIdentity.getGithubLogin())
                             .githubEmail(githubUserIdentity.getEmail())
-                            .oldBillingProfileType(OldBillingProfileType.INDIVIDUAL)
                             .build();
                     final User createdUser = userStoragePort.createUser(user);
                     user = user.toBuilder()
@@ -99,11 +87,6 @@ public class UserService implements UserFacadePort {
     public UserProfileView updateProfile(UUID userId, UserProfile userProfile) {
         userStoragePort.saveProfile(userId, userProfile);
         return userStoragePort.getProfileById(userId);
-    }
-
-    @Override
-    public UserPayoutSettings getPayoutSettingsForUserId(UUID userId) {
-        return userStoragePort.getPayoutSettingsById(userId);
     }
 
     @Override
@@ -143,16 +126,6 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
-    public List<OldBillingProfile> oldGetBillingProfiles(UUID id, Long githubUserId) {
-        return oldBillingProfileStoragePort.all(id, githubUserId);
-    }
-
-    @Override
-    public UserPayoutSettings updatePayoutSettings(UUID userId, UserPayoutSettings userPayoutSettings) {
-        return userStoragePort.savePayoutSettingsForUserId(userId, userPayoutSettings);
-    }
-
-    @Override
     public void markUserAsOnboarded(UUID userId) {
         userStoragePort.updateOnboardingWizardDisplayDate(userId, dateProvider.now());
     }
@@ -182,8 +155,8 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
-    public RewardView getRewardByIdForRecipientId(UUID rewardId, Long recipientId) {
-        final RewardView reward = userStoragePort.findRewardById(rewardId);
+    public RewardDetailsView getRewardByIdForRecipientId(UUID rewardId, Long recipientId) {
+        final RewardDetailsView reward = userStoragePort.findRewardById(rewardId);
         if (!reward.getTo().getGithubUserId().equals(recipientId)) {
             throw OnlyDustException.forbidden("Only recipient user can read it's own reward");
         }
@@ -246,40 +219,5 @@ public class UserService implements UserFacadePort {
             return false;
         }
         return true;
-    }
-
-    @Override
-    @Transactional
-    public OldCompanyBillingProfile getCompanyBillingProfile(UUID userId) {
-        return oldBillingProfileStoragePort.findCompanyProfileForUser(userId)
-                .orElseGet(() -> {
-                    OldCompanyBillingProfile newCompanyBillingProfile = OldCompanyBillingProfile.initForUser(userId);
-                    oldBillingProfileStoragePort.saveCompanyProfileForUser(newCompanyBillingProfile);
-                    oldBillingProfileStoragePort.saveProfileTypeForUser(OldBillingProfileType.COMPANY, userId);
-                    return newCompanyBillingProfile;
-                });
-    }
-
-    @Override
-    @Transactional
-    public OldIndividualBillingProfile getIndividualBillingProfile(UUID userId) {
-        return oldBillingProfileStoragePort.findIndividualBillingProfile(userId)
-                .orElseGet(() -> {
-                    OldIndividualBillingProfile individualBillingProfile = OldIndividualBillingProfile.initForUser(userId);
-                    oldBillingProfileStoragePort.saveIndividualProfileForUser(individualBillingProfile);
-                    oldBillingProfileStoragePort.saveProfileTypeForUser(OldBillingProfileType.INDIVIDUAL, userId);
-                    return individualBillingProfile;
-                });
-    }
-
-    @Override
-    @Transactional
-    public void updateBillingProfileType(UUID userId, OldBillingProfileType oldBillingProfileType) {
-        oldBillingProfileStoragePort.updateBillingProfileType(userId, oldBillingProfileType);
-        if (oldBillingProfileType.equals(OldBillingProfileType.COMPANY)) {
-            accountingUserObserverPort.onBillingProfileSelected(userId, getCompanyBillingProfile(userId));
-        } else {
-            accountingUserObserverPort.onBillingProfileSelected(userId, getIndividualBillingProfile(userId));
-        }
     }
 }

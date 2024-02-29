@@ -23,7 +23,7 @@ public class BankAccountEntity {
     @Id
     UUID billingProfileId;
     @OneToOne
-    @JoinColumn(name = "billingProfile", insertable = false, updatable = false)
+    @JoinColumn(name = "billingProfileId", insertable = false, updatable = false)
     BillingProfileEntity billingProfile;
 
     String bic;

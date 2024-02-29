@@ -178,54 +178,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/me/payout-settings:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Me
-      summary: Caller payout settings
-      operationId: getMyPayoutSettings
-      description: |
-        Get payout settings of the caller
-      responses:
-        "200":
-          description: 'Payout settings'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserPayoutSettingsResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-    put:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Me
-      summary: Update caller payout settings
-      operationId: putMyPayoutSettings
-      description: |
-        Set payout settings of the caller
-      requestBody:
-        description: 'Payout settings'
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserPayoutSettingsRequest'
-      responses:
-        "200":
-          description: 'Payout information'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserPayoutSettingsResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
   /api/v1/me/project-leader-invitations/{projectId}:
     put:
       security:
@@ -709,107 +661,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/me/billing-profiles/individual:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Me
-      summary: Get my individual billing profile
-      operationId: getMyIndividualBillingProfile
-      description: |
-        Get my individual billing profile
-      responses:
-        "200":
-          description: 'My individual billing profile'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/IndividualBillingProfileResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "403":
-          $ref: '#/components/responses/ProjectForbiddenError'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-  /api/v1/me/billing-profiles/company:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Me
-      summary: Get my company billing profile
-      operationId: getMyCompanyBillingProfile
-      description: |
-        Get my company billing profile
-      responses:
-        "200":
-          description: 'My company billing profile'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CompanyBillingProfileResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "403":
-          $ref: '#/components/responses/ProjectForbiddenError'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
-  /api/v1/me/billing-profiles:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Me
-      summary: Get my billing profiles
-      operationId: oldGetMyBillingProfiles
-      description: |
-        Get my billing profiles
-      responses:
-        "200":
-          description: 'User billing profiles'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MyBillingProfilesResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "403":
-          $ref: '#/components/responses/ProjectForbiddenError'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-    patch:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Me
-      summary: Update user billing profile type
-      operationId: oldUpdateMyBillingProfileType
-      description: |
-        Update user billing profile type
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BillingProfileTypeRequest'
-      responses:
-        "204":
-          description: 'User billing profile type updated'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "403":
-          $ref: '#/components/responses/ProjectForbiddenError'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
   /api/v1/me/billing-profiles/{billingProfileId}/invitations:
     post:
       security:
@@ -843,7 +694,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v2/me/billing-profiles:
+  /api/v1/me/billing-profiles:
     get:
       security:
         - bearerAuth: [ ]
@@ -1555,7 +1406,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/CurrencyContract'
+              $ref: '#/components/schemas/CurrencyId'
         - in: query
           name: contributors
           description: Contributor filter
@@ -1775,88 +1626,6 @@ paths:
 
 
   /api/v2/projects/{projectId}/rewards:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Projects
-      summary: Get project rewards
-      operationId: getProjectRewardsV2
-      description: |
-        Get the list of all rewards granted from this project. Only project leaders can access this information.
-      parameters:
-        - in: path
-          name: projectId
-          required: true
-          schema:
-            $ref: '#/components/schemas/ProjectId'
-        - in: query
-          name: currencies
-          description: Currency filter
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/CurrencyContract'
-        - in: query
-          name: contributors
-          description: Contributor filter
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/GithubUserId'
-        - in: query
-          name: fromDate
-          description: Date filter
-          schema:
-            type: string
-            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
-        - in: query
-          name: toDate
-          description: Date filter
-          schema:
-            type: string
-            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
-        - in: query
-          name: sort
-          description: Sort order
-          schema:
-            enum:
-              - REQUESTED_AT
-              - CONTRIBUTION
-              - AMOUNT
-              - STATUS
-        - in: query
-          name: direction
-          schema:
-            type: string
-            enum:
-              - ASC
-              - DESC
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: 'List of rewards'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RewardsPageResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "403":
-          $ref: '#/components/responses/ProjectForbiddenError'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
     post:
       security:
         - bearerAuth: [ ]
@@ -5828,81 +5597,6 @@ components:
         kyb:
           $ref: '#/components/schemas/KYBResponse'
 
-    CompanyBillingProfileResponse:
-      type: object
-      required:
-        - id
-        - status
-      properties:
-        id:
-          type: string
-          format: uuid
-        status:
-          $ref: '#/components/schemas/VerificationStatus'
-        name:
-          type: string
-        registrationNumber:
-          type: string
-        registrationDate:
-          type: string
-          format: date-time
-        address:
-          type: string
-        country:
-          deprecated: true
-          type: string
-        countryCode:
-          type: string
-          format: iso-country-code
-        usEntity:
-          type: boolean
-        subjectToEuropeVAT:
-          type: boolean
-        euVATNumber:
-          type: string
-
-    IndividualBillingProfileResponse:
-      type: object
-      required:
-        - id
-        - status
-      properties:
-        id:
-          type: string
-          format: uuid
-        status:
-          $ref: '#/components/schemas/VerificationStatus'
-        firstName:
-          type: string
-        lastName:
-          type: string
-        birthdate:
-          type: string
-          format: date-time
-        address:
-          type: string
-        country:
-          type: string
-          deprecated: true
-        countryCode:
-          type: string
-          format: iso-country-code
-        usCitizen:
-          type: boolean
-        idDocumentType:
-          type: string
-          enum:
-            - PASSPORT
-            - ID_CARD
-            - RESIDENCE_PERMIT
-            - DRIVER_LICENSE
-        idDocumentNumber:
-          type: string
-        validUntil:
-          type: string
-          format: date-time
-        idDocumentCountryCode:
-          type: string
     KYCResponse:
       type: object
       required:

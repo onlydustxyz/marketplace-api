@@ -27,7 +27,6 @@ public class User {
     List<ProjectLedView> pendingProjectsLed = new ArrayList<>();
     @Builder.Default
     List<UUID> projectsAppliedTo = new ArrayList<>();
-    OldBillingProfileType oldBillingProfileType;
     @Builder.Default
     Boolean hasValidBillingProfile = true;
 

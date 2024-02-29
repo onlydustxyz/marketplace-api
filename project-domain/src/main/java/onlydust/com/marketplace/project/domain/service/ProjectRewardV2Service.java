@@ -38,7 +38,7 @@ public class ProjectRewardV2Service implements ProjectRewardFacadePort {
     }
 
     @Override
-    public RewardView getRewardByIdForProjectLead(UUID projectId, UUID rewardId, UUID projectLeadId) {
+    public RewardDetailsView getRewardByIdForProjectLead(UUID projectId, UUID rewardId, UUID projectLeadId) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
             return projectRewardStoragePortV2.getProjectReward(rewardId);
         } else {

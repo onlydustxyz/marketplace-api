@@ -34,7 +34,7 @@ public class KycEntity {
     UUID id;
     UUID billingProfileId;
     @OneToOne
-    @JoinColumn(name = "billingProfile", insertable = false, updatable = false)
+    @JoinColumn(name = "billingProfileId", insertable = false, updatable = false)
     BillingProfileEntity billingProfile;
 
     UUID ownerId;

@@ -2,10 +2,9 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
-import onlydust.com.marketplace.project.domain.view.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
+import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.project.domain.view.*;
 
 import java.util.UUID;
@@ -38,33 +37,40 @@ public interface RewardMapper {
                 .build();
     }
 
-    static RewardDetailsResponse rewardDetailsToResponse(RewardView rewardView) {
-        return new RewardDetailsResponse()
+    static RewardDetailsResponse rewardDetailsToResponse(RewardDetailsView rewardDetailsView, boolean forUser) {
+        final var response = new RewardDetailsResponse()
                 .from(new ContributorResponse()
-                        .githubUserId(rewardView.getFrom().getGithubUserId())
-                        .avatarUrl(rewardView.getFrom().getGithubAvatarUrl())
-                        .login(rewardView.getFrom().getGithubLogin())
+                        .githubUserId(rewardDetailsView.getFrom().getGithubUserId())
+                        .avatarUrl(rewardDetailsView.getFrom().getGithubAvatarUrl())
+                        .login(rewardDetailsView.getFrom().getGithubLogin())
                 )
                 .to(
                         new ContributorResponse()
-                                .githubUserId(rewardView.getTo().getGithubUserId())
-                                .avatarUrl(rewardView.getTo().getGithubAvatarUrl())
-                                .login(rewardView.getTo().getGithubLogin())
+                                .githubUserId(rewardDetailsView.getTo().getGithubUserId())
+                                .avatarUrl(rewardDetailsView.getTo().getGithubAvatarUrl())
+                                .login(rewardDetailsView.getTo().getGithubLogin())
                 )
-                .createdAt(DateMapper.toZoneDateTime(rewardView.getCreatedAt()))
-                .processedAt(DateMapper.toZoneDateTime(rewardView.getProcessedAt()))
-                .amount(rewardView.getAmount())
-                .currency(mapCurrency(rewardView.getCurrency()))
-                .status(mapRewardStatus(rewardView.getStatus()))
-                .unlockDate(DateMapper.toZoneDateTime(rewardView.getUnlockDate()))
-                .dollarsEquivalent(rewardView.getDollarsEquivalent())
-                .id(rewardView.getId())
-                .receipt(receiptToResponse(rewardView.getReceipt()))
-                .project(ProjectMapper.mapShortProjectResponse(rewardView.getProject()));
+                .createdAt(DateMapper.toZoneDateTime(rewardDetailsView.getCreatedAt()))
+                .processedAt(DateMapper.toZoneDateTime(rewardDetailsView.getProcessedAt()))
+                .amount(rewardDetailsView.getAmount())
+                .currency(mapCurrency(rewardDetailsView.getCurrency()))
+                .unlockDate(DateMapper.toZoneDateTime(rewardDetailsView.getUnlockDate()))
+                .dollarsEquivalent(rewardDetailsView.getDollarsEquivalent())
+                .id(rewardDetailsView.getId())
+                .receipt(receiptToResponse(rewardDetailsView.getReceipt()))
+                .project(ProjectMapper.mapShortProjectResponse(rewardDetailsView.getProject()));
+
+        if (forUser) {
+            response.status(mapRewardStatus(rewardDetailsView.getStatusForUser()));
+        } else {
+            response.status(mapRewardStatus(rewardDetailsView.getStatusForProjectLead()));
+        }
+
+        return response;
     }
 
     @NonNull
-    private static RewardStatus mapRewardStatus(UserRewardStatus rewardView) {
+    private static RewardStatus mapRewardStatus(UserRewardView.Status rewardView) {
         return switch (rewardView) {
             case complete -> RewardStatus.COMPLETE;
             case missingPayoutInfo -> RewardStatus.MISSING_PAYOUT_INFO;
@@ -76,7 +82,18 @@ public interface RewardMapper {
     }
 
     @NonNull
-    private static RewardStatus mapRewardStatusToProject(UserRewardStatus rewardView) {
+    private static RewardStatus mapRewardStatus(ProjectRewardView.Status rewardView) {
+        return switch (rewardView) {
+            case complete -> RewardStatus.COMPLETE;
+            case pendingContributor -> RewardStatus.PENDING_CONTRIBUTOR;
+            case pendingSignup -> RewardStatus.PENDING_SIGNUP;
+            case processing -> RewardStatus.PROCESSING;
+            case locked -> RewardStatus.LOCKED;
+        };
+    }
+
+    @NonNull
+    private static RewardStatus mapRewardStatusToProject(UserRewardView.Status rewardView) {
         return switch (rewardView) {
             case complete -> RewardStatus.COMPLETE;
             case missingPayoutInfo -> RewardStatus.PENDING_CONTRIBUTOR;

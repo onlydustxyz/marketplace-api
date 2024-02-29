@@ -29,8 +29,8 @@ public interface BillingProfileRepository extends JpaRepository<BillingProfileEn
     @Modifying
     @Query(value = """
                     update accounting.billing_profiles
-                    set verification_status = :verificationStatus
+                    set verification_status = cast(:verificationStatus as accounting.verification_status)
                     where id = :billingProfileId
             """, nativeQuery = true)
-    void updateBillingProfileVerificationStatus(UUID billingProfileId, VerificationStatusEntity verificationStatus);
+    void updateBillingProfileVerificationStatus(UUID billingProfileId, String verificationStatus);
 }

@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
@@ -22,6 +23,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Data
+@Accessors(chain = true, fluent = true)
 @Builder(toBuilder = true)
 @Table(name = "kyb", schema = "accounting")
 @EntityListeners(AuditingEntityListener.class)
@@ -32,7 +34,7 @@ public class KybEntity {
     UUID id;
     UUID billingProfileId;
     @OneToOne
-    @JoinColumn(name = "billingProfile", insertable = false, updatable = false)
+    @JoinColumn(name = "billingProfileId", insertable = false, updatable = false)
     BillingProfileEntity billingProfile;
     @Type(type = "verification_status")
     @Enumerated(EnumType.STRING)

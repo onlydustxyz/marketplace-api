@@ -54,7 +54,6 @@ public class PostgresConfiguration {
                                                  final ProjectRepoRepository projectRepoRepository,
                                                  final CustomProjectRepository customProjectRepository,
                                                  final CustomContributorRepository customContributorRepository,
-                                                 final CustomProjectRewardRepository customProjectRewardRepository,
                                                  final CustomProjectBudgetRepository customProjectBudgetRepository,
                                                  final ProjectLeadViewRepository projectLeadViewRepository,
                                                  final CustomRewardRepository customRewardRepository,
@@ -72,7 +71,8 @@ public class PostgresConfiguration {
                                                  final ProjectTagRepository projectTagRepository,
                                                  final PaymentRequestRepository paymentRequestRepository,
                                                  final HistoricalQuoteRepository historicalQuoteRepository,
-                                                 final CurrencyRepository currencyRepository) {
+                                                 final CurrencyRepository currencyRepository,
+                                                 final RewardViewRepository rewardViewRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -81,7 +81,6 @@ public class PostgresConfiguration {
                 projectRepoRepository,
                 customProjectRepository,
                 customContributorRepository,
-                customProjectRewardRepository,
                 customProjectBudgetRepository,
                 projectLeadViewRepository,
                 customRewardRepository,
@@ -99,7 +98,8 @@ public class PostgresConfiguration {
                 projectTagRepository,
                 paymentRequestRepository,
                 historicalQuoteRepository,
-                currencyRepository
+                currencyRepository,
+                rewardViewRepository
         );
     }
 
@@ -111,7 +111,6 @@ public class PostgresConfiguration {
                                                            final ProjectRepoRepository projectRepoRepository,
                                                            final CustomProjectRepository customProjectRepository,
                                                            final CustomContributorRepository customContributorRepository,
-                                                           final CustomProjectRewardRepository customProjectRewardRepository,
                                                            final CustomProjectBudgetRepository customProjectBudgetRepository,
                                                            final ProjectLeadViewRepository projectLeadViewRepository,
                                                            final CustomRewardRepository customRewardRepository,
@@ -129,7 +128,8 @@ public class PostgresConfiguration {
                                                            final ProjectTagRepository projectTagRepository,
                                                            final PaymentRequestRepository paymentRequestRepository,
                                                            final HistoricalQuoteRepository historicalQuoteRepository,
-                                                           final CurrencyRepository currencyRepository) {
+                                                           final CurrencyRepository currencyRepository,
+                                                           final RewardViewRepository rewardViewRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -138,7 +138,6 @@ public class PostgresConfiguration {
                 projectRepoRepository,
                 customProjectRepository,
                 customContributorRepository,
-                customProjectRewardRepository,
                 customProjectBudgetRepository,
                 projectLeadViewRepository,
                 customRewardRepository,
@@ -156,7 +155,8 @@ public class PostgresConfiguration {
                 projectTagRepository,
                 paymentRequestRepository,
                 historicalQuoteRepository,
-                currencyRepository
+                currencyRepository,
+                rewardViewRepository
         );
     }
 
@@ -184,53 +184,37 @@ public class PostgresConfiguration {
                                                    final UserRepository userRepository,
                                                    final UserViewRepository userViewRepository,
                                                    final GlobalSettingsRepository globalSettingsRepository,
-                                                   final UserPayoutInfoRepository userPayoutInfoRepository,
                                                    final OnboardingRepository onboardingRepository,
                                                    final ProjectLeaderInvitationRepository projectLeaderInvitationRepository,
                                                    final ProjectLeadRepository projectLeadRepository,
                                                    final ApplicationRepository applicationRepository,
                                                    final ProjectIdRepository projectIdRepository,
                                                    final UserProfileInfoRepository userProfileInfoRepository,
-                                                   final OldWalletRepository oldWalletRepository,
-                                                   final CustomUserPayoutInfoRepository customUserPayoutInfoRepository,
                                                    final CustomRewardRepository customRewardRepository,
                                                    final ProjectLedIdRepository projectLedIdRepository,
                                                    final RewardStatsRepository rewardStatsRepository,
-                                                   final UserRewardViewRepository userRewardViewRepository) {
+                                                   final RewardViewRepository rewardViewRepository) {
         return new PostgresUserAdapter(
                 customUserRepository,
                 customContributorRepository,
                 userRepository,
                 userViewRepository,
                 globalSettingsRepository,
-                userPayoutInfoRepository,
                 onboardingRepository,
                 projectLeaderInvitationRepository,
                 projectLeadRepository,
                 applicationRepository,
                 projectIdRepository,
                 userProfileInfoRepository,
-                oldWalletRepository,
-                customUserPayoutInfoRepository,
                 customRewardRepository,
                 projectLedIdRepository,
                 rewardStatsRepository,
-                userRewardViewRepository);
-    }
-
-    @Bean
-    public CustomProjectRewardRepository customProjectRewardRepository(final EntityManager entityManager) {
-        return new CustomProjectRewardRepository(entityManager);
+                rewardViewRepository);
     }
 
     @Bean
     public CustomProjectBudgetRepository customProjectBudgetRepository(final EntityManager entityManager) {
         return new CustomProjectBudgetRepository(entityManager);
-    }
-
-    @Bean
-    public CustomUserPayoutInfoRepository customUserPayoutInfoRepository(final EntityManager entityManager) {
-        return new CustomUserPayoutInfoRepository(entityManager);
     }
 
     @Bean
@@ -341,20 +325,6 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresOldBillingProfileAdapter postgresBillingProfileAdapter(final UserBillingProfileTypeRepository userBillingProfileTypeRepository,
-                                                                          final IndividualBillingProfileRepository individualBillingProfileRepository,
-                                                                          final CompanyBillingProfileRepository companyBillingProfileRepository,
-                                                                          final GlobalSettingsRepository globalSettingsRepository,
-                                                                          final UserRewardViewRepository userRewardViewRepository) {
-        return new PostgresOldBillingProfileAdapter(
-                userBillingProfileTypeRepository,
-                companyBillingProfileRepository,
-                individualBillingProfileRepository,
-                globalSettingsRepository,
-                userRewardViewRepository);
-    }
-
-    @Bean
     public PostgresRewardStatusAdapter postgresRewardStatusAdapter(final RewardStatusRepository rewardStatusRepository) {
         return new PostgresRewardStatusAdapter(rewardStatusRepository);
     }
@@ -365,11 +335,13 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    InvoiceStoragePort invoicePreviewStoragePort(final @NonNull BillingProfileRepository billingProfileRepository,
-                                                 final @NonNull InvoiceRewardRepository invoiceRewardRepository,
-                                                 final @NonNull InvoiceRepository invoiceRepository,
-                                                 final @NonNull RewardRepository rewardRepository) {
-        return new PostgresInvoiceStorage(billingProfileRepository, invoiceRewardRepository, invoiceRepository, rewardRepository);
+    InvoiceStoragePort invoicePreviewStoragePort(
+            final @NonNull BillingProfileRepository billingProfileRepository,
+            final @NonNull InvoiceRewardRepository invoiceRewardRepository,
+            final @NonNull InvoiceRepository invoiceRepository,
+            final @NonNull RewardRepository rewardRepository) {
+        return new PostgresInvoiceStorage(billingProfileRepository, invoiceRewardRepository,
+                invoiceRepository, rewardRepository);
     }
 
     @Bean
@@ -382,10 +354,11 @@ public class PostgresConfiguration {
                                                                      final BillingProfileUserRepository billingProfileUserRepository,
                                                                      final BillingProfileUserViewRepository billingProfileUserViewRepository,
                                                                      final ChildrenKycRepository childrenKycRepository,
-                                                                     final BillingProfileUserInvitationRepository billingProfileUserInvitationRepository) {
+                                                                     final BillingProfileUserInvitationRepository billingProfileUserInvitationRepository,
+                                                                     final PayoutPreferenceRepository payoutPreferenceRepository) {
         return new PostgresBillingProfileAdapter(globalSettingsRepository,
                 billingProfileRepository, kybRepository, kycRepository, payoutInfoRepository, walletRepository, billingProfileUserRepository,
-                billingProfileUserViewRepository, childrenKycRepository, billingProfileUserInvitationRepository);
+                billingProfileUserViewRepository, childrenKycRepository, billingProfileUserInvitationRepository, payoutPreferenceRepository);
     }
 
     @Bean

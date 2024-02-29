@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.api.contract.model.BillingProfileType;
 import onlydust.com.marketplace.api.contract.model.ProjectVisibility;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.project.domain.model.*;
@@ -245,10 +244,6 @@ public interface UserMapper {
         getMeResponse.setIsAdmin(authenticatedUser.hasRole(UserRole.ADMIN));
         getMeResponse.setCreatedAt(DateMapper.toZoneDateTime(authenticatedUser.getCreatedAt()));
         getMeResponse.setEmail(authenticatedUser.getGithubEmail());
-        getMeResponse.setBillingProfileType(switch (authenticatedUser.getOldBillingProfileType()) {
-            case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
-            case COMPANY -> BillingProfileType.COMPANY;
-        });
         getMeResponse.setFirstName(authenticatedUser.getFirstName());
         getMeResponse.setLastName(authenticatedUser.getLastName());
         getMeResponse.setHasValidBillingProfile(authenticatedUser.getHasValidBillingProfile());
