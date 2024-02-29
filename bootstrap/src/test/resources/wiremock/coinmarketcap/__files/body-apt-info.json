@@ -1,0 +1,112 @@
+{
+    "status": {
+        "timestamp": "2024-03-01T09:57:36.754Z",
+        "error_code": 0,
+        "error_message": null,
+        "elapsed": 29,
+        "credit_count": 1,
+        "notice": null
+    },
+    "data": {
+        "APT": [
+            {
+                "id": 21794,
+                "name": "Aptos",
+                "symbol": "APT",
+                "category": "coin",
+                "description": "Aptos (APT) is a cryptocurrency launched in 2022. Aptos has a current supply of 1,083,635,359.5606499 with 367,526,667.5878332 in circulation. The last known price of Aptos is 11.73030558 USD and is down -2.59 over the last 24 hours. It is currently trading on 339 active market(s) with $438,617,012.33 traded over the last 24 hours. More information can be found at https://aptosfoundation.org.",
+                "slug": "aptos",
+                "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/21794.png",
+                "subreddit": "aptos",
+                "tag-names": [
+                    "Binance Labs Portfolio",
+                    "Aptos Ecosystem",
+                    "Circle Ventures Portfolio",
+                    "Layer 1",
+                    "FTX Bankruptcy Estate "
+                ],
+                "tag-groups": [
+                    "CATEGORY",
+                    "PLATFORM",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY"
+                ],
+                "twitter_username": "aptos_network",
+                "is_hidden": 0,
+                "date_launched": "2022-10-18T00:00:00.000Z",
+                "contract_address": [
+                    {
+                        "contract_address": "0x1::aptos_coin::AptosCoin",
+                        "platform": {
+                            "name": "Aptos",
+                            "coin": {
+                                "id": "21794",
+                                "name": "Aptos",
+                                "symbol": "APT",
+                                "slug": "aptos"
+                            }
+                        }
+                    }
+                ],
+                "self_reported_circulating_supply": 130000000,
+                "self_reported_tags": [
+                    "PoS",
+                    "Scaling",
+                    "Smart Contracts",
+                    "Staking",
+                    "Coinbase Ventures Portfolio",
+                    "Binance Labs Portfolio",
+                    "DragonFly Capital Portfolio",
+                    "a16z Portfolio",
+                    "Animoca Brands Portfolio",
+                    "Aptos Ecosystem",
+                    "Circle Ventures Portfolio",
+                    "Layer 1",
+                    "Jump Crypto"
+                ],
+                "self_reported_market_cap": 1522238998.3085165,
+                "infinite_supply": true
+            },
+            {
+                "id": 13473,
+                "name": "Apricot Finance",
+                "symbol": "APT",
+                "category": "token",
+                "description": "Apricot Finance (APT) is a cryptocurrency and operates on the Solana platform. Apricot Finance has a current supply of 0. The last known price of Apricot Finance is 0.0013715 USD and is up 14.99 over the last 24 hours. It is currently trading on 8 active market(s) with $13,619.58 traded over the last 24 hours. More information can be found at https://apricot.one/.",
+                "slug": "apricot",
+                "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/13473.png",
+                "subreddit": "",
+                "tag-names": [
+                    "BullPerks Launchpad",
+                    "SkyVision Capital Portfolio"
+                ],
+                "tag-groups": [
+                    "CATEGORY",
+                    "CATEGORY"
+                ],
+                "twitter_username": "ApricotFinance",
+                "is_hidden": 0,
+                "date_launched": null,
+                "contract_address": [
+                    {
+                        "contract_address": "APTtJyaRX5yGTsJU522N4VYWg3vCvSb65eam5GrPT5Rt",
+                        "platform": {
+                            "name": "Solana",
+                            "coin": {
+                                "id": "5426",
+                                "name": "Solana",
+                                "symbol": "SOL",
+                                "slug": "solana"
+                            }
+                        }
+                    }
+                ],
+                "self_reported_circulating_supply": null,
+                "self_reported_tags": null,
+                "self_reported_market_cap": null,
+                "infinite_supply": false
+            }
+        ]
+    }
+}

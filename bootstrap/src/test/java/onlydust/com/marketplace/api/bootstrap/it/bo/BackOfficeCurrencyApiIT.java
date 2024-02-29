@@ -148,7 +148,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                             "type": "CRYPTO",
                             "standard": "ERC20",
                             "blockchain": "STARKNET",
-                            "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85"
+                            "address": "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8"
                         }
                         """)
                 .exchange()
@@ -157,7 +157,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .expectBody()
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.type").isEqualTo("CRYPTO")
-                .jsonPath("$.tokens[?(@.blockchain=='STARKNET')].address").isEqualTo("0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85")
+                .jsonPath("$.tokens[?(@.blockchain=='STARKNET')].address").isEqualTo("0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8")
                 .jsonPath("$.name").isEqualTo("USD Coin")
                 .jsonPath("$.code").isEqualTo("USDC")
                 .jsonPath("$.logoUrl").isEqualTo("https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png")
@@ -335,7 +335,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                                 },
                                 {
                                   "blockchain": "STARKNET",
-                                  "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+                                  "address": "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8",
                                   "decimals": 6,
                                   "symbol": "USDC",
                                   "name": "USD Coin"

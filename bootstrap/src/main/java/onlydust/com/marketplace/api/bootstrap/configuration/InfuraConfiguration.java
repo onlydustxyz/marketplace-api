@@ -1,7 +1,8 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.api.infura.InfuraClient;
-import onlydust.com.marketplace.api.infura.adapters.InfuraERC20ProviderAdapter;
+import onlydust.com.marketplace.api.infura.adapters.EthInfuraERC20ProviderAdapter;
+import onlydust.com.marketplace.api.infura.adapters.StarknetInfuraERC20ProviderAdapter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,8 +16,8 @@ public class InfuraConfiguration {
     }
 
     @Bean
-    public InfuraERC20ProviderAdapter ethereumERC20Provider(final InfuraClient.Properties ethereumProperties) {
-        return new InfuraERC20ProviderAdapter(ethereumProperties);
+    public EthInfuraERC20ProviderAdapter ethereumERC20Provider(final InfuraClient.Properties ethereumProperties) {
+        return new EthInfuraERC20ProviderAdapter(ethereumProperties);
     }
 
     @Bean
@@ -26,8 +27,8 @@ public class InfuraConfiguration {
     }
 
     @Bean
-    public InfuraERC20ProviderAdapter optimismERC20Provider(final InfuraClient.Properties optimismProperties) {
-        return new InfuraERC20ProviderAdapter(optimismProperties);
+    public EthInfuraERC20ProviderAdapter optimismERC20Provider(final InfuraClient.Properties optimismProperties) {
+        return new EthInfuraERC20ProviderAdapter(optimismProperties);
     }
 
     @Bean
@@ -37,8 +38,8 @@ public class InfuraConfiguration {
     }
 
     @Bean
-    public InfuraERC20ProviderAdapter starknetERC20Provider(final InfuraClient.Properties starknetProperties) {
-        return new InfuraERC20ProviderAdapter(starknetProperties);
+    public StarknetInfuraERC20ProviderAdapter starknetERC20Provider(final InfuraClient.Properties starknetProperties) {
+        return new StarknetInfuraERC20ProviderAdapter(starknetProperties);
     }
 
 }

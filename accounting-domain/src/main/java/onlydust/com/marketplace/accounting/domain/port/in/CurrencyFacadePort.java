@@ -3,7 +3,7 @@ package onlydust.com.marketplace.accounting.domain.port.in;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
-import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.Hash;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -12,7 +12,7 @@ import java.net.URL;
 import java.util.Collection;
 
 public interface CurrencyFacadePort {
-    Currency addERC20Support(final @NonNull Blockchain blockchain, final @NonNull ContractAddress tokenAddress);
+    Currency addERC20Support(final @NonNull Blockchain blockchain, final @NonNull Hash tokenAddress);
 
     Currency addNativeCryptocurrencySupport(Currency.Code code, Integer decimals);
 

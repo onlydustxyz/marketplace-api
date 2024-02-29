@@ -16,7 +16,10 @@ public class InfuraClient {
     private final Properties properties;
 
     public InfuraClient(Properties properties) {
-        this.web3j = Web3j.build(new HttpService("%s/%s".formatted(properties.baseUri, properties.apiKey)));
+        this.web3j = switch (properties.blockchain) {
+            case ETHEREUM, OPTIMISM -> Web3j.build(new HttpService("%s/%s".formatted(properties.baseUri, properties.apiKey)));
+            default -> throw new IllegalArgumentException("Unsupported blockchain: %s".formatted(properties.blockchain));
+        };
         this.gasPriceProvider = new DefaultGasProvider();
         this.credentials = Credentials.create(properties.privateKey);
         this.properties = properties;

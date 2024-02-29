@@ -1,0 +1,10 @@
+{
+    "status": {
+        "timestamp": "2024-03-01T09:53:57.355Z",
+        "error_code": 400,
+        "error_message": "No items found",
+        "elapsed": 0,
+        "credit_count": 0,
+        "notice": null
+    }
+}

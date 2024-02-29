@@ -1,0 +1,108 @@
+{
+    "status": {
+        "timestamp": "2024-03-01T09:57:16.307Z",
+        "error_code": 0,
+        "error_message": null,
+        "elapsed": 30,
+        "credit_count": 1,
+        "notice": null
+    },
+    "data": {
+        "OP": [
+            {
+                "id": 11840,
+                "name": "Optimism",
+                "symbol": "OP",
+                "category": "token",
+                "description": "Optimism (OP) is a cryptocurrency and operates on the Optimism platform. Optimism has a current supply of 4,294,967,296 with 1,006,141,600 in circulation. The last known price of Optimism is 3.78951144 USD and is down -2.99 over the last 24 hours. It is currently trading on 468 active market(s) with $261,763,013.04 traded over the last 24 hours. More information can be found at https://www.optimism.io/.",
+                "slug": "optimism-ethereum",
+                "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/11840.png",
+                "subreddit": "",
+                "tag-names": [
+                    "Layer 2",
+                    "Optimism Ecosystem",
+                    "Modular Blockchain"
+                ],
+                "tag-groups": [
+                    "CATEGORY",
+                    "PLATFORM",
+                    "CATEGORY"
+                ],
+                "twitter_username": "optimismFND",
+                "is_hidden": 0,
+                "date_launched": null,
+                "contract_address": [
+                    {
+                        "contract_address": "0x4200000000000000000000000000000000000042",
+                        "platform": {
+                            "name": "Optimism",
+                            "coin": {
+                                "id": "11840",
+                                "name": "Optimism",
+                                "symbol": "OP",
+                                "slug": "optimism-ethereum"
+                            }
+                        }
+                    }
+                ],
+                "self_reported_circulating_supply": null,
+                "self_reported_tags": null,
+                "self_reported_market_cap": null,
+                "infinite_supply": false
+            },
+            {
+                "id": 1222,
+                "name": "Operand",
+                "symbol": "OP",
+                "category": "coin",
+                "description": "Operand (OP) is a cryptocurrency . Operand has a current supply of 36,309,295.7394042 with 0 in circulation. The last known price of Operand is 0.00104476 USD and is up 0.00 over the last 24 hours. More information can be found at http://www.operand.money/.",
+                "slug": "operand",
+                "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/1222.png",
+                "subreddit": "",
+                "tag-names": null,
+                "tag-groups": null,
+                "twitter_username": "",
+                "is_hidden": 0,
+                "date_launched": null,
+                "contract_address": [],
+                "self_reported_circulating_supply": null,
+                "self_reported_tags": null,
+                "self_reported_market_cap": null,
+                "infinite_supply": false
+            },
+            {
+                "id": 18804,
+                "name": "onPlanet",
+                "symbol": "OP",
+                "category": "token",
+                "description": "onPlanet (OP) is a cryptocurrency launched in 2022and operates on the BNB Smart Chain (BEP20) platform. onPlanet has a current supply of 1,000,000,000 with 0 in circulation. The last known price of onPlanet is 0.00042473 USD and is up 0.00 over the last 24 hours. More information can be found at https://onplanet.io/.",
+                "slug": "onplanet",
+                "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/18804.png",
+                "subreddit": "",
+                "tag-names": null,
+                "tag-groups": null,
+                "twitter_username": "onPlanetIO",
+                "is_hidden": 0,
+                "date_launched": "2022-03-03T00:00:00.000Z",
+                "contract_address": [
+                    {
+                        "contract_address": "0x80f3c51a3fbdc38194852ee239e729ccd2c0c40c",
+                        "platform": {
+                            "name": "BNB Smart Chain (BEP20)",
+                            "coin": {
+                                "id": "1839",
+                                "name": "BNB",
+                                "symbol": "BNB",
+                                "slug": "bnb"
+                            }
+                        }
+                    }
+                ],
+                "self_reported_circulating_supply": 692369560,
+                "self_reported_tags": null,
+                "self_reported_market_cap": 0,
+                "infinite_supply": false
+            }
+        ]
+    }
+}

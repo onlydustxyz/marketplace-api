@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
-import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.Hash;
 
 import java.math.BigInteger;
 
@@ -15,7 +15,7 @@ public class ERC20 {
     @EqualsAndHashCode.Include
     Blockchain blockchain;
     @EqualsAndHashCode.Include
-    ContractAddress address;
+    Hash address;
     String name;
     String symbol;
     Integer decimals;

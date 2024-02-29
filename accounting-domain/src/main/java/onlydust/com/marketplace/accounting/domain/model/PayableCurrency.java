@@ -3,7 +3,7 @@ package onlydust.com.marketplace.accounting.domain.model;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
-import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.Hash;
 
 import java.net.URI;
 import java.util.Optional;
@@ -24,7 +24,7 @@ public class PayableCurrency {
     private final @NonNull Currency.Type type;
     private final Currency.Standard standard;
     private final Blockchain blockchain;
-    private final ContractAddress address;
+    private final Hash address;
 
     public Optional<Currency.Standard> standard() {
         return Optional.ofNullable(standard);
@@ -38,7 +38,7 @@ public class PayableCurrency {
         return Optional.ofNullable(blockchain);
     }
 
-    public Optional<ContractAddress> address() {
+    public Optional<Hash> address() {
         return Optional.ofNullable(address);
     }
 }

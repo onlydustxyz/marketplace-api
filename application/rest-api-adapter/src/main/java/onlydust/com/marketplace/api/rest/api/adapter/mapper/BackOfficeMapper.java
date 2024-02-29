@@ -6,7 +6,7 @@ import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
-import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.Hash;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Currency;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
@@ -446,6 +446,6 @@ public interface BackOfficeMapper {
                 .type(mapCurrencyType(currency.type()))
                 .standard(currency.standard().map(BackOfficeMapper::mapCurrencyStandard).orElse(null))
                 .blockchain(currency.blockchain().map(BackOfficeMapper::mapBlockchain).orElse(null))
-                .address(currency.address().map(ContractAddress::toString).orElse(null));
+                .address(currency.address().map(Hash::toString).orElse(null));
     }
 }

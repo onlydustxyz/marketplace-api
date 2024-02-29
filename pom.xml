@@ -52,6 +52,7 @@
         <jjwt.version>0.9.1</jjwt.version>
         <jjwt-impl.version>0.11.5</jjwt-impl.version>
         <slack-api-client.version>1.38.1</slack-api-client.version>
+        <kotlin.version>1.9.20</kotlin.version>
     </properties>
 
     <dependencyManagement>
@@ -207,6 +208,16 @@
                 <version>0.10.2</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-stdlib</artifactId>
+                <version>${kotlin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-reflect</artifactId>
+                <version>${kotlin.version}</version>
+            </dependency>
 
             <!-- Test -->
             <dependency>

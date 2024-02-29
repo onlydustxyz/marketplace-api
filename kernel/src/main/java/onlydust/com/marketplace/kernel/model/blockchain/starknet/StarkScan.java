@@ -4,11 +4,11 @@ import onlydust.com.marketplace.kernel.model.blockchain.BlockExplorer;
 
 import java.net.URI;
 
-public class StarkScan implements BlockExplorer<TransactionHash> {
+public class StarkScan implements BlockExplorer<StarknetTransactionHash> {
     private static final String BASE_URL = "https://starkscan.co";
 
     @Override
-    public URI url(TransactionHash transactionHash) {
+    public URI url(StarknetTransactionHash transactionHash) {
         return URI.create(BASE_URL + "/tx/" + transactionHash);
     }
 }
