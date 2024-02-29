@@ -114,7 +114,7 @@ from payment_requests pr
 
 insert into reward_items(reward_id, number, repo_id, id, type, project_id, recipient_id)
 select wi.payment_id, wi.number, wi.repo_id, wi.id, wi.type, wi.project_id, wi.recipient_id
-from marketplace_db.public.work_items wi;
+from work_items wi;
 
 insert into accounting.reward_status_data(reward_id, sponsor_has_enough_fund, unlock_date, invoice_received_at, paid_at, networks, amount_usd_equivalent)
 select r.id,
