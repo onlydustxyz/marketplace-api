@@ -3,7 +3,8 @@ package onlydust.com.marketplace.project.domain.service;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
-import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
+import onlydust.com.marketplace.project.domain.model.OldPayRewardRequestCommand;
+import onlydust.com.marketplace.project.domain.model.OldRequestRewardCommand;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.AccountingServicePort;
@@ -26,7 +27,7 @@ public class RewardV2Service implements RewardFacadePort {
     @Override
     @Transactional
     public UUID createReward(UUID projectLeadId,
-                             RequestRewardCommand command) {
+                             OldRequestRewardCommand command) {
         if (!permissionService.isUserProjectLead(command.getProjectId(), projectLeadId))
             throw OnlyDustException.forbidden("User must be project lead to request a reward");
 
@@ -86,5 +87,12 @@ public class RewardV2Service implements RewardFacadePort {
     @Override
     public Optional<Reward> getReward(UUID rewardId) {
         return rewardStoragePort.get(rewardId);
+    }
+
+    @Override
+    @Deprecated
+    public void oldPayReward(OldPayRewardRequestCommand oldPayRewardRequestCommand) {
+        // TODO : to delete
+        throw OnlyDustException.internalServerError("Deprecated method not implemented and to delete");
     }
 }

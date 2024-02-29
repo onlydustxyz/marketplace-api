@@ -9,6 +9,7 @@ import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.project.domain.service.BackofficeService;
+import onlydust.com.marketplace.project.domain.service.RewardService;
 import onlydust.com.marketplace.project.domain.service.RewardV2Service;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,8 +45,9 @@ public class BackofficeConfiguration {
             final AccountingFacadePort accountingFacadePort,
             final RewardV2Service rewardV2Service,
             final CurrencyFacadePort currencyFacadePort,
-            final UserFacadePort userFacadePort) {
-        return new BackofficeAccountingManagementRestApi(accountingFacadePort, rewardV2Service, currencyFacadePort, userFacadePort);
+            final UserFacadePort userFacadePort,
+            final RewardService rewardService) {
+        return new BackofficeAccountingManagementRestApi(accountingFacadePort, rewardV2Service, currencyFacadePort, userFacadePort, rewardService);
     }
 
     @Bean

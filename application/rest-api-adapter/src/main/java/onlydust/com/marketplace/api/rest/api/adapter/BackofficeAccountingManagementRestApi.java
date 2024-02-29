@@ -9,9 +9,10 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
+import onlydust.com.marketplace.project.domain.model.OldPayRewardRequestCommand;
 import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,6 +30,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     private final RewardFacadePort rewardFacadePort;
     private final CurrencyFacadePort currencyFacadePort;
     private final UserFacadePort userFacadePort;
+    private final RewardFacadePort rewardFacadePortV2;
 
     @Override
     public ResponseEntity<AccountResponse> createSponsorAccount(UUID sponsorUuid, CreateAccountRequest createAccountRequest) {
@@ -137,4 +139,22 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
         return ResponseEntity.noContent().build();
     }
 
+
+    @Override
+    public ResponseEntity<Void> oldPayReward(UUID rewardId, PayRewardRequest payRewardRequest) {
+        rewardFacadePortV2.oldPayReward(OldPayRewardRequestCommand.builder()
+                .rewardId(rewardId)
+                .recipientAccount(payRewardRequest.getRecipientAccount())
+                .transactionReference(payRewardRequest.getReference())
+                .currency(switch (payRewardRequest.getNetwork()) {
+                    case SWIFT -> onlydust.com.marketplace.project.domain.model.Currency.USD;
+                    case SEPA -> onlydust.com.marketplace.project.domain.model.Currency.USD;
+                    case ETHEREUM -> onlydust.com.marketplace.project.domain.model.Currency.ETH;
+                    case OPTIMISM -> onlydust.com.marketplace.project.domain.model.Currency.OP;
+                    case STARKNET -> onlydust.com.marketplace.project.domain.model.Currency.STRK;
+                    case APTOS -> onlydust.com.marketplace.project.domain.model.Currency.APT;
+                })
+                .build());
+        return ResponseEntity.ok().build();
+    }
 }
