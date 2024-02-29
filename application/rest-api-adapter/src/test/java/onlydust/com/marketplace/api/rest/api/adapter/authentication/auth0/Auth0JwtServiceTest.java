@@ -119,7 +119,7 @@ class Auth0JwtServiceTest {
                         .name("Mehdi")
                         .avatarUrl("https://avatars.google.com/u/143011364?v=4")
                         .build())
-        ).thenReturn(new BackofficeUser("pixelfact.company@gmail.com", "Mehdi",
+        ).thenReturn(new BackofficeUser(BackofficeUser.Id.random(), "pixelfact.company@gmail.com", "Mehdi",
                 Set.of(BackofficeUser.Role.BO_READER), "https://avatars.google.com/u/143011364?v=4"));
 
 

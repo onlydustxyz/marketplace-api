@@ -85,8 +85,13 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public AuthenticatedAppUserService authenticationService(final AuthenticationContext authenticationContext) {
+    public AuthenticatedAppUserService authenticatedAppUserService(final AuthenticationContext authenticationContext) {
         return new AuthenticatedAppUserService(authenticationContext);
+    }
+
+    @Bean
+    public AuthenticatedBackofficeUserService authenticatedBackofficeUserService(final AuthenticationContext authenticationContext) {
+        return new AuthenticatedBackofficeUserService(authenticationContext);
     }
 
     @Bean
