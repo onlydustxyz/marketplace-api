@@ -1,50 +1,29 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import lombok.NonNull;
-import lombok.SneakyThrows;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
-import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 
 public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
-    RewardRepository rewardRepository;
-    @Autowired
-    RewardStatusRepository rewardStatusRepository;
-    @Autowired
-    InvoiceRewardRepository invoiceRewardRepository;
-    @Autowired
     CurrencyRepository currencyRepository;
     @Autowired
-    InvoiceRepository invoiceRepository;
-    @Autowired
     BillingProfileStoragePort billingProfileStoragePort;
-    @Autowired
-    PayoutPreferenceRepository payoutPreferenceRepository;
-    @Autowired
-    BillingProfileRepository billingProfileRepository;
 
     UserAuthHelper.AuthenticatedUser pierre;
 
@@ -369,89 +348,5 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(191010)
                 .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(101010)
         ;
-    }
-
-    @SneakyThrows
-    private void patchReward(@NonNull String id, Number amount, String currencyCode, Number usdAmount, String invoiceReceivedAt, String paidAt) {
-        final var rewardEntity = rewardRepository.findById(UUID.fromString(id)).orElseThrow();
-        final var rewardStatus = rewardStatusRepository.findById(rewardEntity.getId()).orElseThrow();
-
-        if (amount != null) rewardEntity.setAmount(BigDecimal.valueOf(amount.doubleValue()));
-        if (currencyCode != null) {
-            final var currency = currencyRepository.findByCode(currencyCode).orElseThrow();
-            final var network = switch (currencyCode) {
-                case "ETH" -> NetworkEnumEntity.ethereum;
-                case "APT" -> NetworkEnumEntity.aptos;
-                case "OP" -> NetworkEnumEntity.optimism;
-                case "STRK" -> NetworkEnumEntity.starknet;
-                default -> throw new IllegalArgumentException("Currency code %s not mapped".formatted(currencyCode));
-            };
-
-            rewardEntity.setCurrency(currency);
-            rewardStatus.setNetworks(new NetworkEnumEntity[]{network});
-        }
-        rewardStatus.setAmountUsdEquivalent(usdAmount == null ? null : BigDecimal.valueOf(usdAmount.doubleValue()));
-
-        if (invoiceReceivedAt != null) {
-            final var invoiceEntity = fakeInvoice(UUID.randomUUID(), List.of(rewardEntity.getId()));
-            invoiceRepository.save(invoiceEntity);
-            rewardEntity.setInvoice(invoiceEntity);
-            // TODO check if still needed and correctly updated when invoice is uploaded
-            rewardStatus.setInvoiceReceivedAt(new SimpleDateFormat("yyyy-MM-dd").parse(invoiceReceivedAt));
-        }
-
-        if (paidAt != null) {
-            rewardStatus.setPaidAt(new SimpleDateFormat("yyyy-MM-dd").parse(paidAt));
-        }
-
-        rewardRepository.save(rewardEntity);
-        rewardStatusRepository.save(rewardStatus);
-    }
-
-    private void patchBillingProfile(@NonNull String billingProfileId,
-                                     BillingProfileEntity.Type type,
-                                     VerificationStatusEntity status) {
-
-        final var billingProfile = billingProfileRepository.findById(UUID.fromString(billingProfileId)).orElseThrow();
-
-        if (type != null) billingProfile.setType(type);
-        if (status != null) billingProfile.setVerificationStatus(status);
-
-        billingProfileRepository.save(billingProfile);
-    }
-
-    @SneakyThrows
-    @Transactional
-    InvoiceEntity fakeInvoice(UUID id, List<UUID> rewardIds) {
-        final var firstName = faker.name().firstName();
-        final var lastName = faker.name().lastName();
-
-        final var rewards = invoiceRewardRepository.findAll(rewardIds);
-
-        return new InvoiceEntity(
-                id,
-                UUID.randomUUID(),
-                Invoice.Number.of(12, lastName, firstName).toString(),
-                ZonedDateTime.now().minusDays(1),
-                InvoiceEntity.Status.TO_REVIEW,
-                rewards.stream().map(InvoiceRewardEntity::targetAmount).reduce(BigDecimal.ZERO, BigDecimal::add),
-                rewards.get(0).targetCurrency(),
-                new URL("https://s3.storage.com/invoice.pdf"),
-                null,
-                new InvoiceEntity.Data(
-                        ZonedDateTime.now().plusDays(9),
-                        BigDecimal.ZERO,
-                        new Invoice.PersonalInfo(
-                                firstName,
-                                lastName,
-                                faker.address().fullAddress(),
-                                faker.address().countryCode()
-                        ),
-                        null,
-                        null,
-                        List.of(new Invoice.Wallet("ETHEREUM", "vitalik.eth")),
-                        rewards
-                )
-        );
     }
 }

@@ -412,12 +412,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
         final var pageRequest = PageRequest.of(pageIndex, pageSize,
                 RewardViewRepository.sortBy(sort, sortDirection == SortDirection.asc ? Sort.Direction.ASC : Sort.Direction.DESC));
 
-        final var page = rewardViewRepository.findProjectRewards(projectId,
-                filters.getCurrencies(), filters.getContributors(),
-                fromDate, toDate, pageRequest);
-
-        final var budgetStats = budgetStatsRepository.findByProject(projectId, filters.getCurrencies(), filters.getContributors(),
-                fromDate, toDate);
+        final var page = rewardViewRepository.findProjectRewards(projectId, filters.getCurrencies(), filters.getContributors(), fromDate, toDate, pageRequest);
+        final var budgetStats = budgetStatsRepository.findByProject(projectId, filters.getCurrencies(), filters.getContributors(), fromDate, toDate);
 
         return ProjectRewardsPageView.builder().
                 rewards(Page.<ProjectRewardView>builder()

@@ -4,6 +4,7 @@ import com.vladmihalcea.hibernate.type.array.EnumArrayType;
 import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
 import org.hibernate.annotations.Parameter;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Builder(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
+@Accessors(fluent = true, chain = true)
 @TypeDef(name = "currency", typeClass = PostgreSQLEnumType.class)
 @TypeDef(
         name = "accounting.network[]",

@@ -32,7 +32,7 @@ public class InvoiceRewardEntity {
     @NonNull CurrencyEntity currency;
     @ManyToOne
     @NonNull CurrencyEntity targetCurrency;
-    @NonNull BigDecimal targetAmount;
+    BigDecimal targetAmount;
     UUID invoiceId;
 
     public Invoice.Reward forInvoice() {

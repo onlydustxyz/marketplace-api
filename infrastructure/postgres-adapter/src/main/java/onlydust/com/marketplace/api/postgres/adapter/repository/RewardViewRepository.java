@@ -6,6 +6,7 @@ import onlydust.com.marketplace.project.domain.view.UserRewardView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -175,7 +176,7 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
 
     static Sort sortBy(final UserRewardView.SortBy sortBy, final Sort.Direction direction) {
         return switch (sortBy) {
-            case amount -> Sort.by(Sort.Order.by("dollars_equivalent").with(direction).nullsLast()).and(Sort.by("requested_at").descending());
+            case amount -> JpaSort.unsafe(direction, "coalesce(rsd.amount_usd_equivalent, 0)").and(Sort.by("requested_at").descending());
             case contribution -> Sort.by(direction, "contribution_count").and(Sort.by("requested_at").descending());
             case status -> Sort.by(direction, "status").and(Sort.by("requested_at").descending());
             case requestedAt -> Sort.by(direction, "requested_at");
@@ -184,7 +185,7 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
 
     static Sort sortBy(final ProjectRewardView.SortBy sortBy, final Sort.Direction direction) {
         return switch (sortBy) {
-            case amount -> Sort.by(Sort.Order.by("dollars_equivalent").with(direction).nullsLast()).and(Sort.by("requested_at").descending());
+            case amount -> JpaSort.unsafe(direction, "coalesce(rsd.amount_usd_equivalent, 0)").and(Sort.by("requested_at").descending());
             case contribution -> Sort.by(direction, "contribution_count").and(Sort.by("requested_at").descending());
             case status -> Sort.by(direction, "status").and(Sort.by("requested_at").descending());
             case requestedAt -> Sort.by(direction, "requested_at");

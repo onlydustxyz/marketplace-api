@@ -58,8 +58,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
         invoiceRepository.saveAndFlush(entity);
 
         final var rewards = rewardRepository.findAllById(invoice.rewards().stream().map(r -> r.id().value()).toList());
-        rewards.forEach(pr -> pr.setInvoice(entity));
-        rewardRepository.saveAll(rewards);
+        rewardRepository.saveAll(rewards.stream().map(pr -> pr.invoice(entity)).toList());
     }
 
     @Override
@@ -79,8 +78,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
 
         drafts.forEach(invoice -> {
             final var rewards = rewardRepository.findAllById(invoice.data().rewards().stream().map(InvoiceRewardEntity::id).toList());
-            rewards.forEach(pr -> pr.setInvoice(null));
-            rewardRepository.saveAll(rewards);
+            rewardRepository.saveAll(rewards.stream().map(pr -> pr.invoice(null)).toList());
         });
 
         invoiceRepository.deleteAll(drafts);
@@ -121,7 +119,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     @Override
     public Optional<Invoice> invoiceOf(RewardId rewardId) {
         final var reward = rewardRepository.findById(rewardId.value()).orElseThrow(() -> notFound("Reward %s not found".formatted(rewardId)));
-        return Optional.ofNullable(reward.getInvoice()).map(InvoiceEntity::toDomain);
+        return Optional.ofNullable(reward.invoice()).map(InvoiceEntity::toDomain);
     }
 
     private Sort sortBy(Invoice.Sort sort, Sort.Direction direction) {

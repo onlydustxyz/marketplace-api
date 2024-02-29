@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import lombok.*;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.project.domain.model.Reward;
 
@@ -17,6 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
+@Accessors(fluent = true, chain = true)
 public class RewardEntity {
     @Id
     @NonNull UUID id;

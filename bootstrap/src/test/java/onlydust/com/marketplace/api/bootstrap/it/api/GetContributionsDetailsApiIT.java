@@ -1,13 +1,17 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 
 public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
-
+    @Autowired
+    private BillingProfileStoragePort billingProfileStoragePort;
 
     @Test
     void should_return_404_when_not_found() {
@@ -48,24 +52,16 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_contribution_details_when_found() {
         // Given
-        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.authenticateAnthony();
-        final String jwt = authenticatedUser.jwt();
-        // TODO
-//        final UserBillingProfileTypeEntity userBillingProfileTypeEntity =
-//                userBillingProfileTypeRepository.findById(authenticatedUser.user().getId()).orElseThrow();
-//        userBillingProfileTypeEntity.setBillingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.INDIVIDUAL);
-//        userBillingProfileTypeRepository.save(userBillingProfileTypeEntity);
-//        final IndividualBillingProfileEntity individualBillingProfileEntity = individualBillingProfileRepository.findByUserId(authenticatedUser.user()
-//        .getId()).orElseThrow();
-//        individualBillingProfileEntity.setVerificationStatus(OldVerificationStatusEntity.VERIFIED);
-//        individualBillingProfileRepository.save(individualBillingProfileEntity);
+        final var antho = userAuthHelper.authenticateAnthony();
+        final var billingProfile = billingProfileStoragePort.findIndividualBillingProfileForUser(UserId.of(antho.user().getId())).orElseThrow();
+        billingProfileStoragePort.updateBillingProfileStatus(billingProfile.getId(), VerificationStatus.VERIFIED);
 
         // When
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
                         "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
                         "b66cd16a35e0043d86f1850eb9ba6519d20ff833394f7516b0842fa2f18a5abf")))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
