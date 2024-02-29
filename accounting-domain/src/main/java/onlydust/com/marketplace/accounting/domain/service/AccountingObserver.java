@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
-import static onlydust.com.marketplace.accounting.domain.model.Currency.Code.USD_STR;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -74,7 +73,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
 
     @Override
     public BigDecimal usdEquivalent(RewardId rewardId) {
-        final var usd = currencyStorage.findByCode(Currency.Code.of(USD_STR))
+        final var usd = currencyStorage.findByCode(Currency.Code.USD)
                 .orElseThrow(() -> internalServerError("Currency USD not found"));
 
         return rewardUsdEquivalentStorage.get(rewardId).flatMap(

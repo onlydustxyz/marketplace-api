@@ -42,6 +42,7 @@ public enum NetworkEnumEntity {
             case APTOS -> aptos;
             case STARKNET -> starknet;
             case OPTIMISM -> optimism;
+            case SEPA -> sepa;
             default -> throw new IllegalStateException("Unexpected value: " + network);
         };
     }
