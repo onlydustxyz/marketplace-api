@@ -59,6 +59,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @EnableWireMock({
         @ConfigureWireMock(name = "auth0", property = "application.web.auth0.user-info-url"),
         @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri"),
+        @ConfigureWireMock(name = "rust-api", property = "infrastructure.od.api.client.baseUri")
 })
 public class AbstractMarketplaceBackOfficeApiIT {
     static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:14.3-alpine")
@@ -86,6 +87,8 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected WireMockServer auth0WireMockServer;
     @InjectWireMock("indexer-api")
     protected WireMockServer indexerApiWireMockServer;
+    @InjectWireMock("rust-api")
+    protected WireMockServer rustApiWireMockServer;
 
     @Autowired
     ApiKeyAuthenticationService.Config backOfficeApiKeyAuthenticationConfig;
@@ -158,6 +161,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String INVOICES = "/bo/v1/invoices";
     protected static final String INVOICE = "/bo/v1/invoices/%s";
     protected static final String EXTERNAL_INVOICE = "/bo/v1/external/invoices/%s";
+    protected static final String POST_REWARDS_PAY_VO = "/bo/v0/rewards/%s/pay";
 
     protected String apiKey() {
         return backOfficeApiKeyAuthenticationConfig.getApiKey();
