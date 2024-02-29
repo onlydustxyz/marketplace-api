@@ -4,6 +4,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
@@ -21,6 +22,11 @@ public class BackofficeConfiguration {
     @Bean
     public BackofficeRestApi backofficeRestApi(final BackofficeFacadePort backofficeFacadePort) {
         return new BackofficeRestApi(backofficeFacadePort);
+    }
+
+    @Bean
+    public BackofficeMeRestApi backofficeMeRestApi(final AuthenticatedBackofficeUserService authenticatedBackofficeUserService) {
+        return new BackofficeMeRestApi(authenticatedBackofficeUserService);
     }
 
     @Bean

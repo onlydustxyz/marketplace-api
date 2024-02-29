@@ -138,6 +138,8 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelogs/00000067_remove_mandate_for_individuals.sql
   - include:
+      file: db/changelog/changelogs/00000068_backoffice_users.sql
+  - include:
       file: db/changelog/changelogs/00000068_migrating_billing_profile_tables.sql
   - include:
       file: db/changelog/changelogs/00000070_migrating_kyc_kyb_events.sql

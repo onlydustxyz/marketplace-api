@@ -1,19 +1,19 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key;
 
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.OnlyDustAppAuthentication;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.OnlyDustAppGrantedAuthority;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.model.UserRole;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustAuthentication;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustGrantedAuthority;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 import java.util.List;
 
-public record ApiKeyAuthentication(String apiKey) implements OnlyDustAuthentication {
+public record ApiKeyAuthentication(String apiKey) implements OnlyDustAppAuthentication {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new OnlyDustGrantedAuthority(UserRole.INTERNAL_SERVICE));
+        return List.of(new OnlyDustAppGrantedAuthority(UserRole.INTERNAL_SERVICE));
     }
 
     @Override

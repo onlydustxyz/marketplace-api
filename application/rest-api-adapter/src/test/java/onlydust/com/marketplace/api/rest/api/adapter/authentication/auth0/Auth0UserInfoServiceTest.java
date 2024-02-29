@@ -75,9 +75,9 @@ class Auth0UserInfoServiceTest {
         var claims = auth0UserInfoService.getUserInfo(accessToken);
 
         // Then
-        assertThat(claims.getGithubWithUserId()).isEqualTo("github|595505");
-        assertThat(claims.getGithubLogin()).isEqualTo("ofux");
-        assertThat(claims.getGithubAvatarUrl()).isEqualTo("https://avatars.githubusercontent.com/u/595505?v=4");
+        assertThat(claims.getSub()).isEqualTo("github|595505");
+        assertThat(claims.getNickname()).isEqualTo("ofux");
+        assertThat(claims.getPicture()).isEqualTo("https://avatars.githubusercontent.com/u/595505?v=4");
         assertThat(claims.getEmail()).isEqualTo("olivier@foo.org");
         verify(httpClient, times(1)).send(any(), any());
 
@@ -85,9 +85,9 @@ class Auth0UserInfoServiceTest {
         // And when we call it again, the user info should be cached
         Mockito.reset(httpClient);
         claims = auth0UserInfoService.getUserInfo(accessToken);
-        assertThat(claims.getGithubWithUserId()).isEqualTo("github|595505");
-        assertThat(claims.getGithubLogin()).isEqualTo("ofux");
-        assertThat(claims.getGithubAvatarUrl()).isEqualTo("https://avatars.githubusercontent.com/u/595505?v=4");
+        assertThat(claims.getSub()).isEqualTo("github|595505");
+        assertThat(claims.getNickname()).isEqualTo("ofux");
+        assertThat(claims.getPicture()).isEqualTo("https://avatars.githubusercontent.com/u/595505?v=4");
         assertThat(claims.getEmail()).isEqualTo("olivier@foo.org");
         verify(httpClient, never()).send(any(), any());
 
@@ -97,9 +97,9 @@ class Auth0UserInfoServiceTest {
         when(httpClient.send(request, HttpResponse.BodyHandlers.ofString())).thenReturn(response);
         Thread.sleep(2_100);
         claims = auth0UserInfoService.getUserInfo(accessToken);
-        assertThat(claims.getGithubWithUserId()).isEqualTo("github|595505");
-        assertThat(claims.getGithubLogin()).isEqualTo("ofux");
-        assertThat(claims.getGithubAvatarUrl()).isEqualTo("https://avatars.githubusercontent.com/u/595505?v=4");
+        assertThat(claims.getSub()).isEqualTo("github|595505");
+        assertThat(claims.getNickname()).isEqualTo("ofux");
+        assertThat(claims.getPicture()).isEqualTo("https://avatars.githubusercontent.com/u/595505?v=4");
         assertThat(claims.getEmail()).isEqualTo("olivier@foo.org");
         verify(httpClient, times(1)).send(any(), any());
     }

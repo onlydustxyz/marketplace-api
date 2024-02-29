@@ -13,6 +13,7 @@
         <module>backoffice-api-contract</module>
         <module>accounting-domain</module>
         <module>kernel</module>
+        <module>user-domain</module>
     </modules>
 
     <parent>

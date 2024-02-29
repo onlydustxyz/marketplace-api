@@ -2,18 +2,20 @@ package onlydust.com.marketplace.api.rest.api.adapter.authentication;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.OnlyDustAppAuthentication;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.project.domain.model.User;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
 import java.util.Optional;
 
 import static java.lang.String.format;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.unauthorized;
 
 @AllArgsConstructor
 @Slf4j
-public class AuthenticationService {
+public class AuthenticatedAppUserService {
 
     private final AuthenticationContext authenticationContext;
 
@@ -24,23 +26,20 @@ public class AuthenticationService {
     public User getAuthenticatedUser() {
         final Authentication authentication = authenticationContext.getAuthenticationFromContext();
         if (authentication instanceof AnonymousAuthenticationToken) {
-            final OnlyDustException unauthorized = OnlyDustException.unauthorized(format("Unauthorized anonymous user" +
-                                                                                         " %s", authentication));
+            final OnlyDustException unauthorized = unauthorized(format("Unauthorized anonymous user %s", authentication));
             LOGGER.warn(unauthorized.toString());
             throw unauthorized;
         } else if (!authentication.isAuthenticated()) {
-            final OnlyDustException unauthorized = OnlyDustException.unauthorized("Unauthorized non-authenticated " +
-                                                                                  "user");
+            final OnlyDustException unauthorized = unauthorized("Unauthorized non-authenticated user");
             LOGGER.warn(unauthorized.toString());
             throw unauthorized;
-        } else if (!(authentication instanceof OnlyDustAuthentication)) {
-            final OnlyDustException internalError = OnlyDustException.internalServerError(format("Expected an " +
-                                                                                                 "OnlyDustAuthentication, got %s", authentication.getClass()));
+        } else if (!(authentication instanceof OnlyDustAppAuthentication)) {
+            final OnlyDustException internalError = unauthorized(format("Expected an OnlyDustAppAuthentication, got %s", authentication.getClass()));
             LOGGER.error(internalError.toString());
             throw internalError;
         }
 
-        return ((OnlyDustAuthentication) authentication).getUser();
+        return ((OnlyDustAppAuthentication) authentication).getUser();
     }
 
     /**
@@ -49,8 +48,8 @@ public class AuthenticationService {
      */
     public Optional<User> tryGetAuthenticatedUser() {
         final Authentication authentication = authenticationContext.getAuthenticationFromContext();
-        if (authentication.isAuthenticated() && authentication instanceof OnlyDustAuthentication) {
-            return Optional.of(((OnlyDustAuthentication) authentication).getUser());
+        if (authentication.isAuthenticated() && authentication instanceof OnlyDustAppAuthentication) {
+            return Optional.of(((OnlyDustAppAuthentication) authentication).getUser());
         }
         return Optional.empty();
     }

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 @Data
 @Builder
@@ -14,11 +15,26 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Auth0JwtClaims {
     @JsonProperty("nickname")
-    String githubLogin;
+    String nickname;
     @JsonProperty("sub")
-    String githubWithUserId;
+    String sub;
     @JsonProperty("picture")
-    String githubAvatarUrl;
+    String picture;
     @JsonProperty("email")
     String email;
+    @JsonProperty("name")
+    String name;
+
+    public enum Connection {
+        GITHUB, GOOGLE
+    }
+
+    public Connection connection() {
+        if (sub.startsWith("github")) {
+            return Connection.GITHUB;
+        } else if (sub.startsWith("google-oauth2")) {
+            return Connection.GOOGLE;
+        }
+        throw OnlyDustException.unauthorized("Unknown connection type: " + sub);
+    }
 }

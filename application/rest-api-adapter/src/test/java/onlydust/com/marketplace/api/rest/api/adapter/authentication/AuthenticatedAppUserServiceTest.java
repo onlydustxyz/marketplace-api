@@ -1,10 +1,11 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication;
 
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.Auth0OnlyDustAppAuthentication;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.OnlyDustAppGrantedAuthority;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.model.UserRole;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Authentication;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
@@ -17,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class AuthenticationServiceTest {
+public class AuthenticatedAppUserServiceTest {
 
     private static final Faker faker = new Faker();
 
@@ -25,7 +26,7 @@ public class AuthenticationServiceTest {
     void should_return_authenticated_user() {
         // Given
         final AuthenticationContext authenticationContext = mock(AuthenticationContext.class);
-        final AuthenticationService authenticationService = new AuthenticationService(authenticationContext);
+        final AuthenticatedAppUserService authenticatedAppUserService = new AuthenticatedAppUserService(authenticationContext);
         final UUID userId = UUID.randomUUID();
         final long githubUserId = faker.number().randomNumber();
         final List<UserRole> allowedRoles = List.of(UserRole.USER);
@@ -38,12 +39,12 @@ public class AuthenticationServiceTest {
 
         // When
         when(authenticationContext.getAuthenticationFromContext())
-                .thenReturn(Auth0Authentication.builder()
+                .thenReturn(Auth0OnlyDustAppAuthentication.builder()
                         .isAuthenticated(true)
                         .user(user)
-                        .authorities(allowedRoles.stream().map(OnlyDustGrantedAuthority::new).collect(Collectors.toList()))
+                        .authorities(allowedRoles.stream().map(OnlyDustAppGrantedAuthority::new).collect(Collectors.toList()))
                         .build());
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         // Then
         assertEquals(userId, authenticatedUser.getId());
@@ -55,14 +56,14 @@ public class AuthenticationServiceTest {
     void should_throw_exception_for_unauthenticated_user() {
         // Given
         final AuthenticationContext authenticationContext = mock(AuthenticationContext.class);
-        final AuthenticationService authenticationService = new AuthenticationService(authenticationContext);
+        final AuthenticatedAppUserService authenticatedAppUserService = new AuthenticatedAppUserService(authenticationContext);
 
         // When
         when(authenticationContext.getAuthenticationFromContext())
                 .thenReturn(mock(AnonymousAuthenticationToken.class));
         OnlyDustException onlydustException = null;
         try {
-            authenticationService.getAuthenticatedUser();
+            authenticatedAppUserService.getAuthenticatedUser();
         } catch (OnlyDustException e) {
             onlydustException = e;
         }
@@ -76,14 +77,14 @@ public class AuthenticationServiceTest {
     void should_throw_exception_for_invalid_jwt() {
         // Given
         final AuthenticationContext authenticationContext = mock(AuthenticationContext.class);
-        final AuthenticationService authenticationService = new AuthenticationService(authenticationContext);
+        final AuthenticatedAppUserService authenticatedAppUserService = new AuthenticatedAppUserService(authenticationContext);
 
         // When
         when(authenticationContext.getAuthenticationFromContext())
-                .thenReturn(Auth0Authentication.builder().build());
+                .thenReturn(Auth0OnlyDustAppAuthentication.builder().build());
         OnlyDustException onlydustException = null;
         try {
-            authenticationService.getAuthenticatedUser();
+            authenticatedAppUserService.getAuthenticatedUser();
         } catch (OnlyDustException e) {
             onlydustException = e;
         }
