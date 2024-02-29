@@ -502,8 +502,63 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/rewards/search:
+    post:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Search rewards
+      operationId: searchRewards
+      description: |
+        Search rewards
+      requestBody:
+        description: Payment information
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRewardsRequest'
+      responses:
+        "200":
+          description: 'Page of rewards'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchRewardsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
-
+  /bo/v1/rewards/batch-payments:
+    post:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Create a batch payments for a given list of invoice ids
+      operationId: createBatchPayments
+      description: |
+        Create a batch payments for a given list of invoice ids
+      requestBody:
+        description: List of invoice ids
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostBatchPaymentRequest'
+      responses:
+        "200":
+          description: 'List of batch payment'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchPaymentsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
   # BackofficeSponsorManagement ===============================================================
   /bo/v1/sponsors:
@@ -2259,3 +2314,117 @@ components:
     ContractAddress:
       type: string
       format: hex
+    
+    SearchRewardsRequest:
+      type: object
+      required:
+        - invoiceIds
+      properties:
+        invoiceIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceId'
+    
+    SearchRewardsResponse:
+      type: object
+      required:
+        - rewards
+      properties:
+        rewards:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchRewardItemResponse'
+
+    SearchRewardItemResponse:
+      type: object
+      required:
+        - id
+        - recipient
+        - requestedAt
+        - githubUrls
+        - project
+      properties:
+        id:
+          $ref: '#/components/schemas/RewardId'
+        recipient:
+          $ref: '#/components/schemas/RewardRecipientResponse'
+        requestedAt:
+          type: string
+          format: date-time
+        githubUrls:
+          type: array
+          items:
+            type: string
+        project:
+          $ref: '#/components/schemas/ProjectLinkResponse'
+        sponsors:
+          type: array
+          items:
+            $ref: '#/components/schemas/SponsorLinkResponse'
+
+    ProjectLinkResponse:
+      type: object
+      required:
+        - name
+        - logoUrl
+      properties:
+        name:
+          type: string
+        logoUrl:
+          type: string
+
+    SponsorLinkResponse:
+      type: object
+      required:
+        - name
+        - avatarUrl
+      properties:
+        name:
+          type: string
+        avatarUrl:
+          type: string
+
+    RewardRecipientResponse:
+      type: object
+      required:
+        - githubLogin
+        - email
+      properties:
+        githubLogin:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+
+    PostBatchPaymentRequest:
+      type: object
+      required: 
+        - invoiceIds
+      properties:
+        invoiceIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceId'
+
+    BatchPaymentId:
+      type: string
+      format: uuid
+
+    BatchPaymentsResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/BatchPaymentId'
+        csv:
+          type: string
+        rewardCount:
+          type: integer
+          format: int64
+        totalAmount:
+          
+
+
+      
