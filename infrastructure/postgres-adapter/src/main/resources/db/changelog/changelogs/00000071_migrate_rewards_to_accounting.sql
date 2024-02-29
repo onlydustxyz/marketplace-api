@@ -129,6 +129,7 @@ select r.id,
            when 'strk' then '{starknet}'::accounting.network[]
            when 'lords' then '{ethereum}'::accounting.network[]
            when 'usdc' then '{ethereum}'::accounting.network[]
+           when 'apt' then '{aptos}'::accounting.network[]
            end,
        case pr.currency when 'usd' then pr.amount else cuq.price * pr.amount end
 from rewards r
