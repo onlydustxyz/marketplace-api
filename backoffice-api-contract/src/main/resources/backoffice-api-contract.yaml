@@ -2052,9 +2052,9 @@ components:
         status:
           $ref: '#/components/schemas/InvoiceInternalStatus'
         billingProfile:
-          $ref: '#/components/schemas/BillingProfile'
+          $ref: '#/components/schemas/BillingProfileShortResponse'
         recipient:
-          $ref: '#/components/schemas/Recipient'
+          $ref: '#/components/schemas/RecipientResponse'
         createdAt:
           type: string
           format: date-time
@@ -2067,9 +2067,9 @@ components:
         amounts:
           type: array
           items:
-            $ref: '#/components/schemas/Money'
+            $ref: '#/components/schemas/MoneyResponse'
 
-    Money:
+    MoneyResponse:
       type: object
       description: An amount and its currency
       required:
@@ -2091,7 +2091,7 @@ components:
       format: uuid
       description: Billing profile ID
 
-    Recipient:
+    RecipientResponse:
       type: object
       required:
         - id
@@ -2113,7 +2113,7 @@ components:
           type: string
           example: olivier@foobar.org
 
-    BillingProfile:
+    BillingProfileShortResponse:
       type: object
       required:
         - id
