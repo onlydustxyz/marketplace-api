@@ -2,10 +2,10 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
@@ -51,6 +51,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final ProjectLedIdRepository projectLedIdRepository;
     private final RewardStatsRepository rewardStatsRepository;
     private final RewardViewRepository rewardViewRepository;
+    private final CurrencyRepository currencyRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -324,8 +325,8 @@ public class PostgresUserAdapter implements UserStoragePort {
 
     @Override
     public List<Currency> listRewardCurrencies(Long githubUserId) {
-        return rewardStatsRepository.listRewardCurrenciesByRecipient(githubUserId).stream()
-                .map(CurrencyEnumEntity::toDomain)
+        return currencyRepository.listRewardCurrenciesByRecipient(githubUserId).stream()
+                .map(CurrencyEntity::toOldDomain)
                 .toList();
     }
 
