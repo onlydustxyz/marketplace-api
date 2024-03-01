@@ -426,9 +426,10 @@ public class AccountingServiceTest {
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
             reset(accountingObserver);
-            accountingService.pay(rewardId2, currency.id(), fakeTransaction(network, PositiveAmount.of(300L)));
+            final var reference = fakePaymentReference(network);
+            accountingService.pay(rewardId2, currency.id(), reference);
             verify(accountingObserver).onSponsorAccountBalanceChanged(any());
-            verify(accountingObserver).onRewardPaid(rewardId2);
+            verify(accountingObserver).onRewardPaid(rewardId2, reference);
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
@@ -908,9 +909,10 @@ public class AccountingServiceTest {
             assertThat(accountingService.isPayable(rewardId, currency.id())).isTrue();
 
             reset(accountingObserver);
-            accountingService.pay(rewardId, currency.id(), fakePaymentReference(Network.ETHEREUM));
+            final var reference = fakePaymentReference(Network.ETHEREUM);
+            accountingService.pay(rewardId, currency.id(), reference);
             verify(accountingObserver, times(2)).onSponsorAccountBalanceChanged(any());
-            verify(accountingObserver).onRewardPaid(rewardId);
+            verify(accountingObserver).onRewardPaid(rewardId, reference);
 
             // Then
             assertThat(sponsorAccountStorage.get(unlockedSponsorSponsorAccount1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
@@ -1166,9 +1168,10 @@ public class AccountingServiceTest {
             );
 
             reset(accountingObserver);
-            accountingService.pay(rewardId3, usdc.id(), fakePaymentReference(Network.ETHEREUM));
+            final var reference = fakePaymentReference(Network.ETHEREUM);
+            accountingService.pay(rewardId3, usdc.id(), reference);
             verify(accountingObserver).onSponsorAccountBalanceChanged(any());
-            verify(accountingObserver).onRewardPaid(rewardId3);
+            verify(accountingObserver).onRewardPaid(rewardId3, reference);
 
             // When
             final var payableRewards = accountingService.getPayableRewards();

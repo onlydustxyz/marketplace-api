@@ -16,11 +16,13 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 
 @AllArgsConstructor
 public class AccountingObserver implements AccountingObserverPort, RewardStatusFacadePort, BillingProfileObserver {
+    // TODO migrate rewards to accounting schema and merge all those storages as onetone dependencies of reward
     private final RewardStatusStorage rewardStatusStorage;
     private final RewardUsdEquivalentStorage rewardUsdEquivalentStorage;
     private final QuoteStorage quoteStorage;
     private final CurrencyStorage currencyStorage;
     private final InvoiceStoragePort invoiceStorage;
+    private final ReceiptStoragePort receiptStorage;
 
     @Override
     public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
@@ -52,7 +54,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
     }
 
     @Override
-    public void onRewardPaid(RewardId rewardId) {
+    public void onRewardPaid(RewardId rewardId, SponsorAccount.PaymentReference reference) {
         final var rewardStatus = rewardStatusStorage.get(rewardId)
                 .orElseThrow(() -> notFound("RewardStatus not found for reward %s".formatted(rewardId)));
         rewardStatusStorage.save(rewardStatus.paidAt(ZonedDateTime.now()));
@@ -63,6 +65,8 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
                 invoiceStorage.update(invoice.status(Invoice.Status.PAID));
             }
         });
+
+        receiptStorage.save(Receipt.of(rewardId, reference));
     }
 
     public void updateUsdEquivalent(RewardId rewardId) {

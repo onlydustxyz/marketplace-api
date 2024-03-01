@@ -36,6 +36,7 @@ public class AccountingObserverTest {
     QuoteStorage quoteStorage;
     CurrencyStorage currencyStorage;
     AccountingObserver accountingObserver;
+    ReceiptStoragePort receiptStorage;
     final Faker faker = new Faker();
     final Currency currency = ETH;
     final Currency usd = USD;
@@ -52,7 +53,9 @@ public class AccountingObserverTest {
         quoteStorage = mock(QuoteStorage.class);
         currencyStorage = mock(CurrencyStorage.class);
         invoiceStorage = mock(InvoiceStoragePort.class);
-        accountingObserver = new AccountingObserver(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage, invoiceStorage);
+        receiptStorage = mock(ReceiptStoragePort.class);
+        accountingObserver = new AccountingObserver(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage, invoiceStorage,
+                receiptStorage);
         when(currencyStorage.findByCode(usd.code())).thenReturn(Optional.of(usd));
 
         when(rewardStatusStorage.get(any(RewardId.class))).then(invocation -> {
@@ -147,6 +150,8 @@ public class AccountingObserverTest {
                     .paidAt(null)
                     .withAdditionalNetworks(Set.of(Network.ETHEREUM, Network.OPTIMISM));
 
+            final var reference = new SponsorAccount.PaymentReference(Network.ETHEREUM, "0x1234", "ofux", "ofux.eth");
+
             Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1,
                     new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", "FRA", false, false, false, null));
             invoice = invoice.rewards(List.of(
@@ -163,7 +168,7 @@ public class AccountingObserverTest {
             when(invoiceStorage.invoiceOf(rewardId)).thenReturn(Optional.of(invoice));
             when(invoiceStorage.invoiceOf(rewardId2)).thenReturn(Optional.of(invoice));
 
-            accountingObserver.onRewardPaid(rewardId);
+            accountingObserver.onRewardPaid(rewardId, reference);
 
             // Then
             {
@@ -174,16 +179,27 @@ public class AccountingObserverTest {
                 assertThat(newRewardStatus.paidAt()).isNotNull();
 
                 verify(invoiceStorage, never()).update(invoice.status(Invoice.Status.PAID));
+
+                final var receiptCaptor = ArgumentCaptor.forClass(Receipt.class);
+                verify(receiptStorage).save(receiptCaptor.capture());
+                final var receipt = receiptCaptor.getValue();
+                assertThat(receipt.id()).isNotNull();
+                assertThat(receipt.rewardId()).isEqualTo(rewardId);
+                assertThat(receipt.network()).isEqualTo(reference.network());
+                assertThat(receipt.createdAt()).isBefore(ZonedDateTime.now());
+                assertThat(receipt.reference()).isEqualTo(reference.reference());
+                assertThat(receipt.thirdPartyName()).isEqualTo(reference.thirdPartyName());
+                assertThat(receipt.thirdPartyAccountNumber()).isEqualTo(reference.thirdPartyAccountNumber());
             }
 
             // When
-            reset(rewardStatusStorage, invoiceStorage);
+            reset(rewardStatusStorage, invoiceStorage, receiptStorage);
             when(rewardStatusStorage.get(rewardId)).thenReturn(Optional.of(rewardStatus.paidAt(ZonedDateTime.now())));
             when(rewardStatusStorage.get(rewardId2)).thenReturn(Optional.of(rewardStatus2.paidAt(ZonedDateTime.now())));
             when(invoiceStorage.invoiceOf(rewardId)).thenReturn(Optional.of(invoice));
             when(invoiceStorage.invoiceOf(rewardId2)).thenReturn(Optional.of(invoice));
 
-            accountingObserver.onRewardPaid(rewardId2);
+            accountingObserver.onRewardPaid(rewardId2, reference);
 
             // Then
             {
@@ -194,6 +210,17 @@ public class AccountingObserverTest {
                 assertThat(newRewardStatus.paidAt()).isNotNull();
 
                 verify(invoiceStorage).update(invoice.status(Invoice.Status.PAID));
+
+                final var receiptCaptor = ArgumentCaptor.forClass(Receipt.class);
+                verify(receiptStorage).save(receiptCaptor.capture());
+                final var receipt = receiptCaptor.getValue();
+                assertThat(receipt.id()).isNotNull();
+                assertThat(receipt.rewardId()).isEqualTo(rewardId2);
+                assertThat(receipt.network()).isEqualTo(reference.network());
+                assertThat(receipt.createdAt()).isBefore(ZonedDateTime.now());
+                assertThat(receipt.reference()).isEqualTo(reference.reference());
+                assertThat(receipt.thirdPartyName()).isEqualTo(reference.thirdPartyName());
+                assertThat(receipt.thirdPartyAccountNumber()).isEqualTo(reference.thirdPartyAccountNumber());
             }
         }
     }

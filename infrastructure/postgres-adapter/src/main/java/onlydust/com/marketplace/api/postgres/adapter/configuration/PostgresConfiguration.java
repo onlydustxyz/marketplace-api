@@ -383,4 +383,9 @@ public class PostgresConfiguration {
     public PostgresBackofficeUserAdapter postgresBackofficeUserAdapter(final BackofficeUserRepository backofficeUserRepository) {
         return new PostgresBackofficeUserAdapter(backofficeUserRepository);
     }
+
+    @Bean
+    PostgresReceiptStorage postgresReceiptStorage(final RewardRepository rewardRepository) {
+        return new PostgresReceiptStorage(rewardRepository);
+    }
 }

@@ -446,7 +446,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         ;
 
         // When
-        final var response = client.get()
+        client.get()
                 .uri(getApiURI(GET_PENDING_PAYMENTS))
                 .header("Api-Key", apiKey())
                 .exchange()
@@ -489,6 +489,36 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectBody()
                 .jsonPath("$.payments.size()").isEqualTo(0)
         ;
+
+        client.get()
+                .uri(getApiURI(String.format(ME_REWARD, rewardId)))
+                .header("Authorization", BEARER_PREFIX + ofux.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                           "currency": "STRK",
+                           "amount": 30,
+                           "dollarsEquivalent": null,
+                           "status": "COMPLETE",
+                           "from": {
+                             "login": "AnthonyBuisset"
+                           },
+                           "to": {
+                             "login": "ofux"
+                           },
+                           "receipt": {
+                             "type": "CRYPTO",
+                             "walletAddress": "ofux.eth",
+                             "transactionReference": "0x14",
+                             "transactionReferenceLink": "https://etherscan.io/tx/0x14"
+                           }
+                         }
+                         """
+                );
     }
 
     @Test

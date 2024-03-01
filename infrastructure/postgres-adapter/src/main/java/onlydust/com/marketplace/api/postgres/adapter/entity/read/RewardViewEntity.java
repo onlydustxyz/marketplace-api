@@ -4,6 +4,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ReceiptEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
@@ -15,6 +16,7 @@ import onlydust.com.marketplace.project.domain.view.UserRewardView;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Set;
 import java.util.UUID;
 
 @Value
@@ -45,6 +47,14 @@ public class RewardViewEntity {
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
     @NonNull RewardStatusDataEntity statusData;
 
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "rewards_receipts",
+            schema = "accounting",
+            joinColumns = @JoinColumn(name = "reward_id"),
+            inverseJoinColumns = @JoinColumn(name = "receipt_id"))
+    Set<ReceiptEntity> receipts = Set.of();
+
     public RewardDetailsView toDomain() {
         return RewardDetailsView.builder()
                 .id(id)
@@ -66,6 +76,7 @@ public class RewardViewEntity {
                         .githubAvatarUrl(requestorAvatarUrl)
                         .build())
                 .project(project.toDomain())
+                .receipt(receipts.stream().findFirst().map(ReceiptEntity::toDomain).orElse(null))
                 .build();
     }
 

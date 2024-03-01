@@ -102,7 +102,7 @@ public class AccountingService implements AccountingFacadePort {
         });
 
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
-        accountingObserver.onRewardPaid(rewardId);
+        accountingObserver.onRewardPaid(rewardId, paymentReference);
     }
 
     @Override

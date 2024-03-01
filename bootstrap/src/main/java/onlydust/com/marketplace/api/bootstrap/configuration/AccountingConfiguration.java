@@ -36,8 +36,9 @@ public class AccountingConfiguration {
                                                  final @NonNull RewardUsdEquivalentStorage rewardUsdEquivalentStorage,
                                                  final @NonNull QuoteStorage quoteStorage,
                                                  final @NonNull CurrencyStorage currencyStorage,
-                                                 final @NonNull InvoiceStoragePort invoiceStorage) {
-        return new AccountingObserver(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage, invoiceStorage);
+                                                 final @NonNull InvoiceStoragePort invoiceStorage,
+                                                 final @NonNull ReceiptStoragePort receiptStorage) {
+        return new AccountingObserver(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage, invoiceStorage, receiptStorage);
     }
 
     @Bean

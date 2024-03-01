@@ -7,9 +7,7 @@ import onlydust.com.marketplace.project.domain.model.Reward;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Data
@@ -37,6 +35,14 @@ public class RewardEntity {
 
     @ManyToOne
     InvoiceEntity invoice;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "rewards_receipts",
+            schema = "accounting",
+            joinColumns = @JoinColumn(name = "reward_id"),
+            inverseJoinColumns = @JoinColumn(name = "receipt_id"))
+    Set<ReceiptEntity> receipts = new HashSet<>();
 
     public static RewardEntity of(Reward reward, Currency currency) {
         return RewardEntity.builder()
