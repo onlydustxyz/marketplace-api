@@ -24,16 +24,15 @@ public interface RewardStatsRepository extends JpaRepository<RewardStatsEntity, 
             FROM rewards r
                      JOIN accounting.reward_status_data rsd ON rsd.reward_id = r.id
                      JOIN accounting.reward_statuses rs ON rs.reward_id = r.id
-                     JOIN iam.users u on u.github_user_id = r.recipient_id
                      LEFT JOIN reward_item_ids wii ON wii.reward_id = r.id
-            WHERE u.id = :userId
+            WHERE r.recipient_id = :contributorId
               AND (COALESCE(:currencyIds) IS NULL OR r.currency_id IN (:currencyIds))
               AND (COALESCE(:projectIds) IS NULL OR r.project_id IN (:projectIds))
               AND (:fromDate IS NULL OR r.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD'))
               AND (:toDate IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
             GROUP BY r.currency_id
             """, nativeQuery = true)
-    List<RewardStatsEntity> findByUser(UUID userId, List<UUID> currencyIds, List<UUID> projectIds, String fromDate,
+    List<RewardStatsEntity> findByUser(Long contributorId, List<UUID> currencyIds, List<UUID> projectIds, String fromDate,
                                        String toDate);
 
 

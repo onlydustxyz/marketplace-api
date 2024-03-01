@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectAllowance
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.model.Currency;
+import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.output.ProjectRewardStoragePort;
 import onlydust.com.marketplace.project.domain.view.*;
 
@@ -27,7 +28,7 @@ public class PostgresProjectRewardV2Adapter implements ProjectRewardStoragePort 
 
     @Override
     @Transactional
-    public ProjectRewardsPageView findRewards(UUID projectId, ProjectRewardView.Filters filters, ProjectRewardView.SortBy sortBy, SortDirection sortDirection
+    public ProjectRewardsPageView findRewards(UUID projectId, ProjectRewardView.Filters filters, Reward.SortBy sortBy, SortDirection sortDirection
             , int pageIndex, int pageSize) {
         // TODO
         return null;

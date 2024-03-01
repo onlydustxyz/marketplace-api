@@ -221,9 +221,9 @@ public class PostgresUserAdapter implements UserStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public UserRewardsPageView findRewardsForUserId(UUID userId, UserRewardView.Filters filters,
+    public UserRewardsPageView findRewardsForUserId(Long githubUserId, UserRewardView.Filters filters,
                                                     int pageIndex, int pageSize,
-                                                    UserRewardView.SortBy sort, SortDirection sortDirection) {
+                                                    Reward.SortBy sort, SortDirection sortDirection) {
 
         final var format = new SimpleDateFormat("yyyy-MM-dd");
         final var fromDate = isNull(filters.getFrom()) ? null : format.format(filters.getFrom());
@@ -232,9 +232,9 @@ public class PostgresUserAdapter implements UserStoragePort {
         final var pageRequest = PageRequest.of(pageIndex, pageSize,
                 RewardViewRepository.sortBy(sort, sortDirection == SortDirection.asc ? Direction.ASC : Direction.DESC));
 
-        final var page = rewardViewRepository.findUserRewards(userId, filters.getCurrencies(), filters.getProjectIds(), fromDate, toDate, pageRequest);
+        final var page = rewardViewRepository.findUserRewards(githubUserId, filters.getCurrencies(), filters.getProjectIds(), fromDate, toDate, pageRequest);
 
-        final var rewardsStats = rewardStatsRepository.findByUser(userId, filters.getCurrencies(), filters.getProjectIds(),
+        final var rewardsStats = rewardStatsRepository.findByUser(githubUserId, filters.getCurrencies(), filters.getProjectIds(),
                 fromDate, toDate);
 
         return UserRewardsPageView.builder()

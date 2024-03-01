@@ -8,7 +8,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
@@ -32,6 +31,7 @@ import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper.moreInfosToEntities;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
 public class PostgresProjectAdapter implements ProjectStoragePort, ProjectRewardStoragePort {
@@ -69,7 +69,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
     @Transactional(readOnly = true)
     public ProjectDetailsView getById(UUID projectId, User caller) {
         final var projectEntity = projectViewRepository.findById(projectId)
-                .orElseThrow(() -> OnlyDustException.notFound(format("Project %s not found", projectId)));
+                .orElseThrow(() -> notFound(format("Project %s not found", projectId)));
         return getProjectDetails(projectEntity, caller);
     }
 
@@ -77,14 +77,14 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
     @Transactional(readOnly = true)
     public ProjectDetailsView getBySlug(String slug, User caller) {
         final var projectEntity = projectViewRepository.findByKey(slug)
-                .orElseThrow(() -> OnlyDustException.notFound(format("Project '%s' not found", slug)));
+                .orElseThrow(() -> notFound(format("Project '%s' not found", slug)));
         return getProjectDetails(projectEntity, caller);
     }
 
     @Override
     public String getProjectSlugById(UUID projectId) {
         return projectViewRepository.findById(projectId)
-                .orElseThrow(() -> OnlyDustException.notFound(format("Project %s not found", projectId)))
+                .orElseThrow(() -> notFound(format("Project %s not found", projectId)))
                 .getKey();
     }
 
@@ -92,7 +92,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
     public RewardableItemView getRewardableIssue(String repoOwner, String repoName, long issueNumber) {
         return rewardableItemRepository.findRewardableIssue(repoOwner, repoName, issueNumber)
                 .map(RewardableItemMapper::itemToDomain)
-                .orElseThrow(() -> OnlyDustException.notFound(format("Issue %s/%s#%d not found", repoOwner, repoName,
+                .orElseThrow(() -> notFound(format("Issue %s/%s#%d not found", repoOwner, repoName,
                         issueNumber)));
     }
 
@@ -100,7 +100,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
     public RewardableItemView getRewardablePullRequest(String repoOwner, String repoName, long pullRequestNumber) {
         return rewardableItemRepository.findRewardablePullRequest(repoOwner, repoName, pullRequestNumber)
                 .map(RewardableItemMapper::itemToDomain)
-                .orElseThrow(() -> OnlyDustException.notFound(format("Pull request %s/%s#%d not found", repoOwner,
+                .orElseThrow(() -> notFound(format("Pull request %s/%s#%d not found", repoOwner,
                         repoName,
                         pullRequestNumber)));
     }
@@ -260,7 +260,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
                               List<UUID> projectLeadersToKeep, String imageUrl,
                               ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds) {
         final var project = this.projectRepository.findById(projectId)
-                .orElseThrow(() -> OnlyDustException.notFound(format("Project %s not found", projectId)));
+                .orElseThrow(() -> notFound(format("Project %s not found", projectId)));
         project.setName(name);
         project.setShortDescription(shortDescription);
         project.setLongDescription(longDescription);
@@ -403,7 +403,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
     @Override
     @Transactional(readOnly = true)
     public ProjectRewardsPageView findRewards(UUID projectId, ProjectRewardView.Filters filters,
-                                              ProjectRewardView.SortBy sort, SortDirection sortDirection,
+                                              Reward.SortBy sort, SortDirection sortDirection,
                                               int pageIndex, int pageSize) {
         final var format = new SimpleDateFormat("yyyy-MM-dd");
         final var fromDate = isNull(filters.getFrom()) ? null : format.format(filters.getFrom());
@@ -453,7 +453,9 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
     @Override
     @Transactional(readOnly = true)
     public RewardDetailsView getProjectReward(UUID rewardId) {
-        return rewardViewRepository.find(rewardId).orElseThrow().toDomain();
+        return rewardViewRepository.find(rewardId)
+                .orElseThrow(() -> notFound("Reward %s not found".formatted(rewardId)))
+                .toDomain();
     }
 
     @Override
@@ -475,15 +477,15 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
     @Override
     public void updateUsdAmount(UUID rewardId) {
         final var paymentRequest = paymentRequestRepository.findById(rewardId)
-                .orElseThrow(() -> OnlyDustException.notFound("Payment request %s not found".formatted(rewardId)));
+                .orElseThrow(() -> notFound("Payment request %s not found".formatted(rewardId)));
         final var currency = currencyRepository.findByCode(paymentRequest.getCurrency().toString().toUpperCase())
-                .orElseThrow(() -> OnlyDustException.notFound("Currency %s not found".formatted(paymentRequest.getCurrency())));
+                .orElseThrow(() -> notFound("Currency %s not found".formatted(paymentRequest.getCurrency())));
         final var usd = currencyRepository.findByCode("USD")
-                .orElseThrow(() -> OnlyDustException.notFound("Currency USD not found"));
+                .orElseThrow(() -> notFound("Currency USD not found"));
 
         final var usdAmount = historicalQuoteRepository.findFirstByBaseIdAndTargetIdAndTimestampLessThanEqualOrderByTimestampDesc(currency.id(), usd.id(),
                         paymentRequest.getRequestedAt().toInstant())
-                .orElseThrow(() -> OnlyDustException.notFound("No usd quote found for %s at %s".formatted(paymentRequest.getCurrency(),
+                .orElseThrow(() -> notFound("No usd quote found for %s at %s".formatted(paymentRequest.getCurrency(),
                         paymentRequest.getRequestedAt())));
 
         paymentRequest.setUsdAmount(paymentRequest.getAmount().multiply(usdAmount.getPrice()));

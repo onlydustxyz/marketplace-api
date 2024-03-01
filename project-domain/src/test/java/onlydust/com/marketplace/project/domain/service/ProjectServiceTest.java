@@ -320,7 +320,7 @@ public class ProjectServiceTest {
     @Test
     void should_check_project_lead_permissions_when_getting_project_rewards_given_a_valid_project_lead() {
         final UUID projectId = UUID.randomUUID();
-        final ProjectRewardView.SortBy sortBy = ProjectRewardView.SortBy.contribution;
+        final Reward.SortBy sortBy = Reward.SortBy.CONTRIBUTION;
         final UUID projectLeadId = UUID.randomUUID();
         final int pageIndex = 1;
         final int pageSize = 1;
@@ -341,7 +341,7 @@ public class ProjectServiceTest {
     void should_throw_forbidden_exception_when_getting_project_rewards_given_an_invalid_project_lead() {
         final UUID projectId = UUID.randomUUID();
         final UUID projectLeadId = UUID.randomUUID();
-        final ProjectRewardView.SortBy sortBy = ProjectRewardView.SortBy.contribution;
+        final Reward.SortBy sortBy = Reward.SortBy.CONTRIBUTION;
         final int pageIndex = 1;
         final int pageSize = 1;
         final SortDirection sortDirection = SortDirection.asc;

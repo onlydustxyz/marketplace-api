@@ -239,7 +239,7 @@ public class ProjectService implements ProjectFacadePort, ProjectRewardFacadePor
     public ProjectRewardsPageView getRewards(UUID projectId, UUID projectLeadId,
                                              ProjectRewardView.Filters filters,
                                              Integer pageIndex, Integer pageSize,
-                                             ProjectRewardView.SortBy sortBy, SortDirection sortDirection) {
+                                             Reward.SortBy sortBy, SortDirection sortDirection) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
             return projectRewardStoragePort.findRewards(projectId, filters, sortBy, sortDirection, pageIndex, pageSize);
         } else {

@@ -1,11 +1,9 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.project.domain.view.ProjectRewardsPageView;
-import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
-
-import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapCurrency;
@@ -64,16 +62,5 @@ public interface ProjectRewardMapper {
         amount.setDollarsEquivalent(view.getAmount().getDollarsEquivalent());
         amount.setTotal(view.getAmount().getTotal());
         return amount;
-    }
-
-
-    static ProjectRewardView.SortBy getSortBy(String sort) {
-        sort = Objects.isNull(sort) ? "" : sort;
-        return switch (sort) {
-            case "AMOUNT" -> ProjectRewardView.SortBy.amount;
-            case "CONTRIBUTION" -> ProjectRewardView.SortBy.contribution;
-            case "STATUS" -> ProjectRewardView.SortBy.status;
-            default -> ProjectRewardView.SortBy.requestedAt;
-        };
     }
 }
