@@ -39,10 +39,10 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                      join indexer_exp.contributions c on c.repo_id = gr.id
                      left join indexer_exp.github_pull_requests pull_request on pull_request.id = c.pull_request_id
                      left join ignored_contributions ic on ic.contribution_id = c.id and ic.project_id = :projectId
-                     left join work_items wi on wi.id = coalesce(cast(c.pull_request_id as text), cast(c.issue_id as text), c.code_review_id) and wi.recipient_id = c.contributor_id
+                     left join reward_items ri on ri.id = coalesce(cast(c.pull_request_id as text), cast(c.issue_id as text), c.code_review_id) and ri.recipient_id = c.contributor_id
             where pgr.project_id = :projectId
               and gr.visibility = 'PUBLIC'
-              and wi.id is null
+              and ri.id is null
               and c.contributor_id = :githubUserId
               and (:includeIgnoredItems is true or ic.contribution_id is null)
               and (coalesce(:contributionStatus) is null or c.status = cast(cast(:contributionStatus as text) as indexer_exp.contribution_status))
@@ -87,10 +87,10 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                      left join get_issue issue on issue.id = c.issue_id
                      left join get_pr pull_request on pull_request.id = c.pull_request_id
                      left join ignored_contributions ic on ic.contribution_id = c.id and ic.project_id = :projectId
-                     left join work_items wi on wi.id = coalesce(cast(c.pull_request_id as text), cast(c.issue_id as text), c.code_review_id) and wi.recipient_id = c.contributor_id
+                     left join reward_items ri on ri.id = coalesce(cast(c.pull_request_id as text), cast(c.issue_id as text), c.code_review_id) and ri.recipient_id = c.contributor_id
             where pgr.project_id = :projectId
               and repo.visibility = 'PUBLIC'
-              and wi.id is null
+              and ri.id is null
               and c.contributor_id = :githubUserId
               and (:includeIgnoredItems is true or ic.contribution_id is null)
               and (coalesce(:contributionStatus) is null or c.status = cast(cast(:contributionStatus as text) as indexer_exp.contribution_status))

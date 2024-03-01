@@ -3,17 +3,20 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.bootstrap.helper.Auth0ApiClientStub;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRepoEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
-import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.UUID;
@@ -454,9 +457,6 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.email").isEqualTo(newEmail);
     }
 
-    @Autowired
-    PaymentRequestRepository paymentRequestRepository;
-
     //    @Test - TODO: restore ?
     void should_return_has_valid_billing_profile() {
         // Given
@@ -474,10 +474,6 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.hasValidBillingProfile").isEqualTo(true);
-
-        final UserEntity user = authenticatedUser.user();
-        paymentRequestRepository.save(new PaymentRequestEntity(UUID.randomUUID(), user.getId(), user.getGithubUserId(), new Date(), BigDecimal.ONE, null,
-                0, UUID.randomUUID(), CurrencyEnumEntity.usdc, BigDecimal.ONE));
 
         // When
         client.get()

@@ -69,7 +69,6 @@ public class PostgresConfiguration {
                                                  final ContributionViewEntityRepository contributionViewEntityRepository,
                                                  final HiddenContributorRepository hiddenContributorRepository,
                                                  final ProjectTagRepository projectTagRepository,
-                                                 final PaymentRequestRepository paymentRequestRepository,
                                                  final HistoricalQuoteRepository historicalQuoteRepository,
                                                  final CurrencyRepository currencyRepository,
                                                  final RewardViewRepository rewardViewRepository) {
@@ -96,7 +95,6 @@ public class PostgresConfiguration {
                 contributionViewEntityRepository,
                 hiddenContributorRepository,
                 projectTagRepository,
-                paymentRequestRepository,
                 historicalQuoteRepository,
                 currencyRepository,
                 rewardViewRepository
@@ -126,7 +124,6 @@ public class PostgresConfiguration {
                                                            final ContributionViewEntityRepository contributionViewEntityRepository,
                                                            final HiddenContributorRepository hiddenContributorRepository,
                                                            final ProjectTagRepository projectTagRepository,
-                                                           final PaymentRequestRepository paymentRequestRepository,
                                                            final HistoricalQuoteRepository historicalQuoteRepository,
                                                            final CurrencyRepository currencyRepository,
                                                            final RewardViewRepository rewardViewRepository) {
@@ -153,7 +150,6 @@ public class PostgresConfiguration {
                 contributionViewEntityRepository,
                 hiddenContributorRepository,
                 projectTagRepository,
-                paymentRequestRepository,
                 historicalQuoteRepository,
                 currencyRepository,
                 rewardViewRepository
@@ -193,7 +189,8 @@ public class PostgresConfiguration {
                                                    final CustomRewardRepository customRewardRepository,
                                                    final ProjectLedIdRepository projectLedIdRepository,
                                                    final RewardStatsRepository rewardStatsRepository,
-                                                   final RewardViewRepository rewardViewRepository) {
+                                                   final RewardViewRepository rewardViewRepository,
+                                                   final CurrencyRepository currencyRepository) {
         return new PostgresUserAdapter(
                 customUserRepository,
                 customContributorRepository,
@@ -209,7 +206,8 @@ public class PostgresConfiguration {
                 customRewardRepository,
                 projectLedIdRepository,
                 rewardStatsRepository,
-                rewardViewRepository);
+                rewardViewRepository,
+                currencyRepository);
     }
 
     @Bean

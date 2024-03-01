@@ -34,13 +34,4 @@ public interface RewardStatsRepository extends JpaRepository<RewardStatsEntity, 
             """, nativeQuery = true)
     List<RewardStatsEntity> findByUser(Long contributorId, List<UUID> currencyIds, List<UUID> projectIds, String fromDate,
                                        String toDate);
-
-
-    @Query(value = """
-            SELECT DISTINCT pr.currency
-            FROM payment_requests pr
-            WHERE pr.recipient_id = :githubUserId
-            ORDER BY pr.currency
-            """, nativeQuery = true)
-    List<CurrencyEnumEntity> listRewardCurrenciesByRecipient(Long githubUserId);
 }

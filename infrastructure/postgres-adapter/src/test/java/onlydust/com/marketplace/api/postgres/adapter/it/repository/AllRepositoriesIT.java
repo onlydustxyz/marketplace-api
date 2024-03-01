@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
-import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
@@ -33,13 +32,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     @Autowired
     OnboardingRepository onboardingRepository;
     @Autowired
-    PaymentRepository paymentRepository;
-    @Autowired
     BudgetRepository budgetRepository;
-    @Autowired
-    PaymentRequestRepository paymentRequestRepository;
-    @Autowired
-    WorkItemRepository workItemRepository;
     @Autowired
     ApplicationRepository applicationRepository;
     @Autowired
@@ -159,24 +152,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     }
 
     @Test
-    void should_create_payment() {
-        // Given
-        final PaymentEntity expected = PaymentEntity.builder()
-                .id(UUID.randomUUID())
-                .amount(BigDecimal.valueOf(faker.number().randomNumber()))
-                .currencyCode(faker.programmingLanguage().creator())
-                .receipt(JacksonUtil.toJsonNode("""
-                        {
-                        "test": true
-                        }"""))
-                .processedAt(new Date())
-                .requestId(UUID.randomUUID())
-                .build();
-
-        assertIsSaved(expected, paymentRepository);
-    }
-
-    @Test
     void should_create_budget() {
         // Given
         final BudgetEntity expected = BudgetEntity.builder()
@@ -187,42 +162,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .build();
 
         assertIsSaved(expected, budgetRepository);
-    }
-
-    @Test
-    void should_create_payment_request() {
-        // Given
-        final PaymentRequestEntity expected = PaymentRequestEntity.builder()
-                .amount(BigDecimal.ZERO)
-                .requestedAt(new Date())
-                .currency(CurrencyEnumEntity.usd)
-                .recipientId(faker.number().randomNumber())
-                .id(UUID.randomUUID())
-                .projectId(UUID.randomUUID())
-                .requestorId(UUID.randomUUID())
-                .hoursWorked(faker.number().randomDigit())
-                .build();
-
-        assertIsSaved(expected, paymentRequestRepository);
-    }
-
-    @Test
-    void should_create_work_item() {
-        // Given
-        final WorkItemEntity expected = WorkItemEntity
-                .builder()
-                .workItemId(WorkItemIdEntity.builder()
-                        .repoId(faker.number().randomDigit())
-                        .number(faker.number().randomDigit())
-                        .paymentId(UUID.randomUUID())
-                        .build())
-                .id(faker.pokemon().location())
-                .contributionType(ContributionTypeEnumEntity.PULL_REQUEST)
-                .projectId(UUID.randomUUID())
-                .recipientId(faker.number().randomNumber())
-                .build();
-
-        assertIsSaved(expected, workItemRepository);
     }
 
     @Test

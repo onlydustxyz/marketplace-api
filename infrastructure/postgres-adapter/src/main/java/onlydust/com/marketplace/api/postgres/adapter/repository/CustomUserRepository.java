@@ -69,7 +69,6 @@ public class CustomUserRepository {
                             and c.contributor_id = gu.id
                           GROUP BY year, week) as cc)      counts,
                         
-                        
                    (select count(pl.project_id)
                     from project_leads pl
                     where u.id is not null
@@ -87,12 +86,14 @@ public class CustomUserRepository {
                                            'total_dollars_equivalent', prs.total_dollars_equivalent,
                                            'currency', prs.currency
                                              )))
-                    from (select sum(pr.amount)                   as total_amount,
-                                 coalesce(sum(pr.usd_amount), 0)  as total_dollars_equivalent,
-                                 pr.currency                      as currency
-                          from payment_requests pr
-                          where pr.recipient_id = gu.id
-                          group by pr.currency) as prs)    totals_earned,
+                    from (select sum(r.amount)  as total_amount,
+                                 coalesce(sum(rsd.amount_usd_equivalent), 0)  as total_dollars_equivalent,
+                                 LOWER(c.code)  as currency
+                          from rewards r
+                          join accounting.reward_status_data rsd on rsd.reward_id = r.id
+                          join currencies c on c.id = r.currency_id
+                          where r.recipient_id = gu.id
+                          group by c.code) as prs)    totals_earned,
                         
                    (select sum(rc.completed_contribution_count)
                     from indexer_exp.repos_contributors rc

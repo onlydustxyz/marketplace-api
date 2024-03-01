@@ -55,9 +55,9 @@ public interface ShortProjectViewEntityRepository extends JpaRepository<ShortPro
                 p.visibility
             FROM 
                  project_details p
-            JOIN payment_requests pr ON pr.project_id = p.project_id
+            JOIN rewards r ON r.project_id = p.project_id
             WHERE
-                pr.recipient_id = :rewardId
+                r.recipient_id = :rewardId
             ORDER BY 
                 p.name 
             """, nativeQuery = true)

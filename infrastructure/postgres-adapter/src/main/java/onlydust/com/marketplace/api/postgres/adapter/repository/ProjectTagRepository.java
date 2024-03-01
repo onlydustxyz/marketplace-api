@@ -57,15 +57,15 @@ public interface ProjectTagRepository extends JpaRepository<ProjectTagEntity, Pr
     @Modifying
     @Query(value = """
             with likely_to_reward as (SELECT pgr.project_id,
-                                       COUNT(DISTINCT pr.recipient_id) AS recipients_last_month
+                                       COUNT(DISTINCT r.recipient_id) AS recipients_last_month
                                 FROM project_github_repos pgr
                                          JOIN
                                      project_details pd ON pgr.project_id = pd.project_id
                                          JOIN
-                                     payment_requests pr ON pgr.project_id = pr.project_id
-                                WHERE pr.requested_at > cast(:now as timestamp) - INTERVAL '1 month'
+                                     rewards r ON pgr.project_id = r.project_id
+                                WHERE r.requested_at > cast(:now as timestamp) - INTERVAL '1 month'
                                 GROUP BY pgr.project_id, pd.name
-                                HAVING COUNT(DISTINCT pr.recipient_id) >= 3
+                                HAVING COUNT(DISTINCT r.recipient_id) >= 3
                                 ORDER BY recipients_last_month DESC)
              insert into projects_tags (project_id, tag)
              select nw.project_id, 'LIKELY_TO_REWARD'
@@ -118,14 +118,15 @@ public interface ProjectTagRepository extends JpaRepository<ProjectTagEntity, Pr
 
     @Modifying
     @Query(value = """
-            with big_whale as (SELECT pr.project_id,
-                                      SUM(pr.usd_amount) AS total_rewards_in_usd
-                               FROM payment_requests pr
+            with big_whale as (SELECT r.project_id,
+                                      SUM(rsd.amount_usd_equivalent) AS total_rewards_in_usd
+                               FROM rewards r
+                               JOIN accounting.reward_status_data rsd ON r.id = rsd.reward_id
                                         LEFT JOIN
-                                    project_details pd ON pr.project_id = pd.project_id
-                               WHERE pr.requested_at > cast(:now as timestamp) - INTERVAL '3 months'
-                               GROUP BY pr.project_id, pd.name
-                               HAVING SUM(pr.usd_amount) > 5000
+                                    project_details pd ON r.project_id = pd.project_id
+                               WHERE r.requested_at > cast(:now as timestamp) - INTERVAL '3 months'
+                               GROUP BY r.project_id, pd.name
+                               HAVING SUM(rsd.amount_usd_equivalent) > 5000
                                ORDER BY total_rewards_in_usd DESC)
              insert into projects_tags (project_id, tag)
              select bw.project_id, 'BIG_WHALE'

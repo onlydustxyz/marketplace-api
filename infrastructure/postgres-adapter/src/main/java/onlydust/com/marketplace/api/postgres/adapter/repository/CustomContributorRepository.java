@@ -51,10 +51,10 @@ public class CustomContributorRepository {
                    user_avatar_url(ga.id, ga.avatar_url) as avatar_url,
                    pc.completed_contribution_count                 contribution_count,
                    u.github_user_id is not null is_registered,
-                   (select count(distinct pr.id)
-                    from payment_requests pr
-                    where pr.project_id = :projectId
-                      and pr.recipient_id = ga.id)               reward_count,
+                   (select count(distinct r.id)
+                    from rewards r
+                    where r.project_id = :projectId
+                      and r.recipient_id = ga.id)               reward_count,
                    coalesce(to_rewards_stats.total_count,0) to_reward_count,
                    to_rewards_stats.pull_request_count prs_to_reward,
                    to_rewards_stats.issue_count issues_to_reward,
@@ -93,31 +93,33 @@ public class CustomContributorRepository {
                                 from project_github_repos pgr
                                          join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
                                          join indexer_exp.contributions c on c.repo_id = gr.id
-                                         left join work_items wi on wi.id = coalesce(cast(c.pull_request_id as text), cast(c.issue_id as text), c.code_review_id) and wi.recipient_id = c.contributor_id
+                                         left join reward_items ri on ri.id = coalesce(cast(c.pull_request_id as text), cast(c.issue_id as text), c.code_review_id) and ri.recipient_id = c.contributor_id
                                          left join ignored_contributions ic on ic.contribution_id = c.id and ic.project_id = :projectId
                                 where pgr.project_id = :projectId
                                   and gr.visibility = 'PUBLIC'
                                   and c.status = 'COMPLETED'
-                                  and wi.id is null
+                                  and ri.id is null
                                   and ic.project_id is null
                                 group by c.contributor_id) to_rewards_stats on to_rewards_stats.contributor_id = ga.id
-                     left join (select sum(pr.amount) filter (where pr.currency = 'usd')   usd,
-                                       sum(pr.amount) filter (where pr.currency = 'usdc')   usdc,
-                                       sum(pr.usd_amount) filter (where pr.currency = 'usdc')   usdc_usd,
-                                       sum(pr.amount) filter (where pr.currency = 'apt')   apt,
-                                       sum(pr.usd_amount) filter (where pr.currency = 'apt')   apt_usd,
-                                       sum(pr.amount) filter (where pr.currency = 'strk') stark,
-                                       sum(pr.usd_amount) filter (where pr.currency = 'strk') stark_usd,
-                                       sum(pr.amount) filter (where pr.currency = 'op')    op,
-                                       sum(pr.usd_amount) filter (where pr.currency = 'op')    op_usd,
-                                       sum(pr.amount) filter (where pr.currency = 'eth')   eth,
-                                       sum(pr.usd_amount) filter (where pr.currency = 'eth')   eth_usd,
-                                       sum(pr.amount) filter (where pr.currency = 'lords')   lords,
-                                       sum(pr.usd_amount) filter (where pr.currency = 'lords')   lords_usd,
-                                       pr.recipient_id
-                                 from payment_requests pr
-                                 where pr.project_id = :projectId
-                                 group by pr.recipient_id) amounts on amounts.recipient_id = ga.id
+                     left join (select sum(r.amount) filter (where c.code = 'USD')   usd,
+                                       sum(r.amount) filter (where c.code = 'USDC')   usdc,
+                                       sum(rsd.amount_usd_equivalent) filter (where c.code = 'USDC')   usdc_usd,
+                                       sum(r.amount) filter (where c.code = 'APT')   apt,
+                                       sum(rsd.amount_usd_equivalent) filter (where c.code = 'APT')   apt_usd,
+                                       sum(r.amount) filter (where c.code = 'STRK') stark,
+                                       sum(rsd.amount_usd_equivalent) filter (where c.code = 'STRK') stark_usd,
+                                       sum(r.amount) filter (where c.code = 'OP')    op,
+                                       sum(rsd.amount_usd_equivalent) filter (where c.code = 'OP')    op_usd,
+                                       sum(r.amount) filter (where c.code = 'ETH')   eth,
+                                       sum(rsd.amount_usd_equivalent) filter (where c.code = 'ETH')   eth_usd,
+                                       sum(r.amount) filter (where c.code = 'LORDS')   lords,
+                                       sum(rsd.amount_usd_equivalent) filter (where c.code = 'LORDS')   lords_usd,
+                                       r.recipient_id
+                                 from rewards r 
+                                 join accounting.reward_status_data rsd on r.id = rsd.reward_id
+                                 join currencies c on r.currency_id = c.id
+                                 where r.project_id = :projectId
+                                 group by r.recipient_id) amounts on amounts.recipient_id = ga.id
             where pc.project_id = :projectId
               and ga.login ilike '%' || :login || '%'
               and (hc.contributor_github_user_id is null or :showHidden)

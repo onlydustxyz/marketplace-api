@@ -9,7 +9,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRewardRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     @Autowired
     private InvoiceRewardRepository invoiceRewardRepository;
     @Autowired
-    private PaymentRequestRepository paymentRequestRepository;
+    private RewardRepository rewardRepository;
     @Autowired
     PdfStoragePort pdfStoragePort;
     private final Faker faker = new Faker();
@@ -53,18 +53,16 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
         );
 
         invoices.forEach(invoice -> {
-            final var rewards = paymentRequestRepository.findAllById(invoice.data().rewards().stream().map(InvoiceRewardEntity::id).toList());
-            rewards.forEach(reward -> reward.setInvoice(null));
-            paymentRequestRepository.saveAll(rewards);
+            final var rewards = rewardRepository.findAllById(invoice.data().rewards().stream().map(InvoiceRewardEntity::id).toList());
+            rewardRepository.saveAll(rewards.stream().map(reward -> reward.invoice(null)).toList());
         });
 
         invoiceRepository.deleteAll();
         invoiceRepository.saveAll(invoices);
 
         invoices.forEach(invoice -> {
-            final var rewards = paymentRequestRepository.findAllById(invoice.data().rewards().stream().map(InvoiceRewardEntity::id).toList());
-            rewards.forEach(reward -> reward.setInvoice(invoice));
-            paymentRequestRepository.saveAll(rewards);
+            final var rewards = rewardRepository.findAllById(invoice.data().rewards().stream().map(InvoiceRewardEntity::id).toList());
+            rewardRepository.saveAll(rewards.stream().map(reward -> reward.invoice(invoice)).toList());
         });
     }
 
