@@ -109,6 +109,14 @@ paths:
           schema:
             type: integer
         - in: query
+          name: invoiceIds
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/InvoiceId'
+          style: form
+        - in: query
           name: statuses
           required: false
           schema:
@@ -2128,7 +2136,6 @@ components:
         - status
         - internalStatus
         - billingProfile
-        - recipient
         - createdAt
         - totalAmount
         - totalAmountCurrency
@@ -2140,19 +2147,15 @@ components:
         status:
           $ref: '#/components/schemas/InvoiceInternalStatus'
         billingProfile:
-          $ref: '#/components/schemas/BillingProfileShortResponse'
-        recipient:
-          $ref: '#/components/schemas/RecipientResponse'
+          $ref: '#/components/schemas/BillingProfileResponse'
         createdAt:
           type: string
           format: date-time
-        totalAmount:
-          type: number
-        totalAmountCurrency:
-          $ref: '#/components/schemas/Currency'
         rewardCount:
-          type: number
-        amounts:
+          type: integer
+        totalEquivalent:
+          $ref: '#/components/schemas/MoneyResponse'
+        totalPerCurrency:
           type: array
           items:
             $ref: '#/components/schemas/MoneyResponse'
@@ -2169,7 +2172,7 @@ components:
         dollarsEquivalent:
           type: number
         currency:
-          $ref: '#/components/schemas/Currency'
+          $ref: '#/components/schemas/CurrencyResponse'
 
     MoneyLinkResponse:
       type: object
@@ -2201,57 +2204,7 @@ components:
       format: uuid
       description: Billing profile ID
 
-    RecipientResponse:
-      type: object
-      required:
-        - id
-        - login
-        - email
-      properties:
-        id:
-          $ref: '#/components/schemas/UserId'
-        login:
-          type: string
-          example: ofux
-        firstName:
-          type: string
-          example: Olivier
-        lastName:
-          type: string
-          example: Fu
-        email:
-          type: string
-          example: olivier@foobar.org
-
-    BillingProfileAdminResponse:
-      type: object
-      required:
-        - adminLogin
-        - adminEmail
-        - adminAvatarUrl
-        - billingProfileName
-        - billingProfileType
-      properties:
-        adminLogin:
-          type: string
-          example: ofux
-        adminName:
-          type: string
-          example: Olivier Fuxet
-        adminEmail:
-          type: string
-          example: olivier@foobar.org
-        adminAvatarUrl:
-          type: string
-        billingProfileName:
-          type: string
-          example: WAGMI
-        billingProfileType:
-          $ref: '#/components/schemas/BillingProfileType'
-
-
-
-    BillingProfileShortResponse:
+    BillingProfileResponse:
       type: object
       required:
         - id
@@ -2265,6 +2218,28 @@ components:
           example: Apple Inc.
         type:
           $ref: '#/components/schemas/BillingProfileType'
+        admins:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillingProfileAdminResponse'
+
+    BillingProfileAdminResponse:
+      type: object
+      required:
+        - login
+        - email
+      properties:
+        login:
+          type: string
+          example: ofux
+        name:
+          type: string
+          example: Olivier Fuxet
+        email:
+          type: string
+          example: olivier@foobar.org
+        avatarUrl:
+          type: string
 
     BillingProfileType:
       type: string
@@ -2598,8 +2573,8 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/RewardId'
-        billingProfileAdmin:
-          $ref: '#/components/schemas/BillingProfileAdminResponse'
+        billingProfile:
+          $ref: '#/components/schemas/BillingProfileResponse'
         requestedAt:
           type: string
           format: date-time

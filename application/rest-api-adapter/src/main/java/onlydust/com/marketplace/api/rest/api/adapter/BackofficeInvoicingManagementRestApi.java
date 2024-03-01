@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeInvoicingManagementApi;
 import onlydust.com.backoffice.api.contract.model.InvoiceInternalStatus;
 import onlydust.com.backoffice.api.contract.model.InvoicePage;
+import onlydust.com.backoffice.api.contract.model.InvoicePageV2;
 import onlydust.com.backoffice.api.contract.model.PatchInvoiceRequest;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
@@ -22,8 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapInvoicePageToContract;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapInvoiceStatus;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 
@@ -57,6 +57,26 @@ public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicing
     }
 
     @Override
+    public ResponseEntity<InvoicePageV2> getInvoicePageV2(Integer pageIndex, Integer pageSize, List<UUID> invoiceIds,
+                                                          List<InvoiceInternalStatus> internalStatuses) {
+        final int sanitizedPageSize = sanitizePageSize(pageSize, MAX_PAGE_SIZE);
+        final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
+        final var page = invoiceFacadePort.findAll(
+                Optional.ofNullable(invoiceIds).orElse(List.of()).stream().map(Invoice.Id::of).toList(),
+                Optional.ofNullable(internalStatuses).orElse(ALL_STATUSES).stream().map(BackOfficeMapper::mapInvoiceStatus).toList(),
+                sanitizedPageIndex,
+                sanitizedPageSize
+        );
+
+        final var response = mapInvoicePageV2ToContract(page, pageIndex, queryParamTokenAuthenticationConfig.getBaseUrl(),
+                queryParamTokenAuthenticationConfig.getToken());
+
+        return page.getTotalPageNumber() > 1 ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
+                ResponseEntity.ok(response);
+    }
+
+    @Override
     public ResponseEntity<Void> updateInvoice(UUID invoiceId, PatchInvoiceRequest request) {
         invoiceFacadePort.update(Invoice.Id.of(invoiceId), mapInvoiceStatus(request.getStatus()));
         return ResponseEntity.noContent().build();
@@ -71,4 +91,6 @@ public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicing
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(new InputStreamResource(invoice.data()));
     }
+
+
 }

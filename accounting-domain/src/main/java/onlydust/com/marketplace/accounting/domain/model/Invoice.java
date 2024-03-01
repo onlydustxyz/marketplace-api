@@ -179,6 +179,10 @@ public class Invoice {
         public String countryName() {
             return Country.fromIso3(countryCode).display().orElse(countryCode);
         }
+
+        public String fullName() {
+            return "%s %s".formatted(firstName, lastName);
+        }
     }
 
     // TODO, store the vatRegulationState

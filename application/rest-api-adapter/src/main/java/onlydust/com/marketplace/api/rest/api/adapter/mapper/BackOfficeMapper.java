@@ -274,6 +274,38 @@ public interface BackOfficeMapper {
                 .downloadUrl(URI.create("%s/bo/v1/external/invoices/%s?token=%s".formatted(baseUri, invoice.id().value(), token)));
     }
 
+    static InvoicePageV2 mapInvoicePageV2ToContract(final Page<Invoice> page, final int pageIndex, final String baseUri, final String token) {
+        return new InvoicePageV2()
+                .invoices(page.getContent().stream().map(i -> mapInvoiceV2(i, baseUri, token)).toList())
+                .totalPageNumber(page.getTotalPageNumber())
+                .totalItemNumber(page.getTotalItemNumber())
+                .hasMore(hasMore(pageIndex, page.getTotalPageNumber()))
+                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPageNumber()));
+    }
+
+    @SneakyThrows
+    static InvoicePageItemV2 mapInvoiceV2(final Invoice invoice, final String baseUri, final String token) {
+        return new InvoicePageItemV2()
+                .id(invoice.id().value())
+                .status(mapInvoiceInternalStatus(invoice.status()))
+                .createdAt(invoice.createdAt())
+                .billingProfile(new BillingProfileResponse()
+                        .id(invoice.billingProfileId().value())
+                        .type(invoice.companyInfo().isPresent() ? BillingProfileType.COMPANY : BillingProfileType.INDIVIDUAL)
+                        .name(invoice.companyInfo().map(Invoice.CompanyInfo::name).orElse(invoice.personalInfo().map(Invoice.PersonalInfo::fullName).orElse(null)))
+                        .admins(null) //TODO: add admins when implementing the new version for pennylane
+                )
+                .rewardCount(invoice.rewards().size())
+                .totalEquivalent(new MoneyResponse()
+                        .amount(invoice.totalAfterTax().getValue())
+                        .currency(mapCurrencyResponse(invoice.totalAfterTax().getCurrency()))
+                )
+                .totalPerCurrency(invoice.rewards().stream().map(reward -> new MoneyResponse()
+                        .amount(reward.amount().getValue())
+                        .currency(mapCurrencyResponse(reward.amount().getCurrency()))
+                ).toList());
+    }
+
     static InvoiceStatus mapInvoiceStatus(final Invoice.Status status) {
         return switch (status) {
             case DRAFT -> throw internalServerError("Unknown invoice status: %s".formatted(status));
@@ -374,6 +406,7 @@ public interface BackOfficeMapper {
                 .tokens(currency.erc20().stream().map(BackOfficeMapper::mapToken).toList())
                 ;
     }
+
 
     @NonNull
     private static Token mapToken(ERC20 token) {
