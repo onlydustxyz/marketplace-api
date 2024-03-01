@@ -338,10 +338,10 @@ public interface BackOfficeMapper {
                         .currencyName(invoice.totalAfterTax().getCurrency().name())
                         .currencyLogoUrl(invoice.totalAfterTax().getCurrency().logoUri().map(URI::toString).orElse(null))
                 )
-                .rewardsPerNetwork(mapInvoiceRewardsPerNetworks(rewards));
+                .rewardsPerNetwork(mapInvoiceRewardsPerNetworks(invoice, rewards));
     }
 
-    static List<InvoiceRewardsPerNetwork> mapInvoiceRewardsPerNetworks(final List<RewardView> rewards) {
+    static List<InvoiceRewardsPerNetwork> mapInvoiceRewardsPerNetworks(final Invoice invoice, final List<RewardView> rewards) {
         final Map<Network, List<RewardView>> rewardsPerNetworks = rewards.stream().collect(groupingBy(RewardView::network));
 
         return rewardsPerNetworks.entrySet().stream().map(e -> {
@@ -350,6 +350,11 @@ public interface BackOfficeMapper {
 
                     return new InvoiceRewardsPerNetwork()
                             .network(mapNetwork(e.getKey()))
+                            .billingAccountNumber(invoice.wallets().stream()
+                                    .filter(w -> w.network() == e.getKey())
+                                    .findFirst()
+                                    .map(Invoice.Wallet::address)
+                                    .orElse(null))
                             .dollarsEquivalent(totalEquivalent)
                             .rewards(e.getValue().stream().map(reward ->
                                     new RewardResponse()

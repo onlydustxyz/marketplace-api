@@ -293,6 +293,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "rewardsPerNetwork": [
                             {
                               "network": "ETHEREUM",
+                              "billingAccountNumber": "vitalik.eth",
                               "dollarsEquivalent": 1010.00,
                               "rewards": [
                                 {
