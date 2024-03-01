@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.accounting.domain.model.Receipt;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.project.domain.view.ReceiptView;
 import org.hibernate.annotations.Type;
@@ -32,6 +33,17 @@ public class ReceiptEntity {
     @NonNull String thirdPartyName;
     @NonNull String thirdPartyAccountNumber;
     @NonNull String transactionReference;
+
+    public static ReceiptEntity of(Receipt receipt) {
+        return new ReceiptEntity(
+                receipt.id().value(),
+                Date.from(receipt.createdAt().toInstant()),
+                NetworkEnumEntity.of(receipt.network()),
+                receipt.thirdPartyName(),
+                receipt.thirdPartyAccountNumber(),
+                receipt.reference()
+        );
+    }
 
     public ReceiptView toDomain() {
         return ReceiptView.builder()
