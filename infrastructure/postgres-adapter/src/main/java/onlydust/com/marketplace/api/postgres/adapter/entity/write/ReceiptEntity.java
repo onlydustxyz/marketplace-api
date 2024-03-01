@@ -18,11 +18,12 @@ import java.util.UUID;
 @Table(name = "receipts", schema = "accounting")
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Accessors(fluent = true, chain = true)
 @TypeDef(name = "network", typeClass = PostgreSQLEnumType.class)
 public class ReceiptEntity {
     @Id
+    @EqualsAndHashCode.Include
     @NonNull UUID id;
     @NonNull Date createdAt;
 

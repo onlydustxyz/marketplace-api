@@ -61,7 +61,6 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .jsonPath("$.rewards[0].id").isEqualTo("2ac80cc6-7e83-4eef-bc0c-932b58f683c0")
                 .jsonPath("$.rewards[0].status").isEqualTo("PENDING_CONTRIBUTOR")
                 .jsonPath("$.rewards[0].amount.currency").isEqualTo("APT")

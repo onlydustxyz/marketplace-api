@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
@@ -103,13 +104,13 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
         rewardRepository.save(rewardRepository.findById(rewardId).orElseThrow()
                 .amount(BigDecimal.valueOf(100))
                 .currency(currencyRepository.findByCode("STRK").orElseThrow())
-                .receipt(new ReceiptEntity(
+                .receipts(Set.of(new ReceiptEntity(
                         UUID.randomUUID(),
                         new SimpleDateFormat("yyyy-MM-dd").parse("2023-09-20"),
                         NetworkEnumEntity.starknet,
                         "AnthonyBuisset",
                         "abuisset.stark",
-                        "0x038398d0db52b3e9b4361acc57c8d03c898be857833265b4ed6ce0c43635e5a4"))
+                        "0x038398d0db52b3e9b4361acc57c8d03c898be857833265b4ed6ce0c43635e5a4")))
         );
 
         rewardStatusRepository.save(rewardStatusRepository.findById(rewardId).orElseThrow()

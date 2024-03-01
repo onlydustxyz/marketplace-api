@@ -16,6 +16,7 @@ import onlydust.com.marketplace.project.domain.view.UserRewardView;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Set;
 import java.util.UUID;
 
 @Value
@@ -45,8 +46,14 @@ public class RewardViewEntity {
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
     @NonNull RewardStatusDataEntity statusData;
-    @ManyToOne
-    ReceiptEntity receipt;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "rewards_receipts",
+            schema = "accounting",
+            joinColumns = @JoinColumn(name = "reward_id"),
+            inverseJoinColumns = @JoinColumn(name = "receipt_id"))
+    Set<ReceiptEntity> receipts = Set.of();
 
     public RewardDetailsView toDomain() {
         return RewardDetailsView.builder()
@@ -69,7 +76,7 @@ public class RewardViewEntity {
                         .githubAvatarUrl(requestorAvatarUrl)
                         .build())
                 .project(project.toDomain())
-                .receipt(receipt == null ? null : receipt.toDomain())
+                .receipt(receipts.stream().findFirst().map(ReceiptEntity::toDomain).orElse(null))
                 .build();
     }
 

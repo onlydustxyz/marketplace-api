@@ -16,8 +16,12 @@ CREATE TRIGGER accounting_receipts_set_tech_updated_at
     FOR EACH ROW
 EXECUTE PROCEDURE set_tech_updated_at();
 
-ALTER TABLE rewards
-    ADD COLUMN receipt_id UUID REFERENCES accounting.receipts (id);
+CREATE TABLE accounting.rewards_receipts
+(
+    reward_id  UUID NOT NULL REFERENCES rewards (id),
+    receipt_id UUID NOT NULL REFERENCES accounting.receipts (id),
+    PRIMARY KEY (reward_id, receipt_id)
+);
 
 INSERT INTO accounting.receipts (id, created_at, network, third_party_account_number, third_party_name, transaction_reference)
 SELECT p.id,
@@ -43,7 +47,6 @@ FROM payments p
          LEFT JOIN iam.users u on u.github_user_id = pr.recipient_id
 WHERE p.receipt -> 'Sepa' IS NOT NULL;
 
-UPDATE rewards r
-SET receipt_id = p.id
-FROM payments p
-WHERE p.request_id = r.id;
+INSERT INTO accounting.rewards_receipts (reward_id, receipt_id)
+SELECT request_id, id
+FROM payments;
