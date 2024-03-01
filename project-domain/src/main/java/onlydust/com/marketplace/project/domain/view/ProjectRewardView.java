@@ -37,10 +37,6 @@ public class ProjectRewardView {
         pendingSignup, processing, complete, locked, pendingContributor
     }
 
-    public enum SortBy {
-        requestedAt, status, contribution, amount
-    }
-
     @Builder
     @Data
     public static class Filters {

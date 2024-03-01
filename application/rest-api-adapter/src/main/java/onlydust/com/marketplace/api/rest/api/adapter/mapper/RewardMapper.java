@@ -5,8 +5,10 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
+import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.view.*;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -184,4 +186,15 @@ public interface RewardMapper {
                 .authorLogin(view.getAuthorLogin())
                 .githubBody(view.getGithubBody());
     }
+
+    static Reward.SortBy getSortBy(String sort) {
+        sort = Objects.isNull(sort) ? "" : sort;
+        return switch (sort) {
+            case "STATUS" -> Reward.SortBy.STATUS;
+            case "AMOUNT" -> Reward.SortBy.AMOUNT;
+            case "CONTRIBUTION" -> Reward.SortBy.CONTRIBUTION;
+            default -> Reward.SortBy.REQUESTED_AT;
+        };
+    }
+
 }

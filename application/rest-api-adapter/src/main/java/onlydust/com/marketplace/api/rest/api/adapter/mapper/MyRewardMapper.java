@@ -1,18 +1,17 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.view.UserRewardTotalAmountsView;
 import onlydust.com.marketplace.project.domain.view.UserRewardView;
 import onlydust.com.marketplace.project.domain.view.UserRewardsPageView;
 import onlydust.com.marketplace.project.domain.view.UserTotalRewardView;
-import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 
 import java.util.List;
-import java.util.Objects;
 
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapCurrency;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectRewardMapper.mapMoney;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 
 public interface MyRewardMapper {
 
@@ -60,18 +59,6 @@ public interface MyRewardMapper {
                 .dollarsEquivalent(view.getAmount().getDollarsEquivalent())
                 .total(view.getAmount().getTotal());
     }
-
-
-    static UserRewardView.SortBy getSortBy(String sort) {
-        sort = Objects.isNull(sort) ? "" : sort;
-        return switch (sort) {
-            case "STATUS" -> UserRewardView.SortBy.status;
-            case "AMOUNT" -> UserRewardView.SortBy.amount;
-            case "CONTRIBUTION" -> UserRewardView.SortBy.contribution;
-            default -> UserRewardView.SortBy.requestedAt;
-        };
-    }
-
 
     static RewardTotalAmountsResponse mapUserRewardTotalAmountsToResponse(final UserRewardTotalAmountsView view) {
         final RewardTotalAmountsResponse myRewardTotalAmountsResponse = new RewardTotalAmountsResponse();

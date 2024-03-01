@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.port.input;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
+import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.model.UserProfile;
 import onlydust.com.marketplace.project.domain.view.*;
@@ -35,9 +36,9 @@ public interface UserFacadePort {
 
     void applyOnProject(UUID id, UUID projectId);
 
-    UserRewardsPageView getRewardsForUserId(UUID userId, UserRewardView.Filters filters,
+    UserRewardsPageView getRewardsForUserId(Long githubUserId, UserRewardView.Filters filters,
                                             int pageIndex, int sanitizedPageSize,
-                                            UserRewardView.SortBy sortBy, SortDirection sortDirection);
+                                            Reward.SortBy sortBy, SortDirection sortDirection);
 
     RewardDetailsView getRewardByIdForRecipientId(UUID rewardId, Long recipientId);
 

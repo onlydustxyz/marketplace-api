@@ -33,4 +33,8 @@ public record Reward(
             PULL_REQUEST, ISSUE, CODE_REVIEW
         }
     }
+
+    public enum SortBy {
+        REQUESTED_AT, STATUS, CONTRIBUTION, AMOUNT
+    }
 }

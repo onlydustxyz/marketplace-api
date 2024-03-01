@@ -38,8 +38,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MyRewardMapper.getSortBy;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MyRewardMapper.mapMyRewardsToResponse;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.getSortBy;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
@@ -123,7 +123,7 @@ public class MeRestApi implements MeApi {
                 .to(isNull(toDate) ? null : DateMapper.parse(toDate))
                 .build();
 
-        final var page = userFacadePort.getRewardsForUserId(authenticatedUser.getId(), filters, sanitizedPageIndex,
+        final var page = userFacadePort.getRewardsForUserId(authenticatedUser.getGithubUserId(), filters, sanitizedPageIndex,
                 sanitizedPageSize, sortBy, SortDirectionMapper.requestToDomain(direction));
 
         final var myRewardsPageResponse = mapMyRewardsToResponse(sanitizedPageIndex, page);

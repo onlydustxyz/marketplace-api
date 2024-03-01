@@ -34,10 +34,6 @@ public class UserRewardView {
         BigDecimal dollarsEquivalent;
     }
 
-    public enum SortBy {
-        requestedAt, status, contribution, amount
-    }
-
     @Data
     @Builder
     public static class Filters {
