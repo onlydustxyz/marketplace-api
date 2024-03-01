@@ -35,7 +35,7 @@ public class WebSecurityAdapter extends WebSecurityConfigurerAdapter {
                 .and().csrf().disable()
                 .authorizeRequests()
 
-                .antMatchers("/bo/v1/external/**").hasAuthority(UserRole.UNSAFE_INTERNAL_SERVICE.name())
+                .antMatchers("/bo/v1/external/**").hasAnyAuthority(UserRole.UNSAFE_INTERNAL_SERVICE.name(), BO_READER.name())
                 .antMatchers(HttpMethod.GET, "/bo/v1/**").hasAnyAuthority(UserRole.INTERNAL_SERVICE.name(), BO_READER.name())
                 .antMatchers(HttpMethod.OPTIONS, "/bo/v1/**").hasAnyAuthority(UserRole.INTERNAL_SERVICE.name(), BO_READER.name())
                 .antMatchers(HttpMethod.HEAD, "/bo/v1/**").hasAnyAuthority(UserRole.INTERNAL_SERVICE.name(), BO_READER.name())
