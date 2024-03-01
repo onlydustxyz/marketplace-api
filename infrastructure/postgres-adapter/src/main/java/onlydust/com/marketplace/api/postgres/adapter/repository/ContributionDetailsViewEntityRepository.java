@@ -144,14 +144,14 @@ public interface ContributionDetailsViewEntityRepository extends JpaRepository<C
                 ) AS reviewed_pull_requests ON TRUE
                 LEFT JOIN LATERAL (
                     SELECT 
-                        jsonb_agg(pr.id) as ids
+                        jsonb_agg(r.id) as ids
                     FROM
-                        payment_requests pr
-                    JOIN work_items wi ON wi.payment_id = pr.id 
+                        rewards r
+                    JOIN reward_items ri ON ri.reward_id = r.id 
                     WHERE
-                        wi.id = COALESCE(CAST(c.pull_request_id AS TEXT), CAST(c.issue_id AS TEXT), c.code_review_id) AND
-                        c.contributor_id = pr.recipient_id AND
-                        pr.project_id = p.project_id
+                        ri.id = COALESCE(CAST(c.pull_request_id AS TEXT), CAST(c.issue_id AS TEXT), c.code_review_id) AND
+                        c.contributor_id = r.recipient_id AND
+                        r.project_id = p.project_id
                 ) AS rewards ON TRUE
                 WHERE 
                     c.id = :contributionId AND
