@@ -24,11 +24,11 @@ SELECT p.id,
        processed_at,
        'ethereum'::accounting.network,
        coalesce(p.receipt #>> '{Ethereum, recipient_address}', p.receipt #>> '{Ethereum, recipient_ens}'),
-       u.github_login,
+       coalesce(u.github_login, CAST(pr.recipient_id AS TEXT)),
        p.receipt #>> '{Ethereum, transaction_hash}'
 FROM payments p
          JOIN payment_requests pr on pr.id = p.request_id
-         JOIN iam.users u on u.github_user_id = pr.recipient_id
+         LEFT JOIN iam.users u on u.github_user_id = pr.recipient_id
 WHERE p.receipt -> 'Ethereum' IS NOT NULL;
 
 INSERT INTO accounting.receipts (id, created_at, network, third_party_account_number, third_party_name, transaction_reference)
@@ -36,11 +36,11 @@ SELECT p.id,
        processed_at,
        'sepa'::accounting.network,
        p.receipt #>> '{Sepa, recipient_iban}',
-       u.github_login,
+       coalesce(u.github_login, CAST(pr.recipient_id AS TEXT)),
        p.receipt #>> '{Sepa, transaction_reference}'
 FROM payments p
          JOIN payment_requests pr on pr.id = p.request_id
-         JOIN iam.users u on u.github_user_id = pr.recipient_id
+         LEFT JOIN iam.users u on u.github_user_id = pr.recipient_id
 WHERE p.receipt -> 'Sepa' IS NOT NULL;
 
 UPDATE rewards r
