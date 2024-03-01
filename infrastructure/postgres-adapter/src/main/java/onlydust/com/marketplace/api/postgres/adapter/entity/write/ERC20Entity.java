@@ -7,7 +7,8 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
-import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmContractAddress;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -55,7 +56,11 @@ public class ERC20Entity {
     public ERC20 toDomain() {
         return new ERC20(
                 blockchain.toBlockchain(),
-                Ethereum.contractAddress(address),
+                switch (blockchain.toBlockchain()) {
+                    case ETHEREUM, OPTIMISM -> Ethereum.contractAddress(address);
+                    case STARKNET -> StarkNet.contractAddress(address);
+                    default -> throw new IllegalStateException("Unexpected value: " + blockchain.toBlockchain());
+                },
                 name,
                 symbol,
                 decimals,
@@ -71,7 +76,7 @@ public class ERC20Entity {
         final @NonNull NetworkEnumEntity blockchain;
         final @NonNull String address;
 
-        public static PrimaryKey of(Blockchain blockchain, ContractAddress address) {
+        public static PrimaryKey of(Blockchain blockchain, EvmContractAddress address) {
             return new PrimaryKey(NetworkEnumEntity.of(blockchain), address.toString());
         }
     }

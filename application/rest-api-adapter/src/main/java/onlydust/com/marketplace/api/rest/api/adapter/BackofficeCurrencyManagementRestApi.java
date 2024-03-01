@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
+import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,9 +35,17 @@ public class BackofficeCurrencyManagementRestApi implements BackofficeCurrencyMa
     public ResponseEntity<CurrencyResponse> createCurrency(CurrencyCreateRequest request) {
         check(request);
         final var currency = switch (request.getType()) {
-            case CRYPTO -> request.getStandard() == null
-                    ? currencyFacadePort.addNativeCryptocurrencySupport(Currency.Code.of(request.getCode()), request.getDecimals())
-                    : currencyFacadePort.addERC20Support(mapBlockchain(request.getBlockchain()), Ethereum.contractAddress(request.getAddress()));
+            case CRYPTO -> {
+                if (request.getStandard() == null)
+                    yield currencyFacadePort.addNativeCryptocurrencySupport(Currency.Code.of(request.getCode()), request.getDecimals());
+
+                final var blockchain = mapBlockchain(request.getBlockchain());
+                yield switch (blockchain) {
+                    case ETHEREUM, OPTIMISM -> currencyFacadePort.addERC20Support(blockchain, Ethereum.contractAddress(request.getAddress()));
+                    case STARKNET -> currencyFacadePort.addERC20Support(blockchain, StarkNet.contractAddress(request.getAddress()));
+                    default -> throw badRequest("Standard %s is not supported for blockchain %s".formatted(request.getStandard(), request.getBlockchain()));
+                };
+            }
 
             case FIAT -> currencyFacadePort.addIsoCurrencySupport(Currency.Code.of(request.getCode()), request.getDescription(), request.getLogoUrl());
         };

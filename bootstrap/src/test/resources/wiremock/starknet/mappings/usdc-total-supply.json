@@ -6,14 +6,15 @@
             {
                 "equalToJson": {
                     "jsonrpc": "2.0",
-                    "method": "eth_call",
-                    "params": [
-                        {
-                            "to": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
-                            "data": "0x18160ddd"
+                    "method": "starknet_call",
+                    "params": {
+                        "request": {
+                            "contract_address": "0x53c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8",
+                            "entry_point_selector": "0x1557182e4359a1f0c6301278e8f5b35a776ab58d39892581e357578fb287836",
+                            "calldata": []
                         },
-                        "latest"
-                    ]
+                        "block_id": "latest"
+                    }
                 },
                 "ignoreArrayOrder": true,
                 "ignoreExtraElements": true

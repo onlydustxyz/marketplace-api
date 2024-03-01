@@ -12,7 +12,7 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.infrastructure.HttpClient;
-import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmContractAddress;
 
 import java.math.BigDecimal;
 import java.net.URI;
@@ -139,7 +139,7 @@ public class CmcClient extends HttpClient {
         }
 
         @JsonIgnoreProperties(ignoreUnknown = true)
-        public record Platform(@JsonProperty("token_address") ContractAddress tokenAddress) {
+        public record Platform(@JsonProperty("token_address") EvmContractAddress tokenAddress) {
         }
     }
 

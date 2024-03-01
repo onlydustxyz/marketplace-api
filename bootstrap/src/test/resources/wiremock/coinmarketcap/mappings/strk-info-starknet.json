@@ -1,0 +1,15 @@
+{
+    "request": {
+        "url": "/v2/cryptocurrency/info?aux=logo,description&address=0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8",
+        "method": "GET",
+        "headers": {
+            "X-CMC_PRO_API_KEY": {
+                "contains": "CMC_API_KEY"
+            }
+        }
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "body-not-found.json"
+    }
+}

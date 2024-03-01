@@ -5,7 +5,7 @@ import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.accounting.domain.port.out.ERC20Provider;
 import onlydust.com.marketplace.api.infura.InfuraClient;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.Hash;
 import org.web3j.abi.TypeReference;
 import org.web3j.abi.datatypes.Function;
 import org.web3j.abi.datatypes.generated.Uint256;
@@ -23,13 +23,13 @@ import java.util.concurrent.ExecutionException;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
-public class InfuraERC20ProviderAdapter extends InfuraClient implements ERC20Provider {
-    public InfuraERC20ProviderAdapter(final Properties properties) {
+public class EthInfuraERC20ProviderAdapter extends InfuraClient implements ERC20Provider {
+    public EthInfuraERC20ProviderAdapter(final Properties properties) {
         super(properties);
     }
 
     @Override
-    public Optional<ERC20> get(@NonNull final ContractAddress address) {
+    public Optional<ERC20> get(@NonNull final Hash address) {
         try {
             final var contract = ERC20Contract.load(address.toString(), web3j, credentials, gasPriceProvider);
             final var name = contract.nameWithBinaryFallback();
