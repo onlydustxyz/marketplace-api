@@ -54,11 +54,11 @@ public interface BoProjectRepository extends JpaRepository<BoProjectEntity, UUID
                                                   WHERE c2.contributor_id = c.contributor_id
                                                     AND c2.created_at < CURRENT_DATE - INTERVAL '3 months')
                                 GROUP BY pc.project_id) nc ON p.project_id = nc.project_id
-                     LEFT JOIN (SELECT pr.project_id,
-                                       COUNT(DISTINCT pr.recipient_id) AS count_rewarded_contributors
-                                FROM payment_requests pr
-                                WHERE pr.requested_at > CURRENT_DATE - INTERVAL '3 months'
-                                GROUP BY pr.project_id) rc ON p.project_id = rc.project_id
+                     LEFT JOIN (SELECT r.project_id,
+                                       COUNT(DISTINCT r.recipient_id) AS count_rewarded_contributors
+                                FROM rewards r
+                                WHERE r.requested_at > CURRENT_DATE - INTERVAL '3 months'
+                                GROUP BY r.project_id) rc ON p.project_id = rc.project_id
                      LEFT JOIN (SELECT pgr.project_id,
                                        COALESCE(COUNT(*), 0) AS open_issues
                                 FROM indexer_exp.github_issues gi
@@ -73,18 +73,21 @@ public interface BoProjectRepository extends JpaRepository<BoProjectEntity, UUID
                                      projects_contributors pc ON c.contributor_id = pc.github_user_id
                                 WHERE c.created_at > CURRENT_DATE - INTERVAL '3 months'
                                 GROUP BY pc.project_id) tc ON p.project_id = tc.project_id
-                     LEFT JOIN (SELECT pr.project_id,
-                                       SUM(pr.usd_amount) AS total_dollars_sent
-                                FROM payment_requests pr
-                                WHERE pr.requested_at > CURRENT_DATE - INTERVAL '3 months'
-                                  and pr.currency != 'strk'
-                                GROUP BY pr.project_id) das ON p.project_id = das.project_id
-                     LEFT JOIN (SELECT pr.project_id,
-                                       SUM(pr.amount) AS total_strk_sent
-                                FROM payment_requests pr
-                                WHERE pr.requested_at > CURRENT_DATE - INTERVAL '3 months'
-                                  and pr.currency = 'strk'
-                                GROUP BY pr.project_id) sat ON p.project_id = sat.project_id
+                     LEFT JOIN (SELECT r.project_id,
+                                       SUM(rsd.amount_usd_equivalent) AS total_dollars_sent
+                                FROM rewards r
+                                JOIN accounting.reward_status_data rsd on r.id = rsd.reward_id
+                                JOIN currencies c on r.currency_id = c.id
+                                WHERE r.requested_at > CURRENT_DATE - INTERVAL '3 months'
+                                  and c.code != 'STRK'
+                                GROUP BY r.project_id) das ON p.project_id = das.project_id
+                     LEFT JOIN (SELECT r.project_id,
+                                       SUM(r.amount) AS total_strk_sent
+                                FROM rewards r
+                                JOIN currencies c on r.currency_id = c.id
+                                WHERE r.requested_at > CURRENT_DATE - INTERVAL '3 months'
+                                  and c.code = 'STRK'
+                                GROUP BY r.project_id) sat ON p.project_id = sat.project_id
             WHERE (COALESCE(:projectIds) IS NULL OR p.project_id IN (:projectIds))
             ORDER BY p.name
             """, nativeQuery = true)
