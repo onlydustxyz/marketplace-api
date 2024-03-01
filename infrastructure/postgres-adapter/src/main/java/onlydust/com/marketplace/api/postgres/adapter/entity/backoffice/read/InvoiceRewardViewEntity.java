@@ -63,6 +63,7 @@ public class InvoiceRewardViewEntity {
     String currencyName;
     String currencyCode;
     String currencyLogoUrl;
+    String transactionHash;
 
     @Data
     public static class SponsorLinkView {
@@ -107,6 +108,7 @@ public class InvoiceRewardViewEntity {
                         .currencyCode(this.currencyCode)
                         .currencyLogoUrl(this.currencyLogoUrl)
                         .build())
+                .transactionHash(this.transactionHash)
                 .build();
     }
 }

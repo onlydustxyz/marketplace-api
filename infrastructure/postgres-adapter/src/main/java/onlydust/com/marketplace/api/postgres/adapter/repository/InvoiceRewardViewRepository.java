@@ -32,7 +32,14 @@ public interface InvoiceRewardViewRepository extends JpaRepository<InvoiceReward
                        end                                billing_profile_name,
                    c.name                                 currency_name,
                    c.code                                 currency_code,
-                   c.logo_url                             currency_logo_url
+                   c.logo_url                             currency_logo_url,
+                   case
+                        when r.receipt -> 'Ethereum' is not null then r.receipt ->> '{Ethereum, transaction_hash}'
+                        when r.receipt -> 'Optimism' is not null then r.receipt ->> '{Optimism, transaction_hash}'
+                        when r.receipt -> 'Aptos' is not null then r.receipt ->> '{Aptos, transaction_hash}'
+                        when r.receipt -> 'Starknet' is not null then r.receipt ->> '{Starknet, transaction_hash}'
+                        when r.receipt -> 'Sepa' is not null then r.receipt ->> '{Sepa, transaction_reference}'
+                        end                                transaction_hash
             from accounting.invoices i
                      join payment_requests pr on pr.invoice_id = i.id
                      join currencies c on c.code = upper(pr.currency::text)

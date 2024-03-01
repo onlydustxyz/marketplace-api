@@ -210,16 +210,9 @@ public class Invoice {
 
     public record Reward(@NonNull RewardId id, @NonNull ZonedDateTime createdAt, @NonNull String projectName,
                          @NonNull Money amount, @NonNull Money target, Invoice.Id invoiceId) {
+        @Deprecated
         public Network network() {
-            return switch (amount.currency.code().toString()) {
-                case Currency.Code.USD_STR, Currency.Code.EUR_STR -> Network.SEPA;
-                case Currency.Code.APT_STR -> Network.APTOS;
-                case Currency.Code.ETH_STR, Currency.Code.LORDS_STR, Currency.Code.USDC_STR -> Network.ETHEREUM;
-                case Currency.Code.OP_STR -> Network.OPTIMISM;
-                case Currency.Code.STRK_STR -> Network.STARKNET;
-
-                default -> throw new IllegalArgumentException("Currency %s not supported".formatted(amount.currency.code()));
-            };
+            return Network.fromCurrencyCode(amount.currency.code().toString());
         }
     }
 

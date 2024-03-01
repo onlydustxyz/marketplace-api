@@ -44,8 +44,9 @@ public class BackofficeConfiguration {
 
     @Bean
     public BackofficeInvoicingManagementRestApi backofficeInvoicingManagementRestApi(final InvoiceFacadePort invoiceFacadePort,
+                                                                                     final AccountingRewardPort accountingRewardPort,
                                                                                      final QueryParamTokenAuthenticationService.Config apiKeyAuthenticationConfig) {
-        return new BackofficeInvoicingManagementRestApi(invoiceFacadePort, apiKeyAuthenticationConfig);
+        return new BackofficeInvoicingManagementRestApi(invoiceFacadePort, accountingRewardPort, apiKeyAuthenticationConfig);
     }
 
     @Bean

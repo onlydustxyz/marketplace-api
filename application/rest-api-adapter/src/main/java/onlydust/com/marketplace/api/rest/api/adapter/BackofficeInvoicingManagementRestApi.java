@@ -4,11 +4,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeInvoicingManagementApi;
-import onlydust.com.backoffice.api.contract.model.InvoiceInternalStatus;
-import onlydust.com.backoffice.api.contract.model.InvoicePage;
-import onlydust.com.backoffice.api.contract.model.InvoicePageV2;
-import onlydust.com.backoffice.api.contract.model.PatchInvoiceRequest;
+import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
@@ -24,6 +22,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.*;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 
@@ -32,6 +31,7 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 @AllArgsConstructor
 public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicingManagementApi {
     private final InvoiceFacadePort invoiceFacadePort;
+    private final AccountingRewardPort accountingRewardPort;
     private final QueryParamTokenAuthenticationService.Config queryParamTokenAuthenticationConfig;
     final static Integer MAX_PAGE_SIZE = Integer.MAX_VALUE;
     final static List<InvoiceInternalStatus> ALL_STATUSES = List.of(InvoiceInternalStatus.values());
@@ -68,12 +68,21 @@ public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicing
                 sanitizedPageSize
         );
 
-        final var response = mapInvoicePageV2ToContract(page, pageIndex, queryParamTokenAuthenticationConfig.getBaseUrl(),
-                queryParamTokenAuthenticationConfig.getToken());
+        final var response = mapInvoicePageV2ToContract(page, pageIndex);
 
         return page.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
                 ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<InvoiceResponse> getInvoice(UUID invoiceId) {
+        final var invoice = invoiceFacadePort.find(Invoice.Id.of(invoiceId))
+                .orElseThrow(() -> notFound("Invoice %s not found".formatted(invoiceId)));
+
+        final var rewards = accountingRewardPort.findByInvoiceId(Invoice.Id.of(invoiceId));
+        final var response = mapInvoiceToContract(invoice, rewards);
+        return ResponseEntity.ok(response);
     }
 
     @Override

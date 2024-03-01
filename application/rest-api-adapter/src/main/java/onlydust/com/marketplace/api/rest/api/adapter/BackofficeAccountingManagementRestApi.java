@@ -165,7 +165,9 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
     @Override
     public ResponseEntity<SearchRewardsResponse> searchRewards(SearchRewardsRequest searchRewardsRequest) {
-        final List<RewardView> rewardViews = accountingRewardPort.searchForInvoiceIds(searchRewardsRequest.getInvoiceIds());
+        final var invoiceIds = searchRewardsRequest.getInvoiceIds() != null ?
+                searchRewardsRequest.getInvoiceIds().stream().map(Invoice.Id::of).toList() : null;
+        final List<RewardView> rewardViews = accountingRewardPort.searchForApprovedInvoiceIds(invoiceIds);
         return ResponseEntity.ok(SearchRewardMapper.searchRewardToResponse(rewardViews));
     }
 }

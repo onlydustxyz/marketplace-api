@@ -138,6 +138,32 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /bo/v1/invoices/{invoiceId}:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeInvoicingManagement
+      summary: Get invoice
+      operationId: getInvoice
+      description: |
+        Get invoice details
+      parameters:
+        - in: path
+          name: invoiceId
+          required: true
+          schema:
+            $ref: '#/components/schemas/InvoiceId'
+      responses:
+        "200":
+          description: 'Invoice'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
     patch:
       security:
         - apiKey: [ ]
@@ -2107,6 +2133,38 @@ components:
           format: uri
 
 
+    InvoiceResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/InvoiceId'
+        status:
+          $ref: '#/components/schemas/InvoiceInternalStatus'
+        billingProfile:
+          $ref: '#/components/schemas/BillingProfileResponse'
+        createdAt:
+          type: string
+          format: date-time
+        totalEquivalent:
+          $ref: '#/components/schemas/MoneyResponse'
+        rewardsPerNetwork:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceRewardsPerNetwork'
+
+    InvoiceRewardsPerNetwork:
+      type: object
+      properties:
+        network:
+          $ref: '#/components/schemas/TransactionNetwork'
+        dollarsEquivalent:
+          type: number
+        rewards:
+          type: array
+          items:
+            $ref: '#/components/schemas/RewardResponse'
+
+
     InvoicePageV2:
       type: object
       required:
@@ -2154,25 +2212,29 @@ components:
         rewardCount:
           type: integer
         totalEquivalent:
-          $ref: '#/components/schemas/MoneyResponse'
+          $ref: '#/components/schemas/MoneyLinkResponse'
         totalPerCurrency:
           type: array
           items:
-            $ref: '#/components/schemas/MoneyResponse'
+            $ref: '#/components/schemas/MoneyLinkResponse'
 
     MoneyResponse:
       type: object
       description: An amount and its currency
       required:
         - amount
-        - currency
+        - currencyCode
+        - currencyName
+        - currencyLogoUrl
       properties:
         amount:
           type: number
-        dollarsEquivalent:
-          type: number
-        currency:
-          $ref: '#/components/schemas/CurrencyResponse'
+        currencyCode:
+          type: string
+        currencyName:
+          type: string
+        currencyLogoUrl:
+          type: string
 
     MoneyLinkResponse:
       type: object
@@ -2186,6 +2248,8 @@ components:
         amount:
           type: number
         dollarsEquivalent:
+          type: number
+        conversionRate:
           type: number
         currencyCode:
           type: string
@@ -2594,6 +2658,32 @@ components:
         money:
           $ref: '#/components/schemas/MoneyLinkResponse'
 
+    RewardResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/RewardId'
+        requestedAt:
+          type: string
+          format: date-time
+        processedAt:
+          type: string
+          format: date-time
+        githubUrls:
+          type: array
+          items:
+            type: string
+        project:
+          $ref: '#/components/schemas/ProjectLinkResponse'
+        sponsors:
+          type: array
+          items:
+            $ref: '#/components/schemas/SponsorLinkResponse'
+        money:
+          $ref: '#/components/schemas/MoneyLinkResponse'
+        transactionHash:
+          type: string
+
     ProjectLinkResponse:
       type: object
       required:
@@ -2658,7 +2748,7 @@ components:
           format: int64
         totalAmounts:
           items:
-            $ref: '#/components/schemas/MoneyResponse'
+            $ref: '#/components/schemas/MoneyLinkResponse'
 
     BatchPaymentRequest:
       type: object
