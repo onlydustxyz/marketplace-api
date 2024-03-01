@@ -1,10 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IgnoredContributionsRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -1111,8 +1108,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     IgnoredContributionsRepository ignoredContributionsRepository;
-    @Autowired
-    PaymentRequestRepository paymentRequestRepository;
 
     @Test
     @Order(1)
@@ -1294,33 +1289,29 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
         final String jwt = userAuthHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
-        final PaymentRequestEntity reward1 = paymentRequestRepository.findById(UUID.fromString("8fe07ae1-cf3b-4401" +
-                                                                                               "-8958-a9e0b0aec7b0")).orElseThrow();
-        reward1.setCurrency(CurrencyEnumEntity.eth);
-        reward1.setAmount(BigDecimal.valueOf(20.5));
-        reward1.setUsdAmount(BigDecimal.valueOf(31426.5));
-        paymentRequestRepository.save(reward1);
+        final var reward1 = rewardRepository.findById(UUID.fromString("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0")).orElseThrow();
+        reward1.currency(currencyRepository.findByCode("ETH").orElseThrow());
+        reward1.amount(BigDecimal.valueOf(20.5));
+        rewardRepository.save(reward1);
+        rewardStatusRepository.save(rewardStatusRepository.findById(reward1.id()).orElseThrow().amountUsdEquivalent(BigDecimal.valueOf(31426.5)));
 
-        final PaymentRequestEntity reward2 = paymentRequestRepository.findById(UUID.fromString("e1498a17-5090-4071" +
-                                                                                               "-a88a-6f0b0c337c3a")).orElseThrow();
-        reward2.setCurrency(CurrencyEnumEntity.apt);
-        reward2.setAmount(BigDecimal.valueOf(2000));
-        reward2.setUsdAmount(BigDecimal.valueOf(1120));
-        paymentRequestRepository.save(reward2);
+        final var reward2 = rewardRepository.findById(UUID.fromString("e1498a17-5090-4071-a88a-6f0b0c337c3a")).orElseThrow();
+        reward2.currency(currencyRepository.findByCode("APT").orElseThrow());
+        reward2.amount(BigDecimal.valueOf(2000));
+        rewardRepository.save(reward2);
+        rewardStatusRepository.save(rewardStatusRepository.findById(reward2.id()).orElseThrow().amountUsdEquivalent(BigDecimal.valueOf(1120)));
 
-        final PaymentRequestEntity reward3 = paymentRequestRepository.findById(UUID.fromString("40fda3c6-2a3f-4cdd" +
-                                                                                               "-ba12-0499dd232d53")).orElseThrow();
-        reward3.setCurrency(CurrencyEnumEntity.op);
-        reward3.setAmount(BigDecimal.valueOf(450));
-        reward3.setUsdAmount(BigDecimal.valueOf(643.5));
-        paymentRequestRepository.save(reward3);
+        final var reward3 = rewardRepository.findById(UUID.fromString("40fda3c6-2a3f-4cdd-ba12-0499dd232d53")).orElseThrow();
+        reward3.currency(currencyRepository.findByCode("OP").orElseThrow());
+        reward3.amount(BigDecimal.valueOf(450));
+        rewardRepository.save(reward3);
+        rewardStatusRepository.save(rewardStatusRepository.findById(reward3.id()).orElseThrow().amountUsdEquivalent(BigDecimal.valueOf(643.5)));
 
-        final PaymentRequestEntity reward4 = paymentRequestRepository.findById(UUID.fromString("5b96ca1e-4ad2-41c1" +
-                                                                                               "-8819-520b885d9223")).orElseThrow();
-        reward4.setCurrency(CurrencyEnumEntity.strk);
-        reward4.setAmount(BigDecimal.valueOf(500000));
-        reward4.setUsdAmount(null);
-        paymentRequestRepository.save(reward4);
+        final var reward4 = rewardRepository.findById(UUID.fromString("5b96ca1e-4ad2-41c1-8819-520b885d9223")).orElseThrow();
+        reward4.currency(currencyRepository.findByCode("STRK").orElseThrow());
+        reward4.amount(BigDecimal.valueOf(500000));
+        rewardRepository.save(reward4);
+        rewardStatusRepository.save(rewardStatusRepository.findById(reward4.id()).orElseThrow().amountUsdEquivalent(null));
 
         // When
         client.get()
