@@ -3,6 +3,8 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ReceiptEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardStatusRepository;
@@ -101,14 +103,19 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
         rewardRepository.save(rewardRepository.findById(rewardId).orElseThrow()
                 .amount(BigDecimal.valueOf(100))
                 .currency(currencyRepository.findByCode("STRK").orElseThrow())
+                .receipt(new ReceiptEntity(
+                        UUID.randomUUID(),
+                        new SimpleDateFormat("yyyy-MM-dd").parse("2023-09-20"),
+                        NetworkEnumEntity.starknet,
+                        "AnthonyBuisset",
+                        "abuisset.stark",
+                        "0x038398d0db52b3e9b4361acc57c8d03c898be857833265b4ed6ce0c43635e5a4"))
         );
 
         rewardStatusRepository.save(rewardStatusRepository.findById(rewardId).orElseThrow()
                 .amountUsdEquivalent(null)
                 .paidAt(new SimpleDateFormat("yyyy-MM-dd").parse("2023-09-20"))
         );
-
-        // TODO add and check receipt in response
 
         client.get()
                 .uri(getApiURI(String.format(ME_REWARD, rewardId)))
@@ -139,7 +146,14 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                            },
                            "createdAt": "2023-09-19T07:38:22.018458Z",
                            "processedAt": "2023-09-20T00:00:00Z",
-                           "receipt": null
+                           "receipt": {
+                             "type": "CRYPTO",
+                             "iban": null,
+                             "walletAddress": "abuisset.stark",
+                             "ens": null,
+                             "transactionReference": "0x038398d0db52b3e9b4361acc57c8d03c898be857833265b4ed6ce0c43635e5a4",
+                             "transactionReferenceLink": "https://starkscan.co/tx/0x038398d0db52b3e9b4361acc57c8d03c898be857833265b4ed6ce0c43635e5a4"
+                           }
                          }
                          """
                 );

@@ -38,6 +38,9 @@ public class RewardEntity {
     @ManyToOne
     InvoiceEntity invoice;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    ReceiptEntity receipt;
+
     public static RewardEntity of(Reward reward, Currency currency) {
         return RewardEntity.builder()
                 .id(reward.id())

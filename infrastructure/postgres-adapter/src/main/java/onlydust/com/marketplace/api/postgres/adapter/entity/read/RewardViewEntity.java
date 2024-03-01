@@ -4,6 +4,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ReceiptEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
@@ -44,6 +45,8 @@ public class RewardViewEntity {
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
     @NonNull RewardStatusDataEntity statusData;
+    @ManyToOne
+    ReceiptEntity receipt;
 
     public RewardDetailsView toDomain() {
         return RewardDetailsView.builder()
@@ -66,6 +69,7 @@ public class RewardViewEntity {
                         .githubAvatarUrl(requestorAvatarUrl)
                         .build())
                 .project(project.toDomain())
+                .receipt(receipt == null ? null : receipt.toDomain())
                 .build();
     }
 

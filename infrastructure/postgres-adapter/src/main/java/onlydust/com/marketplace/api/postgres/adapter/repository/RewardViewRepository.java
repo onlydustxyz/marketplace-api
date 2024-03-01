@@ -28,7 +28,8 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                    user_avatar_url(r.recipient_id, github_recipient.avatar_url)  AS recipient_avatar_url,
                    github_requestor.id          AS requestor_id,
                    github_requestor.login       AS requestor_login,
-                   user_avatar_url(github_requestor.id, github_requestor.avatar_url)  AS requestor_avatar_url
+                   user_avatar_url(github_requestor.id, github_requestor.avatar_url)  AS requestor_avatar_url,
+                   receipt_id                   AS receipt_id
             from iam.users recipient
                  JOIN rewards r ON r.recipient_id = recipient.github_user_id
                  JOIN accounting.reward_status_data rsd ON rsd.reward_id = r.id
@@ -70,7 +71,8 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                    user_avatar_url(r.recipient_id, github_recipient.avatar_url)  AS recipient_avatar_url,
                    github_requestor.id          AS requestor_id,
                    github_requestor.login       AS requestor_login,
-                   user_avatar_url(github_requestor.id, github_requestor.avatar_url)  AS requestor_avatar_url
+                   user_avatar_url(github_requestor.id, github_requestor.avatar_url)  AS requestor_avatar_url,
+                   receipt_id                   AS receipt_id
             from rewards r
                  JOIN accounting.reward_status_data rsd ON rsd.reward_id = r.id
                  JOIN reward_items ri ON ri.reward_id = r.id
@@ -112,7 +114,8 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                    user_avatar_url(r.recipient_id, github_recipient.avatar_url)  AS recipient_avatar_url,
                    github_requestor.id          AS requestor_id,
                    github_requestor.login       AS requestor_login,
-                   user_avatar_url(github_requestor.id, github_requestor.avatar_url)  AS requestor_avatar_url
+                   user_avatar_url(github_requestor.id, github_requestor.avatar_url)  AS requestor_avatar_url,
+                   receipt_id                   AS receipt_id
             from rewards r
                  JOIN accounting.reward_status_data rsd ON rsd.reward_id = r.id
                  JOIN reward_items ri ON ri.reward_id = r.id
@@ -149,7 +152,8 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                     user_avatar_url(r.recipient_id, github_recipient.avatar_url)  AS recipient_avatar_url,
                     github_requestor.id          AS requestor_id,
                     github_requestor.login       AS requestor_login,
-                    user_avatar_url(github_requestor.id, github_requestor.avatar_url)  AS requestor_avatar_url
+                    user_avatar_url(github_requestor.id, github_requestor.avatar_url)  AS requestor_avatar_url,
+                    receipt_id                   AS receipt_id
             from rewards r 
                   JOIN accounting.reward_status_data rsd ON rsd.reward_id = r.id
                   JOIN accounting.reward_statuses rs ON rs.reward_id = r.id AND rs.status_for_user = 'PENDING_REQUEST'
