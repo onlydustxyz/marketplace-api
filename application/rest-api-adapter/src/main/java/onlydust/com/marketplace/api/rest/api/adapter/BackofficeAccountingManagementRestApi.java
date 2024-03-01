@@ -8,14 +8,18 @@ import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
+import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.SearchRewardMapper;
 import onlydust.com.marketplace.project.domain.model.OldPayRewardRequestCommand;
 import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.*;
@@ -31,6 +35,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     private final CurrencyFacadePort currencyFacadePort;
     private final UserFacadePort userFacadePort;
     private final RewardFacadePort rewardFacadePortV2;
+    private final AccountingRewardPort accountingRewardPort;
 
     @Override
     public ResponseEntity<AccountResponse> createSponsorAccount(UUID sponsorUuid, CreateAccountRequest createAccountRequest) {
@@ -156,5 +161,13 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                 })
                 .build());
         return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<SearchRewardsResponse> searchRewards(SearchRewardsRequest searchRewardsRequest) {
+        final var invoiceIds = searchRewardsRequest.getInvoiceIds() != null ?
+                searchRewardsRequest.getInvoiceIds().stream().map(Invoice.Id::of).toList() : null;
+        final List<RewardView> rewardViews = accountingRewardPort.searchForApprovedInvoiceIds(invoiceIds);
+        return ResponseEntity.ok(SearchRewardMapper.searchRewardToResponse(rewardViews));
     }
 }

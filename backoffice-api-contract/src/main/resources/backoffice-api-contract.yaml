@@ -109,6 +109,14 @@ paths:
           schema:
             type: integer
         - in: query
+          name: invoiceIds
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/InvoiceId'
+          style: form
+        - in: query
           name: statuses
           required: false
           schema:
@@ -130,6 +138,32 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /bo/v1/invoices/{invoiceId}:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeInvoicingManagement
+      summary: Get invoice
+      operationId: getInvoice
+      description: |
+        Get invoice details
+      parameters:
+        - in: path
+          name: invoiceId
+          required: true
+          schema:
+            $ref: '#/components/schemas/InvoiceId'
+      responses:
+        "200":
+          description: 'Invoice'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
     patch:
       security:
         - apiKey: [ ]
@@ -2099,6 +2133,38 @@ components:
           format: uri
 
 
+    InvoiceResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/InvoiceId'
+        status:
+          $ref: '#/components/schemas/InvoiceInternalStatus'
+        billingProfile:
+          $ref: '#/components/schemas/BillingProfileResponse'
+        createdAt:
+          type: string
+          format: date-time
+        totalEquivalent:
+          $ref: '#/components/schemas/MoneyResponse'
+        rewardsPerNetwork:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceRewardsPerNetwork'
+
+    InvoiceRewardsPerNetwork:
+      type: object
+      properties:
+        network:
+          $ref: '#/components/schemas/TransactionNetwork'
+        dollarsEquivalent:
+          type: number
+        rewards:
+          type: array
+          items:
+            $ref: '#/components/schemas/RewardResponse'
+
+
     InvoicePageV2:
       type: object
       required:
@@ -2128,7 +2194,6 @@ components:
         - status
         - internalStatus
         - billingProfile
-        - recipient
         - createdAt
         - totalAmount
         - totalAmountCurrency
@@ -2140,36 +2205,58 @@ components:
         status:
           $ref: '#/components/schemas/InvoiceInternalStatus'
         billingProfile:
-          $ref: '#/components/schemas/BillingProfileShortResponse'
-        recipient:
-          $ref: '#/components/schemas/RecipientResponse'
+          $ref: '#/components/schemas/BillingProfileResponse'
         createdAt:
           type: string
           format: date-time
-        totalAmount:
-          type: number
-        totalAmountCurrency:
-          $ref: '#/components/schemas/Currency'
         rewardCount:
-          type: number
-        amounts:
+          type: integer
+        totalEquivalent:
+          $ref: '#/components/schemas/MoneyLinkResponse'
+        totalPerCurrency:
           type: array
           items:
-            $ref: '#/components/schemas/MoneyResponse'
+            $ref: '#/components/schemas/MoneyLinkResponse'
 
     MoneyResponse:
       type: object
       description: An amount and its currency
       required:
         - amount
-        - currency
+        - currencyCode
+        - currencyName
+        - currencyLogoUrl
+      properties:
+        amount:
+          type: number
+        currencyCode:
+          type: string
+        currencyName:
+          type: string
+        currencyLogoUrl:
+          type: string
+
+    MoneyLinkResponse:
+      type: object
+      description: An amount and its currency
+      required:
+        - amount
+        - currencyCode
+        - currencyName
+        - currencyLogoUrl
       properties:
         amount:
           type: number
         dollarsEquivalent:
           type: number
-        currency:
-          $ref: '#/components/schemas/Currency'
+        conversionRate:
+          type: number
+        currencyCode:
+          type: string
+        currencyName:
+          type: string
+        currencyLogoUrl:
+          type: string
 
     BillingProfileId:
       type: string
@@ -2181,29 +2268,7 @@ components:
       format: uuid
       description: Billing profile ID
 
-    RecipientResponse:
-      type: object
-      required:
-        - id
-        - login
-        - email
-      properties:
-        id:
-          $ref: '#/components/schemas/UserId'
-        login:
-          type: string
-          example: ofux
-        firstName:
-          type: string
-          example: Olivier
-        lastName:
-          type: string
-          example: Fu
-        email:
-          type: string
-          example: olivier@foobar.org
-
-    BillingProfileShortResponse:
+    BillingProfileResponse:
       type: object
       required:
         - id
@@ -2217,6 +2282,28 @@ components:
           example: Apple Inc.
         type:
           $ref: '#/components/schemas/BillingProfileType'
+        admins:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillingProfileAdminResponse'
+
+    BillingProfileAdminResponse:
+      type: object
+      required:
+        - login
+        - email
+      properties:
+        login:
+          type: string
+          example: ofux
+        name:
+          type: string
+          example: Olivier Fuxet
+        email:
+          type: string
+          example: olivier@foobar.org
+        avatarUrl:
+          type: string
 
     BillingProfileType:
       type: string
@@ -2543,16 +2630,19 @@ components:
       type: object
       required:
         - id
-        - recipient
+        - billingProfileAdmin
         - requestedAt
         - githubUrls
         - project
       properties:
         id:
           $ref: '#/components/schemas/RewardId'
-        recipient:
-          $ref: '#/components/schemas/RecipientResponse'
+        billingProfile:
+          $ref: '#/components/schemas/BillingProfileResponse'
         requestedAt:
+          type: string
+          format: date-time
+        processedAt:
           type: string
           format: date-time
         githubUrls:
@@ -2565,8 +2655,34 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SponsorLinkResponse'
-        amount:
-          $ref: '#/components/schemas/MoneyResponse'
+        money:
+          $ref: '#/components/schemas/MoneyLinkResponse'
+
+    RewardResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/RewardId'
+        requestedAt:
+          type: string
+          format: date-time
+        processedAt:
+          type: string
+          format: date-time
+        githubUrls:
+          type: array
+          items:
+            type: string
+        project:
+          $ref: '#/components/schemas/ProjectLinkResponse'
+        sponsors:
+          type: array
+          items:
+            $ref: '#/components/schemas/SponsorLinkResponse'
+        money:
+          $ref: '#/components/schemas/MoneyLinkResponse'
+        transactionHash:
+          type: string
 
     ProjectLinkResponse:
       type: object
@@ -2632,7 +2748,7 @@ components:
           format: int64
         totalAmounts:
           items:
-            $ref: '#/components/schemas/MoneyResponse'
+            $ref: '#/components/schemas/MoneyLinkResponse'
 
     BatchPaymentRequest:
       type: object

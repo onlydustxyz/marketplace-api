@@ -11,6 +11,7 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
 import java.util.List;
+import java.util.Optional;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -19,6 +20,11 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 public class InvoiceService implements InvoiceFacadePort {
     private final @NonNull InvoiceStoragePort invoiceStoragePort;
     private final @NonNull PdfStoragePort pdfStoragePort;
+
+    @Override
+    public Optional<Invoice> find(Invoice.@NonNull Id id) {
+        return invoiceStoragePort.get(id);
+    }
 
     @Override
     public Page<Invoice> findAll(final @NonNull List<Invoice.Id> ids, final @NonNull List<Invoice.Status> statuses, final @NonNull Integer pageIndex,
