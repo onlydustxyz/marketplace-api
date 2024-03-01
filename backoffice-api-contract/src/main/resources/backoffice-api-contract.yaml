@@ -2171,6 +2171,26 @@ components:
         currency:
           $ref: '#/components/schemas/Currency'
 
+    MoneyLinkResponse:
+      type: object
+      description: An amount and its currency
+      required:
+        - amount
+        - currencyCode
+        - currencyName
+        - currencyLogoUrl
+      properties:
+        amount:
+          type: number
+        dollarsEquivalent:
+          type: number
+        currencyCode:
+          type: string
+        currencyName:
+          type: string
+        currencyLogoUrl:
+          type: string
+
     BillingProfileId:
       type: string
       format: uuid
@@ -2202,6 +2222,34 @@ components:
         email:
           type: string
           example: olivier@foobar.org
+
+    BillingProfileAdminResponse:
+      type: object
+      required:
+        - adminLogin
+        - adminEmail
+        - adminAvatarUrl
+        - billingProfileName
+        - billingProfileType
+      properties:
+        adminLogin:
+          type: string
+          example: ofux
+        adminName:
+          type: string
+          example: Olivier Fuxet
+        adminEmail:
+          type: string
+          example: olivier@foobar.org
+        adminAvatarUrl:
+          type: string
+        billingProfileName:
+          type: string
+          example: WAGMI
+        billingProfileType:
+          $ref: '#/components/schemas/BillingProfileType'
+
+
 
     BillingProfileShortResponse:
       type: object
@@ -2543,16 +2591,19 @@ components:
       type: object
       required:
         - id
-        - recipient
+        - billingProfileAdmin
         - requestedAt
         - githubUrls
         - project
       properties:
         id:
           $ref: '#/components/schemas/RewardId'
-        recipient:
-          $ref: '#/components/schemas/RecipientResponse'
+        billingProfileAdmin:
+          $ref: '#/components/schemas/BillingProfileAdminResponse'
         requestedAt:
+          type: string
+          format: date-time
+        processedAt:
           type: string
           format: date-time
         githubUrls:
@@ -2565,8 +2616,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SponsorLinkResponse'
-        amount:
-          $ref: '#/components/schemas/MoneyResponse'
+        money:
+          $ref: '#/components/schemas/MoneyLinkResponse'
 
     ProjectLinkResponse:
       type: object

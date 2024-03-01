@@ -1,21 +1,26 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
+import onlydust.com.marketplace.accounting.domain.view.RewardView;
+import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.InvoiceRewardViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
+import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRewardViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ShortProjectViewEntityRepository;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.output.RewardStoragePort;
-import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
-import onlydust.com.marketplace.api.postgres.adapter.repository.ShortProjectViewEntityRepository;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
-public class PostgresRewardAdapter implements RewardStoragePort {
+public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewardStoragePort {
 
     private final ShortProjectViewEntityRepository shortProjectViewEntityRepository;
+    private final InvoiceRewardViewRepository invoiceRewardViewRepository;
 
     @Override
     public void save(Reward reward) {
@@ -37,6 +42,14 @@ public class PostgresRewardAdapter implements RewardStoragePort {
         return shortProjectViewEntityRepository.listProjectsByRewardRecipient(githubUserId)
                 .stream()
                 .map(ProjectMapper::mapShortProjectViewToProject)
+                .toList();
+    }
+
+    @Override
+    public List<RewardView> searchPayableRewardsForInvoiceIds(List<UUID> invoiceIds) {
+        return invoiceRewardViewRepository.findAllByInvoiceStatusesAndInvoiceIds(List.of("APPROVED"), invoiceIds)
+                .stream()
+                .map(InvoiceRewardViewEntity::toDomain)
                 .toList();
     }
 }
