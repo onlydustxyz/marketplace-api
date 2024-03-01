@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
+import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.InvoiceRewardViewEntity;
+import org.intellij.lang.annotations.Language;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -9,7 +11,8 @@ import java.util.UUID;
 
 public interface InvoiceRewardViewRepository extends JpaRepository<InvoiceRewardViewEntity, UUID> {
 
-    @Query(value = """
+    @Language("PostgreSQL")
+    String SELECT = """
             select pr.id                                  reward_id,
                    pr.amount,
                    pr.requested_at,
@@ -42,7 +45,7 @@ public interface InvoiceRewardViewRepository extends JpaRepository<InvoiceReward
                         end                                transaction_hash
             from accounting.invoices i
                      join payment_requests pr on pr.invoice_id = i.id
-                     join currencies c on c.code = upper(pr.currency::text)
+                     join currencies c on c.code = upper(cast(pr.currency as text))
                      join project_details pd on pr.project_id = pd.project_id
                      left join (select ps2.project_id, json_agg(json_build_object('name', s.name, 'logo_url', s.logo_url)) s_list
                                 from sponsors s
@@ -60,8 +63,18 @@ public interface InvoiceRewardViewRepository extends JpaRepository<InvoiceReward
                                     left join indexer_exp.github_code_reviews gcr on gcr.id = wi.id
                                     left join indexer_exp.github_issues gi on cast(gi.id as text) = wi.id
                            group by wi.payment_id) g_urls on g_urls.payment_id = pr.id
-            where (coalesce(:invoiceStatuses) is null or i.status in (:invoiceStatuses))
+                           
+            """;
+
+    @Query(value = SELECT + """
+            where (coalesce(:invoiceStatuses) is null or cast(i.status as text) in (:invoiceStatuses))
             and (coalesce(:invoiceIds) is null or i.id in (:invoiceIds))
             """, nativeQuery = true)
-    List<InvoiceRewardViewEntity> findAllByInvoiceStatusesAndInvoiceIds(final List<String> invoiceStatuses, final List<UUID> invoiceIds);
+    List<InvoiceRewardViewEntity> findAllByInvoiceStatusesAndInvoiceIds(List<String> invoiceStatuses, List<UUID> invoiceIds);
+
+    @Query(value = SELECT + """
+            where i.id = :invoiceId
+            """, nativeQuery = true)
+    List<InvoiceRewardViewEntity> findAllByInvoiceId(@NonNull UUID invoiceId);
+
 }

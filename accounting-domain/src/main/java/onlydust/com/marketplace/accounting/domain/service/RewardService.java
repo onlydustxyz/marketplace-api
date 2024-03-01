@@ -20,6 +20,6 @@ public class RewardService implements AccountingRewardPort {
 
     @Override
     public List<RewardView> findByInvoiceId(Invoice.Id invoiceId) {
-        return accountingRewardStoragePort.searchRewards(null, List.of(invoiceId));
+        return accountingRewardStoragePort.getInvoiceRewards(invoiceId);
     }
 }
