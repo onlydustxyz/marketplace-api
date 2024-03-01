@@ -133,6 +133,234 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     }
 
     @Test
+    void should_list_invoices_v2() {
+        client
+                .get()
+                .uri(getApiURI(V2_INVOICES, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10",
+                        "invoiceIds", invoices.stream().map(InvoiceEntity::id).map(UUID::toString).collect(Collectors.joining(",")))))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.invoices[?(@.createdAt empty true)]").isEmpty()
+                .jsonPath("$.invoices[?(@.billingProfile.id empty true)]").isEmpty()
+                .jsonPath("$.invoices[?(@.billingProfile.name empty true)]").isEmpty()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 3,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "invoices": [
+                            {
+                              "id": "3fcd930b-b84d-4ce5-82cd-eca91b8a7553",
+                              "status": "TO_REVIEW",
+                              "billingProfile": {
+                                "type": "INDIVIDUAL",
+                                "admins": null
+                              },
+                              "rewardCount": 3,
+                              "totalEquivalent": {
+                                "amount": 4765.00,
+                                "dollarsEquivalent": 4765.00,
+                                "currency": {
+                                  "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                  "code": "USD",
+                                  "name": "US Dollar",
+                                  "logoUrl": null,
+                                  "type": "FIAT",
+                                  "tokens": [],
+                                  "decimals": 2,
+                                  "description": null
+                                }
+                              },
+                              "totalPerCurrency": [
+                                {
+                                  "amount": 3250,
+                                  "dollarsEquivalent": 3250,
+                                  "currency": {
+                                    "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                    "code": "USD",
+                                    "name": "US Dollar",
+                                    "logoUrl": null,
+                                    "type": "FIAT",
+                                    "tokens": [],
+                                    "decimals": 2,
+                                    "description": null
+                                  }
+                                },
+                                {
+                                  "amount": 1000,
+                                  "dollarsEquivalent": 1010.00,
+                                  "currency": {
+                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                    "code": "USDC",
+                                    "name": "USD Coin",
+                                    "logoUrl": null,
+                                    "type": "CRYPTO",
+                                    "tokens": [
+                                      {
+                                        "blockchain": "ETHEREUM",
+                                        "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                                        "decimals": 6,
+                                        "symbol": "USDC",
+                                        "name": "USD Coin"
+                                      }
+                                    ],
+                                    "decimals": 6,
+                                    "description": null
+                                  }
+                                },
+                                {
+                                  "amount": 500,
+                                  "dollarsEquivalent": 505.00,
+                                  "currency": {
+                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                    "code": "USDC",
+                                    "name": "USD Coin",
+                                    "logoUrl": null,
+                                    "type": "CRYPTO",
+                                    "tokens": [
+                                      {
+                                        "blockchain": "ETHEREUM",
+                                        "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                                        "decimals": 6,
+                                        "symbol": "USDC",
+                                        "name": "USD Coin"
+                                      }
+                                    ],
+                                    "decimals": 6,
+                                    "description": null
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "id": "51d37fff-ed4c-474a-b846-af18edda6b8a",
+                              "status": "TO_REVIEW",
+                              "billingProfile": {
+                                "type": "INDIVIDUAL",
+                                "admins": null
+                              },
+                              "rewardCount": 2,
+                              "totalEquivalent": {
+                                "amount": 2777.50,
+                                "dollarsEquivalent": 2777.50,
+                                "currency": {
+                                  "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                  "code": "USD",
+                                  "name": "US Dollar",
+                                  "logoUrl": null,
+                                  "type": "FIAT",
+                                  "tokens": [],
+                                  "decimals": 2,
+                                  "description": null
+                                }
+                              },
+                              "totalPerCurrency": [
+                                {
+                                  "amount": 1000,
+                                  "dollarsEquivalent": 1010.00,
+                                  "currency": {
+                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                    "code": "USDC",
+                                    "name": "USD Coin",
+                                    "logoUrl": null,
+                                    "type": "CRYPTO",
+                                    "tokens": [
+                                      {
+                                        "blockchain": "ETHEREUM",
+                                        "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                                        "decimals": 6,
+                                        "symbol": "USDC",
+                                        "name": "USD Coin"
+                                      }
+                                    ],
+                                    "decimals": 6,
+                                    "description": null
+                                  }
+                                },
+                                {
+                                  "amount": 1750,
+                                  "dollarsEquivalent": 1767.50,
+                                  "currency": {
+                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                    "code": "USDC",
+                                    "name": "USD Coin",
+                                    "logoUrl": null,
+                                    "type": "CRYPTO",
+                                    "tokens": [
+                                      {
+                                        "blockchain": "ETHEREUM",
+                                        "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                                        "decimals": 6,
+                                        "symbol": "USDC",
+                                        "name": "USD Coin"
+                                      }
+                                    ],
+                                    "decimals": 6,
+                                    "description": null
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "id": "16ca82f4-4671-4036-8666-ce0930824558",
+                              "status": "TO_REVIEW",
+                              "billingProfile": {
+                                "type": "INDIVIDUAL",
+                                "admins": null
+                              },
+                              "rewardCount": 1,
+                              "totalEquivalent": {
+                                "amount": 1010.00,
+                                "dollarsEquivalent": 1010.00,
+                                "currency": {
+                                  "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                  "code": "USD",
+                                  "name": "US Dollar",
+                                  "logoUrl": null,
+                                  "type": "FIAT",
+                                  "tokens": [],
+                                  "decimals": 2,
+                                  "description": null
+                                }
+                              },
+                              "totalPerCurrency": [
+                                {
+                                  "amount": 1000,
+                                  "dollarsEquivalent": 1010.00,
+                                  "currency": {
+                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                    "code": "USDC",
+                                    "name": "USD Coin",
+                                    "logoUrl": null,
+                                    "type": "CRYPTO",
+                                    "tokens": [
+                                      {
+                                        "blockchain": "ETHEREUM",
+                                        "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                                        "decimals": 6,
+                                        "symbol": "USDC",
+                                        "name": "USD Coin"
+                                      }
+                                    ],
+                                    "decimals": 6,
+                                    "description": null
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                        """)
+        ;
+    }
+
+    @Test
     void should_approve_invoices() {
         client
                 .patch()

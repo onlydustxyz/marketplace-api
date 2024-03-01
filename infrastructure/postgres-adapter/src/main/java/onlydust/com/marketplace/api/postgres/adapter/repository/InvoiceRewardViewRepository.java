@@ -24,6 +24,7 @@ public interface InvoiceRewardViewRepository extends JpaRepository<InvoiceReward
                    pr.currency,
                    g_urls.urls                            github_urls,
                    pr.usd_amount                          dollars_equivalent,
+                   coalesce(ibp.id, cbp.id)               billing_profile_id,
                    ubpt.billing_profile_type,
                    case
                        when ubpt.billing_profile_type = 'INDIVIDUAL' then ibp.first_name || ' ' || ibp.last_name

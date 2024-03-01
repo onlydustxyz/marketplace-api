@@ -1,8 +1,10 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
@@ -52,12 +54,19 @@ public class BackofficeConfiguration {
             final RewardV2Service rewardV2Service,
             final CurrencyFacadePort currencyFacadePort,
             final UserFacadePort userFacadePort,
-            final RewardService rewardService) {
-        return new BackofficeAccountingManagementRestApi(accountingFacadePort, rewardV2Service, currencyFacadePort, userFacadePort, rewardService);
+            final RewardService rewardService,
+            final AccountingRewardPort accountingRewardPort) {
+        return new BackofficeAccountingManagementRestApi(accountingFacadePort, rewardV2Service, currencyFacadePort, userFacadePort, rewardService,
+                accountingRewardPort);
     }
 
     @Bean
     public BackofficeFacadePort backofficeFacadePort(final BackofficeStoragePort backofficeStoragePort) {
         return new BackofficeService(backofficeStoragePort);
+    }
+
+    @Bean
+    public AccountingRewardPort accountingRewardPort(final AccountingRewardStoragePort accountingRewardStoragePort) {
+        return new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort);
     }
 }

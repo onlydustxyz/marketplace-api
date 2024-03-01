@@ -30,17 +30,20 @@ public interface SearchRewardMapper {
                                     .name(shortSponsorView.name())
                                     .avatarUrl(shortSponsorView.logoUrl()))
                             .toList())
-                    .billingProfileAdmin(new BillingProfileAdminResponse()
-                            .billingProfileName(view.billingProfileAdmin().billingProfileName())
-                            .billingProfileType(switch (view.billingProfileAdmin().billingProfileType()) {
+                    .billingProfile(new BillingProfileResponse()
+                            .id(view.billingProfileAdmin().billingProfileId().value())
+                            .type(switch (view.billingProfileAdmin().billingProfileType()) {
                                 case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
                                 case COMPANY, SELF_EMPLOYED -> BillingProfileType.COMPANY;
                             })
-                            .adminName(view.billingProfileAdmin().adminName())
-                            .adminEmail(view.billingProfileAdmin().adminEmail())
-                            .adminLogin(view.billingProfileAdmin().adminGithubLogin())
-                            .adminAvatarUrl(view.billingProfileAdmin().adminGithubAvatarUrl())
-                    ));
+                            .name(view.billingProfileAdmin().billingProfileName())
+                            .admins(List.of(new BillingProfileAdminResponse()
+                                            .name(view.billingProfileAdmin().adminName())
+                                            .email(view.billingProfileAdmin().adminEmail())
+                                            .login(view.billingProfileAdmin().adminGithubLogin())
+                                            .avatarUrl(view.billingProfileAdmin().adminGithubAvatarUrl())
+                                    )
+                            )));
         }
         return searchRewardsResponse;
     }

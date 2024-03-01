@@ -298,11 +298,13 @@ public interface BackOfficeMapper {
                 .rewardCount(invoice.rewards().size())
                 .totalEquivalent(new MoneyResponse()
                         .amount(invoice.totalAfterTax().getValue())
+                        .dollarsEquivalent(invoice.totalAfterTax().getValue())
                         .currency(mapCurrencyResponse(invoice.totalAfterTax().getCurrency()))
                 )
                 .totalPerCurrency(invoice.rewards().stream().map(reward -> new MoneyResponse()
                         .amount(reward.amount().getValue())
                         .currency(mapCurrencyResponse(reward.amount().getCurrency()))
+                        .dollarsEquivalent(reward.target().getValue())
                 ).toList());
     }
 

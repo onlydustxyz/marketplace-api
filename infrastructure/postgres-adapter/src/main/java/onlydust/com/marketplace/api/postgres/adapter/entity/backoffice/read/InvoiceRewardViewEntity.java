@@ -55,6 +55,7 @@ public class InvoiceRewardViewEntity {
     @Enumerated(EnumType.STRING)
     UserBillingProfileTypeEntity.BillingProfileTypeEntity billingProfileType;
     String billingProfileName;
+    UUID billingProfileId;
     @Type(type = "jsonb")
     List<SponsorLinkView> sponsors;
     @Type(type = "jsonb")
@@ -89,6 +90,7 @@ public class InvoiceRewardViewEntity {
                         .adminEmail(this.recipientEmail)
                         .adminName(this.recipientName)
                         .adminGithubAvatarUrl(this.recipientAvatarUrl)
+                        .billingProfileId(BillingProfile.Id.of(this.billingProfileId))
                         .billingProfileName(this.billingProfileName)
                         .billingProfileType(switch (this.billingProfileType) {
                             case INDIVIDUAL -> BillingProfile.Type.INDIVIDUAL;
