@@ -7,7 +7,10 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEcosyst
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
@@ -60,7 +63,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
     private final ContributionViewEntityRepository contributionViewEntityRepository;
     private final HiddenContributorRepository hiddenContributorRepository;
     private final ProjectTagRepository projectTagRepository;
-    private final PaymentRequestRepository paymentRequestRepository;
     private final HistoricalQuoteRepository historicalQuoteRepository;
     private final CurrencyRepository currencyRepository;
     private final RewardViewRepository rewardViewRepository;
@@ -476,20 +478,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
 
     @Override
     public void updateUsdAmount(UUID rewardId) {
-        final var paymentRequest = paymentRequestRepository.findById(rewardId)
-                .orElseThrow(() -> notFound("Payment request %s not found".formatted(rewardId)));
-        final var currency = currencyRepository.findByCode(paymentRequest.getCurrency().toString().toUpperCase())
-                .orElseThrow(() -> notFound("Currency %s not found".formatted(paymentRequest.getCurrency())));
-        final var usd = currencyRepository.findByCode("USD")
-                .orElseThrow(() -> notFound("Currency USD not found"));
-
-        final var usdAmount = historicalQuoteRepository.findFirstByBaseIdAndTargetIdAndTimestampLessThanEqualOrderByTimestampDesc(currency.id(), usd.id(),
-                        paymentRequest.getRequestedAt().toInstant())
-                .orElseThrow(() -> notFound("No usd quote found for %s at %s".formatted(paymentRequest.getCurrency(),
-                        paymentRequest.getRequestedAt())));
-
-        paymentRequest.setUsdAmount(paymentRequest.getAmount().multiply(usdAmount.getPrice()));
-        paymentRequestRepository.save(paymentRequest);
+        // TODO remove
     }
 
     @Override
