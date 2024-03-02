@@ -2157,6 +2157,9 @@ components:
       properties:
         network:
           $ref: '#/components/schemas/TransactionNetwork'
+        billingAccountNumber:
+          type: string
+          description: IBAN, account number, ENS or wallet address
         dollarsEquivalent:
           type: number
         rewards:

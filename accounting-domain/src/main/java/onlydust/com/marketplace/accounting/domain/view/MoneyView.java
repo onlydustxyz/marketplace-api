@@ -9,6 +9,6 @@ import java.math.BigDecimal;
 public record MoneyView(@NonNull BigDecimal amount,
                         @NonNull String currencyName,
                         @NonNull String currencyCode,
-                        @NonNull String currencyLogoUrl,
+                        String currencyLogoUrl,
                         @NonNull BigDecimal dollarsEquivalent) {
 }

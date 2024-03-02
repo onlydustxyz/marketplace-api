@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.RewardView;
@@ -52,6 +53,14 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
                         statuses != null ? statuses.stream().map(Invoice.Status::toString).toList() : null,
                         invoiceIds != null ? invoiceIds.stream().map(Invoice.Id::value).toList() : null
                 )
+                .stream()
+                .map(InvoiceRewardViewEntity::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<RewardView> getInvoiceRewards(@NonNull Invoice.Id invoiceId) {
+        return invoiceRewardViewRepository.findAllByInvoiceId(invoiceId.value())
                 .stream()
                 .map(InvoiceRewardViewEntity::toDomain)
                 .toList();
