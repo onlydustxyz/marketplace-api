@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.RewardView;
 
 import java.util.List;
@@ -15,12 +16,7 @@ public interface SearchRewardMapper {
                     .githubUrls(view.githubUrls())
                     .processedAt(view.processedAt())
                     .requestedAt(view.requestedAt())
-                    .money(new MoneyLinkResponse()
-                            .amount(view.money().amount())
-                            .currencyCode(view.money().currencyCode())
-                            .currencyName(view.money().currencyName())
-                            .currencyLogoUrl(view.money().currencyLogoUrl())
-                            .dollarsEquivalent(view.money().dollarsEquivalent())
+                    .money(moneyViewToResponse(view.money())
                     )
                     .project(new ProjectLinkResponse()
                             .name(view.projectName())
@@ -46,5 +42,14 @@ public interface SearchRewardMapper {
                             )));
         }
         return searchRewardsResponse;
+    }
+
+    static MoneyLinkResponse moneyViewToResponse(final MoneyView view) {
+        return new MoneyLinkResponse()
+                .amount(view.amount())
+                .currencyCode(view.currencyCode())
+                .currencyName(view.currencyName())
+                .currencyLogoUrl(view.currencyLogoUrl())
+                .dollarsEquivalent(view.dollarsEquivalent());
     }
 }

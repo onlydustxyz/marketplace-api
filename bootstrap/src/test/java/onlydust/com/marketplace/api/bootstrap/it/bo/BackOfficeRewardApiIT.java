@@ -202,6 +202,30 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .json(SEARCH_REWARDS_FOR_INVOICE_IDS_RESPONSE_JSON);
     }
 
+    @Test
+    @Order(2)
+    void should_post_batch_payments_given_list_of_invoice_ids() {
+        // When
+        client.post()
+                .uri(getApiURI(POST_REWARDS_BATCH_PAYMENTS))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                            {
+                            "invoiceIds": ["%s","%s","%s","%s"]
+                            }
+                        """.formatted(
+                        invoiceIds.get(0),
+                        invoiceIds.get(1),
+                        invoiceIds.get(2),
+                        invoiceIds.get(3)))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println);
+    }
 
     private final static String SEARCH_REWARDS_FOR_INVOICE_IDS_RESPONSE_JSON = """
             {
