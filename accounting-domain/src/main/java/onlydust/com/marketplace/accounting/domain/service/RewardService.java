@@ -36,7 +36,10 @@ public class RewardService implements AccountingRewardPort {
 
     @Override
     public List<BatchPayment> createBatchPaymentsForInvoices(List<Invoice.Id> invoiceIds) {
-        final List<PayableRewardWithPayoutInfoView> rewardViews = accountingRewardStoragePort.findPayableRewardsWithPayoutInfo(invoiceIds);
+        final List<PayableRewardWithPayoutInfoView> rewardViews = accountingRewardStoragePort.findPayableRewardsWithPayoutInfo(invoiceIds)
+                .stream()
+                .filter(r -> List.of(Currency.Code.STRK_STR, Currency.Code.USDC_STR, Currency.Code.LORDS_STR, Currency.Code.ETH_STR).contains(r.money().currencyCode()))
+                .toList();
         if (rewardViews.isEmpty()) {
             return List.of();
         }

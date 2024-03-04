@@ -11,7 +11,6 @@ import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -35,8 +34,8 @@ public class PayableRewardWithPayoutInfoViewEntity {
     @Enumerated(EnumType.STRING)
     @Type(type = "currency")
     CurrencyEnumEntity currency;
-    String starknetWalletAddress;
-    String ethereumWalletAddress;
+    String starknetAddress;
+    String ethereumAddress;
     BigDecimal dollarsEquivalent;
     BigDecimal amount;
     String currencyName;
@@ -47,11 +46,9 @@ public class PayableRewardWithPayoutInfoViewEntity {
         return PayableRewardWithPayoutInfoView.builder()
                 .id(this.rewardId)
                 .wallet(switch (this.currency) {
-                    case eth -> new Invoice.Wallet(Network.ETHEREUM, this.ethereumWalletAddress);
-                    case strk -> new Invoice.Wallet(Network.STARKNET, this.starknetWalletAddress);
-                    case lords -> new Invoice.Wallet(Network.ETHEREUM, this.ethereumWalletAddress);
-                    case usdc -> new Invoice.Wallet(Network.ETHEREUM, this.ethereumWalletAddress);
-                    default -> throw OnlyDustException.internalServerError("Currency %s not supported".formatted(this.currency.toDomain()));
+                    case eth, lords, usdc -> new Invoice.Wallet(Network.ETHEREUM, this.ethereumAddress);
+                    case strk -> new Invoice.Wallet(Network.STARKNET, this.starknetAddress);
+                    default -> null;
                 })
                 .money(MoneyView.builder()
                         .amount(this.amount)

@@ -98,6 +98,39 @@ public class RewardServiceTest {
                 .build();
         when(accountingRewardStoragePort.findPayableRewardsWithPayoutInfo(invoiceIds))
                 .thenReturn(List.of(
+                        PayableRewardWithPayoutInfoView.builder()
+                                .id(UUID.randomUUID())
+                                .money(MoneyView.builder()
+                                        .amount(BigDecimal.valueOf(1))
+                                        .dollarsEquivalent(BigDecimal.valueOf(1))
+                                        .currencyCode(Currency.Code.USD_STR)
+                                        .currencyLogoUrl("https://usd.logo")
+                                        .currencyName("usd")
+                                        .build())
+                                .wallet(null)
+                                .build(),
+                        PayableRewardWithPayoutInfoView.builder()
+                                .id(UUID.randomUUID())
+                                .money(MoneyView.builder()
+                                        .amount(BigDecimal.valueOf(1))
+                                        .dollarsEquivalent(BigDecimal.valueOf(1))
+                                        .currencyCode(Currency.Code.EUR_STR)
+                                        .currencyLogoUrl("https://eur.logo")
+                                        .currencyName("eur")
+                                        .build())
+                                .wallet(null)
+                                .build(),
+                        PayableRewardWithPayoutInfoView.builder()
+                                .id(UUID.randomUUID())
+                                .money(MoneyView.builder()
+                                        .amount(BigDecimal.valueOf(1))
+                                        .dollarsEquivalent(BigDecimal.valueOf(1))
+                                        .currencyCode(Currency.Code.OP_STR)
+                                        .currencyLogoUrl("https://op.logo")
+                                        .currencyName("OP")
+                                        .build())
+                                .wallet(null)
+                                .build(),
                         strk1,
                         strk2,
                         eth,

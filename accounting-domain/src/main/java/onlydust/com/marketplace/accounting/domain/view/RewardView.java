@@ -12,7 +12,7 @@ import java.util.UUID;
 public record RewardView(@NonNull UUID id,
                          @NonNull ZonedDateTime requestedAt,
                          ZonedDateTime processedAt,
-                         @NonNull List<String> githubUrls,
+                         List<String> githubUrls,
                          @NonNull String projectName,
                          String projectLogoUrl,
                          @NonNull List<ShortSponsorView> sponsors,

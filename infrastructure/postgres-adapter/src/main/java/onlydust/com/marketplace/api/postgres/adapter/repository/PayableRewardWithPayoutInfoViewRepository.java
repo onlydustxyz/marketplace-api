@@ -25,7 +25,7 @@ public interface PayableRewardWithPayoutInfoViewRepository extends JpaRepository
                                  left join wallets eth_w on eth_w.user_id = u.id and eth_w.network = 'ethereum'
                                  left join wallets strk_w on strk_w.user_id = u.id and strk_w.network = 'starknet'
                                  left join payments r on r.request_id = pr.id
-                        where i.id = :invoiceId and r.id is null
+                        where i.id in (:invoiceIds) and r.id is null order by c.code,pr.amount
             """)
     List<PayableRewardWithPayoutInfoViewEntity> findAllByInvoiceIds(final List<UUID> invoiceIds);
 
