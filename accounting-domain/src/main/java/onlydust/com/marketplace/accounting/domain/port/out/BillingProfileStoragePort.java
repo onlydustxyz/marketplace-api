@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.accounting.domain.port.out;
 
+import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
@@ -12,6 +13,7 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface BillingProfileStoragePort {
     boolean oldIsAdmin(UserId userId, BillingProfile.Id billingProfileId);
@@ -42,7 +44,9 @@ public interface BillingProfileStoragePort {
 
     void savePayoutInfoForBillingProfile(PayoutInfo payoutInfo, BillingProfile.Id billingProfileId);
 
-    Page<BillingProfileCoworkerView> findCoworkersByBillingProfile(BillingProfile.Id billingProfileId, int pageIndex, int pageSize);
+    Page<BillingProfileCoworkerView> findCoworkersByBillingProfile(@NonNull BillingProfile.Id billingProfileId, @NonNull Set<BillingProfile.User.Role> roles,
+                                                                   int pageIndex,
+                                                                   int pageSize);
 
     void saveCoworkerInvitation(BillingProfile.Id billingProfileId, UserId invitedBy, GithubUserId invitedUser, BillingProfile.User.Role role,
                                 ZonedDateTime invitedAt);

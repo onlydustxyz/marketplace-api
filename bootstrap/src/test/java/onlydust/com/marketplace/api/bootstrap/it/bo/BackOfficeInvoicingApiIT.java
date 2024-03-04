@@ -282,7 +282,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "status": "TO_REVIEW",
                           "billingProfile": {
                             "type": "INDIVIDUAL",
-                            "admins": null
+                            "admins": []
                           },
                           "totalEquivalent": {
                             "amount": 1010.00,

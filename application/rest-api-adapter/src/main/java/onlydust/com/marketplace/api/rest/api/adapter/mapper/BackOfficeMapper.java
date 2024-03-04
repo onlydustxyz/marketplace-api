@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
@@ -322,7 +323,7 @@ public interface BackOfficeMapper {
     }
 
     @SneakyThrows
-    static InvoiceResponse mapInvoiceToContract(final Invoice invoice, final List<RewardView> rewards) {
+    static InvoiceResponse mapInvoiceToContract(final Invoice invoice, List<BillingProfileCoworkerView> billingProfileAdmins, final List<RewardView> rewards) {
         return new InvoiceResponse()
                 .id(invoice.id().value())
                 .status(mapInvoiceInternalStatus(invoice.status()))
@@ -331,7 +332,13 @@ public interface BackOfficeMapper {
                         .id(invoice.billingProfileId().value())
                         .type(invoice.companyInfo().isPresent() ? BillingProfileType.COMPANY : BillingProfileType.INDIVIDUAL)
                         .name(invoice.companyInfo().map(Invoice.CompanyInfo::name).orElse(invoice.personalInfo().map(Invoice.PersonalInfo::fullName).orElse(null)))
-                        .admins(null) //TODO: add admins when implementing the new version for pennylane
+                        .admins(billingProfileAdmins.stream()
+                                .map(admin -> new BillingProfileAdminResponse()
+                                        .name(admin.login())
+                                        .avatarUrl(admin.avatarUrl())
+                                        .email(admin.email())
+                                ).toList()
+                        )
                 )
                 .totalEquivalent(new MoneyResponse()
                         .amount(invoice.totalAfterTax().getValue())

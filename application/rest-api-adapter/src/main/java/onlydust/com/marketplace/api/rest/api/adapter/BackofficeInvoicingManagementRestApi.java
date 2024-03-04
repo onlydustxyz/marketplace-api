@@ -6,7 +6,9 @@ import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeInvoicingManagementApi;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
+import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.*;
@@ -32,6 +35,7 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicingManagementApi {
     private final InvoiceFacadePort invoiceFacadePort;
     private final AccountingRewardPort accountingRewardPort;
+    private final BillingProfileFacadePort billingProfileFacadePort;
     private final QueryParamTokenAuthenticationService.Config queryParamTokenAuthenticationConfig;
     final static Integer MAX_PAGE_SIZE = Integer.MAX_VALUE;
     final static List<InvoiceInternalStatus> ALL_STATUSES = List.of(InvoiceInternalStatus.values());
@@ -79,9 +83,10 @@ public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicing
     public ResponseEntity<InvoiceResponse> getInvoice(UUID invoiceId) {
         final var invoice = invoiceFacadePort.find(Invoice.Id.of(invoiceId))
                 .orElseThrow(() -> notFound("Invoice %s not found".formatted(invoiceId)));
-
+        final var billingProfileAdmins = billingProfileFacadePort.getCoworkers(invoice.billingProfileId(), Set.of(BillingProfile.User.Role.ADMIN));
         final var rewards = accountingRewardPort.findByInvoiceId(Invoice.Id.of(invoiceId));
-        final var response = mapInvoiceToContract(invoice, rewards);
+
+        final var response = mapInvoiceToContract(invoice, billingProfileAdmins, rewards);
         return ResponseEntity.ok(response);
     }
 

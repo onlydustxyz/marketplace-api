@@ -22,6 +22,7 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static java.time.ZonedDateTime.now;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -198,8 +199,11 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public Page<BillingProfileCoworkerView> findCoworkersByBillingProfile(BillingProfile.Id billingProfileId, int pageIndex, int pageSize) {
+    public Page<BillingProfileCoworkerView> findCoworkersByBillingProfile(@NonNull BillingProfile.Id billingProfileId,
+                                                                          @NonNull Set<BillingProfile.User.Role> roles,
+                                                                          int pageIndex, int pageSize) {
         final var page = billingProfileUserViewRepository.findByBillingProfileId(billingProfileId.value(),
+                roles.stream().map(BillingProfileUserEntity.Role::fromDomain).map(Enum::toString).toList(),
                 PageRequest.of(pageIndex, pageSize, Sort.by("user_id")));
         return Page.<BillingProfileCoworkerView>builder()
                 .content(page.getContent().stream().map(BillingProfileUserViewEntity::toView).toList())

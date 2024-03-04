@@ -19,6 +19,7 @@ public class BillingProfileCoworkerView {
     UserId userId;
     GithubUserId githubUserId;
     String login;
+    String email;
     URI githubHtmlUrl;
     String avatarUrl;
     BillingProfile.User.Role role;

@@ -9,6 +9,8 @@ import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -46,7 +48,11 @@ public abstract class BillingProfile {
 
     public record User(@NonNull UserId id, @NonNull Role role) {
         public enum Role {
-            ADMIN, MEMBER
+            ADMIN, MEMBER;
+
+            public static Set<Role> all() {
+                return EnumSet.allOf(Role.class);
+            }
         }
     }
 }
