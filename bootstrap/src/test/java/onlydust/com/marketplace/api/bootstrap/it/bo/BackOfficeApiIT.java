@@ -1376,7 +1376,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "83612081-949a-47c4-a467-6f28f6adad6d"
                               ],
                               "createdAt": "2023-05-24T09:55:04.729065Z",
-                              "activeContributors": 2,
                               "newContributors": 0,
                               "uniqueRewardedContributors": 0,
                               "openedIssues": 0,
