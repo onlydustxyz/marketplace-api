@@ -2162,11 +2162,20 @@ components:
           description: IBAN, account number, ENS or wallet address
         dollarsEquivalent:
           type: number
+        rewardsPerCurrency:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceRewardsPerCurrency'
+
+    InvoiceRewardsPerCurrency:
+      type: object
+      properties:
+        total:
+          $ref: '#/components/schemas/MoneyLinkResponse'
         rewards:
           type: array
           items:
             $ref: '#/components/schemas/RewardResponse'
-
 
     InvoicePageV2:
       type: object

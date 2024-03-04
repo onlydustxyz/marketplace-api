@@ -295,28 +295,40 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "network": "ETHEREUM",
                               "billingAccountNumber": "vitalik.eth",
                               "dollarsEquivalent": 1010.00,
-                              "rewards": [
+                              "rewardsPerCurrency": [
                                 {
-                                  "id": "061e2c7e-bda4-49a8-9914-2e76926f70c2",
-                                  "requestedAt": "2023-05-15T12:15:54.25529Z",
-                                  "processedAt": "2023-07-27T10:27:14.522708Z",
-                                  "githubUrls": [
-                                    "https://github.com/od-mocks/cool-repo-A/pull/397"
-                                  ],
-                                  "project": {
-                                    "name": "Pizzeria Yoshi !",
-                                    "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png"
-                                  },
-                                  "sponsors": [],
-                                  "money": {
+                                  "total": {
                                     "amount": 1000,
-                                    "dollarsEquivalent": null,
+                                    "dollarsEquivalent": 1010.00,
                                     "conversionRate": null,
                                     "currencyCode": "USDC",
                                     "currencyName": "USD Coin",
                                     "currencyLogoUrl": null
                                   },
-                                  "transactionHash": null
+                                  "rewards": [
+                                    {
+                                      "id": "061e2c7e-bda4-49a8-9914-2e76926f70c2",
+                                      "requestedAt": "2023-05-15T12:15:54.25529Z",
+                                      "processedAt": "2023-07-27T10:27:14.522708Z",
+                                      "githubUrls": [
+                                        "https://github.com/od-mocks/cool-repo-A/pull/397"
+                                      ],
+                                      "project": {
+                                        "name": "Pizzeria Yoshi !",
+                                        "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png"
+                                      },
+                                      "sponsors": [],
+                                      "money": {
+                                        "amount": 1000,
+                                        "dollarsEquivalent": 1010.00,
+                                        "conversionRate": null,
+                                        "currencyCode": "USDC",
+                                        "currencyName": "USD Coin",
+                                        "currencyLogoUrl": null
+                                      },
+                                      "transactionHash": null
+                                    }
+                                  ]
                                 }
                               ]
                             }
