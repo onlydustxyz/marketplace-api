@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
@@ -19,6 +20,7 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.ETHEREUM;
@@ -321,7 +323,7 @@ public interface BackOfficeMapper {
     }
 
     @SneakyThrows
-    static InvoiceResponse mapInvoiceToContract(final Invoice invoice, final List<RewardView> rewards) {
+    static InvoiceResponse mapInvoiceToContract(final Invoice invoice, List<BillingProfileCoworkerView> billingProfileAdmins, final List<RewardView> rewards) {
         return new InvoiceResponse()
                 .id(invoice.id().value())
                 .status(mapInvoiceInternalStatus(invoice.status()))
@@ -330,7 +332,13 @@ public interface BackOfficeMapper {
                         .id(invoice.billingProfileId().value())
                         .type(invoice.companyInfo().isPresent() ? BillingProfileType.COMPANY : BillingProfileType.INDIVIDUAL)
                         .name(invoice.companyInfo().map(Invoice.CompanyInfo::name).orElse(invoice.personalInfo().map(Invoice.PersonalInfo::fullName).orElse(null)))
-                        .admins(null) //TODO: add admins when implementing the new version for pennylane
+                        .admins(billingProfileAdmins.stream()
+                                .map(admin -> new BillingProfileAdminResponse()
+                                        .name(admin.login())
+                                        .avatarUrl(admin.avatarUrl())
+                                        .email(admin.email())
+                                ).toList()
+                        )
                 )
                 .totalEquivalent(new MoneyResponse()
                         .amount(invoice.totalAfterTax().getValue())
@@ -344,42 +352,76 @@ public interface BackOfficeMapper {
     static List<InvoiceRewardsPerNetwork> mapInvoiceRewardsPerNetworks(final Invoice invoice, final List<RewardView> rewards) {
         final Map<Network, List<RewardView>> rewardsPerNetworks = rewards.stream().collect(groupingBy(RewardView::network));
 
-        return rewardsPerNetworks.entrySet().stream().map(e -> {
-                    final var totalEquivalent = e.getValue().stream().map(r -> r.money().dollarsEquivalent()).reduce(BigDecimal::add)
-                            .orElseThrow(() -> internalServerError("No reward found for network %s".formatted(e.getKey())));
+        return rewardsPerNetworks.entrySet().stream()
+                .map(e -> {
+                            final var totalEquivalent = e.getValue().stream().map(r -> r.money().dollarsEquivalent()).reduce(BigDecimal::add)
+                                    .orElseThrow(() -> internalServerError("No reward found for network %s".formatted(e.getKey())));
 
-                    return new InvoiceRewardsPerNetwork()
-                            .network(mapNetwork(e.getKey()))
-                            .billingAccountNumber(invoice.wallets().stream()
-                                    .filter(w -> w.network() == e.getKey())
-                                    .findFirst()
-                                    .map(Invoice.Wallet::address)
-                                    .orElse(null))
-                            .dollarsEquivalent(totalEquivalent)
-                            .rewards(e.getValue().stream().map(reward ->
-                                    new RewardResponse()
-                                            .id(reward.id())
-                                            .requestedAt(reward.requestedAt())
-                                            .processedAt(reward.processedAt())
-                                            .githubUrls(reward.githubUrls())
-                                            .project(new ProjectLinkResponse()
-                                                    .name(reward.projectName())
-                                                    .logoUrl(reward.projectLogoUrl()))
-                                            .sponsors(reward.sponsors().stream().map(sponsor ->
-                                                    new SponsorLinkResponse()
-                                                            .name(sponsor.name())
-                                                            .avatarUrl(sponsor.logoUrl())
-                                            ).toList())
-                                            .money(new MoneyLinkResponse()
-                                                    .amount(reward.money().amount())
-                                                    .currencyCode(reward.money().currencyCode())
-                                                    .currencyName(reward.money().currencyName())
-                                                    .currencyLogoUrl(reward.money().currencyLogoUrl())
+                            return new InvoiceRewardsPerNetwork()
+                                    .network(mapNetwork(e.getKey()))
+                                    .billingAccountNumber(invoice.wallets().stream()
+                                            .filter(w -> w.network() == e.getKey())
+                                            .findFirst()
+                                            .map(Invoice.Wallet::address)
+                                            .orElse(null))
+                                    .dollarsEquivalent(totalEquivalent)
+                                    .rewardsPerCurrency(mapInvoiceRewardsPeCurrencies(e.getValue()));
+                        }
+                )
+                .sorted(comparing(InvoiceRewardsPerNetwork::getNetwork))
+                .toList();
+    }
+
+    static List<InvoiceRewardsPerCurrency> mapInvoiceRewardsPeCurrencies(final List<RewardView> rewards) {
+        final Map<String, List<RewardView>> rewardsPerCurrencyCode = rewards.stream().collect(groupingBy(r -> r.money().currencyCode()));
+
+        return rewardsPerCurrencyCode.entrySet().stream()
+                .map(e -> {
+                            final var currencyCode = e.getKey();
+                            final var currencyName = rewards.stream().findFirst().map(r -> r.money().currencyName()).orElse(null);
+                            final var currencyLogoUrl = rewards.stream().findFirst().map(r -> r.money().currencyLogoUrl()).orElse(null);
+                            final var total = e.getValue().stream().map(r -> r.money().amount()).reduce(BigDecimal::add)
+                                    .orElseThrow(() -> internalServerError("No reward found for currency %s".formatted(e.getKey())));
+                            final var totalEquivalent = e.getValue().stream().map(r -> r.money().dollarsEquivalent()).reduce(BigDecimal::add)
+                                    .orElseThrow(() -> internalServerError("No reward found for currency %s".formatted(e.getKey())));
+
+                            return new InvoiceRewardsPerCurrency()
+                                    .total(new MoneyLinkResponse()
+                                            .amount(total)
+                                            .dollarsEquivalent(totalEquivalent)
+                                            .currencyCode(currencyCode)
+                                            .currencyName(currencyName)
+                                            .currencyLogoUrl(currencyLogoUrl))
+                                    .rewards(e.getValue().stream()
+                                            .map(reward ->
+                                                    new RewardResponse()
+                                                            .id(reward.id())
+                                                            .requestedAt(reward.requestedAt())
+                                                            .processedAt(reward.processedAt())
+                                                            .githubUrls(reward.githubUrls())
+                                                            .project(new ProjectLinkResponse()
+                                                                    .name(reward.projectName())
+                                                                    .logoUrl(reward.projectLogoUrl()))
+                                                            .sponsors(reward.sponsors().stream().map(sponsor ->
+                                                                    new SponsorLinkResponse()
+                                                                            .name(sponsor.name())
+                                                                            .avatarUrl(sponsor.logoUrl())
+                                                            ).toList())
+                                                            .money(new MoneyLinkResponse()
+                                                                    .amount(reward.money().amount())
+                                                                    .dollarsEquivalent(reward.money().dollarsEquivalent())
+                                                                    .currencyCode(reward.money().currencyCode())
+                                                                    .currencyName(reward.money().currencyName())
+                                                                    .currencyLogoUrl(reward.money().currencyLogoUrl())
+                                                            )
+                                                            .transactionHash(reward.transactionHash())
                                             )
-                                            .transactionHash(reward.transactionHash())
-                            ).toList());
-                }
-        ).toList();
+                                            .sorted(comparing(RewardResponse::getRequestedAt))
+                                            .toList());
+                        }
+                )
+                .sorted(comparing(rewardsPerCurrency -> rewardsPerCurrency.getTotal().getCurrencyCode()))
+                .toList();
     }
 
     static InvoiceStatus mapInvoiceStatus(final Invoice.Status status) {

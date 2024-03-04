@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface BillingProfileUserViewRepository extends JpaRepository<BillingProfileUserViewEntity, BillingProfileUserViewEntity.PrimaryKey> {
@@ -16,6 +17,7 @@ public interface BillingProfileUserViewRepository extends JpaRepository<BillingP
                 u.github_user_id,
                 bpu.role,
                 bpu.user_id,
+                u.email,
                 COALESCE(ga.login, u.github_login) as github_login,
                 user_avatar_url(u.github_user_id, COALESCE(ga.avatar_url, u.github_avatar_url)) as github_avatar_url,
                 ga.html_url as github_html_url,
@@ -36,6 +38,7 @@ public interface BillingProfileUserViewRepository extends JpaRepository<BillingP
                 FROM accounting.billing_profiles_users admins
                 WHERE admins.billing_profile_id = bpu.billing_profile_id AND admins.role = 'ADMIN') admin_count ON true
             WHERE bpu.billing_profile_id = :billingProfileId
+            AND (coalesce(roles) IS NULL OR cast(bpu.role as text) IN (:roles))
                         
             UNION
                         
@@ -44,6 +47,7 @@ public interface BillingProfileUserViewRepository extends JpaRepository<BillingP
                 bpui.github_user_id,
                 bpui.role,
                 u.id as user_id,
+                u.email,
                 ga.login as github_login,
                 ga.avatar_url as github_avatar_url,
                 ga.html_url as github_html_url,
@@ -55,6 +59,7 @@ public interface BillingProfileUserViewRepository extends JpaRepository<BillingP
             LEFT JOIN iam.users u ON u.github_user_id = bpui.github_user_id
             LEFT JOIN indexer_exp.github_accounts ga ON ga.id = bpui.github_user_id
             WHERE bpui.billing_profile_id = :billingProfileId
+            AND (coalesce(roles) IS NULL OR cast(bpui.role as text) IN (:roles))
             """, nativeQuery = true)
-    Page<BillingProfileUserViewEntity> findByBillingProfileId(UUID billingProfileId, Pageable pageable);
+    Page<BillingProfileUserViewEntity> findByBillingProfileId(UUID billingProfileId, List<String> roles, Pageable pageable);
 }

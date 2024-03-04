@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
-import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
-import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.*;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
@@ -45,8 +42,9 @@ public class BackofficeConfiguration {
     @Bean
     public BackofficeInvoicingManagementRestApi backofficeInvoicingManagementRestApi(final InvoiceFacadePort invoiceFacadePort,
                                                                                      final AccountingRewardPort accountingRewardPort,
+                                                                                     final BillingProfileFacadePort billingProfileFacadePort,
                                                                                      final QueryParamTokenAuthenticationService.Config apiKeyAuthenticationConfig) {
-        return new BackofficeInvoicingManagementRestApi(invoiceFacadePort, accountingRewardPort, apiKeyAuthenticationConfig);
+        return new BackofficeInvoicingManagementRestApi(invoiceFacadePort, accountingRewardPort, billingProfileFacadePort, apiKeyAuthenticationConfig);
     }
 
     @Bean

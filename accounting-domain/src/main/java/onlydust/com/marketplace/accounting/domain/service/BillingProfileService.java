@@ -190,10 +190,15 @@ public class BillingProfileService implements BillingProfileFacadePort {
     }
 
     @Override
+    public List<BillingProfileCoworkerView> getCoworkers(BillingProfile.Id billingProfileId, Set<BillingProfile.User.Role> roles) {
+        return billingProfileStoragePort.findCoworkersByBillingProfile(billingProfileId, roles, 0, 1_000_000).getContent();
+    }
+
+    @Override
     public Page<BillingProfileCoworkerView> getCoworkers(BillingProfile.Id billingProfileId, UserId userId, int pageIndex, int pageSize) {
         if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
             throw unauthorized("User %s must be admin to list coworkers of billing profile %s".formatted(userId.value(), billingProfileId.value()));
-        return billingProfileStoragePort.findCoworkersByBillingProfile(billingProfileId, pageIndex, pageSize);
+        return billingProfileStoragePort.findCoworkersByBillingProfile(billingProfileId, BillingProfile.User.Role.all(), pageIndex, pageSize);
     }
 
     @Override
