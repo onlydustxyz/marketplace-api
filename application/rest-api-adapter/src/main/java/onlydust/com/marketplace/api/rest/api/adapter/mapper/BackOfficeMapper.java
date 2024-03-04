@@ -365,14 +365,45 @@ public interface BackOfficeMapper {
                                             .map(Invoice.Wallet::address)
                                             .orElse(null))
                                     .dollarsEquivalent(totalEquivalent)
-                                    .rewardsPerCurrency(mapInvoiceRewardsPeCurrencies(e.getValue()));
+                                    .totalPerCurrency(mapNetworkRewardTotals(e.getValue()))
+                                    .rewards(mapNetworkRewards(e.getValue()));
                         }
                 )
                 .sorted(comparing(InvoiceRewardsPerNetwork::getNetwork))
                 .toList();
     }
 
-    static List<InvoiceRewardsPerCurrency> mapInvoiceRewardsPeCurrencies(final List<RewardView> rewards) {
+    static List<RewardResponse> mapNetworkRewards(final List<RewardView> rewards) {
+        final Map<String, List<RewardView>> rewardsPerCurrencyCode = rewards.stream().collect(groupingBy(r -> r.money().currencyCode()));
+
+        return rewards.stream()
+                .map(reward -> new RewardResponse()
+                        .id(reward.id())
+                        .requestedAt(reward.requestedAt())
+                        .processedAt(reward.processedAt())
+                        .githubUrls(reward.githubUrls())
+                        .project(new ProjectLinkResponse()
+                                .name(reward.projectName())
+                                .logoUrl(reward.projectLogoUrl()))
+                        .sponsors(reward.sponsors().stream().map(sponsor ->
+                                new SponsorLinkResponse()
+                                        .name(sponsor.name())
+                                        .avatarUrl(sponsor.logoUrl())
+                        ).toList())
+                        .money(new MoneyLinkResponse()
+                                .amount(reward.money().amount())
+                                .dollarsEquivalent(reward.money().dollarsEquivalent())
+                                .currencyCode(reward.money().currencyCode())
+                                .currencyName(reward.money().currencyName())
+                                .currencyLogoUrl(reward.money().currencyLogoUrl())
+                        )
+                        .transactionHash(reward.transactionHash())
+                )
+                .sorted(comparing(RewardResponse::getRequestedAt))
+                .toList();
+    }
+
+    static List<MoneyLinkResponse> mapNetworkRewardTotals(final List<RewardView> rewards) {
         final Map<String, List<RewardView>> rewardsPerCurrencyCode = rewards.stream().collect(groupingBy(r -> r.money().currencyCode()));
 
         return rewardsPerCurrencyCode.entrySet().stream()
@@ -385,42 +416,15 @@ public interface BackOfficeMapper {
                             final var totalEquivalent = e.getValue().stream().map(r -> r.money().dollarsEquivalent()).reduce(BigDecimal::add)
                                     .orElseThrow(() -> internalServerError("No reward found for currency %s".formatted(e.getKey())));
 
-                            return new InvoiceRewardsPerCurrency()
-                                    .total(new MoneyLinkResponse()
-                                            .amount(total)
-                                            .dollarsEquivalent(totalEquivalent)
-                                            .currencyCode(currencyCode)
-                                            .currencyName(currencyName)
-                                            .currencyLogoUrl(currencyLogoUrl))
-                                    .rewards(e.getValue().stream()
-                                            .map(reward ->
-                                                    new RewardResponse()
-                                                            .id(reward.id())
-                                                            .requestedAt(reward.requestedAt())
-                                                            .processedAt(reward.processedAt())
-                                                            .githubUrls(reward.githubUrls())
-                                                            .project(new ProjectLinkResponse()
-                                                                    .name(reward.projectName())
-                                                                    .logoUrl(reward.projectLogoUrl()))
-                                                            .sponsors(reward.sponsors().stream().map(sponsor ->
-                                                                    new SponsorLinkResponse()
-                                                                            .name(sponsor.name())
-                                                                            .avatarUrl(sponsor.logoUrl())
-                                                            ).toList())
-                                                            .money(new MoneyLinkResponse()
-                                                                    .amount(reward.money().amount())
-                                                                    .dollarsEquivalent(reward.money().dollarsEquivalent())
-                                                                    .currencyCode(reward.money().currencyCode())
-                                                                    .currencyName(reward.money().currencyName())
-                                                                    .currencyLogoUrl(reward.money().currencyLogoUrl())
-                                                            )
-                                                            .transactionHash(reward.transactionHash())
-                                            )
-                                            .sorted(comparing(RewardResponse::getRequestedAt))
-                                            .toList());
+                            return new MoneyLinkResponse()
+                                    .amount(total)
+                                    .dollarsEquivalent(totalEquivalent)
+                                    .currencyCode(currencyCode)
+                                    .currencyName(currencyName)
+                                    .currencyLogoUrl(currencyLogoUrl);
                         }
                 )
-                .sorted(comparing(rewardsPerCurrency -> rewardsPerCurrency.getTotal().getCurrencyCode()))
+                .sorted(comparing(MoneyLinkResponse::getCurrencyCode))
                 .toList();
     }
 
