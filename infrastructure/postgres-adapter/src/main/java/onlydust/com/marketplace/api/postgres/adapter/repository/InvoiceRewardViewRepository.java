@@ -47,7 +47,7 @@ public interface InvoiceRewardViewRepository extends JpaRepository<InvoiceReward
                      join payment_requests pr on pr.invoice_id = i.id
                      join currencies c on c.code = upper(cast(pr.currency as text))
                      join project_details pd on pr.project_id = pd.project_id
-                     left join (select ps2.project_id, json_agg(json_build_object('name', s.name, 'logo_url', s.logo_url)) s_list
+                     left join (select ps2.project_id, json_agg(json_build_object('name', s.name, 'logoUrl', s.logo_url)) s_list
                                 from sponsors s
                                          join projects_sponsors ps2 on ps2.sponsor_id = s.id
                                 group by ps2.project_id) s2 on s2.project_id = pr.project_id
