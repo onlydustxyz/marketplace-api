@@ -11,6 +11,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.OldRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
@@ -18,10 +19,7 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -116,6 +114,20 @@ public class RewardService implements AccountingRewardPort {
             batchPayments.add(batchPayment);
         }
         return batchPayments;
+    }
+
+    @Override
+    public Page<RewardDetailsView> getRewards(int pageIndex, int pageSize,
+                                              List<RewardDetailsView.Status> statuses,
+                                              Date fromRequestedAt, Date toRequestedAt,
+                                              Date fromProcessedAt, Date toProcessedAt) {
+        Set<RewardDetailsView.Status> sanitizedStatuses;
+        if (statuses == null || statuses.isEmpty()) {
+            sanitizedStatuses = EnumSet.allOf(RewardDetailsView.Status.class).stream().collect(Collectors.toUnmodifiableSet());
+        } else {
+            sanitizedStatuses = statuses.stream().collect(Collectors.toUnmodifiableSet());
+        }
+        return accountingRewardStoragePort.findRewards(pageIndex, pageSize, sanitizedStatuses, fromRequestedAt, toRequestedAt, fromProcessedAt, toProcessedAt);
     }
 
     private BatchPayment buildEthereumBatchPayment(final Map<String, List<PayableRewardWithPayoutInfoView>> ethereumRewardMapToCurrencyCode) {

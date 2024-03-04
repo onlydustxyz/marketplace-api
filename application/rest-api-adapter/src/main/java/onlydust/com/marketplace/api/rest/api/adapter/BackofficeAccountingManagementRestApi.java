@@ -4,16 +4,20 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeAccountingManagementApi;
+import onlydust.com.backoffice.api.contract.model.RewardStatus;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BatchPaymentMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SearchRewardMapper;
+import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.OldPayRewardRequestCommand;
 import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
@@ -28,6 +32,8 @@ import java.util.UUID;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 
 @RestController
 @Tags(@Tag(name = "BackofficeAccountingManagement"))
@@ -164,6 +170,28 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                 })
                 .build());
         return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<RewardPageResponse> getRewards(Integer pageIndex, Integer pageSize,
+                                                         List<RewardStatus> statuses,
+                                                         String fromRequestedAt,
+                                                         String toRequestedAt,
+                                                         String fromProcessedAt,
+                                                         String toProcessedAt) {
+        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
+
+        final Page<RewardDetailsView> rewards = accountingRewardPort.getRewards(
+                sanitizedPageIndex,
+                sanitizedPageSize,
+                statuses != null ? statuses.stream().map(BackOfficeMapper::mapRewardStatus).toList() : null,
+                DateMapper.parseNullable(fromRequestedAt),
+                DateMapper.parseNullable(toRequestedAt),
+                DateMapper.parseNullable(fromProcessedAt),
+                DateMapper.parseNullable(toProcessedAt)
+        );
+        return ResponseEntity.ok(SearchRewardMapper.rewardPageToResponse(sanitizedPageIndex, rewards));
     }
 
     @Override

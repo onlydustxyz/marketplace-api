@@ -198,7 +198,25 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
     }
 
     @Test
-    @Order(2)
+    @Order(1)
+    void should_get_all_rewards() {
+
+        // When
+        client.get()
+                .uri(getApiURI(REWARDS, Map.of("pageIndex", "0", "pageSize", "50")))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {"foo":"bar"}
+                        """);
+    }
+
+    @Test
+    @Order(100)
     void should_post_batch_payments_given_list_of_invoice_ids() {
         // When
         client.post()

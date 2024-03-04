@@ -2,9 +2,11 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import onlydust.com.backoffice.api.contract.model.RewardStatus;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
@@ -374,11 +376,11 @@ public interface BackOfficeMapper {
                 .toList();
     }
 
-    static List<RewardResponse> mapNetworkRewards(final List<RewardView> rewards) {
+    static List<InvoiceRewardResponse> mapNetworkRewards(final List<RewardView> rewards) {
         final Map<String, List<RewardView>> rewardsPerCurrencyCode = rewards.stream().collect(groupingBy(r -> r.money().currencyCode()));
 
         return rewards.stream()
-                .map(reward -> new RewardResponse()
+                .map(reward -> new InvoiceRewardResponse()
                         .id(reward.id())
                         .requestedAt(reward.requestedAt())
                         .processedAt(reward.processedAt())
@@ -400,7 +402,7 @@ public interface BackOfficeMapper {
                         )
                         .transactionHash(reward.transactionHash())
                 )
-                .sorted(comparing(RewardResponse::getRequestedAt))
+                .sorted(comparing(InvoiceRewardResponse::getRequestedAt))
                 .toList();
     }
 
@@ -611,5 +613,18 @@ public interface BackOfficeMapper {
                 .standard(currency.standard().map(BackOfficeMapper::mapCurrencyStandard).orElse(null))
                 .blockchain(currency.blockchain().map(BackOfficeMapper::mapBlockchain).orElse(null))
                 .address(currency.address().map(ContractAddress::toString).orElse(null));
+    }
+
+    static RewardDetailsView.Status mapRewardStatus(RewardStatus rewardStatus) {
+        return switch (rewardStatus) {
+            case PENDING_INVOICE -> RewardDetailsView.Status.PENDING_INVOICE;
+            case PENDING_SIGNUP -> RewardDetailsView.Status.PENDING_SIGNUP;
+            case PENDING_CONTRIBUTOR -> RewardDetailsView.Status.PENDING_CONTRIBUTOR;
+            case PENDING_VERIFICATION -> RewardDetailsView.Status.PENDING_VERIFICATION;
+            case MISSING_PAYOUT_INFO -> RewardDetailsView.Status.MISSING_PAYOUT_INFO;
+            case PROCESSING -> RewardDetailsView.Status.PROCESSING;
+            case COMPLETE -> RewardDetailsView.Status.COMPLETE;
+            case LOCKED -> RewardDetailsView.Status.LOCKED;
+        };
     }
 }
