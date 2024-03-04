@@ -178,4 +178,10 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                 accountingRewardPort.createBatchPaymentsForInvoices(postBatchPaymentRequest.getInvoiceIds().stream().map(Invoice.Id::of).toList());
         return ResponseEntity.ok(BatchPaymentMapper.domainToResponse(batchPayments));
     }
+
+    @Override
+    public ResponseEntity<Void> updateBatchPayments(UUID batchPaymentId, BatchPaymentRequest batchPaymentRequest) {
+        accountingRewardPort.markBatchPaymentAsPaid(BatchPayment.Id.of(batchPaymentId), batchPaymentRequest.getTransactionHash());
+        return ResponseEntity.ok().build();
+    }
 }

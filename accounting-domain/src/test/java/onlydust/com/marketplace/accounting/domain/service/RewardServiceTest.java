@@ -6,27 +6,38 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.OldRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class RewardServiceTest {
 
     private final Faker faker = new Faker();
+    private final AccountingRewardStoragePort accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
+    private final OldRewardStoragePort oldRewardStoragePort = mock(OldRewardStoragePort.class);
+    private final RewardService rewardService = new RewardService(accountingRewardStoragePort, oldRewardStoragePort);
+
+    @BeforeEach
+    void setUp() {
+        reset(accountingRewardStoragePort, oldRewardStoragePort);
+    }
 
     @Test
     void should_generate_batch_payment_given_all_currencies() {
         // Given
-        final AccountingRewardStoragePort accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
-        final RewardService rewardService = new RewardService(accountingRewardStoragePort);
         final List<Invoice.Id> invoiceIds = List.of(Invoice.Id.random(), Invoice.Id.random());
 
         // When
@@ -96,7 +107,7 @@ public class RewardServiceTest {
                         .build())
                 .wallet(new Invoice.Wallet(Network.ETHEREUM, faker.internet().macAddress()))
                 .build();
-        when(accountingRewardStoragePort.findPayableRewardsWithPayoutInfo(invoiceIds))
+        when(accountingRewardStoragePort.findPayableRewardsWithPayoutInfoForInvoices(invoiceIds))
                 .thenReturn(List.of(
                         PayableRewardWithPayoutInfoView.builder()
                                 .id(UUID.randomUUID())
@@ -144,8 +155,8 @@ public class RewardServiceTest {
         assertEquals(2, batchPaymentsForInvoices.size());
         final BatchPayment starknetBatchPayment =
                 batchPaymentsForInvoices.stream().filter(batchPayment -> batchPayment.blockchain().equals(Blockchain.STARKNET)).findFirst().orElseThrow();
-        verify(accountingRewardStoragePort).createBatchPayment(starknetBatchPayment);
-        assertEquals(2, starknetBatchPayment.rewardCount());
+        verify(accountingRewardStoragePort).saveBatchPayment(starknetBatchPayment);
+        assertEquals(2, starknetBatchPayment.rewardIds().size());
         assertEquals(1, starknetBatchPayment.moneys().size());
         assertEquals(strk1.money().amount().add(strk2.money().amount()), starknetBatchPayment.moneys().get(0).amount());
         assertEquals(strk1.money().dollarsEquivalent().add(strk2.money().dollarsEquivalent()), starknetBatchPayment.moneys().get(0).dollarsEquivalent());
@@ -161,8 +172,8 @@ public class RewardServiceTest {
 
         final BatchPayment ethereumBatchPayment =
                 batchPaymentsForInvoices.stream().filter(batchPayment -> batchPayment.blockchain().equals(Blockchain.ETHEREUM)).findFirst().orElseThrow();
-        verify(accountingRewardStoragePort).createBatchPayment(ethereumBatchPayment);
-        assertEquals(4, ethereumBatchPayment.rewardCount());
+        verify(accountingRewardStoragePort).saveBatchPayment(ethereumBatchPayment);
+        assertEquals(4, ethereumBatchPayment.rewardIds().size());
         assertEquals(3, ethereumBatchPayment.moneys().size());
         assertEquals(eth.money(),
                 ethereumBatchPayment.moneys().stream().filter(moneyView -> moneyView.currencyCode().equals(Currency.Code.ETH_STR)).findFirst().orElseThrow());
@@ -181,5 +192,106 @@ public class RewardServiceTest {
                 erc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,%s,%s"""
                 .formatted(eth.wallet().address(), eth.money().amount(), lords.wallet().address(), lords.money().amount().toString(), usdc1.wallet().address(),
                         usdc1.money().amount().toString(), usdc2.wallet().address(), usdc2.money().amount().toString()), ethereumBatchPayment.csv());
+    }
+
+    @Test
+    void should_raise_not_found_exception_given_not_existing_batch_payment() {
+        // Given
+        final BatchPayment.Id batchPaymentId = BatchPayment.Id.random();
+
+        // When
+        when(accountingRewardStoragePort.findBatchPayment(batchPaymentId))
+                .thenReturn(Optional.empty());
+        Exception exception = null;
+        try {
+            rewardService.markBatchPaymentAsPaid(batchPaymentId, faker.random().hex());
+        } catch (Exception e) {
+            exception = e;
+        }
+
+        // Then
+        assertTrue(exception instanceof OnlyDustException);
+        assertEquals(404, ((OnlyDustException) exception).getStatus());
+        assertEquals("Batch payment %s not found".formatted(batchPaymentId.value()), exception.getMessage());
+    }
+
+
+    @Test
+    void should_raise_wrong_transaction_hash_exception() {
+        // Given
+        final BatchPayment.Id batchPaymentId = BatchPayment.Id.random();
+        final String transactionHash = faker.rickAndMorty().character();
+
+        // When
+        when(accountingRewardStoragePort.findBatchPayment(batchPaymentId))
+                .thenReturn(Optional.of(BatchPayment.builder()
+                        .csv("")
+                        .id(BatchPayment.Id.random())
+                        .moneys(List.of())
+                        .blockchain(Blockchain.STARKNET)
+                        .rewardIds(List.of())
+                        .build()));
+        Exception exception = null;
+        try {
+            rewardService.markBatchPaymentAsPaid(batchPaymentId, transactionHash);
+        } catch (Exception e) {
+            exception = e;
+        }
+
+        // Then
+        assertTrue(exception instanceof OnlyDustException);
+        assertEquals(400, ((OnlyDustException) exception).getStatus());
+        assertEquals("Wrong transaction hash format %s".formatted(transactionHash), exception.getMessage());
+    }
+
+    @Test
+    void should_update_batch_payment_and_linked_rewards_with_transaction_hash() {
+        // Given
+        final BatchPayment.Id batchPaymentId = BatchPayment.Id.random();
+        final String transactionHash = "0x" + faker.random().hex();
+        final BatchPayment batchPayment = BatchPayment.builder()
+                .id(batchPaymentId)
+                .moneys(List.of())
+                .blockchain(Blockchain.STARKNET)
+                .csv(faker.gameOfThrones().character())
+                .rewardIds(List.of())
+                .build();
+        final List<PayableRewardWithPayoutInfoView> payableRewardWithPayoutInfoViews = List.of(
+                PayableRewardWithPayoutInfoView.builder()
+                        .id(UUID.randomUUID())
+                        .money(MoneyView.builder()
+                                .amount(BigDecimal.ONE)
+                                .currencyCode(faker.gameOfThrones().city())
+                                .currencyName(faker.gameOfThrones().dragon())
+                                .currencyLogoUrl(faker.gameOfThrones().quote())
+                                .build())
+                        .build(),
+                PayableRewardWithPayoutInfoView.builder()
+                        .id(UUID.randomUUID())
+                        .money(MoneyView.builder()
+                                .amount(BigDecimal.ONE)
+                                .currencyCode(faker.gameOfThrones().city())
+                                .currencyName(faker.gameOfThrones().dragon())
+                                .currencyLogoUrl(faker.gameOfThrones().quote())
+                                .build())
+                        .build()
+        );
+        final BatchPayment updatedBatchPayment = batchPayment.toBuilder()
+                .status(BatchPayment.Status.PAID)
+                .transactionHash(transactionHash)
+                .build();
+
+
+        // When
+        when(accountingRewardStoragePort.findBatchPayment(batchPaymentId))
+                .thenReturn(Optional.of(batchPayment));
+        when(accountingRewardStoragePort.findPayableRewardsWithPayoutInfoForBatchPayment(batchPaymentId))
+                .thenReturn(payableRewardWithPayoutInfoViews);
+        rewardService.markBatchPaymentAsPaid(batchPaymentId, transactionHash);
+
+        // Then
+        verify(oldRewardStoragePort).markRewardAsPaid(payableRewardWithPayoutInfoViews.get(0), transactionHash);
+        verify(oldRewardStoragePort).markRewardAsPaid(payableRewardWithPayoutInfoViews.get(1), transactionHash);
+        verify(accountingRewardStoragePort).saveBatchPayment(updatedBatchPayment);
     }
 }

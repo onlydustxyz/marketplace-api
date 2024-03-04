@@ -10,7 +10,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import java.util.List;
 import java.util.UUID;
 
-@Builder
+@Builder(toBuilder = true)
 @Accessors(chain = true, fluent = true)
 @Data
 public class BatchPayment {
@@ -19,22 +19,30 @@ public class BatchPayment {
     @NonNull
     String csv;
     @NonNull
-    Long rewardCount;
-    @NonNull
     Blockchain blockchain;
-    @NonNull
     List<MoneyView> moneys;
+    @NonNull
+    @Builder.Default
+    Status status = Status.TO_PAY;
+    String transactionHash;
+    @NonNull
+    List<RewardId> rewardIds;
 
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)
     @SuperBuilder
     public static class Id extends UuidWrapper {
-        public static Invoice.Id of(@NonNull final UUID uuid) {
-            return Invoice.Id.builder().uuid(uuid).build();
+        public static BatchPayment.Id of(@NonNull final UUID uuid) {
+            return BatchPayment.Id.builder().uuid(uuid).build();
         }
 
-        public static Invoice.Id of(@NonNull final String uuid) {
-            return Invoice.Id.of(UUID.fromString(uuid));
+        public static BatchPayment.Id of(@NonNull final String uuid) {
+            return BatchPayment.Id.of(UUID.fromString(uuid));
         }
+    }
+
+
+    public enum Status {
+        TO_PAY, PAID
     }
 }

@@ -15,7 +15,7 @@ public interface BatchPaymentMapper {
             batchPaymentsResponse.addBatchPaymentsItem(new BatchPaymentResponse()
                     .id(batchPayment.id().value())
                     .csv(batchPayment.csv())
-                    .rewardCount(batchPayment.rewardCount())
+                    .rewardCount((long) batchPayment.rewardIds().size())
                     .blockchain(switch (batchPayment.blockchain()) {
                         case ETHEREUM -> BlockchainContract.ETHEREUM;
                         case OPTIMISM -> BlockchainContract.OPTIMISM;

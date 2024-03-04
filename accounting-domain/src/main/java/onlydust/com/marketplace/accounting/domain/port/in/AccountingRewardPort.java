@@ -12,4 +12,6 @@ public interface AccountingRewardPort {
     List<RewardView> findByInvoiceId(Invoice.Id invoiceId);
 
     List<BatchPayment> createBatchPaymentsForInvoices(List<Invoice.Id> invoiceIds);
+
+    void markBatchPaymentAsPaid(BatchPayment.Id batchPaymentId, String transactionHash);
 }
