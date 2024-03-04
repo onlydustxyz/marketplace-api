@@ -8,7 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 public record ShortBillingProfileAdminView(@NonNull String adminGithubLogin,
                                            @NonNull String adminGithubAvatarUrl,
                                            @NonNull String adminEmail,
-                                           @NonNull String adminName,
+                                           String adminName,
                                            @NonNull BillingProfile.Id billingProfileId,
                                            @NonNull BillingProfile.Type billingProfileType,
                                            @NonNull String billingProfileName) {
