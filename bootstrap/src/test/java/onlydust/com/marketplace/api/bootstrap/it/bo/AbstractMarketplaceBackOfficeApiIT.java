@@ -164,6 +164,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String INVOICE = "/bo/v1/invoices/%s";
     protected static final String EXTERNAL_INVOICE = "/bo/v1/external/invoices/%s";
     protected static final String POST_REWARDS_PAY_VO = "/bo/v0/rewards/%s/pay";
+    protected static final String POST_REWARDS_SEARCH = "/bo/v1/rewards/search";
 
     protected String apiKey() {
         return backOfficeApiKeyAuthenticationConfig.getApiKey();
