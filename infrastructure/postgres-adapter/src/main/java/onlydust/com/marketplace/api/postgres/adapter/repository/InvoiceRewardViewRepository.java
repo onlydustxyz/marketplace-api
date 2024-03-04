@@ -57,7 +57,7 @@ public interface InvoiceRewardViewRepository extends JpaRepository<InvoiceReward
                      left join individual_billing_profiles ibp on ibp.user_id = ubpt.user_id
                      left join company_billing_profiles cbp on cbp.user_id = ubpt.user_id
                      left join payments r on r.request_id = pr.id
-                     join (select wi.payment_id, json_agg(coalesce(gpr.html_url, gcr.html_url, gi.html_url)) urls
+                     left join (select wi.payment_id, json_agg(coalesce(gpr.html_url, gcr.html_url, gi.html_url)) urls
                            from work_items wi
                                     left join indexer_exp.github_pull_requests gpr on cast(gpr.id as text) = wi.id
                                     left join indexer_exp.github_code_reviews gcr on gcr.id = wi.id
