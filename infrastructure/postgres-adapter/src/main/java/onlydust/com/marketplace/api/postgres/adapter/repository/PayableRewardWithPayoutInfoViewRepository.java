@@ -26,7 +26,8 @@ public interface PayableRewardWithPayoutInfoViewRepository extends JpaRepository
                                  left join wallets eth_w on eth_w.user_id = u.id and eth_w.network = 'ethereum'
                                  left join wallets strk_w on strk_w.user_id = u.id and strk_w.network = 'starknet'
                                  left join payments r on r.request_id = pr.id
-                        where i.id in (:invoiceIds) and r.id is null order by c.code,pr.amount
+                        where i.id in (:invoiceIds) and r.id is null and i.status = 'APPROVED'
+                        order by c.code,pr.amount
             """)
     List<PayableRewardWithPayoutInfoViewEntity> findAllByInvoiceIds(final List<UUID> invoiceIds);
 
@@ -43,12 +44,14 @@ public interface PayableRewardWithPayoutInfoViewRepository extends JpaRepository
                                strk_w.address                         starknet_address
                         from reward_to_batch_payment rtbp
                                  join payment_requests pr on pr.id = rtbp.reward_id
+                                 join accounting.invoices i on i.id = pr.invoice_id
                                  join iam.users u on u.github_user_id = pr.recipient_id
                                  join currencies c on c.code = upper(cast(pr.currency as text))
                                  left join wallets eth_w on eth_w.user_id = u.id and eth_w.network = 'ethereum'
                                  left join wallets strk_w on strk_w.user_id = u.id and strk_w.network = 'starknet'
                                  left join payments r on r.request_id = pr.id
-                        where rtbp.batch_payment_id = :batchPaymentId and r.id is null order by c.code,pr.amount
+                        where rtbp.batch_payment_id = :batchPaymentId and r.id is null and i.status = 'APPROVED'
+                        order by c.code,pr.amount
             """)
     List<PayableRewardWithPayoutInfoViewEntity> findAllByBatchPaymentId(UUID batchPaymentId);
 }
