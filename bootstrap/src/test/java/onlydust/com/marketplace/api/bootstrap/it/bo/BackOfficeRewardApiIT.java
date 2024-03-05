@@ -380,6 +380,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .jsonPath("$.totalAmountUsd").isEqualTo(544)
                 .jsonPath("$.totalAmounts[0].amount").isEqualTo(11533.222)
                 .jsonPath("$.totalAmounts.length()").isEqualTo(1)
+                .jsonPath("$.csv").isNotEmpty()
+                .jsonPath("$.transactionHash").isNotEmpty()
                 .jsonPath("$.rewards.length()").isEqualTo(2);
     }
 

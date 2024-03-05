@@ -71,6 +71,8 @@ public interface BatchPaymentMapper {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         return new BatchPaymentDetailsResponse()
                 .id(batchPaymentDetailsView.batchPayment().id().value())
+                .csv(batchPaymentDetailsView.batchPayment().csv())
+                .transactionHash(batchPaymentDetailsView.batchPayment().transactionHash())
                 .totalAmountUsd(totalDollarsEquivalent)
                 .rewardCount((long) batchPaymentDetailsView.batchPayment().rewardIds().size())
                 .blockchain(mapBlockchainToResponse(batchPaymentDetailsView.batchPayment()))

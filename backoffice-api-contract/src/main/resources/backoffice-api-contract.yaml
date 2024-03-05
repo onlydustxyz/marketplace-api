@@ -2873,3 +2873,9 @@ components:
       allOf:
         - $ref: '#/components/schemas/BatchPaymentItemResponse'
         - $ref: '#/components/schemas/SearchRewardsResponse'
+        - type: object
+          properties:
+            csv:
+              type: string
+            transactionHash:
+              type: string
