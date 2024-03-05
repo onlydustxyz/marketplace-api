@@ -300,9 +300,9 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                         {
                                            "amount": %s,
                                            "currency": "%s",
-                                           "recipient_wallet": "%s",
-                                           "recipient_iban" : null,
-                                           "transaction_reference" : "%s"
+                                           "recipientWallet": "%s",
+                                           "recipientIban" : null,
+                                           "transactionReference" : "%s"
                                         }
                                             """.formatted(r1.getAmount().toString(), r1.getCurrency().toDomain().name(), anthoStarknetAddress, transactionHash)
                         ))
@@ -319,9 +319,9 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                         {
                                            "amount": %s,
                                            "currency": "%s",
-                                           "recipient_wallet": "%s",
-                                           "recipient_iban" : null,
-                                           "transaction_reference" : "%s"
+                                           "recipientWallet": "%s",
+                                           "recipientIban" : null,
+                                           "transactionReference" : "%s"
                                         }
                                         """.formatted(r2.getAmount().toString(), r2.getCurrency().toDomain().name(), olivierStarknetAddress,
                                         transactionHash)

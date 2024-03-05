@@ -34,22 +34,21 @@ public class BackOfficeV0ApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .orElseThrow();
         final String iban = faker.internet().macAddress();
         final String transaction = faker.internet().macAddress();
-        final BigDecimal amount = BigDecimal.valueOf(111.2324D);
 
 
         rustApiWireMockServer.stubFor(
-                WireMock.post("/payments/%s/receipts".formatted(usdReward.getId()))
+                WireMock.post("/api/payments/%s/receipts".formatted(usdReward.getId()))
                         .withHeader("Api-Key", WireMock.equalTo(odRustApiHttpClientProperties.getApiKey()))
                         .withRequestBody(WireMock.equalToJson(
                                 """
                                         {
                                            "amount": %s,
                                            "currency": "USD",
-                                           "recipient_wallet": null,
-                                           "recipient_iban" : "%s",
-                                           "transaction_reference" : "%s"
+                                           "recipientWallet": null,
+                                           "recipientIban" : "%s",
+                                           "transactionReference" : "%s"
                                         }
-                                            """.formatted(amount, iban, transaction)
+                                            """.formatted(usdReward.getAmount().toString(), iban, transaction)
                         ))
                         .willReturn(ResponseDefinitionBuilder.okForJson("""
                                 {
