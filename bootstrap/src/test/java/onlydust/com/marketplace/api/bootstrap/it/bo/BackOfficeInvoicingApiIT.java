@@ -484,7 +484,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
 
         client
                 .get()
-                .uri(getApiURI(INVOICE.formatted(invoices.get(1).id())))
+                .uri(getApiURI(INVOICE.formatted(companyBillingProfileToReviewInvoices.get(1))))
                 .header("Api-Key", apiKey())
                 .exchange()
                 .expectStatus()
@@ -554,20 +554,6 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     @Test
     @Order(6)
     void should_filter_invoices_by_status() {
-        client
-                .patch()
-                .uri(getApiURI(INVOICE.formatted(invoices.get(0).id())))
-                .header("Api-Key", apiKey())
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                          "status": "REJECTED"
-                        }
-                        """)
-                .exchange()
-                .expectStatus()
-                .isNoContent()
-        ;
 
         client
                 .get()

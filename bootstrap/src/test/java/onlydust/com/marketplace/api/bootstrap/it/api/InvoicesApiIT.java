@@ -471,9 +471,13 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
 
     protected void testInvoiceStatus(UUID invoiceId) {
         {
-            final var invoice = entityManagerFactory.createEntityManager().find(InvoiceEntity.class, invoiceId);
+            final var em = entityManagerFactory.createEntityManager();
+            final var invoice = em.find(InvoiceEntity.class, invoiceId);
             assertThat(invoice.status()).isEqualTo(InvoiceEntity.Status.APPROVED);
+            em.close();
+        }
 
+        {
             final var em = entityManagerFactory.createEntityManager();
             em.getTransaction().begin();
             em.persist(PaymentEntity.builder()
@@ -491,9 +495,13 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
         }
 
         {
-            final var invoice = entityManagerFactory.createEntityManager().find(InvoiceEntity.class, invoiceId);
+            final var em = entityManagerFactory.createEntityManager();
+            final var invoice = em.find(InvoiceEntity.class, invoiceId);
             assertThat(invoice.status()).isEqualTo(InvoiceEntity.Status.APPROVED);
+            em.close();
+        }
 
+        {
             final var em = entityManagerFactory.createEntityManager();
             em.getTransaction().begin();
             em.persist(PaymentEntity.builder()
@@ -511,8 +519,10 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
         }
 
         {
-            final var invoice = entityManagerFactory.createEntityManager().find(InvoiceEntity.class, invoiceId);
+            final var em = entityManagerFactory.createEntityManager();
+            final var invoice = em.find(InvoiceEntity.class, invoiceId);
             assertThat(invoice.status()).isEqualTo(InvoiceEntity.Status.PAID);
+            em.close();
         }
     }
 
@@ -890,6 +900,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     @Order(200)
     void preview_with_both_billing_profile_types() {
         final var rewardId = "fa097fab-9c01-4afa-bf1f-8d07029e03af";
+        final var em = entityManagerFactory.createEntityManager();
 
         // First, generate an invoice preview with the company billing profile
         final var invoiceOnCompanyId = new MutableObject<String>();
@@ -905,7 +916,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.id").value(invoiceOnCompanyId::setValue);
 
-        var invoiceOnCompany = entityManagerFactory.createEntityManager().find(InvoiceEntity.class, UUID.fromString(invoiceOnCompanyId.getValue()));
+        var invoiceOnCompany = em.find(InvoiceEntity.class, UUID.fromString(invoiceOnCompanyId.getValue()));
         assertThat(invoiceOnCompany.status()).isEqualTo(InvoiceEntity.Status.DRAFT);
         assertThat(invoiceOnCompany.data().rewards().stream().anyMatch(r -> r.id().equals(UUID.fromString(rewardId)))).isTrue();
         var reward = entityManagerFactory.createEntityManager().find(PaymentRequestEntity.class, UUID.fromString(rewardId));
@@ -950,11 +961,11 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful();
 
-        final var invoice = entityManagerFactory.createEntityManager().find(InvoiceEntity.class, UUID.fromString(invoiceId.getValue()));
+        final var invoice = em.find(InvoiceEntity.class, UUID.fromString(invoiceId.getValue()));
         assertThat(invoice.status()).isEqualTo(InvoiceEntity.Status.APPROVED);
 
         // Check that the reward is part of the approved invoice
-        reward = entityManagerFactory.createEntityManager().find(PaymentRequestEntity.class, UUID.fromString(rewardId));
+        reward = em.find(PaymentRequestEntity.class, UUID.fromString(rewardId));
         assertThat(reward.getInvoice().id().toString()).isEqualTo(invoiceId.getValue());
 
         // Switch back to company billing profile type
@@ -985,7 +996,8 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectBody();
 
         // Now check that the reward is still part of the approved invoice
-        reward = entityManagerFactory.createEntityManager().find(PaymentRequestEntity.class, UUID.fromString(rewardId));
+        reward = em.find(PaymentRequestEntity.class, UUID.fromString(rewardId));
         assertThat(reward.getInvoice().id().toString()).isEqualTo(invoiceId.getValue());
+        em.close();
     }
 }

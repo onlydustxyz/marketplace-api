@@ -6,13 +6,13 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.bootstrap.helper.JwtVerifierStub;
 import onlydust.com.marketplace.api.contract.model.GetMeResponse;
-import onlydust.com.marketplace.project.domain.model.UserRole;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
 import onlydust.com.marketplace.api.posthog.properties.PosthogProperties;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter;
+import onlydust.com.marketplace.project.domain.model.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -154,13 +154,15 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
     }
 
     protected void assertUserEntity(UUID userId) {
-        final var userEntity = entityManagerFactory.createEntityManager().find(UserEntity.class, userId);
+        final var em = entityManagerFactory.createEntityManager();
+        final var userEntity = em.find(UserEntity.class, userId);
         assertThat(userEntity).isNotNull();
         assertThat(userEntity.getGithubUserId()).isEqualTo(githubUserId);
         assertThat(userEntity.getGithubLogin()).isEqualTo(login);
         assertThat(userEntity.getGithubAvatarUrl()).isEqualTo(avatarUrl);
         assertThat(userEntity.getGithubEmail()).isEqualTo(email);
         assertThat(userEntity.getRoles()).containsExactly(UserRole.USER);
+        em.close();
     }
 
     private void assertMe(GetMeResponse me) {
