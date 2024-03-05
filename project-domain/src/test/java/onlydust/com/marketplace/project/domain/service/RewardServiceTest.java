@@ -263,6 +263,7 @@ public class RewardServiceTest {
         // When
         when(permissionService.isUserProjectLead(projectId, projectLeadId))
                 .thenReturn(true);
+        when(userStoragePort.findRewardById(rewardId)).thenReturn(RewardView.builder().id(rewardId).build());
         rewardService.cancelReward(projectLeadId, projectId, rewardId);
 
         // Then
