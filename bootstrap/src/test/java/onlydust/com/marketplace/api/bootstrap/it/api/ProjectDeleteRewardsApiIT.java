@@ -19,7 +19,10 @@ import onlydust.com.marketplace.project.domain.model.OldCompanyBillingProfile;
 import onlydust.com.marketplace.project.domain.model.OldCountry;
 import onlydust.com.marketplace.project.domain.model.OldVerificationStatus;
 import onlydust.com.marketplace.project.domain.service.UserService;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 
@@ -34,6 +37,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.IMPERSONATION_HEADER;
 
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     public ProjectRepository projectRepository;
@@ -42,6 +46,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
     AuthenticatedAppUserService authenticatedAppUserService;
 
     @Test
+    @Order(0)
     public void should_be_unauthorized() {
         final RewardRequest rewardRequest = new RewardRequest()
                 .amount(BigDecimal.ONE)
@@ -60,6 +65,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(1)
     void should_be_forbidden_given_authenticated_user_not_project_lead() throws JsonProcessingException {
         // Given
         userAuthHelper.newFakeUser(UUID.randomUUID(), 1L, faker.rickAndMorty().character(), faker.internet().url(),
@@ -81,6 +87,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(2)
     void should_request_reward_to_old_api_given_a_project_lead() throws JsonProcessingException {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
@@ -105,6 +112,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(3)
     void should_request_reward_to_old_api_given_a_project_lead_impersonated() throws JsonProcessingException {
         // Given
         final String jwt = userAuthHelper.newFakeUser(UUID.randomUUID(), 2L, faker.rickAndMorty().character(),
@@ -139,8 +147,8 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     PostgresOldBillingProfileAdapter postgresOldBillingProfileAdapter;
 
-
     @Test
+    @Order(4)
     void should_prevent_cancel_reward_action_given_a_reward_already_in_an_invoice() throws IOException {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();

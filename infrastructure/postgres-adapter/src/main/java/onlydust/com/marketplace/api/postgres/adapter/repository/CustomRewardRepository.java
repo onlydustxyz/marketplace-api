@@ -47,6 +47,7 @@ public class CustomRewardRepository {
                 pr.id,
                 pr.amount,
                 pr.currency,
+                pr.invoice_id,
                 (select count(id) from work_items wi where wi.payment_id = pr.id)           contribution_count,
                 pr.usd_amount                                                               dollars_equivalent,
                 case
