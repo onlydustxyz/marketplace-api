@@ -169,11 +169,10 @@ paths:
         - apiKey: [ ]
       tags:
         - BackofficeInvoicingManagement
-      summary: Update an invoice
+      summary: Update some invoice attributes
       operationId: updateInvoice
       description: |
-        Update an invoice.
-        This will allow to update the invoice's status to APPROVED or REJECTED.
+        Update some invoice attributes.
       parameters:
         - in: path
           name: invoiceId
@@ -189,7 +188,37 @@ paths:
               $ref: '#/components/schemas/PatchInvoiceRequest'
       responses:
         "204":
-          description: 'The invoice has been approved'
+          description: 'The invoice has been patched'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /bo/v1/invoices/{invoiceId}/status:
+    put:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeInvoicingManagement
+      summary: Update invoice's status
+      operationId: updateInvoiceStatus
+      description: |
+        Update invoice's status to APPROVED or REJECTED.
+      parameters:
+        - in: path
+          name: invoiceId
+          required: true
+          schema:
+            $ref: '#/components/schemas/InvoiceId'
+      requestBody:
+        description: Invoice
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInvoiceStatusRequest'
+      responses:
+        "204":
+          description: 'The invoice status has been updated'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -1596,18 +1625,26 @@ components:
     PatchInvoiceRequest:
       type: object
       properties:
-        status:
-          type: string
-          enum:
-            - APPROVED
-            - REJECTED
-
         paymentDate:
           type: string
           format: date-time
         refundDate:
           type: string
           format: date-time
+
+    UpdateInvoiceStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - APPROVED
+            - REJECTED
+        reason:
+          type: string
+          example: "The invoice is not valid"
 
     SponsorRequest:
       type: object
