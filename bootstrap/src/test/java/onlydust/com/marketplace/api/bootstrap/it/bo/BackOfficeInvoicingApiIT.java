@@ -339,8 +339,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     @Test
     void should_approve_invoices() {
         client
-                .patch()
-                .uri(getApiURI(INVOICE.formatted(invoices.get(1).id())))
+                .put()
+                .uri(getApiURI(PUT_INVOICES_STATUS.formatted(invoices.get(1).id())))
                 .header("Api-Key", apiKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -396,20 +396,32 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
 
     @Test
     void should_reject_invoices() {
+        final String rejectionReason = faker.rickAndMorty().character();
         client
-                .patch()
-                .uri(getApiURI(INVOICE.formatted(invoices.get(1).id())))
+                .put()
+                .uri(getApiURI(PUT_INVOICES_STATUS.formatted(invoices.get(1).id())))
                 .header("Api-Key", apiKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
-                          "status": "REJECTED"
+                          "status": "REJECTED",
+                          "reason": "%s"
                         }
-                        """)
+                        """.formatted(rejectionReason))
                 .exchange()
                 .expectStatus()
                 .isNoContent()
         ;
+
+        client
+                .get()
+                .uri(getApiURI(INVOICE.formatted(invoices.get(1).id())))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.rejectionReason").isEqualTo(rejectionReason);
 
         client
                 .get()
@@ -448,14 +460,15 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         }
                         """)
         ;
+
     }
 
 
     @Test
     void should_filter_invoices_by_status() {
         client
-                .patch()
-                .uri(getApiURI(INVOICE.formatted(invoices.get(0).id())))
+                .put()
+                .uri(getApiURI(PUT_INVOICES_STATUS.formatted(invoices.get(0).id())))
                 .header("Api-Key", apiKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -551,7 +564,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         null,
                         List.of(new Invoice.Wallet(Network.ETHEREUM, "vitalik.eth")),
                         rewards
-                )
+                ), null
         );
     }
 }

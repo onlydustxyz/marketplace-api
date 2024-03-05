@@ -326,6 +326,7 @@ public interface BackOfficeMapper {
     static InvoiceResponse mapInvoiceToContract(final Invoice invoice, List<BillingProfileCoworkerView> billingProfileAdmins, final List<RewardView> rewards) {
         return new InvoiceResponse()
                 .id(invoice.id().value())
+                .rejectionReason(invoice.rejectionReason())
                 .status(mapInvoiceInternalStatus(invoice.status()))
                 .createdAt(invoice.createdAt())
                 .billingProfile(new BillingProfileResponse()
@@ -447,7 +448,7 @@ public interface BackOfficeMapper {
         };
     }
 
-    static Invoice.Status mapInvoiceStatus(final PatchInvoiceRequest.StatusEnum status) {
+    static Invoice.Status mapInvoiceStatus(final UpdateInvoiceStatusRequest.StatusEnum status) {
         return switch (status) {
             case APPROVED -> Invoice.Status.APPROVED;
             case REJECTED -> Invoice.Status.REJECTED;

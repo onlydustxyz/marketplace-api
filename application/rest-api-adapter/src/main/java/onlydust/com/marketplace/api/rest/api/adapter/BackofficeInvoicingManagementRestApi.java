@@ -91,12 +91,6 @@ public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicing
     }
 
     @Override
-    public ResponseEntity<Void> updateInvoice(UUID invoiceId, PatchInvoiceRequest request) {
-        invoiceFacadePort.update(Invoice.Id.of(invoiceId), mapInvoiceStatus(request.getStatus()));
-        return ResponseEntity.noContent().build();
-    }
-
-    @Override
     public ResponseEntity<Resource> downloadInvoice(UUID invoiceId) {
         final var invoice = invoiceFacadePort.download(Invoice.Id.of(invoiceId));
 
@@ -106,5 +100,9 @@ public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicing
                 .body(new InputStreamResource(invoice.data()));
     }
 
-
+    @Override
+    public ResponseEntity<Void> updateInvoiceStatus(UUID invoiceId, UpdateInvoiceStatusRequest updateInvoiceStatusRequest) {
+        invoiceFacadePort.update(Invoice.Id.of(invoiceId), mapInvoiceStatus(updateInvoiceStatusRequest.getStatus()), updateInvoiceStatusRequest.getRejectionReason());
+        return ResponseEntity.noContent().build();
+    }
 }

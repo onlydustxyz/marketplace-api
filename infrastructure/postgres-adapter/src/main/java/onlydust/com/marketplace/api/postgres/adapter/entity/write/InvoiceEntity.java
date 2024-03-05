@@ -44,6 +44,7 @@ public class InvoiceEntity {
     String originalFileName;
     @Type(type = "jsonb")
     Data data;
+    String rejectionReason;
 
     public Invoice toDomain() {
         return new Invoice(
@@ -60,7 +61,8 @@ public class InvoiceEntity {
                 data.wallets,
                 data.rewards.stream().map(InvoiceRewardEntity::forInvoice).toList(),
                 url,
-                originalFileName
+                originalFileName,
+                rejectionReason
         );
     }
 
@@ -74,6 +76,7 @@ public class InvoiceEntity {
                 .amount(invoice.totalAfterTax().getValue())
                 .currency(CurrencyEntity.of(invoice.totalAfterTax().getCurrency()))
                 .originalFileName(invoice.originalFileName())
+                .rejectionReason(invoice.rejectionReason())
                 .data(Data.of(invoice));
     }
 

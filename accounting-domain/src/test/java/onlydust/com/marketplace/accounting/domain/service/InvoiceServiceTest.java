@@ -41,10 +41,21 @@ class InvoiceServiceTest {
         when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
 
         // When
-        assertThatThrownBy(() -> invoiceService.update(invoice.id(), Invoice.Status.APPROVED))
+        assertThatThrownBy(() -> invoiceService.update(invoice.id(), Invoice.Status.APPROVED, null))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Invoice %s not found".formatted(invoice.id()));
+    }
+
+    @Test
+    void should_reject_if_rejection_reason_on_approved_status() {
+        // Given
+        when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
+
+        assertThatThrownBy(() -> invoiceService.update(invoice.id(), Invoice.Status.APPROVED, faker.rickAndMorty().character()))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Only rejected invoice can have a rejection reason");
     }
 
     @ParameterizedTest
@@ -54,7 +65,7 @@ class InvoiceServiceTest {
         when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
         // When
-        assertThatThrownBy(() -> invoiceService.update(invoice.id(), status))
+        assertThatThrownBy(() -> invoiceService.update(invoice.id(), status, null))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Cannot update invoice to status %s".formatted(status));
@@ -65,27 +76,16 @@ class InvoiceServiceTest {
     void should_update_if_valid_status(Invoice.Status status) {
         // Given
         when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
+        final String rejectionReason = status == Invoice.Status.REJECTED ? faker.rickAndMorty().character() : null;
 
         // When
-        invoiceService.update(invoice.id(), status);
+        invoiceService.update(invoice.id(), status, rejectionReason);
 
         // Then
         final var invoiceCaptor = ArgumentCaptor.forClass(Invoice.class);
         verify(invoiceStoragePort).update(invoiceCaptor.capture());
         final var updatedInvoice = invoiceCaptor.getValue();
         assertThat(updatedInvoice.status()).isEqualTo(status);
-    }
-
-    @Test
-    void should_do_nothing_if_status_is_null() {
-        // Given
-        when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
-
-        // When
-        invoiceService.update(invoice.id(), null);
-
-        // Then
-        verify(invoiceStoragePort, never()).update(any());
     }
 
     @SneakyThrows
