@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutIn
 import onlydust.com.marketplace.accounting.domain.view.RewardView;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AccountingRewardStoragePort {
 
@@ -14,7 +15,11 @@ public interface AccountingRewardStoragePort {
 
     List<RewardView> getInvoiceRewards(@NonNull Invoice.Id invoiceId);
 
-    List<PayableRewardWithPayoutInfoView> findPayableRewardsWithPayoutInfo(List<Invoice.Id> invoiceIds);
+    List<PayableRewardWithPayoutInfoView> findPayableRewardsWithPayoutInfoForInvoices(List<Invoice.Id> invoiceIds);
 
-    void createBatchPayment(BatchPayment batchPayment);
+    List<PayableRewardWithPayoutInfoView> findPayableRewardsWithPayoutInfoForBatchPayment(BatchPayment.Id batchPaymentId);
+
+    Optional<BatchPayment> findBatchPayment(BatchPayment.Id batchPaymentId);
+
+    void saveBatchPayment(BatchPayment updatedBatchPayment);
 }

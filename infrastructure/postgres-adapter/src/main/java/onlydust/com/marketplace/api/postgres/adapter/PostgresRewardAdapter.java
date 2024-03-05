@@ -9,10 +9,12 @@ import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutIn
 import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.InvoiceRewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.PayableRewardWithPayoutInfoViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRewardViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.PayableRewardWithPayoutInfoViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ShortProjectViewEntityRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.project.domain.model.Project;
@@ -29,6 +31,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     private final ShortProjectViewEntityRepository shortProjectViewEntityRepository;
     private final InvoiceRewardViewRepository invoiceRewardViewRepository;
     private final PayableRewardWithPayoutInfoViewRepository payableRewardWithPayoutInfoViewRepository;
+    private final BatchPaymentRepository batchPaymentRepository;
 
     @Override
     public void save(Reward reward) {
@@ -73,14 +76,27 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     }
 
     @Override
-    public List<PayableRewardWithPayoutInfoView> findPayableRewardsWithPayoutInfo(List<Invoice.Id> invoiceIds) {
+    public List<PayableRewardWithPayoutInfoView> findPayableRewardsWithPayoutInfoForInvoices(List<Invoice.Id> invoiceIds) {
         return payableRewardWithPayoutInfoViewRepository.findAllByInvoiceIds(invoiceIds.stream().map(UuidWrapper::value).toList())
                 .stream().map(PayableRewardWithPayoutInfoViewEntity::toDomain)
                 .toList();
     }
 
     @Override
-    public void createBatchPayment(BatchPayment batchPayment) {
+    public List<PayableRewardWithPayoutInfoView> findPayableRewardsWithPayoutInfoForBatchPayment(BatchPayment.Id batchPaymentId) {
+        return payableRewardWithPayoutInfoViewRepository.findAllByBatchPaymentId(batchPaymentId.value())
+                .stream()
+                .map(PayableRewardWithPayoutInfoViewEntity::toDomain)
+                .toList();
+    }
 
+    @Override
+    public Optional<BatchPayment> findBatchPayment(BatchPayment.Id batchPaymentId) {
+        return batchPaymentRepository.findById(batchPaymentId.value()).map(BatchPaymentEntity::toDomain);
+    }
+
+    @Override
+    public void saveBatchPayment(BatchPayment batchPayment) {
+        batchPaymentRepository.save(BatchPaymentEntity.fromDomain(batchPayment));
     }
 }

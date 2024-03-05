@@ -2,6 +2,8 @@ package onlydust.com.marketplace.api.od.rust.api.client.adapter;
 
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.accounting.domain.port.out.OldRewardStoragePort;
+import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.MarkInvoiceAsReceivedDTO;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.RequestRewardDTO;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.RequestRewardResponseDTO;
@@ -15,7 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
-public class OdRustApiClientAdapter implements RewardServicePort {
+public class OdRustApiClientAdapter implements RewardServicePort, OldRewardStoragePort {
 
     private final OdRustApiHttpClient httpClient;
 
@@ -41,5 +43,11 @@ public class OdRustApiClientAdapter implements RewardServicePort {
     public void markPaymentAsReceived(BigDecimal amount, OldPayRewardRequestCommand oldPayRewardRequestCommand) {
         httpClient.send("/api/payments/%s/receipts".formatted(oldPayRewardRequestCommand.getRewardId()), HttpMethod.POST,
                 RewardMapper.mapOldPayRewardRequestCommandToDTO(oldPayRewardRequestCommand, amount), Void.class);
+    }
+
+    @Override
+    public void markRewardAsPaid(PayableRewardWithPayoutInfoView payableRewardWithPayoutInfoView, String transactionHash) {
+        httpClient.send("/api/payments/%s/receipts".formatted(payableRewardWithPayoutInfoView.id()), HttpMethod.POST,
+                RewardMapper.mapPayableRewardWithPayoutInfoViewToDTO(payableRewardWithPayoutInfoView, transactionHash), Void.class);
     }
 }

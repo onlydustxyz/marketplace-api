@@ -166,6 +166,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String POST_REWARDS_PAY_VO = "/bo/v0/rewards/%s/pay";
     protected static final String POST_REWARDS_SEARCH = "/bo/v1/rewards/search";
     protected static final String POST_REWARDS_BATCH_PAYMENTS = "/bo/v1/rewards/batch-payments";
+    protected static final String PUT_REWARDS_BATCH_PAYMENTS = "/bo/v1/rewards/batch-payments/%s";
 
     protected String apiKey() {
         return backOfficeApiKeyAuthenticationConfig.getApiKey();

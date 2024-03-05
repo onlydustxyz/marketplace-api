@@ -1,6 +1,9 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import onlydust.com.backoffice.api.contract.model.SearchRewardsResponse;
+import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
@@ -8,14 +11,19 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.od.rust.api.client.adapter.OdRustApiHttpClient;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.OldVerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserPayoutInfoRepository;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
 import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Wallet;
@@ -24,7 +32,10 @@ import onlydust.com.marketplace.project.domain.model.OldAccountNumber;
 import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
 import onlydust.com.marketplace.project.domain.service.UserService;
 import onlydust.com.marketplace.project.domain.view.UserRewardView;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
@@ -35,6 +46,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.util.Objects.nonNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
@@ -55,6 +67,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
     InvoiceStoragePort invoiceStoragePort;
     static List<UUID> invoiceIds = new ArrayList<>();
     static List<UUID> rewardIds = new ArrayList<>();
+    final StarknetAccountAddress olivierStarknetAddress = new StarknetAccountAddress("0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc8");
+    final StarknetAccountAddress anthoStarknetAddress = new StarknetAccountAddress("0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7");
 
     @Test
     @Order(1)
@@ -89,7 +103,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .ethWallet(new Wallet(new EvmAccountAddress("0x716E30e2981481bc56CCc315171A9E2923bD12B4")))
                 .aptosAddress(new AptosAccountAddress("0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5"))
                 .optimismAddress(new EvmAccountAddress("0x716E30e2981481bc56CCc315171A9E2923bD12B4"))
-                .starknetAddress(new StarknetAccountAddress("0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"))
+                .starknetAddress(olivierStarknetAddress)
                 .sepaAccount(UserPayoutSettings.SepaAccount.builder()
                         .accountNumber(OldAccountNumber.of("FR24 1009 6000 4032 5458 9765 X13"))
                         .bic("BOUSFRPPXXX")
@@ -100,7 +114,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .ethWallet(new Wallet(new EvmAccountAddress("0x716E30e2981481bc56CCc315171A9E2923bD12B4")))
                 .aptosAddress(new AptosAccountAddress("0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5"))
                 .optimismAddress(new EvmAccountAddress("0x716E30e2981481bc56CCc315171A9E2923bD12B4"))
-                .starknetAddress(new StarknetAccountAddress("0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"))
+                .starknetAddress(anthoStarknetAddress)
                 .sepaAccount(UserPayoutSettings.SepaAccount.builder()
                         .accountNumber(OldAccountNumber.of("FR24 1009 6000 4032 5458 9765 X13"))
                         .bic("BOUSFRPPXXX")
@@ -179,7 +193,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
         expectedRewardIds.addAll(anthoInvoice1.rewards().stream().map(reward -> reward.id().value()).toList());
         expectedRewardIds.addAll(anthoInvoice2.rewards().stream().map(reward -> reward.id().value()).toList());
         rewardIds.addAll(expectedRewardIds);
-        Assertions.assertEquals(expectedRewardIds.size(), searchRewardsResponse.getRewards().size());
+        assertEquals(expectedRewardIds.size(), searchRewardsResponse.getRewards().size());
     }
 
     @Test
@@ -205,7 +219,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .json("""
-                        {
+
+                                                {
                           "batchPayments": [
                             {
                               "csv": "native,,0x716E30e2981481bc56CCc315171A9E2923bD12B4,1000\\nerc20,0x686f2404e77Ab0d9070a46cdfb0B7feCDD2318b0,0x716E30e2981481bc56CCc315171A9E2923bD12B4,11.22\\nerc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,0x716E30e2981481bc56CCc315171A9E2923bD12B4,11.22\\nerc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,0x716E30e2981481bc56CCc315171A9E2923bD12B4,1000\\nerc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,0x716E30e2981481bc56CCc315171A9E2923bD12B4,1000\\nerc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,0x716E30e2981481bc56CCc315171A9E2923bD12B4,1000\\nerc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,0x716E30e2981481bc56CCc315171A9E2923bD12B4,1000\\nerc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,0x716E30e2981481bc56CCc315171A9E2923bD12B4,1000\\nerc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,0x716E30e2981481bc56CCc315171A9E2923bD12B4,1000\\nerc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,0x716E30e2981481bc56CCc315171A9E2923bD12B4,1000\\nerc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,0x716E30e2981481bc56CCc315171A9E2923bD12B4,1000\\nerc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,0x716E30e2981481bc56CCc315171A9E2923bD12B4,1000\\nerc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,0x716E30e2981481bc56CCc315171A9E2923bD12B4,1000",
@@ -239,7 +254,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ]
                             },
                             {
-                              "csv": "erc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7,11.222\\nerc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7,11522",
+                              "csv": "erc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7,11.222\\nerc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc8,11522",
                               "blockchain": "STARKNET",
                               "rewardCount": 2,
                               "totalAmounts": [
@@ -254,8 +269,86 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ]
                             }
                           ]
-                        }
-                        """);
+                        }""");
     }
 
+    @Autowired
+    BatchPaymentRepository batchPaymentRepository;
+    @Autowired
+    OdRustApiHttpClient.Properties odRustApiHttpClientProperties;
+    @Autowired
+    ApiKeyAuthenticationService.Config backOfficeApiKeyAuthenticationConfig;
+
+
+    @Test
+    @Order(3)
+    void should_pay_strk_batch_payment() {
+        // Given
+        final BatchPaymentEntity starknetBatchPaymentEntity = batchPaymentRepository.findAll().stream()
+                .filter(batchPaymentEntity -> batchPaymentEntity.getNetwork().equals(NetworkEnumEntity.starknet))
+                .findFirst()
+                .orElseThrow();
+        final String transactionHash = "0x" + faker.random().hex();
+
+        final PaymentRequestEntity r1 = paymentRequestRepository.findById(starknetBatchPaymentEntity.getRewardIds().get(0)).orElseThrow();
+        final PaymentRequestEntity r2 = paymentRequestRepository.findById(starknetBatchPaymentEntity.getRewardIds().get(1)).orElseThrow();
+
+
+        rustApiWireMockServer.stubFor(
+                WireMock.post("/api/payments/%s/receipts".formatted(r1.getId()))
+                        .withHeader("Api-Key", WireMock.equalTo(odRustApiHttpClientProperties.getApiKey()))
+                        .withRequestBody(WireMock.equalToJson(
+                                """
+                                        {
+                                           "amount": %s,
+                                           "currency": "%s",
+                                           "recipient_wallet": "%s",
+                                           "recipient_iban" : null,
+                                           "transaction_reference" : "%s"
+                                        }
+                                            """.formatted(r1.getAmount().toString(), r1.getCurrency().toDomain().name(), anthoStarknetAddress, transactionHash)
+                        ))
+                        .willReturn(ResponseDefinitionBuilder.okForJson("""
+                                {
+                                    "receipt_id": "%s"
+                                }""".formatted(UUID.randomUUID()))));
+
+        rustApiWireMockServer.stubFor(
+                WireMock.post("/api/payments/%s/receipts".formatted(r1.getId()))
+                        .withHeader("Api-Key", WireMock.equalTo(odRustApiHttpClientProperties.getApiKey()))
+                        .withRequestBody(WireMock.equalToJson(
+                                """
+                                        {
+                                           "amount": %s,
+                                           "currency": "%s",
+                                           "recipient_wallet": "%s",
+                                           "recipient_iban" : null,
+                                           "transaction_reference" : "%s"
+                                        }
+                                        """.formatted(r2.getAmount().toString(), r2.getCurrency().toDomain().name(), olivierStarknetAddress,
+                                        transactionHash)
+                        ))
+                        .willReturn(ResponseDefinitionBuilder.okForJson("""
+                                {
+                                    "receipt_id": "%s"
+                                }""".formatted(UUID.randomUUID()))));
+
+
+        // When
+        client.put()
+                .uri(getApiURI(PUT_REWARDS_BATCH_PAYMENTS.formatted(starknetBatchPaymentEntity.getId())))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Api-Key", apiKey())
+                .bodyValue("""
+                                          {
+                                            "transactionHash": "%s"
+                                          }
+                        """.formatted(transactionHash))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        assertEquals(BatchPayment.Status.PAID, batchPaymentRepository.findById(starknetBatchPaymentEntity.getId()).orElseThrow().toDomain().status());
+    }
 }

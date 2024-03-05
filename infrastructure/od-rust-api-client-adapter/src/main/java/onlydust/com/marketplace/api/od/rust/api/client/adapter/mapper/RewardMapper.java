@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.api.od.rust.api.client.adapter.mapper;
 
+import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.MarkPaymentReceivedDTO;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.RequestRewardDTO;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.OldPayRewardRequestCommand;
 import onlydust.com.marketplace.project.domain.model.OldRequestRewardCommand;
 
@@ -49,7 +51,7 @@ public interface RewardMapper {
     }
 
     static MarkPaymentReceivedDTO mapOldPayRewardRequestCommandToDTO(final OldPayRewardRequestCommand command,
-                                                                             final BigDecimal amount) {
+                                                                     final BigDecimal amount) {
         return MarkPaymentReceivedDTO.builder()
                 .amount(amount)
                 .transactionReference(command.getTransactionReference())
@@ -73,6 +75,21 @@ public interface RewardMapper {
                     case STRK -> "STRK";
                     case LORDS -> "LORDS";
                     case USDC -> "USDC";
+                })
+                .build();
+    }
+
+    static MarkPaymentReceivedDTO mapPayableRewardWithPayoutInfoViewToDTO(final PayableRewardWithPayoutInfoView view, final String transactionHash) {
+        return MarkPaymentReceivedDTO.builder()
+                .amount(view.money().amount())
+                .transactionReference(transactionHash)
+                .recipientWallet(view.wallet().address())
+                .currency(switch (view.money().currencyCode()) {
+                    case "ETH" -> "ETH";
+                    case "STRK" -> "STRK";
+                    case "LORDS" -> "LORDS";
+                    case "USDC" -> "USDC";
+                    default -> throw OnlyDustException.badRequest("Currency %s not supported here".formatted(view.money().currencyCode()));
                 })
                 .build();
     }
