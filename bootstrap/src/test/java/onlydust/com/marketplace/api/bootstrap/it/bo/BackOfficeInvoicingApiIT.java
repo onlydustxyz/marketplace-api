@@ -405,7 +405,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .bodyValue("""
                         {
                           "status": "REJECTED",
-                          "reason": "%s"
+                          "rejectionReason": "%s"
                         }
                         """.formatted(rejectionReason))
                 .exchange()
