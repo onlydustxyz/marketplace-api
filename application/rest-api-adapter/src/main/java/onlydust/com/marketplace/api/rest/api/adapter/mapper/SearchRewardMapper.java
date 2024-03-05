@@ -11,37 +11,41 @@ public interface SearchRewardMapper {
     static SearchRewardsResponse searchRewardToResponse(final List<RewardView> rewardViews) {
         final SearchRewardsResponse searchRewardsResponse = new SearchRewardsResponse();
         for (RewardView view : rewardViews) {
-            searchRewardsResponse.addRewardsItem(new SearchRewardItemResponse()
-                    .id(view.id())
-                    .githubUrls(view.githubUrls())
-                    .processedAt(view.processedAt())
-                    .requestedAt(view.requestedAt())
-                    .money(moneyViewToResponse(view.money())
-                    )
-                    .project(new ProjectLinkResponse()
-                            .name(view.projectName())
-                            .logoUrl(view.projectLogoUrl()))
-                    .sponsors(view.sponsors().stream()
-                            .map(shortSponsorView -> new SponsorLinkResponse()
-                                    .name(shortSponsorView.name())
-                                    .avatarUrl(shortSponsorView.logoUrl()))
-                            .toList())
-                    .billingProfile(new BillingProfileResponse()
-                            .id(view.billingProfileAdmin().billingProfileId().value())
-                            .type(switch (view.billingProfileAdmin().billingProfileType()) {
-                                case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
-                                case COMPANY, SELF_EMPLOYED -> BillingProfileType.COMPANY;
-                            })
-                            .name(view.billingProfileAdmin().billingProfileName())
-                            .admins(List.of(new BillingProfileAdminResponse()
-                                            .name(view.billingProfileAdmin().adminName())
-                                            .email(view.billingProfileAdmin().adminEmail())
-                                            .login(view.billingProfileAdmin().adminGithubLogin())
-                                            .avatarUrl(view.billingProfileAdmin().adminGithubAvatarUrl())
-                                    )
-                            )));
+            searchRewardsResponse.addRewardsItem(mapToItem(view));
         }
         return searchRewardsResponse;
+    }
+
+    static SearchRewardItemResponse mapToItem(RewardView view) {
+        return new SearchRewardItemResponse()
+                .id(view.id())
+                .githubUrls(view.githubUrls())
+                .processedAt(view.processedAt())
+                .requestedAt(view.requestedAt())
+                .money(moneyViewToResponse(view.money())
+                )
+                .project(new ProjectLinkResponse()
+                        .name(view.projectName())
+                        .logoUrl(view.projectLogoUrl()))
+                .sponsors(view.sponsors().stream()
+                        .map(shortSponsorView -> new SponsorLinkResponse()
+                                .name(shortSponsorView.name())
+                                .avatarUrl(shortSponsorView.logoUrl()))
+                        .toList())
+                .billingProfile(new BillingProfileResponse()
+                        .id(view.billingProfileAdmin().billingProfileId().value())
+                        .type(switch (view.billingProfileAdmin().billingProfileType()) {
+                            case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
+                            case COMPANY, SELF_EMPLOYED -> BillingProfileType.COMPANY;
+                        })
+                        .name(view.billingProfileAdmin().billingProfileName())
+                        .admins(List.of(new BillingProfileAdminResponse()
+                                        .name(view.billingProfileAdmin().adminName())
+                                        .email(view.billingProfileAdmin().adminEmail())
+                                        .login(view.billingProfileAdmin().adminGithubLogin())
+                                        .avatarUrl(view.billingProfileAdmin().adminGithubAvatarUrl())
+                                )
+                        ));
     }
 
     static MoneyLinkResponse moneyViewToResponse(final MoneyView view) {

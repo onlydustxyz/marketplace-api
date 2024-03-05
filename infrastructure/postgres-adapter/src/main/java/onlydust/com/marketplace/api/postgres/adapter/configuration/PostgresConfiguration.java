@@ -257,9 +257,10 @@ public class PostgresConfiguration {
     public PostgresRewardAdapter postgresRewardAdapter(final ShortProjectViewEntityRepository shortProjectViewEntityRepository,
                                                        final InvoiceRewardViewRepository invoiceRewardViewRepository,
                                                        final PayableRewardWithPayoutInfoViewRepository payableRewardWithPayoutInfoViewRepository,
-                                                       final BatchPaymentRepository batchPaymentRepository) {
+                                                       final BatchPaymentRepository batchPaymentRepository,
+                                                       final BatchPaymentDetailsViewRepository batchPaymentDetailsViewRepository) {
         return new PostgresRewardAdapter(shortProjectViewEntityRepository, invoiceRewardViewRepository, payableRewardWithPayoutInfoViewRepository,
-                batchPaymentRepository);
+                batchPaymentRepository, batchPaymentDetailsViewRepository);
     }
 
     @Bean

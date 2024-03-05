@@ -14,9 +14,11 @@ import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BatchPaymentMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SearchRewardMapper;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.OldPayRewardRequestCommand;
 import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -183,5 +185,21 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     public ResponseEntity<Void> updateBatchPayments(UUID batchPaymentId, BatchPaymentRequest batchPaymentRequest) {
         accountingRewardPort.markBatchPaymentAsPaid(BatchPayment.Id.of(batchPaymentId), batchPaymentRequest.getTransactionHash());
         return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<BatchPaymentDetailsResponse> getBatchPayment(UUID batchPaymentId) {
+        return ResponseEntity.ok(BatchPaymentMapper.detailsToResponse(accountingRewardPort.findBatchPaymentById(BatchPayment.Id.of(batchPaymentId))));
+    }
+
+    @Override
+    public ResponseEntity<BatchPaymentPageResponse> getBatchPayments(Integer pageIndex, Integer pageSize) {
+        final int sanitizePageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
+        final int sanitizedPageSize = PaginationHelper.sanitizePageSize(pageSize);
+        final BatchPaymentPageResponse batchPaymentPageResponse = BatchPaymentMapper.pageToResponse(accountingRewardPort.findBatchPayments(sanitizePageIndex,
+                sanitizedPageSize), pageIndex);
+        return batchPaymentPageResponse.getTotalPageNumber() > 1 ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(batchPaymentPageResponse) :
+                ResponseEntity.ok(batchPaymentPageResponse);
     }
 }

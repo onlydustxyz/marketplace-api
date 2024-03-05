@@ -40,13 +40,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static java.util.Objects.nonNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
@@ -314,7 +312,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 }""".formatted(UUID.randomUUID()))));
 
         rustApiWireMockServer.stubFor(
-                WireMock.post("/api/payments/%s/receipts".formatted(r1.getId()))
+                WireMock.post("/api/payments/%s/receipts".formatted(r2.getId()))
                         .withHeader("Api-Key", WireMock.equalTo(odRustApiHttpClientProperties.getApiKey()))
                         .withRequestBody(WireMock.equalToJson(
                                 """
@@ -349,6 +347,73 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectStatus()
                 .is2xxSuccessful();
 
-        assertEquals(BatchPayment.Status.PAID, batchPaymentRepository.findById(starknetBatchPaymentEntity.getId()).orElseThrow().toDomain().status());
+        final BatchPayment batchPayment = batchPaymentRepository.findById(starknetBatchPaymentEntity.getId()).orElseThrow().toDomain();
+        assertEquals(BatchPayment.Status.PAID, batchPayment.status());
+        assertTrue(batchPayment.rewardIds().contains(RewardId.of(r1.getId())));
+        assertTrue(batchPayment.rewardIds().contains(RewardId.of(r2.getId())));
     }
+
+
+    @Test
+    @Order(4)
+    void should_get_page_of_payment_batch_and_get_payment_batch_by_id() {
+        // Given
+        final BatchPaymentEntity starknetBatchPaymentEntity = batchPaymentRepository.findAll().stream()
+                .filter(batchPaymentEntity -> batchPaymentEntity.getNetwork().equals(NetworkEnumEntity.starknet))
+                .findFirst()
+                .orElseThrow();
+
+        // When
+        client.get()
+                .uri(getApiURI(GET_REWARDS_BATCH_PAYMENTS, Map.of("pageIndex", "0", "pageSize", "20")))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json(GET_BATCH_PAYMENTS_PAGE_JSON_RESPONSE);
+
+        // When
+        client.get()
+                .uri(getApiURI(GET_REWARDS_BATCH_PAYMENTS_BY_ID.formatted(starknetBatchPaymentEntity.getId())))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.blockchain").isEqualTo("STARKNET")
+                .jsonPath("$.rewardCount").isEqualTo(2)
+                .jsonPath("$.totalAmountUsd").isEqualTo(544)
+                .jsonPath("$.totalAmounts[0].amount").isEqualTo(11533.222)
+                .jsonPath("$.totalAmounts.length()").isEqualTo(1)
+                .jsonPath("$.rewards.length()").isEqualTo(2);
+    }
+
+    private static final String GET_BATCH_PAYMENTS_PAGE_JSON_RESPONSE = """
+            {
+              "totalPageNumber": 1,
+              "totalItemNumber": 1,
+              "hasMore": false,
+              "nextPageIndex": 0,
+              "batchPayments": [
+                {
+                  "blockchain": "STARKNET",
+                  "rewardCount": 2,
+                  "totalAmountUsd": 544,
+                  "totalAmounts": [
+                    {
+                      "amount": 11533.222,
+                      "dollarsEquivalent": 544,
+                      "conversionRate": null,
+                      "currencyCode": "STRK",
+                      "currencyName": "StarkNet Token",
+                      "currencyLogoUrl": null
+                    }
+                  ]
+                }
+              ]
+            }
+            """;
 }

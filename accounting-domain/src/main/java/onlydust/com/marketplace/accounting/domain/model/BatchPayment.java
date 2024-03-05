@@ -7,6 +7,8 @@ import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,6 +29,7 @@ public class BatchPayment {
     String transactionHash;
     @NonNull
     List<RewardId> rewardIds;
+    Date createdAt;
 
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)

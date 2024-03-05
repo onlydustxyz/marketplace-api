@@ -3,8 +3,10 @@ package onlydust.com.marketplace.accounting.domain.port.out;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
 import onlydust.com.marketplace.accounting.domain.view.RewardView;
+import onlydust.com.marketplace.kernel.pagination.Page;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,4 +24,8 @@ public interface AccountingRewardStoragePort {
     Optional<BatchPayment> findBatchPayment(BatchPayment.Id batchPaymentId);
 
     void saveBatchPayment(BatchPayment updatedBatchPayment);
+
+    Page<BatchPayment> findBatchPayments(int pageIndex, int pageSize);
+
+    Optional<BatchPaymentDetailsView> findBatchPaymentDetailsById(BatchPayment.Id batchPaymentId);
 }
