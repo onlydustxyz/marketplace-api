@@ -15,21 +15,17 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.BatchPaymentDet
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.PayableRewardWithPayoutInfoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
-import onlydust.com.marketplace.api.postgres.adapter.repository.BatchPaymentDetailsViewRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRewardViewRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.PayableRewardWithPayoutInfoViewRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.RewardViewRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.ShortProjectViewEntityRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
-import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.output.RewardStoragePort;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -152,7 +148,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
                 statuses.stream().map(RewardDetailsView.Status::toString).toList(),
                 fromRequestedAt, toRequestedAt,
                 fromProcessedAt, toProcessedAt,
-                Pageable.ofSize(pageSize).withPage(pageIndex)
+                PageRequest.of(pageIndex, pageSize, Sort.by("requested_at").descending())
         );
 
         return Page.<RewardDetailsView>builder()

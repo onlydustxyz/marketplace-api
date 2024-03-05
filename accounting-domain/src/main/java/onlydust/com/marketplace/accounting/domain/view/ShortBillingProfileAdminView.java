@@ -11,5 +11,5 @@ public record ShortBillingProfileAdminView(@NonNull String adminGithubLogin,
                                            String adminName,
                                            @NonNull BillingProfile.Id billingProfileId,
                                            @NonNull BillingProfile.Type billingProfileType,
-                                           @NonNull String billingProfileName) {
+                                           String billingProfileName) {
 }

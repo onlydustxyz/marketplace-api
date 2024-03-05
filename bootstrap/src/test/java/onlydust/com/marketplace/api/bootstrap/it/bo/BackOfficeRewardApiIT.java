@@ -26,6 +26,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.Batch
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserPayoutInfoRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
+import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Wallet;
@@ -42,7 +43,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static java.util.Objects.nonNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -120,19 +125,26 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         .build())
                 .build());
 
+        final var requestedAt = ZonedDateTime.parse("2024-03-05T19:00:00.000Z");
         final List<ProjectEntity> projects = projectRepository.findAll();
         paymentRequestRepository.saveAll(List.of(
-                new PaymentRequestEntity(UUID.randomUUID(), anthony.user().getId(), anthony.user().getGithubUserId(), new Date(), BigDecimal.valueOf(11.22),
+                new PaymentRequestEntity(UUID.fromString("5ae4a031-2676-4a96-8ff3-65a934f06fa9"), anthony.user().getId(), anthony.user().getGithubUserId(),
+                        DateMapper.ofNullable(requestedAt.minusMinutes(1)), BigDecimal.valueOf(11.22),
                         null, 0, projects.get(0).getId(), CurrencyEnumEntity.lords, BigDecimal.valueOf(22)),
-                new PaymentRequestEntity(UUID.randomUUID(), anthony.user().getId(), anthony.user().getGithubUserId(), new Date(), BigDecimal.valueOf(11.22),
+                new PaymentRequestEntity(UUID.fromString("bb790ead-639e-41ff-a6c9-7e8c240cad14"), anthony.user().getId(), anthony.user().getGithubUserId(),
+                        DateMapper.ofNullable(requestedAt.minusMinutes(2)), BigDecimal.valueOf(11.22),
                         null, 0, projects.get(1).getId(), CurrencyEnumEntity.op, BigDecimal.valueOf(2212)),
-                new PaymentRequestEntity(UUID.randomUUID(), olivier.user().getId(), anthony.user().getGithubUserId(), new Date(), BigDecimal.valueOf(11.222),
+                new PaymentRequestEntity(UUID.fromString("afb0d66f-6ccb-4c72-bfa1-22e8aaac12ec"), olivier.user().getId(), anthony.user().getGithubUserId(),
+                        DateMapper.ofNullable(requestedAt.minusMinutes(3)), BigDecimal.valueOf(11.222),
                         null, 0, projects.get(2).getId(), CurrencyEnumEntity.strk, BigDecimal.valueOf(322)),
-                new PaymentRequestEntity(UUID.randomUUID(), anthony.user().getId(), olivier.user().getGithubUserId(), new Date(), BigDecimal.valueOf(11522),
+                new PaymentRequestEntity(UUID.fromString("a2cb3b32-921a-48da-af29-a1e038c6c341"), anthony.user().getId(), olivier.user().getGithubUserId(),
+                        DateMapper.ofNullable(requestedAt.minusMinutes(4)), BigDecimal.valueOf(11522),
                         null, 0, projects.get(3).getId(), CurrencyEnumEntity.strk, BigDecimal.valueOf(222)),
-                new PaymentRequestEntity(UUID.randomUUID(), anthony.user().getId(), olivier.user().getGithubUserId(), new Date(), BigDecimal.valueOf(171.22),
+                new PaymentRequestEntity(UUID.fromString("e3ab855b-f6c4-485f-8d34-aa6cfb99e2b3"), anthony.user().getId(), olivier.user().getGithubUserId(),
+                        DateMapper.ofNullable(requestedAt.minusMinutes(5)), BigDecimal.valueOf(171.22),
                         null, 0, projects.get(3).getId(), CurrencyEnumEntity.usd, BigDecimal.valueOf(122)),
-                new PaymentRequestEntity(UUID.randomUUID(), olivier.user().getId(), anthony.user().getGithubUserId(), new Date(), BigDecimal.valueOf(11.22),
+                new PaymentRequestEntity(UUID.fromString("56a647e2-9ec7-4383-a91a-d41ce899682c"), olivier.user().getId(), anthony.user().getGithubUserId(),
+                        DateMapper.ofNullable(requestedAt.minusMinutes(6)), BigDecimal.valueOf(11.22),
                         null, 0, projects.get(2).getId(), CurrencyEnumEntity.usdc, BigDecimal.valueOf(2882))
         ));
 
@@ -198,12 +210,12 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
     }
 
     @Test
-    @Order(1)
+    @Order(2)
     void should_get_all_rewards() {
 
         // When
         client.get()
-                .uri(getApiURI(REWARDS, Map.of("pageIndex", "0", "pageSize", "50")))
+                .uri(getApiURI(REWARDS, Map.of("pageIndex", "0", "pageSize", "5")))
                 .header("Api-Key", apiKey())
                 // Then
                 .exchange()
@@ -211,7 +223,782 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .json("""
-                        {"foo":"bar"}
+                        {
+                          "totalPageNumber": 30,
+                          "totalItemNumber": 149,
+                          "hasMore": true,
+                          "nextPageIndex": 1,
+                          "rewards": [
+                            {
+                              "id": "5ae4a031-2676-4a96-8ff3-65a934f06fa9",
+                              "billingProfile": {
+                                "id": "7aadc53b-d146-4322-8ae2-1ee0083255b3",
+                                "name": "A My company",
+                                "type": "COMPANY",
+                                "verificationStatus": null,
+                                "admins": [
+                                  {
+                                    "login": "AnthonyBuisset",
+                                    "name": "Anthony BUISSET",
+                                    "email": "abuisset@gmail.com",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4"
+                                  }
+                                ]
+                              },
+                              "invoice": {
+                                "number": "OD-AMYCOMPANY-002",
+                                "status": "APPROVED"
+                              },
+                              "status": "PROCESSING",
+                              "requestedAt": "2024-03-05T18:59:00Z",
+                              "processedAt": null,
+                              "githubUrls": [],
+                              "recipient": {
+                                "login": "AnthonyBuisset",
+                                "name": null,
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4"
+                              },
+                              "project": {
+                                "name": "Cairo foundry",
+                                "logoUrl": null
+                              },
+                              "sponsors": [],
+                              "money": {
+                                "amount": 11.22,
+                                "dollarsEquivalent": 22,
+                                "conversionRate": null,
+                                "currencyCode": "LORDS",
+                                "currencyName": "Lords",
+                                "currencyLogoUrl": null
+                              },
+                              "transactionHash": null,
+                              "paidTo": null
+                            },
+                            {
+                              "id": "afb0d66f-6ccb-4c72-bfa1-22e8aaac12ec",
+                              "billingProfile": {
+                                "id": "7aadc53b-d146-4322-8ae2-1ee0083255b3",
+                                "name": "A My company",
+                                "type": "COMPANY",
+                                "verificationStatus": null,
+                                "admins": [
+                                  {
+                                    "login": "AnthonyBuisset",
+                                    "name": "Anthony BUISSET",
+                                    "email": "abuisset@gmail.com",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4"
+                                  }
+                                ]
+                              },
+                              "invoice": {
+                                "number": "OD-AMYCOMPANY-002",
+                                "status": "APPROVED"
+                              },
+                              "status": "PROCESSING",
+                              "requestedAt": "2024-03-05T18:57:00Z",
+                              "processedAt": null,
+                              "githubUrls": [],
+                              "recipient": {
+                                "login": "AnthonyBuisset",
+                                "name": null,
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4"
+                              },
+                              "project": {
+                                "name": "DogGPT",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15366926246018901574.jpg"
+                              },
+                              "sponsors": [],
+                              "money": {
+                                "amount": 11.222,
+                                "dollarsEquivalent": 322,
+                                "conversionRate": null,
+                                "currencyCode": "STRK",
+                                "currencyName": "StarkNet Token",
+                                "currencyLogoUrl": null
+                              },
+                              "transactionHash": null,
+                              "paidTo": null
+                            },
+                            {
+                              "id": "a2cb3b32-921a-48da-af29-a1e038c6c341",
+                              "billingProfile": {
+                                "id": "a59fd44b-f75f-430b-b60b-a4550c7feae4",
+                                "name": "O My company",
+                                "type": "COMPANY",
+                                "verificationStatus": null,
+                                "admins": [
+                                  {
+                                    "login": "ofux",
+                                    "name": "Olivier Fuxet",
+                                    "email": "olivier.fuxet@gmail.com",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4"
+                                  }
+                                ]
+                              },
+                              "invoice": {
+                                "number": "OD-OMYCOMPANY-002",
+                                "status": "APPROVED"
+                              },
+                              "status": "PROCESSING",
+                              "requestedAt": "2024-03-05T18:56:00Z",
+                              "processedAt": null,
+                              "githubUrls": [],
+                              "recipient": {
+                                "login": "ofux",
+                                "name": null,
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4"
+                              },
+                              "project": {
+                                "name": "kaaper2",
+                                "logoUrl": null
+                              },
+                              "sponsors": [],
+                              "money": {
+                                "amount": 11522,
+                                "dollarsEquivalent": 222,
+                                "conversionRate": null,
+                                "currencyCode": "STRK",
+                                "currencyName": "StarkNet Token",
+                                "currencyLogoUrl": null
+                              },
+                              "transactionHash": null,
+                              "paidTo": null
+                            },
+                            {
+                              "id": "e3ab855b-f6c4-485f-8d34-aa6cfb99e2b3",
+                              "billingProfile": {
+                                "id": "a59fd44b-f75f-430b-b60b-a4550c7feae4",
+                                "name": "O My company",
+                                "type": "COMPANY",
+                                "verificationStatus": null,
+                                "admins": [
+                                  {
+                                    "login": "ofux",
+                                    "name": "Olivier Fuxet",
+                                    "email": "olivier.fuxet@gmail.com",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4"
+                                  }
+                                ]
+                              },
+                              "invoice": {
+                                "number": "OD-OMYCOMPANY-002",
+                                "status": "APPROVED"
+                              },
+                              "status": "PROCESSING",
+                              "requestedAt": "2024-03-05T18:55:00Z",
+                              "processedAt": null,
+                              "githubUrls": [],
+                              "recipient": {
+                                "login": "ofux",
+                                "name": null,
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4"
+                              },
+                              "project": {
+                                "name": "kaaper2",
+                                "logoUrl": null
+                              },
+                              "sponsors": [],
+                              "money": {
+                                "amount": 171.22,
+                                "dollarsEquivalent": 122,
+                                "conversionRate": null,
+                                "currencyCode": "USD",
+                                "currencyName": "US Dollar",
+                                "currencyLogoUrl": null
+                              },
+                              "transactionHash": null,
+                              "paidTo": null
+                            },
+                            {
+                              "id": "56a647e2-9ec7-4383-a91a-d41ce899682c",
+                              "billingProfile": {
+                                "id": "7aadc53b-d146-4322-8ae2-1ee0083255b3",
+                                "name": "A My company",
+                                "type": "COMPANY",
+                                "verificationStatus": null,
+                                "admins": [
+                                  {
+                                    "login": "AnthonyBuisset",
+                                    "name": "Anthony BUISSET",
+                                    "email": "abuisset@gmail.com",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4"
+                                  }
+                                ]
+                              },
+                              "invoice": {
+                                "number": "OD-AMYCOMPANY-002",
+                                "status": "APPROVED"
+                              },
+                              "status": "PROCESSING",
+                              "requestedAt": "2024-03-05T18:54:00Z",
+                              "processedAt": null,
+                              "githubUrls": [],
+                              "recipient": {
+                                "login": "AnthonyBuisset",
+                                "name": null,
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4"
+                              },
+                              "project": {
+                                "name": "DogGPT",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15366926246018901574.jpg"
+                              },
+                              "sponsors": [],
+                              "money": {
+                                "amount": 11.22,
+                                "dollarsEquivalent": 2882,
+                                "conversionRate": null,
+                                "currencyCode": "USDC",
+                                "currencyName": "USD Coin",
+                                "currencyLogoUrl": null
+                              },
+                              "transactionHash": null,
+                              "paidTo": null
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
+    @Order(3)
+    void should_get_all_rewards_with_status() {
+
+        // When
+        client.get()
+                .uri(getApiURI(REWARDS, Map.of("pageIndex", "0", "pageSize", "5", "statuses", "PENDING_VERIFICATION")))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 6,
+                          "totalItemNumber": 30,
+                          "hasMore": true,
+                          "nextPageIndex": 1,
+                          "rewards": [
+                            {
+                              "id": "5f9060a7-6f9e-4ef7-a1e4-1aaa4c85f03c",
+                              "billingProfile": {
+                                "id": "4d47beb1-8f63-476b-8548-9f9fe97f0a6c",
+                                "name": "OnlyDust",
+                                "type": "COMPANY",
+                                "verificationStatus": null,
+                                "admins": [
+                                  {
+                                    "login": "gregcha",
+                                    "name": "Gregoire Charles",
+                                    "email": "gcm.charles@gmail.com",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4"
+                                  }
+                                ]
+                              },
+                              "invoice": null,
+                              "status": "PENDING_VERIFICATION",
+                              "requestedAt": "2023-10-08T10:09:31.842962Z",
+                              "processedAt": null,
+                              "githubUrls": [
+                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
+                              ],
+                              "recipient": {
+                                "login": "gregcha",
+                                "name": null,
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4"
+                              },
+                              "project": {
+                                "name": "Bretzel",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                              },
+                              "sponsors": [
+                                {
+                                  "name": "Coca Cola",
+                                  "avatarUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                                },
+                                {
+                                  "name": "OGC Nissa Ineos",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                                }
+                              ],
+                              "money": {
+                                "amount": 1000.00,
+                                "dollarsEquivalent": 1000.00,
+                                "conversionRate": null,
+                                "currencyCode": "USD",
+                                "currencyName": "US Dollar",
+                                "currencyLogoUrl": null
+                              },
+                              "transactionHash": null,
+                              "paidTo": null
+                            },
+                            {
+                              "id": "fab7aaf4-9b0c-4e52-bc9b-72ce08131617",
+                              "billingProfile": {
+                                "id": "4d47beb1-8f63-476b-8548-9f9fe97f0a6c",
+                                "name": "OnlyDust",
+                                "type": "COMPANY",
+                                "verificationStatus": null,
+                                "admins": [
+                                  {
+                                    "login": "gregcha",
+                                    "name": "Gregoire Charles",
+                                    "email": "gcm.charles@gmail.com",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4"
+                                  }
+                                ]
+                              },
+                              "invoice": null,
+                              "status": "PENDING_VERIFICATION",
+                              "requestedAt": "2023-10-08T10:06:42.730697Z",
+                              "processedAt": null,
+                              "githubUrls": [
+                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
+                              ],
+                              "recipient": {
+                                "login": "gregcha",
+                                "name": null,
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4"
+                              },
+                              "project": {
+                                "name": "Bretzel",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                              },
+                              "sponsors": [
+                                {
+                                  "name": "Coca Cola",
+                                  "avatarUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                                },
+                                {
+                                  "name": "OGC Nissa Ineos",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                                }
+                              ],
+                              "money": {
+                                "amount": 1000.00,
+                                "dollarsEquivalent": 1000.00,
+                                "conversionRate": null,
+                                "currencyCode": "USD",
+                                "currencyName": "US Dollar",
+                                "currencyLogoUrl": null
+                              },
+                              "transactionHash": null,
+                              "paidTo": null
+                            },
+                            {
+                              "id": "64fb2732-5632-4b09-a8b1-217485648129",
+                              "billingProfile": {
+                                "id": "4d47beb1-8f63-476b-8548-9f9fe97f0a6c",
+                                "name": "OnlyDust",
+                                "type": "COMPANY",
+                                "verificationStatus": null,
+                                "admins": [
+                                  {
+                                    "login": "gregcha",
+                                    "name": "Gregoire Charles",
+                                    "email": "gcm.charles@gmail.com",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4"
+                                  }
+                                ]
+                              },
+                              "invoice": null,
+                              "status": "PENDING_VERIFICATION",
+                              "requestedAt": "2023-10-08T10:00:31.105159Z",
+                              "processedAt": null,
+                              "githubUrls": [
+                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
+                              ],
+                              "recipient": {
+                                "login": "gregcha",
+                                "name": null,
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4"
+                              },
+                              "project": {
+                                "name": "Bretzel",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                              },
+                              "sponsors": [
+                                {
+                                  "name": "Coca Cola",
+                                  "avatarUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                                },
+                                {
+                                  "name": "OGC Nissa Ineos",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                                }
+                              ],
+                              "money": {
+                                "amount": 1000.00,
+                                "dollarsEquivalent": 1000.00,
+                                "conversionRate": null,
+                                "currencyCode": "USD",
+                                "currencyName": "US Dollar",
+                                "currencyLogoUrl": null
+                              },
+                              "transactionHash": null,
+                              "paidTo": null
+                            },
+                            {
+                              "id": "e1498a17-5090-4071-a88a-6f0b0c337c3a",
+                              "billingProfile": {
+                                "id": "7557dc00-6aa3-4a1c-9a00-9bdef3056943",
+                                "name": "Test",
+                                "type": "COMPANY",
+                                "verificationStatus": null,
+                                "admins": [
+                                  {
+                                    "login": "PierreOucif",
+                                    "name": "Pierre Oucif",
+                                    "email": "pierre.oucif@gadz.org",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                                  }
+                                ]
+                              },
+                              "invoice": null,
+                              "status": "PENDING_VERIFICATION",
+                              "requestedAt": "2023-09-20T08:46:52.77875Z",
+                              "processedAt": null,
+                              "githubUrls": [
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1221"
+                              ],
+                              "recipient": {
+                                "login": "PierreOucif",
+                                "name": null,
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                              },
+                              "project": {
+                                "name": "QA new contributions",
+                                "logoUrl": null
+                              },
+                              "sponsors": [],
+                              "money": {
+                                "amount": 1000,
+                                "dollarsEquivalent": 1010.00,
+                                "conversionRate": null,
+                                "currencyCode": "USDC",
+                                "currencyName": "USD Coin",
+                                "currencyLogoUrl": null
+                              },
+                              "transactionHash": null,
+                              "paidTo": null
+                            },
+                            {
+                              "id": "40fda3c6-2a3f-4cdd-ba12-0499dd232d53",
+                              "billingProfile": {
+                                "id": "7557dc00-6aa3-4a1c-9a00-9bdef3056943",
+                                "name": "Test",
+                                "type": "COMPANY",
+                                "verificationStatus": null,
+                                "admins": [
+                                  {
+                                    "login": "PierreOucif",
+                                    "name": "Pierre Oucif",
+                                    "email": "pierre.oucif@gadz.org",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                                  }
+                                ]
+                              },
+                              "invoice": null,
+                              "status": "PENDING_VERIFICATION",
+                              "requestedAt": "2023-09-19T07:40:26.971981Z",
+                              "processedAt": null,
+                              "githubUrls": [
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1129",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1138",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1139",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1157",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1170",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1171",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1178",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1179",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1180",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1183",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1185",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1186",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1187",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1188",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1194",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1195",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1198",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1200",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1203",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1206",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1209",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1212",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1220",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1225",
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1232"
+                              ],
+                              "recipient": {
+                                "login": "PierreOucif",
+                                "name": null,
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                              },
+                              "project": {
+                                "name": "QA new contributions",
+                                "logoUrl": null
+                              },
+                              "sponsors": [],
+                              "money": {
+                                "amount": 1000,
+                                "dollarsEquivalent": 1010.00,
+                                "conversionRate": null,
+                                "currencyCode": "USDC",
+                                "currencyName": "USD Coin",
+                                "currencyLogoUrl": null
+                              },
+                              "transactionHash": null,
+                              "paidTo": null
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
+    @Order(4)
+    void should_get_all_rewards_between_dates() {
+
+        // When
+        client.get()
+                .uri(getApiURI(REWARDS, Map.of("pageIndex", "0", "pageSize", "5", "statuses", "COMPLETE",
+                        "fromRequestedAt", "2023-02-08", "toRequestedAt", "2023-02-10"))
+                )
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 5,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "rewards": [
+                            {
+                              "id": "bdb59436-1b93-4c3c-a6e2-b8b09411280c",
+                              "billingProfile": {
+                                "id": "4d47beb1-8f63-476b-8548-9f9fe97f0a6c",
+                                "name": "OnlyDust",
+                                "type": "COMPANY",
+                                "verificationStatus": null,
+                                "admins": [
+                                  {
+                                    "login": "gregcha",
+                                    "name": "Gregoire Charles",
+                                    "email": "gcm.charles@gmail.com",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4"
+                                  }
+                                ]
+                              },
+                              "invoice": null,
+                              "status": "COMPLETE",
+                              "requestedAt": "2023-02-09T07:24:48.146947Z",
+                              "processedAt": "2023-02-09T07:35:03.828144Z",
+                              "githubUrls": [
+                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
+                              ],
+                              "recipient": {
+                                "login": "gregcha",
+                                "name": null,
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4"
+                              },
+                              "project": {
+                                "name": "Starklings",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
+                              },
+                              "sponsors": [],
+                              "money": {
+                                "amount": 1000,
+                                "dollarsEquivalent": 1010.00,
+                                "conversionRate": null,
+                                "currencyCode": "USDC",
+                                "currencyName": "USD Coin",
+                                "currencyLogoUrl": null
+                              },
+                              "transactionHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                              "paidTo": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea"
+                            },
+                            {
+                              "id": "e23ad82b-27c5-4840-9481-da31aef6ba1b",
+                              "billingProfile": {
+                                "id": "4d47beb1-8f63-476b-8548-9f9fe97f0a6c",
+                                "name": "OnlyDust",
+                                "type": "COMPANY",
+                                "verificationStatus": null,
+                                "admins": [
+                                  {
+                                    "login": "gregcha",
+                                    "name": "Gregoire Charles",
+                                    "email": "gcm.charles@gmail.com",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4"
+                                  }
+                                ]
+                              },
+                              "invoice": null,
+                              "status": "COMPLETE",
+                              "requestedAt": "2023-02-09T07:24:40.924453Z",
+                              "processedAt": "2023-02-09T07:35:03.417235Z",
+                              "githubUrls": [
+                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
+                              ],
+                              "recipient": {
+                                "login": "gregcha",
+                                "name": null,
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4"
+                              },
+                              "project": {
+                                "name": "Starklings",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
+                              },
+                              "sponsors": [],
+                              "money": {
+                                "amount": 2500,
+                                "dollarsEquivalent": 2525.00,
+                                "conversionRate": null,
+                                "currencyCode": "USDC",
+                                "currencyName": "USD Coin",
+                                "currencyLogoUrl": null
+                              },
+                              "transactionHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                              "paidTo": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea"
+                            },
+                            {
+                              "id": "72f257fa-1b20-433d-9cdd-88d5182b7369",
+                              "billingProfile": {
+                                "id": "4d47beb1-8f63-476b-8548-9f9fe97f0a6c",
+                                "name": "OnlyDust",
+                                "type": "COMPANY",
+                                "verificationStatus": null,
+                                "admins": [
+                                  {
+                                    "login": "gregcha",
+                                    "name": "Gregoire Charles",
+                                    "email": "gcm.charles@gmail.com",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4"
+                                  }
+                                ]
+                              },
+                              "invoice": null,
+                              "status": "COMPLETE",
+                              "requestedAt": "2023-02-09T07:24:31.946777Z",
+                              "processedAt": "2023-02-09T07:35:02.985188Z",
+                              "githubUrls": [
+                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
+                              ],
+                              "recipient": {
+                                "login": "gregcha",
+                                "name": null,
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4"
+                              },
+                              "project": {
+                                "name": "Starklings",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
+                              },
+                              "sponsors": [],
+                              "money": {
+                                "amount": 750,
+                                "dollarsEquivalent": 757.50,
+                                "conversionRate": null,
+                                "currencyCode": "USDC",
+                                "currencyName": "USD Coin",
+                                "currencyLogoUrl": null
+                              },
+                              "transactionHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                              "paidTo": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea"
+                            },
+                            {
+                              "id": "91c7e960-37ba-4334-ba91-f1b02f1927ab",
+                              "billingProfile": {
+                                "id": "4d47beb1-8f63-476b-8548-9f9fe97f0a6c",
+                                "name": "OnlyDust",
+                                "type": "COMPANY",
+                                "verificationStatus": null,
+                                "admins": [
+                                  {
+                                    "login": "gregcha",
+                                    "name": "Gregoire Charles",
+                                    "email": "gcm.charles@gmail.com",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4"
+                                  }
+                                ]
+                              },
+                              "invoice": null,
+                              "status": "COMPLETE",
+                              "requestedAt": "2023-02-09T07:24:20.274391Z",
+                              "processedAt": "2023-02-09T07:35:02.582428Z",
+                              "githubUrls": [
+                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
+                              ],
+                              "recipient": {
+                                "login": "gregcha",
+                                "name": null,
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4"
+                              },
+                              "project": {
+                                "name": "Starklings",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
+                              },
+                              "sponsors": [],
+                              "money": {
+                                "amount": 1000,
+                                "dollarsEquivalent": 1010.00,
+                                "conversionRate": null,
+                                "currencyCode": "USDC",
+                                "currencyName": "USD Coin",
+                                "currencyLogoUrl": null
+                              },
+                              "transactionHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                              "paidTo": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea"
+                            },
+                            {
+                              "id": "e6152967-9bd4-40e6-bad5-c9c4a9578d0f",
+                              "billingProfile": {
+                                "id": "86295e05-6a91-40ba-8544-6f56c2dbec6e",
+                                "name": "sasfd",
+                                "type": "COMPANY",
+                                "verificationStatus": null,
+                                "admins": [
+                                  {
+                                    "login": "oscarwroche",
+                                    "name": "sdf sdf",
+                                    "email": "oscar.w.roche@gmail.com",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4"
+                                  }
+                                ]
+                              },
+                              "invoice": null,
+                              "status": "COMPLETE",
+                              "requestedAt": "2023-02-08T09:14:56.053584Z",
+                              "processedAt": "2023-02-27T11:56:28.044044Z",
+                              "githubUrls": [
+                                "https://github.com/onlydustxyz/marketplace-frontend/pull/663"
+                              ],
+                              "recipient": {
+                                "login": "oscarwroche",
+                                "name": null,
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4"
+                              },
+                              "project": {
+                                "name": "oscar's awesome project",
+                                "logoUrl": null
+                              },
+                              "sponsors": [],
+                              "money": {
+                                "amount": 500,
+                                "dollarsEquivalent": 505.00,
+                                "conversionRate": null,
+                                "currencyCode": "USDC",
+                                "currencyName": "USD Coin",
+                                "currencyLogoUrl": null
+                              },
+                              "transactionHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                              "paidTo": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
+                            }
+                          ]
+                        }
                         """);
     }
 
@@ -292,9 +1079,10 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
 
     @Test
-    @Order(3)
+    @Order(103)
     void should_pay_strk_batch_payment() {
         // Given
+        final var toto = batchPaymentRepository.findAll();
         final BatchPaymentEntity starknetBatchPaymentEntity = batchPaymentRepository.findAll().stream()
                 .filter(batchPaymentEntity -> batchPaymentEntity.getNetwork().equals(NetworkEnumEntity.starknet))
                 .findFirst()
@@ -368,7 +1156,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
 
     @Test
-    @Order(4)
+    @Order(104)
     void should_get_page_of_payment_batch_and_get_payment_batch_by_id() {
         // Given
         final BatchPaymentEntity starknetBatchPaymentEntity = batchPaymentRepository.findAll().stream()

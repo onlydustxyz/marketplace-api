@@ -328,6 +328,7 @@ public interface BackOfficeMapper {
     static InvoiceResponse mapInvoiceToContract(final Invoice invoice, List<BillingProfileCoworkerView> billingProfileAdmins, final List<RewardView> rewards) {
         return new InvoiceResponse()
                 .id(invoice.id().value())
+                .number(invoice.number().toString())
                 .rejectionReason(invoice.rejectionReason())
                 .status(mapInvoiceInternalStatus(invoice.status()))
                 .createdAt(invoice.createdAt())

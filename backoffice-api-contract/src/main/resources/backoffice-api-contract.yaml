@@ -2431,7 +2431,6 @@ components:
         - id
         - name
         - type
-        - verificationStatus
       properties:
         id:
           $ref: '#/components/schemas/BillingProfileId'

@@ -45,7 +45,7 @@ public class RewardDetailsViewEntity {
 
     @NonNull UUID projectId;
     @NonNull String projectName;
-    @NonNull String projectLogoUrl;
+    String projectLogoUrl;
     @NonNull String projectShortDescription;
     @NonNull String projectSlug;
 
@@ -96,7 +96,7 @@ public class RewardDetailsViewEntity {
                 .status(RewardDetailsView.Status.valueOf(this.status))
                 .requestedAt(DateMapper.ofNullable(this.requestedAt))
                 .processedAt(DateMapper.ofNullable(this.processedAt))
-                .githubUrls(this.githubUrls)
+                .githubUrls(isNull(this.githubUrls) ? List.of() : this.githubUrls)
                 .project(ShortProjectView.builder()
                         .id(ProjectId.of(this.projectId))
                         .name(this.projectName)
@@ -127,7 +127,7 @@ public class RewardDetailsViewEntity {
                         .currencyCode(this.currencyCode)
                         .currencyLogoUrl(this.currencyLogoUrl)
                         .build())
-                .invoice(ShortInvoiceView.builder()
+                .invoice(isNull(this.invoiceId) ? null : ShortInvoiceView.builder()
                         .id(Invoice.Id.of(this.invoiceId))
                         .number(Invoice.Number.fromString(this.invoiceNumber))
                         .status(Invoice.Status.valueOf(this.invoiceStatus.toString()))

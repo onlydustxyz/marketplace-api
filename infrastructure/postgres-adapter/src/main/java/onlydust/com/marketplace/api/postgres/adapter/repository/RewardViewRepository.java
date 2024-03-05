@@ -15,31 +15,6 @@ public interface RewardViewRepository extends JpaRepository<RewardDetailsViewEnt
 
 
     @Query(value = """
-            WITH billing_profile_check as (select ubpt.user_id              as user_id,
-                                                ubpt.billing_profile_type   as type,
-                                                (
-                                                  case
-                                                      when ubpt.billing_profile_type = 'INDIVIDUAL'
-                                                          then ibp.verification_status = 'VERIFIED'
-                                                      when ubpt.billing_profile_type = 'COMPANY'
-                                                          then cbp.verification_status = 'VERIFIED'
-                                                      else false
-                                                  end
-                                                )                           as billing_profile_verified
-                                            from user_billing_profile_types ubpt
-                                            left join individual_billing_profiles ibp on ibp.user_id = ubpt.user_id
-                                            left join company_billing_profiles cbp on cbp.user_id = ubpt.user_id),
-                                            
-                 payout_checks as (select u.github_user_id                           github_user_id,
-                                          coalesce(wallets.list, '{}')               wallets,
-                                          ba.iban is not null and ba.bic is not null has_bank_account
-                                   from iam.users u
-                                   left join public.user_payout_info upi on u.id = upi.user_id
-                                   left join (select w.user_id, array_agg(distinct w.network) as list
-                                              from wallets w
-                                              group by w.user_id) wallets on wallets.user_id = u.id
-                                   left join bank_accounts ba on ba.user_id = u.id)
-                                   
             select pr.id                                    id,
                    reward_status.value                      status,
                    pr.requested_at                          requested_at,
@@ -94,18 +69,15 @@ public interface RewardViewRepository extends JpaRepository<RewardDetailsViewEnt
             from payment_requests pr
             join currencies c on c.code = upper(cast(pr.currency as text))
             join project_details pd on pd.project_id = pr.project_id
-            left join payout_checks ON payout_checks.github_user_id = pr.recipient_id
             left join (select ps2.project_id, json_agg(json_build_object('name', s.name, 'logoUrl', s.logo_url)) s_list
                        from sponsors s
                        join projects_sponsors ps2 on ps2.sponsor_id = s.id
                        group by ps2.project_id) s2 on s2.project_id = pr.project_id
-                       
             left join iam.users u on u.github_user_id = pr.recipient_id
             left join user_profile_info upi on upi.id = u.id
             left join user_billing_profile_types ubpt on ubpt.user_id = u.id
             left join individual_billing_profiles ibp on ibp.user_id = ubpt.user_id
             left join company_billing_profiles cbp on cbp.user_id = ubpt.user_id
-            left join billing_profile_check bpc on bpc.user_id = u.id
                         
             left join payments r on r.request_id = pr.id
             left join accounting.invoices i on i.id = pr.invoice_id
@@ -117,7 +89,33 @@ public interface RewardViewRepository extends JpaRepository<RewardDetailsViewEnt
                        left join indexer_exp.github_issues gi on cast(gi.id as text) = wi.id
                        group by wi.payment_id) g_urls on g_urls.payment_id = pr.id
                        
-            left join lateral (select case
+            left join lateral (
+                    with billing_profile_check as (select ubpt.user_id              as user_id,
+                                                ubpt.billing_profile_type   as type,
+                                                (
+                                                  case
+                                                      when ubpt.billing_profile_type = 'INDIVIDUAL'
+                                                          then ibp.verification_status = 'VERIFIED'
+                                                      when ubpt.billing_profile_type = 'COMPANY'
+                                                          then cbp.verification_status = 'VERIFIED'
+                                                      else false
+                                                  end
+                                                )                           as billing_profile_verified
+                                            from user_billing_profile_types ubpt
+                                            left join individual_billing_profiles ibp on ibp.user_id = ubpt.user_id
+                                            left join company_billing_profiles cbp on cbp.user_id = ubpt.user_id),
+                                            
+                    payout_checks as (select u.github_user_id                           github_user_id,
+                                          coalesce(wallets.list, '{}')               wallets,
+                                          ba.iban is not null and ba.bic is not null has_bank_account
+                                   from iam.users u
+                                   left join public.user_payout_info upi on u.id = upi.user_id
+                                   left join (select w.user_id, array_agg(distinct w.network) as list
+                                              from wallets w
+                                              group by w.user_id) wallets on wallets.user_id = u.id
+                                   left join bank_accounts ba on ba.user_id = u.id)
+                        
+                    select case
                        when r.id is not null then 'COMPLETE'
                        when not coalesce(bpc.billing_profile_verified, false) then 'PENDING_VERIFICATION'
                        when (case
@@ -131,7 +129,10 @@ public interface RewardViewRepository extends JpaRepository<RewardDetailsViewEnt
                        when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'
                        when coalesce(pr.invoice_received_at, i.created_at) is null then 'PENDING_INVOICE'
                        else 'PROCESSING'
-                   end as value) as reward_status on true
+                   end as value
+                   from payout_checks
+                   left join billing_profile_check bpc on bpc.user_id = u.id
+                   where payout_checks.github_user_id = pr.recipient_id) as reward_status on true
                        
             where reward_status.value in (:statuses)
                 and (coalesce(:fromRequestedAt) is null or pr.requested_at >= cast(cast(:fromRequestedAt as text) as timestamp))
