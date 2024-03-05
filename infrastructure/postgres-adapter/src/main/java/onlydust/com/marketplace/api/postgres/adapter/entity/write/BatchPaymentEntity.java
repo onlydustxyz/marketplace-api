@@ -85,6 +85,7 @@ public class BatchPaymentEntity {
                     case PAID -> BatchPayment.Status.PAID;
                     case TO_PAY -> BatchPayment.Status.TO_PAY;
                 })
+                .createdAt(this.createdAt)
                 .build();
     }
 

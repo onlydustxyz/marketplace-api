@@ -8,11 +8,13 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.OldRewardStoragePort;
+import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
 import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
+import onlydust.com.marketplace.kernel.pagination.Page;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
@@ -56,6 +58,17 @@ public class RewardService implements AccountingRewardPort {
                 .transactionHash(transactionHash)
                 .build();
         accountingRewardStoragePort.saveBatchPayment(updatedBatchPayment);
+    }
+
+    @Override
+    public Page<BatchPayment> findBatchPayments(int pageIndex, int pageSize) {
+        return accountingRewardStoragePort.findBatchPayments(pageIndex, pageSize);
+    }
+
+    @Override
+    public BatchPaymentDetailsView findBatchPaymentById(BatchPayment.Id batchPaymentId) {
+        return accountingRewardStoragePort.findBatchPaymentDetailsById(batchPaymentId)
+                .orElseThrow(() -> OnlyDustException.notFound("Batch payment details %s not found".formatted(batchPaymentId.value())));
     }
 
     @Override

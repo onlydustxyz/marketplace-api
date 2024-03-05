@@ -597,7 +597,7 @@ paths:
               $ref: '#/components/schemas/SearchRewardsRequest'
       responses:
         "200":
-          description: 'Page of rewards'
+          description: 'List of rewards'
           content:
             application/json:
               schema:
@@ -635,8 +635,65 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Get batch payments
+      operationId: getBatchPayments
+      description: |
+        Get page of paid batch payments
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'Page of paid batch payments'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchPaymentPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
   /bo/v1/rewards/batch-payments/{batchPaymentId}:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Get batch payment details
+      operationId: getBatchPayment
+      description: |
+        Get batch payment details
+      parameters:
+        - in: path
+          name: batchPaymentId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BatchPaymentId'
+      responses:
+        "200":
+          description: Batch payment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchPaymentDetailsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
     put:
       security:
         - apiKey: [ ]
@@ -651,7 +708,7 @@ paths:
           name: batchPaymentId
           required: true
           schema:
-            $ref: '#/components/schemas/ProjectId'
+            $ref: '#/components/schemas/BatchPaymentId'
       requestBody:
         description: Transaction hash
         required: true
@@ -2763,7 +2820,56 @@ components:
       properties:
         transactionHash:
           type: string
-          
 
+    BatchPaymentPageResponse:
+      required:
+        - batchPayments
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        batchPayments:
+          type: array
+          items:
+            $ref: '#/components/schemas/BatchPaymentItemResponse'
 
-      
+    BatchPaymentItemResponse:
+      type: object
+      required:
+        - id
+        - createdAt
+        - blockchain
+        - rewardCount
+        - totalAmounts
+        - totalAmountUsd
+      properties:
+        id:
+          $ref: '#/components/schemas/BatchPaymentId'
+        createdAt:
+          type: string
+          format: date-time
+        blockchain:
+          $ref: '#/components/schemas/BlockchainContract'
+        rewardCount:
+          type: integer
+          format: int64
+        totalAmountUsd:
+          type: number
+        totalAmounts:
+          items:
+            $ref: '#/components/schemas/MoneyLinkResponse'
+
+    BatchPaymentDetailsResponse:
+      allOf:
+        - $ref: '#/components/schemas/BatchPaymentItemResponse'
+        - $ref: '#/components/schemas/SearchRewardsResponse'
