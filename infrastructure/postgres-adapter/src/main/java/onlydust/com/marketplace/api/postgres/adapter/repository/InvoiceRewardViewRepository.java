@@ -37,11 +37,11 @@ public interface InvoiceRewardViewRepository extends JpaRepository<InvoiceReward
                    c.code                                 currency_code,
                    c.logo_url                             currency_logo_url,
                    case
-                        when r.receipt -> 'Ethereum' is not null then r.receipt ->> '{Ethereum, transaction_hash}'
-                        when r.receipt -> 'Optimism' is not null then r.receipt ->> '{Optimism, transaction_hash}'
-                        when r.receipt -> 'Aptos' is not null then r.receipt ->> '{Aptos, transaction_hash}'
-                        when r.receipt -> 'Starknet' is not null then r.receipt ->> '{Starknet, transaction_hash}'
-                        when r.receipt -> 'Sepa' is not null then r.receipt ->> '{Sepa, transaction_reference}'
+                        when r.receipt -> 'Ethereum' is not null then r.receipt -> 'Ethereum' ->> 'transaction_hash'
+                        when r.receipt -> 'Optimism' is not null then r.receipt -> 'Optimism' ->> 'transaction_hash'
+                        when r.receipt -> 'Aptos' is not null then r.receipt -> 'Aptos' ->> 'transaction_hash'
+                        when r.receipt -> 'Starknet' is not null then r.receipt -> 'Starknet' ->> 'transaction_hash'
+                        when r.receipt -> 'Sepa' is not null then r.receipt -> 'Sepa' ->> 'transaction_reference'
                         end                                transaction_hash
             from accounting.invoices i
                      join payment_requests pr on pr.invoice_id = i.id
@@ -103,11 +103,11 @@ public interface InvoiceRewardViewRepository extends JpaRepository<InvoiceReward
                    c.code                                 currency_code,
                    c.logo_url                             currency_logo_url,
                    case
-                        when r.receipt -> 'Ethereum' is not null then r.receipt ->> '{Ethereum, transaction_hash}'
-                        when r.receipt -> 'Optimism' is not null then r.receipt ->> '{Optimism, transaction_hash}'
-                        when r.receipt -> 'Aptos' is not null then r.receipt ->> '{Aptos, transaction_hash}'
-                        when r.receipt -> 'Starknet' is not null then r.receipt ->> '{Starknet, transaction_hash}'
-                        when r.receipt -> 'Sepa' is not null then r.receipt ->> '{Sepa, transaction_reference}'
+                        when r.receipt -> 'Ethereum' is not null then r.receipt -> 'Ethereum' ->> 'transaction_hash'
+                        when r.receipt -> 'Optimism' is not null then r.receipt -> 'Optimism' ->> 'transaction_hash'
+                        when r.receipt -> 'Aptos' is not null then r.receipt -> 'Aptos' ->> 'transaction_hash'
+                        when r.receipt -> 'Starknet' is not null then r.receipt -> 'Starknet' ->> 'transaction_hash'
+                        when r.receipt -> 'Sepa' is not null then r.receipt -> 'Sepa' ->> 'transaction_reference'
                         end                                transaction_hash
             from payment_requests pr
                      join currencies c on c.code = upper(cast(pr.currency as text))

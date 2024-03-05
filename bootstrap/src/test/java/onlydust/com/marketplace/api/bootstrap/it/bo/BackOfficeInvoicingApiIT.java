@@ -326,7 +326,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                     "currencyName": "USD Coin",
                                     "currencyLogoUrl": null
                                   },
-                                  "transactionHash": null
+                                  "transactionHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
                                 }
                               ]
                             }

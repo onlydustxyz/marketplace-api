@@ -46,7 +46,7 @@ public class PayableRewardWithPayoutInfoViewEntity {
         return PayableRewardWithPayoutInfoView.builder()
                 .id(this.rewardId)
                 .wallet(switch (this.currency) {
-                    case eth, lords, usdc -> new Invoice.Wallet(Network.ETHEREUM, this.ethereumAddress);
+                    case lords, usdc -> new Invoice.Wallet(Network.ETHEREUM, this.ethereumAddress);
                     case strk -> new Invoice.Wallet(Network.STARKNET, this.starknetAddress);
                     default -> null;
                 })

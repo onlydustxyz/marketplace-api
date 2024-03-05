@@ -75,7 +75,7 @@ public class RewardService implements AccountingRewardPort {
     public List<BatchPayment> createBatchPaymentsForInvoices(List<Invoice.Id> invoiceIds) {
         final List<PayableRewardWithPayoutInfoView> rewardViews = accountingRewardStoragePort.findPayableRewardsWithPayoutInfoForInvoices(invoiceIds)
                 .stream()
-                .filter(r -> List.of(Currency.Code.STRK_STR, Currency.Code.USDC_STR, Currency.Code.LORDS_STR, Currency.Code.ETH_STR).contains(r.money().currencyCode()))
+                .filter(r -> List.of(Currency.Code.STRK_STR, Currency.Code.USDC_STR, Currency.Code.LORDS_STR).contains(r.money().currencyCode()))
                 .toList();
         if (rewardViews.isEmpty()) {
             return List.of();
@@ -84,7 +84,7 @@ public class RewardService implements AccountingRewardPort {
         final List<PayableRewardWithPayoutInfoView> starknetRewards = new ArrayList<>();
         for (PayableRewardWithPayoutInfoView rewardView : rewardViews) {
             final String currencyCode = rewardView.money().currencyCode();
-            if (List.of(Currency.Code.USDC_STR, Currency.Code.LORDS_STR, Currency.Code.ETH_STR).contains(rewardView.money().currencyCode())) {
+            if (List.of(Currency.Code.USDC_STR, Currency.Code.LORDS_STR).contains(rewardView.money().currencyCode())) {
                 if (ethereumRewardMapToCurrencyCode.containsKey(currencyCode)) {
                     ethereumRewardMapToCurrencyCode.get(currencyCode).add(rewardView);
                 } else {
@@ -120,8 +120,6 @@ public class RewardService implements AccountingRewardPort {
             for (PayableRewardWithPayoutInfoView payableRewardWithPayoutInfoView : rewardsByCurrencyCode.getValue()) {
                 final String currencyCode = rewardsByCurrencyCode.getKey();
                 switch (currencyCode) {
-                    case Currency.Code.ETH_STR -> csvLines.add(new String[]{"native", "", payableRewardWithPayoutInfoView.wallet().address(),
-                            payableRewardWithPayoutInfoView.money().amount().toString()});
                     case Currency.Code.USDC_STR ->
                             csvLines.add(new String[]{"erc20", "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", payableRewardWithPayoutInfoView.wallet().address(),
                                     payableRewardWithPayoutInfoView.money().amount().toString()});

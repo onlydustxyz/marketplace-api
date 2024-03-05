@@ -173,10 +173,10 @@ public class RewardServiceTest {
         final BatchPayment ethereumBatchPayment =
                 batchPaymentsForInvoices.stream().filter(batchPayment -> batchPayment.blockchain().equals(Blockchain.ETHEREUM)).findFirst().orElseThrow();
         verify(accountingRewardStoragePort).saveBatchPayment(ethereumBatchPayment);
-        assertEquals(4, ethereumBatchPayment.rewardIds().size());
-        assertEquals(3, ethereumBatchPayment.moneys().size());
-        assertEquals(eth.money(),
-                ethereumBatchPayment.moneys().stream().filter(moneyView -> moneyView.currencyCode().equals(Currency.Code.ETH_STR)).findFirst().orElseThrow());
+        assertEquals(3, ethereumBatchPayment.rewardIds().size());
+        assertEquals(2, ethereumBatchPayment.moneys().size());
+        assertEquals(0,
+                ethereumBatchPayment.moneys().stream().filter(moneyView -> moneyView.currencyCode().equals(Currency.Code.ETH_STR)).toList().size());
         assertEquals(lords.money(),
                 ethereumBatchPayment.moneys().stream().filter(moneyView -> moneyView.currencyCode().equals(Currency.Code.LORDS_STR)).findFirst().orElseThrow());
         assertEquals(usdc1.money().toBuilder()
@@ -186,11 +186,10 @@ public class RewardServiceTest {
                 ,
                 ethereumBatchPayment.moneys().stream().filter(moneyView -> moneyView.currencyCode().equals(Currency.Code.USDC_STR)).findFirst().orElseThrow());
         assertEquals("""
-                native,,%s,%s
                 erc20,0x686f2404e77Ab0d9070a46cdfb0B7feCDD2318b0,%s,%s
                 erc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,%s,%s
                 erc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,%s,%s"""
-                .formatted(eth.wallet().address(), eth.money().amount(), lords.wallet().address(), lords.money().amount().toString(), usdc1.wallet().address(),
+                .formatted(lords.wallet().address(), lords.money().amount().toString(), usdc1.wallet().address(),
                         usdc1.money().amount().toString(), usdc2.wallet().address(), usdc2.money().amount().toString()), ethereumBatchPayment.csv());
     }
 
