@@ -571,7 +571,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
 
         client
                 .get()
-                .uri(getApiURI(V2_INVOICES, Map.of("pageIndex", "0", "pageSize", "10", "internalStatuses", "TO_REVIEW,REJECTED")))
+                .uri(getApiURI(V2_INVOICES, Map.of("pageIndex", "0", "pageSize", "10", "statuses", "TO_REVIEW,REJECTED")))
                 .header("Api-Key", apiKey())
                 .exchange()
                 .expectStatus()
@@ -580,7 +580,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .json("""
                         {
                           "totalPageNumber": 1,
-                          "totalItemNumber": 3,
+                          "totalItemNumber": 2,
                           "hasMore": false,
                           "nextPageIndex": 0,
                           "invoices": [

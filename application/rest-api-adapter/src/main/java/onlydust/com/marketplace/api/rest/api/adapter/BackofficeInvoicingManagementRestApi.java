@@ -62,12 +62,12 @@ public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicing
 
     @Override
     public ResponseEntity<InvoicePageV2> getInvoicePageV2(Integer pageIndex, Integer pageSize, List<UUID> invoiceIds,
-                                                          List<InvoiceInternalStatus> internalStatuses) {
+                                                          List<InvoiceInternalStatus> statuses) {
         final int sanitizedPageSize = sanitizePageSize(pageSize, MAX_PAGE_SIZE);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final var page = invoiceFacadePort.findAll(
                 Optional.ofNullable(invoiceIds).orElse(List.of()).stream().map(Invoice.Id::of).toList(),
-                Optional.ofNullable(internalStatuses).orElse(ALL_STATUSES).stream().map(BackOfficeMapper::mapInvoiceStatus).toList(),
+                Optional.ofNullable(statuses).orElse(ALL_STATUSES).stream().map(BackOfficeMapper::mapInvoiceStatus).toList(),
                 sanitizedPageIndex,
                 sanitizedPageSize
         );
