@@ -56,6 +56,7 @@ public interface RewardMapper {
     static RewardView rewardWithReceiptToDomain(RewardViewEntity rewardViewEntityByd) {
         return RewardView.builder()
                 .id(rewardViewEntityByd.getId())
+                .invoiceId(rewardViewEntityByd.getInvoiceId())
                 .to(GithubUserIdentity.builder()
                         .githubAvatarUrl(rewardViewEntityByd.getRecipientAvatarUrl())
                         .githubLogin(rewardViewEntityByd.getRecipientLogin())

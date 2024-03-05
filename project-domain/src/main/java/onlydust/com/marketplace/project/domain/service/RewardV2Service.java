@@ -72,6 +72,7 @@ public class RewardV2Service implements RewardFacadePort {
 
         final var reward = rewardStoragePort.get(rewardId)
                 .orElseThrow(() -> OnlyDustException.notFound("Reward %s not found".formatted(rewardId)));
+        // TODO: prevent cancel if reward already in invoice
 
         // TODO: Use currencyId as input in REST API
         rewardStoragePort.delete(rewardId);

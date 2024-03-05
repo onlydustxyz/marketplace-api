@@ -9,6 +9,7 @@ import onlydust.com.marketplace.project.domain.port.output.RewardServicePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.view.BudgetView;
 import onlydust.com.marketplace.project.domain.view.ProjectBudgetsView;
+import onlydust.com.marketplace.project.domain.view.RewardView;
 import onlydust.com.marketplace.project.domain.view.UserRewardView;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -262,6 +263,7 @@ public class RewardServiceTest {
         // When
         when(permissionService.isUserProjectLead(projectId, projectLeadId))
                 .thenReturn(true);
+        when(userStoragePort.findRewardById(rewardId)).thenReturn(RewardView.builder().id(rewardId).build());
         rewardService.cancelReward(projectLeadId, projectId, rewardId);
 
         // Then
@@ -299,6 +301,40 @@ public class RewardServiceTest {
         Assertions.assertNotNull(onlyDustException);
         Assertions.assertEquals(403, onlyDustException.getStatus());
         Assertions.assertEquals("User must be project lead to cancel a reward", onlyDustException.getMessage());
+    }
+
+    @Test
+    void should_throw_a_forbidden_exception_when_cancelling_a_reward_already_contained_in_an_invoice() {
+        final RewardServicePort rewardServicePort = mock(RewardServicePort.class);
+        final PermissionService permissionService = mock(PermissionService.class);
+        final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
+        final IndexerPort indexerPort = mock(IndexerPort.class);
+        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
+
+        final RewardService rewardService =
+                new RewardService(rewardServicePort, projectRewardStoragePort, permissionService, indexerPort,
+                        userStoragePort);
+
+        final UUID projectLeadId = UUID.randomUUID();
+        final UUID projectId = UUID.randomUUID();
+        final var rewardId = UUID.randomUUID();
+
+        // When
+        when(permissionService.isUserProjectLead(projectId, projectLeadId))
+                .thenReturn(true);
+        when(userStoragePort.findRewardById(rewardId))
+                .thenReturn(RewardView.builder().id(rewardId).invoiceId(UUID.randomUUID()).build());
+        OnlyDustException onlyDustException = null;
+        try {
+            rewardService.cancelReward(projectLeadId, projectId, rewardId);
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        Assertions.assertNotNull(onlyDustException);
+        Assertions.assertEquals(403, onlyDustException.getStatus());
+        Assertions.assertEquals("Cannot cancel reward %s which is already contained in an invoice".formatted(rewardId), onlyDustException.getMessage());
     }
 
     @Test
