@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.contract.model.MyBillingProfilesResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.OldVerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
@@ -57,6 +58,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     UserAuthHelper.AuthenticatedUser antho;
     UserAuthHelper.AuthenticatedUser olivier;
     UUID billingProfileId;
+    UUID individualBillingProfileId;
 
     @BeforeEach
     void setUp() {
@@ -87,6 +89,16 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
         companyBillingProfileRepository.save(companyBillingProfile);
 
         billingProfileId = companyBillingProfile.getId();
+
+        final var individualBillingProfile = individualBillingProfileRepository.findByUserId(antho.user().getId()).orElseThrow();
+        individualBillingProfile.setFirstName("Anthony");
+        individualBillingProfile.setLastName("Buisson");
+        individualBillingProfile.setCountry("FRA");
+        individualBillingProfile.setAddress("My address");
+        individualBillingProfile.setVerificationStatus(OldVerificationStatusEntity.VERIFIED);
+        individualBillingProfileRepository.save(individualBillingProfile);
+
+        individualBillingProfileId = individualBillingProfile.getId();
     }
 
 
@@ -402,7 +414,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isForbidden();
 
-        // Uploading a generated invoice is forbidden when the mandate has been accepted
+        // Uploading a generated invoice is allowed when the mandate has been accepted
         client.post()
                 .uri(getApiURI(BILLING_PROFILE_INVOICE.formatted(billingProfileId, invoiceId.getValue())))
                 .header("Authorization", BEARER_PREFIX + antho.jwt())
@@ -459,9 +471,13 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
 
     protected void testInvoiceStatus(UUID invoiceId) {
         {
-            final var invoice = entityManagerFactory.createEntityManager().find(InvoiceEntity.class, invoiceId);
+            final var em = entityManagerFactory.createEntityManager();
+            final var invoice = em.find(InvoiceEntity.class, invoiceId);
             assertThat(invoice.status()).isEqualTo(InvoiceEntity.Status.APPROVED);
+            em.close();
+        }
 
+        {
             final var em = entityManagerFactory.createEntityManager();
             em.getTransaction().begin();
             em.persist(PaymentEntity.builder()
@@ -479,9 +495,13 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
         }
 
         {
-            final var invoice = entityManagerFactory.createEntityManager().find(InvoiceEntity.class, invoiceId);
+            final var em = entityManagerFactory.createEntityManager();
+            final var invoice = em.find(InvoiceEntity.class, invoiceId);
             assertThat(invoice.status()).isEqualTo(InvoiceEntity.Status.APPROVED);
+            em.close();
+        }
 
+        {
             final var em = entityManagerFactory.createEntityManager();
             em.getTransaction().begin();
             em.persist(PaymentEntity.builder()
@@ -499,8 +519,10 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
         }
 
         {
-            final var invoice = entityManagerFactory.createEntityManager().find(InvoiceEntity.class, invoiceId);
+            final var em = entityManagerFactory.createEntityManager();
+            final var invoice = em.find(InvoiceEntity.class, invoiceId);
             assertThat(invoice.status()).isEqualTo(InvoiceEntity.Status.PAID);
+            em.close();
         }
     }
 
@@ -617,61 +639,6 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.billingProfiles.length()").isEqualTo(1)
                 .jsonPath("$.billingProfiles[0].id").isNotEmpty()
                 .jsonPath("$.billingProfiles[0].invoiceMandateAccepted").isEqualTo(false);
-    }
-
-
-    @SneakyThrows
-    @Test
-    @Order(5)
-    void preview_with_both_billing_profile_types() {
-        // First, generate an invoice preview with the individual billing profile
-        client.get()
-                .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(billingProfileId), Map.of(
-                        "rewardIds", "dd7d445f-6915-4955-9bae-078173627b05"
-                )))
-                .header("Authorization", BEARER_PREFIX + antho.jwt())
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful();
-
-        // Then switch billing profile type
-        client.patch()
-                .uri(getApiURI(ME_PATCH_BILLING_PROFILE_TYPE))
-                .header("Authorization", "Bearer " + antho.jwt())
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                          "type": "INDIVIDUAL"
-                        }
-                        """)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful();
-
-        final var individualBillingProfileId = client.get()
-                .uri(ME_BILLING_PROFILES)
-                .header("Authorization", BEARER_PREFIX + antho.jwt())
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody(MyBillingProfilesResponse.class)
-                .returnResult()
-                .getResponseBody().getBillingProfiles().get(0).getId();
-
-
-        // Generate another preview for the same rewards
-        client.get()
-                .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(individualBillingProfileId), Map.of(
-                        "rewardIds", "dd7d445f-6915-4955-9bae-078173627b05"
-                )))
-                .header("Authorization", BEARER_PREFIX + antho.jwt())
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful();
     }
 
 
@@ -926,5 +893,111 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
             assertThat(invoices).hasSize(2);
             assertThat(invoices.get(1).getStatus()).isLessThan(invoices.get(0).getStatus());
         }
+    }
+
+    @SneakyThrows
+    @Test
+    @Order(200)
+    void preview_with_both_billing_profile_types() {
+        final var rewardId = "fa097fab-9c01-4afa-bf1f-8d07029e03af";
+        final var em = entityManagerFactory.createEntityManager();
+
+        // First, generate an invoice preview with the company billing profile
+        final var invoiceOnCompanyId = new MutableObject<String>();
+        client.get()
+                .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(billingProfileId), Map.of(
+                        "rewardIds", rewardId
+                )))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.id").value(invoiceOnCompanyId::setValue);
+
+        var invoiceOnCompany = em.find(InvoiceEntity.class, UUID.fromString(invoiceOnCompanyId.getValue()));
+        assertThat(invoiceOnCompany.status()).isEqualTo(InvoiceEntity.Status.DRAFT);
+        assertThat(invoiceOnCompany.data().rewards().stream().anyMatch(r -> r.id().equals(UUID.fromString(rewardId)))).isTrue();
+        var reward = entityManagerFactory.createEntityManager().find(PaymentRequestEntity.class, UUID.fromString(rewardId));
+        assertThat(reward.getInvoice().id().toString()).isEqualTo(invoiceOnCompanyId.getValue());
+
+        // Then switch billing profile type
+        client.patch()
+                .uri(getApiURI(ME_PATCH_BILLING_PROFILE_TYPE))
+                .header("Authorization", "Bearer " + antho.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "type": "INDIVIDUAL"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // Generate another preview for the same rewards
+        final var invoiceId = new MutableObject<String>();
+        client.get()
+                .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(individualBillingProfileId), Map.of(
+                        "rewardIds", rewardId
+                )))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.id").value(invoiceId::setValue);
+
+        // ...and approve it
+        client.post()
+                .uri(getApiURI(BILLING_PROFILE_INVOICE.formatted(individualBillingProfileId, invoiceId.getValue())))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .body(fromResource(new FileSystemResource(getClass().getResource("/invoices/invoice-sample.pdf").getFile())))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+
+        final var invoice = em.find(InvoiceEntity.class, UUID.fromString(invoiceId.getValue()));
+        assertThat(invoice.status()).isEqualTo(InvoiceEntity.Status.APPROVED);
+
+        // Check that the reward is part of the approved invoice
+        reward = em.find(PaymentRequestEntity.class, UUID.fromString(rewardId));
+        assertThat(reward.getInvoice().id().toString()).isEqualTo(invoiceId.getValue());
+
+        // Switch back to company billing profile type
+        client.patch()
+                .uri(getApiURI(ME_PATCH_BILLING_PROFILE_TYPE))
+                .header("Authorization", "Bearer " + antho.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "type": "COMPANY"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // And generate another preview for another reward
+        client.get()
+                .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(billingProfileId), Map.of(
+                        "rewardIds", "b917e003-2880-4958-995b-06805fb0e928"
+                )))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody();
+
+        // Now check that the reward is still part of the approved invoice
+        reward = em.find(PaymentRequestEntity.class, UUID.fromString(rewardId));
+        assertThat(reward.getInvoice().id().toString()).isEqualTo(invoiceId.getValue());
+        em.close();
     }
 }
