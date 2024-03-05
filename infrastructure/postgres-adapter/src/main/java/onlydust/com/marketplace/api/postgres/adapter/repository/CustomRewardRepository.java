@@ -117,6 +117,7 @@ public class CustomRewardRepository {
                        user_avatar_url(gu_requestor.id, gu_requestor.avatar_url)                   requestor_avatar_url,
                        gu_requestor.id                                                             requestor_id,
                        pr.id,
+                       pr.invoice_id,
                        pr.amount,
                        pr.currency,
                        (select count(id) from work_items wi where wi.payment_id = pr.id)           contribution_count,

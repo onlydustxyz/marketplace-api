@@ -42,7 +42,7 @@ public class RewardViewEntity {
     BigDecimal dollarsEquivalent;
     @Column(name = "status")
     String status;
-
+    UUID invoiceId;
     @Column(name = "requestor_login")
     String requestorLogin;
     @Column(name = "requestor_avatar_url")

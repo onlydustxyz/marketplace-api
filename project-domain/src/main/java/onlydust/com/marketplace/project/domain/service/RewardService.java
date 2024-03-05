@@ -54,6 +54,10 @@ public class RewardService implements RewardFacadePort {
     @Override
     public void cancelReward(UUID projectLeadId, UUID projectId, UUID rewardId) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
+            final RewardView rewardById = userStoragePort.findRewardById(rewardId);
+            if (nonNull(rewardById.getInvoiceId())) {
+                throw OnlyDustException.forbidden("Cannot cancel reward %s which is already contained in an invoice".formatted(rewardId));
+            }
             rewardServicePort.cancel(rewardId);
         } else {
             throw OnlyDustException.forbidden("User must be project lead to cancel a reward");
