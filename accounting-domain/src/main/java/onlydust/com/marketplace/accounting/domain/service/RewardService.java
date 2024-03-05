@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
+
 @AllArgsConstructor
 public class RewardService implements AccountingRewardPort {
 
@@ -37,6 +39,7 @@ public class RewardService implements AccountingRewardPort {
         return accountingRewardStoragePort.searchRewards(List.of(Invoice.Status.APPROVED), invoiceIds)
                 .stream()
                 .filter(rewardView -> CURRENCY_CODES_AVAILABLE_FOR_BATCH_PAYMENT.contains(rewardView.money().currencyCode()))
+                .filter(rewardView -> isNull(rewardView.processedAt()) && isNull(rewardView.transactionHash()))
                 .toList();
     }
 

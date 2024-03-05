@@ -310,10 +310,57 @@ public class RewardServiceTest {
                         generateRewardStubForCurrency(Currency.Code.EUR_STR),
                         generateRewardStubForCurrency(Currency.Code.OP_STR),
                         generateRewardStubForCurrency(Currency.Code.USD_STR),
+                        generateRewardStubForCurrency(Currency.Code.USD_STR),
                         generateRewardStubForCurrency(Currency.Code.USDC_STR),
                         generateRewardStubForCurrency(Currency.Code.APT_STR),
                         generateRewardStubForCurrency(Currency.Code.LORDS_STR),
-                        generateRewardStubForCurrency(Currency.Code.STRK_STR)
+                        generateRewardStubForCurrency(Currency.Code.STRK_STR),
+                        RewardView.builder()
+                                .id(UUID.randomUUID())
+                                .billingProfileAdmin(ShortBillingProfileAdminView.builder()
+                                        .adminEmail(faker.gameOfThrones().character())
+                                        .billingProfileName(faker.gameOfThrones().character())
+                                        .adminGithubLogin(faker.gameOfThrones().character())
+                                        .adminName(faker.gameOfThrones().character())
+                                        .adminEmail(faker.gameOfThrones().character())
+                                        .billingProfileType(BillingProfile.Type.COMPANY)
+                                        .billingProfileId(BillingProfile.Id.random())
+                                        .adminGithubAvatarUrl(faker.rickAndMorty().character())
+                                        .build())
+                                .requestedAt(ZonedDateTime.now())
+                                .githubUrls(List.of())
+                                .sponsors(List.of())
+                                .projectName(faker.rickAndMorty().character())
+                                .processedAt(ZonedDateTime.now())
+                                .money(MoneyView.builder()
+                                        .amount(BigDecimal.ONE)
+                                        .currencyCode(Currency.Code.USDC_STR)
+                                        .currencyName(faker.rickAndMorty().location())
+                                        .build())
+                                .build(),
+                        RewardView.builder()
+                                .id(UUID.randomUUID())
+                                .billingProfileAdmin(ShortBillingProfileAdminView.builder()
+                                        .adminEmail(faker.gameOfThrones().character())
+                                        .billingProfileName(faker.gameOfThrones().character())
+                                        .adminGithubLogin(faker.gameOfThrones().character())
+                                        .adminName(faker.gameOfThrones().character())
+                                        .adminEmail(faker.gameOfThrones().character())
+                                        .billingProfileType(BillingProfile.Type.COMPANY)
+                                        .billingProfileId(BillingProfile.Id.random())
+                                        .adminGithubAvatarUrl(faker.rickAndMorty().character())
+                                        .build())
+                                .requestedAt(ZonedDateTime.now())
+                                .githubUrls(List.of())
+                                .sponsors(List.of())
+                                .projectName(faker.rickAndMorty().character())
+                                .transactionHash(faker.random().hex())
+                                .money(MoneyView.builder()
+                                        .amount(BigDecimal.ONE)
+                                        .currencyCode(Currency.Code.USDC_STR)
+                                        .currencyName(faker.rickAndMorty().location())
+                                        .build())
+                                .build()
                 ));
         final List<RewardView> rewardViews = rewardService.searchForBatchPaymentByInvoiceIds(invoiceIds);
 
