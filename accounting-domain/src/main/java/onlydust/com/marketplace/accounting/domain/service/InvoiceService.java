@@ -13,6 +13,7 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -33,15 +34,14 @@ public class InvoiceService implements InvoiceFacadePort {
     }
 
     @Override
-    public void update(Invoice.Id id, Invoice.Status status) throws OnlyDustException {
+    public void update(Invoice.@NonNull Id id, Invoice.@NonNull Status status, String rejectionReason) {
         final var invoice = invoiceStoragePort.get(id).orElseThrow(() -> OnlyDustException.notFound("Invoice %s not found".formatted(id)));
-
-        if (status == null) return;
-
         if (status != Invoice.Status.APPROVED && status != Invoice.Status.REJECTED)
             throw forbidden("Cannot update invoice to status %s".formatted(status));
-
-        invoiceStoragePort.update(invoice.status(status));
+        if (nonNull(rejectionReason) && status != Invoice.Status.REJECTED){
+            throw forbidden("Only rejected invoice can have a rejection reason");
+        }
+        invoiceStoragePort.update(invoice.status(status).rejectionReason(rejectionReason));
     }
 
     @Override

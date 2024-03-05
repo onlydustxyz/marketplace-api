@@ -15,7 +15,7 @@ public interface InvoiceFacadePort {
     Page<Invoice> findAll(final @NonNull List<Invoice.Id> ids, final @NonNull List<Invoice.Status> statuses, final @NonNull Integer pageIndex,
                           final @NonNull Integer pageSize);
 
-    void update(Invoice.Id id, Invoice.Status status);
+    void update(@NonNull Invoice.Id id, @NonNull Invoice.Status status, String rejectionReason);
 
     @NonNull InvoiceDownload download(final @NonNull Invoice.Id invoiceId);
 }

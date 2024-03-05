@@ -40,6 +40,7 @@ public class Invoice {
     private @NonNull List<Reward> rewards = new ArrayList<>();
     private URL url;
     private String originalFileName;
+    private String rejectionReason;
 
     public static Invoice of(BillingProfile.Id billingProfileId, Integer sequenceNumber, PersonalInfo personalInfo) {
         final var now = ZonedDateTime.now();

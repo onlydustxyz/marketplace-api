@@ -164,16 +164,16 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-    patch:
+  /bo/v1/invoices/{invoiceId}/status:
+    put:
       security:
         - apiKey: [ ]
       tags:
         - BackofficeInvoicingManagement
-      summary: Update an invoice
-      operationId: updateInvoice
+      summary: Update invoice's status
+      operationId: updateInvoiceStatus
       description: |
-        Update an invoice.
-        This will allow to update the invoice's status to APPROVED or REJECTED.
+        Update invoice's status to APPROVED or REJECTED.
       parameters:
         - in: path
           name: invoiceId
@@ -186,10 +186,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchInvoiceRequest'
+              $ref: '#/components/schemas/UpdateInvoiceStatusRequest'
       responses:
         "204":
-          description: 'The invoice has been approved'
+          description: 'The invoice status has been updated'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -1593,21 +1593,19 @@ components:
         logoUrl:
           type: string
 
-    PatchInvoiceRequest:
+    UpdateInvoiceStatusRequest:
       type: object
+      required:
+        - status
       properties:
         status:
           type: string
           enum:
             - APPROVED
             - REJECTED
-
-        paymentDate:
+        rejectionReason:
           type: string
-          format: date-time
-        refundDate:
-          type: string
-          format: date-time
+          example: "The invoice is not valid"
 
     SponsorRequest:
       type: object
@@ -2192,6 +2190,13 @@ components:
 
     InvoiceResponse:
       type: object
+      required:
+        - id
+        - status
+        - billingProfile
+        - createdAt
+        - totalEquivalent
+        - rewardsPerNetwork
       properties:
         id:
           $ref: '#/components/schemas/InvoiceId'
@@ -2199,6 +2204,8 @@ components:
           $ref: '#/components/schemas/InvoiceInternalStatus'
         billingProfile:
           $ref: '#/components/schemas/BillingProfileResponse'
+        rejectionReason:
+          type: string
         createdAt:
           type: string
           format: date-time
