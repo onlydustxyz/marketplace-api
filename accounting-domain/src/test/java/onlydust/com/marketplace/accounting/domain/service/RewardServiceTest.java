@@ -5,16 +5,20 @@ import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.OldRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
+import onlydust.com.marketplace.accounting.domain.view.RewardView;
+import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileAdminView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -292,5 +296,56 @@ public class RewardServiceTest {
         verify(oldRewardStoragePort).markRewardAsPaid(payableRewardWithPayoutInfoViews.get(0), transactionHash);
         verify(oldRewardStoragePort).markRewardAsPaid(payableRewardWithPayoutInfoViews.get(1), transactionHash);
         verify(accountingRewardStoragePort).saveBatchPayment(updatedBatchPayment);
+    }
+
+    @Test
+    void should_search_for_batch_payment() {
+        // Given
+        final List<Invoice.Id> invoiceIds = List.of(Invoice.Id.of(UUID.randomUUID()));
+
+        // When
+        when(accountingRewardStoragePort.searchRewards(List.of(Invoice.Status.APPROVED), invoiceIds))
+                .thenReturn(List.of(
+                        generateRewardStubForCurrency(Currency.Code.ETH_STR),
+                        generateRewardStubForCurrency(Currency.Code.EUR_STR),
+                        generateRewardStubForCurrency(Currency.Code.OP_STR),
+                        generateRewardStubForCurrency(Currency.Code.USD_STR),
+                        generateRewardStubForCurrency(Currency.Code.USDC_STR),
+                        generateRewardStubForCurrency(Currency.Code.APT_STR),
+                        generateRewardStubForCurrency(Currency.Code.LORDS_STR),
+                        generateRewardStubForCurrency(Currency.Code.STRK_STR)
+                ));
+        final List<RewardView> rewardViews = rewardService.searchForBatchPaymentByInvoiceIds(invoiceIds);
+
+        // Then
+        assertEquals(3, rewardViews.size());
+        assertEquals(Currency.Code.USDC_STR, rewardViews.get(0).money().currencyCode());
+        assertEquals(Currency.Code.LORDS_STR, rewardViews.get(1).money().currencyCode());
+        assertEquals(Currency.Code.STRK_STR, rewardViews.get(2).money().currencyCode());
+    }
+
+    private RewardView generateRewardStubForCurrency(final String currencyCode) {
+        return RewardView.builder()
+                .id(UUID.randomUUID())
+                .billingProfileAdmin(ShortBillingProfileAdminView.builder()
+                        .adminEmail(faker.gameOfThrones().character())
+                        .billingProfileName(faker.gameOfThrones().character())
+                        .adminGithubLogin(faker.gameOfThrones().character())
+                        .adminName(faker.gameOfThrones().character())
+                        .adminEmail(faker.gameOfThrones().character())
+                        .billingProfileType(BillingProfile.Type.COMPANY)
+                        .billingProfileId(BillingProfile.Id.random())
+                        .adminGithubAvatarUrl(faker.rickAndMorty().character())
+                        .build())
+                .requestedAt(ZonedDateTime.now())
+                .githubUrls(List.of())
+                .sponsors(List.of())
+                .projectName(faker.rickAndMorty().character())
+                .money(MoneyView.builder()
+                        .amount(BigDecimal.ONE)
+                        .currencyCode(currencyCode)
+                        .currencyName(faker.rickAndMorty().location())
+                        .build())
+                .build();
     }
 }

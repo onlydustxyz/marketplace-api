@@ -29,10 +29,15 @@ public class RewardService implements AccountingRewardPort {
 
     private final AccountingRewardStoragePort accountingRewardStoragePort;
     private final OldRewardStoragePort oldRewardStoragePort;
+    private static final List<String> CURRENCY_CODES_AVAILABLE_FOR_BATCH_PAYMENT = List.of(Currency.Code.STRK_STR, Currency.Code.USDC_STR,
+            Currency.Code.LORDS_STR);
 
     @Override
-    public List<RewardView> searchForApprovedInvoiceIds(List<Invoice.Id> invoiceIds) {
-        return accountingRewardStoragePort.searchRewards(List.of(Invoice.Status.APPROVED), invoiceIds);
+    public List<RewardView> searchForBatchPaymentByInvoiceIds(List<Invoice.Id> invoiceIds) {
+        return accountingRewardStoragePort.searchRewards(List.of(Invoice.Status.APPROVED), invoiceIds)
+                .stream()
+                .filter(rewardView -> CURRENCY_CODES_AVAILABLE_FOR_BATCH_PAYMENT.contains(rewardView.money().currencyCode()))
+                .toList();
     }
 
     @Override
@@ -75,7 +80,7 @@ public class RewardService implements AccountingRewardPort {
     public List<BatchPayment> createBatchPaymentsForInvoices(List<Invoice.Id> invoiceIds) {
         final List<PayableRewardWithPayoutInfoView> rewardViews = accountingRewardStoragePort.findPayableRewardsWithPayoutInfoForInvoices(invoiceIds)
                 .stream()
-                .filter(r -> List.of(Currency.Code.STRK_STR, Currency.Code.USDC_STR, Currency.Code.LORDS_STR).contains(r.money().currencyCode()))
+                .filter(r -> CURRENCY_CODES_AVAILABLE_FOR_BATCH_PAYMENT.contains(r.money().currencyCode()))
                 .toList();
         if (rewardViews.isEmpty()) {
             return List.of();

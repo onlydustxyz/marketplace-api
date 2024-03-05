@@ -2,8 +2,10 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import onlydust.com.backoffice.api.contract.model.SearchRewardItemResponse;
 import onlydust.com.backoffice.api.contract.model.SearchRewardsResponse;
 import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
@@ -64,7 +66,6 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Autowired
     InvoiceStoragePort invoiceStoragePort;
     static List<UUID> invoiceIds = new ArrayList<>();
-    static List<UUID> rewardIds = new ArrayList<>();
     final StarknetAccountAddress olivierStarknetAddress = new StarknetAccountAddress("0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc8");
     final StarknetAccountAddress anthoStarknetAddress = new StarknetAccountAddress("0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7");
 
@@ -190,8 +191,10 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
         expectedRewardIds.addAll(olivierInvoice2.rewards().stream().map(reward -> reward.id().value()).toList());
         expectedRewardIds.addAll(anthoInvoice1.rewards().stream().map(reward -> reward.id().value()).toList());
         expectedRewardIds.addAll(anthoInvoice2.rewards().stream().map(reward -> reward.id().value()).toList());
-        rewardIds.addAll(expectedRewardIds);
-        assertEquals(expectedRewardIds.size(), searchRewardsResponse.getRewards().size());
+        for (SearchRewardItemResponse reward : searchRewardsResponse.getRewards()) {
+            assertTrue(expectedRewardIds.contains(reward.getId()));
+            assertTrue(List.of(Currency.Code.USDC_STR, Currency.Code.LORDS_STR, Currency.Code.STRK_STR).contains(reward.getMoney().getCurrencyCode()));
+        }
     }
 
     @Test

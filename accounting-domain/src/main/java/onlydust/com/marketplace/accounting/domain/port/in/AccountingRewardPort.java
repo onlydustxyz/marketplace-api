@@ -9,7 +9,7 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import java.util.List;
 
 public interface AccountingRewardPort {
-    List<RewardView> searchForApprovedInvoiceIds(List<Invoice.Id> invoiceIds);
+    List<RewardView> searchForBatchPaymentByInvoiceIds(List<Invoice.Id> invoiceIds);
 
     List<RewardView> findByInvoiceId(Invoice.Id invoiceId);
 
