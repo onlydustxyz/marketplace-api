@@ -7,16 +7,15 @@ import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.InvoiceRewardViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.RewardDetailsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BatchPaymentDetailsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.PayableRewardWithPayoutInfoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
-import onlydust.com.marketplace.api.postgres.adapter.repository.BatchPaymentDetailsViewRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRewardViewRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.PayableRewardWithPayoutInfoViewRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.ShortProjectViewEntityRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
@@ -25,11 +24,11 @@ import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.output.RewardStoragePort;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @AllArgsConstructor
 public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewardStoragePort {
@@ -39,6 +38,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     private final PayableRewardWithPayoutInfoViewRepository payableRewardWithPayoutInfoViewRepository;
     private final BatchPaymentRepository batchPaymentRepository;
     private final BatchPaymentDetailsViewRepository batchPaymentDetailsViewRepository;
+    private final RewardViewRepository rewardViewRepository;
 
     @Override
     public void save(Reward reward) {
@@ -137,5 +137,24 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
                                         .toList())
                                 .build()
                 );
+    }
+
+    @Override
+    public Page<RewardDetailsView> findRewards(int pageIndex, int pageSize,
+                                               @NonNull Set<RewardDetailsView.Status> statuses,
+                                               Date fromRequestedAt, Date toRequestedAt,
+                                               Date fromProcessedAt, Date toProcessedAt) {
+        final var page = rewardViewRepository.findAllByStatusesAndDates(
+                statuses.stream().map(RewardDetailsView.Status::toString).toList(),
+                fromRequestedAt, toRequestedAt,
+                fromProcessedAt, toProcessedAt,
+                PageRequest.of(pageIndex, pageSize, Sort.by("requested_at").descending())
+        );
+
+        return Page.<RewardDetailsView>builder()
+                .content(page.getContent().stream().map(RewardDetailsViewEntity::toDomain).toList())
+                .totalItemNumber((int) page.getTotalElements())
+                .totalPageNumber(page.getTotalPages())
+                .build();
     }
 }

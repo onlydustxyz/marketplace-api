@@ -2,9 +2,16 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardView;
+import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileAdminView;
+import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 
 import java.util.List;
+
+import static java.util.Comparator.comparing;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapInvoiceInternalStatus;
 
 public interface SearchRewardMapper {
 
@@ -32,28 +39,78 @@ public interface SearchRewardMapper {
                                 .name(shortSponsorView.name())
                                 .avatarUrl(shortSponsorView.logoUrl()))
                         .toList())
-                .billingProfile(new BillingProfileResponse()
-                        .id(view.billingProfileAdmin().billingProfileId().value())
-                        .type(switch (view.billingProfileAdmin().billingProfileType()) {
-                            case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
-                            case COMPANY, SELF_EMPLOYED -> BillingProfileType.COMPANY;
-                        })
-                        .name(view.billingProfileAdmin().billingProfileName())
-                        .admins(List.of(new BillingProfileAdminResponse()
-                                        .name(view.billingProfileAdmin().adminName())
-                                        .email(view.billingProfileAdmin().adminEmail())
-                                        .login(view.billingProfileAdmin().adminGithubLogin())
-                                        .avatarUrl(view.billingProfileAdmin().adminGithubAvatarUrl())
-                                )
-                        ));
+                .billingProfile(mapBillingProfile(view.billingProfileAdmin()));
     }
 
     static MoneyLinkResponse moneyViewToResponse(final MoneyView view) {
+        if (view == null) {
+            return null;
+        }
         return new MoneyLinkResponse()
                 .amount(view.amount())
                 .currencyCode(view.currencyCode())
                 .currencyName(view.currencyName())
                 .currencyLogoUrl(view.currencyLogoUrl())
                 .dollarsEquivalent(view.dollarsEquivalent());
+    }
+
+    static RewardPageResponse rewardPageToResponse(int pageIndex, Page<RewardDetailsView> page) {
+        final RewardPageResponse response = new RewardPageResponse();
+        response.setTotalPageNumber(page.getTotalPageNumber());
+        response.setTotalItemNumber(page.getTotalItemNumber());
+        response.setHasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()));
+        response.setNextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()));
+        page.getContent().forEach(rewardDetailsView -> response.addRewardsItem(new RewardPageItemResponse()
+                .id(rewardDetailsView.id().value())
+                .status(RewardStatus.valueOf(rewardDetailsView.status().name()))
+                .requestedAt(rewardDetailsView.requestedAt())
+                .processedAt(rewardDetailsView.processedAt())
+                .githubUrls(rewardDetailsView.githubUrls())
+                .project(new ProjectLinkResponse()
+                        .name(rewardDetailsView.project().name())
+                        .logoUrl(rewardDetailsView.project().logoUrl()))
+                .sponsors(rewardDetailsView.sponsors().stream()
+                        .map(sponsor -> new SponsorLinkResponse()
+                                .name(sponsor.name())
+                                .avatarUrl(sponsor.logoUrl()))
+                        .sorted(comparing(SponsorLinkResponse::getName))
+                        .toList())
+                .money(moneyViewToResponse(rewardDetailsView.money()))
+                .billingProfile(mapBillingProfile(rewardDetailsView.billingProfileAdmin()))
+                .invoice(rewardDetailsView.invoice() != null ?
+                        new InvoiceLinkResponse()
+                                .id(rewardDetailsView.invoice().id().value())
+                                .number(rewardDetailsView.invoice().number().toString())
+                                .status(mapInvoiceInternalStatus(rewardDetailsView.invoice().status()))
+                        : null
+                )
+                .transactionHash(rewardDetailsView.transactionHash())
+                .paidTo(rewardDetailsView.paidTo())
+                .recipient(rewardDetailsView.recipient() != null ?
+                        new RecipientLinkResponse()
+                                .login(rewardDetailsView.recipient().login())
+                                .avatarUrl(rewardDetailsView.recipient().avatarUrl())
+                        : null)
+        ));
+        return response;
+    }
+
+    private static BillingProfileResponse mapBillingProfile(ShortBillingProfileAdminView rewardDetailsView) {
+        if (rewardDetailsView == null) {
+            return null;
+        }
+        return new BillingProfileResponse()
+                .id(rewardDetailsView.billingProfileId().value())
+                .type(switch (rewardDetailsView.billingProfileType()) {
+                    case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
+                    case COMPANY, SELF_EMPLOYED -> BillingProfileType.COMPANY;
+                })
+                .name(rewardDetailsView.billingProfileName())
+                .admins(List.of(new BillingProfileAdminResponse()
+                        .name(rewardDetailsView.adminName())
+                        .email(rewardDetailsView.adminEmail())
+                        .login(rewardDetailsView.adminGithubLogin())
+                        .avatarUrl(rewardDetailsView.adminGithubAvatarUrl()))
+                );
     }
 }

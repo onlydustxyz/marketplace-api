@@ -1,0 +1,15 @@
+package onlydust.com.marketplace.kernel.mapper;
+
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.Date;
+
+public class DateMapper {
+    public static Date ofNullable(ZonedDateTime date) {
+        return date != null ? Date.from(date.toInstant()) : null;
+    }
+
+    public static ZonedDateTime ofNullable(Date date) {
+        return date != null ? ZonedDateTime.ofInstant(date.toInstant(), ZoneOffset.UTC) : null;
+    }
+}

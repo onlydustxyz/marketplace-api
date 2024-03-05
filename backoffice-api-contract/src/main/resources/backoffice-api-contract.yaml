@@ -578,6 +578,71 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/rewards:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Get all (paginated) rewards
+      operationId: getRewards
+      description: |
+        Get paginated rewards
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: statuses
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/RewardStatus'
+          style: form
+        - in: query
+          name: fromRequestedAt
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: toRequestedAt
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: fromProcessedAt
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: toProcessedAt
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+      responses:
+        "200":
+          description: 'Page of rewards'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /bo/v1/rewards/search:
     post:
       security:
@@ -2187,11 +2252,25 @@ components:
           type: string
           format: uri
 
+    InvoiceLinkResponse:
+      type: object
+      required:
+        - id
+        - number
+        - status
+      properties:
+        id:
+          $ref: '#/components/schemas/InvoiceId'
+        number:
+          type: string
+        status:
+          $ref: '#/components/schemas/InvoiceInternalStatus'
 
     InvoiceResponse:
       type: object
       required:
         - id
+        - number
         - status
         - billingProfile
         - createdAt
@@ -2200,6 +2279,8 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/InvoiceId'
+        number:
+          type: string
         status:
           $ref: '#/components/schemas/InvoiceInternalStatus'
         billingProfile:
@@ -2218,6 +2299,12 @@ components:
 
     InvoiceRewardsPerNetwork:
       type: object
+      required:
+        - network
+        - billingAccountNumber
+        - dollarsEquivalent
+        - totalPerCurrency
+        - rewards
       properties:
         network:
           $ref: '#/components/schemas/TransactionNetwork'
@@ -2233,7 +2320,7 @@ components:
         rewards:
           type: array
           items:
-            $ref: '#/components/schemas/RewardResponse'
+            $ref: '#/components/schemas/InvoiceRewardResponse'
 
     InvoicePageV2:
       type: object
@@ -2352,6 +2439,8 @@ components:
           example: Apple Inc.
         type:
           $ref: '#/components/schemas/BillingProfileType'
+        verificationStatus:
+          $ref: '#/components/schemas/VerificationStatus'
         admins:
           type: array
           items:
@@ -2728,7 +2817,97 @@ components:
         money:
           $ref: '#/components/schemas/MoneyLinkResponse'
 
-    RewardResponse:
+    RewardPageResponse:
+      type: object
+      required:
+        - rewards
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        rewards:
+          type: array
+          items:
+            $ref: '#/components/schemas/RewardPageItemResponse'
+    RewardPageItemResponse:
+      type: object
+      required:
+        - id
+        - billingProfileAdmin
+        - requestedAt
+        - githubUrls
+        - project
+      properties:
+        id:
+          $ref: '#/components/schemas/RewardId'
+        billingProfile:
+          $ref: '#/components/schemas/BillingProfileResponse'
+        invoice:
+          $ref: '#/components/schemas/InvoiceLinkResponse'
+        status:
+          $ref: '#/components/schemas/RewardStatus'
+        requestedAt:
+          type: string
+          format: date-time
+        processedAt:
+          type: string
+          format: date-time
+        githubUrls:
+          type: array
+          items:
+            type: string
+        recipient:
+          $ref: '#/components/schemas/RecipientLinkResponse'
+        project:
+          $ref: '#/components/schemas/ProjectLinkResponse'
+        sponsors:
+          type: array
+          items:
+            $ref: '#/components/schemas/SponsorLinkResponse'
+        money:
+          $ref: '#/components/schemas/MoneyLinkResponse'
+        transactionHash:
+          type: string
+          example: 0x1234567890abcdef
+        paidTo:
+          type: string
+          example: 0x1234567890abcdef
+
+    RewardStatus:
+      enum:
+        - PENDING_INVOICE
+        - PENDING_SIGNUP
+        - PENDING_CONTRIBUTOR
+        - PENDING_VERIFICATION
+        - MISSING_PAYOUT_INFO
+        - PROCESSING
+        - COMPLETE
+        - LOCKED
+
+    RecipientLinkResponse:
+      type: object
+      required:
+        - login
+        - avatarUrl
+      properties:
+        login:
+          type: string
+        name:
+          type: string
+        avatarUrl:
+          type: string
+
+    InvoiceRewardResponse:
       type: object
       properties:
         id:
