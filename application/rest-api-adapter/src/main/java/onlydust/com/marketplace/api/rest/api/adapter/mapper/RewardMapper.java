@@ -74,6 +74,8 @@ public interface RewardMapper {
             case processing -> RewardStatus.PROCESSING;
             case locked -> RewardStatus.LOCKED;
             case pendingVerification -> RewardStatus.PENDING_VERIFICATION;
+            case pendingContributor -> RewardStatus.PENDING_CONTRIBUTOR;
+            case pendingSignup -> RewardStatus.PENDING_SIGNUP;
         };
     }
 

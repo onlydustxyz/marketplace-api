@@ -72,7 +72,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                           "currency": "USDC",
                           "amount": 1000,
                           "dollarsEquivalent": 1010.00,
-                          "status": "PROCESSING",
+                          "status": "PENDING_CONTRIBUTOR",
                           "unlockDate": null,
                           "from": {
                             "githubUserId": 16590657,

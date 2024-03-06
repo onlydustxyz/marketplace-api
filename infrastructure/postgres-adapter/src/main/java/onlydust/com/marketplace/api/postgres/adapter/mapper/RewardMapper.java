@@ -183,6 +183,8 @@ public interface RewardMapper {
             case "COMPLETE" -> UserRewardStatus.complete;
             case "MISSING_PAYOUT_INFO" -> UserRewardStatus.missingPayoutInfo;
             case "PENDING_VERIFICATION" -> UserRewardStatus.pendingVerification;
+            case "PENDING_CONTRIBUTOR" -> UserRewardStatus.pendingContributor;
+            case "PENDING_SIGNUP" -> UserRewardStatus.pendingContributor;
             case "LOCKED" -> UserRewardStatus.locked;
             default -> UserRewardStatus.processing;
         };
