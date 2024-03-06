@@ -42,7 +42,7 @@ public interface MyRewardMapper {
                 .status(switch (view.getStatus()) {
                     case complete -> RewardStatus.COMPLETE;
                     case pendingInvoice -> RewardStatus.PENDING_INVOICE;
-                    case processing -> RewardStatus.PROCESSING;
+                    default -> RewardStatus.PROCESSING;
                     case missingPayoutInfo -> RewardStatus.MISSING_PAYOUT_INFO;
                     case locked -> RewardStatus.LOCKED;
                     case pendingVerification -> RewardStatus.PENDING_VERIFICATION;

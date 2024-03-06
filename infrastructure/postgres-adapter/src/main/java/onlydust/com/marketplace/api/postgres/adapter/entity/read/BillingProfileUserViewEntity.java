@@ -40,6 +40,7 @@ public class BillingProfileUserViewEntity {
     BillingProfileUserEntity.Role role;
 
     UUID userId;
+    String email;
     String githubLogin;
     String githubAvatarUrl;
     String githubHtmlUrl;
@@ -53,6 +54,7 @@ public class BillingProfileUserViewEntity {
                 .userId(userId != null ? UserId.of(userId) : null)
                 .role(role.toDomain())
                 .login(githubLogin)
+                .email(email)
                 .githubUserId(githubUserId != null ? GithubUserId.of(githubUserId) : null)
                 .avatarUrl(githubAvatarUrl)
                 .githubHtmlUrl(githubHtmlUrl != null ? URI.create(githubHtmlUrl) : null)

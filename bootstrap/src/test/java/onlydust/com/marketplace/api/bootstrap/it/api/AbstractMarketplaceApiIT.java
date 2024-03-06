@@ -62,7 +62,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         @ConfigureWireMock(name = "dustyBot", stubLocation = "", property = "infrastructure.dustyBot.baseUri"),
         @ConfigureWireMock(name = "rust-api", property = "infrastructure.od.api.client.baseUri"),
         @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri"),
-        @ConfigureWireMock(name = "webhook", property = "infrastructure.webhook.url"),
+        @ConfigureWireMock(name = "webhook", property = "infrastructure.make.webhook.url"),
         @ConfigureWireMock(name = "linear", property = "infrastructure.linear.base-uri"),
         @ConfigureWireMock(name = "auth0", property = "application.web.auth0.user-info-url"),
         @ConfigureWireMock(name = "posthog", property = "infrastructure.posthog.base-uri"),
@@ -337,7 +337,8 @@ public class AbstractMarketplaceApiIT {
                         null,
                         List.of(new Invoice.Wallet(Network.ETHEREUM, "vitalik.eth")),
                         rewards
-                )
+                ),
+                null
         );
     }
 

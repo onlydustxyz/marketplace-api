@@ -1,79 +1,135 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import com.github.javafaker.Faker;
-import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRewardRepository;
+import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
-import org.junit.jupiter.api.BeforeEach;
+import onlydust.com.marketplace.api.webhook.Config;
+import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
+import onlydust.com.marketplace.project.domain.service.UserService;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
-import java.math.BigDecimal;
-import java.net.URL;
-import java.time.ZonedDateTime;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Autowired
-    private InvoiceRepository invoiceRepository;
+    PdfStoragePort pdfStoragePort;
     @Autowired
-    private InvoiceRewardRepository invoiceRewardRepository;
+    BillingProfileService billingProfileService;
+    @Autowired
+    UserService userService;
     @Autowired
     private RewardRepository rewardRepository;
     @Autowired
-    PdfStoragePort pdfStoragePort;
+    OutboxConsumerJob notificationOutboxJob;
+    @Autowired
+    Config webhookHttpClientProperties;
+    @Autowired
+    InvoiceStoragePort invoiceStoragePort;
     private final Faker faker = new Faker();
-    private List<InvoiceEntity> invoices;
 
-    @BeforeEach
-    void setUp() {
-        invoices = List.of(
-                fakeInvoice(UUID.fromString("16ca82f4-4671-4036-8666-ce0930824558"), List.of(UUID.fromString("061e2c7e-bda4-49a8-9914-2e76926f70c2"))),
-                fakeInvoice(UUID.fromString("51d37fff-ed4c-474a-b846-af18edda6b8a"), List.of(UUID.fromString("ee28315c-7a84-4052-9308-c2236eeafda1"),
-                        UUID.fromString("d067b24d-115a-45e9-92de-94dd1d01b184"))),
-                fakeInvoice(UUID.fromString("3fcd930b-b84d-4ce5-82cd-eca91b8a7553"), List.of(UUID.fromString("d506a05d-3739-452f-928d-45ea81d33079"),
-                        UUID.fromString("5083ac1f-4325-4d47-9760-cbc9ab82f25c"),
-                        UUID.fromString("e6ee79ae-b3f0-4f4e-b7e3-9e643bc27236")))
-        );
+    UserId userId;
+    BillingProfile.Id companyBillingProfileId;
+    BillingProfile.Id individualBillingProfileId;
 
-        invoices.forEach(invoice -> {
-            final var rewards = rewardRepository.findAllById(invoice.data().rewards().stream().map(InvoiceRewardEntity::id).toList());
-            rewardRepository.saveAll(rewards.stream().map(reward -> reward.invoice(null)).toList());
-        });
+    static final List<Invoice.Id> companyBillingProfileToReviewInvoices = new ArrayList<>();
 
-        invoiceRepository.deleteAll();
-        invoiceRepository.saveAll(invoices);
+    void setUp() throws IOException {
+        // Given
+        final UserAuthHelper.AuthenticatedUser olivier = userAuthHelper.authenticateOlivier();
+        userId = UserId.of(olivier.user().getId());
 
-        invoices.forEach(invoice -> {
-            final var rewards = rewardRepository.findAllById(invoice.data().rewards().stream().map(InvoiceRewardEntity::id).toList());
-            rewardRepository.saveAll(rewards.stream().map(reward -> reward.invoice(invoice)).toList());
-        });
+        //TODO
+//        companyBillingProfile = userService.getCompanyBillingProfile(userId.value());
+//        postgresOldBillingProfileAdapter.saveCompanyProfile(companyBillingProfile.toBuilder()
+//                .name("Mr. Needful")
+//                .userId(userId.value())
+//                .address(faker.address().fullAddress())
+//                .euVATNumber("111")
+//                .subjectToEuropeVAT(false)
+//                .oldCountry(OldCountry.fromIso3("FRA"))
+//                .usEntity(false)
+//                .status(OldVerificationStatus.VERIFIED)
+//                .build()
+//        );
+//        companyBillingProfileId = BillingProfile.Id.of(companyBillingProfile.getId());
+//
+//        individualBillingProfile = userService.getIndividualBillingProfile(userId.value());
+//        postgresOldBillingProfileAdapter.saveIndividualProfile(individualBillingProfile.toBuilder()
+//                .firstName("Olivier")
+//                .lastName("Fu")
+//                .userId(userId.value())
+//                .address(faker.address().fullAddress())
+//                .oldCountry(OldCountry.fromIso3("FRA"))
+//                .usCitizen(false)
+//                .idDocumentType(OldIndividualBillingProfile.OldIdDocumentTypeEnum.PASSPORT)
+//                .idDocumentNumber(faker.idNumber().valid())
+//                .idDocumentCountryCode("FRA")
+//                .validUntil(Date.from(ZonedDateTime.now().plusYears(10).toInstant()))
+//                .status(OldVerificationStatus.VERIFIED)
+//                .build()
+//        );
+//        individualBillingProfileId = BillingProfile.Id.of(individualBillingProfile.getId());
+//
+//        // Select COMPANY as active billing profile
+//        userService.updateBillingProfileType(userId.value(), OldBillingProfileType.COMPANY);
+
+
+        // Given
+        newCompanyToReviewInvoice(List.of(
+                RewardId.of("061e2c7e-bda4-49a8-9914-2e76926f70c2")));
+        newCompanyToReviewInvoice(List.of(
+                RewardId.of("ee28315c-7a84-4052-9308-c2236eeafda1"),
+                RewardId.of("d067b24d-115a-45e9-92de-94dd1d01b184")));
+        newCompanyToReviewInvoice(List.of(
+                RewardId.of("d506a05d-3739-452f-928d-45ea81d33079"),
+                RewardId.of("5083ac1f-4325-4d47-9760-cbc9ab82f25c"),
+                RewardId.of("e6ee79ae-b3f0-4f4e-b7e3-9e643bc27236")));
+    }
+
+    private void newCompanyToReviewInvoice(List<RewardId> rewardIds) throws IOException {
+        final Invoice.Id invoiceId = billingProfileService.previewInvoice(userId, companyBillingProfileId, rewardIds).id();
+        billingProfileService.uploadExternalInvoice(userId, companyBillingProfileId, invoiceId, "foo.pdf",
+                new FileSystemResource(Objects.requireNonNull(getClass().getResource("/invoices/invoice-sample.pdf")).getFile()).getInputStream());
+        companyBillingProfileToReviewInvoices.add(invoiceId);
     }
 
     @Test
-    void should_list_invoices() {
+    @Order(1)
+    void should_list_invoices() throws IOException {
+        setUp();
+
+        // When
         client
                 .get()
                 .uri(getApiURI(INVOICES, Map.of(
                         "pageIndex", "0",
                         "pageSize", "10",
-                        "invoiceIds", invoices.stream().map(InvoiceEntity::id).map(UUID::toString).collect(Collectors.joining(",")))))
+                        "invoiceIds", companyBillingProfileToReviewInvoices.stream().map(Invoice.Id::toString).collect(Collectors.joining(",")))))
                 .header("Api-Key", apiKey())
                 .exchange()
                 .expectStatus()
@@ -89,30 +145,6 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "nextPageIndex": 0,
                           "invoices": [
                             {
-                              "id": "16ca82f4-4671-4036-8666-ce0930824558",
-                              "status": "PROCESSING",
-                              "internalStatus": "TO_REVIEW",
-                              "amount": 1010.00,
-                              "currencyId": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                              "rewardIds": [
-                                "061e2c7e-bda4-49a8-9914-2e76926f70c2"
-                              ],
-                              "downloadUrl": "https://local-bo-api.onlydust.com/bo/v1/external/invoices/16ca82f4-4671-4036-8666-ce0930824558?token=BO_TOKEN"
-                            },
-                            {
-                              "id": "51d37fff-ed4c-474a-b846-af18edda6b8a",
-                              "status": "PROCESSING",
-                              "internalStatus": "TO_REVIEW",
-                              "amount": 2777.50,
-                              "currencyId": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                              "rewardIds": [
-                                "d067b24d-115a-45e9-92de-94dd1d01b184",
-                                "ee28315c-7a84-4052-9308-c2236eeafda1"
-                              ],
-                              "downloadUrl": "https://local-bo-api.onlydust.com/bo/v1/external/invoices/51d37fff-ed4c-474a-b846-af18edda6b8a?token=BO_TOKEN"
-                            },
-                            {
-                              "id": "3fcd930b-b84d-4ce5-82cd-eca91b8a7553",
                               "status": "PROCESSING",
                               "internalStatus": "TO_REVIEW",
                               "amount": 4765.00,
@@ -121,8 +153,26 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 "d506a05d-3739-452f-928d-45ea81d33079",
                                 "5083ac1f-4325-4d47-9760-cbc9ab82f25c",
                                 "e6ee79ae-b3f0-4f4e-b7e3-9e643bc27236"
-                              ],
-                              "downloadUrl": "https://local-bo-api.onlydust.com/bo/v1/external/invoices/3fcd930b-b84d-4ce5-82cd-eca91b8a7553?token=BO_TOKEN"
+                              ]
+                            },
+                            {
+                              "status": "PROCESSING",
+                              "internalStatus": "TO_REVIEW",
+                              "amount": 2777.50,
+                              "currencyId": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                              "rewardIds": [
+                                "d067b24d-115a-45e9-92de-94dd1d01b184",
+                                "ee28315c-7a84-4052-9308-c2236eeafda1"
+                              ]
+                            },
+                            {
+                              "status": "PROCESSING",
+                              "internalStatus": "TO_REVIEW",
+                              "amount": 1010.00,
+                              "currencyId": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                              "rewardIds": [
+                                "061e2c7e-bda4-49a8-9914-2e76926f70c2"
+                              ]
                             }
                           ]
                         }
@@ -131,10 +181,219 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     }
 
     @Test
+    @Order(2)
+    void should_list_invoices_v2() throws IOException {
+
+        // When
+        client
+                .get()
+                .uri(getApiURI(V2_INVOICES, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10",
+                        "invoiceIds", companyBillingProfileToReviewInvoices.stream().map(Invoice.Id::toString).collect(Collectors.joining(",")))))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.invoices[?(@.createdAt empty true)]").isEmpty()
+                .jsonPath("$.invoices[?(@.billingProfile.id empty true)]").isEmpty()
+                .jsonPath("$.invoices[?(@.billingProfile.name empty true)]").isEmpty()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 3,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "invoices": [
+                            {
+                              "status": "TO_REVIEW",
+                              "billingProfile": {
+                                "name": "Mr. Needful",
+                                "type": "COMPANY",
+                                "admins": null
+                              },
+                              "rewardCount": 3,
+                              "totalEquivalent": {
+                                "amount": 4765.00,
+                                "dollarsEquivalent": 4765.00,
+                                "conversionRate": null,
+                                "currencyCode": "USD",
+                                "currencyName": "US Dollar",
+                                "currencyLogoUrl": null
+                              },
+                              "totalPerCurrency": [
+                                {
+                                  "amount": 3250,
+                                  "dollarsEquivalent": 3250,
+                                  "conversionRate": null,
+                                  "currencyCode": "USD",
+                                  "currencyName": "US Dollar",
+                                  "currencyLogoUrl": null
+                                },
+                                {
+                                  "amount": 1000,
+                                  "dollarsEquivalent": 1010.00,
+                                  "conversionRate": null,
+                                  "currencyCode": "USDC",
+                                  "currencyName": "USD Coin",
+                                  "currencyLogoUrl": null
+                                },
+                                {
+                                  "amount": 500,
+                                  "dollarsEquivalent": 505.00,
+                                  "conversionRate": null,
+                                  "currencyCode": "USDC",
+                                  "currencyName": "USD Coin",
+                                  "currencyLogoUrl": null
+                                }
+                              ]
+                            },
+                            {
+                              "status": "TO_REVIEW",
+                              "billingProfile": {
+                                "name": "Mr. Needful",
+                                "type": "COMPANY",
+                                "admins": null
+                              },
+                              "rewardCount": 2,
+                              "totalEquivalent": {
+                                "amount": 2777.50,
+                                "dollarsEquivalent": 2777.50,
+                                "conversionRate": null,
+                                "currencyCode": "USD",
+                                "currencyName": "US Dollar",
+                                "currencyLogoUrl": null
+                              },
+                              "totalPerCurrency": [
+                                {
+                                  "amount": 1000,
+                                  "dollarsEquivalent": 1010.00,
+                                  "conversionRate": null,
+                                  "currencyCode": "USDC",
+                                  "currencyName": "USD Coin",
+                                  "currencyLogoUrl": null
+                                },
+                                {
+                                  "amount": 1750,
+                                  "dollarsEquivalent": 1767.50,
+                                  "conversionRate": null,
+                                  "currencyCode": "USDC",
+                                  "currencyName": "USD Coin",
+                                  "currencyLogoUrl": null
+                                }
+                              ]
+                            },
+                            {
+                              "status": "TO_REVIEW",
+                              "billingProfile": {
+                                "name": "Mr. Needful",
+                                "type": "COMPANY",
+                                "admins": null
+                              },
+                              "rewardCount": 1,
+                              "totalEquivalent": {
+                                "amount": 1010.00,
+                                "dollarsEquivalent": 1010.00,
+                                "conversionRate": null,
+                                "currencyCode": "USD",
+                                "currencyName": "US Dollar",
+                                "currencyLogoUrl": null
+                              },
+                              "totalPerCurrency": [
+                                {
+                                  "amount": 1000,
+                                  "dollarsEquivalent": 1010.00,
+                                  "conversionRate": null,
+                                  "currencyCode": "USDC",
+                                  "currencyName": "USD Coin",
+                                  "currencyLogoUrl": null
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                        """)
+        ;
+    }
+
+    @Test
+    @Order(3)
+    void should_get_invoice() {
+        client
+                .get()
+                .uri(getApiURI(INVOICE.formatted(companyBillingProfileToReviewInvoices.get(0))))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "status": "TO_REVIEW",
+                          "billingProfile": {
+                            "name": "Mr. Needful",
+                            "type": "COMPANY",
+                            "admins": []
+                          },
+                          "totalEquivalent": {
+                            "amount": 1010.00,
+                            "currencyCode": "USD",
+                            "currencyName": "US Dollar",
+                            "currencyLogoUrl": null
+                          },
+                          "rewardsPerNetwork": [
+                            {
+                              "network": "ETHEREUM",
+                              "billingAccountNumber": null,
+                              "dollarsEquivalent": 1010.00,
+                              "totalPerCurrency": [
+                                {
+                                  "amount": 1000,
+                                  "dollarsEquivalent": 1010.00,
+                                  "conversionRate": null,
+                                  "currencyCode": "USDC",
+                                  "currencyName": "USD Coin",
+                                  "currencyLogoUrl": null
+                                }
+                              ],
+                              "rewards": [
+                                {
+                                  "id": "061e2c7e-bda4-49a8-9914-2e76926f70c2",
+                                  "requestedAt": "2023-05-15T12:15:54.25529Z",
+                                  "processedAt": "2023-07-27T10:27:14.522708Z",
+                                  "githubUrls": [
+                                    "https://github.com/od-mocks/cool-repo-A/pull/397"
+                                  ],
+                                  "project": {
+                                    "name": "Pizzeria Yoshi !",
+                                    "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png"
+                                  },
+                                  "sponsors": [],
+                                  "money": {
+                                    "amount": 1000,
+                                    "dollarsEquivalent": 1010.00,
+                                    "conversionRate": null,
+                                    "currencyCode": "USDC",
+                                    "currencyName": "USD Coin",
+                                    "currencyLogoUrl": null
+                                  },
+                                  "transactionHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                        """)
+        ;
+    }
+
+    @Test
+    @Order(4)
     void should_approve_invoices() {
         client
-                .patch()
-                .uri(getApiURI(INVOICE.formatted(invoices.get(1).id())))
+                .put()
+                .uri(getApiURI(PUT_INVOICES_STATUS.formatted(companyBillingProfileToReviewInvoices.get(0))))
                 .header("Api-Key", apiKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -149,7 +408,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
 
         client
                 .get()
-                .uri(getApiURI(INVOICES, Map.of("pageIndex", "0", "pageSize", "10")))
+                .uri(getApiURI(V2_INVOICES, Map.of("pageIndex", "0", "pageSize", "10")))
                 .header("Api-Key", apiKey())
                 .exchange()
                 .expectStatus()
@@ -157,30 +416,46 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .expectBody()
                 .json("""
                         {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 3,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
                           "invoices": [
                             {
-                              "status": "PROCESSING",
-                              "internalStatus": "APPROVED",
-                              "rewardIds": [
-                                "d067b24d-115a-45e9-92de-94dd1d01b184",
-                                "ee28315c-7a84-4052-9308-c2236eeafda1"
-                              ]
+                              "status": "TO_REVIEW",
+                              "rewardCount": 3,
+                              "totalEquivalent": {
+                                "amount": 4765.00,
+                                "dollarsEquivalent": 4765.00,
+                                "conversionRate": null,
+                                "currencyCode": "USD",
+                                "currencyName": "US Dollar",
+                                "currencyLogoUrl": null
+                              }
                             },
                             {
-                              "status": "PROCESSING",
-                              "internalStatus": "TO_REVIEW",
-                              "rewardIds": [
-                                "d506a05d-3739-452f-928d-45ea81d33079",
-                                "5083ac1f-4325-4d47-9760-cbc9ab82f25c",
-                                "e6ee79ae-b3f0-4f4e-b7e3-9e643bc27236"
-                              ]
+                              "status": "TO_REVIEW",
+                              "rewardCount": 2,
+                              "totalEquivalent": {
+                                "amount": 2777.50,
+                                "dollarsEquivalent": 2777.50,
+                                "conversionRate": null,
+                                "currencyCode": "USD",
+                                "currencyName": "US Dollar",
+                                "currencyLogoUrl": null
+                              }
                             },
                             {
-                              "status": "PROCESSING",
-                              "internalStatus": "TO_REVIEW",
-                              "rewardIds": [
-                                "061e2c7e-bda4-49a8-9914-2e76926f70c2"
-                              ]
+                              "status": "APPROVED",
+                              "rewardCount": 1,
+                              "totalEquivalent": {
+                                "amount": 1010.00,
+                                "dollarsEquivalent": 1010.00,
+                                "conversionRate": null,
+                                "currencyCode": "USD",
+                                "currencyName": "US Dollar",
+                                "currencyLogoUrl": null
+                              }
                             }
                           ]
                         }
@@ -189,25 +464,63 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     }
 
     @Test
+    @Order(5)
     void should_reject_invoices() {
+        final String rejectionReason = faker.rickAndMorty().character();
         client
-                .patch()
-                .uri(getApiURI(INVOICE.formatted(invoices.get(1).id())))
+                .put()
+                .uri(getApiURI(PUT_INVOICES_STATUS.formatted(companyBillingProfileToReviewInvoices.get(1))))
                 .header("Api-Key", apiKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
-                          "status": "REJECTED"
+                          "status": "REJECTED",
+                          "rejectionReason": "%s"
                         }
-                        """)
+                        """.formatted(rejectionReason))
                 .exchange()
                 .expectStatus()
                 .isNoContent()
         ;
 
+        // To avoid error on post InvoiceUploaded event to old BO
+        makeWebhookWireMockServer.stubFor(post("/").willReturn(ok()));
+        makeWebhookSendRejectedInvoiceMailWireMockServer.stubFor(
+                post("/?api-key=%s".formatted(webhookHttpClientProperties.getApiKey()))
+                        .willReturn(ok()));
+
+        notificationOutboxJob.run();
+
+
+        final Invoice invoice = invoiceStoragePort.get(companyBillingProfileToReviewInvoices.get(1)).orElseThrow();
+        makeWebhookSendRejectedInvoiceMailWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/?api-key=%s".formatted(webhookHttpClientProperties.getApiKey())))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withRequestBody(matchingJsonPath("$.recipientEmail", equalTo("olivier.fuxet@gmail.com")))
+                        .withRequestBody(matchingJsonPath("$.recipientName", equalTo("Olivier")))
+                        .withRequestBody(matchingJsonPath("$.rewardCount", equalTo(String.valueOf(invoice.rewards().size()))))
+                        .withRequestBody(matchingJsonPath("$.invoiceName", equalTo(invoice.number().value())))
+                        .withRequestBody(matchingJsonPath("$.totalUsdAmount", equalTo("2777.5")))
+                        .withRequestBody(
+                                matchingJsonPath("$.rejectionReason", equalTo(rejectionReason))
+                        )
+                        .withRequestBody(matchingJsonPath("$.rewardNames", containing("#D067B - oscar's awesome project - USDC - 1000")))
+                        .withRequestBody(matchingJsonPath("$.rewardNames", containing("#EE283 - Aldébaran du Taureau - USDC - 1750")))
+        );
+
         client
                 .get()
-                .uri(getApiURI(INVOICES, Map.of("pageIndex", "0", "pageSize", "10")))
+                .uri(getApiURI(INVOICE.formatted(companyBillingProfileToReviewInvoices.get(1))))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.rejectionReason").isEqualTo(rejectionReason);
+
+        client
+                .get()
+                .uri(getApiURI(V2_INVOICES, Map.of("pageIndex", "0", "pageSize", "10")))
                 .header("Api-Key", apiKey())
                 .exchange()
                 .expectStatus()
@@ -215,56 +528,62 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .expectBody()
                 .json("""
                         {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 3,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
                           "invoices": [
+                            {
+                              "status": "TO_REVIEW",
+                              "rewardCount": 3,
+                              "totalEquivalent": {
+                                "amount": 4765.00,
+                                "dollarsEquivalent": 4765.00,
+                                "conversionRate": null,
+                                "currencyCode": "USD",
+                                "currencyName": "US Dollar",
+                                "currencyLogoUrl": null
+                              }
+                            },
                             {
                               "status": "REJECTED",
-                              "rewardIds": [
-                                "d067b24d-115a-45e9-92de-94dd1d01b184",
-                                "ee28315c-7a84-4052-9308-c2236eeafda1"
-                              ]
+                              "rewardCount": 2,
+                              "totalEquivalent": {
+                                "amount": 2777.50,
+                                "dollarsEquivalent": 2777.50,
+                                "conversionRate": null,
+                                "currencyCode": "USD",
+                                "currencyName": "US Dollar",
+                                "currencyLogoUrl": null
+                              }
                             },
                             {
-                              "status": "PROCESSING",
-                              "rewardIds": [
-                                "d506a05d-3739-452f-928d-45ea81d33079",
-                                "5083ac1f-4325-4d47-9760-cbc9ab82f25c",
-                                "e6ee79ae-b3f0-4f4e-b7e3-9e643bc27236"
-                              ]
-                            },
-                            {
-                              "status": "PROCESSING",
-                              "internalStatus": "TO_REVIEW",
-                              "rewardIds": [
-                                "061e2c7e-bda4-49a8-9914-2e76926f70c2"
-                              ]
+                              "status": "APPROVED",
+                              "rewardCount": 1,
+                              "totalEquivalent": {
+                                "amount": 1010.00,
+                                "dollarsEquivalent": 1010.00,
+                                "conversionRate": null,
+                                "currencyCode": "USD",
+                                "currencyName": "US Dollar",
+                                "currencyLogoUrl": null
+                              }
                             }
                           ]
                         }
                         """)
         ;
+
     }
 
 
     @Test
+    @Order(6)
     void should_filter_invoices_by_status() {
-        client
-                .patch()
-                .uri(getApiURI(INVOICE.formatted(invoices.get(0).id())))
-                .header("Api-Key", apiKey())
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                          "status": "REJECTED"
-                        }
-                        """)
-                .exchange()
-                .expectStatus()
-                .isNoContent()
-        ;
 
         client
                 .get()
-                .uri(getApiURI(INVOICES, Map.of("pageIndex", "0", "pageSize", "10", "internalStatuses", "TO_REVIEW")))
+                .uri(getApiURI(V2_INVOICES, Map.of("pageIndex", "0", "pageSize", "10", "statuses", "TO_REVIEW,REJECTED")))
                 .header("Api-Key", apiKey())
                 .exchange()
                 .expectStatus()
@@ -272,12 +591,34 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .expectBody()
                 .json("""
                         {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
                           "invoices": [
                             {
-                              "internalStatus": "TO_REVIEW"
+                              "status": "TO_REVIEW",
+                              "rewardCount": 3,
+                              "totalEquivalent": {
+                                "amount": 4765.00,
+                                "dollarsEquivalent": 4765.00,
+                                "conversionRate": null,
+                                "currencyCode": "USD",
+                                "currencyName": "US Dollar",
+                                "currencyLogoUrl": null
+                              }
                             },
                             {
-                              "internalStatus": "TO_REVIEW"
+                              "status": "REJECTED",
+                              "rewardCount": 2,
+                              "totalEquivalent": {
+                                "amount": 2777.50,
+                                "dollarsEquivalent": 2777.50,
+                                "conversionRate": null,
+                                "currencyCode": "USD",
+                                "currencyName": "US Dollar",
+                                "currencyLogoUrl": null
+                              }
                             }
                           ]
                         }
@@ -286,8 +627,9 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     }
 
     @Test
+    @Order(7)
     void should_download_invoices() {
-        final var invoiceId = invoices.get(1).id();
+        final var invoiceId = companyBillingProfileToReviewInvoices.get(0);
         final var pdfData = faker.lorem().paragraph().getBytes();
         when(pdfStoragePort.download(eq(invoiceId + ".pdf"))).then(invocation -> new ByteArrayInputStream(pdfData));
 
@@ -303,8 +645,9 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     }
 
     @Test
+    @Order(8)
     void should_reject_invoice_download_if_wrong_token() {
-        final var invoiceId = invoices.get(1).id();
+        final var invoiceId = companyBillingProfileToReviewInvoices.get(0);
 
         client.get()
                 .uri(getApiURI(EXTERNAL_INVOICE.formatted(invoiceId), Map.of("token", "INVALID_TOKEN")))
@@ -312,40 +655,5 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 // Then
                 .expectStatus()
                 .isUnauthorized();
-    }
-
-    @SneakyThrows
-    @Transactional
-    InvoiceEntity fakeInvoice(UUID id, List<UUID> rewardIds) {
-        final var firstName = faker.name().firstName();
-        final var lastName = faker.name().lastName();
-
-        final var rewards = invoiceRewardRepository.findAll(rewardIds);
-
-        return new InvoiceEntity(
-                id,
-                UUID.randomUUID(),
-                Invoice.Number.of(12, lastName, firstName).toString(),
-                ZonedDateTime.now().minusDays(1),
-                InvoiceEntity.Status.TO_REVIEW,
-                rewards.stream().map(InvoiceRewardEntity::targetAmount).reduce(BigDecimal.ZERO, BigDecimal::add),
-                rewards.get(0).targetCurrency(),
-                new URL("https://s3.storage.com/invoice.pdf"),
-                null,
-                new InvoiceEntity.Data(
-                        ZonedDateTime.now().plusDays(9),
-                        BigDecimal.ZERO,
-                        new Invoice.PersonalInfo(
-                                firstName,
-                                lastName,
-                                faker.address().fullAddress(),
-                                faker.address().countryCode()
-                        ),
-                        null,
-                        null,
-                        List.of(new Invoice.Wallet(Network.ETHEREUM, "vitalik.eth")),
-                        rewards
-                )
-        );
     }
 }

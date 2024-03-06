@@ -57,6 +57,9 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
         invoiceRepository.saveAndFlush(entity);
 
         final var rewards = rewardRepository.findAllById(invoice.rewards().stream().map(r -> r.id().value()).toList());
+        if (rewards.size() != invoice.rewards().size()) {
+            throw notFound("Some invoice's rewards were not found (invoice %s). This may happen if a reward was cancelled in the meantime.".formatted(invoice.id()));
+        }
         rewardRepository.saveAll(rewards.stream().map(pr -> pr.invoice(entity)).toList());
     }
 
@@ -76,8 +79,9 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
         final var drafts = invoiceRepository.findAllByBillingProfileIdAndStatus(billingProfileId.value(), InvoiceEntity.Status.DRAFT);
 
         drafts.forEach(invoice -> {
-            final var rewards = rewardRepository.findAllById(invoice.data().rewards().stream().map(InvoiceRewardEntity::id).toList());
-            rewardRepository.saveAll(rewards.stream().map(pr -> pr.invoice(null)).toList());
+            //TODO
+//            final var rewards = rewardRepository.findAllByInvoiceId(invoice.id());
+//            rewardRepository.saveAll(rewards.stream().map(pr -> pr.invoice(null)).toList());
         });
 
         invoiceRepository.deleteAll(drafts);

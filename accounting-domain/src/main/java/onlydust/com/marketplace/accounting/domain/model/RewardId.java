@@ -19,4 +19,8 @@ public class RewardId extends UuidWrapper {
     public static RewardId of(@NonNull final String uuid) {
         return RewardId.of(UUID.fromString(uuid));
     }
+
+    public String pretty() {
+        return "#" + this.value().toString().substring(0, 5).toUpperCase();
+    }
 }

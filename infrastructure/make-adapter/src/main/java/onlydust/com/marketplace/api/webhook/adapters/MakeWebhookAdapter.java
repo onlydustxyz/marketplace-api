@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.webhook.adapters;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
+import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceUploaded;
 import onlydust.com.marketplace.api.webhook.Config;
 import onlydust.com.marketplace.api.webhook.MakeWebhookHttpClient;
@@ -40,6 +41,8 @@ public class MakeWebhookAdapter implements WebhookPort {
             makeWebhookHttpClient.post(UserBillingProfileVerificationStatusUpdatedEventDTO.of(billingProfileVerificationUpdated, config.getEnvironment()));
         } else if (event instanceof InvoiceUploaded invoiceUploaded) {
             makeWebhookHttpClient.post(InvoiceUploadedEventDTO.of(invoiceUploaded, config.getEnvironment()));
+        } else if (event instanceof InvoiceRejected invoiceRejected) {
+            makeWebhookHttpClient.post(InvoiceRejectedEventDTO.fromEvent(invoiceRejected), config.getSendRejectedInvoiceEmailUrl(), config.getApiKey());
         } else {
             throw new IllegalArgumentException("Unknown notification type %s".formatted(event));
         }

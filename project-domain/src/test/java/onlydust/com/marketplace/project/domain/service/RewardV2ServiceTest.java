@@ -4,7 +4,7 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.project.domain.model.Currency;
-import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
+import onlydust.com.marketplace.project.domain.model.OldRequestRewardCommand;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.output.AccountingServicePort;
 import onlydust.com.marketplace.project.domain.port.output.RewardStoragePort;
@@ -50,7 +50,7 @@ public class RewardV2ServiceTest {
         void should_create_reward() {
             // Given
             when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
-            final var command = RequestRewardCommand.builder()
+            final var command = OldRequestRewardCommand.builder()
                     .projectId(projectId)
                     .recipientId(recipientId)
                     .amount(BigDecimal.TEN)
@@ -84,7 +84,7 @@ public class RewardV2ServiceTest {
         void should_prevent_non_project_lead_to_create_reward() {
             // Given
             when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
-            final var command = RequestRewardCommand.builder()
+            final var command = OldRequestRewardCommand.builder()
                     .projectId(projectId)
                     .recipientId(recipientId)
                     .amount(BigDecimal.TEN)
@@ -102,7 +102,7 @@ public class RewardV2ServiceTest {
         void should_prevent_creating_reward_with_negative_amount() {
             // Given
             when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
-            final var command = RequestRewardCommand.builder()
+            final var command = OldRequestRewardCommand.builder()
                     .projectId(projectId)
                     .recipientId(recipientId)
                     .amount(BigDecimal.TEN.negate())
@@ -120,7 +120,7 @@ public class RewardV2ServiceTest {
         void should_prevent_creating_reward_with_zero_amount() {
             // Given
             when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
-            final var command = RequestRewardCommand.builder()
+            final var command = OldRequestRewardCommand.builder()
                     .projectId(projectId)
                     .recipientId(recipientId)
                     .amount(BigDecimal.ZERO)

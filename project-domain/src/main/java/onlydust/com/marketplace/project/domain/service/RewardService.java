@@ -3,7 +3,8 @@ package onlydust.com.marketplace.project.domain.service;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
-import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
+import onlydust.com.marketplace.project.domain.model.OldPayRewardRequestCommand;
+import onlydust.com.marketplace.project.domain.model.OldRequestRewardCommand;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectRewardStoragePort;
@@ -14,6 +15,8 @@ import onlydust.com.marketplace.project.domain.view.UserRewardView;
 import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
+
+import static java.util.Objects.nonNull;
 
 @AllArgsConstructor
 public class RewardService implements RewardFacadePort {
@@ -26,7 +29,7 @@ public class RewardService implements RewardFacadePort {
 
     @Override
     public UUID createReward(UUID projectLeadId,
-                             RequestRewardCommand command) {
+                             OldRequestRewardCommand command) {
         if (!permissionService.isUserProjectLead(command.getProjectId(), projectLeadId)) {
             throw OnlyDustException.forbidden("User must be project lead to request a reward");
         }
@@ -50,6 +53,10 @@ public class RewardService implements RewardFacadePort {
     @Override
     public void cancelReward(UUID projectLeadId, UUID projectId, UUID rewardId) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
+            final var rewardById = userStoragePort.findRewardById(rewardId);
+            if (nonNull(rewardById.getInvoiceId())) {
+                throw OnlyDustException.forbidden("Cannot cancel reward %s which is already contained in an invoice".formatted(rewardId));
+            }
             rewardServicePort.cancel(rewardId);
         } else {
             throw OnlyDustException.forbidden("User must be project lead to cancel a reward");
@@ -66,5 +73,15 @@ public class RewardService implements RewardFacadePort {
     @Override
     public Optional<Reward> getReward(UUID rewardId) {
         throw new UnsupportedOperationException("Not implemented in v1");
+    }
+
+    @Override
+    public void oldPayReward(OldPayRewardRequestCommand oldPayRewardRequestCommand) {
+        final var projectReward = projectRewardStoragePort.getProjectReward(oldPayRewardRequestCommand.getRewardId());
+        if (nonNull(projectReward)) {
+            rewardServicePort.markPaymentAsReceived(projectReward.getAmount(), oldPayRewardRequestCommand);
+        } else {
+            throw OnlyDustException.notFound("Reward %s was not found, failed to mark it to paid".formatted(oldPayRewardRequestCommand.getRewardId()));
+        }
     }
 }

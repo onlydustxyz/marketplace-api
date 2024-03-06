@@ -25,6 +25,7 @@ public class RewardDetailsView {
     Date processedAt;
     ReceiptView receipt;
     Project project;
+    UUID invoiceId;
 
     public Date getUnlockDate() {
         return currency.unlockDate();

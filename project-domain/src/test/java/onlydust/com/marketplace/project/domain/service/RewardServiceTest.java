@@ -3,12 +3,13 @@ package onlydust.com.marketplace.project.domain.service;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.project.domain.model.Currency;
-import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
+import onlydust.com.marketplace.project.domain.model.OldRequestRewardCommand;
 import onlydust.com.marketplace.project.domain.port.output.ProjectRewardStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.RewardServicePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.view.BudgetView;
 import onlydust.com.marketplace.project.domain.view.ProjectBudgetsView;
+import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.UserRewardView;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -36,8 +37,8 @@ public class RewardServiceTest {
                         userStoragePort);
 
         final UUID projectLeadId = UUID.randomUUID();
-        final RequestRewardCommand requestRewardCommand =
-                RequestRewardCommand.builder()
+        final OldRequestRewardCommand oldRequestRewardCommand =
+                OldRequestRewardCommand.builder()
                         .projectId(UUID.randomUUID())
                         .amount(BigDecimal.valueOf(10L))
                         .currency(Currency.STRK)
@@ -45,11 +46,11 @@ public class RewardServiceTest {
         final var newRewardId = UUID.randomUUID();
 
         // When
-        when(rewardServicePort.create(projectLeadId, requestRewardCommand))
+        when(rewardServicePort.create(projectLeadId, oldRequestRewardCommand))
                 .thenReturn(newRewardId);
-        when(permissionService.isUserProjectLead(requestRewardCommand.getProjectId(), projectLeadId))
+        when(permissionService.isUserProjectLead(oldRequestRewardCommand.getProjectId(), projectLeadId))
                 .thenReturn(true);
-        when(projectRewardStoragePort.findBudgets(requestRewardCommand.getProjectId()))
+        when(projectRewardStoragePort.findBudgets(oldRequestRewardCommand.getProjectId()))
                 .thenReturn(ProjectBudgetsView.builder()
                         .budgets(List.of(BudgetView.builder()
                                 .currency(Currency.STRK)
@@ -57,11 +58,11 @@ public class RewardServiceTest {
                                 .build()))
                         .build());
         final UUID rewardId = rewardService.createReward(projectLeadId,
-                requestRewardCommand);
+                oldRequestRewardCommand);
 
         // Then
         assertThat(rewardId).isEqualTo(newRewardId);
-        verify(indexerPort, times(1)).indexUser(requestRewardCommand.getRecipientId());
+        verify(indexerPort, times(1)).indexUser(oldRequestRewardCommand.getRecipientId());
     }
 
     @Test
@@ -78,16 +79,16 @@ public class RewardServiceTest {
                         userStoragePort);
 
         final UUID projectLeadId = UUID.randomUUID();
-        final RequestRewardCommand requestRewardCommand =
-                RequestRewardCommand.builder().projectId(UUID.randomUUID())
+        final OldRequestRewardCommand oldRequestRewardCommand =
+                OldRequestRewardCommand.builder().projectId(UUID.randomUUID())
                         .amount(BigDecimal.valueOf(10L))
                         .currency(Currency.STRK)
                         .build();
 
         // When
-        when(permissionService.isUserProjectLead(requestRewardCommand.getProjectId(), projectLeadId))
+        when(permissionService.isUserProjectLead(oldRequestRewardCommand.getProjectId(), projectLeadId))
                 .thenReturn(false);
-        when(projectRewardStoragePort.findBudgets(requestRewardCommand.getProjectId()))
+        when(projectRewardStoragePort.findBudgets(oldRequestRewardCommand.getProjectId()))
                 .thenReturn(ProjectBudgetsView.builder()
                         .budgets(List.of(BudgetView.builder()
                                 .currency(Currency.STRK)
@@ -96,7 +97,7 @@ public class RewardServiceTest {
                         .build());
         OnlyDustException onlyDustException = null;
         try {
-            rewardService.createReward(projectLeadId, requestRewardCommand);
+            rewardService.createReward(projectLeadId, oldRequestRewardCommand);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -105,7 +106,7 @@ public class RewardServiceTest {
         Assertions.assertNotNull(onlyDustException);
         Assertions.assertEquals(403, onlyDustException.getStatus());
         Assertions.assertEquals("User must be project lead to request a reward", onlyDustException.getMessage());
-        verify(indexerPort, never()).indexUser(requestRewardCommand.getRecipientId());
+        verify(indexerPort, never()).indexUser(oldRequestRewardCommand.getRecipientId());
     }
 
     @Test
@@ -122,16 +123,16 @@ public class RewardServiceTest {
                         userStoragePort);
 
         final UUID projectLeadId = UUID.randomUUID();
-        final RequestRewardCommand requestRewardCommand =
-                RequestRewardCommand.builder().projectId(UUID.randomUUID())
+        final OldRequestRewardCommand oldRequestRewardCommand =
+                OldRequestRewardCommand.builder().projectId(UUID.randomUUID())
                         .amount(BigDecimal.valueOf(0L))
                         .currency(Currency.STRK)
                         .build();
 
         // When
-        when(permissionService.isUserProjectLead(requestRewardCommand.getProjectId(), projectLeadId))
+        when(permissionService.isUserProjectLead(oldRequestRewardCommand.getProjectId(), projectLeadId))
                 .thenReturn(true);
-        when(projectRewardStoragePort.findBudgets(requestRewardCommand.getProjectId()))
+        when(projectRewardStoragePort.findBudgets(oldRequestRewardCommand.getProjectId()))
                 .thenReturn(ProjectBudgetsView.builder()
                         .budgets(List.of(BudgetView.builder()
                                 .currency(Currency.STRK)
@@ -140,7 +141,7 @@ public class RewardServiceTest {
                         .build());
         OnlyDustException onlyDustException = null;
         try {
-            rewardService.createReward(projectLeadId, requestRewardCommand);
+            rewardService.createReward(projectLeadId, oldRequestRewardCommand);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -149,7 +150,7 @@ public class RewardServiceTest {
         Assertions.assertNotNull(onlyDustException);
         Assertions.assertEquals(403, onlyDustException.getStatus());
         Assertions.assertEquals("Amount must be greater than 0", onlyDustException.getMessage());
-        verify(indexerPort, never()).indexUser(requestRewardCommand.getRecipientId());
+        verify(indexerPort, never()).indexUser(oldRequestRewardCommand.getRecipientId());
     }
 
 
@@ -167,22 +168,22 @@ public class RewardServiceTest {
                         userStoragePort);
 
         final UUID projectLeadId = UUID.randomUUID();
-        final RequestRewardCommand requestRewardCommand =
-                RequestRewardCommand.builder().projectId(UUID.randomUUID())
+        final OldRequestRewardCommand oldRequestRewardCommand =
+                OldRequestRewardCommand.builder().projectId(UUID.randomUUID())
                         .amount(BigDecimal.valueOf(10L))
                         .currency(Currency.STRK)
                         .build();
 
         // When
-        when(permissionService.isUserProjectLead(requestRewardCommand.getProjectId(), projectLeadId))
+        when(permissionService.isUserProjectLead(oldRequestRewardCommand.getProjectId(), projectLeadId))
                 .thenReturn(true);
-        when(projectRewardStoragePort.findBudgets(requestRewardCommand.getProjectId()))
+        when(projectRewardStoragePort.findBudgets(oldRequestRewardCommand.getProjectId()))
                 .thenReturn(ProjectBudgetsView.builder()
                         .budgets(List.of())
                         .build());
         OnlyDustException onlyDustException = null;
         try {
-            rewardService.createReward(projectLeadId, requestRewardCommand);
+            rewardService.createReward(projectLeadId, oldRequestRewardCommand);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -191,9 +192,9 @@ public class RewardServiceTest {
         Assertions.assertNotNull(onlyDustException);
         Assertions.assertEquals(400, onlyDustException.getStatus());
         Assertions.assertEquals(("Not enough budget of currency STRK for project %s to request a reward with an " +
-                                 "amount of 10").formatted(requestRewardCommand.getProjectId()),
+                                 "amount of 10").formatted(oldRequestRewardCommand.getProjectId()),
                 onlyDustException.getMessage());
-        verify(indexerPort, never()).indexUser(requestRewardCommand.getRecipientId());
+        verify(indexerPort, never()).indexUser(oldRequestRewardCommand.getRecipientId());
     }
 
     @Test
@@ -210,16 +211,16 @@ public class RewardServiceTest {
                         userStoragePort);
 
         final UUID projectLeadId = UUID.randomUUID();
-        final RequestRewardCommand requestRewardCommand =
-                RequestRewardCommand.builder().projectId(UUID.randomUUID())
+        final OldRequestRewardCommand oldRequestRewardCommand =
+                OldRequestRewardCommand.builder().projectId(UUID.randomUUID())
                         .amount(BigDecimal.valueOf(10L))
                         .currency(Currency.STRK)
                         .build();
 
         // When
-        when(permissionService.isUserProjectLead(requestRewardCommand.getProjectId(), projectLeadId))
+        when(permissionService.isUserProjectLead(oldRequestRewardCommand.getProjectId(), projectLeadId))
                 .thenReturn(true);
-        when(projectRewardStoragePort.findBudgets(requestRewardCommand.getProjectId()))
+        when(projectRewardStoragePort.findBudgets(oldRequestRewardCommand.getProjectId()))
                 .thenReturn(ProjectBudgetsView.builder()
                         .budgets(List.of(BudgetView.builder()
                                 .currency(Currency.STRK)
@@ -228,7 +229,7 @@ public class RewardServiceTest {
                         .build());
         OnlyDustException onlyDustException = null;
         try {
-            rewardService.createReward(projectLeadId, requestRewardCommand);
+            rewardService.createReward(projectLeadId, oldRequestRewardCommand);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -237,9 +238,9 @@ public class RewardServiceTest {
         Assertions.assertNotNull(onlyDustException);
         Assertions.assertEquals(400, onlyDustException.getStatus());
         Assertions.assertEquals(("Not enough budget of currency STRK for project %s to request a reward with an " +
-                                 "amount of 10").formatted(requestRewardCommand.getProjectId()),
+                                 "amount of 10").formatted(oldRequestRewardCommand.getProjectId()),
                 onlyDustException.getMessage());
-        verify(indexerPort, never()).indexUser(requestRewardCommand.getRecipientId());
+        verify(indexerPort, never()).indexUser(oldRequestRewardCommand.getRecipientId());
     }
 
     @Test
@@ -262,6 +263,7 @@ public class RewardServiceTest {
         // When
         when(permissionService.isUserProjectLead(projectId, projectLeadId))
                 .thenReturn(true);
+        when(userStoragePort.findRewardById(rewardId)).thenReturn(RewardDetailsView.builder().id(rewardId).build());
         rewardService.cancelReward(projectLeadId, projectId, rewardId);
 
         // Then
@@ -299,6 +301,40 @@ public class RewardServiceTest {
         Assertions.assertNotNull(onlyDustException);
         Assertions.assertEquals(403, onlyDustException.getStatus());
         Assertions.assertEquals("User must be project lead to cancel a reward", onlyDustException.getMessage());
+    }
+
+    @Test
+    void should_throw_a_forbidden_exception_when_cancelling_a_reward_already_contained_in_an_invoice() {
+        final RewardServicePort rewardServicePort = mock(RewardServicePort.class);
+        final PermissionService permissionService = mock(PermissionService.class);
+        final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
+        final IndexerPort indexerPort = mock(IndexerPort.class);
+        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
+
+        final RewardService rewardService =
+                new RewardService(rewardServicePort, projectRewardStoragePort, permissionService, indexerPort,
+                        userStoragePort);
+
+        final UUID projectLeadId = UUID.randomUUID();
+        final UUID projectId = UUID.randomUUID();
+        final var rewardId = UUID.randomUUID();
+
+        // When
+        when(permissionService.isUserProjectLead(projectId, projectLeadId))
+                .thenReturn(true);
+        when(userStoragePort.findRewardById(rewardId))
+                .thenReturn(RewardDetailsView.builder().id(rewardId).invoiceId(UUID.randomUUID()).build());
+        OnlyDustException onlyDustException = null;
+        try {
+            rewardService.cancelReward(projectLeadId, projectId, rewardId);
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        Assertions.assertNotNull(onlyDustException);
+        Assertions.assertEquals(403, onlyDustException.getStatus());
+        Assertions.assertEquals("Cannot cancel reward %s which is already contained in an invoice".formatted(rewardId), onlyDustException.getMessage());
     }
 
     @Test
