@@ -514,7 +514,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         .withRequestBody(
                                 matchingJsonPath("$.rejectionReason", equalTo(rejectionReason))
                         )
-                        .withRequestBody(matchingJsonPath("$.rewardNames", containing(rewardNames.get(0)).and(containing(rewardNames.get(1)))))
+                        .withRequestBody(matchingJsonPath("$.rewardNames", containing(rewardNames.get(0))))
+                        .withRequestBody(matchingJsonPath("$.rewardNames", containing(rewardNames.get(1))))
         );
 
         client
