@@ -10,6 +10,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -23,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 
 @AllArgsConstructor
@@ -33,6 +35,7 @@ import static java.util.Objects.isNull;
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 @TypeDef(name = "billing_profile_type", typeClass = PostgreSQLEnumType.class)
 @TypeDef(name = "invoice_status", typeClass = PostgreSQLEnumType.class)
+@TypeDef(name = "verification_status", typeClass = PostgreSQLEnumType.class)
 public class RewardDetailsViewEntity {
     @Id
     @NonNull UUID id;
@@ -63,6 +66,9 @@ public class RewardDetailsViewEntity {
     UserBillingProfileTypeEntity.BillingProfileTypeEntity billingProfileType;
     String billingProfileName;
     UUID billingProfileId;
+    @Type(type = "verification_status")
+    @Enumerated(EnumType.STRING)
+    VerificationStatusEntity billingProfileVerificationStatus;
     String billingProfileAdminLogin;
     String billingProfileAdminAvatarUrl;
     String billingProfileAdminName;
@@ -96,7 +102,7 @@ public class RewardDetailsViewEntity {
                 .status(RewardDetailsView.Status.valueOf(this.status))
                 .requestedAt(DateMapper.ofNullable(this.requestedAt))
                 .processedAt(DateMapper.ofNullable(this.processedAt))
-                .githubUrls(isNull(this.githubUrls) ? List.of() : this.githubUrls)
+                .githubUrls(isNull(this.githubUrls) ? List.of() : this.githubUrls.stream().sorted().toList())
                 .project(ShortProjectView.builder()
                         .id(ProjectId.of(this.projectId))
                         .name(this.projectName)
@@ -104,21 +110,24 @@ public class RewardDetailsViewEntity {
                         .shortDescription(this.projectShortDescription)
                         .slug(this.projectSlug)
                         .build())
-                .billingProfileAdmin(ShortBillingProfileAdminView.builder()
-                        .adminGithubLogin(this.billingProfileAdminLogin)
-                        .adminEmail(this.billingProfileAdminEmail)
-                        .adminName(this.billingProfileAdminName)
-                        .adminGithubAvatarUrl(this.billingProfileAdminAvatarUrl)
-                        .billingProfileId(BillingProfile.Id.of(this.billingProfileId))
-                        .billingProfileName(this.billingProfileName)
-                        .billingProfileType(switch (this.billingProfileType) {
-                            case INDIVIDUAL -> BillingProfile.Type.INDIVIDUAL;
-                            case COMPANY -> BillingProfile.Type.COMPANY;
-                        })
-                        .build())
+                .billingProfileAdmin(isNull(this.billingProfileId) ? null :
+                        ShortBillingProfileAdminView.builder()
+                                .adminGithubLogin(this.billingProfileAdminLogin)
+                                .adminEmail(this.billingProfileAdminEmail)
+                                .adminName(this.billingProfileAdminName)
+                                .adminGithubAvatarUrl(this.billingProfileAdminAvatarUrl)
+                                .billingProfileId(BillingProfile.Id.of(this.billingProfileId))
+                                .billingProfileName(this.billingProfileName)
+                                .billingProfileType(switch (this.billingProfileType) {
+                                    case INDIVIDUAL -> BillingProfile.Type.INDIVIDUAL;
+                                    case COMPANY -> BillingProfile.Type.COMPANY;
+                                })
+                                .verificationStatus(this.billingProfileVerificationStatus.toDomain())
+                                .build())
                 .recipient(new ShortContributorView(this.billingProfileAdminLogin, this.billingProfileAdminAvatarUrl))
                 .sponsors(isNull(this.sponsors) ? List.of() : this.sponsors.stream()
                         .map(InvoiceRewardViewEntity.SponsorLinkView::toDomain)
+                        .sorted(comparing(ShortSponsorView::name))
                         .toList())
                 .money(MoneyView.builder()
                         .amount(this.amount)

@@ -195,6 +195,27 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     }
 
     @Override
+    public ResponseEntity<String> exportRewardsCSV(List<RewardStatus> statuses,
+                                                   String fromRequestedAt,
+                                                   String toRequestedAt,
+                                                   String fromProcessedAt,
+                                                   String toProcessedAt) {
+        if (statuses == null || statuses.isEmpty())
+            throw badRequest("At least one status must be set in the filter");
+        if (fromRequestedAt == null && toRequestedAt == null && fromProcessedAt == null && toProcessedAt == null)
+            throw badRequest("At least one of the date filters must be set");
+
+        final String csv = accountingRewardPort.exportRewardsCSV(
+                statuses.stream().map(BackOfficeMapper::mapRewardStatus).toList(),
+                DateMapper.parseNullable(fromRequestedAt),
+                DateMapper.parseNullable(toRequestedAt),
+                DateMapper.parseNullable(fromProcessedAt),
+                DateMapper.parseNullable(toProcessedAt)
+        );
+        return ResponseEntity.ok(csv);
+    }
+
+    @Override
     public ResponseEntity<SearchRewardsResponse> searchRewards(SearchRewardsRequest searchRewardsRequest) {
         final var invoiceIds = searchRewardsRequest.getInvoiceIds() != null ?
                 searchRewardsRequest.getInvoiceIds().stream().map(Invoice.Id::of).toList() : null;

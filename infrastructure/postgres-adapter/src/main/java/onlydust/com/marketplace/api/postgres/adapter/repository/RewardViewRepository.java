@@ -42,6 +42,8 @@ public interface RewardViewRepository extends JpaRepository<RewardDetailsViewEnt
                        when ubpt.billing_profile_type = 'COMPANY' then cbp.name
                        end                                  billing_profile_name,
                    coalesce(ibp.id, cbp.id)                 billing_profile_id,
+                   coalesce(ibp.verification_status,
+                            cbp.verification_status)        billing_profile_verification_status,
                    u.github_login                           billing_profile_admin_login,
                    u.github_avatar_url                      billing_profile_admin_avatar_url,
                    upi.first_name || ' ' || upi.last_name   billing_profile_admin_name,
@@ -76,8 +78,8 @@ public interface RewardViewRepository extends JpaRepository<RewardDetailsViewEnt
             left join iam.users u on u.github_user_id = pr.recipient_id
             left join user_profile_info upi on upi.id = u.id
             left join user_billing_profile_types ubpt on ubpt.user_id = u.id
-            left join individual_billing_profiles ibp on ibp.user_id = ubpt.user_id
-            left join company_billing_profiles cbp on cbp.user_id = ubpt.user_id
+            left join individual_billing_profiles ibp on ubpt.billing_profile_type = 'INDIVIDUAL' and ibp.user_id = ubpt.user_id
+            left join company_billing_profiles cbp on ubpt.billing_profile_type = 'COMPANY' and cbp.user_id = ubpt.user_id
                         
             left join payments r on r.request_id = pr.id
             left join accounting.invoices i on i.id = pr.invoice_id
