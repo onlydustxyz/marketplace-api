@@ -38,6 +38,42 @@ WHERE p.receipt -> 'Ethereum' IS NOT NULL;
 INSERT INTO accounting.receipts (id, created_at, network, third_party_account_number, third_party_name, transaction_reference)
 SELECT p.id,
        processed_at,
+       'aptos'::accounting.network,
+       coalesce(p.receipt #>> '{Aptos, recipient_address}', p.receipt #>> '{Aptos, recipient_ens}'),
+       coalesce(u.github_login, CAST(pr.recipient_id AS TEXT)),
+       p.receipt #>> '{Aptos, transaction_hash}'
+FROM payments p
+         JOIN payment_requests pr on pr.id = p.request_id
+         LEFT JOIN iam.users u on u.github_user_id = pr.recipient_id
+WHERE p.receipt -> 'Aptos' IS NOT NULL;
+
+INSERT INTO accounting.receipts (id, created_at, network, third_party_account_number, third_party_name, transaction_reference)
+SELECT p.id,
+       processed_at,
+       'starknet'::accounting.network,
+       coalesce(p.receipt #>> '{Starknet, recipient_address}', p.receipt #>> '{Starknet, recipient_ens}'),
+       coalesce(u.github_login, CAST(pr.recipient_id AS TEXT)),
+       p.receipt #>> '{Starknet, transaction_hash}'
+FROM payments p
+         JOIN payment_requests pr on pr.id = p.request_id
+         LEFT JOIN iam.users u on u.github_user_id = pr.recipient_id
+WHERE p.receipt -> 'Starknet' IS NOT NULL;
+
+INSERT INTO accounting.receipts (id, created_at, network, third_party_account_number, third_party_name, transaction_reference)
+SELECT p.id,
+       processed_at,
+       'optimism'::accounting.network,
+       coalesce(p.receipt #>> '{Optimism, recipient_address}', p.receipt #>> '{Optimism, recipient_ens}'),
+       coalesce(u.github_login, CAST(pr.recipient_id AS TEXT)),
+       p.receipt #>> '{Optimism, transaction_hash}'
+FROM payments p
+         JOIN payment_requests pr on pr.id = p.request_id
+         LEFT JOIN iam.users u on u.github_user_id = pr.recipient_id
+WHERE p.receipt -> 'Optimism' IS NOT NULL;
+
+INSERT INTO accounting.receipts (id, created_at, network, third_party_account_number, third_party_name, transaction_reference)
+SELECT p.id,
+       processed_at,
        'sepa'::accounting.network,
        p.receipt #>> '{Sepa, recipient_iban}',
        coalesce(u.github_login, CAST(pr.recipient_id AS TEXT)),
