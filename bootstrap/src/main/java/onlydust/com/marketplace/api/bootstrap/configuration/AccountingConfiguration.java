@@ -58,10 +58,10 @@ public class AccountingConfiguration {
     @Bean
     public InvoiceFacadePort invoiceFacadePort(final @NonNull InvoiceStoragePort invoiceStoragePort,
                                                final @NonNull PdfStoragePort pdfStoragePort,
-                                               final @NonNull BillingProfileObserver billingProfileObserver,
+                                               final @NonNull BillingProfileObserver billingProfileObservers,
                                                final @NonNull BillingProfileStoragePort billingProfileStoragePort
     ) {
-        return new InvoiceService(invoiceStoragePort, pdfStoragePort, billingProfileStoragePort, billingProfileObserver);
+        return new InvoiceService(invoiceStoragePort, pdfStoragePort, billingProfileStoragePort, billingProfileObservers);
     }
 
     @Bean
