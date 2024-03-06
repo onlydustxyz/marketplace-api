@@ -187,7 +187,7 @@ public class RewardService implements AccountingRewardPort {
         for (PayableRewardWithPayoutInfoView starknetReward : starknetRewards) {
             totalAmount = totalAmount.add(starknetReward.money().amount());
             totalAmountDollarsEquivalent = totalAmountDollarsEquivalent.add(starknetReward.money().dollarsEquivalent());
-            csvLines.add(new String[]{"erc20", "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", starknetReward.wallet().address(),
+            csvLines.add(new String[]{"erc20", "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d", starknetReward.wallet().address(),
                     starknetReward.money().amount().toString()});
         }
         return BatchPayment.builder()
