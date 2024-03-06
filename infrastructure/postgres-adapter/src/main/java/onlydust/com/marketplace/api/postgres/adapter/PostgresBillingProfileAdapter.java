@@ -2,17 +2,21 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileAdminView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.OldBillingProfileAdminViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.OldBillingProfileAdminViewRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -40,6 +44,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     private final @NonNull BillingProfileUserRepository billingProfileUserRepository;
     private final @NonNull BillingProfileUserViewRepository billingProfileUserViewRepository;
     private final @NonNull BillingProfileUserInvitationRepository billingProfileUserInvitationRepository;
+    private final @NonNull OldBillingProfileAdminViewRepository oldBillingProfileAdminViewRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -213,6 +218,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     }
 
     @Override
+    @Transactional
     public void saveCoworkerInvitation(BillingProfile.Id billingProfileId, UserId invitedBy, GithubUserId invitedUser, BillingProfile.User.Role role,
                                        ZonedDateTime invitedAt) {
         billingProfileUserInvitationRepository.save(BillingProfileUserInvitationEntity.builder()
@@ -222,5 +228,12 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                 .invitedAt(Date.from(invitedAt.toInstant()))
                 .role(BillingProfileUserEntity.Role.fromDomain(role))
                 .build());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<BillingProfileAdminView> findBillingProfileAdminForInvoice(Invoice.Id invoiceId) {
+        return oldBillingProfileAdminViewRepository.findByInvoiceId(invoiceId.value())
+                .map(OldBillingProfileAdminViewEntity::toDomain);
     }
 }

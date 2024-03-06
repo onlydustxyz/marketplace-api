@@ -12,10 +12,10 @@ import org.springframework.context.annotation.Configuration;
 import java.net.http.HttpClient;
 
 @Configuration
-public class WebhookConfiguration {
+public class MakeWebhookConfiguration {
 
     @Bean
-    @ConfigurationProperties(value = "infrastructure.webhook")
+    @ConfigurationProperties(value = "infrastructure.make.webhook")
     public Config webhookHttpClientProperties() {
         return new Config();
     }

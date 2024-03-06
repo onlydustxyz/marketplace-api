@@ -1,19 +1,18 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import com.github.javafaker.Faker;
-import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresOldBillingProfileAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRewardRepository;
+import onlydust.com.marketplace.api.webhook.Config;
+import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.service.UserService;
 import org.junit.jupiter.api.MethodOrderer;
@@ -23,24 +22,21 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT {
-    @Autowired
-    private InvoiceRewardRepository invoiceRewardRepository;
     @Autowired
     PdfStoragePort pdfStoragePort;
     @Autowired
@@ -49,6 +45,12 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     UserService userService;
     @Autowired
     PostgresOldBillingProfileAdapter postgresOldBillingProfileAdapter;
+    @Autowired
+    OutboxConsumerJob notificationOutboxJob;
+    @Autowired
+    Config webhookHttpClientProperties;
+    @Autowired
+    InvoiceStoragePort invoiceStoragePort;
     private final Faker faker = new Faker();
 
     UserId userId;
@@ -67,6 +69,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
         companyBillingProfile = userService.getCompanyBillingProfile(userId.value());
         postgresOldBillingProfileAdapter.saveCompanyProfile(companyBillingProfile.toBuilder()
                 .name("Mr. Needful")
+                .userId(userId.value())
                 .address(faker.address().fullAddress())
                 .euVATNumber("111")
                 .subjectToEuropeVAT(false)
@@ -82,6 +85,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
         postgresOldBillingProfileAdapter.saveIndividualProfile(individualBillingProfile.toBuilder()
                 .firstName("Olivier")
                 .lastName("Fu")
+                .userId(userId.value())
                 .address(faker.address().fullAddress())
                 .oldCountry(OldCountry.fromIso3("FRA"))
                 .usCitizen(false)
@@ -482,6 +486,37 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .isNoContent()
         ;
 
+        // To avoid error on post InvoiceUploaded event to old BO
+        makeWebhookWireMockServer.stubFor(post("/").willReturn(ok()));
+        makeWebhookSendRejectedInvoiceMailWireMockServer.stubFor(
+                post("/?api-key=%s".formatted(webhookHttpClientProperties.getApiKey()))
+                        .willReturn(ok()));
+
+        notificationOutboxJob.run();
+
+
+        final Invoice invoice = invoiceStoragePort.get(companyBillingProfileToReviewInvoices.get(1)).orElseThrow();
+
+        final List<String> rewardNames = invoice.rewards().stream()
+                .map(r -> String.join(" - ", r.id().pretty(), r.projectName(), r.amount().getCurrency().code().toString(), r.amount().toString()))
+                .toList();
+
+        makeWebhookSendRejectedInvoiceMailWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/?api-key=%s".formatted(webhookHttpClientProperties.getApiKey())))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withRequestBody(matchingJsonPath("$.recipientEmail", equalTo("olivier.fuxet@gmail.com")))
+                        .withRequestBody(matchingJsonPath("$.recipientName", equalTo("Olivier")))
+                        .withRequestBody(matchingJsonPath("$.rewardCount", equalTo(String.valueOf(invoice.rewards().size()))))
+                        .withRequestBody(matchingJsonPath("$.invoiceName", equalTo(invoice.number().value())))
+                        .withRequestBody(matchingJsonPath("$.totalUsdAmount",
+                                equalTo(invoice.rewards().stream().map(Invoice.Reward::target).map(Money::getValue).reduce(BigDecimal.ZERO,
+                                        BigDecimal::add).toString())))
+                        .withRequestBody(
+                                matchingJsonPath("$.rejectionReason", equalTo(rejectionReason))
+                        )
+                        .withRequestBody(matchingJsonPath("$.rewardNames", containing(rewardNames.get(0)).and(containing(rewardNames.get(1)))))
+        );
+
         client
                 .get()
                 .uri(getApiURI(INVOICE.formatted(companyBillingProfileToReviewInvoices.get(1))))
@@ -629,40 +664,5 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 // Then
                 .expectStatus()
                 .isUnauthorized();
-    }
-
-    @SneakyThrows
-    @Transactional
-    InvoiceEntity fakeInvoice(UUID id, List<UUID> rewardIds) {
-        final var firstName = faker.name().firstName();
-        final var lastName = faker.name().lastName();
-
-        final var rewards = invoiceRewardRepository.findAll(rewardIds);
-
-        return new InvoiceEntity(
-                id,
-                UUID.randomUUID(),
-                Invoice.Number.of(12, lastName, firstName).toString(),
-                ZonedDateTime.now().minusDays(1),
-                InvoiceEntity.Status.TO_REVIEW,
-                rewards.stream().map(InvoiceRewardEntity::baseAmount).reduce(BigDecimal.ZERO, BigDecimal::add),
-                rewards.get(0).targetCurrency(),
-                new URL("https://s3.storage.com/invoice.pdf"),
-                null,
-                new InvoiceEntity.Data(
-                        ZonedDateTime.now().plusDays(9),
-                        BigDecimal.ZERO,
-                        new Invoice.PersonalInfo(
-                                firstName,
-                                lastName,
-                                faker.address().fullAddress(),
-                                faker.address().countryCode()
-                        ),
-                        null,
-                        null,
-                        List.of(new Invoice.Wallet(Network.ETHEREUM, "vitalik.eth")),
-                        rewards
-                ), null
-        );
     }
 }

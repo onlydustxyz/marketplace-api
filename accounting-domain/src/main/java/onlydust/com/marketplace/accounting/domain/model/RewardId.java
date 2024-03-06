@@ -21,6 +21,6 @@ public class RewardId extends UuidWrapper {
     }
 
     public String pretty() {
-        return "#" + this.value().toString().toUpperCase().substring(0, 5);
+        return "#" + this.value().toString().substring(0, 5).toUpperCase();
     }
 }
