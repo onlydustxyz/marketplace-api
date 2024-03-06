@@ -337,7 +337,8 @@ public class AbstractMarketplaceApiIT {
                         null,
                         List.of(new Invoice.Wallet(Network.ETHEREUM, "vitalik.eth")),
                         rewards
-                )
+                ),
+                null
         );
     }
 

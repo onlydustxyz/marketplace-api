@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.accounting.domain.port.out;
 
+import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
+import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 
@@ -19,12 +21,12 @@ public class BillingProfileObserverComposite implements BillingProfileObserver {
     }
 
     @Override
-    public void onInvoiceRejected(Invoice.Id invoiceId) {
-        observers.forEach(observer -> observer.onInvoiceRejected(invoiceId));
+    public void onBillingProfileUpdated(BillingProfileVerificationUpdated billingProfileVerificationUpdated) {
+        observers.forEach(observer -> observer.onBillingProfileUpdated(billingProfileVerificationUpdated));
     }
 
     @Override
-    public void onBillingProfileUpdated(BillingProfileVerificationUpdated billingProfileVerificationUpdated) {
-        observers.forEach(observer -> observer.onBillingProfileUpdated(billingProfileVerificationUpdated));
+    public void onInvoiceRejected(@NonNull InvoiceRejected invoiceRejected) {
+        observers.forEach(observer -> observer.onInvoiceRejected(invoiceRejected));
     }
 }

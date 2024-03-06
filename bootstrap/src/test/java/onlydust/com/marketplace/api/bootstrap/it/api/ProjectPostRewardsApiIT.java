@@ -10,8 +10,6 @@ import onlydust.com.marketplace.api.contract.model.RewardType;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.RequestRewardResponseDTO;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.reactive.function.BodyInserters;

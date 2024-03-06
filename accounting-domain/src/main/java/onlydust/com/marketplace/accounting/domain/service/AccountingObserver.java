@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
+import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
@@ -112,13 +114,13 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
     }
 
     @Override
-    public void onInvoiceRejected(Invoice.Id invoiceId) {
-        final var invoice = invoiceStorage.get(invoiceId).orElseThrow(() -> notFound("Invoice %s not found".formatted(invoiceId)));
-        invoice.rewards().forEach(reward -> {
+    public void onInvoiceRejected(@NonNull InvoiceRejected invoiceRejected) {
+        invoiceRejected.rewards().forEach(reward -> {
             final var rewardStatus = rewardStatusStorage.get(reward.id())
                     .orElseThrow(() -> notFound("RewardStatus not found for reward %s".formatted(reward.id())));
             rewardStatusStorage.save(rewardStatus.invoiceReceivedAt(null));
         });
+        //TODO send notification to make
     }
 
     @Override

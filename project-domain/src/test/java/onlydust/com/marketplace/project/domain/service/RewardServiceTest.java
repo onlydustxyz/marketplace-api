@@ -9,7 +9,7 @@ import onlydust.com.marketplace.project.domain.port.output.RewardServicePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.view.BudgetView;
 import onlydust.com.marketplace.project.domain.view.ProjectBudgetsView;
-import onlydust.com.marketplace.project.domain.view.RewardView;
+import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.UserRewardView;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -263,7 +263,7 @@ public class RewardServiceTest {
         // When
         when(permissionService.isUserProjectLead(projectId, projectLeadId))
                 .thenReturn(true);
-        when(userStoragePort.findRewardById(rewardId)).thenReturn(RewardView.builder().id(rewardId).build());
+        when(userStoragePort.findRewardById(rewardId)).thenReturn(RewardDetailsView.builder().id(rewardId).build());
         rewardService.cancelReward(projectLeadId, projectId, rewardId);
 
         // Then
@@ -323,7 +323,7 @@ public class RewardServiceTest {
         when(permissionService.isUserProjectLead(projectId, projectLeadId))
                 .thenReturn(true);
         when(userStoragePort.findRewardById(rewardId))
-                .thenReturn(RewardView.builder().id(rewardId).invoiceId(UUID.randomUUID()).build());
+                .thenReturn(RewardDetailsView.builder().id(rewardId).invoiceId(UUID.randomUUID()).build());
         OnlyDustException onlyDustException = null;
         try {
             rewardService.cancelReward(projectLeadId, projectId, rewardId);

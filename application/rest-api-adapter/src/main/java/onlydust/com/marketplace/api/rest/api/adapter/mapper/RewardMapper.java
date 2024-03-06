@@ -1,19 +1,14 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import lombok.NonNull;
-import onlydust.com.backoffice.api.contract.model.SearchRewardItemResponse;
-import onlydust.com.backoffice.api.contract.model.SearchRewardsResponse;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.project.domain.model.OldRequestRewardCommand;
-import onlydust.com.marketplace.project.domain.view.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
-import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
+import onlydust.com.marketplace.project.domain.model.OldRequestRewardCommand;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.view.*;
 
 import java.util.Objects;
-import java.util.List;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -85,8 +80,8 @@ public interface RewardMapper {
             case processing -> RewardStatus.PROCESSING;
             case locked -> RewardStatus.LOCKED;
             case pendingVerification -> RewardStatus.PENDING_VERIFICATION;
-            case pendingContributor -> RewardStatus.PENDING_CONTRIBUTOR;
-            case pendingSignup -> RewardStatus.PENDING_SIGNUP;
+            //TODO case pendingContributor -> RewardStatus.PENDING_CONTRIBUTOR;
+            //TODO case pendingSignup -> RewardStatus.PENDING_SIGNUP;
         };
     }
 

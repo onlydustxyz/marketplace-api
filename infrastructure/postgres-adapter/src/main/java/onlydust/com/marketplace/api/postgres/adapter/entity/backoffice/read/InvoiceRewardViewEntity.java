@@ -11,7 +11,7 @@ import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileAdminView;
 import onlydust.com.marketplace.accounting.domain.view.ShortSponsorView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -53,7 +53,7 @@ public class InvoiceRewardViewEntity {
     CurrencyEnumEntity currency;
     @Type(type = "billing_profile_type")
     @Enumerated(EnumType.STRING)
-    UserBillingProfileTypeEntity.BillingProfileTypeEntity billingProfileType;
+    BillingProfileEntity.Type billingProfileType;
     String billingProfileName;
     UUID billingProfileId;
     @Type(type = "jsonb")
@@ -96,6 +96,7 @@ public class InvoiceRewardViewEntity {
                         .billingProfileType(switch (this.billingProfileType) {
                             case INDIVIDUAL -> BillingProfile.Type.INDIVIDUAL;
                             case COMPANY -> BillingProfile.Type.COMPANY;
+                            case SELF_EMPLOYED -> BillingProfile.Type.SELF_EMPLOYED;
                         })
                         .build())
                 .sponsors(isNull(this.sponsors) ? List.of() : this.sponsors.stream()

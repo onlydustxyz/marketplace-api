@@ -13,21 +13,15 @@ import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerVie
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.OldBillingProfileAdminViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.OldBillingProfileAdminViewRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.Set;
+import java.util.*;
 
 import static java.time.ZonedDateTime.now;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -320,7 +314,9 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional(readOnly = true)
     public Optional<BillingProfileAdminView> findBillingProfileAdminForInvoice(Invoice.Id invoiceId) {
-        return oldBillingProfileAdminViewRepository.findByInvoiceId(invoiceId.value())
-                .map(OldBillingProfileAdminViewEntity::toDomain);
+//        return oldBillingProfileAdminViewRepository.findByInvoiceId(invoiceId.value())
+//                .map(OldBillingProfileAdminViewEntity::toDomain);
+        //TODO
+        return Optional.empty();
     }
 }

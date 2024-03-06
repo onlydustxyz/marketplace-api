@@ -10,7 +10,6 @@ import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectRewardStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.RewardServicePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
-import onlydust.com.marketplace.project.domain.view.RewardView;
 import onlydust.com.marketplace.project.domain.view.UserRewardView;
 
 import java.math.BigDecimal;
@@ -54,7 +53,7 @@ public class RewardService implements RewardFacadePort {
     @Override
     public void cancelReward(UUID projectLeadId, UUID projectId, UUID rewardId) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            final RewardView rewardById = userStoragePort.findRewardById(rewardId);
+            final var rewardById = userStoragePort.findRewardById(rewardId);
             if (nonNull(rewardById.getInvoiceId())) {
                 throw OnlyDustException.forbidden("Cannot cancel reward %s which is already contained in an invoice".formatted(rewardId));
             }
@@ -78,7 +77,7 @@ public class RewardService implements RewardFacadePort {
 
     @Override
     public void oldPayReward(OldPayRewardRequestCommand oldPayRewardRequestCommand) {
-        final RewardView projectReward = projectRewardStoragePort.getProjectReward(oldPayRewardRequestCommand.getRewardId());
+        final var projectReward = projectRewardStoragePort.getProjectReward(oldPayRewardRequestCommand.getRewardId());
         if (nonNull(projectReward)) {
             rewardServicePort.markPaymentAsReceived(projectReward.getAmount(), oldPayRewardRequestCommand);
         } else {

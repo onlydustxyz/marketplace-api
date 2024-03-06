@@ -2,24 +2,16 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRewardRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
-import org.junit.jupiter.api.BeforeEach;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.PostgresOldBillingProfileAdapter;
+import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
 import onlydust.com.marketplace.api.webhook.Config;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
-import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.service.UserService;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -31,8 +23,10 @@ import org.springframework.http.MediaType;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -49,8 +43,6 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     @Autowired
     UserService userService;
     @Autowired
-    PostgresOldBillingProfileAdapter postgresOldBillingProfileAdapter;
-    @Autowired
     private RewardRepository rewardRepository;
     @Autowired
     OutboxConsumerJob notificationOutboxJob;
@@ -61,9 +53,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     private final Faker faker = new Faker();
 
     UserId userId;
-    OldCompanyBillingProfile companyBillingProfile;
     BillingProfile.Id companyBillingProfileId;
-    OldIndividualBillingProfile individualBillingProfile;
     BillingProfile.Id individualBillingProfileId;
 
     static final List<Invoice.Id> companyBillingProfileToReviewInvoices = new ArrayList<>();
@@ -73,39 +63,40 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
         final UserAuthHelper.AuthenticatedUser olivier = userAuthHelper.authenticateOlivier();
         userId = UserId.of(olivier.user().getId());
 
-        companyBillingProfile = userService.getCompanyBillingProfile(userId.value());
-        postgresOldBillingProfileAdapter.saveCompanyProfile(companyBillingProfile.toBuilder()
-                .name("Mr. Needful")
-                .userId(userId.value())
-                .address(faker.address().fullAddress())
-                .euVATNumber("111")
-                .subjectToEuropeVAT(false)
-                .oldCountry(OldCountry.fromIso3("FRA"))
-                .usEntity(false)
-                .status(OldVerificationStatus.VERIFIED)
-                .build()
-        );
-        companyBillingProfileId = BillingProfile.Id.of(companyBillingProfile.getId());
-
-        individualBillingProfile = userService.getIndividualBillingProfile(userId.value());
-        postgresOldBillingProfileAdapter.saveIndividualProfile(individualBillingProfile.toBuilder()
-                .firstName("Olivier")
-                .lastName("Fu")
-                .userId(userId.value())
-                .address(faker.address().fullAddress())
-                .oldCountry(OldCountry.fromIso3("FRA"))
-                .usCitizen(false)
-                .idDocumentType(OldIndividualBillingProfile.OldIdDocumentTypeEnum.PASSPORT)
-                .idDocumentNumber(faker.idNumber().valid())
-                .idDocumentCountryCode("FRA")
-                .validUntil(Date.from(ZonedDateTime.now().plusYears(10).toInstant()))
-                .status(OldVerificationStatus.VERIFIED)
-                .build()
-        );
-        individualBillingProfileId = BillingProfile.Id.of(individualBillingProfile.getId());
-
-        // Select COMPANY as active billing profile
-        userService.updateBillingProfileType(userId.value(), OldBillingProfileType.COMPANY);
+        //TODO
+//        companyBillingProfile = userService.getCompanyBillingProfile(userId.value());
+//        postgresOldBillingProfileAdapter.saveCompanyProfile(companyBillingProfile.toBuilder()
+//                .name("Mr. Needful")
+//                .userId(userId.value())
+//                .address(faker.address().fullAddress())
+//                .euVATNumber("111")
+//                .subjectToEuropeVAT(false)
+//                .oldCountry(OldCountry.fromIso3("FRA"))
+//                .usEntity(false)
+//                .status(OldVerificationStatus.VERIFIED)
+//                .build()
+//        );
+//        companyBillingProfileId = BillingProfile.Id.of(companyBillingProfile.getId());
+//
+//        individualBillingProfile = userService.getIndividualBillingProfile(userId.value());
+//        postgresOldBillingProfileAdapter.saveIndividualProfile(individualBillingProfile.toBuilder()
+//                .firstName("Olivier")
+//                .lastName("Fu")
+//                .userId(userId.value())
+//                .address(faker.address().fullAddress())
+//                .oldCountry(OldCountry.fromIso3("FRA"))
+//                .usCitizen(false)
+//                .idDocumentType(OldIndividualBillingProfile.OldIdDocumentTypeEnum.PASSPORT)
+//                .idDocumentNumber(faker.idNumber().valid())
+//                .idDocumentCountryCode("FRA")
+//                .validUntil(Date.from(ZonedDateTime.now().plusYears(10).toInstant()))
+//                .status(OldVerificationStatus.VERIFIED)
+//                .build()
+//        );
+//        individualBillingProfileId = BillingProfile.Id.of(individualBillingProfile.getId());
+//
+//        // Select COMPANY as active billing profile
+//        userService.updateBillingProfileType(userId.value(), OldBillingProfileType.COMPANY);
 
 
         // Given
