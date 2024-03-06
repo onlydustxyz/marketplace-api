@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Builder
 @Data
-public class RequestRewardCommand {
+public class OldRequestRewardCommand {
     Long recipientId;
     BigDecimal amount;
     Currency currency;

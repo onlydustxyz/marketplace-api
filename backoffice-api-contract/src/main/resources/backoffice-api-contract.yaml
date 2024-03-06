@@ -87,17 +87,93 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/invoices/{invoiceId}:
-    patch:
+  /bo/v2/invoices:
+    get:
       security:
         - apiKey: [ ]
       tags:
         - BackofficeInvoicingManagement
-      summary: Update an invoice
-      operationId: updateInvoice
+      summary: Get invoice page
+      operationId: getInvoicePageV2
       description: |
-        Update an invoice.
-        This will allow to update the invoice's status to APPROVED or REJECTED.
+        Get invoice page
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: invoiceIds
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/InvoiceId'
+          style: form
+        - in: query
+          name: statuses
+          required: false
+          schema:
+            type: array
+            default: [ TO_REVIEW, REJECTED, APPROVED, PAID ]
+            items:
+              $ref: '#/components/schemas/InvoiceInternalStatus'
+          style: form
+      responses:
+        "200":
+          description: 'Invoice page'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoicePageV2'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/invoices/{invoiceId}:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeInvoicingManagement
+      summary: Get invoice
+      operationId: getInvoice
+      description: |
+        Get invoice details
+      parameters:
+        - in: path
+          name: invoiceId
+          required: true
+          schema:
+            $ref: '#/components/schemas/InvoiceId'
+      responses:
+        "200":
+          description: 'Invoice'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /bo/v1/invoices/{invoiceId}/status:
+    put:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeInvoicingManagement
+      summary: Update invoice's status
+      operationId: updateInvoiceStatus
+      description: |
+        Update invoice's status to APPROVED or REJECTED.
       parameters:
         - in: path
           name: invoiceId
@@ -110,10 +186,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchInvoiceRequest'
+              $ref: '#/components/schemas/UpdateInvoiceStatusRequest'
       responses:
         "204":
-          description: 'The invoice has been approved'
+          description: 'The invoice status has been updated'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -469,6 +545,307 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+
+  /bo/v0/rewards/{rewardId}/pay:
+    post:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Pay a reward
+      operationId: oldPayReward
+      description: |
+        Pay a reward using the transaction reference and recipient account as input.
+        The provided reward will be marked as complete.
+      parameters:
+        - in: path
+          name: rewardId
+          required: true
+          schema:
+            $ref: '#/components/schemas/RewardId'
+      requestBody:
+        description: Payment information
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PayRewardRequest'
+      responses:
+        "204":
+          description: 'The reward has been marked as complete'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/rewards:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Get all (paginated) rewards
+      operationId: getRewards
+      description: |
+        Get paginated rewards
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: statuses
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/RewardStatus'
+          style: form
+        - in: query
+          name: fromRequestedAt
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: toRequestedAt
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: fromProcessedAt
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: toProcessedAt
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+      responses:
+        "200":
+          description: 'Page of rewards'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/rewards/csv:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Export rewards in a CSV
+      operationId: exportRewardsCSV
+      description: |
+        Export rewards in a CSV
+      parameters:
+        - in: query
+          name: statuses
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/RewardStatus'
+          style: form
+        - in: query
+          name: fromRequestedAt
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: toRequestedAt
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: fromProcessedAt
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: toProcessedAt
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+      responses:
+        "200":
+          description: 'CSV of rewards'
+          content:
+            text/csv:
+              schema:
+                type: string
+              example: |-
+                Project,Recipient,Recipient Github,Amount,Currency,Contributions,Status,Requested at,Processed at,Transaction Hash,Payout information,Pretty ID,Sponsors,Recipient email,Verification status,Account type,Invoice number,Invoice id,Budget,Batch payments,Batch payment info,Conversion rate,Dollar Amount
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/rewards/search:
+    post:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Search rewards
+      operationId: searchRewards
+      description: |
+        Search rewards
+      requestBody:
+        description: Payment information
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRewardsRequest'
+      responses:
+        "200":
+          description: 'List of rewards'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchRewardsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/rewards/batch-payments:
+    post:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Create a batch payments for a given list of invoice ids
+      operationId: createBatchPayments
+      description: |
+        Create a batch payments for a given list of invoice ids
+      requestBody:
+        description: List of invoice ids
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostBatchPaymentRequest'
+      responses:
+        "200":
+          description: 'List of batch payment'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchPaymentsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Get batch payments
+      operationId: getBatchPayments
+      description: |
+        Get page of paid batch payments
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'Page of paid batch payments'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchPaymentPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/rewards/batch-payments/{batchPaymentId}:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Get batch payment details
+      operationId: getBatchPayment
+      description: |
+        Get batch payment details
+      parameters:
+        - in: path
+          name: batchPaymentId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BatchPaymentId'
+      responses:
+        "200":
+          description: Batch payment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchPaymentDetailsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Update batch payment with transaction hash
+      operationId: updateBatchPayments
+      description: |
+        Update batch payment with transaction hash
+      parameters:
+        - in: path
+          name: batchPaymentId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BatchPaymentId'
+      requestBody:
+        description: Transaction hash
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchPaymentRequest'
+      responses:
+        "204":
+          description: 'Batch payment processed'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 
 
   # BackofficeSponsorManagement ===============================================================
@@ -1338,21 +1715,19 @@ components:
         logoUrl:
           type: string
 
-    PatchInvoiceRequest:
+    UpdateInvoiceStatusRequest:
       type: object
+      required:
+        - status
       properties:
         status:
           type: string
           enum:
             - APPROVED
             - REJECTED
-
-        paymentDate:
+        rejectionReason:
           type: string
-          format: date-time
-        refundDate:
-          type: string
-          format: date-time
+          example: "The invoice is not valid"
 
     SponsorRequest:
       type: object
@@ -1934,6 +2309,225 @@ components:
           type: string
           format: uri
 
+    InvoiceLinkResponse:
+      type: object
+      required:
+        - id
+        - number
+        - status
+      properties:
+        id:
+          $ref: '#/components/schemas/InvoiceId'
+        number:
+          type: string
+        status:
+          $ref: '#/components/schemas/InvoiceInternalStatus'
+
+    InvoiceResponse:
+      type: object
+      required:
+        - id
+        - number
+        - status
+        - billingProfile
+        - createdAt
+        - totalEquivalent
+        - rewardsPerNetwork
+      properties:
+        id:
+          $ref: '#/components/schemas/InvoiceId'
+        number:
+          type: string
+        status:
+          $ref: '#/components/schemas/InvoiceInternalStatus'
+        billingProfile:
+          $ref: '#/components/schemas/BillingProfileResponse'
+        rejectionReason:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        totalEquivalent:
+          $ref: '#/components/schemas/MoneyResponse'
+        rewardsPerNetwork:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceRewardsPerNetwork'
+
+    InvoiceRewardsPerNetwork:
+      type: object
+      required:
+        - network
+        - billingAccountNumber
+        - dollarsEquivalent
+        - totalPerCurrency
+        - rewards
+      properties:
+        network:
+          $ref: '#/components/schemas/TransactionNetwork'
+        billingAccountNumber:
+          type: string
+          description: IBAN, account number, ENS or wallet address
+        dollarsEquivalent:
+          type: number
+        totalPerCurrency:
+          type: array
+          items:
+            $ref: '#/components/schemas/MoneyLinkResponse'
+        rewards:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceRewardResponse'
+
+    InvoicePageV2:
+      type: object
+      required:
+        - invoices
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        invoices:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoicePageItemV2'
+    InvoicePageItemV2:
+      type: object
+      required:
+        - id
+        - status
+        - internalStatus
+        - billingProfile
+        - createdAt
+        - totalAmount
+        - totalAmountCurrency
+        - rewardCount
+        - amounts
+      properties:
+        id:
+          $ref: '#/components/schemas/InvoiceId'
+        status:
+          $ref: '#/components/schemas/InvoiceInternalStatus'
+        billingProfile:
+          $ref: '#/components/schemas/BillingProfileResponse'
+        createdAt:
+          type: string
+          format: date-time
+        rewardCount:
+          type: integer
+        totalEquivalent:
+          $ref: '#/components/schemas/MoneyLinkResponse'
+        totalPerCurrency:
+          type: array
+          items:
+            $ref: '#/components/schemas/MoneyLinkResponse'
+
+    MoneyResponse:
+      type: object
+      description: An amount and its currency
+      required:
+        - amount
+        - currencyCode
+        - currencyName
+        - currencyLogoUrl
+      properties:
+        amount:
+          type: number
+        currencyCode:
+          type: string
+        currencyName:
+          type: string
+        currencyLogoUrl:
+          type: string
+
+    MoneyLinkResponse:
+      type: object
+      description: An amount and its currency
+      required:
+        - amount
+        - currencyCode
+        - currencyName
+        - currencyLogoUrl
+      properties:
+        amount:
+          type: number
+        dollarsEquivalent:
+          type: number
+        conversionRate:
+          type: number
+        currencyCode:
+          type: string
+        currencyName:
+          type: string
+        currencyLogoUrl:
+          type: string
+
+    BillingProfileId:
+      type: string
+      format: uuid
+      description: Billing profile ID
+
+    UserId:
+      type: string
+      format: uuid
+      description: Billing profile ID
+
+    BillingProfileResponse:
+      type: object
+      required:
+        - id
+        - name
+        - type
+      properties:
+        id:
+          $ref: '#/components/schemas/BillingProfileId'
+        name:
+          type: string
+          example: Apple Inc.
+        type:
+          $ref: '#/components/schemas/BillingProfileType'
+        verificationStatus:
+          $ref: '#/components/schemas/VerificationStatus'
+        admins:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillingProfileAdminResponse'
+
+    BillingProfileAdminResponse:
+      type: object
+      required:
+        - login
+        - email
+      properties:
+        login:
+          type: string
+          example: ofux
+        name:
+          type: string
+          example: Olivier Fuxet
+        email:
+          type: string
+          example: olivier@foobar.org
+        avatarUrl:
+          type: string
+
+    BillingProfileType:
+      type: string
+      enum:
+        - INDIVIDUAL
+        - COMPANY
+        - SELF_EMPLOYED
+
     InvoiceInternalStatus:
       type: string
       enum:
@@ -2159,8 +2753,10 @@ components:
           $ref: '#/components/schemas/CurrencyId'
         code:
           type: string
+          example: USDC
         name:
           type: string
+          example: USD Coin
         logoUrl:
           type: string
           format: uri
@@ -2225,3 +2821,304 @@ components:
     ContractAddress:
       type: string
       format: hex
+    
+    SearchRewardsRequest:
+      type: object
+      required:
+        - invoiceIds
+      properties:
+        invoiceIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceId'
+    
+    SearchRewardsResponse:
+      type: object
+      required:
+        - rewards
+      properties:
+        rewards:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchRewardItemResponse'
+
+    SearchRewardItemResponse:
+      type: object
+      required:
+        - id
+        - billingProfileAdmin
+        - requestedAt
+        - githubUrls
+        - project
+      properties:
+        id:
+          $ref: '#/components/schemas/RewardId'
+        billingProfile:
+          $ref: '#/components/schemas/BillingProfileResponse'
+        requestedAt:
+          type: string
+          format: date-time
+        processedAt:
+          type: string
+          format: date-time
+        githubUrls:
+          type: array
+          items:
+            type: string
+        project:
+          $ref: '#/components/schemas/ProjectLinkResponse'
+        sponsors:
+          type: array
+          items:
+            $ref: '#/components/schemas/SponsorLinkResponse'
+        money:
+          $ref: '#/components/schemas/MoneyLinkResponse'
+
+    RewardPageResponse:
+      type: object
+      required:
+        - rewards
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        rewards:
+          type: array
+          items:
+            $ref: '#/components/schemas/RewardPageItemResponse'
+    RewardPageItemResponse:
+      type: object
+      required:
+        - id
+        - billingProfileAdmin
+        - requestedAt
+        - githubUrls
+        - project
+      properties:
+        id:
+          $ref: '#/components/schemas/RewardId'
+        billingProfile:
+          $ref: '#/components/schemas/BillingProfileResponse'
+        invoice:
+          $ref: '#/components/schemas/InvoiceLinkResponse'
+        status:
+          $ref: '#/components/schemas/RewardStatus'
+        requestedAt:
+          type: string
+          format: date-time
+        processedAt:
+          type: string
+          format: date-time
+        githubUrls:
+          type: array
+          items:
+            type: string
+        recipient:
+          $ref: '#/components/schemas/RecipientLinkResponse'
+        project:
+          $ref: '#/components/schemas/ProjectLinkResponse'
+        sponsors:
+          type: array
+          items:
+            $ref: '#/components/schemas/SponsorLinkResponse'
+        money:
+          $ref: '#/components/schemas/MoneyLinkResponse'
+        transactionHash:
+          type: string
+          example: 0x1234567890abcdef
+        paidTo:
+          type: string
+          example: 0x1234567890abcdef
+
+    RewardStatus:
+      enum:
+        - PENDING_INVOICE
+        - PENDING_SIGNUP
+        - PENDING_CONTRIBUTOR
+        - PENDING_VERIFICATION
+        - MISSING_PAYOUT_INFO
+        - PROCESSING
+        - COMPLETE
+        - LOCKED
+
+    RecipientLinkResponse:
+      type: object
+      required:
+        - login
+        - avatarUrl
+      properties:
+        login:
+          type: string
+        name:
+          type: string
+        avatarUrl:
+          type: string
+
+    InvoiceRewardResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/RewardId'
+        requestedAt:
+          type: string
+          format: date-time
+        processedAt:
+          type: string
+          format: date-time
+        githubUrls:
+          type: array
+          items:
+            type: string
+        project:
+          $ref: '#/components/schemas/ProjectLinkResponse'
+        sponsors:
+          type: array
+          items:
+            $ref: '#/components/schemas/SponsorLinkResponse'
+        money:
+          $ref: '#/components/schemas/MoneyLinkResponse'
+        transactionHash:
+          type: string
+
+    ProjectLinkResponse:
+      type: object
+      required:
+        - name
+        - logoUrl
+      properties:
+        name:
+          type: string
+        logoUrl:
+          type: string
+
+    SponsorLinkResponse:
+      type: object
+      required:
+        - name
+        - avatarUrl
+      properties:
+        name:
+          type: string
+        avatarUrl:
+          type: string
+
+    PostBatchPaymentRequest:
+      type: object
+      required:
+        - invoiceIds
+      properties:
+        invoiceIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceId'
+
+    BatchPaymentId:
+      type: string
+      format: uuid
+    BatchPaymentsResponse:
+      type: object
+      required:
+        - batchPayments
+      properties:
+        batchPayments:
+          type: array
+          items:
+            $ref: '#/components/schemas/BatchPaymentResponse'
+    BatchPaymentResponse:
+      type: object
+      required:
+        - id
+        - csv
+        - rewardCount
+        - totalAmounts
+        - blockchain
+      properties:
+        id:
+          $ref: '#/components/schemas/BatchPaymentId'
+        csv:
+          type: string
+        blockchain:
+          $ref: '#/components/schemas/BlockchainContract'
+        rewardCount:
+          type: integer
+          format: int64
+        totalAmounts:
+          items:
+            $ref: '#/components/schemas/MoneyLinkResponse'
+
+    BatchPaymentRequest:
+      type: object
+      required:
+        - transactionHash
+      properties:
+        transactionHash:
+          type: string
+
+    BatchPaymentPageResponse:
+      required:
+        - batchPayments
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        batchPayments:
+          type: array
+          items:
+            $ref: '#/components/schemas/BatchPaymentItemResponse'
+
+    BatchPaymentItemResponse:
+      type: object
+      required:
+        - id
+        - createdAt
+        - blockchain
+        - rewardCount
+        - totalAmounts
+        - totalAmountUsd
+      properties:
+        id:
+          $ref: '#/components/schemas/BatchPaymentId'
+        createdAt:
+          type: string
+          format: date-time
+        blockchain:
+          $ref: '#/components/schemas/BlockchainContract'
+        rewardCount:
+          type: integer
+          format: int64
+        totalAmountUsd:
+          type: number
+        totalAmounts:
+          items:
+            $ref: '#/components/schemas/MoneyLinkResponse'
+
+    BatchPaymentDetailsResponse:
+      allOf:
+        - $ref: '#/components/schemas/BatchPaymentItemResponse'
+        - $ref: '#/components/schemas/SearchRewardsResponse'
+        - type: object
+          properties:
+            csv:
+              type: string
+            transactionHash:
+              type: string

@@ -1,9 +1,12 @@
 package onlydust.com.marketplace.accounting.domain.port.out;
 
+import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileAdminView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
@@ -13,6 +16,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.Set;
 
 public interface BillingProfileStoragePort {
 
@@ -40,7 +44,9 @@ public interface BillingProfileStoragePort {
 
     void savePayoutInfoForBillingProfile(PayoutInfo payoutInfo, BillingProfile.Id billingProfileId);
 
-    Page<BillingProfileCoworkerView> findCoworkersByBillingProfile(BillingProfile.Id billingProfileId, int pageIndex, int pageSize);
+    Page<BillingProfileCoworkerView> findCoworkersByBillingProfile(@NonNull BillingProfile.Id billingProfileId, @NonNull Set<BillingProfile.User.Role> roles,
+                                                                   int pageIndex,
+                                                                   int pageSize);
 
     Optional<Kyc> findKycById(UUID verificationId);
 
@@ -70,4 +76,6 @@ public interface BillingProfileStoragePort {
     Optional<BillingProfileCoworkerView> getCoworker(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId);
 
     void deleteCoworker(BillingProfile.Id billingProfileId, UserId userId);
+
+    Optional<BillingProfileAdminView> findBillingProfileAdminForInvoice(Invoice.Id invoiceId);
 }

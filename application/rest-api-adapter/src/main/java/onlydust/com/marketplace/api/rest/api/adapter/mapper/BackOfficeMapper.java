@@ -2,8 +2,12 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import onlydust.com.backoffice.api.contract.model.RewardStatus;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Hash;
@@ -12,9 +16,14 @@ import onlydust.com.marketplace.project.domain.model.Currency;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.view.backoffice.*;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.time.ZoneOffset;
+import java.util.List;
+import java.util.Map;
 
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.groupingBy;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.ETHEREUM;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
@@ -266,6 +275,155 @@ public interface BackOfficeMapper {
                 .downloadUrl(URI.create("%s/bo/v1/external/invoices/%s?token=%s".formatted(baseUri, invoice.id().value(), token)));
     }
 
+    static InvoicePageV2 mapInvoicePageV2ToContract(final Page<Invoice> page, final int pageIndex) {
+        return new InvoicePageV2()
+                .invoices(page.getContent().stream().map(i -> mapInvoiceV2(i)).toList())
+                .totalPageNumber(page.getTotalPageNumber())
+                .totalItemNumber(page.getTotalItemNumber())
+                .hasMore(hasMore(pageIndex, page.getTotalPageNumber()))
+                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPageNumber()));
+    }
+
+    @SneakyThrows
+    static InvoicePageItemV2 mapInvoiceV2(final Invoice invoice) {
+        return new InvoicePageItemV2()
+                .id(invoice.id().value())
+                .status(mapInvoiceInternalStatus(invoice.status()))
+                .createdAt(invoice.createdAt())
+                .billingProfile(new BillingProfileResponse()
+                        .id(invoice.billingProfileId().value())
+                        .type(invoice.companyInfo().isPresent() ? BillingProfileType.COMPANY : BillingProfileType.INDIVIDUAL)
+                        .name(invoice.companyInfo().map(Invoice.CompanyInfo::name).orElse(invoice.personalInfo().map(Invoice.PersonalInfo::fullName).orElse(null)))
+                        .admins(null) //TODO: add admins when implementing the new version for pennylane
+                )
+                .rewardCount(invoice.rewards().size())
+                .totalEquivalent(new MoneyLinkResponse()
+                        .amount(invoice.totalAfterTax().getValue())
+                        .dollarsEquivalent(invoice.totalAfterTax().getValue())
+                        .currencyCode(invoice.totalAfterTax().getCurrency().code().toString())
+                        .currencyName(invoice.totalAfterTax().getCurrency().name())
+                        .currencyLogoUrl(invoice.totalAfterTax().getCurrency().logoUri().map(URI::toString).orElse(null))
+                        .conversionRate(null) //TODO: add conversion rate when implementing the new version for pennylane
+                )
+                .totalPerCurrency(invoice.rewards().stream().map(reward ->
+                        new MoneyLinkResponse()
+                                .amount(reward.amount().getValue())
+                                .dollarsEquivalent(reward.target().getValue())
+                                .currencyCode(reward.amount().getCurrency().code().toString())
+                                .currencyName(reward.amount().getCurrency().name())
+                                .currencyLogoUrl(reward.amount().getCurrency().logoUri().map(URI::toString).orElse(null))
+                                .conversionRate(null) //TODO: add conversion rate when implementing the new version for pennylane
+                ).toList());
+    }
+
+    @SneakyThrows
+    static InvoiceResponse mapInvoiceToContract(final Invoice invoice, List<BillingProfileCoworkerView> billingProfileAdmins, final List<RewardView> rewards) {
+        return new InvoiceResponse()
+                .id(invoice.id().value())
+                .number(invoice.number().toString())
+                .rejectionReason(invoice.rejectionReason())
+                .status(mapInvoiceInternalStatus(invoice.status()))
+                .createdAt(invoice.createdAt())
+                .billingProfile(new BillingProfileResponse()
+                        .id(invoice.billingProfileId().value())
+                        .type(invoice.companyInfo().isPresent() ? BillingProfileType.COMPANY : BillingProfileType.INDIVIDUAL)
+                        .name(invoice.companyInfo().map(Invoice.CompanyInfo::name).orElse(invoice.personalInfo().map(Invoice.PersonalInfo::fullName).orElse(null)))
+                        .admins(billingProfileAdmins.stream()
+                                .map(admin -> new BillingProfileAdminResponse()
+                                        .name(admin.login())
+                                        .avatarUrl(admin.avatarUrl())
+                                        .email(admin.email())
+                                ).toList()
+                        )
+                )
+                .totalEquivalent(new MoneyResponse()
+                        .amount(invoice.totalAfterTax().getValue())
+                        .currencyCode(invoice.totalAfterTax().getCurrency().code().toString())
+                        .currencyName(invoice.totalAfterTax().getCurrency().name())
+                        .currencyLogoUrl(invoice.totalAfterTax().getCurrency().logoUri().map(URI::toString).orElse(null))
+                )
+                .rewardsPerNetwork(mapInvoiceRewardsPerNetworks(invoice, rewards));
+    }
+
+    static List<InvoiceRewardsPerNetwork> mapInvoiceRewardsPerNetworks(final Invoice invoice, final List<RewardView> rewards) {
+        final Map<Network, List<RewardView>> rewardsPerNetworks = rewards.stream().collect(groupingBy(RewardView::network));
+
+        return rewardsPerNetworks.entrySet().stream()
+                .map(e -> {
+                            final var totalEquivalent = e.getValue().stream().map(r -> r.money().dollarsEquivalent()).reduce(BigDecimal::add)
+                                    .orElseThrow(() -> internalServerError("No reward found for network %s".formatted(e.getKey())));
+
+                            return new InvoiceRewardsPerNetwork()
+                                    .network(mapNetwork(e.getKey()))
+                                    .billingAccountNumber(invoice.wallets().stream()
+                                            .filter(w -> w.network() == e.getKey())
+                                            .findFirst()
+                                            .map(Invoice.Wallet::address)
+                                            .orElse(null))
+                                    .dollarsEquivalent(totalEquivalent)
+                                    .totalPerCurrency(mapNetworkRewardTotals(e.getValue()))
+                                    .rewards(mapNetworkRewards(e.getValue()));
+                        }
+                )
+                .sorted(comparing(InvoiceRewardsPerNetwork::getNetwork))
+                .toList();
+    }
+
+    static List<InvoiceRewardResponse> mapNetworkRewards(final List<RewardView> rewards) {
+        final Map<String, List<RewardView>> rewardsPerCurrencyCode = rewards.stream().collect(groupingBy(r -> r.money().currencyCode()));
+
+        return rewards.stream()
+                .map(reward -> new InvoiceRewardResponse()
+                        .id(reward.id())
+                        .requestedAt(reward.requestedAt())
+                        .processedAt(reward.processedAt())
+                        .githubUrls(reward.githubUrls())
+                        .project(new ProjectLinkResponse()
+                                .name(reward.projectName())
+                                .logoUrl(reward.projectLogoUrl()))
+                        .sponsors(reward.sponsors().stream().map(sponsor ->
+                                new SponsorLinkResponse()
+                                        .name(sponsor.name())
+                                        .avatarUrl(sponsor.logoUrl())
+                        ).toList())
+                        .money(new MoneyLinkResponse()
+                                .amount(reward.money().amount())
+                                .dollarsEquivalent(reward.money().dollarsEquivalent())
+                                .currencyCode(reward.money().currencyCode())
+                                .currencyName(reward.money().currencyName())
+                                .currencyLogoUrl(reward.money().currencyLogoUrl())
+                        )
+                        .transactionHash(reward.transactionHash())
+                )
+                .sorted(comparing(InvoiceRewardResponse::getRequestedAt))
+                .toList();
+    }
+
+    static List<MoneyLinkResponse> mapNetworkRewardTotals(final List<RewardView> rewards) {
+        final Map<String, List<RewardView>> rewardsPerCurrencyCode = rewards.stream().collect(groupingBy(r -> r.money().currencyCode()));
+
+        return rewardsPerCurrencyCode.entrySet().stream()
+                .map(e -> {
+                            final var currencyCode = e.getKey();
+                            final var currencyName = rewards.stream().findFirst().map(r -> r.money().currencyName()).orElse(null);
+                            final var currencyLogoUrl = rewards.stream().findFirst().map(r -> r.money().currencyLogoUrl()).orElse(null);
+                            final var total = e.getValue().stream().map(r -> r.money().amount()).reduce(BigDecimal::add)
+                                    .orElseThrow(() -> internalServerError("No reward found for currency %s".formatted(e.getKey())));
+                            final var totalEquivalent = e.getValue().stream().map(r -> r.money().dollarsEquivalent()).reduce(BigDecimal::add)
+                                    .orElseThrow(() -> internalServerError("No reward found for currency %s".formatted(e.getKey())));
+
+                            return new MoneyLinkResponse()
+                                    .amount(total)
+                                    .dollarsEquivalent(totalEquivalent)
+                                    .currencyCode(currencyCode)
+                                    .currencyName(currencyName)
+                                    .currencyLogoUrl(currencyLogoUrl);
+                        }
+                )
+                .sorted(comparing(MoneyLinkResponse::getCurrencyCode))
+                .toList();
+    }
+
     static InvoiceStatus mapInvoiceStatus(final Invoice.Status status) {
         return switch (status) {
             case DRAFT -> throw internalServerError("Unknown invoice status: %s".formatted(status));
@@ -285,7 +443,7 @@ public interface BackOfficeMapper {
         };
     }
 
-    static Invoice.Status mapInvoiceStatus(final PatchInvoiceRequest.StatusEnum status) {
+    static Invoice.Status mapInvoiceStatus(final UpdateInvoiceStatusRequest.StatusEnum status) {
         return switch (status) {
             case APPROVED -> Invoice.Status.APPROVED;
             case REJECTED -> Invoice.Status.REJECTED;
@@ -367,6 +525,7 @@ public interface BackOfficeMapper {
                 ;
     }
 
+
     @NonNull
     private static Token mapToken(ERC20 token) {
         return new Token()
@@ -447,5 +606,18 @@ public interface BackOfficeMapper {
                 .standard(currency.standard().map(BackOfficeMapper::mapCurrencyStandard).orElse(null))
                 .blockchain(currency.blockchain().map(BackOfficeMapper::mapBlockchain).orElse(null))
                 .address(currency.address().map(Hash::toString).orElse(null));
+    }
+
+    static RewardDetailsView.Status mapRewardStatus(RewardStatus rewardStatus) {
+        return switch (rewardStatus) {
+            case PENDING_INVOICE -> RewardDetailsView.Status.PENDING_INVOICE;
+            case PENDING_SIGNUP -> RewardDetailsView.Status.PENDING_SIGNUP;
+            case PENDING_CONTRIBUTOR -> RewardDetailsView.Status.PENDING_CONTRIBUTOR;
+            case PENDING_VERIFICATION -> RewardDetailsView.Status.PENDING_VERIFICATION;
+            case MISSING_PAYOUT_INFO -> RewardDetailsView.Status.MISSING_PAYOUT_INFO;
+            case PROCESSING -> RewardDetailsView.Status.PROCESSING;
+            case COMPLETE -> RewardDetailsView.Status.COMPLETE;
+            case LOCKED -> RewardDetailsView.Status.LOCKED;
+        };
     }
 }

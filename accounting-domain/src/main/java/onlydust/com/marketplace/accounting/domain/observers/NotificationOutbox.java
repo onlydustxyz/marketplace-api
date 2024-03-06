@@ -3,6 +3,7 @@ package onlydust.com.marketplace.accounting.domain.observers;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
+import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceUploaded;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
@@ -19,7 +20,8 @@ public class NotificationOutbox implements BillingProfileObserver {
     }
 
     @Override
-    public void onInvoiceRejected(Invoice.Id invoiceId) {
+    public void onInvoiceRejected(@NonNull InvoiceRejected invoiceRejected) {
+        notificationOutbox.push(invoiceRejected);
     }
 
     @Override

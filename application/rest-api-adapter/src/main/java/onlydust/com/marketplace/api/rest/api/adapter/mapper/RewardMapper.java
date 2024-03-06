@@ -1,7 +1,11 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import lombok.NonNull;
+import onlydust.com.backoffice.api.contract.model.SearchRewardItemResponse;
+import onlydust.com.backoffice.api.contract.model.SearchRewardsResponse;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.project.domain.model.OldRequestRewardCommand;
+import onlydust.com.marketplace.project.domain.view.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
@@ -9,6 +13,7 @@ import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.view.*;
 
 import java.util.Objects;
+import java.util.List;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -16,8 +21,8 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudget
 
 public interface RewardMapper {
 
-    static RequestRewardCommand rewardRequestToDomain(final RewardRequest rewardRequest, final UUID projectId) {
-        return RequestRewardCommand.builder()
+    static OldRequestRewardCommand rewardRequestToDomain(final RewardRequest rewardRequest, final UUID projectId) {
+        return OldRequestRewardCommand.builder()
                 .amount(rewardRequest.getAmount())
                 .projectId(projectId)
                 .currency(mapCurrency(rewardRequest.getCurrency()))
@@ -26,15 +31,15 @@ public interface RewardMapper {
                 .build();
     }
 
-    private static RequestRewardCommand.Item rewardItemRequestToDomain(final RewardItemRequest rewardItemRequest) {
-        return RequestRewardCommand.Item.builder()
+    private static OldRequestRewardCommand.Item rewardItemRequestToDomain(final RewardItemRequest rewardItemRequest) {
+        return OldRequestRewardCommand.Item.builder()
                 .id(rewardItemRequest.getId())
                 .number(rewardItemRequest.getNumber())
                 .repoId(rewardItemRequest.getRepoId())
                 .type(switch (rewardItemRequest.getType()) {
-                    case ISSUE -> RequestRewardCommand.Item.Type.issue;
-                    case PULL_REQUEST -> RequestRewardCommand.Item.Type.pullRequest;
-                    case CODE_REVIEW -> RequestRewardCommand.Item.Type.codeReview;
+                    case ISSUE -> OldRequestRewardCommand.Item.Type.issue;
+                    case PULL_REQUEST -> OldRequestRewardCommand.Item.Type.pullRequest;
+                    case CODE_REVIEW -> OldRequestRewardCommand.Item.Type.codeReview;
                 })
                 .build();
     }
@@ -80,6 +85,8 @@ public interface RewardMapper {
             case processing -> RewardStatus.PROCESSING;
             case locked -> RewardStatus.LOCKED;
             case pendingVerification -> RewardStatus.PENDING_VERIFICATION;
+            case pendingContributor -> RewardStatus.PENDING_CONTRIBUTOR;
+            case pendingSignup -> RewardStatus.PENDING_SIGNUP;
         };
     }
 

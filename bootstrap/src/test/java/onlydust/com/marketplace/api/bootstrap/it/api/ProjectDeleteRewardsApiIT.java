@@ -3,15 +3,34 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.CurrencyContract;
 import onlydust.com.marketplace.api.contract.model.RewardRequest;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresOldBillingProfileAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
+import onlydust.com.marketplace.project.domain.model.OldBillingProfileType;
+import onlydust.com.marketplace.project.domain.model.OldCompanyBillingProfile;
+import onlydust.com.marketplace.project.domain.model.OldCountry;
+import onlydust.com.marketplace.project.domain.model.OldVerificationStatus;
+import onlydust.com.marketplace.project.domain.service.UserService;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
@@ -19,6 +38,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.IMPERSONATION_HEADER;
 
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     public ProjectRepository projectRepository;
@@ -27,6 +47,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
     AuthenticatedAppUserService authenticatedAppUserService;
 
     @Test
+    @Order(0)
     public void should_be_unauthorized() {
         final RewardRequest rewardRequest = new RewardRequest()
                 .amount(BigDecimal.ONE)
@@ -45,6 +66,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(1)
     void should_be_forbidden_given_authenticated_user_not_project_lead() throws JsonProcessingException {
         // Given
         userAuthHelper.newFakeUser(UUID.randomUUID(), 1L, faker.rickAndMorty().character(), faker.internet().url(),
@@ -66,6 +88,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(2)
     void should_request_reward_to_old_api_given_a_project_lead() throws JsonProcessingException {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
@@ -90,6 +113,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(3)
     void should_request_reward_to_old_api_given_a_project_lead_impersonated() throws JsonProcessingException {
         // Given
         final String jwt = userAuthHelper.newFakeUser(UUID.randomUUID(), 2L, faker.rickAndMorty().character(),
@@ -117,5 +141,51 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
                 .isEqualTo(204);
     }
 
+    @Autowired
+    BillingProfileService billingProfileService;
+    @Autowired
+    UserService userService;
+    @Autowired
+    PostgresOldBillingProfileAdapter postgresOldBillingProfileAdapter;
 
+    @Test
+    @Order(4)
+    void should_prevent_cancel_reward_action_given_a_reward_already_in_an_invoice() throws IOException {
+        // Given
+        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
+        final String jwt = pierre.jwt();
+        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final UUID userId = pierre.user().getId();
+        final var rewardId = UUID.fromString("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0");
+
+        final OldCompanyBillingProfile companyBillingProfile = userService.getCompanyBillingProfile(userId);
+        userService.updateBillingProfileType(userId, OldBillingProfileType.COMPANY);
+        postgresOldBillingProfileAdapter.saveCompanyProfile(companyBillingProfile.toBuilder()
+                .name(faker.rickAndMorty().character())
+                .address(faker.address().fullAddress())
+                .euVATNumber("111")
+                .subjectToEuropeVAT(false)
+                .oldCountry(OldCountry.fromIso3("FRA"))
+                .usEntity(false)
+                .status(OldVerificationStatus.VERIFIED)
+                .build()
+        );
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(companyBillingProfile.getId());
+        billingProfileService.updateInvoiceMandateAcceptanceDate(UserId.of(userId), billingProfileId);
+        final Invoice.Id invoiceId =
+                billingProfileService.previewInvoice(UserId.of(userId), billingProfileId, List.of(RewardId.of(rewardId))).id();
+        billingProfileService.uploadGeneratedInvoice(UserId.of(userId), billingProfileId, invoiceId,
+                new FileSystemResource(Objects.requireNonNull(getClass().getResource("/invoices/invoice-sample.pdf")).getFile()).getInputStream());
+
+        // When
+        client.delete()
+                .uri(getApiURI(String.format(PROJECTS_REWARD, projectId, rewardId)))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(403)
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("Cannot cancel reward %s which is already contained in an invoice".formatted(rewardId));
+    }
 }

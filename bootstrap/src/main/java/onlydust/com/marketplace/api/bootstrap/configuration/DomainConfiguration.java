@@ -20,6 +20,7 @@ import onlydust.com.marketplace.project.domain.observer.UserObserver;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.service.*;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
@@ -156,7 +157,7 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public RewardService rewardFacadePort(final RewardServicePort rewardServicePort,
+    public RewardService rewardFacadePort(@Qualifier("rewardStoragePort") final RewardServicePort rewardServicePort,
                                           final ProjectRewardStoragePort projectRewardStoragePort,
                                           final PermissionService permissionService,
                                           final IndexerPort indexerPort,

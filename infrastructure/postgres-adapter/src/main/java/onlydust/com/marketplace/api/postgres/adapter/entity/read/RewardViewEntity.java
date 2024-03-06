@@ -35,6 +35,7 @@ public class RewardViewEntity {
     BigDecimal dollarsEquivalent;
     Integer contributionCount;
     Long recipientId;
+    UUID invoiceId;
     String recipientLogin;
     String recipientAvatarUrl;
     Long requestorId;

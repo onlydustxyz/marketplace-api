@@ -4,22 +4,36 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeAccountingManagementApi;
+import onlydust.com.backoffice.api.contract.model.RewardStatus;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.accounting.domain.view.RewardView;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.BatchPaymentMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.SearchRewardMapper;
+import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
+import onlydust.com.marketplace.project.domain.model.OldPayRewardRequestCommand;
 import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 
 @RestController
 @Tags(@Tag(name = "BackofficeAccountingManagement"))
@@ -29,6 +43,8 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     private final RewardFacadePort rewardFacadePort;
     private final CurrencyFacadePort currencyFacadePort;
     private final UserFacadePort userFacadePort;
+    private final RewardFacadePort rewardFacadePortV2;
+    private final AccountingRewardPort accountingRewardPort;
 
     @Override
     public ResponseEntity<AccountResponse> createSponsorAccount(UUID sponsorUuid, CreateAccountRequest createAccountRequest) {
@@ -137,4 +153,102 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
         return ResponseEntity.noContent().build();
     }
 
+
+    @Override
+    public ResponseEntity<Void> oldPayReward(UUID rewardId, PayRewardRequest payRewardRequest) {
+        rewardFacadePortV2.oldPayReward(OldPayRewardRequestCommand.builder()
+                .rewardId(rewardId)
+                .recipientAccount(payRewardRequest.getRecipientAccount())
+                .transactionReference(payRewardRequest.getReference())
+                .currency(switch (payRewardRequest.getNetwork()) {
+                    case SWIFT -> onlydust.com.marketplace.project.domain.model.Currency.USD;
+                    case SEPA -> onlydust.com.marketplace.project.domain.model.Currency.USD;
+                    case ETHEREUM -> onlydust.com.marketplace.project.domain.model.Currency.ETH;
+                    case OPTIMISM -> onlydust.com.marketplace.project.domain.model.Currency.OP;
+                    case STARKNET -> onlydust.com.marketplace.project.domain.model.Currency.STRK;
+                    case APTOS -> onlydust.com.marketplace.project.domain.model.Currency.APT;
+                })
+                .build());
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<RewardPageResponse> getRewards(Integer pageIndex, Integer pageSize,
+                                                         List<RewardStatus> statuses,
+                                                         String fromRequestedAt,
+                                                         String toRequestedAt,
+                                                         String fromProcessedAt,
+                                                         String toProcessedAt) {
+        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
+
+        final Page<RewardDetailsView> rewards = accountingRewardPort.getRewards(
+                sanitizedPageIndex,
+                sanitizedPageSize,
+                statuses != null ? statuses.stream().map(BackOfficeMapper::mapRewardStatus).toList() : null,
+                DateMapper.parseNullable(fromRequestedAt),
+                DateMapper.parseNullable(toRequestedAt),
+                DateMapper.parseNullable(fromProcessedAt),
+                DateMapper.parseNullable(toProcessedAt)
+        );
+        return ResponseEntity.ok(SearchRewardMapper.rewardPageToResponse(sanitizedPageIndex, rewards));
+    }
+
+    @Override
+    public ResponseEntity<String> exportRewardsCSV(List<RewardStatus> statuses,
+                                                   String fromRequestedAt,
+                                                   String toRequestedAt,
+                                                   String fromProcessedAt,
+                                                   String toProcessedAt) {
+        if (statuses == null || statuses.isEmpty())
+            throw badRequest("At least one status must be set in the filter");
+        if (fromRequestedAt == null && toRequestedAt == null && fromProcessedAt == null && toProcessedAt == null)
+            throw badRequest("At least one of the date filters must be set");
+
+        final String csv = accountingRewardPort.exportRewardsCSV(
+                statuses.stream().map(BackOfficeMapper::mapRewardStatus).toList(),
+                DateMapper.parseNullable(fromRequestedAt),
+                DateMapper.parseNullable(toRequestedAt),
+                DateMapper.parseNullable(fromProcessedAt),
+                DateMapper.parseNullable(toProcessedAt)
+        );
+        return ResponseEntity.ok(csv);
+    }
+
+    @Override
+    public ResponseEntity<SearchRewardsResponse> searchRewards(SearchRewardsRequest searchRewardsRequest) {
+        final var invoiceIds = searchRewardsRequest.getInvoiceIds() != null ?
+                searchRewardsRequest.getInvoiceIds().stream().map(Invoice.Id::of).toList() : null;
+        final List<RewardView> rewardViews = accountingRewardPort.searchForBatchPaymentByInvoiceIds(invoiceIds);
+        return ResponseEntity.ok(SearchRewardMapper.searchRewardToResponse(rewardViews));
+    }
+
+    @Override
+    public ResponseEntity<BatchPaymentsResponse> createBatchPayments(PostBatchPaymentRequest postBatchPaymentRequest) {
+        final List<BatchPayment> batchPayments =
+                accountingRewardPort.createBatchPaymentsForInvoices(postBatchPaymentRequest.getInvoiceIds().stream().map(Invoice.Id::of).toList());
+        return ResponseEntity.ok(BatchPaymentMapper.domainToResponse(batchPayments));
+    }
+
+    @Override
+    public ResponseEntity<Void> updateBatchPayments(UUID batchPaymentId, BatchPaymentRequest batchPaymentRequest) {
+        accountingRewardPort.markBatchPaymentAsPaid(BatchPayment.Id.of(batchPaymentId), batchPaymentRequest.getTransactionHash());
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<BatchPaymentDetailsResponse> getBatchPayment(UUID batchPaymentId) {
+        return ResponseEntity.ok(BatchPaymentMapper.detailsToResponse(accountingRewardPort.findBatchPaymentById(BatchPayment.Id.of(batchPaymentId))));
+    }
+
+    @Override
+    public ResponseEntity<BatchPaymentPageResponse> getBatchPayments(Integer pageIndex, Integer pageSize) {
+        final int sanitizePageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
+        final int sanitizedPageSize = PaginationHelper.sanitizePageSize(pageSize);
+        final BatchPaymentPageResponse batchPaymentPageResponse = BatchPaymentMapper.pageToResponse(accountingRewardPort.findBatchPayments(sanitizePageIndex,
+                sanitizedPageSize), pageIndex);
+        return batchPaymentPageResponse.getTotalPageNumber() > 1 ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(batchPaymentPageResponse) :
+                ResponseEntity.ok(batchPaymentPageResponse);
+    }
 }

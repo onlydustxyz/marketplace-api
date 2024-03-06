@@ -2,17 +2,21 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileAdminView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.OldBillingProfileAdminViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.OldBillingProfileAdminViewRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.Set;
 
 import static java.time.ZonedDateTime.now;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -199,8 +204,11 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public Page<BillingProfileCoworkerView> findCoworkersByBillingProfile(BillingProfile.Id billingProfileId, int pageIndex, int pageSize) {
+    public Page<BillingProfileCoworkerView> findCoworkersByBillingProfile(@NonNull BillingProfile.Id billingProfileId,
+                                                                          @NonNull Set<BillingProfile.User.Role> roles,
+                                                                          int pageIndex, int pageSize) {
         final var page = billingProfileUserViewRepository.findByBillingProfileId(billingProfileId.value(),
+                roles.stream().map(BillingProfileUserEntity.Role::fromDomain).map(Enum::toString).toList(),
                 PageRequest.of(pageIndex, pageSize, Sort.by("user_id")));
         return Page.<BillingProfileCoworkerView>builder()
                 .content(page.getContent().stream().map(BillingProfileUserViewEntity::toView).toList())
@@ -265,6 +273,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     }
 
     @Override
+    @Transactional
     public void saveCoworkerInvitation(BillingProfile.Id billingProfileId, UserId invitedBy, GithubUserId invitedUser, BillingProfile.User.Role role,
                                        ZonedDateTime invitedAt) {
         billingProfileUserInvitationRepository.save(BillingProfileUserInvitationEntity.builder()
@@ -306,5 +315,12 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     public void deleteCoworker(BillingProfile.Id billingProfileId, UserId userId) {
         billingProfileUserRepository.deleteById(new BillingProfileUserEntity.PrimaryKey(userId.value(), billingProfileId.value()));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<BillingProfileAdminView> findBillingProfileAdminForInvoice(Invoice.Id invoiceId) {
+        return oldBillingProfileAdminViewRepository.findByInvoiceId(invoiceId.value())
+                .map(OldBillingProfileAdminViewEntity::toDomain);
     }
 }

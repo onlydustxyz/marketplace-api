@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
-import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.*;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.OldRewardStoragePort;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
@@ -10,6 +10,7 @@ import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.project.domain.service.BackofficeService;
+import onlydust.com.marketplace.project.domain.service.RewardService;
 import onlydust.com.marketplace.project.domain.service.RewardV2Service;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,8 +42,10 @@ public class BackofficeConfiguration {
 
     @Bean
     public BackofficeInvoicingManagementRestApi backofficeInvoicingManagementRestApi(final InvoiceFacadePort invoiceFacadePort,
+                                                                                     final AccountingRewardPort accountingRewardPort,
+                                                                                     final BillingProfileFacadePort billingProfileFacadePort,
                                                                                      final QueryParamTokenAuthenticationService.Config apiKeyAuthenticationConfig) {
-        return new BackofficeInvoicingManagementRestApi(invoiceFacadePort, apiKeyAuthenticationConfig);
+        return new BackofficeInvoicingManagementRestApi(invoiceFacadePort, accountingRewardPort, billingProfileFacadePort, apiKeyAuthenticationConfig);
     }
 
     @Bean
@@ -50,12 +53,21 @@ public class BackofficeConfiguration {
             final AccountingFacadePort accountingFacadePort,
             final RewardV2Service rewardV2Service,
             final CurrencyFacadePort currencyFacadePort,
-            final UserFacadePort userFacadePort) {
-        return new BackofficeAccountingManagementRestApi(accountingFacadePort, rewardV2Service, currencyFacadePort, userFacadePort);
+            final UserFacadePort userFacadePort,
+            final RewardService rewardService,
+            final AccountingRewardPort accountingRewardPort) {
+        return new BackofficeAccountingManagementRestApi(accountingFacadePort, rewardV2Service, currencyFacadePort, userFacadePort, rewardService,
+                accountingRewardPort);
     }
 
     @Bean
     public BackofficeFacadePort backofficeFacadePort(final BackofficeStoragePort backofficeStoragePort) {
         return new BackofficeService(backofficeStoragePort);
+    }
+
+    @Bean
+    public AccountingRewardPort accountingRewardPort(final AccountingRewardStoragePort accountingRewardStoragePort,
+                                                     final OldRewardStoragePort oldRewardStoragePort) {
+        return new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, oldRewardStoragePort);
     }
 }

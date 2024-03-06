@@ -59,6 +59,9 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @EnableWireMock({
         @ConfigureWireMock(name = "auth0", property = "application.web.auth0.user-info-url"),
         @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri"),
+        @ConfigureWireMock(name = "rust-api", property = "infrastructure.od.api.client.baseUri"),
+        @ConfigureWireMock(name = "make-webhook-send-rejected-invoice-mail", property = "infrastructure.make.webhook.sendRejectedInvoiceEmailUrl"),
+        @ConfigureWireMock(name = "make-webhook", property = "infrastructure.make.webhook.url"),
 })
 public class AbstractMarketplaceBackOfficeApiIT {
     static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:14.3-alpine")
@@ -86,6 +89,12 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected WireMockServer auth0WireMockServer;
     @InjectWireMock("indexer-api")
     protected WireMockServer indexerApiWireMockServer;
+    @InjectWireMock("rust-api")
+    protected WireMockServer rustApiWireMockServer;
+    @InjectWireMock("make-webhook-send-rejected-invoice-mail")
+    protected WireMockServer makeWebhookSendRejectedInvoiceMailWireMockServer;
+    @InjectWireMock("make-webhook")
+    protected WireMockServer makeWebhookWireMockServer;
 
     @Autowired
     ApiKeyAuthenticationService.Config backOfficeApiKeyAuthenticationConfig;
@@ -157,9 +166,19 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String PUT_CURRENCIES = "/bo/v1/currencies/%s";
     protected static final String GET_CURRENCIES = "/bo/v1/currencies";
     protected static final String INVOICES = "/bo/v1/invoices";
+    protected static final String V2_INVOICES = "/bo/v2/invoices";
     protected static final String INVOICE = "/bo/v1/invoices/%s";
+    protected static final String PUT_INVOICES_STATUS = "/bo/v1/invoices/%s/status";
     protected static final String EXTERNAL_INVOICE = "/bo/v1/external/invoices/%s";
     protected static final String ME_REWARD = "/api/v1/me/rewards/%s";
+    protected static final String POST_REWARDS_PAY_VO = "/bo/v0/rewards/%s/pay";
+    protected static final String POST_REWARDS_SEARCH = "/bo/v1/rewards/search";
+    protected static final String POST_REWARDS_BATCH_PAYMENTS = "/bo/v1/rewards/batch-payments";
+    protected static final String PUT_REWARDS_BATCH_PAYMENTS = "/bo/v1/rewards/batch-payments/%s";
+    protected static final String GET_REWARDS_BATCH_PAYMENTS_BY_ID = "/bo/v1/rewards/batch-payments/%s";
+    protected static final String GET_REWARDS_BATCH_PAYMENTS = "/bo/v1/rewards/batch-payments";
+    protected static final String REWARDS = "/bo/v1/rewards";
+    protected static final String GET_REWARDS_CSV = "/bo/v1/rewards/csv";
 
     protected String apiKey() {
         return backOfficeApiKeyAuthenticationConfig.getApiKey();

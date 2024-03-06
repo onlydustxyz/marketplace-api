@@ -11,9 +11,12 @@ infrastructure:
     api:
       client:
         api-key: "some-indexer-api-key"
-  webhook:
-    environment: "local-it"
-    url: http://fake.test
+  make:
+    webhook:
+      environment: "local-it"
+      url: http://fake.test
+      api-key: "make-api-key"
+      send-rejected-invoice-email-url: http://fake.test/send-invoice-rejected-email
   posthog:
     api-key: fake-ph-api-key
     base-uri: http://ph.fake
