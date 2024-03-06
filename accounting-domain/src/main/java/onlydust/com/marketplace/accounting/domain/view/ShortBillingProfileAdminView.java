@@ -3,6 +3,7 @@ package onlydust.com.marketplace.accounting.domain.view;
 import lombok.Builder;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 
 @Builder
 public record ShortBillingProfileAdminView(@NonNull String adminGithubLogin,
@@ -11,5 +12,6 @@ public record ShortBillingProfileAdminView(@NonNull String adminGithubLogin,
                                            String adminName,
                                            @NonNull BillingProfile.Id billingProfileId,
                                            @NonNull BillingProfile.Type billingProfileType,
-                                           String billingProfileName) {
+                                           String billingProfileName,
+                                           VerificationStatus verificationStatus) {
 }

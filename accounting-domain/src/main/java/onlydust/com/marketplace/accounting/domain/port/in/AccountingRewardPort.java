@@ -2,8 +2,8 @@ package onlydust.com.marketplace.accounting.domain.port.in;
 
 import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
@@ -27,4 +27,8 @@ public interface AccountingRewardPort {
                                        List<RewardDetailsView.Status> statuses,
                                        Date fromRequestedAt, Date toRequestedAt,
                                        Date fromProcessedAt, Date toProcessedAt);
+
+    String exportRewardsCSV(List<RewardDetailsView.Status> statuses,
+                            Date fromRequestedAt, Date toRequestedAt,
+                            Date fromProcessedAt, Date toProcessedAt);
 }

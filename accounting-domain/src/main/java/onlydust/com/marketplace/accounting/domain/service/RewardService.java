@@ -8,11 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.OldRewardStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.MoneyView;
-import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
-import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.RewardView;
+import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -23,6 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
 @AllArgsConstructor
 public class RewardService implements AccountingRewardPort {
@@ -52,7 +49,7 @@ public class RewardService implements AccountingRewardPort {
         final BatchPayment batchPayment = accountingRewardStoragePort.findBatchPayment(batchPaymentId)
                 .orElseThrow(() -> OnlyDustException.notFound("Batch payment %s not found".formatted(batchPaymentId.value())));
         if (!transactionHash.startsWith("0x")) {
-            throw OnlyDustException.badRequest("Wrong transaction hash format %s".formatted(transactionHash));
+            throw badRequest("Wrong transaction hash format %s".formatted(transactionHash));
         }
 
         final List<PayableRewardWithPayoutInfoView> rewardViews = accountingRewardStoragePort.findPayableRewardsWithPayoutInfoForBatchPayment(batchPaymentId);
@@ -131,6 +128,20 @@ public class RewardService implements AccountingRewardPort {
             sanitizedStatuses = statuses.stream().collect(Collectors.toUnmodifiableSet());
         }
         return accountingRewardStoragePort.findRewards(pageIndex, pageSize, sanitizedStatuses, fromRequestedAt, toRequestedAt, fromProcessedAt, toProcessedAt);
+    }
+
+    @Override
+    public String exportRewardsCSV(List<RewardDetailsView.Status> statuses,
+                                   Date fromRequestedAt, Date toRequestedAt,
+                                   Date fromProcessedAt, Date toProcessedAt) {
+        final var rewards = accountingRewardStoragePort.findRewards(0, 1_000_000,
+                statuses.stream().collect(Collectors.toUnmodifiableSet()), fromRequestedAt, toRequestedAt, fromProcessedAt, toProcessedAt);
+
+        if (rewards.getTotalPageNumber() > 1) {
+            throw badRequest("Too many rewards to export");
+        }
+
+        return RewardsExporter.csv(rewards.getContent());
     }
 
     private BatchPayment buildEthereumBatchPayment(final Map<String, List<PayableRewardWithPayoutInfoView>> ethereumRewardMapToCurrencyCode) {

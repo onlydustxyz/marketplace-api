@@ -3,9 +3,9 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Country;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -33,7 +33,7 @@ public class KycEntity {
     UUID id;
     UUID billingProfileId;
     UUID ownerId;
-    @Type(type = "billing_profile_type")
+    @Type(type = "verification_status")
     @Enumerated(EnumType.STRING)
     VerificationStatusEntity verificationStatus;
     String firstName;

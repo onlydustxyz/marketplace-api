@@ -11,6 +11,7 @@ import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import java.util.List;
 
 import static java.util.Comparator.comparing;
+import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapInvoiceInternalStatus;
 
 public interface SearchRewardMapper {
@@ -95,22 +96,31 @@ public interface SearchRewardMapper {
         return response;
     }
 
-    private static BillingProfileResponse mapBillingProfile(ShortBillingProfileAdminView rewardDetailsView) {
-        if (rewardDetailsView == null) {
+    private static BillingProfileResponse mapBillingProfile(ShortBillingProfileAdminView billingProfileAdminView) {
+        if (billingProfileAdminView == null) {
             return null;
         }
         return new BillingProfileResponse()
-                .id(rewardDetailsView.billingProfileId().value())
-                .type(switch (rewardDetailsView.billingProfileType()) {
+                .id(billingProfileAdminView.billingProfileId().value())
+                .type(switch (billingProfileAdminView.billingProfileType()) {
                     case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
                     case COMPANY, SELF_EMPLOYED -> BillingProfileType.COMPANY;
                 })
-                .name(rewardDetailsView.billingProfileName())
+                .name(billingProfileAdminView.billingProfileName())
+                .verificationStatus(isNull(billingProfileAdminView.verificationStatus()) ? null :
+                        switch (billingProfileAdminView.verificationStatus()) {
+                            case NOT_STARTED -> VerificationStatus.NOT_STARTED;
+                            case STARTED -> VerificationStatus.STARTED;
+                            case UNDER_REVIEW -> VerificationStatus.UNDER_REVIEW;
+                            case VERIFIED -> VerificationStatus.VERIFIED;
+                            case REJECTED -> VerificationStatus.REJECTED;
+                            case CLOSED -> VerificationStatus.CLOSED;
+                        })
                 .admins(List.of(new BillingProfileAdminResponse()
-                        .name(rewardDetailsView.adminName())
-                        .email(rewardDetailsView.adminEmail())
-                        .login(rewardDetailsView.adminGithubLogin())
-                        .avatarUrl(rewardDetailsView.adminGithubAvatarUrl()))
+                        .name(billingProfileAdminView.adminName())
+                        .email(billingProfileAdminView.adminEmail())
+                        .login(billingProfileAdminView.adminGithubLogin())
+                        .avatarUrl(billingProfileAdminView.adminGithubAvatarUrl()))
                 );
     }
 }

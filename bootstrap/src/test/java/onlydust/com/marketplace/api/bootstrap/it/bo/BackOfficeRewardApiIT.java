@@ -50,6 +50,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static java.util.Objects.nonNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -232,10 +233,9 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "5ae4a031-2676-4a96-8ff3-65a934f06fa9",
                               "billingProfile": {
-                                "id": "7aadc53b-d146-4322-8ae2-1ee0083255b3",
                                 "name": "A My company",
                                 "type": "COMPANY",
-                                "verificationStatus": null,
+                                "verificationStatus": "VERIFIED",
                                 "admins": [
                                   {
                                     "login": "AnthonyBuisset",
@@ -277,10 +277,9 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "afb0d66f-6ccb-4c72-bfa1-22e8aaac12ec",
                               "billingProfile": {
-                                "id": "7aadc53b-d146-4322-8ae2-1ee0083255b3",
                                 "name": "A My company",
                                 "type": "COMPANY",
-                                "verificationStatus": null,
+                                "verificationStatus": "VERIFIED",
                                 "admins": [
                                   {
                                     "login": "AnthonyBuisset",
@@ -322,10 +321,9 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "a2cb3b32-921a-48da-af29-a1e038c6c341",
                               "billingProfile": {
-                                "id": "a59fd44b-f75f-430b-b60b-a4550c7feae4",
                                 "name": "O My company",
                                 "type": "COMPANY",
-                                "verificationStatus": null,
+                                "verificationStatus": "VERIFIED",
                                 "admins": [
                                   {
                                     "login": "ofux",
@@ -367,10 +365,9 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "e3ab855b-f6c4-485f-8d34-aa6cfb99e2b3",
                               "billingProfile": {
-                                "id": "a59fd44b-f75f-430b-b60b-a4550c7feae4",
                                 "name": "O My company",
                                 "type": "COMPANY",
-                                "verificationStatus": null,
+                                "verificationStatus": "VERIFIED",
                                 "admins": [
                                   {
                                     "login": "ofux",
@@ -412,10 +409,9 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "56a647e2-9ec7-4383-a91a-d41ce899682c",
                               "billingProfile": {
-                                "id": "7aadc53b-d146-4322-8ae2-1ee0083255b3",
                                 "name": "A My company",
                                 "type": "COMPANY",
-                                "verificationStatus": null,
+                                "verificationStatus": "VERIFIED",
                                 "admins": [
                                   {
                                     "login": "AnthonyBuisset",
@@ -485,7 +481,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "id": "4d47beb1-8f63-476b-8548-9f9fe97f0a6c",
                                 "name": "OnlyDust",
                                 "type": "COMPANY",
-                                "verificationStatus": null,
+                                "verificationStatus": "NOT_STARTED",
                                 "admins": [
                                   {
                                     "login": "gregcha",
@@ -538,7 +534,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "id": "4d47beb1-8f63-476b-8548-9f9fe97f0a6c",
                                 "name": "OnlyDust",
                                 "type": "COMPANY",
-                                "verificationStatus": null,
+                                "verificationStatus": "NOT_STARTED",
                                 "admins": [
                                   {
                                     "login": "gregcha",
@@ -591,7 +587,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "id": "4d47beb1-8f63-476b-8548-9f9fe97f0a6c",
                                 "name": "OnlyDust",
                                 "type": "COMPANY",
-                                "verificationStatus": null,
+                                "verificationStatus": "NOT_STARTED",
                                 "admins": [
                                   {
                                     "login": "gregcha",
@@ -644,7 +640,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "id": "7557dc00-6aa3-4a1c-9a00-9bdef3056943",
                                 "name": "Test",
                                 "type": "COMPANY",
-                                "verificationStatus": null,
+                                "verificationStatus": "NOT_STARTED",
                                 "admins": [
                                   {
                                     "login": "PierreOucif",
@@ -688,7 +684,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "id": "7557dc00-6aa3-4a1c-9a00-9bdef3056943",
                                 "name": "Test",
                                 "type": "COMPANY",
-                                "verificationStatus": null,
+                                "verificationStatus": "NOT_STARTED",
                                 "admins": [
                                   {
                                     "login": "PierreOucif",
@@ -783,7 +779,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "id": "4d47beb1-8f63-476b-8548-9f9fe97f0a6c",
                                 "name": "OnlyDust",
                                 "type": "COMPANY",
-                                "verificationStatus": null,
+                                "verificationStatus": "NOT_STARTED",
                                 "admins": [
                                   {
                                     "login": "gregcha",
@@ -827,7 +823,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "id": "4d47beb1-8f63-476b-8548-9f9fe97f0a6c",
                                 "name": "OnlyDust",
                                 "type": "COMPANY",
-                                "verificationStatus": null,
+                                "verificationStatus": "NOT_STARTED",
                                 "admins": [
                                   {
                                     "login": "gregcha",
@@ -871,7 +867,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "id": "4d47beb1-8f63-476b-8548-9f9fe97f0a6c",
                                 "name": "OnlyDust",
                                 "type": "COMPANY",
-                                "verificationStatus": null,
+                                "verificationStatus": "NOT_STARTED",
                                 "admins": [
                                   {
                                     "login": "gregcha",
@@ -915,7 +911,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "id": "4d47beb1-8f63-476b-8548-9f9fe97f0a6c",
                                 "name": "OnlyDust",
                                 "type": "COMPANY",
-                                "verificationStatus": null,
+                                "verificationStatus": "NOT_STARTED",
                                 "admins": [
                                   {
                                     "login": "gregcha",
@@ -959,7 +955,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "id": "86295e05-6a91-40ba-8544-6f56c2dbec6e",
                                 "name": "sasfd",
                                 "type": "COMPANY",
-                                "verificationStatus": null,
+                                "verificationStatus": "NOT_STARTED",
                                 "admins": [
                                   {
                                     "login": "oscarwroche",
@@ -1000,6 +996,116 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           ]
                         }
                         """);
+    }
+
+    @Test
+    @Order(5)
+    void should_export_all_rewards_between_requested_dates() {
+
+        // When
+        final var csv = client.get()
+                .uri(getApiURI(GET_REWARDS_CSV, Map.of("statuses", "COMPLETE",
+                        "fromRequestedAt", "2023-02-08", "toRequestedAt", "2023-02-10"))
+                )
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(String.class)
+                .returnResult().getResponseBody();
+
+        assertThat(csv).isEqualToIgnoringWhitespace("""
+                Project,Recipient,Recipient Github,Amount,Currency,Contributions,Status,Requested at,Processed at,Transaction Hash,Payout information,Pretty ID,Sponsors,Recipient email,Verification status,Account type,Invoice number,Invoice id,Budget,Conversion rate,Dollar Amount
+                Starklings,Gregoire Charles,gregcha,1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:48.146947Z,2023-02-09T07:35:03.828144Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#BDB59",[],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Starklings - USDC,1.01,1010.00
+                Starklings,Gregoire Charles,gregcha,2500,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:40.924453Z,2023-02-09T07:35:03.417235Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#E23AD",[],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Starklings - USDC,1.01,2525.00
+                Starklings,Gregoire Charles,gregcha,750,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:31.946777Z,2023-02-09T07:35:02.985188Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#72F25",[],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Starklings - USDC,1.01,757.50
+                Starklings,Gregoire Charles,gregcha,1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:20.274391Z,2023-02-09T07:35:02.582428Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#91C7E",[],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Starklings - USDC,1.01,1010.00
+                oscar's awesome project,sdf sdf,oscarwroche,500,USDC,[https://github.com/onlydustxyz/marketplace-frontend/pull/663],COMPLETE,2023-02-08T09:14:56.053584Z,2023-02-27T11:56:28.044044Z,0x0000000000000000000000000000000000000000000000000000000000000000,0xd8da6bf26964af9d7eed9e03e53415d37aa96045,"#E6152",[],oscar.w.roche@gmail.com,NOT_STARTED,COMPANY,,,oscar's awesome project - USDC,1.01,505.00
+                """);
+    }
+
+    @Test
+    @Order(6)
+    void should_export_all_rewards_between_processed_dates() {
+        // When
+        final var csv = client.get()
+                .uri(getApiURI(GET_REWARDS_CSV, Map.of("statuses", "COMPLETE",
+                        "fromProcessedAt", "2023-06-01", "toProcessedAt", "2024-01-31"))
+                )
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(String.class)
+                .returnResult().getResponseBody();
+
+        assertThat(csv).isEqualToIgnoringWhitespace("""
+                Project,Recipient,Recipient Github,Amount,Currency,Contributions,Status,Requested at,Processed at,Transaction Hash,Payout information,Pretty ID,Sponsors,Recipient email,Verification status,Account type,Invoice number,Invoice id,Budget,Conversion rate,Dollar Amount
+                Bretzel,Gregoire Charles,gregcha,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-26T15:57:29.834949Z,2023-09-26T21:08:01.957813Z,0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#736E0","[Coca Cola, OGC Nissa Ineos]",gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Bretzel - USDC,1.0100,1010.0000
+                Bretzel,Gregoire Charles,gregcha,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-26T08:43:36.823851Z,2023-09-26T21:08:01.735916Z,0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#1C56D","[Coca Cola, OGC Nissa Ineos]",gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Bretzel - USDC,1.0100,1010.0000
+                Bretzel,Gregoire Charles,gregcha,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-25T13:12:26.971685Z,2023-09-26T21:08:01.601831Z,0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#4CCF3","[Coca Cola, OGC Nissa Ineos]",gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Bretzel - USDC,1.0100,1010.0000
+                Bretzel,Gregoire Charles,gregcha,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-25T13:01:35.433511Z,2023-09-26T21:25:50.605546Z,0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#CF65A","[Coca Cola, OGC Nissa Ineos]",gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Bretzel - USDC,1.0100,1010.0000
+                Bretzel,Gregoire Charles,gregcha,1000,USDC,[https://github.com/gregcha/bretzel-app/issues/1],COMPLETE,2023-08-10T14:25:38.310796Z,2023-09-26T21:25:49.941482Z,0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#1CCB3","[Coca Cola, OGC Nissa Ineos]",gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Bretzel - USDC,1.01,1010.00
+                Bretzel,Gregoire Charles,gregcha,1000,USDC,[https://github.com/gregcha/bretzel-site/issues/1],COMPLETE,2023-07-26T10:06:57.034426Z,2023-09-26T21:25:48.826952Z,0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#B69D6","[Coca Cola, OGC Nissa Ineos]",gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Bretzel - USDC,1.01,1010.00
+                Taco Tuesday,Gregoire Charles,gregcha,1000,USD,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-07-23T08:34:56.803043Z,2023-09-26T21:28:32.053680Z,OK cool,FR7640618802650004034616528,"#0D951",[Red Bull],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Taco Tuesday - USD,1,1000
+                Taco Tuesday,Gregoire Charles,gregcha,1000,USD,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-07-06T07:59:45.045849Z,2023-10-06T17:13:39.984503Z,yeaah,FR7640618802650004034616528,"#CF023",[Red Bull],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Taco Tuesday - USD,1,1000
+                Taco Tuesday,Gregoire Charles,gregcha,1000,USD,[https://github.com/MaximeBeasse/KeyDecoder/issues/3],COMPLETE,2023-07-06T07:56:24.591202Z,2023-10-08T09:49:11.213844Z,yeaaaah,FR7640618802650004034616528,"#B0CEB",[Red Bull],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Taco Tuesday - USD,1,1000
+                Taco Tuesday,Gregoire Charles,gregcha,1000,USD,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-07-06T07:54:27.050353Z,2023-10-06T17:09:10.488656Z,coucou,FR7640618802650004034616528,"#3C906",[Red Bull],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Taco Tuesday - USD,1,1000
+                Aldébaran du Taureau,Anthony BUISSET,AnthonyBuisset,1000,STRK,"[https://github.com/MaximeBeasse/KeyDecoder/issues/3, https://github.com/MaximeBeasse/KeyDecoder/pull/1]",COMPLETE,2023-06-22T09:37:23.518886Z,2023-07-27T10:27:15.315253Z,0x0000000000000000000000000000000000000000000000000000000000000000,abuisset.eth,"#B31A4","[AS Nancy Lorraine, OGC Nissa Ineos]",abuisset@gmail.com,VERIFIED,COMPANY,,,Aldébaran du Taureau - STRK,,
+                Aldébaran du Taureau,Anthony BUISSET,AnthonyBuisset,1750,USDC,"[https://github.com/MaximeBeasse/KeyDecoder/issues/3, https://github.com/MaximeBeasse/KeyDecoder/pull/1]",COMPLETE,2023-06-22T08:47:12.915468Z,2023-07-27T10:27:14.782552Z,0x0000000000000000000000000000000000000000000000000000000000000000,abuisset.eth,"#EE283","[AS Nancy Lorraine, OGC Nissa Ineos]",abuisset@gmail.com,VERIFIED,COMPANY,,,Aldébaran du Taureau - USDC,1.01,1767.50
+                Taco Tuesday,Gregoire Charles,gregcha,1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-06-21T16:09:26.565380Z,2023-06-21T16:16:05.542193Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#4745D",[Red Bull],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Taco Tuesday - USDC,1.01,1010.00
+                Taco Tuesday,Gregoire Charles,gregcha,1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/issues/3],COMPLETE,2023-06-21T16:08:03.421165Z,2023-06-21T16:16:05.501815Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#A4234",[Red Bull],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Taco Tuesday - USDC,1.01,1010.00
+                Taco Tuesday,Gregoire Charles,gregcha,1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/issues/3],COMPLETE,2023-06-21T16:07:01.585046Z,2023-06-21T16:16:05.462540Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#7B0F6",[Red Bull],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Taco Tuesday - USDC,1.01,1010.00
+                Taco Tuesday,Gregoire Charles,gregcha,1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/issues/3],COMPLETE,2023-06-21T16:00:44.754809Z,2023-06-21T16:16:05.420146Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#4A23B",[Red Bull],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Taco Tuesday - USDC,1.01,1010.00
+                Taco Tuesday,Gregoire Charles,gregcha,1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-06-21T15:56:31.915313Z,2023-06-21T16:16:05.325781Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#6187B",[Red Bull],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Taco Tuesday - USDC,1.01,1010.00
+                Aldébaran du Taureau,Gregoire Charles,gregcha,2500,USDC,"[https://github.com/MaximeBeasse/KeyDecoder/issues/3, https://github.com/MaximeBeasse/KeyDecoder/pull/1]",COMPLETE,2023-06-20T10:58:30.275669Z,2023-06-21T15:37:04.235514Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#E75D1","[AS Nancy Lorraine, OGC Nissa Ineos]",gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Aldébaran du Taureau - USDC,1.01,2525.00
+                Aldébaran du Taureau,Gregoire Charles,gregcha,1750,USDC,"[https://github.com/MaximeBeasse/KeyDecoder/issues/3, https://github.com/MaximeBeasse/KeyDecoder/pull/1, https://github.com/eFounders/efounders-workable-client/issues/2, https://github.com/od-mocks/cool-repo-A/issues/379]",COMPLETE,2023-06-20T07:42:21.332040Z,2023-06-21T15:37:03.921254Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#420CA","[AS Nancy Lorraine, OGC Nissa Ineos]",gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Aldébaran du Taureau - USDC,1.01,1767.50
+                Aldébaran du Taureau,Gregoire Charles,gregcha,5500,USDC,"[https://github.com/Emmykage/portfolio/issues/14, https://github.com/MaximeBeasse/KeyDecoder/issues/3, https://github.com/MaximeBeasse/KeyDecoder/pull/1]",COMPLETE,2023-06-16T17:09:08.048298Z,2023-06-19T21:26:31.162539Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#A4D8E","[AS Nancy Lorraine, OGC Nissa Ineos]",gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Aldébaran du Taureau - USDC,1.01,5555.00
+                Taco Tuesday,Gregoire Charles,gregcha,1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-06-16T16:54:22.119984Z,2023-06-19T21:26:31.119345Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#B9359",[Red Bull],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Taco Tuesday - USDC,1.01,1010.00
+                Taco Tuesday,Gregoire Charles,gregcha,1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-06-16T16:43:07.063277Z,2023-06-19T21:26:31.074390Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#74301",[Red Bull],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Taco Tuesday - USDC,1.01,1010.00
+                Taco Tuesday,Gregoire Charles,gregcha,1500,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-06-16T16:40:05.043259Z,2023-06-19T21:26:31.033539Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#7DD21",[Red Bull],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Taco Tuesday - USDC,1.01,1515.00
+                Taco Tuesday,Gregoire Charles,gregcha,1750,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-06-16T16:01:29.786743Z,2023-06-19T21:26:30.983109Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#4C259",[Red Bull],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Taco Tuesday - USDC,1.01,1767.50
+                Taco Tuesday,Gregoire Charles,gregcha,1750,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-06-16T15:57:11.777649Z,2023-06-19T21:26:30.933236Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#600A4",[Red Bull],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Taco Tuesday - USDC,1.01,1767.50
+                Taco Tuesday,Gregoire Charles,gregcha,1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-06-05T18:06:27.648269Z,2023-06-19T21:26:30.821013Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#34A06",[Red Bull],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Taco Tuesday - USDC,1.01,1010.00
+                Pizzeria Yoshi !,Gregoire Charles,gregcha,1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-05-26T09:46:21.215986Z,2023-06-19T21:35:58.329155Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#D55BE",[],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Pizzeria Yoshi ! - USDC,1.01,1010.00
+                Pizzeria Yoshi !,Gregoire Charles,gregcha,1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-05-26T09:45:22.077302Z,2023-06-19T21:35:57.981608Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#F270A",[],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Pizzeria Yoshi ! - USDC,1.01,1010.00
+                Pizzeria Yoshi !,Gregoire Charles,gregcha,1000,USD,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-05-26T09:30:42.881962Z,2023-06-19T21:40:42.314436Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#03413",[],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Pizzeria Yoshi ! - USD,1,1000
+                Taco Tuesday,Gregoire Charles,gregcha,1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-05-22T16:12:59.162216Z,2023-06-21T15:37:03.883232Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#6FDC4",[Red Bull],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Taco Tuesday - USDC,1.01,1010.00
+                Pizzeria Yoshi !,Gregoire Charles,gregcha,1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-05-19T16:48:23.145660Z,2023-06-21T15:37:03.838492Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#0A7A4",[],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Pizzeria Yoshi ! - USDC,1.01,1010.00
+                Pizzeria Yoshi !,Anthony BUISSET,AnthonyBuisset,1000,USDC,[https://github.com/od-mocks/cool-repo-A/pull/397],COMPLETE,2023-05-15T12:15:54.255290Z,2023-07-27T10:27:14.522708Z,0x0000000000000000000000000000000000000000000000000000000000000000,abuisset.eth,"#061E2",[],abuisset@gmail.com,VERIFIED,COMPANY,,,Pizzeria Yoshi ! - USDC,1.01,1010.00
+                Aldébaran du Taureau,Gregoire Charles,gregcha,1000,USDC,[https://github.com/starknet-id/stats.starknet.id/pull/12],COMPLETE,2023-03-20T10:54:38.467011Z,2023-06-21T15:37:03.803663Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#54007","[AS Nancy Lorraine, OGC Nissa Ineos]",gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Aldébaran du Taureau - USDC,1.01,1010.00
+                Aldébaran du Taureau,Gregoire Charles,gregcha,2000,USDC,[https://github.com/starknet-id/stats.starknet.id/pull/12],COMPLETE,2023-03-20T10:54:15.070044Z,2023-06-21T15:37:03.763624Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#5F1F8","[AS Nancy Lorraine, OGC Nissa Ineos]",gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Aldébaran du Taureau - USDC,1.01,2020.00
+                Aldébaran du Taureau,Gregoire Charles,gregcha,1000,USDC,[https://github.com/starknet-id/stats.starknet.id/pull/12],COMPLETE,2023-03-20T10:54:06.888272Z,2023-06-21T15:37:03.725796Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#1BF84","[AS Nancy Lorraine, OGC Nissa Ineos]",gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Aldébaran du Taureau - USDC,1.01,1010.00
+                Starklings,Gregoire Charles,gregcha,1000,USDC,[https://github.com/starknet-id/stats.starknet.id/pull/12],COMPLETE,2023-03-20T09:13:36.459128Z,2023-06-21T15:37:03.375232Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#2CEFB",[],gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Starklings - USDC,1.01,1010.00
+                Mooooooonlight,Gregoire Charles,gregcha,1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-03-13T17:00:40.161532Z,2023-06-21T15:37:03.332235Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#E4F41","[Starknet Foundation, Theodo]",gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Mooooooonlight - USDC,1.01,1010.00
+                Mooooooonlight,Gregoire Charles,gregcha,1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-03-13T17:00:21.831113Z,2023-06-21T15:37:03.239054Z,0x0000000000000000000000000000000000000000000000000000000000000000,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#B3AB5","[Starknet Foundation, Theodo]",gcm.charles@gmail.com,NOT_STARTED,COMPANY,,,Mooooooonlight - USDC,1.01,1010.00
+                Mooooooonlight,sdf sdf,oscarwroche,1000,USDC,[https://github.com/onlydustxyz/marketplace-frontend/pull/743],COMPLETE,2023-03-01T12:48:51.425766Z,2023-09-26T20:22:12.865097Z,0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db,0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea,"#AB855","[Starknet Foundation, Theodo]",oscar.w.roche@gmail.com,NOT_STARTED,COMPANY,,,Mooooooonlight - USDC,1.01,1010.00
+                Marketplace 2,Anthony BUISSET,AnthonyBuisset,500,ETH,[https://github.com/onlydustxyz/marketplace-frontend/pull/661],COMPLETE,2023-02-07T17:15:40.383831Z,2023-07-27T10:27:14.168340Z,0x0000000000000000000000000000000000000000000000000000000000000000,abuisset.eth,"#1C06C",[],abuisset@gmail.com,VERIFIED,COMPANY,,,Marketplace 2 - ETH,1781.98,890990.00
+                Marketplace 2,Olivier Fuxet,ofux,438,USD,[https://github.com/onlydustxyz/marketplace-frontend/pull/642],COMPLETE,2023-02-02T15:20:35.665817Z,2023-09-26T20:24:00.439566Z,Coucou les filles,GB33BUKB20201555555555,"#C5AE2",[],olivier.fuxet@gmail.com,VERIFIED,COMPANY,,,Marketplace 2 - USD,1,438
+                """);
+    }
+
+    @Test
+    @Order(7)
+    void should_export_nothing_when_there_is_no_reward() {
+        // When
+        final var csv = client.get()
+                .uri(getApiURI(GET_REWARDS_CSV, Map.of("statuses", "COMPLETE",
+                        "fromProcessedAt", "2099-01-01", "toProcessedAt", "2099-01-02"))
+                )
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(String.class)
+                .returnResult().getResponseBody();
+
+        assertThat(csv).isEqualToIgnoringWhitespace("""
+                Project,Recipient,Recipient Github,Amount,Currency,Contributions,Status,Requested at,Processed at,Transaction Hash,Payout information,Pretty ID,Sponsors,Recipient email,Verification status,Account type,Invoice number,Invoice id,Budget,Conversion rate,Dollar Amount
+                """);
     }
 
     @Test
