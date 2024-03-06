@@ -123,7 +123,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                             "currency": "STRK",
                             "amount": 100,
                             "dollarsEquivalent": null,
-                            "status": "PROCESSING",
+                            "status": "PENDING_CONTRIBUTOR",
                             "from": {
                                 "githubUserId": 16590657,
                                 "login": "PierreOucif",
