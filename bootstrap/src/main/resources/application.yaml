@@ -112,9 +112,12 @@ infrastructure:
         states:
           backlog:
             id: "35c07f98-74f2-4b43-bfd1-d394addf337b"
-  webhook:
-    url: ${BACKOFFICE_WEBHOOK_URL}
-    environment: ${ENV}
+  make:
+    webhook:
+      url: ${BACKOFFICE_WEBHOOK_URL}
+      environment: ${ENV}
+      send-rejected-invoice-email-url: ${MAKE_SEND_REJECTED_INVOICE_MAIL_WEBHOOK_URL}
+      api-key: ${MAKE_WEBHOOK_API_KEY}
   auth0:
     api:
       client:
