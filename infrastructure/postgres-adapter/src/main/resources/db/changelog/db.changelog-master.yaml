@@ -145,4 +145,6 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000070_add_rejection_reason_to_invoices_table.sql
   - include:
       file: db/changelog/changelogs/00000071_add_missing_indexes.sql
+  - include:
+      file: db/changelog/changelogs/00000072_improve_indexes.sql
 
