@@ -643,6 +643,63 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/rewards/csv:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Export rewards in a CSV
+      operationId: exportRewardsCSV
+      description: |
+        Export rewards in a CSV
+      parameters:
+        - in: query
+          name: statuses
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/RewardStatus'
+          style: form
+        - in: query
+          name: fromRequestedAt
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: toRequestedAt
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: fromProcessedAt
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: toProcessedAt
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+      responses:
+        "200":
+          description: 'CSV of rewards'
+          content:
+            text/csv:
+              schema:
+                type: string
+              example: |-
+                Project,Recipient,Recipient Github,Amount,Currency,Contributions,Status,Requested at,Processed at,Transaction Hash,Payout information,Pretty ID,Sponsors,Recipient email,Verification status,Account type,Invoice number,Invoice id,Budget,Batch payments,Batch payment info,Conversion rate,Dollar Amount
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /bo/v1/rewards/search:
     post:
       security:
