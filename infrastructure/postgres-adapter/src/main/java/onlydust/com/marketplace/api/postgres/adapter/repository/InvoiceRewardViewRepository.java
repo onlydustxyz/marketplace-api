@@ -52,7 +52,7 @@ public interface InvoiceRewardViewRepository extends JpaRepository<InvoiceReward
                                          join projects_sponsors ps2 on ps2.sponsor_id = s.id
                                 group by ps2.project_id) s2 on s2.project_id = pr.project_id
                      join iam.users u on u.github_user_id = pr.recipient_id
-                     join user_profile_info upi on upi.id = u.id
+                     left join user_profile_info upi on upi.id = u.id
                      join user_billing_profile_types ubpt on ubpt.user_id = u.id
                      left join individual_billing_profiles ibp on ibp.user_id = ubpt.user_id
                      left join company_billing_profiles cbp on cbp.user_id = ubpt.user_id
@@ -117,7 +117,7 @@ public interface InvoiceRewardViewRepository extends JpaRepository<InvoiceReward
                                          join projects_sponsors ps2 on ps2.sponsor_id = s.id
                                 group by ps2.project_id) s2 on s2.project_id = pr.project_id
                      join iam.users u on u.github_user_id = pr.recipient_id
-                     join user_profile_info upi on upi.id = u.id
+                     left join user_profile_info upi on upi.id = u.id
                      join user_billing_profile_types ubpt on ubpt.user_id = u.id
                      left join individual_billing_profiles ibp on ibp.user_id = ubpt.user_id
                      left join company_billing_profiles cbp on cbp.user_id = ubpt.user_id
