@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
@@ -25,7 +24,6 @@ import org.springframework.http.MediaType;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -496,11 +494,6 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
 
 
         final Invoice invoice = invoiceStoragePort.get(companyBillingProfileToReviewInvoices.get(1)).orElseThrow();
-
-        final List<String> rewardNames = invoice.rewards().stream()
-                .map(r -> String.join(" - ", r.id().pretty(), r.projectName(), r.amount().getCurrency().code().toString(), r.amount().toString()))
-                .toList();
-
         makeWebhookSendRejectedInvoiceMailWireMockServer.verify(1,
                 postRequestedFor(urlEqualTo("/?api-key=%s".formatted(webhookHttpClientProperties.getApiKey())))
                         .withHeader("Content-Type", equalTo("application/json"))
@@ -508,14 +501,12 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         .withRequestBody(matchingJsonPath("$.recipientName", equalTo("Olivier")))
                         .withRequestBody(matchingJsonPath("$.rewardCount", equalTo(String.valueOf(invoice.rewards().size()))))
                         .withRequestBody(matchingJsonPath("$.invoiceName", equalTo(invoice.number().value())))
-                        .withRequestBody(matchingJsonPath("$.totalUsdAmount",
-                                equalTo(invoice.rewards().stream().map(Invoice.Reward::target).map(Money::getValue).reduce(BigDecimal.ZERO,
-                                        BigDecimal::add).toString())))
+                        .withRequestBody(matchingJsonPath("$.totalUsdAmount", equalTo("2777.5")))
                         .withRequestBody(
                                 matchingJsonPath("$.rejectionReason", equalTo(rejectionReason))
                         )
-                        .withRequestBody(matchingJsonPath("$.rewardNames", containing(rewardNames.get(0))))
-                        .withRequestBody(matchingJsonPath("$.rewardNames", containing(rewardNames.get(1))))
+                        .withRequestBody(matchingJsonPath("$.rewardNames", containing("#D067B - oscar's awesome project - USDC - 1000")))
+                        .withRequestBody(matchingJsonPath("$.rewardNames", containing("#EE283 - Aldébaran du Taureau - USDC - 1750")))
         );
 
         client
