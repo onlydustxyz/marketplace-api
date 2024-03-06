@@ -35,8 +35,6 @@ public class RewardsExporter {
             "Invoice number",
             "Invoice id",
             "Budget",
-            "Batch payments",
-            "Batch payment info",
             "Conversion rate",
             "Dollar Amount"
     };
@@ -69,10 +67,6 @@ public class RewardsExporter {
                         isNull(reward.invoice()) ? null : reward.invoice().number(),
                         isNull(reward.invoice()) ? null : reward.invoice().id(),
                         "%s - %s".formatted(reward.project().name(), reward.money().currencyCode()),
-                        //TODO: batch payment???
-                        null,
-                        //TODO: batch payment csv
-                        null,
                         //TODO: get the real conversion rate instead of computing it
                         isNull(reward.money().dollarsEquivalent()) || BigDecimal.ZERO.compareTo(reward.money().amount()) == 0 ? null :
                                 reward.money().dollarsEquivalent().divide(reward.money().amount(), RoundingMode.FLOOR),
