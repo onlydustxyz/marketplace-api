@@ -1,0 +1,127 @@
+package onlydust.com.marketplace.api.bootstrap.it.api;
+
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CompanyBillingProfileEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.OldVerificationStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.WalletEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OldWalletEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.WalletTypeEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.WalletRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.OldWalletRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
+import onlydust.com.marketplace.project.domain.model.OldBillingProfileType;
+import onlydust.com.marketplace.project.domain.service.UserService;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.Map;
+import java.util.UUID;
+
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+public class UnlockOpOnProjectApiIT extends AbstractMarketplaceApiIT {
+
+    @Autowired
+    PaymentRequestRepository paymentRequestRepository;
+    @Autowired
+    EntityManagerFactory entityManagerFactory;
+    @Autowired
+    UserService userService;
+    @Autowired
+    CompanyBillingProfileRepository companyBillingProfileRepository;
+    @Autowired
+    OldWalletRepository walletRepository;
+    private final UUID bretzelWithOpBudget = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
+
+    void setUp() {
+        final EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+        em.createNativeQuery("insert into unlock_op_on_projects (project_id) values ('%s')".formatted(bretzelWithOpBudget))
+                .executeUpdate();
+        em.flush();
+        em.getTransaction().commit();
+        em.close();
+    }
+
+    @Test
+    @Order(1)
+    void should_unlock_op_on_project() {
+        // Given
+        setUp();
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.authenticateGregoire();
+        final UUID billingProfileId = userService.getCompanyBillingProfile(authenticatedUser.user().getId()).getId();
+        final CompanyBillingProfileEntity companyBillingProfileEntity = companyBillingProfileRepository.findById(billingProfileId).orElseThrow();
+        companyBillingProfileRepository.save(companyBillingProfileEntity.toBuilder()
+                .verificationStatus(OldVerificationStatusEntity.VERIFIED)
+                .build());
+        userService.updateBillingProfileType(authenticatedUser.user().getId(), OldBillingProfileType.COMPANY);
+        walletRepository.save(OldWalletEntity.builder()
+                .userId(authenticatedUser.user().getId())
+                .type(WalletTypeEnumEntity.address)
+                .network(NetworkEnumEntity.optimism)
+                .address("0x807fbf4e9ff6f6ad24145ade1fff905d955afefc")
+                .build());
+
+        final UUID opRewardId = paymentRequestRepository.save(new PaymentRequestEntity(
+                UUID.randomUUID(), authenticatedUser.user().getId(), authenticatedUser.user().getGithubUserId(),
+                new Date(), BigDecimal.valueOf(11.22), null, 0, bretzelWithOpBudget, CurrencyEnumEntity.op, null
+        )).getId();
+
+        // When
+        client.get()
+                .uri(getApiURI(PROJECTS_REWARDS.formatted(bretzelWithOpBudget), Map.of("pageIndex", "0", "pageSize", "20")))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.rewards[?(@.amount.currency == 'OP')].status").isEqualTo("PROCESSING");
+
+        // When
+        client.get()
+                .uri(getApiURI(PROJECTS_REWARD.formatted(bretzelWithOpBudget, opRewardId)))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("PROCESSING");
+
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_REWARDS, Map.of("pageIndex", "0", "pageSize", "20", "currencies", "OP")))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.rewards[?(@.amount.currency == 'OP')].status").isEqualTo("PENDING_INVOICE");
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_REWARD.formatted(opRewardId)))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("PENDING_INVOICE");
+
+    }
+}
