@@ -1,15 +1,22 @@
 package onlydust.com.marketplace.api.webhook.adapters;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceUploaded;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.api.webhook.Config;
 import onlydust.com.marketplace.api.webhook.MakeWebhookHttpClient;
 import onlydust.com.marketplace.api.webhook.dto.*;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.project.domain.model.notification.*;
 import onlydust.com.marketplace.kernel.port.output.WebhookPort;
+
+import java.math.BigDecimal;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.util.List;
 
 @AllArgsConstructor
 public class MakeWebhookAdapter implements WebhookPort {

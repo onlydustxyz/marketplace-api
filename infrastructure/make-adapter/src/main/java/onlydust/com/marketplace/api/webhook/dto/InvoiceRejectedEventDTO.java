@@ -7,7 +7,6 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import static java.util.Objects.isNull;
 
@@ -26,7 +25,7 @@ public class InvoiceRejectedEventDTO {
     @NonNull
     String invoiceName;
     @NonNull
-    List<String> rewardNames;
+    String rewardNames;
 
 
     public static InvoiceRejectedEventDTO fromEvent(final InvoiceRejected invoiceRejected) {
@@ -37,9 +36,9 @@ public class InvoiceRejectedEventDTO {
                 .recipientName(isNull(invoiceRejected.billingProfileAdminFirstName()) ? invoiceRejected.billingProfileAdminGithubLogin() :
                         invoiceRejected.billingProfileAdminFirstName())
                 .rewardCount(invoiceRejected.rewardCount())
-                .rewardNames(invoiceRejected.rewards().stream()
+                .rewardNames(String.join("<br>", invoiceRejected.rewards().stream()
                         .map(r -> String.join(" - ", r.id().pretty(), r.projectName(), r.currencyCode(), r.amount().toString()))
-                        .toList())
+                        .toList()))
                 .totalUsdAmount(invoiceRejected.rewards().stream()
                         .map(InvoiceRejected.ShortReward::dollarsEquivalent)
                         .reduce(BigDecimal.ZERO, BigDecimal::add))
