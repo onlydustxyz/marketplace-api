@@ -168,8 +168,8 @@ public class RewardServiceTest {
         assertEquals(strk1.money().currencyCode(), starknetBatchPayment.moneys().get(0).currencyCode());
         assertEquals(strk1.money().currencyLogoUrl(), starknetBatchPayment.moneys().get(0).currencyLogoUrl());
         assertEquals("""
-                        erc20,0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d,%s,%s
-                        erc20,0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d,%s,%s"""
+                        erc20,0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d,%s,%s,\s
+                        erc20,0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d,%s,%s,\s"""
                         .formatted(strk1.wallet().address(), strk1.money().amount(),
                                 strk2.wallet().address(), strk2.money().amount()),
                 starknetBatchPayment.csv());
@@ -190,9 +190,9 @@ public class RewardServiceTest {
                 ,
                 ethereumBatchPayment.moneys().stream().filter(moneyView -> moneyView.currencyCode().equals(Currency.Code.USDC_STR)).findFirst().orElseThrow());
         assertEquals("""
-                erc20,0x686f2404e77Ab0d9070a46cdfb0B7feCDD2318b0,%s,%s
-                erc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,%s,%s
-                erc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,%s,%s"""
+                erc20,0x686f2404e77Ab0d9070a46cdfb0B7feCDD2318b0,%s,%s,\s
+                erc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,%s,%s,\s
+                erc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,%s,%s,\s"""
                 .formatted(lords.wallet().address(), lords.money().amount().toString(), usdc1.wallet().address(),
                         usdc1.money().amount().toString(), usdc2.wallet().address(), usdc2.money().amount().toString()), ethereumBatchPayment.csv());
     }
