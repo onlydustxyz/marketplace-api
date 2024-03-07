@@ -7,6 +7,7 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import static java.util.Objects.isNull;
 
@@ -41,8 +42,7 @@ public class InvoiceRejectedEventDTO {
                         .toList()))
                 .totalUsdAmount(invoiceRejected.rewards().stream()
                         .map(InvoiceRejected.ShortReward::dollarsEquivalent)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(1, RoundingMode.HALF_UP))
                 .build();
     }
-
 }
