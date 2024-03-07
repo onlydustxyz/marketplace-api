@@ -3,8 +3,10 @@ package onlydust.com.marketplace.accounting.domain.model;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
+import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
@@ -17,6 +19,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @Data
@@ -27,45 +30,67 @@ public class Invoice {
     public static final int DUE_DAY_COUNT_AFTER_CREATION = 10;
 
     private final @NonNull Id id;
-    private final @NonNull BillingProfile.Id billingProfileId;
+    private final @NonNull BillingProfileSnapshot billingProfileSnapshot;
     private final @NonNull ZonedDateTime createdAt;
     private final @NonNull ZonedDateTime dueAt;
     private final @NonNull Invoice.Number number;
     private @NonNull Status status;
     private final @NonNull BigDecimal taxRate;
-    private PersonalInfo personalInfo;
-    private CompanyInfo companyInfo;
-    private BankAccount bankAccount;
-    private @NonNull List<Wallet> wallets = new ArrayList<>();
     private @NonNull List<Reward> rewards = new ArrayList<>();
     private URL url;
     private String originalFileName;
     private String rejectionReason;
 
-    public static Invoice of(BillingProfile.Id billingProfileId, Integer sequenceNumber, PersonalInfo personalInfo) {
+    public static Invoice of(final @NonNull BillingProfileView billingProfile, int sequenceNumber) {
         final var now = ZonedDateTime.now();
         return new Invoice(
                 Id.random(),
-                billingProfileId,
+                BillingProfileSnapshot.of(billingProfile, billingProfile.getPayoutInfo()),
                 now,
                 now.plusDays(DUE_DAY_COUNT_AFTER_CREATION),
-                Number.of(sequenceNumber, personalInfo.lastName, personalInfo.firstName),
+                Number.of(sequenceNumber, billingProfile.getKyc().getFirstName(), billingProfile.getKyc().getLastName()),
                 Status.DRAFT,
                 BigDecimal.ZERO
-        ).personalInfo(personalInfo);
+        );
     }
 
-    public static Invoice of(BillingProfile.Id billingProfileId, Integer sequenceNumber, CompanyInfo companyInfo) {
+    public static Invoice of(final @NonNull IndividualBillingProfile billingProfile, final @NonNull PayoutInfo payoutInfo, int sequenceNumber) {
         final var now = ZonedDateTime.now();
         return new Invoice(
                 Id.random(),
-                billingProfileId,
+                BillingProfileSnapshot.of(billingProfile, payoutInfo),
                 now,
                 now.plusDays(DUE_DAY_COUNT_AFTER_CREATION),
-                Number.of(sequenceNumber, companyInfo.name),
+                Number.of(sequenceNumber, billingProfile.kyc().getFirstName(), billingProfile.kyc().getLastName()),
                 Status.DRAFT,
-                companyInfo.vatRegulationState() == Invoice.VatRegulationState.APPLICABLE ? BigDecimal.valueOf(0.2) : BigDecimal.ZERO
-        ).companyInfo(companyInfo);
+                BigDecimal.ZERO
+        );
+    }
+
+    public static Invoice of(final @NonNull SelfEmployedBillingProfile billingProfile, final @NonNull PayoutInfo payoutInfo, int sequenceNumber) {
+        final var now = ZonedDateTime.now();
+        return new Invoice(
+                Id.random(),
+                BillingProfileSnapshot.of(billingProfile, payoutInfo),
+                now,
+                now.plusDays(DUE_DAY_COUNT_AFTER_CREATION),
+                Number.of(sequenceNumber, billingProfile.kyb().getName()),
+                Status.DRAFT,
+                BillingProfileSnapshot.KybSnapshot.of(billingProfile.kyb()).taxRate()
+        );
+    }
+
+    public static Invoice of(final @NonNull CompanyBillingProfile billingProfile, final @NonNull PayoutInfo payoutInfo, int sequenceNumber) {
+        final var now = ZonedDateTime.now();
+        return new Invoice(
+                Id.random(),
+                BillingProfileSnapshot.of(billingProfile, payoutInfo),
+                now,
+                now.plusDays(DUE_DAY_COUNT_AFTER_CREATION),
+                Number.of(sequenceNumber, billingProfile.kyb().getName()),
+                Status.DRAFT,
+                BillingProfileSnapshot.KybSnapshot.of(billingProfile.kyb()).taxRate()
+        );
     }
 
     public enum Status {
@@ -77,7 +102,7 @@ public class Invoice {
     }
 
     public BillingProfile.Type billingProfileType() {
-        return personalInfo != null ? BillingProfile.Type.INDIVIDUAL : BillingProfile.Type.COMPANY;
+        return billingProfileSnapshot.type();
     }
 
     public Money totalBeforeTax() {
@@ -93,20 +118,12 @@ public class Invoice {
         return totalBeforeTax().add(totalTax());
     }
 
-    public Optional<PersonalInfo> personalInfo() {
-        return Optional.ofNullable(personalInfo);
-    }
-
-    public Optional<CompanyInfo> companyInfo() {
-        return Optional.ofNullable(companyInfo);
-    }
-
     public Optional<BankAccount> bankAccount() {
-        return Optional.ofNullable(bankAccount).filter(b -> networks().contains(Network.SEPA));
+        return Optional.ofNullable(billingProfileSnapshot.bankAccount()).filter(b -> networks().contains(Network.SEPA));
     }
 
     public List<Wallet> wallets() {
-        return wallets.stream().filter(w -> networks().contains(w.network())).toList();
+        return billingProfileSnapshot.wallets().stream().filter(w -> networks().contains(w.network())).toList();
     }
 
     private List<Network> networks() {
@@ -169,45 +186,140 @@ public class Invoice {
         APPLICABLE, NOT_APPLICABLE_NON_UE, NOT_APPLICABLE_FRENCH_NOT_SUBJECT, REVERSE_CHARGE
     }
 
-    public record Wallet(@NonNull Network network, @NonNull String address) {
-    }
 
-    public record BankAccount(@NonNull String bic, @NonNull String accountNumber) {
-    }
+    @AllArgsConstructor
+    @Data
+    @Accessors(fluent = true)
+    public static class BillingProfileSnapshot {
+        private final @NonNull BillingProfile.Id id;
+        private final @NonNull BillingProfile.Type type;
+        private final @NonNull VerificationStatus status;
+        private final KycSnapshot kycSnapshot;
+        private final KybSnapshot kybSnapshot;
+        private BankAccount bankAccount;
+        private @NonNull List<Wallet> wallets;
 
-    public record PersonalInfo(@NonNull String firstName, @NonNull String lastName, @NonNull String address, @NonNull String countryCode) {
-        @Deprecated
-        public String countryName() {
-            return Country.fromIso3(countryCode).display().orElse(countryCode);
+        public static BillingProfileSnapshot of(final @NonNull BillingProfileView billingProfile, final @NonNull PayoutInfo payoutInfo) {
+            return new BillingProfileSnapshot(
+                    billingProfile.getId(),
+                    billingProfile.getType(),
+                    billingProfile.getVerificationStatus(),
+                    KycSnapshot.of(billingProfile.getKyc()),
+                    KybSnapshot.of(billingProfile.getKyb()),
+                    payoutInfo.getBankAccount(),
+                    payoutInfo.wallets()
+            );
         }
 
-        public String fullName() {
-            return "%s %s".formatted(firstName, lastName);
+        public static BillingProfileSnapshot of(final @NonNull IndividualBillingProfile billingProfile, final @NonNull PayoutInfo payoutInfo) {
+            return new BillingProfileSnapshot(
+                    billingProfile.id(),
+                    billingProfile.type(),
+                    billingProfile.status(),
+                    KycSnapshot.of(billingProfile.kyc()),
+                    null,
+                    payoutInfo.getBankAccount(),
+                    payoutInfo.wallets()
+            );
+        }
+
+        public static BillingProfileSnapshot of(final @NonNull SelfEmployedBillingProfile billingProfile, final @NonNull PayoutInfo payoutInfo) {
+            return new BillingProfileSnapshot(
+                    billingProfile.id(),
+                    billingProfile.type(),
+                    billingProfile.status(),
+                    null,
+                    KybSnapshot.of(billingProfile.kyb()),
+                    payoutInfo.getBankAccount(),
+                    payoutInfo.wallets()
+            );
+        }
+
+        public static BillingProfileSnapshot of(final @NonNull CompanyBillingProfile billingProfile, final @NonNull PayoutInfo payoutInfo) {
+            return new BillingProfileSnapshot(
+                    billingProfile.id(),
+                    billingProfile.type(),
+                    billingProfile.status(),
+                    null,
+                    KybSnapshot.of(billingProfile.kyb()),
+                    payoutInfo.getBankAccount(),
+                    payoutInfo.wallets()
+            );
+        }
+
+        public String subject() {
+            return switch (type) {
+                case INDIVIDUAL ->
+                        kycSnapshot().map(KycSnapshot::fullName).orElseThrow(() -> internalServerError("No KYC found for individual billing profile"));
+                case SELF_EMPLOYED, COMPANY ->
+                        kybSnapshot().map(KybSnapshot::name).orElseThrow(() -> internalServerError("No KYB found for company/self-employed billing profile"));
+            };
+        }
+
+        public Optional<KycSnapshot> kycSnapshot() {
+            return Optional.ofNullable(kycSnapshot);
+        }
+
+        public Optional<KybSnapshot> kybSnapshot() {
+            return Optional.ofNullable(kybSnapshot);
+        }
+
+        public record KycSnapshot(@NonNull String firstName, @NonNull String lastName, @NonNull String address, @NonNull String countryCode) {
+            public static KycSnapshot of(Kyc kyc) {
+                return new KycSnapshot(kyc.getFirstName(), kyc.getLastName(), kyc.getAddress(), kyc.getCountry().iso3Code());
+            }
+
+            @Deprecated
+            public String countryName() {
+                return Country.fromIso3(countryCode).display().orElse(countryCode);
+            }
+
+            public String fullName() {
+                return "%s %s".formatted(firstName, lastName);
+            }
+        }
+
+        // TODO, store the vatRegulationState
+        public record KybSnapshot(@NonNull String registrationNumber,
+                                  @NonNull String name,
+                                  @NonNull String address,
+                                  @NonNull String countryCode,
+                                  @NonNull Boolean subjectToEuVAT,
+                                  @NonNull Boolean inEuropeanUnion,
+                                  @NonNull Boolean isFrance,
+                                  String euVATNumber
+        ) {
+            public static KybSnapshot of(Kyb kyb) {
+                return new KybSnapshot(
+                        kyb.getRegistrationNumber(),
+                        kyb.getName(),
+                        kyb.getAddress(),
+                        kyb.getCountry().iso3Code(),
+                        kyb.getSubjectToEuropeVAT(),
+                        kyb.getCountry().inEuropeanUnion(),
+                        kyb.getCountry().isFrance(),
+                        kyb.getEuVATNumber()
+                );
+            }
+
+            public VatRegulationState vatRegulationState() {
+                if (!inEuropeanUnion) return VatRegulationState.NOT_APPLICABLE_NON_UE;
+                if (!isFrance) return VatRegulationState.REVERSE_CHARGE;
+                if (!subjectToEuVAT) return VatRegulationState.NOT_APPLICABLE_FRENCH_NOT_SUBJECT;
+                return VatRegulationState.APPLICABLE;
+            }
+
+            public BigDecimal taxRate() {
+                return vatRegulationState() == VatRegulationState.APPLICABLE ? BigDecimal.valueOf(0.2) : BigDecimal.ZERO;
+            }
+
+            @Deprecated
+            public String countryName() {
+                return Country.fromIso3(countryCode).display().orElse(countryCode);
+            }
         }
     }
 
-    // TODO, store the vatRegulationState
-    public record CompanyInfo(@NonNull String registrationNumber,
-                              @NonNull String name,
-                              @NonNull String address,
-                              @NonNull String countryCode,
-                              @NonNull Boolean subjectToEuVAT,
-                              @NonNull Boolean inEuropeanUnion,
-                              @NonNull Boolean isFrance,
-                              String euVATNumber
-    ) {
-        public VatRegulationState vatRegulationState() {
-            if (!inEuropeanUnion) return VatRegulationState.NOT_APPLICABLE_NON_UE;
-            if (!isFrance) return VatRegulationState.REVERSE_CHARGE;
-            if (!subjectToEuVAT) return VatRegulationState.NOT_APPLICABLE_FRENCH_NOT_SUBJECT;
-            return VatRegulationState.APPLICABLE;
-        }
-
-        @Deprecated
-        public String countryName() {
-            return Country.fromIso3(countryCode).display().orElse(countryCode);
-        }
-    }
 
     public record Reward(@NonNull RewardId id, @NonNull ZonedDateTime createdAt, @NonNull String projectName,
                          @NonNull Money amount, @NonNull Money target, Invoice.Id invoiceId) {

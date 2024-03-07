@@ -58,6 +58,9 @@ public class BillingProfileEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "billingProfile")
     Set<WalletEntity> wallets;
 
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "billingProfile")
+    PayoutInfoEntity payoutInfo;
+
     @CreationTimestamp
     @Column(name = "tech_created_at", nullable = false, updatable = false)
     @EqualsAndHashCode.Exclude

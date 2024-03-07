@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import onlydust.com.backoffice.api.contract.model.RewardStatus;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardView;
@@ -277,7 +278,7 @@ public interface BackOfficeMapper {
 
     static InvoicePageV2 mapInvoicePageV2ToContract(final Page<Invoice> page, final int pageIndex) {
         return new InvoicePageV2()
-                .invoices(page.getContent().stream().map(i -> mapInvoiceV2(i)).toList())
+                .invoices(page.getContent().stream().map(BackOfficeMapper::mapInvoiceV2).toList())
                 .totalPageNumber(page.getTotalPageNumber())
                 .totalItemNumber(page.getTotalItemNumber())
                 .hasMore(hasMore(pageIndex, page.getTotalPageNumber()))
@@ -291,9 +292,13 @@ public interface BackOfficeMapper {
                 .status(mapInvoiceInternalStatus(invoice.status()))
                 .createdAt(invoice.createdAt())
                 .billingProfile(new BillingProfileResponse()
-                        .id(invoice.billingProfileId().value())
-                        .type(invoice.companyInfo().isPresent() ? BillingProfileType.COMPANY : BillingProfileType.INDIVIDUAL)
-                        .name(invoice.companyInfo().map(Invoice.CompanyInfo::name).orElse(invoice.personalInfo().map(Invoice.PersonalInfo::fullName).orElse(null)))
+                        .id(invoice.billingProfileSnapshot().id().value())
+                        .type(switch (invoice.billingProfileType()) {
+                            case COMPANY -> BillingProfileType.COMPANY;
+                            case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
+                            case SELF_EMPLOYED -> BillingProfileType.SELF_EMPLOYED;
+                        })
+                        .name(invoice.billingProfileSnapshot().subject())
                         .admins(null) //TODO: add admins when implementing the new version for pennylane
                 )
                 .rewardCount(invoice.rewards().size())
@@ -325,9 +330,13 @@ public interface BackOfficeMapper {
                 .status(mapInvoiceInternalStatus(invoice.status()))
                 .createdAt(invoice.createdAt())
                 .billingProfile(new BillingProfileResponse()
-                        .id(invoice.billingProfileId().value())
-                        .type(invoice.companyInfo().isPresent() ? BillingProfileType.COMPANY : BillingProfileType.INDIVIDUAL)
-                        .name(invoice.companyInfo().map(Invoice.CompanyInfo::name).orElse(invoice.personalInfo().map(Invoice.PersonalInfo::fullName).orElse(null)))
+                        .id(invoice.billingProfileSnapshot().id().value())
+                        .type(switch (invoice.billingProfileType()) {
+                            case COMPANY -> BillingProfileType.COMPANY;
+                            case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
+                            case SELF_EMPLOYED -> BillingProfileType.SELF_EMPLOYED;
+                        })
+                        .name(invoice.billingProfileSnapshot().subject())
                         .admins(billingProfileAdmins.stream()
                                 .map(admin -> new BillingProfileAdminResponse()
                                         .name(admin.login())
@@ -358,7 +367,7 @@ public interface BackOfficeMapper {
                                     .billingAccountNumber(invoice.wallets().stream()
                                             .filter(w -> w.network() == e.getKey())
                                             .findFirst()
-                                            .map(Invoice.Wallet::address)
+                                            .map(Wallet::address)
                                             .orElse(null))
                                     .dollarsEquivalent(totalEquivalent)
                                     .totalPerCurrency(mapNetworkRewardTotals(e.getValue()))

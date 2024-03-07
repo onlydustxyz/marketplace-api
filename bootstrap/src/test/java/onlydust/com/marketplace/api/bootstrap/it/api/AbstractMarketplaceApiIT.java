@@ -11,6 +11,9 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
@@ -324,21 +327,27 @@ public class AbstractMarketplaceApiIT {
                 rewards.get(0).targetCurrency(),
                 new URL("https://s3.storage.com/invoice.pdf"),
                 null,
-                new InvoiceEntity.Data(
+                null,
+                null,
+                new InvoiceEntity.DataV2(
                         ZonedDateTime.now().plusDays(9),
                         BigDecimal.ZERO,
-                        new Invoice.PersonalInfo(
-                                firstName,
-                                lastName,
-                                faker.address().fullAddress(),
-                                faker.address().countryCode()
+                        new Invoice.BillingProfileSnapshot(
+                                BillingProfile.Id.random(),
+                                BillingProfile.Type.INDIVIDUAL,
+                                VerificationStatus.VERIFIED,
+                                new Invoice.BillingProfileSnapshot.KycSnapshot(
+                                        firstName,
+                                        lastName,
+                                        faker.address().fullAddress(),
+                                        faker.address().countryCode()
+                                ),
+                                null,
+                                null,
+                                List.of(new Wallet(Network.ETHEREUM, "vitalik.eth"))
                         ),
-                        null,
-                        null,
-                        List.of(new Invoice.Wallet(Network.ETHEREUM, "vitalik.eth")),
                         rewards
-                ),
-                null
+                )
         );
     }
 

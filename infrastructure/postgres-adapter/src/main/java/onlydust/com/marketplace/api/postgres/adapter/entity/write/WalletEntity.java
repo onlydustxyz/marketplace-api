@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.WalletTypeEnumEntity;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
@@ -55,10 +54,6 @@ public class WalletEntity {
     @EqualsAndHashCode.Exclude
     private Date updatedAt;
 
-
-    public Invoice.Wallet forInvoice() {
-        return new Invoice.Wallet(network.toNetwork(), address);
-    }
 
     @EqualsAndHashCode
     public static class PrimaryKey implements Serializable {

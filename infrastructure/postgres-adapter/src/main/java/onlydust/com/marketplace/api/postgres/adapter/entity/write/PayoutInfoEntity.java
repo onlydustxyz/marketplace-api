@@ -9,7 +9,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
-import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Wallet;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -33,6 +33,9 @@ public class PayoutInfoEntity {
 
     @Id
     UUID billingProfileId;
+    @OneToOne
+    @JoinColumn(name = "billingProfileId", insertable = false, updatable = false)
+    BillingProfileEntity billingProfile;
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "billingProfileId", referencedColumnName = "billingProfileId")
     @Builder.Default
@@ -70,10 +73,10 @@ public class PayoutInfoEntity {
                     case ethereum -> {
                         payoutInfo = switch (wallet.getType()) {
                             case address -> payoutInfo.toBuilder()
-                                    .ethWallet(new Wallet(Ethereum.accountAddress(wallet.getAddress())))
+                                    .ethWallet(new WalletLocator(Ethereum.accountAddress(wallet.getAddress())))
                                     .build();
                             case name -> payoutInfo.toBuilder()
-                                    .ethWallet(new Wallet(Ethereum.name(wallet.getAddress())))
+                                    .ethWallet(new WalletLocator(Ethereum.name(wallet.getAddress())))
                                     .build();
                         };
                     }

@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface InvoiceStoragePort {
-    Invoice preview(final @NonNull BillingProfile.Id billingProfileId, final @NonNull List<RewardId> rewardIds);
 
     void create(final @NonNull Invoice invoice);
 
@@ -27,4 +26,8 @@ public interface InvoiceStoragePort {
     Page<Invoice> findAll(final @NonNull List<Invoice.Id> ids, final @NonNull List<Invoice.Status> statuses, Integer pageIndex, Integer pageSize);
 
     Optional<Invoice> invoiceOf(RewardId rewardId);
+
+    int getNextSequenceNumber(BillingProfile.Id billingProfileId);
+
+    List<Invoice.Reward> findRewards(List<RewardId> rewardIds);
 }

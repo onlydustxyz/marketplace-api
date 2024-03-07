@@ -38,14 +38,10 @@ FROM currencies usd
          JOIN currencies eur ON eur.code = 'EUR'
 WHERE usd.code = 'USD';
 
-insert into currencies (id, type, name, code, logo_url, decimals, description)
-values ('48388edb-fda2-4a32-b228-28152a147500', 'CRYPTO', 'Aptos Coin', 'APT', null, 8, null),
-       ('00ca98a5-0197-4b76-a208-4bfc55ea8256', 'CRYPTO', 'Optimism', 'OP', null, 18, null);
-
 insert into accounting.payout_preferences (billing_profile_id, project_id, user_id)
-select distinct bpu.billing_profile_id,
-                r.project_id,
-                u.id
+select distinct ON (r.project_id, u.id) bpu.billing_profile_id,
+                                        r.project_id,
+                                        u.id
 from rewards r
          join iam.users u on u.github_user_id = r.recipient_id
          join accounting.billing_profiles_users bpu on bpu.user_id = u.id;

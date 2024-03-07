@@ -7,16 +7,16 @@ import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmAccountAddress;
 import java.util.Optional;
 
 @EqualsAndHashCode
-public class Wallet {
+public class WalletLocator {
     private final EvmAccountAddress address;
     private final Name ens;
 
-    public Wallet(@NonNull EvmAccountAddress address) {
+    public WalletLocator(@NonNull EvmAccountAddress address) {
         this.address = address;
         this.ens = null;
     }
 
-    public Wallet(@NonNull Name ens) {
+    public WalletLocator(@NonNull Name ens) {
         this.address = null;
         this.ens = ens;
     }

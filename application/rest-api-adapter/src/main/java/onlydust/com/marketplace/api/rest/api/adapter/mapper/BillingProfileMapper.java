@@ -10,6 +10,7 @@ import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.contract.model.VerificationStatus;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import org.jetbrains.annotations.NotNull;
@@ -127,8 +128,8 @@ public interface BillingProfileMapper {
                 .createdAt(preview.createdAt())
                 .dueAt(preview.dueAt())
                 .billingProfileType(map(preview.billingProfileType()))
-                .individualBillingProfile(preview.personalInfo().map(BillingProfileMapper::map).orElse(null))
-                .companyBillingProfile(preview.companyInfo().map(BillingProfileMapper::map).orElse(null))
+                .individualBillingProfile(preview.billingProfileSnapshot().kycSnapshot().map(BillingProfileMapper::map).orElse(null))
+                .companyBillingProfile(preview.billingProfileSnapshot().kybSnapshot().map(BillingProfileMapper::map).orElse(null))
                 .destinationAccounts(new DestinationAccountResponse()
                         .bankAccount(preview.bankAccount().map(BillingProfileMapper::map).orElse(null))
                         .wallets(preview.wallets().stream().map(BillingProfileMapper::map).toList())
@@ -160,29 +161,29 @@ public interface BillingProfileMapper {
         };
     }
 
-    static WalletResponse map(Invoice.Wallet wallet) {
+    static WalletResponse map(Wallet wallet) {
         return new WalletResponse()
                 .network(wallet.network().toString())
                 .address(wallet.address());
     }
 
-    static BankAccountResponse map(Invoice.BankAccount bankAccount) {
+    static BankAccountResponse map(BankAccount bankAccount) {
         return new BankAccountResponse()
                 .bic(bankAccount.bic())
                 .accountNumber(bankAccount.accountNumber());
     }
 
-    static InvoicePreviewResponseIndividualBillingProfile map(Invoice.PersonalInfo personalInfo) {
+    static InvoicePreviewResponseIndividualBillingProfile map(Invoice.BillingProfileSnapshot.KycSnapshot kycSnapshot) {
         return new InvoicePreviewResponseIndividualBillingProfile()
-                .firstName(personalInfo.firstName())
-                .lastName(personalInfo.lastName())
-                .address(personalInfo.address())
-                .countryCode(personalInfo.countryCode())
-                .country(personalInfo.countryName())
+                .firstName(kycSnapshot.firstName())
+                .lastName(kycSnapshot.lastName())
+                .address(kycSnapshot.address())
+                .countryCode(kycSnapshot.countryCode())
+                .country(kycSnapshot.countryName())
                 ;
     }
 
-    static InvoicePreviewResponseCompanyBillingProfile map(Invoice.CompanyInfo companyInfo) {
+    static InvoicePreviewResponseCompanyBillingProfile map(Invoice.BillingProfileSnapshot.KybSnapshot companyInfo) {
         return new InvoicePreviewResponseCompanyBillingProfile()
                 .name(companyInfo.name())
                 .address(companyInfo.address())

@@ -3,10 +3,7 @@ package onlydust.com.marketplace.accounting.domain.view;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 
 import java.time.ZonedDateTime;
 
@@ -20,6 +17,7 @@ public class BillingProfileView {
     Kyb kyb;
     BillingProfile.User me;
     VerificationStatus verificationStatus;
+    PayoutInfo payoutInfo;
 
     @Getter(AccessLevel.NONE)
     ZonedDateTime invoiceMandateAcceptedAt;

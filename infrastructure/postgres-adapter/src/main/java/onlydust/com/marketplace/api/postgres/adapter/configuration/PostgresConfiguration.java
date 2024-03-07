@@ -340,11 +340,10 @@ public class PostgresConfiguration {
 
     @Bean
     InvoiceStoragePort invoicePreviewStoragePort(
-            final @NonNull BillingProfileRepository billingProfileRepository,
             final @NonNull InvoiceRewardRepository invoiceRewardRepository,
             final @NonNull InvoiceRepository invoiceRepository,
             final @NonNull RewardRepository rewardRepository) {
-        return new PostgresInvoiceStorage(billingProfileRepository, invoiceRewardRepository,
+        return new PostgresInvoiceStorage(invoiceRewardRepository,
                 invoiceRepository, rewardRepository);
     }
 

@@ -34,7 +34,7 @@ public class UserPayoutSettingsTest {
     void should_be_valid_when_nothing_is_missing() {
         var userPayoutInformation = fakeUserPayoutInformation(
                 UserPayoutSettings.builder()
-                        .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
+                        .ethWalletLocator(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.ETH)
         );
@@ -42,7 +42,7 @@ public class UserPayoutSettingsTest {
 
         userPayoutInformation = fakeUserPayoutInformation(
                 UserPayoutSettings.builder()
-                        .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
+                        .ethWalletLocator(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.ETH)
         );
@@ -146,7 +146,7 @@ public class UserPayoutSettingsTest {
 
         userPayoutInformation = fakeUserPayoutInformation(
                 UserPayoutSettings.builder()
-                        .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
+                        .ethWalletLocator(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.ETH)
         );
@@ -154,7 +154,7 @@ public class UserPayoutSettingsTest {
 
         userPayoutInformation = fakeUserPayoutInformation(
                 UserPayoutSettings.builder()
-                        .ethWallet(Ethereum.wallet("vitalik.eth"))
+                        .ethWalletLocator(Ethereum.wallet("vitalik.eth"))
                         .build(),
                 List.of(Currency.ETH)
         );
@@ -162,7 +162,7 @@ public class UserPayoutSettingsTest {
 
         userPayoutInformation = fakeUserPayoutInformation(
                 UserPayoutSettings.builder()
-                        .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
+                        .ethWalletLocator(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.LORDS)
         );
@@ -170,7 +170,7 @@ public class UserPayoutSettingsTest {
 
         userPayoutInformation = fakeUserPayoutInformation(
                 UserPayoutSettings.builder()
-                        .ethWallet(Ethereum.wallet("vitalik.eth"))
+                        .ethWalletLocator(Ethereum.wallet("vitalik.eth"))
                         .build(),
                 List.of(Currency.LORDS)
         );
@@ -178,7 +178,7 @@ public class UserPayoutSettingsTest {
 
         userPayoutInformation = fakeUserPayoutInformation(
                 UserPayoutSettings.builder()
-                        .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
+                        .ethWalletLocator(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.USDC)
         );
@@ -186,7 +186,7 @@ public class UserPayoutSettingsTest {
 
         userPayoutInformation = fakeUserPayoutInformation(
                 UserPayoutSettings.builder()
-                        .ethWallet(Ethereum.wallet("0xvitalik.eth"))
+                        .ethWalletLocator(Ethereum.wallet("0xvitalik.eth"))
                         .build(),
                 List.of(Currency.USDC)
         );
@@ -201,7 +201,7 @@ public class UserPayoutSettingsTest {
                         .starknetAddress(StarkNet.accountAddress("0x1234567890123456789012345678901234567890"))
                         .aptosAddress(Aptos.accountAddress("0x1234567890123456789012345678901234567890"))
                         .optimismAddress(Optimism.accountAddress("0x1234567890123456789012345678901234567890"))
-                        .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
+                        .ethWalletLocator(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.USD, Currency.STRK, Currency.ETH, Currency.OP, Currency.APT, Currency.LORDS,
                         Currency.USDC)
@@ -217,7 +217,7 @@ public class UserPayoutSettingsTest {
                         .starknetAddress(StarkNet.accountAddress("0x1234567890123456789012345678901234567890"))
                         .aptosAddress(Aptos.accountAddress("0x1234567890123456789012345678901234567890"))
                         .optimismAddress(Optimism.accountAddress("0x1234567890123456789012345678901234567890"))
-                        .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
+                        .ethWalletLocator(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.USD, Currency.STRK, Currency.ETH, Currency.OP, Currency.APT, Currency.LORDS,
                         Currency.USDC)

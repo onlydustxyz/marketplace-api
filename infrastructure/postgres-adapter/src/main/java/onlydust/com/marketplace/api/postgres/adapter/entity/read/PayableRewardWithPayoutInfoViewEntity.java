@@ -6,8 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
@@ -46,8 +46,8 @@ public class PayableRewardWithPayoutInfoViewEntity {
         return PayableRewardWithPayoutInfoView.builder()
                 .id(this.rewardId)
                 .wallet(switch (this.currency) {
-                    case lords, usdc -> new Invoice.Wallet(Network.ETHEREUM, this.ethereumAddress);
-                    case strk -> new Invoice.Wallet(Network.STARKNET, this.starknetAddress);
+                    case lords, usdc -> new Wallet(Network.ETHEREUM, this.ethereumAddress);
+                    case strk -> new Wallet(Network.STARKNET, this.starknetAddress);
                     default -> null;
                 })
                 .money(MoneyView.builder()

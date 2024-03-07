@@ -6,8 +6,8 @@ import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
-import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileRepository;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRewardRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
@@ -24,29 +24,15 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 
 @AllArgsConstructor
 public class PostgresInvoiceStorage implements InvoiceStoragePort {
-    private final @NonNull BillingProfileRepository billingProfileRepository;
     private final @NonNull InvoiceRewardRepository invoiceRewardRepository;
     private final @NonNull InvoiceRepository invoiceRepository;
     private final @NonNull RewardRepository rewardRepository;
 
     @Override
-    public Invoice preview(BillingProfile.@NonNull Id billingProfileId, @NonNull List<RewardId> rewardIds) {
-        final var sequenceNumber = invoiceRepository.countByBillingProfileIdAndStatusNot(billingProfileId.value(), InvoiceEntity.Status.DRAFT) + 1;
-        final var billingProfile = billingProfileRepository.findById(billingProfileId.value())
-                .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
-
-        final var preview = billingProfile.getType() == BillingProfileEntity.Type.INDIVIDUAL ?
-                Invoice.of(billingProfileId, sequenceNumber, billingProfile.getKyc().forInvoice()) :
-                Invoice.of(billingProfileId, sequenceNumber, billingProfile.getKyb().forInvoice());
-
-        final var rewards = invoiceRewardRepository.findAll(rewardIds.stream().map(RewardId::value).toList())
+    public List<Invoice.Reward> findRewards(List<RewardId> rewardIds) {
+        return invoiceRewardRepository.findAll(rewardIds.stream().map(RewardId::value).toList())
                 .stream()
                 .map(InvoiceRewardEntity::forInvoice).toList();
-
-        preview.wallets(billingProfile.getWallets().stream().map(WalletEntity::forInvoice).toList());
-        preview.bankAccount(billingProfile.getBankAccount().map(BankAccountEntity::forInvoice).orElse(null));
-
-        return preview.rewards(rewards);
     }
 
     @Override
@@ -123,6 +109,11 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     public Optional<Invoice> invoiceOf(RewardId rewardId) {
         final var reward = rewardRepository.findById(rewardId.value()).orElseThrow(() -> notFound("Reward %s not found".formatted(rewardId)));
         return Optional.ofNullable(reward.invoice()).map(InvoiceEntity::toDomain);
+    }
+
+    @Override
+    public int getNextSequenceNumber(BillingProfile.Id billingProfileId) {
+        return invoiceRepository.countByBillingProfileIdAndStatusNot(billingProfileId.value(), InvoiceEntity.Status.DRAFT) + 1;
     }
 
     private Sort sortBy(Invoice.Sort sort, Sort.Direction direction) {

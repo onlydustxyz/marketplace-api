@@ -138,6 +138,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                         .id(billingProfileId)
                         .name(billingProfileEntity.getName())
                         .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
+                        .payoutInfo(billingProfileEntity.getPayoutInfo().toDomain())
                         .build();
                 final Optional<KycEntity> optionalKycEntity = kycRepository.findByBillingProfileId(billingProfileId.value());
                 if (optionalKycEntity.isPresent()) {
@@ -154,6 +155,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                         .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                         .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                         .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
+                        .payoutInfo(billingProfileEntity.getPayoutInfo().toDomain())
                         .build();
                 final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
                 if (optionalKybEntity.isPresent()) {
@@ -170,6 +172,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                         .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                         .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                         .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
+                        .payoutInfo(billingProfileEntity.getPayoutInfo().toDomain())
                         .build();
                 final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
                 if (optionalKybEntity.isPresent()) {

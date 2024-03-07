@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import lombok.*;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -36,8 +35,4 @@ public class BankAccountEntity {
     @Column(name = "tech_updated_at", nullable = false)
     @EqualsAndHashCode.Exclude
     private Date updatedAt;
-
-    public Invoice.BankAccount forInvoice() {
-        return new Invoice.BankAccount(bic, number);
-    }
 }

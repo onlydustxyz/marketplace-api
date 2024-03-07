@@ -3,17 +3,18 @@ package onlydust.com.marketplace.accounting.domain.service;
 import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.Money;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileAdminView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -38,12 +39,15 @@ class InvoiceServiceTest {
     private final BillingProfileObserver billingProfileObserver = mock(BillingProfileObserver.class);
     private final InvoiceService invoiceService = new InvoiceService(invoiceStoragePort, pdfStoragePort, billingProfileStoragePort, billingProfileObserver);
     private final Faker faker = new Faker();
-    final Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1,
-            new Invoice.PersonalInfo("John", "Doe", "123 Main St", "FRA"));
     final InputStream pdf = new ByteArrayInputStream(faker.lorem().paragraph().getBytes());
+    Invoice invoice;
 
     @BeforeEach
     void setUp() {
+        final var individualBillingProfile = new IndividualBillingProfile("John", UserId.random());
+        individualBillingProfile.kyc().setCountry(Country.fromIso3("FRA"));
+        final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
+        invoice = Invoice.of(individualBillingProfile, payoutInfo, 1);
         reset(invoiceStoragePort, pdfStoragePort, billingProfileObserver);
     }
 
@@ -121,8 +125,10 @@ class InvoiceServiceTest {
     @Test
     void should_update_if_rejected_status() {
         // Given
-        final Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1,
-                new Invoice.PersonalInfo("John", "Doe", "123 Main St", "FRA"));
+        final var individualBillingProfile = new IndividualBillingProfile("John", UserId.random());
+        individualBillingProfile.kyc().setCountry(Country.fromIso3("FRA"));
+        final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
+        final var invoice = Invoice.of(individualBillingProfile, payoutInfo, 1);
         invoice.rewards(List.of(
                 new Invoice.Reward(RewardId.random(), ZonedDateTime.now(), faker.rickAndMorty().character(),
                         Money.of(BigDecimal.TEN, Currency.crypto("dustyCrypto", Currency.Code.of("DSTC"), 10)),

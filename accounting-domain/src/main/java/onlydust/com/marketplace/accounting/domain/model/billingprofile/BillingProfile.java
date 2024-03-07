@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Getter
+@SuperBuilder
 @Accessors(fluent = true)
 public abstract class BillingProfile {
 
