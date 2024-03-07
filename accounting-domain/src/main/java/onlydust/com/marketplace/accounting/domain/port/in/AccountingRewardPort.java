@@ -31,4 +31,6 @@ public interface AccountingRewardPort {
     String exportRewardsCSV(List<RewardDetailsView.Status> statuses,
                             Date fromRequestedAt, Date toRequestedAt,
                             Date fromProcessedAt, Date toProcessedAt);
+
+    void notifyAllNewPaidRewards();
 }

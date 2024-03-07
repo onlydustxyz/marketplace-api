@@ -251,4 +251,10 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(batchPaymentPageResponse) :
                 ResponseEntity.ok(batchPaymentPageResponse);
     }
+
+    @Override
+    public ResponseEntity<Void> notifyRewardsPaid() {
+        accountingRewardPort.notifyAllNewPaidRewards();
+        return ResponseEntity.ok().build();
+    }
 }
