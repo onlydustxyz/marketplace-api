@@ -11,7 +11,6 @@ import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserve
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
-import onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
@@ -37,6 +36,7 @@ import java.util.UUID;
 
 import static onlydust.com.marketplace.accounting.domain.model.Invoice.Status.APPROVED;
 import static onlydust.com.marketplace.accounting.domain.model.Invoice.Status.TO_REVIEW;
+import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyb;
 import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyc;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -60,16 +60,22 @@ class BillingProfileServiceTest {
     final InputStream pdf = new ByteArrayInputStream(faker.lorem().paragraph().getBytes());
     Invoice invoice;
     BillingProfile.Id billingProfileId;
-    CompanyBillingProfile companyBillingProfile;
+    BillingProfileView companyBillingProfile;
     PayoutInfo payoutInfo;
 
     @BeforeEach
     void setUp() {
-        companyBillingProfile = new CompanyBillingProfile("OnlyDust", UserId.random());
-        BillingProfileHelper.fillKyb(companyBillingProfile.kyb());
-        billingProfileId = companyBillingProfile.id();
         payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
-        invoice = Invoice.of(companyBillingProfile, payoutInfo, 1)
+        billingProfileId = BillingProfile.Id.random();
+        companyBillingProfile = BillingProfileView.builder()
+                .id(billingProfileId)
+                .type(BillingProfile.Type.COMPANY)
+                .payoutInfo(payoutInfo)
+                .verificationStatus(VerificationStatus.VERIFIED)
+                .name("OnlyDust")
+                .kyb(newKyb(billingProfileId, userId))
+                .build();
+        invoice = Invoice.of(companyBillingProfile, 1)
                 .rewards(rewards);
         reset(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort, billingProfileObserver);
     }
@@ -138,12 +144,7 @@ class BillingProfileServiceTest {
             // Given
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
             when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
-                    BillingProfileView.builder()
-                            .id(billingProfileId)
-                            .type(BillingProfile.Type.COMPANY)
-                            .kyb(companyBillingProfile.kyb())
-                            .payoutInfo(payoutInfo)
-                            .build())
+                    companyBillingProfile)
             );
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(1);
 
@@ -173,7 +174,7 @@ class BillingProfileServiceTest {
             rewards = List.of(fakeReward(), fakeReward(), reward, fakeReward());
             rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
 
-            invoice = Invoice.of(companyBillingProfile, payoutInfo, 1)
+            invoice = Invoice.of(companyBillingProfile, 1)
                     .rewards(rewards)
                     .status(Invoice.Status.APPROVED);
             when(invoiceStoragePort.get(reward.invoiceId())).thenReturn(Optional.of(invoice));

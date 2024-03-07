@@ -7,14 +7,16 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileAdminView;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
@@ -31,7 +33,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.fillKyc;
+import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyc;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
@@ -48,10 +50,17 @@ class InvoiceServiceTest {
 
     @BeforeEach
     void setUp() {
-        final var individualBillingProfile = new IndividualBillingProfile("John", UserId.random());
-        fillKyc(individualBillingProfile.kyc());
         final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
-        invoice = Invoice.of(individualBillingProfile, payoutInfo, 1);
+        final var billingProfileId = BillingProfile.Id.random();
+        final var individualBillingProfile = BillingProfileView.builder()
+                .id(billingProfileId)
+                .type(BillingProfile.Type.INDIVIDUAL)
+                .payoutInfo(payoutInfo)
+                .verificationStatus(VerificationStatus.VERIFIED)
+                .name("John")
+                .kyc(newKyc(billingProfileId, UserId.random()))
+                .build();
+        invoice = Invoice.of(individualBillingProfile, 1);
         reset(invoiceStoragePort, pdfStoragePort, billingProfileObserver);
     }
 
@@ -129,10 +138,18 @@ class InvoiceServiceTest {
     @Test
     void should_update_if_rejected_status() {
         // Given
-        final var individualBillingProfile = new IndividualBillingProfile("John", UserId.random());
-        fillKyc(individualBillingProfile.kyc());
         final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
-        final var invoice = Invoice.of(individualBillingProfile, payoutInfo, 1);
+        final var billingProfileId = BillingProfile.Id.random();
+        final var individualBillingProfile = BillingProfileView.builder()
+                .id(billingProfileId)
+                .type(BillingProfile.Type.INDIVIDUAL)
+                .payoutInfo(payoutInfo)
+                .verificationStatus(VerificationStatus.VERIFIED)
+                .name("John")
+                .kyc(newKyc(billingProfileId, UserId.random()))
+                .build();
+
+        final var invoice = Invoice.of(individualBillingProfile, 1);
         invoice.rewards(List.of(
                 new Invoice.Reward(RewardId.random(), ZonedDateTime.now(), faker.rickAndMorty().character(),
                         Money.of(BigDecimal.TEN, Currency.crypto("dustyCrypto", Currency.Code.of("DSTC"), 10)),

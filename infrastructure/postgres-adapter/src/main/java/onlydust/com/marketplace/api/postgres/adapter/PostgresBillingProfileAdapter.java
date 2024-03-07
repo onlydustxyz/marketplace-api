@@ -139,6 +139,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                         .id(billingProfileId)
                         .name(billingProfileEntity.getName())
                         .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
+                        .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
                         .build();
                 final Optional<KycEntity> optionalKycEntity = kycRepository.findByBillingProfileId(billingProfileId.value());
                 if (optionalKycEntity.isPresent()) {
@@ -155,6 +156,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                         .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                         .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                         .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
+                        .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
                         .build();
                 final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
                 if (optionalKybEntity.isPresent()) {
@@ -171,6 +173,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                         .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                         .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                         .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
+                        .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
                         .build();
                 final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
                 if (optionalKybEntity.isPresent()) {

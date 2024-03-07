@@ -5,6 +5,7 @@ import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
@@ -17,6 +18,8 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
 import onlydust.com.marketplace.api.webhook.Config;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import onlydust.com.marketplace.project.domain.service.UserService;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -74,8 +77,16 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
         userId = UserId.of(olivier.user().getId());
 
         companyBillingProfile = billingProfileService.createCompanyBillingProfile(userId, "Apple Inc.", null);
+        billingProfileService.updatePayoutInfo(companyBillingProfile.id(), userId,
+                PayoutInfo.builder().ethWallet(new WalletLocator(new Name(userId + ".eth"))).build());
+
         selfEmployedBillingProfile = billingProfileService.createSelfEmployedBillingProfile(userId, "Olivier SASU", null);
+        billingProfileService.updatePayoutInfo(selfEmployedBillingProfile.id(), userId,
+                PayoutInfo.builder().ethWallet(new WalletLocator(new Name(userId + ".eth"))).build());
+
         individualBillingProfile = billingProfileService.createIndividualBillingProfile(userId, "Olivier", null);
+        billingProfileService.updatePayoutInfo(individualBillingProfile.id(), userId,
+                PayoutInfo.builder().ethWallet(new WalletLocator(new Name(userId + ".eth"))).build());
 
         kybRepository.findByBillingProfileId(companyBillingProfile.id().value())
                 .ifPresent(kyb -> kybRepository.save(kyb.toBuilder()

@@ -1,9 +1,13 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,8 +18,9 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
-import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.fillKyc;
+import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyc;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class InvoiceTest {
@@ -37,16 +42,24 @@ class InvoiceTest {
     @Nested
     class GivenAnIndividual {
 
-        IndividualBillingProfile individualBillingProfile;
+        BillingProfileView individualBillingProfile;
         PayoutInfo payoutInfo;
         Invoice invoice;
 
         @BeforeEach
         void setUp() {
-            individualBillingProfile = new IndividualBillingProfile("John Doe", UserId.random());
-            fillKyc(individualBillingProfile.kyc());
             payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
-            invoice = Invoice.of(individualBillingProfile, payoutInfo, 1)
+            final var billingProfileId = BillingProfile.Id.random();
+            individualBillingProfile = BillingProfileView.builder()
+                    .id(billingProfileId)
+                    .type(BillingProfile.Type.INDIVIDUAL)
+                    .payoutInfo(payoutInfo)
+                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .name("John")
+                    .kyc(newKyc(billingProfileId, UserId.random()))
+                    .build();
+
+            invoice = Invoice.of(individualBillingProfile, 1)
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                     Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
@@ -82,24 +95,37 @@ class InvoiceTest {
     @Nested
     class GivenACompanyOutsideOfEurope {
 
-        CompanyBillingProfile companyBillingProfile;
+        BillingProfileView companyBillingProfile;
         PayoutInfo payoutInfo;
         Invoice invoice;
 
         @BeforeEach
         void setUp() {
-            companyBillingProfile = new CompanyBillingProfile("Foo Inc.", UserId.random());
-            final var kyb = companyBillingProfile.kyb();
-            kyb.setCountry(Country.fromIso3("USA"));
-            kyb.setRegistrationNumber("123456789");
-            kyb.setEuVATNumber(null);
-            kyb.setRegistrationDate(new Date());
-            kyb.setAddress("1 rue de la paix");
-            kyb.setName("OnlyDust SAS");
-            kyb.setSubjectToEuropeVAT(false);
-            kyb.setStatus(VerificationStatus.VERIFIED);
+            final var billingProfileId = BillingProfile.Id.random();
+            final var kyb = Kyb.builder()
+                    .id(UUID.randomUUID())
+                    .ownerId(UserId.random())
+                    .billingProfileId(billingProfileId)
+                    .country(Country.fromIso3("USA"))
+                    .registrationNumber("123456789")
+                    .euVATNumber(null)
+                    .registrationDate(new Date())
+                    .address("1 rue de la paix")
+                    .name("OnlyDust SAS")
+                    .subjectToEuropeVAT(false)
+                    .status(VerificationStatus.VERIFIED)
+                    .build();
             payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
-            invoice = Invoice.of(companyBillingProfile, payoutInfo, 1)
+            companyBillingProfile = BillingProfileView.builder()
+                    .id(billingProfileId)
+                    .type(BillingProfile.Type.COMPANY)
+                    .payoutInfo(payoutInfo)
+                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .name("OnlyDust")
+                    .kyb(kyb)
+                    .build();
+
+            invoice = Invoice.of(companyBillingProfile, 1)
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                     Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
@@ -139,24 +165,37 @@ class InvoiceTest {
 
     @Nested
     class GivenAFrenchCompanySubjectToVAT {
-        CompanyBillingProfile companyBillingProfile;
+        BillingProfileView companyBillingProfile;
         PayoutInfo payoutInfo;
         Invoice invoice;
 
         @BeforeEach
         void setUp() {
-            companyBillingProfile = new CompanyBillingProfile("OnlyDust", UserId.random());
-            final var kyb = companyBillingProfile.kyb();
-            kyb.setCountry(Country.fromIso3("FRA"));
-            kyb.setRegistrationNumber("123456789");
-            kyb.setEuVATNumber(null);
-            kyb.setRegistrationDate(new Date());
-            kyb.setAddress("1 rue de la paix");
-            kyb.setName("OnlyDust SAS");
-            kyb.setSubjectToEuropeVAT(true);
-            kyb.setStatus(VerificationStatus.VERIFIED);
+            final var billingProfileId = BillingProfile.Id.random();
+            final var kyb = Kyb.builder()
+                    .id(UUID.randomUUID())
+                    .ownerId(UserId.random())
+                    .billingProfileId(billingProfileId)
+                    .country(Country.fromIso3("FRA"))
+                    .registrationNumber("123456789")
+                    .euVATNumber(null)
+                    .registrationDate(new Date())
+                    .address("1 rue de la paix")
+                    .name("OnlyDust SAS")
+                    .subjectToEuropeVAT(true)
+                    .status(VerificationStatus.VERIFIED)
+                    .build();
             payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
-            invoice = Invoice.of(companyBillingProfile, payoutInfo, 1)
+            companyBillingProfile = BillingProfileView.builder()
+                    .id(billingProfileId)
+                    .type(BillingProfile.Type.COMPANY)
+                    .payoutInfo(payoutInfo)
+                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .name("OnlyDust")
+                    .kyb(kyb)
+                    .build();
+
+            invoice = Invoice.of(companyBillingProfile, 1)
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                     Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
@@ -197,24 +236,37 @@ class InvoiceTest {
 
     @Nested
     class GivenAFrenchCompanyNonSubjectToVAT {
-        CompanyBillingProfile companyBillingProfile;
+        BillingProfileView companyBillingProfile;
         PayoutInfo payoutInfo;
         Invoice invoice;
 
         @BeforeEach
         void setUp() {
-            companyBillingProfile = new CompanyBillingProfile("OnlyDust", UserId.random());
-            final var kyb = companyBillingProfile.kyb();
-            kyb.setCountry(Country.fromIso3("FRA"));
-            kyb.setRegistrationNumber("123456789");
-            kyb.setEuVATNumber(null);
-            kyb.setRegistrationDate(new Date());
-            kyb.setAddress("1 rue de la paix");
-            kyb.setName("OnlyDust SAS");
-            kyb.setSubjectToEuropeVAT(false);
-            kyb.setStatus(VerificationStatus.VERIFIED);
+            final var billingProfileId = BillingProfile.Id.random();
+            final var kyb = Kyb.builder()
+                    .id(UUID.randomUUID())
+                    .ownerId(UserId.random())
+                    .billingProfileId(billingProfileId)
+                    .country(Country.fromIso3("FRA"))
+                    .registrationNumber("123456789")
+                    .euVATNumber(null)
+                    .registrationDate(new Date())
+                    .address("1 rue de la paix")
+                    .name("OnlyDust SAS")
+                    .subjectToEuropeVAT(false)
+                    .status(VerificationStatus.VERIFIED)
+                    .build();
             payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
-            invoice = Invoice.of(companyBillingProfile, payoutInfo, 1)
+            companyBillingProfile = BillingProfileView.builder()
+                    .id(billingProfileId)
+                    .type(BillingProfile.Type.COMPANY)
+                    .payoutInfo(payoutInfo)
+                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .name("OnlyDust")
+                    .kyb(kyb)
+                    .build();
+
+            invoice = Invoice.of(companyBillingProfile, 1)
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                     Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
@@ -255,24 +307,37 @@ class InvoiceTest {
 
     @Nested
     class GivenANonFrenchEuropeanCompany {
-        CompanyBillingProfile companyBillingProfile;
+        BillingProfileView companyBillingProfile;
         PayoutInfo payoutInfo;
         Invoice invoice;
 
         @BeforeEach
         void setUp() {
-            companyBillingProfile = new CompanyBillingProfile("OnlyDust", UserId.random());
-            final var kyb = companyBillingProfile.kyb();
-            kyb.setCountry(Country.fromIso3("DEU"));
-            kyb.setRegistrationNumber("123456789");
-            kyb.setEuVATNumber("029834980");
-            kyb.setRegistrationDate(new Date());
-            kyb.setAddress("1 rue de la paix");
-            kyb.setName("OnlyDust SAS");
-            kyb.setSubjectToEuropeVAT(true);
-            kyb.setStatus(VerificationStatus.VERIFIED);
+            final var billingProfileId = BillingProfile.Id.random();
+            final var kyb = Kyb.builder()
+                    .id(UUID.randomUUID())
+                    .ownerId(UserId.random())
+                    .billingProfileId(billingProfileId)
+                    .country(Country.fromIso3("DEU"))
+                    .registrationNumber("123456789")
+                    .euVATNumber("029834980")
+                    .registrationDate(new Date())
+                    .address("1 rue de la paix")
+                    .name("OnlyDust SAS")
+                    .subjectToEuropeVAT(true)
+                    .status(VerificationStatus.VERIFIED)
+                    .build();
             payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
-            invoice = Invoice.of(companyBillingProfile, payoutInfo, 1)
+            companyBillingProfile = BillingProfileView.builder()
+                    .id(billingProfileId)
+                    .type(BillingProfile.Type.COMPANY)
+                    .payoutInfo(payoutInfo)
+                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .name("OnlyDust")
+                    .kyb(kyb)
+                    .build();
+
+            invoice = Invoice.of(companyBillingProfile, 1)
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                     Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),

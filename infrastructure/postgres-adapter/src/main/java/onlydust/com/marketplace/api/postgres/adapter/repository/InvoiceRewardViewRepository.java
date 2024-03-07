@@ -44,8 +44,8 @@ public interface InvoiceRewardViewRepository extends JpaRepository<InvoiceReward
                         when r.receipt -> 'Sepa' is not null then r.receipt -> 'Sepa' ->> 'transaction_reference'
                         end                                transaction_hash
             from accounting.invoices i
-                     join payment_requests pr on pr.invoice_id = i.id
-                     join currencies c on c.code = upper(cast(pr.currency as text))
+                     join rewards pr on pr.invoice_id = i.id
+                     join currencies c on c.id = pr.currency_id
                      join project_details pd on pr.project_id = pd.project_id
                      left join (select ps2.project_id, json_agg(json_build_object('name', s.name, 'logoUrl', s.logo_url)) s_list
                                 from sponsors s
@@ -53,9 +53,6 @@ public interface InvoiceRewardViewRepository extends JpaRepository<InvoiceReward
                                 group by ps2.project_id) s2 on s2.project_id = pr.project_id
                      join iam.users u on u.github_user_id = pr.recipient_id
                      left join user_profile_info upi on upi.id = u.id
-                     join user_billing_profile_types ubpt on ubpt.user_id = u.id
-                     left join individual_billing_profiles ibp on ibp.user_id = ubpt.user_id
-                     left join company_billing_profiles cbp on cbp.user_id = ubpt.user_id
                      left join payments r on r.request_id = pr.id
                      left join (select wi.payment_id, json_agg(coalesce(gpr.html_url, gcr.html_url, gi.html_url)) urls
                            from work_items wi

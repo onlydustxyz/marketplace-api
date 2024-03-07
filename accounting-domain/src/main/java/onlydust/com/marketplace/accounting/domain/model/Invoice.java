@@ -58,42 +58,6 @@ public class Invoice {
         );
     }
 
-    public static Invoice of(final @NonNull IndividualBillingProfile billingProfile, final @NonNull PayoutInfo payoutInfo, int sequenceNumber) {
-        final var now = ZonedDateTime.now();
-        return new Invoice(
-                Id.random(),
-                BillingProfileSnapshot.of(billingProfile, payoutInfo),
-                now,
-                now.plusDays(DUE_DAY_COUNT_AFTER_CREATION),
-                Number.of(sequenceNumber, billingProfile.kyc().getLastName(), billingProfile.kyc().getFirstName()),
-                Status.DRAFT
-        );
-    }
-
-    public static Invoice of(final @NonNull SelfEmployedBillingProfile billingProfile, final @NonNull PayoutInfo payoutInfo, int sequenceNumber) {
-        final var now = ZonedDateTime.now();
-        return new Invoice(
-                Id.random(),
-                BillingProfileSnapshot.of(billingProfile, payoutInfo),
-                now,
-                now.plusDays(DUE_DAY_COUNT_AFTER_CREATION),
-                Number.of(sequenceNumber, billingProfile.kyb().getName()),
-                Status.DRAFT
-        );
-    }
-
-    public static Invoice of(final @NonNull CompanyBillingProfile billingProfile, final @NonNull PayoutInfo payoutInfo, int sequenceNumber) {
-        final var now = ZonedDateTime.now();
-        return new Invoice(
-                Id.random(),
-                BillingProfileSnapshot.of(billingProfile, payoutInfo),
-                now,
-                now.plusDays(DUE_DAY_COUNT_AFTER_CREATION),
-                Number.of(sequenceNumber, billingProfile.kyb().getName()),
-                Status.DRAFT
-        );
-    }
-
     public enum Status {
         DRAFT, TO_REVIEW, REJECTED, APPROVED, PAID;
 
@@ -208,45 +172,9 @@ public class Invoice {
             return new BillingProfileSnapshot(
                     billingProfile.getId(),
                     billingProfile.getType(),
-                    billingProfile.verificationStatus(),
+                    billingProfile.getVerificationStatus(),
                     isNull(billingProfile.getKyc()) ? null : KycSnapshot.of(billingProfile.getKyc()),
                     isNull(billingProfile.getKyb()) ? null : KybSnapshot.of(billingProfile.getKyb()),
-                    payoutInfo.getBankAccount(),
-                    payoutInfo.wallets()
-            );
-        }
-
-        public static BillingProfileSnapshot of(final @NonNull IndividualBillingProfile billingProfile, final @NonNull PayoutInfo payoutInfo) {
-            return new BillingProfileSnapshot(
-                    billingProfile.id(),
-                    billingProfile.type(),
-                    billingProfile.status(),
-                    KycSnapshot.of(billingProfile.kyc()),
-                    null,
-                    payoutInfo.getBankAccount(),
-                    payoutInfo.wallets()
-            );
-        }
-
-        public static BillingProfileSnapshot of(final @NonNull SelfEmployedBillingProfile billingProfile, final @NonNull PayoutInfo payoutInfo) {
-            return new BillingProfileSnapshot(
-                    billingProfile.id(),
-                    billingProfile.type(),
-                    billingProfile.status(),
-                    null,
-                    KybSnapshot.of(billingProfile.kyb()),
-                    payoutInfo.getBankAccount(),
-                    payoutInfo.wallets()
-            );
-        }
-
-        public static BillingProfileSnapshot of(final @NonNull CompanyBillingProfile billingProfile, final @NonNull PayoutInfo payoutInfo) {
-            return new BillingProfileSnapshot(
-                    billingProfile.id(),
-                    billingProfile.type(),
-                    billingProfile.status(),
-                    null,
-                    KybSnapshot.of(billingProfile.kyb()),
                     payoutInfo.getBankAccount(),
                     payoutInfo.wallets()
             );

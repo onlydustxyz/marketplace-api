@@ -51,25 +51,19 @@ public class InvoiceEntity {
     @Deprecated
     Data data;
     @Type(type = "jsonb")
+    @Column(name = "data_v2")
     DataV2 dataV2;
 
     public Invoice toDomain() {
-        if (data != null) {
+        if (dataV2 != null) {
             return new Invoice(
                     Invoice.Id.of(id),
-                    new Invoice.BillingProfileSnapshot(BillingProfile.Id.of(billingProfileId),
-                            data.personalInfo != null ? BillingProfile.Type.INDIVIDUAL : BillingProfile.Type.COMPANY,
-                            VerificationStatus.VERIFIED,
-                            data.personalInfo,
-                            data.companyInfo,
-                            data.bankAccount,
-                            data.wallets
-                    ),
+                    dataV2.billingProfileSnapshot(),
                     createdAt,
-                    data.dueAt,
+                    dataV2.dueAt,
                     Invoice.Number.fromString(number),
                     status.toDomain(),
-                    data.rewards.stream().map(InvoiceRewardEntity::forInvoice).toList(),
+                    dataV2.rewards.stream().map(InvoiceRewardEntity::forInvoice).toList(),
                     url,
                     originalFileName,
                     rejectionReason
@@ -77,12 +71,19 @@ public class InvoiceEntity {
         }
         return new Invoice(
                 Invoice.Id.of(id),
-                dataV2.billingProfileSnapshot(),
+                new Invoice.BillingProfileSnapshot(BillingProfile.Id.of(billingProfileId),
+                        data.personalInfo != null ? BillingProfile.Type.INDIVIDUAL : BillingProfile.Type.COMPANY,
+                        VerificationStatus.VERIFIED,
+                        data.personalInfo,
+                        data.companyInfo,
+                        data.bankAccount,
+                        data.wallets
+                ),
                 createdAt,
-                dataV2.dueAt,
+                data.dueAt,
                 Invoice.Number.fromString(number),
                 status.toDomain(),
-                dataV2.rewards.stream().map(InvoiceRewardEntity::forInvoice).toList(),
+                data.rewards.stream().map(InvoiceRewardEntity::forInvoice).toList(),
                 url,
                 originalFileName,
                 rejectionReason

@@ -5,12 +5,13 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
 import onlydust.com.marketplace.accounting.domain.service.AccountingObserver;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
@@ -27,7 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.fillKyb;
+import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyb;
 import static onlydust.com.marketplace.accounting.domain.stubs.Currencies.ETH;
 import static onlydust.com.marketplace.accounting.domain.stubs.Currencies.USD;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -158,10 +159,18 @@ public class AccountingObserverTest {
 
             final var reference = new SponsorAccount.PaymentReference(Network.ETHEREUM, "0x1234", "ofux", "ofux.eth");
 
-            final var companyBillingProfile = new CompanyBillingProfile("OnlyDust", UserId.random());
-            fillKyb(companyBillingProfile.kyb());
             final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
-            var invoice = Invoice.of(companyBillingProfile, payoutInfo, 1);
+            final var billingProfileId = BillingProfile.Id.random();
+            final var companyBillingProfile = BillingProfileView.builder()
+                    .id(billingProfileId)
+                    .type(BillingProfile.Type.COMPANY)
+                    .payoutInfo(payoutInfo)
+                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .name("OnlyDust")
+                    .kyb(newKyb(billingProfileId, UserId.random()))
+                    .build();
+
+            var invoice = Invoice.of(companyBillingProfile, 1);
             invoice = invoice.rewards(List.of(
                     new Invoice.Reward(rewardId, ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                             Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id()),
@@ -339,10 +348,18 @@ public class AccountingObserverTest {
 
         @BeforeEach
         void setUp() {
-            final var companyBillingProfile = new CompanyBillingProfile("OnlyDust", UserId.random());
-            fillKyb(companyBillingProfile.kyb());
             final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
-            invoice = Invoice.of(companyBillingProfile, payoutInfo, 1);
+            final var billingProfileId = BillingProfile.Id.random();
+            final var companyBillingProfile = BillingProfileView.builder()
+                    .id(billingProfileId)
+                    .type(BillingProfile.Type.COMPANY)
+                    .payoutInfo(payoutInfo)
+                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .name("OnlyDust")
+                    .kyb(newKyb(billingProfileId, UserId.random()))
+                    .build();
+
+            invoice = Invoice.of(companyBillingProfile, 1);
 
             invoice.rewards(List.of(
                     new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
@@ -382,10 +399,18 @@ public class AccountingObserverTest {
 
         @BeforeEach
         void setUp() {
-            final var companyBillingProfile = new CompanyBillingProfile("OnlyDust", UserId.random());
-            fillKyb(companyBillingProfile.kyb());
             final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
-            invoice = Invoice.of(companyBillingProfile, payoutInfo, 1);
+            final var billingProfileId = BillingProfile.Id.random();
+            final var companyBillingProfile = BillingProfileView.builder()
+                    .id(billingProfileId)
+                    .type(BillingProfile.Type.COMPANY)
+                    .payoutInfo(payoutInfo)
+                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .name("OnlyDust")
+                    .kyb(newKyb(billingProfileId, UserId.random()))
+                    .build();
+
+            invoice = Invoice.of(companyBillingProfile, 1);
 
             invoice.rewards(List.of(
                     new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
