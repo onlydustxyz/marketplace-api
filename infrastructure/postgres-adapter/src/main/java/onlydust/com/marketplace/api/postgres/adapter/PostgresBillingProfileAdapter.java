@@ -24,6 +24,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 import static java.time.ZonedDateTime.now;
+import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
@@ -137,8 +138,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                         .type(BillingProfile.Type.INDIVIDUAL)
                         .id(billingProfileId)
                         .name(billingProfileEntity.getName())
-                        .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
-                        .payoutInfo(billingProfileEntity.getPayoutInfo().toDomain())
+                        .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
                         .build();
                 final Optional<KycEntity> optionalKycEntity = kycRepository.findByBillingProfileId(billingProfileId.value());
                 if (optionalKycEntity.isPresent()) {
@@ -154,8 +154,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                         .name(billingProfileEntity.getName())
                         .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                         .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
-                        .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
-                        .payoutInfo(billingProfileEntity.getPayoutInfo().toDomain())
+                        .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
                         .build();
                 final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
                 if (optionalKybEntity.isPresent()) {
@@ -171,8 +170,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                         .name(billingProfileEntity.getName())
                         .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                         .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
-                        .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
-                        .payoutInfo(billingProfileEntity.getPayoutInfo().toDomain())
+                        .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
                         .build();
                 final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
                 if (optionalKybEntity.isPresent()) {

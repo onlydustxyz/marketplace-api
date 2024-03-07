@@ -14,7 +14,6 @@ import javax.persistence.*;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -39,9 +38,6 @@ public class BillingProfileEntity {
     @Enumerated(EnumType.STRING)
     Type type;
     Date invoiceMandateAcceptedAt;
-    @org.hibernate.annotations.Type(type = "verification_status")
-    @Enumerated(EnumType.STRING)
-    VerificationStatusEntity verificationStatus;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "billingProfileId")
     Set<BillingProfileUserEntity> users;
@@ -70,10 +66,6 @@ public class BillingProfileEntity {
     @EqualsAndHashCode.Exclude
     private Date updatedAt;
 
-    public Optional<BankAccountEntity> getBankAccount() {
-        return Optional.ofNullable(bankAccount);
-    }
-
     public ZonedDateTime getInvoiceMandateAcceptedAt() {
         return isNull(invoiceMandateAcceptedAt) ? null : new Date(invoiceMandateAcceptedAt.getTime()).toInstant().atZone(ZoneOffset.UTC);
     }
@@ -96,7 +88,6 @@ public class BillingProfileEntity {
         return BillingProfileEntity.builder()
                 .id(billingProfile.id().value())
                 .name(billingProfile.name())
-                .verificationStatus(VerificationStatusEntity.fromDomain(billingProfile.status()))
                 .type(switch (billingProfile.type()) {
                     case COMPANY -> Type.COMPANY;
                     case SELF_EMPLOYED -> Type.SELF_EMPLOYED;

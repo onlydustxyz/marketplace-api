@@ -33,6 +33,11 @@ public class IndividualBillingProfile extends BillingProfile {
         return Type.INDIVIDUAL;
     }
 
+    @Override
+    public VerificationStatus status() {
+        return kyc.getStatus();
+    }
+
     public PositiveAmount currentYearPaymentLimit() {
         return YEARLY_USD_PAYMENT_LIMIT;
     }

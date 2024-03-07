@@ -11,6 +11,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserve
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
+import onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
@@ -36,6 +37,7 @@ import java.util.UUID;
 
 import static onlydust.com.marketplace.accounting.domain.model.Invoice.Status.APPROVED;
 import static onlydust.com.marketplace.accounting.domain.model.Invoice.Status.TO_REVIEW;
+import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyc;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
@@ -51,19 +53,22 @@ class BillingProfileServiceTest {
     final BillingProfileService billingProfileService = new BillingProfileService(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort,
             billingProfileObserver, indexerPort);
     final UserId userId = UserId.random();
-    final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
     final Currency ETH = Currencies.ETH;
     final Currency USD = Currencies.USD;
-    final List<Invoice.Reward> rewards = List.of(fakeReward(), fakeReward(), fakeReward());
-    final List<RewardId> rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
+    List<Invoice.Reward> rewards = List.of(fakeReward(), fakeReward(), fakeReward());
+    List<RewardId> rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
     final InputStream pdf = new ByteArrayInputStream(faker.lorem().paragraph().getBytes());
     Invoice invoice;
+    BillingProfile.Id billingProfileId;
+    CompanyBillingProfile companyBillingProfile;
+    PayoutInfo payoutInfo;
 
     @BeforeEach
     void setUp() {
-        final var companyBillingProfile = new CompanyBillingProfile("OnlyDust", UserId.random());
-        companyBillingProfile.kyb().setCountry(Country.fromIso3("FRA"));
-        final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
+        companyBillingProfile = new CompanyBillingProfile("OnlyDust", UserId.random());
+        BillingProfileHelper.fillKyb(companyBillingProfile.kyb());
+        billingProfileId = companyBillingProfile.id();
+        payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
         invoice = Invoice.of(companyBillingProfile, payoutInfo, 1)
                 .rewards(rewards);
         reset(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort, billingProfileObserver);
@@ -135,17 +140,18 @@ class BillingProfileServiceTest {
             when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
                     BillingProfileView.builder()
                             .id(billingProfileId)
-                            .type(BillingProfile.Type.INDIVIDUAL)
-                            .kyc(Kyc.builder().country(Country.fromIso3("FRA")).build())
+                            .type(BillingProfile.Type.COMPANY)
+                            .kyb(companyBillingProfile.kyb())
+                            .payoutInfo(payoutInfo)
                             .build())
             );
-            when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(42);
+            when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(1);
 
             // When
             final var preview = billingProfileService.previewInvoice(userId, billingProfileId, rewardIds);
 
             // Then
-            assertThat(preview).isEqualTo(invoice);
+            assertThat(preview).isEqualToIgnoringGivenFields(invoice, "id", "createdAt", "dueAt");
             verify(invoiceStoragePort).deleteDraftsOf(billingProfileId);
 
             final var invoiceCaptor = ArgumentCaptor.forClass(Invoice.class);
@@ -164,8 +170,12 @@ class BillingProfileServiceTest {
         void should_prevent_invoice_preview_if_rewards_are_already_invoiced() {
             // Given
             final var reward = fakeReward(Invoice.Id.random());
-            invoice.rewards().add(reward);
-            invoice.status(Invoice.Status.APPROVED);
+            rewards = List.of(fakeReward(), fakeReward(), reward, fakeReward());
+            rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
+
+            invoice = Invoice.of(companyBillingProfile, payoutInfo, 1)
+                    .rewards(rewards)
+                    .status(Invoice.Status.APPROVED);
             when(invoiceStoragePort.get(reward.invoiceId())).thenReturn(Optional.of(invoice));
 
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
@@ -173,11 +183,11 @@ class BillingProfileServiceTest {
                     BillingProfileView.builder()
                             .id(billingProfileId)
                             .type(BillingProfile.Type.INDIVIDUAL)
-                            .kyc(Kyc.builder().country(Country.fromIso3("FRA")).build())
+                            .kyc(newKyc(billingProfileId, userId))
+                            .payoutInfo(payoutInfo)
                             .build())
             );
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(42);
-
 
             // When
             assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))

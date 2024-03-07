@@ -24,6 +24,11 @@ public class SelfEmployedBillingProfile extends BillingProfile {
         return Type.SELF_EMPLOYED;
     }
 
+    @Override
+    public VerificationStatus status() {
+        return kyb.getStatus();
+    }
+
     public boolean isSwitchableToCompany() {
         return true;
     }

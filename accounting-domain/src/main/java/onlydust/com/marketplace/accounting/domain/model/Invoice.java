@@ -19,6 +19,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -35,22 +36,25 @@ public class Invoice {
     private final @NonNull ZonedDateTime dueAt;
     private final @NonNull Invoice.Number number;
     private @NonNull Status status;
-    private final @NonNull BigDecimal taxRate;
     private @NonNull List<Reward> rewards = new ArrayList<>();
     private URL url;
     private String originalFileName;
     private String rejectionReason;
 
     public static Invoice of(final @NonNull BillingProfileView billingProfile, int sequenceNumber) {
+        if (billingProfile.getPayoutInfo() == null) {
+            throw internalServerError("An invoice can only be created on a billing profile with payout info (billing profile %s)".formatted(billingProfile.getId()));
+        }
         final var now = ZonedDateTime.now();
         return new Invoice(
                 Id.random(),
                 BillingProfileSnapshot.of(billingProfile, billingProfile.getPayoutInfo()),
                 now,
                 now.plusDays(DUE_DAY_COUNT_AFTER_CREATION),
-                Number.of(sequenceNumber, billingProfile.getKyc().getFirstName(), billingProfile.getKyc().getLastName()),
-                Status.DRAFT,
-                BigDecimal.ZERO
+                isNull(billingProfile.getKyc()) ?
+                        Number.of(sequenceNumber, billingProfile.getKyb().getName()) :
+                        Number.of(sequenceNumber, billingProfile.getKyc().getLastName(), billingProfile.getKyc().getFirstName()),
+                Status.DRAFT
         );
     }
 
@@ -61,9 +65,8 @@ public class Invoice {
                 BillingProfileSnapshot.of(billingProfile, payoutInfo),
                 now,
                 now.plusDays(DUE_DAY_COUNT_AFTER_CREATION),
-                Number.of(sequenceNumber, billingProfile.kyc().getFirstName(), billingProfile.kyc().getLastName()),
-                Status.DRAFT,
-                BigDecimal.ZERO
+                Number.of(sequenceNumber, billingProfile.kyc().getLastName(), billingProfile.kyc().getFirstName()),
+                Status.DRAFT
         );
     }
 
@@ -75,8 +78,7 @@ public class Invoice {
                 now,
                 now.plusDays(DUE_DAY_COUNT_AFTER_CREATION),
                 Number.of(sequenceNumber, billingProfile.kyb().getName()),
-                Status.DRAFT,
-                BillingProfileSnapshot.KybSnapshot.of(billingProfile.kyb()).taxRate()
+                Status.DRAFT
         );
     }
 
@@ -88,8 +90,7 @@ public class Invoice {
                 now,
                 now.plusDays(DUE_DAY_COUNT_AFTER_CREATION),
                 Number.of(sequenceNumber, billingProfile.kyb().getName()),
-                Status.DRAFT,
-                BillingProfileSnapshot.KybSnapshot.of(billingProfile.kyb()).taxRate()
+                Status.DRAFT
         );
     }
 
@@ -108,6 +109,10 @@ public class Invoice {
     public Money totalBeforeTax() {
         return rewards.stream().map(Invoice.Reward::target).reduce(Money::add)
                 .orElseThrow(() -> notFound("No reward found for invoice %s".formatted(number())));
+    }
+
+    public BigDecimal taxRate() {
+        return billingProfileSnapshot.kybSnapshot().map(BillingProfileSnapshot.KybSnapshot::taxRate).orElse(BigDecimal.ZERO);
     }
 
     public Money totalTax() {
@@ -203,9 +208,9 @@ public class Invoice {
             return new BillingProfileSnapshot(
                     billingProfile.getId(),
                     billingProfile.getType(),
-                    billingProfile.getVerificationStatus(),
-                    KycSnapshot.of(billingProfile.getKyc()),
-                    KybSnapshot.of(billingProfile.getKyb()),
+                    billingProfile.verificationStatus(),
+                    isNull(billingProfile.getKyc()) ? null : KycSnapshot.of(billingProfile.getKyc()),
+                    isNull(billingProfile.getKyb()) ? null : KybSnapshot.of(billingProfile.getKyb()),
                     payoutInfo.getBankAccount(),
                     payoutInfo.wallets()
             );

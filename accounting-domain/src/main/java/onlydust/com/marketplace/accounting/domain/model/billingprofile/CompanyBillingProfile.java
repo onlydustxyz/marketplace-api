@@ -28,6 +28,11 @@ public class CompanyBillingProfile extends BillingProfile {
         return Type.COMPANY;
     }
 
+    @Override
+    public VerificationStatus status() {
+        return kyb.getStatus();
+    }
+
     public boolean isSwitchableToSelfEmployed() {
         return members.size() == 1;
     }

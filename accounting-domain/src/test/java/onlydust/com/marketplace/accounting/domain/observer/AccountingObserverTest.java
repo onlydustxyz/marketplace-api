@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.fillKyb;
 import static onlydust.com.marketplace.accounting.domain.stubs.Currencies.ETH;
 import static onlydust.com.marketplace.accounting.domain.stubs.Currencies.USD;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -158,7 +159,7 @@ public class AccountingObserverTest {
             final var reference = new SponsorAccount.PaymentReference(Network.ETHEREUM, "0x1234", "ofux", "ofux.eth");
 
             final var companyBillingProfile = new CompanyBillingProfile("OnlyDust", UserId.random());
-            companyBillingProfile.kyb().setCountry(Country.fromIso3("FRA"));
+            fillKyb(companyBillingProfile.kyb());
             final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
             var invoice = Invoice.of(companyBillingProfile, payoutInfo, 1);
             invoice = invoice.rewards(List.of(
@@ -339,7 +340,7 @@ public class AccountingObserverTest {
         @BeforeEach
         void setUp() {
             final var companyBillingProfile = new CompanyBillingProfile("OnlyDust", UserId.random());
-            companyBillingProfile.kyb().setCountry(Country.fromIso3("FRA"));
+            fillKyb(companyBillingProfile.kyb());
             final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
             invoice = Invoice.of(companyBillingProfile, payoutInfo, 1);
 
@@ -382,7 +383,7 @@ public class AccountingObserverTest {
         @BeforeEach
         void setUp() {
             final var companyBillingProfile = new CompanyBillingProfile("OnlyDust", UserId.random());
-            companyBillingProfile.kyb().setCountry(Country.fromIso3("FRA"));
+            fillKyb(companyBillingProfile.kyb());
             final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
             invoice = Invoice.of(companyBillingProfile, payoutInfo, 1);
 

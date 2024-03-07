@@ -3,7 +3,10 @@ package onlydust.com.marketplace.accounting.domain.service;
 import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.Money;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
@@ -28,6 +31,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.fillKyc;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
@@ -45,7 +49,7 @@ class InvoiceServiceTest {
     @BeforeEach
     void setUp() {
         final var individualBillingProfile = new IndividualBillingProfile("John", UserId.random());
-        individualBillingProfile.kyc().setCountry(Country.fromIso3("FRA"));
+        fillKyc(individualBillingProfile.kyc());
         final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
         invoice = Invoice.of(individualBillingProfile, payoutInfo, 1);
         reset(invoiceStoragePort, pdfStoragePort, billingProfileObserver);
@@ -126,7 +130,7 @@ class InvoiceServiceTest {
     void should_update_if_rejected_status() {
         // Given
         final var individualBillingProfile = new IndividualBillingProfile("John", UserId.random());
-        individualBillingProfile.kyc().setCountry(Country.fromIso3("FRA"));
+        fillKyc(individualBillingProfile.kyc());
         final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
         final var invoice = Invoice.of(individualBillingProfile, payoutInfo, 1);
         invoice.rewards(List.of(

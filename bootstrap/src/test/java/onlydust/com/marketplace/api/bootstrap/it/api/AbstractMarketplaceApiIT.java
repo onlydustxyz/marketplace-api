@@ -208,6 +208,10 @@ public class AbstractMarketplaceApiIT {
     InvoiceRepository invoiceRepository;
     @Autowired
     BillingProfileRepository billingProfileRepository;
+    @Autowired
+    KybRepository kybRepository;
+    @Autowired
+    KycRepository kycRepository;
 
     @BeforeAll
     static void beforeAll() throws IOException, InterruptedException {
@@ -351,14 +355,23 @@ public class AbstractMarketplaceApiIT {
         );
     }
 
-    protected void patchBillingProfile(@NonNull String billingProfileId,
+    protected void patchBillingProfile(@NonNull UUID billingProfileId,
                                        BillingProfileEntity.Type type,
                                        VerificationStatusEntity status) {
 
-        final var billingProfile = billingProfileRepository.findById(UUID.fromString(billingProfileId)).orElseThrow();
+        final var billingProfile = billingProfileRepository.findById(billingProfileId).orElseThrow();
 
         if (type != null) billingProfile.setType(type);
-        if (status != null) billingProfile.setVerificationStatus(status);
+
+        if (status != null) {
+            if (billingProfile.getKyb() != null) {
+                billingProfile.getKyb().verificationStatus(status);
+                kybRepository.save(billingProfile.getKyb());
+            } else {
+                billingProfile.getKyc().setVerificationStatus(status);
+                kycRepository.save(billingProfile.getKyc());
+            }
+        }
 
         billingProfileRepository.save(billingProfile);
     }
