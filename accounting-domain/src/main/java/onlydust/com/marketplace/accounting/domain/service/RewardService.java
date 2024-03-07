@@ -154,10 +154,10 @@ public class RewardService implements AccountingRewardPort {
                 switch (currencyCode) {
                     case Currency.Code.USDC_STR ->
                             csvLines.add(new String[]{"erc20", "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", payableRewardWithPayoutInfoView.wallet().address(),
-                                    payableRewardWithPayoutInfoView.money().amount().toString()});
+                                    payableRewardWithPayoutInfoView.money().amount().toString(), " "});
                     case Currency.Code.LORDS_STR ->
                             csvLines.add(new String[]{"erc20", "0x686f2404e77Ab0d9070a46cdfb0B7feCDD2318b0", payableRewardWithPayoutInfoView.wallet().address(),
-                                    payableRewardWithPayoutInfoView.money().amount().toString()});
+                                    payableRewardWithPayoutInfoView.money().amount().toString(), " "});
                 }
                 if (moneyViewByCurrencyCode.containsKey(currencyCode)) {
                     final MoneyView moneyView = moneyViewByCurrencyCode.get(currencyCode);
@@ -189,7 +189,7 @@ public class RewardService implements AccountingRewardPort {
             totalAmount = totalAmount.add(starknetReward.money().amount());
             totalAmountDollarsEquivalent = totalAmountDollarsEquivalent.add(starknetReward.money().dollarsEquivalent());
             csvLines.add(new String[]{"erc20", "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d", starknetReward.wallet().address(),
-                    starknetReward.money().amount().toString()});
+                    starknetReward.money().amount().toString(), " "});
         }
         return BatchPayment.builder()
                 .id(BatchPayment.Id.random())
