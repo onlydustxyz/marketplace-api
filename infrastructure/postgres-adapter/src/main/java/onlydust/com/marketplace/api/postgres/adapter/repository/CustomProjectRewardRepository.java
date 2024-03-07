@@ -61,7 +61,7 @@ public class CustomProjectRewardRepository {
                                     when pr.currency = 'usd' then not payout_checks.has_bank_account
                               end) then 'PENDING_CONTRIBUTOR'
                           when r.id is not null then 'COMPLETE'
-                          when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'
+                          when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') and uoop.project_id is null THEN 'LOCKED'
                           else 'PROCESSING'
                           end                                          status
                from payment_requests pr
@@ -70,6 +70,7 @@ public class CustomProjectRewardRepository {
                         left join payments r on r.request_id = pr.id
                         left join billing_profile_check bpc on bpc.user_id = u.id
                         LEFT JOIN payout_checks ON payout_checks.github_user_id = pr.recipient_id
+                        left join unlock_op_on_projects uoop on uoop.project_id = pr.project_id
                where pr.project_id = :projectId
                  and (coalesce(:currencies) is null or CAST(pr.currency AS TEXT) IN (:currencies))
                  and (coalesce(:contributorsIds) is null or pr.recipient_id in (:contributorsIds))

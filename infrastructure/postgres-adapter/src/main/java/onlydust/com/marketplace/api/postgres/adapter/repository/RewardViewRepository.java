@@ -82,8 +82,8 @@ public interface RewardViewRepository extends JpaRepository<RewardDetailsViewEnt
             left join company_billing_profiles cbp on ubpt.billing_profile_type = 'COMPANY' and cbp.user_id = ubpt.user_id
                         
             left join payments r on r.request_id = pr.id
-            left join accounting.invoices i on i.id = pr.invoice_id
-                        
+            left join accounting.invoices i on i.id = pr.invoice_id and i.status != 'DRAFT'
+            left join unlock_op_on_projects uoop on uoop.project_id = pr.project_id                        
             left join (select wi.payment_id, json_agg(coalesce(gpr.html_url, gcr.html_url, gi.html_url)) urls
                        from work_items wi
                        left join indexer_exp.github_pull_requests gpr on cast(gpr.id as text) = wi.id
@@ -128,7 +128,7 @@ public interface RewardViewRepository extends JpaRepository<RewardDetailsViewEnt
                                  when pr.currency = 'apt' then not payout_checks.wallets @> array [cast('aptos' as network)]
                                  when pr.currency = 'usd' then not payout_checks.has_bank_account
                            end) then 'MISSING_PAYOUT_INFO'
-                       when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'
+                       when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') and uoop.project_id is null THEN 'LOCKED'
                        when coalesce(pr.invoice_received_at, i.created_at) is null then 'PENDING_INVOICE'
                        else 'PROCESSING'
                    end as value
