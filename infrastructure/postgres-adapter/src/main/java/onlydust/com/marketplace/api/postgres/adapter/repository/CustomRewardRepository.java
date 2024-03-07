@@ -52,7 +52,7 @@ public class CustomRewardRepository {
                 pr.usd_amount                                                               dollars_equivalent,
                 case
                 when r.id is not null then 'COMPLETE'
-                when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'
+                when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') and uoop.project_id is null THEN 'LOCKED'
                 when u.id is null then 'PENDING_SIGNUP'
                 when not coalesce(bpc.billing_profile_verified, false) then 'PENDING_CONTRIBUTOR'
                 when (case
@@ -84,6 +84,7 @@ public class CustomRewardRepository {
                 left join payments r on r.request_id = pr.id
                 left join billing_profile_check bpc on bpc.user_id = u.id
                 LEFT JOIN payout_checks ON payout_checks.github_user_id = pr.recipient_id
+                left join unlock_op_on_projects uoop on uoop.project_id = pr.project_id
                 where pr.id = :rewardId""";
     private static final String FIND_USER_REWARD_BY_ID = """
             with billing_profile_check as (select ubpt.user_id,
@@ -134,7 +135,7 @@ public class CustomRewardRepository {
                                      when pr.currency = 'apt' then not payout_checks.wallets @> array [cast('aptos' as network)]
                                      when pr.currency = 'usd' then not payout_checks.has_bank_account
                                end) then 'MISSING_PAYOUT_INFO'
-                           when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'
+                           when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') and uoop.project_id is null THEN 'LOCKED'
                            when coalesce(pr.invoice_received_at, i.created_at) is null then 'PENDING_INVOICE'
                            else 'PROCESSING'
                            end                                                                     status,
@@ -158,6 +159,7 @@ public class CustomRewardRepository {
                          LEFT JOIN payout_checks ON payout_checks.github_user_id = pr.recipient_id
                          LEFT JOIN billing_profile_check bpc on bpc.user_id = u.id
                          LEFT JOIN accounting.invoices i on i.id = pr.invoice_id and i.status in ('TO_REVIEW', 'APPROVED', 'PAID')
+                         left join unlock_op_on_projects uoop on uoop.project_id = pr.project_id
                 where pr.id = :rewardId""";
     private static final String COUNT_REWARD_ITEMS = """
             select count(distinct wi.id)

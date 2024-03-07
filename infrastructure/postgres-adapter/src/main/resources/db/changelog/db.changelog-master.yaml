@@ -147,4 +147,6 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000071_add_missing_indexes.sql
   - include:
       file: db/changelog/changelogs/00000072_improve_indexes.sql
+  - include:
+      file: db/changelog/changelogs/00000073_unlock_op_on_projects_table.sql
 
