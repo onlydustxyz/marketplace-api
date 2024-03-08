@@ -80,7 +80,8 @@ public class RewardDetailsViewEntity {
     @Enumerated(EnumType.STRING)
     InvoiceEntity.Status invoiceStatus;
 
-    String transactionHash;
+    @Type(type = "jsonb")
+    List<String> transactionReferences;
     String paidTo;
 
     @Data
@@ -142,7 +143,7 @@ public class RewardDetailsViewEntity {
                         .number(Invoice.Number.fromString(this.invoiceNumber))
                         .status(Invoice.Status.valueOf(this.invoiceStatus.toString()))
                         .build())
-                .transactionHash(this.transactionHash)
+                .transactionReferences(this.transactionReferences)
                 .paidTo(this.paidTo)
                 .build();
     }

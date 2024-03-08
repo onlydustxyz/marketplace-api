@@ -22,6 +22,9 @@ public class BillingProfileCoworkerView {
     String email;
     URI githubHtmlUrl;
     String avatarUrl;
+    String firstName;
+    String lastName;
+    String country;
     BillingProfile.User.Role role;
     ZonedDateTime joinedAt;
     ZonedDateTime invitedAt;

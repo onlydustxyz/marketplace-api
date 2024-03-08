@@ -44,6 +44,9 @@ public class BillingProfileUserViewEntity {
     String githubLogin;
     String githubAvatarUrl;
     String githubHtmlUrl;
+    String firstName;
+    String lastName;
+    String country;
     Date joinedAt;
     Date invitedAt;
     Integer rewardCount;
@@ -58,6 +61,9 @@ public class BillingProfileUserViewEntity {
                 .githubUserId(githubUserId != null ? GithubUserId.of(githubUserId) : null)
                 .avatarUrl(githubAvatarUrl)
                 .githubHtmlUrl(githubHtmlUrl != null ? URI.create(githubHtmlUrl) : null)
+                .firstName(firstName)
+                .lastName(lastName)
+                .country(country)
                 .joinedAt(joinedAt != null ? ZonedDateTime.ofInstant(joinedAt.toInstant(), ZoneOffset.UTC) : null)
                 .invitedAt(invitedAt != null ? ZonedDateTime.ofInstant(invitedAt.toInstant(), ZoneOffset.UTC) : null)
                 .rewardCount(rewardCount)

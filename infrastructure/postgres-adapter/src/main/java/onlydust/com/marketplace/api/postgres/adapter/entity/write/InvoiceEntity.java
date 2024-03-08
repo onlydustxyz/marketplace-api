@@ -8,10 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
-import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -50,35 +46,11 @@ public class InvoiceEntity {
     @Type(type = "jsonb")
     @Deprecated
     Data data;
-    @Type(type = "jsonb")
-    @Column(name = "data_v2")
-    DataV2 dataV2;
 
     public Invoice toDomain() {
-        if (dataV2 != null) {
-            return new Invoice(
-                    Invoice.Id.of(id),
-                    dataV2.billingProfileSnapshot(),
-                    createdAt,
-                    dataV2.dueAt,
-                    Invoice.Number.fromString(number),
-                    status.toDomain(),
-                    dataV2.rewards.stream().map(InvoiceRewardEntity::forInvoice).toList(),
-                    url,
-                    originalFileName,
-                    rejectionReason
-            );
-        }
         return new Invoice(
                 Invoice.Id.of(id),
-                new Invoice.BillingProfileSnapshot(BillingProfile.Id.of(billingProfileId),
-                        data.personalInfo != null ? BillingProfile.Type.INDIVIDUAL : BillingProfile.Type.COMPANY,
-                        VerificationStatus.VERIFIED,
-                        data.personalInfo,
-                        data.companyInfo,
-                        data.bankAccount,
-                        data.wallets
-                ),
+                data.billingProfileSnapshot(),
                 createdAt,
                 data.dueAt,
                 Invoice.Number.fromString(number),
@@ -128,37 +100,14 @@ public class InvoiceEntity {
         }
     }
 
-    @Deprecated
     public record Data(@NonNull ZonedDateTime dueAt,
                        @NonNull BigDecimal taxRate,
-                       Invoice.BillingProfileSnapshot.KycSnapshot personalInfo,
-                       Invoice.BillingProfileSnapshot.KybSnapshot companyInfo,
-                       BankAccount bankAccount,
-                       @NonNull List<Wallet> wallets,
+                       Invoice.BillingProfileSnapshot billingProfileSnapshot,
                        List<InvoiceRewardEntity> rewards
     ) implements Serializable {
 
         public static Data of(final @NonNull Invoice invoice) {
             return new Data(
-                    invoice.dueAt(),
-                    invoice.taxRate(),
-                    invoice.billingProfileSnapshot().kycSnapshot().orElse(null),
-                    invoice.billingProfileSnapshot().kybSnapshot().orElse(null),
-                    invoice.bankAccount().orElse(null),
-                    invoice.wallets(),
-                    invoice.rewards().stream().map(InvoiceRewardEntity::of).toList()
-            );
-        }
-    }
-
-    public record DataV2(@NonNull ZonedDateTime dueAt,
-                         @NonNull BigDecimal taxRate,
-                         Invoice.BillingProfileSnapshot billingProfileSnapshot,
-                         List<InvoiceRewardEntity> rewards
-    ) implements Serializable {
-
-        public static DataV2 of(final @NonNull Invoice invoice) {
-            return new DataV2(
                     invoice.dueAt(),
                     invoice.taxRate(),
                     invoice.billingProfileSnapshot(),

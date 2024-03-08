@@ -402,7 +402,7 @@ public interface BackOfficeMapper {
                                 .currencyName(reward.money().currencyName())
                                 .currencyLogoUrl(reward.money().currencyLogoUrl())
                         )
-                        .transactionHash(reward.transactionHash())
+                        .transactionReferences(reward.transactionReferences())
                 )
                 .sorted(comparing(InvoiceRewardResponse::getRequestedAt))
                 .toList();

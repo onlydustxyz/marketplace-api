@@ -85,7 +85,7 @@ public interface SearchRewardMapper {
                                 .status(mapInvoiceInternalStatus(rewardDetailsView.invoice().status()))
                         : null
                 )
-                .transactionHash(rewardDetailsView.transactionHash())
+                .transactionReferences(rewardDetailsView.transactionReferences())
                 .paidTo(rewardDetailsView.paidTo())
                 .recipient(rewardDetailsView.recipient() != null ?
                         new RecipientLinkResponse()

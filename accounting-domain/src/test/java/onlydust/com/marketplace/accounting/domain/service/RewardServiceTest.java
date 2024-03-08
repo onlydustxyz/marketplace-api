@@ -355,7 +355,7 @@ public class RewardServiceTest {
                                 .githubUrls(List.of())
                                 .sponsors(List.of())
                                 .projectName(faker.rickAndMorty().character())
-                                .transactionHash(faker.random().hex())
+                                .transactionReferences(List.of(faker.random().hex()))
                                 .money(MoneyView.builder()
                                         .amount(BigDecimal.ONE)
                                         .currencyCode(Currency.Code.USDC_STR)

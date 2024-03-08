@@ -57,7 +57,7 @@ public class RewardsExporter {
                         reward.status(),
                         reward.requestedAt(),
                         reward.processedAt(),
-                        reward.transactionHash(),
+                        reward.transactionReferences(),
                         reward.paidTo(),
                         reward.id().pretty(),
                         reward.sponsors().stream().map(ShortSponsorView::name).toList(),

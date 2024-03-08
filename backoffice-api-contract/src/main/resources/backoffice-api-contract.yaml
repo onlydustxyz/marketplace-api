@@ -2933,9 +2933,11 @@ components:
             $ref: '#/components/schemas/SponsorLinkResponse'
         money:
           $ref: '#/components/schemas/MoneyLinkResponse'
-        transactionHash:
-          type: string
-          example: 0x1234567890abcdef
+        transactionReferences:
+          type: array
+          items:
+            type: string
+            example: 0x1234567890abcdef
         paidTo:
           type: string
           example: 0x1234567890abcdef
@@ -2987,8 +2989,11 @@ components:
             $ref: '#/components/schemas/SponsorLinkResponse'
         money:
           $ref: '#/components/schemas/MoneyLinkResponse'
-        transactionHash:
-          type: string
+        transactionReferences:
+          type: array
+          items:
+            type: string
+            example: 0x1234567890abcdef
 
     ProjectLinkResponse:
       type: object

@@ -9,4 +9,5 @@ import java.util.UUID;
 public interface BillingProfileUserRepository extends JpaRepository<BillingProfileUserEntity, BillingProfileUserEntity.PrimaryKey> {
 
     Optional<BillingProfileUserEntity> findByBillingProfileIdAndUserId(UUID billingProfileId, UUID userId);
+
 }

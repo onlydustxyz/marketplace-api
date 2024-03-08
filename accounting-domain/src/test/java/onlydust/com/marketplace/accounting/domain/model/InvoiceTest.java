@@ -151,7 +151,7 @@ class InvoiceTest {
 
         @Test
         void should_compute_vat_regulation_state() {
-            assertThat(invoice.billingProfileSnapshot().kybSnapshot().orElseThrow().vatRegulationState()).isEqualTo(Invoice.VatRegulationState.NOT_APPLICABLE_NON_UE);
+            assertThat(invoice.billingProfileSnapshot().kyb().orElseThrow().vatRegulationState()).isEqualTo(Invoice.VatRegulationState.NOT_APPLICABLE_NON_UE);
         }
 
         @Test
@@ -222,7 +222,7 @@ class InvoiceTest {
 
         @Test
         void should_compute_vat_regulation_state() {
-            assertThat(invoice.billingProfileSnapshot().kybSnapshot().orElseThrow().vatRegulationState()).isEqualTo(Invoice.VatRegulationState.APPLICABLE);
+            assertThat(invoice.billingProfileSnapshot().kyb().orElseThrow().vatRegulationState()).isEqualTo(Invoice.VatRegulationState.APPLICABLE);
         }
 
         @Test
@@ -293,7 +293,7 @@ class InvoiceTest {
 
         @Test
         void should_compute_vat_regulation_state() {
-            assertThat(invoice.billingProfileSnapshot().kybSnapshot().orElseThrow().vatRegulationState()).isEqualTo(Invoice.VatRegulationState.NOT_APPLICABLE_FRENCH_NOT_SUBJECT);
+            assertThat(invoice.billingProfileSnapshot().kyb().orElseThrow().vatRegulationState()).isEqualTo(Invoice.VatRegulationState.NOT_APPLICABLE_FRENCH_NOT_SUBJECT);
         }
 
         @Test
@@ -364,7 +364,7 @@ class InvoiceTest {
 
         @Test
         void should_compute_vat_regulation_state() {
-            assertThat(invoice.billingProfileSnapshot().kybSnapshot().orElseThrow().vatRegulationState()).isEqualTo(Invoice.VatRegulationState.REVERSE_CHARGE);
+            assertThat(invoice.billingProfileSnapshot().kyb().orElseThrow().vatRegulationState()).isEqualTo(Invoice.VatRegulationState.REVERSE_CHARGE);
         }
 
         @Test

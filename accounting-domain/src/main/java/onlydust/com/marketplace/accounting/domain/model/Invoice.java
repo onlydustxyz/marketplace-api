@@ -76,7 +76,7 @@ public class Invoice {
     }
 
     public BigDecimal taxRate() {
-        return billingProfileSnapshot.kybSnapshot().map(BillingProfileSnapshot.KybSnapshot::taxRate).orElse(BigDecimal.ZERO);
+        return billingProfileSnapshot.kyb().map(BillingProfileSnapshot.KybSnapshot::taxRate).orElse(BigDecimal.ZERO);
     }
 
     public Money totalTax() {
@@ -156,23 +156,18 @@ public class Invoice {
     }
 
 
-    @AllArgsConstructor
-    @Data
-    @Accessors(fluent = true)
-    public static class BillingProfileSnapshot {
-        private final @NonNull BillingProfile.Id id;
-        private final @NonNull BillingProfile.Type type;
-        private final @NonNull VerificationStatus status;
-        private final KycSnapshot kycSnapshot;
-        private final KybSnapshot kybSnapshot;
-        private BankAccount bankAccount;
-        private @NonNull List<Wallet> wallets;
+    public record BillingProfileSnapshot(
+            @NonNull BillingProfile.Id id,
+            @NonNull BillingProfile.Type type,
+            KycSnapshot kycSnapshot,
+            KybSnapshot kybSnapshot,
+            BankAccount bankAccount,
+            @NonNull List<Wallet> wallets) {
 
         public static BillingProfileSnapshot of(final @NonNull BillingProfileView billingProfile, final @NonNull PayoutInfo payoutInfo) {
             return new BillingProfileSnapshot(
                     billingProfile.getId(),
                     billingProfile.getType(),
-                    billingProfile.getVerificationStatus(),
                     isNull(billingProfile.getKyc()) ? null : KycSnapshot.of(billingProfile.getKyc()),
                     isNull(billingProfile.getKyb()) ? null : KybSnapshot.of(billingProfile.getKyb()),
                     payoutInfo.getBankAccount(),
@@ -182,18 +177,17 @@ public class Invoice {
 
         public String subject() {
             return switch (type) {
-                case INDIVIDUAL ->
-                        kycSnapshot().map(KycSnapshot::fullName).orElseThrow(() -> internalServerError("No KYC found for individual billing profile"));
+                case INDIVIDUAL -> kyc().map(KycSnapshot::fullName).orElseThrow(() -> internalServerError("No KYC found for individual billing profile"));
                 case SELF_EMPLOYED, COMPANY ->
-                        kybSnapshot().map(KybSnapshot::name).orElseThrow(() -> internalServerError("No KYB found for company/self-employed billing profile"));
+                        kyb().map(KybSnapshot::name).orElseThrow(() -> internalServerError("No KYB found for company/self-employed billing profile"));
             };
         }
 
-        public Optional<KycSnapshot> kycSnapshot() {
+        public Optional<KycSnapshot> kyc() {
             return Optional.ofNullable(kycSnapshot);
         }
 
-        public Optional<KybSnapshot> kybSnapshot() {
+        public Optional<KybSnapshot> kyb() {
             return Optional.ofNullable(kybSnapshot);
         }
 

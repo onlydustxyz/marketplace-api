@@ -10,12 +10,14 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileAdminView;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
@@ -164,8 +166,18 @@ class InvoiceServiceTest {
                 .build();
 
         // When
-        when(billingProfileStoragePort.findBillingProfileAdminForInvoice(invoice.id()))
-                .thenReturn(Optional.of(billingProfileAdminView));
+        when(billingProfileStoragePort.findBillingProfileAdmins(invoice.billingProfileSnapshot().id()))
+                .thenReturn(List.of(BillingProfileCoworkerView.builder()
+                        .login(faker.name().username())
+                        .email(faker.internet().emailAddress())
+                        .firstName(faker.name().firstName())
+                        .githubUserId(GithubUserId.of(faker.number().randomNumber(10, true)))
+                        .role(BillingProfile.User.Role.ADMIN)
+                        .joinedAt(ZonedDateTime.now())
+                        .invitedAt(null)
+                        .rewardCount(0)
+                        .billingProfileAdminCount(1)
+                        .build()));
         invoiceService.update(invoice.id(), status, rejectionReason);
 
         // Then

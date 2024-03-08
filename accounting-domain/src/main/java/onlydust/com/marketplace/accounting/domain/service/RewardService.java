@@ -34,7 +34,8 @@ public class RewardService implements AccountingRewardPort {
         return accountingRewardStoragePort.searchRewards(List.of(Invoice.Status.APPROVED), invoiceIds)
                 .stream()
                 .filter(rewardView -> CURRENCY_CODES_AVAILABLE_FOR_BATCH_PAYMENT.contains(rewardView.money().currencyCode()))
-                .filter(rewardView -> isNull(rewardView.processedAt()) && isNull(rewardView.transactionHash()))
+                // TODO: the following filter won't work when reward has multiple receipts
+                .filter(rewardView -> isNull(rewardView.processedAt()) && rewardView.transactionReferences().isEmpty())
                 .toList();
     }
 

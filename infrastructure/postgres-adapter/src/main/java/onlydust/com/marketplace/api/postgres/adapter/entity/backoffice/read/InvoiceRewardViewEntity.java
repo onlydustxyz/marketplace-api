@@ -12,7 +12,6 @@ import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileAdminView;
 import onlydust.com.marketplace.accounting.domain.view.ShortSponsorView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -48,9 +47,6 @@ public class InvoiceRewardViewEntity {
     String recipientEmail;
     BigDecimal dollarsEquivalent;
     BigDecimal amount;
-    @Enumerated(EnumType.STRING)
-    @Type(type = "currency")
-    CurrencyEnumEntity currency;
     @Type(type = "billing_profile_type")
     @Enumerated(EnumType.STRING)
     BillingProfileEntity.Type billingProfileType;
@@ -63,7 +59,8 @@ public class InvoiceRewardViewEntity {
     String currencyName;
     String currencyCode;
     String currencyLogoUrl;
-    String transactionHash;
+    @Type(type = "jsonb")
+    List<String> transactionReferences;
 
     @Data
     public static class SponsorLinkView {
@@ -109,7 +106,7 @@ public class InvoiceRewardViewEntity {
                         .currencyCode(this.currencyCode)
                         .currencyLogoUrl(this.currencyLogoUrl)
                         .build())
-                .transactionHash(this.transactionHash)
+                .transactionReferences(isNull(this.transactionReferences) ? List.of() : this.transactionReferences)
                 .build();
     }
 }

@@ -230,14 +230,15 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                             {
                               "status": "TO_REVIEW",
                               "billingProfile": {
-                                "name": "Mr. Needful",
+                                "name": "Apple Inc.",
                                 "type": "COMPANY",
+                                "verificationStatus": null,
                                 "admins": null
                               },
                               "rewardCount": 3,
                               "totalEquivalent": {
-                                "amount": 4765.00,
-                                "dollarsEquivalent": 4765.00,
+                                "amount": 5718.000,
+                                "dollarsEquivalent": 5718.000,
                                 "conversionRate": null,
                                 "currencyCode": "USD",
                                 "currencyName": "US Dollar",
@@ -245,11 +246,11 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               },
                               "totalPerCurrency": [
                                 {
-                                  "amount": 3250,
-                                  "dollarsEquivalent": 3250,
+                                  "amount": 500,
+                                  "dollarsEquivalent": 505.00,
                                   "conversionRate": null,
-                                  "currencyCode": "USD",
-                                  "currencyName": "US Dollar",
+                                  "currencyCode": "USDC",
+                                  "currencyName": "USD Coin",
                                   "currencyLogoUrl": null
                                 },
                                 {
@@ -261,11 +262,11 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                   "currencyLogoUrl": null
                                 },
                                 {
-                                  "amount": 500,
-                                  "dollarsEquivalent": 505.00,
+                                  "amount": 3250,
+                                  "dollarsEquivalent": 3250,
                                   "conversionRate": null,
-                                  "currencyCode": "USDC",
-                                  "currencyName": "USD Coin",
+                                  "currencyCode": "USD",
+                                  "currencyName": "US Dollar",
                                   "currencyLogoUrl": null
                                 }
                               ]
@@ -273,14 +274,15 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                             {
                               "status": "TO_REVIEW",
                               "billingProfile": {
-                                "name": "Mr. Needful",
+                                "name": "Apple Inc.",
                                 "type": "COMPANY",
+                                "verificationStatus": null,
                                 "admins": null
                               },
                               "rewardCount": 2,
                               "totalEquivalent": {
-                                "amount": 2777.50,
-                                "dollarsEquivalent": 2777.50,
+                                "amount": 3333.000,
+                                "dollarsEquivalent": 3333.000,
                                 "conversionRate": null,
                                 "currencyCode": "USD",
                                 "currencyName": "US Dollar",
@@ -308,14 +310,15 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                             {
                               "status": "TO_REVIEW",
                               "billingProfile": {
-                                "name": "Mr. Needful",
+                                "name": "Apple Inc.",
                                 "type": "COMPANY",
+                                "verificationStatus": null,
                                 "admins": null
                               },
                               "rewardCount": 1,
                               "totalEquivalent": {
-                                "amount": 1010.00,
-                                "dollarsEquivalent": 1010.00,
+                                "amount": 1212.000,
+                                "dollarsEquivalent": 1212.000,
                                 "conversionRate": null,
                                 "currencyCode": "USD",
                                 "currencyName": "US Dollar",
@@ -351,14 +354,24 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .expectBody()
                 .json("""
                         {
+                          "number": "OD-APPLEINC-001",
                           "status": "TO_REVIEW",
                           "billingProfile": {
-                            "name": "Mr. Needful",
+                            "name": "Apple Inc.",
                             "type": "COMPANY",
-                            "admins": []
+                            "verificationStatus": null,
+                            "admins": [
+                              {
+                                "login": null,
+                                "name": "ofux",
+                                "email": "olivier.fuxet@gmail.com",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
+                              }
+                            ]
                           },
+                          "rejectionReason": null,
                           "totalEquivalent": {
-                            "amount": 1010.00,
+                            "amount": 1212.000,
                             "currencyCode": "USD",
                             "currencyName": "US Dollar",
                             "currencyLogoUrl": null
@@ -366,7 +379,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "rewardsPerNetwork": [
                             {
                               "network": "ETHEREUM",
-                              "billingAccountNumber": null,
+                              "billingAccountNumber": "e461c019-ba23-4671-9b6c-3a5a18748af9.eth",
                               "dollarsEquivalent": 1010.00,
                               "totalPerCurrency": [
                                 {
@@ -399,7 +412,9 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                     "currencyName": "USD Coin",
                                     "currencyLogoUrl": null
                                   },
-                                  "transactionHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                                  "transactionReferences": [
+                                    "0x0000000000000000000000000000000000000000000000000000000000000000"
+                                  ]
                                 }
                               ]
                             }
@@ -444,39 +459,15 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "invoices": [
                             {
                               "status": "TO_REVIEW",
-                              "rewardCount": 3,
-                              "totalEquivalent": {
-                                "amount": 4765.00,
-                                "dollarsEquivalent": 4765.00,
-                                "conversionRate": null,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
-                              }
+                              "rewardCount": 3
                             },
                             {
                               "status": "TO_REVIEW",
-                              "rewardCount": 2,
-                              "totalEquivalent": {
-                                "amount": 2777.50,
-                                "dollarsEquivalent": 2777.50,
-                                "conversionRate": null,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
-                              }
+                              "rewardCount": 2
                             },
                             {
                               "status": "APPROVED",
-                              "rewardCount": 1,
-                              "totalEquivalent": {
-                                "amount": 1010.00,
-                                "dollarsEquivalent": 1010.00,
-                                "conversionRate": null,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
-                              }
+                              "rewardCount": 1
                             }
                           ]
                         }
@@ -556,39 +547,15 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "invoices": [
                             {
                               "status": "TO_REVIEW",
-                              "rewardCount": 3,
-                              "totalEquivalent": {
-                                "amount": 4765.00,
-                                "dollarsEquivalent": 4765.00,
-                                "conversionRate": null,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
-                              }
+                              "rewardCount": 3
                             },
                             {
                               "status": "REJECTED",
-                              "rewardCount": 2,
-                              "totalEquivalent": {
-                                "amount": 2777.50,
-                                "dollarsEquivalent": 2777.50,
-                                "conversionRate": null,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
-                              }
+                              "rewardCount": 2
                             },
                             {
                               "status": "APPROVED",
-                              "rewardCount": 1,
-                              "totalEquivalent": {
-                                "amount": 1010.00,
-                                "dollarsEquivalent": 1010.00,
-                                "conversionRate": null,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
-                              }
+                              "rewardCount": 1
                             }
                           ]
                         }
@@ -619,27 +586,11 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "invoices": [
                             {
                               "status": "TO_REVIEW",
-                              "rewardCount": 3,
-                              "totalEquivalent": {
-                                "amount": 4765.00,
-                                "dollarsEquivalent": 4765.00,
-                                "conversionRate": null,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
-                              }
+                              "rewardCount": 3
                             },
                             {
                               "status": "REJECTED",
-                              "rewardCount": 2,
-                              "totalEquivalent": {
-                                "amount": 2777.50,
-                                "dollarsEquivalent": 2777.50,
-                                "conversionRate": null,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
-                              }
+                              "rewardCount": 2
                             }
                           ]
                         }

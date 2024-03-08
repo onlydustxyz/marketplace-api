@@ -2,13 +2,11 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileAdminView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
@@ -317,10 +315,11 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<BillingProfileAdminView> findBillingProfileAdminForInvoice(Invoice.Id invoiceId) {
-//        return oldBillingProfileAdminViewRepository.findByInvoiceId(invoiceId.value())
-//                .map(OldBillingProfileAdminViewEntity::toDomain);
-        //TODO
-        return Optional.empty();
+    public List<BillingProfileCoworkerView> findBillingProfileAdmins(BillingProfile.Id billingProfileId) {
+        //TODO: save "createdBy" in invoice so that we can return this admin first
+        return billingProfileUserViewRepository.findAdminsByBillingProfileId(billingProfileId.value())
+                .stream()
+                .map(BillingProfileUserViewEntity::toView)
+                .toList();
     }
 }

@@ -20,7 +20,7 @@ public record RewardDetailsView(
         ShortBillingProfileAdminView billingProfileAdmin,
         ShortContributorView recipient,
         ShortInvoiceView invoice,
-        String transactionHash,
+        @NonNull List<String> transactionReferences,
         String paidTo
 ) {
 

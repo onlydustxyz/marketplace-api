@@ -8,10 +8,8 @@ import onlydust.com.marketplace.accounting.domain.model.InvoiceDownload;
 import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileAdminView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
@@ -50,21 +48,23 @@ public class InvoiceService implements InvoiceFacadePort {
         }
         invoiceStoragePort.update(invoice.status(status).rejectionReason(rejectionReason));
         if (status == Invoice.Status.REJECTED) {
-            final BillingProfileAdminView billingProfileAdminView = billingProfileStoragePort.findBillingProfileAdminForInvoice(id)
-                    .orElseThrow(() -> OnlyDustException.notFound("BillingProfile admin for invoice %s was not found".formatted(id.value())));
+            final var billingProfileAdmins = billingProfileStoragePort.findBillingProfileAdmins(invoice.billingProfileSnapshot().id());
+            final var billingProfileAdminView = billingProfileAdmins.stream().findFirst()
+                    .orElseThrow(() -> notFound("Billing profile admin not found for billing profile %s".formatted(invoice.billingProfileSnapshot().id())));
+
             billingProfileObserver.onInvoiceRejected(new InvoiceRejected(billingProfileAdminView.email(),
-                    (long) invoice.rewards().size(), billingProfileAdminView.githubLogin(),
+                    (long) invoice.rewards().size(), billingProfileAdminView.login(),
                     billingProfileAdminView.firstName(),
-                    invoice.number().value()
-                    , invoice.rewards().stream()
-                    .map(reward -> InvoiceRejected.ShortReward.builder()
-                            .id(reward.id())
-                            .amount(reward.amount().getValue())
-                            .currencyCode(reward.amount().getCurrency().code().toString())
-                            .projectName(reward.projectName())
-                            .dollarsEquivalent(reward.target().getValue())
-                            .build()
-                    ).toList(),
+                    invoice.number().value(),
+                    invoice.rewards().stream()
+                            .map(reward -> InvoiceRejected.ShortReward.builder()
+                                    .id(reward.id())
+                                    .amount(reward.amount().getValue())
+                                    .currencyCode(reward.amount().getCurrency().code().toString())
+                                    .projectName(reward.projectName())
+                                    .dollarsEquivalent(reward.target().getValue())
+                                    .build()
+                            ).toList(),
                     rejectionReason));
         }
     }

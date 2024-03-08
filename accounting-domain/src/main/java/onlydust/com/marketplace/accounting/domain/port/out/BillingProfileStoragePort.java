@@ -1,12 +1,10 @@
 package onlydust.com.marketplace.accounting.domain.port.out;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileAdminView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
@@ -15,8 +13,8 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.Set;
+import java.util.UUID;
 
 public interface BillingProfileStoragePort {
 
@@ -77,5 +75,5 @@ public interface BillingProfileStoragePort {
 
     void deleteCoworker(BillingProfile.Id billingProfileId, UserId userId);
 
-    Optional<BillingProfileAdminView> findBillingProfileAdminForInvoice(Invoice.Id invoiceId);
+    List<BillingProfileCoworkerView> findBillingProfileAdmins(BillingProfile.Id billingProfileId);
 }
