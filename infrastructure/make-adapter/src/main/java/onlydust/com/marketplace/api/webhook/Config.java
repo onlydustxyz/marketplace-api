@@ -11,5 +11,6 @@ public class Config {
     private URI url;
     private String environment;
     private String apiKey;
-    private URI sendRejectedInvoiceEmailUrl;
+    private URI sendRejectedInvoiceMailUrl;
+    private URI sendRewardsPaidMailUrl;
 }

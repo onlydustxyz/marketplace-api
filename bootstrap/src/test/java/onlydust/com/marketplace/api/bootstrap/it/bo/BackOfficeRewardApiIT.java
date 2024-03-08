@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import onlydust.com.backoffice.api.contract.model.SearchRewardItemResponse;
 import onlydust.com.backoffice.api.contract.model.SearchRewardsResponse;
 import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
@@ -17,15 +18,18 @@ import onlydust.com.marketplace.api.od.rust.api.client.adapter.OdRustApiHttpClie
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.OldVerificationStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserPayoutInfoRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
+import onlydust.com.marketplace.api.webhook.Config;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmAccountAddress;
@@ -42,13 +46,13 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.util.Objects.nonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -71,6 +75,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
     BillingProfileService billingProfileService;
     @Autowired
     InvoiceStoragePort invoiceStoragePort;
+    @Autowired
+    EntityManagerFactory entityManagerFactory;
     static List<UUID> invoiceIds = new ArrayList<>();
     final StarknetAccountAddress olivierStarknetAddress = new StarknetAccountAddress("0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc8");
     final StarknetAccountAddress anthoStarknetAddress = new StarknetAccountAddress("0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7");
@@ -79,6 +85,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Order(1)
     void should_search_payable_rewards_to_pay_given_a_list_of_invoice_id() {
         // Given
+//        setUp();
         final UserAuthHelper.AuthenticatedUser olivier = userAuthHelper.authenticateOlivier();
         userService.getCompanyBillingProfile(olivier.user().getId());
 
@@ -1298,6 +1305,44 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .jsonPath("$.csv").isNotEmpty()
                 .jsonPath("$.transactionHash").isNotEmpty()
                 .jsonPath("$.rewards.length()").isEqualTo(2);
+    }
+
+    @Autowired
+    PaymentRepository paymentRepository;
+    @Autowired
+    Config webhookHttpClientProperties;
+
+    @Test
+    @Order(110)
+    void should_notify_new_rewards_paid() {
+        // Given
+        final List<PaymentRequestEntity> rewardsToPay = paymentRequestRepository.findAllById(
+                batchPaymentRepository.findAll().stream()
+                        .flatMap(batchPaymentEntity -> batchPaymentEntity.getRewardIds().stream())
+                        .toList());
+        paymentRepository.save(new PaymentEntity(UUID.randomUUID(), BigDecimal.ONE, "ETH", JacksonUtil.toJsonNode("{}"), rewardsToPay.get(0).getId(),
+                new Date()));
+        paymentRepository.save(new PaymentEntity(UUID.randomUUID(), BigDecimal.ONE, "ETH", JacksonUtil.toJsonNode("{}"), rewardsToPay.get(1).getId(),
+                new Date()));
+
+        makeWebhookSendRewardsPaidMailWireMockServer.stubFor(
+                post("/?api-key=%s".formatted(webhookHttpClientProperties.getApiKey()))
+                        .willReturn(ok()));
+
+        // When
+        client.put()
+                .uri(getApiURI(PUT_REWARDS_NOTIFY_PAYMENTS))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        makeWebhookSendRewardsPaidMailWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/?api-key=%s".formatted(webhookHttpClientProperties.getApiKey())))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withRequestBody(matchingJsonPath("$.recipientEmail", equalTo("abuisset@gmail.com")))
+                        .withRequestBody(matchingJsonPath("$.recipientName", equalTo("Anthony BUISSET"))));
     }
 
     private static final String GET_BATCH_PAYMENTS_PAGE_JSON_RESPONSE = """

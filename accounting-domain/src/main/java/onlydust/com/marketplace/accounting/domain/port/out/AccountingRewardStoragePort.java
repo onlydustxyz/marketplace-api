@@ -3,16 +3,14 @@ package onlydust.com.marketplace.accounting.domain.port.out;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public interface AccountingRewardStoragePort {
 
@@ -36,4 +34,8 @@ public interface AccountingRewardStoragePort {
                                         @NonNull Set<RewardDetailsView.Status> statuses,
                                         Date fromRequestedAt, Date toRequestedAt,
                                         Date fromProcessedAt, Date toProcessedAt);
+
+    List<RewardView> findPaidRewardsToNotify();
+
+    void markRewardsAsPaymentNotified(List<RewardId> rewardId);
 }

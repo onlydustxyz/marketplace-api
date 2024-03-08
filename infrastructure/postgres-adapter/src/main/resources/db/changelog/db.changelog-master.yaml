@@ -149,4 +149,6 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000072_improve_indexes.sql
   - include:
       file: db/changelog/changelogs/00000073_unlock_op_on_projects_table.sql
+  - include:
+      file: db/changelog/changelogs/00000074_add_payment_notified_at_column.sql
 

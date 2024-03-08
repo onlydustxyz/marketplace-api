@@ -846,7 +846,23 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-
+  /bo/v1/rewards/notify-payments:
+    put:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Notify payments sent
+      operationId: notifyRewardsPaid
+      description: |
+        Notify payments sent
+      responses:
+        "204":
+          description: New paid rewards were notified
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
   # BackofficeSponsorManagement ===============================================================
   /bo/v1/sponsors:
@@ -2923,6 +2939,9 @@ components:
           type: array
           items:
             type: string
+        paidNotificationDate:
+          type: string
+          format: date-time
         recipient:
           $ref: '#/components/schemas/RecipientLinkResponse'
         project:
