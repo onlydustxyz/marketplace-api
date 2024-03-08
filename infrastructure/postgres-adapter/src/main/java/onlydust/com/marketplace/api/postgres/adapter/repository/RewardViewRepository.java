@@ -1,7 +1,5 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import lombok.NonNull;
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.RewardDetailsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
 import onlydust.com.marketplace.project.domain.model.Reward;
@@ -14,7 +12,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,6 +24,7 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                    r.amount                     AS amount,
                    r.currency_id                AS currency_id,
                    rsd.amount_usd_equivalent    AS dollars_equivalent,
+                   r.invoice_id                 AS invoice_id,
                    count(*)                     AS contribution_count,
                    github_recipient.id          AS recipient_id,
                    github_recipient.login       AS recipient_login,
@@ -34,7 +32,7 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                    github_requestor.id          AS requestor_id,
                    github_requestor.login       AS requestor_login,
                    user_avatar_url(github_requestor.id, github_requestor.avatar_url)  AS requestor_avatar_url
-            from rewards r 
+            from rewards r
                  JOIN accounting.reward_status_data rsd ON rsd.reward_id = r.id
                  JOIN accounting.reward_statuses rs ON rs.reward_id = r.id
                  JOIN reward_items ri ON ri.reward_id = r.id
@@ -133,10 +131,6 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                 toDate,
                 pageRequest);
     }
-    Page<RewardDetailsViewEntity> findAllByStatusesAndDates(@NonNull List<String> statuses,
-                                                            Date fromRequestedAt, Date toRequestedAt,
-                                                            Date fromProcessedAt, Date toProcessedAt,
-                                                            Pageable pageable);
 
     @Modifying
     @Query(nativeQuery = true, value = """
