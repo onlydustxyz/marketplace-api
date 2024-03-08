@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain.view;
 
 import lombok.Builder;
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 
 import java.time.ZonedDateTime;
@@ -24,6 +25,11 @@ public record RewardDetailsView(
         @NonNull List<String> paidToAccountNumbers,
         ZonedDateTime paidNotificationSentAt
 ) {
+
+    @Deprecated
+    public Network network() {
+        return Network.fromCurrencyCode(money().currencyCode());
+    }
 
     public enum Status {
         PENDING_INVOICE,

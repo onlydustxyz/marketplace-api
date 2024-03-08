@@ -13,6 +13,6 @@ public record BatchPaymentDetailsView(
         @NonNull
         BatchPayment batchPayment,
         @NonNull
-        List<RewardView> rewardViews
+        List<RewardDetailsView> rewardViews
 ) {
 }

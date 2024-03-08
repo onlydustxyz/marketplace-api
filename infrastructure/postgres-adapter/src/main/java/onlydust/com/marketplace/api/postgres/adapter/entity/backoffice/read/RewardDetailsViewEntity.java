@@ -56,7 +56,7 @@ public class RewardDetailsViewEntity {
     @NonNull String projectSlug;
 
     @Type(type = "jsonb")
-    List<InvoiceRewardViewEntity.SponsorLinkView> sponsors;
+    List<SponsorLinkView> sponsors;
 
     @NonNull BigDecimal dollarsEquivalent;
     @NonNull BigDecimal amount;
@@ -127,7 +127,7 @@ public class RewardDetailsViewEntity {
                                 .build())
                 .recipient(new ShortContributorView(this.recipientLogin, this.recipientAvatarUrl))
                 .sponsors(isNull(this.sponsors) ? List.of() : this.sponsors.stream()
-                        .map(InvoiceRewardViewEntity.SponsorLinkView::toDomain)
+                        .map(SponsorLinkView::toDomain)
                         .sorted(comparing(ShortSponsorView::name))
                         .toList())
                 .money(MoneyView.builder()

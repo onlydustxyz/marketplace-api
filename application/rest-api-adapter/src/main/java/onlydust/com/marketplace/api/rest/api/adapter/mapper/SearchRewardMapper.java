@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileAdminView;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
@@ -16,25 +15,25 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMap
 
 public interface SearchRewardMapper {
 
-    static SearchRewardsResponse searchRewardToResponse(final List<RewardView> rewardViews) {
+    static SearchRewardsResponse searchRewardToResponse(final List<RewardDetailsView> rewardViews) {
         final SearchRewardsResponse searchRewardsResponse = new SearchRewardsResponse();
-        for (RewardView view : rewardViews) {
+        for (var view : rewardViews) {
             searchRewardsResponse.addRewardsItem(mapToItem(view));
         }
         return searchRewardsResponse;
     }
 
-    static SearchRewardItemResponse mapToItem(RewardView view) {
+    static SearchRewardItemResponse mapToItem(RewardDetailsView view) {
         return new SearchRewardItemResponse()
-                .id(view.id())
+                .id(view.id().value())
                 .githubUrls(view.githubUrls())
                 .processedAt(view.processedAt())
                 .requestedAt(view.requestedAt())
                 .money(moneyViewToResponse(view.money())
                 )
                 .project(new ProjectLinkResponse()
-                        .name(view.projectName())
-                        .logoUrl(view.projectLogoUrl()))
+                        .name(view.project().name())
+                        .logoUrl(view.project().logoUrl()))
                 .sponsors(view.sponsors().stream()
                         .map(shortSponsorView -> new SponsorLinkResponse()
                                 .name(shortSponsorView.name())

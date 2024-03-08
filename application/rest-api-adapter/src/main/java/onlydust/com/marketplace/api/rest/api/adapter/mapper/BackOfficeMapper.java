@@ -8,7 +8,6 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Hash;
@@ -322,7 +321,8 @@ public interface BackOfficeMapper {
     }
 
     @SneakyThrows
-    static InvoiceResponse mapInvoiceToContract(final Invoice invoice, List<BillingProfileCoworkerView> billingProfileAdmins, final List<RewardView> rewards) {
+    static InvoiceResponse mapInvoiceToContract(final Invoice invoice, List<BillingProfileCoworkerView> billingProfileAdmins,
+                                                final List<RewardDetailsView> rewards) {
         return new InvoiceResponse()
                 .id(invoice.id().value())
                 .number(invoice.number().toString())
@@ -354,8 +354,8 @@ public interface BackOfficeMapper {
                 .rewardsPerNetwork(mapInvoiceRewardsPerNetworks(invoice, rewards));
     }
 
-    static List<InvoiceRewardsPerNetwork> mapInvoiceRewardsPerNetworks(final Invoice invoice, final List<RewardView> rewards) {
-        final Map<Network, List<RewardView>> rewardsPerNetworks = rewards.stream().collect(groupingBy(RewardView::network));
+    static List<InvoiceRewardsPerNetwork> mapInvoiceRewardsPerNetworks(final Invoice invoice, final List<RewardDetailsView> rewards) {
+        final Map<Network, List<RewardDetailsView>> rewardsPerNetworks = rewards.stream().collect(groupingBy(RewardDetailsView::network));
 
         return rewardsPerNetworks.entrySet().stream()
                 .map(e -> {
@@ -378,16 +378,16 @@ public interface BackOfficeMapper {
                 .toList();
     }
 
-    static List<InvoiceRewardResponse> mapNetworkRewards(final List<RewardView> rewards) {
+    static List<InvoiceRewardResponse> mapNetworkRewards(final List<RewardDetailsView> rewards) {
         return rewards.stream()
                 .map(reward -> new InvoiceRewardResponse()
-                        .id(reward.id())
+                        .id(reward.id().value())
                         .requestedAt(reward.requestedAt())
                         .processedAt(reward.processedAt())
                         .githubUrls(reward.githubUrls())
                         .project(new ProjectLinkResponse()
-                                .name(reward.projectName())
-                                .logoUrl(reward.projectLogoUrl()))
+                                .name(reward.project().name())
+                                .logoUrl(reward.project().logoUrl()))
                         .sponsors(reward.sponsors().stream().map(sponsor ->
                                 new SponsorLinkResponse()
                                         .name(sponsor.name())
@@ -406,8 +406,8 @@ public interface BackOfficeMapper {
                 .toList();
     }
 
-    static List<MoneyLinkResponse> mapNetworkRewardTotals(final List<RewardView> rewards) {
-        final Map<String, List<RewardView>> rewardsPerCurrencyCode = rewards.stream().collect(groupingBy(r -> r.money().currencyCode()));
+    static List<MoneyLinkResponse> mapNetworkRewardTotals(final List<RewardDetailsView> rewards) {
+        final Map<String, List<RewardDetailsView>> rewardsPerCurrencyCode = rewards.stream().collect(groupingBy(r -> r.money().currencyCode()));
 
         return rewardsPerCurrencyCode.entrySet().stream()
                 .map(e -> {

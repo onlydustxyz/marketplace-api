@@ -9,8 +9,6 @@ import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStora
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.RewardView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.InvoiceRewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.RewardDetailsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BatchPaymentDetailsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.PayableRewardWithPayoutInfoViewEntity;
@@ -36,7 +34,6 @@ import java.util.*;
 public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewardStoragePort {
 
     private final ShortProjectViewEntityRepository shortProjectViewEntityRepository;
-    private final InvoiceRewardViewRepository invoiceRewardViewRepository;
     private final PayableRewardWithPayoutInfoViewRepository payableRewardWithPayoutInfoViewRepository;
     private final BatchPaymentRepository batchPaymentRepository;
     private final BatchPaymentDetailsViewRepository batchPaymentDetailsViewRepository;
@@ -69,22 +66,22 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
 
     @Override
     @Transactional(readOnly = true)
-    public List<RewardView> searchRewards(List<Invoice.Status> statuses, List<Invoice.Id> invoiceIds) {
-        return invoiceRewardViewRepository.findAllByInvoiceStatusesAndInvoiceIds(
+    public List<RewardDetailsView> searchRewards(List<Invoice.Status> statuses, List<Invoice.Id> invoiceIds) {
+        return rewardDetailsViewRepository.findAllByInvoiceStatusesAndInvoiceIds(
                         statuses != null ? statuses.stream().map(Invoice.Status::toString).toList() : null,
                         invoiceIds != null ? invoiceIds.stream().map(Invoice.Id::value).toList() : null
                 )
                 .stream()
-                .map(InvoiceRewardViewEntity::toDomain)
+                .map(RewardDetailsViewEntity::toDomain)
                 .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<RewardView> getInvoiceRewards(@NonNull Invoice.Id invoiceId) {
-        return invoiceRewardViewRepository.findAllByInvoiceId(invoiceId.value())
+    public List<RewardDetailsView> getInvoiceRewards(@NonNull Invoice.Id invoiceId) {
+        return rewardDetailsViewRepository.findAllByInvoiceId(invoiceId.value())
                 .stream()
-                .map(InvoiceRewardViewEntity::toDomain)
+                .map(RewardDetailsViewEntity::toDomain)
                 .toList();
     }
 
@@ -135,8 +132,8 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
                 .map(batchPaymentDetailsView ->
                         BatchPaymentDetailsView.builder()
                                 .batchPayment(batchPaymentDetailsView.toDomain())
-                                .rewardViews(invoiceRewardViewRepository.findAllByRewardIds(batchPaymentDetailsView.getRewardIds()).stream()
-                                        .map(InvoiceRewardViewEntity::toDomain)
+                                .rewardViews(rewardDetailsViewRepository.findAllByRewardIds(batchPaymentDetailsView.getRewardIds()).stream()
+                                        .map(RewardDetailsViewEntity::toDomain)
                                         .toList())
                                 .build()
                 );
@@ -163,8 +160,8 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
 
     @Override
     @Transactional(readOnly = true)
-    public List<RewardView> findPaidRewardsToNotify() {
-        return invoiceRewardViewRepository.findPaidRewardsToNotify().stream().map(InvoiceRewardViewEntity::toDomain).toList();
+    public List<RewardDetailsView> findPaidRewardsToNotify() {
+        return rewardDetailsViewRepository.findPaidRewardsToNotify().stream().map(RewardDetailsViewEntity::toDomain).toList();
     }
 
     @Override

@@ -12,7 +12,6 @@ import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BatchPaymentMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
@@ -219,7 +218,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     public ResponseEntity<SearchRewardsResponse> searchRewards(SearchRewardsRequest searchRewardsRequest) {
         final var invoiceIds = searchRewardsRequest.getInvoiceIds() != null ?
                 searchRewardsRequest.getInvoiceIds().stream().map(Invoice.Id::of).toList() : null;
-        final List<RewardView> rewardViews = accountingRewardPort.searchForBatchPaymentByInvoiceIds(invoiceIds);
+        final List<RewardDetailsView> rewardViews = accountingRewardPort.searchForBatchPaymentByInvoiceIds(invoiceIds);
         return ResponseEntity.ok(SearchRewardMapper.searchRewardToResponse(rewardViews));
     }
 
