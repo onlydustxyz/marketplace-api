@@ -14,7 +14,6 @@ import javax.persistence.*;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -58,6 +57,9 @@ public class BillingProfileEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "billingProfile")
     Set<WalletEntity> wallets;
 
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "billingProfile")
+    PayoutInfoEntity payoutInfo;
+
     @CreationTimestamp
     @Column(name = "tech_created_at", nullable = false, updatable = false)
     @EqualsAndHashCode.Exclude
@@ -66,10 +68,6 @@ public class BillingProfileEntity {
     @Column(name = "tech_updated_at", nullable = false)
     @EqualsAndHashCode.Exclude
     private Date updatedAt;
-
-    public Optional<BankAccountEntity> getBankAccount() {
-        return Optional.ofNullable(bankAccount);
-    }
 
     public ZonedDateTime getInvoiceMandateAcceptedAt() {
         return isNull(invoiceMandateAcceptedAt) ? null : new Date(invoiceMandateAcceptedAt.getTime()).toInstant().atZone(ZoneOffset.UTC);

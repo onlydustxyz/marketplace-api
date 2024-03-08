@@ -10,9 +10,11 @@ import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutIn
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.InvoiceRewardViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.RewardDetailsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BatchPaymentDetailsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.PayableRewardWithPayoutInfoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
@@ -23,6 +25,8 @@ import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.output.RewardStoragePort;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -36,6 +40,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     private final BatchPaymentRepository batchPaymentRepository;
     private final BatchPaymentDetailsViewRepository batchPaymentDetailsViewRepository;
     private final RewardViewRepository rewardViewRepository;
+    private final RewardDetailsViewRepository rewardDetailsViewRepository;
 
     @Override
     public void save(Reward reward) {
@@ -141,19 +146,17 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
                                                @NonNull Set<RewardDetailsView.Status> statuses,
                                                Date fromRequestedAt, Date toRequestedAt,
                                                Date fromProcessedAt, Date toProcessedAt) {
-        //TODO
-//        final var page = rewardViewRepository.findAllByStatusesAndDates(
-//                statuses.stream().map(RewardDetailsView.Status::toString).toList(),
-//                fromRequestedAt, toRequestedAt,
-//                fromProcessedAt, toProcessedAt,
-//                PageRequest.of(pageIndex, pageSize, Sort.by("requested_at").descending())
-//        );
-//
-//        return Page.<RewardDetailsView>builder()
-//                .content(page.getContent().stream().map(RewardDetailsViewEntity::toDomain).toList())
-//                .totalItemNumber((int) page.getTotalElements())
-//                .totalPageNumber(page.getTotalPages())
-//                .build();
-        return null;
+        final var page = rewardDetailsViewRepository.findAllByStatusesAndDates(
+                statuses.stream().map(RewardStatusEntity.Status::from).map(RewardStatusEntity.Status::toString).toList(),
+                fromRequestedAt, toRequestedAt,
+                fromProcessedAt, toProcessedAt,
+                PageRequest.of(pageIndex, pageSize, Sort.by("requested_at").descending())
+        );
+
+        return Page.<RewardDetailsView>builder()
+                .content(page.getContent().stream().map(RewardDetailsViewEntity::toDomain).toList())
+                .totalItemNumber((int) page.getTotalElements())
+                .totalPageNumber(page.getTotalPages())
+                .build();
     }
 }

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -33,6 +33,7 @@ public class InvoiceEntity {
     @NonNull UUID id;
     @NonNull UUID billingProfileId;
     @NonNull String number;
+    @NonNull UUID createdBy;
     @NonNull ZonedDateTime createdAt;
     @Enumerated(EnumType.STRING)
     @Type(type = "invoice_status")
@@ -42,23 +43,21 @@ public class InvoiceEntity {
     @NonNull CurrencyEntity currency;
     URL url;
     String originalFileName;
-    @Type(type = "jsonb")
-    Data data;
     String rejectionReason;
+
+    @Type(type = "jsonb")
+    @Deprecated
+    Data data;
 
     public Invoice toDomain() {
         return new Invoice(
                 Invoice.Id.of(id),
-                BillingProfile.Id.of(billingProfileId),
+                data.billingProfileSnapshot(),
+                UserId.of(createdBy),
                 createdAt,
                 data.dueAt,
                 Invoice.Number.fromString(number),
                 status.toDomain(),
-                data.taxRate,
-                data.personalInfo,
-                data.companyInfo,
-                data.bankAccount,
-                data.wallets,
                 data.rewards.stream().map(InvoiceRewardEntity::forInvoice).toList(),
                 url,
                 originalFileName,
@@ -68,8 +67,9 @@ public class InvoiceEntity {
 
     public void updateWith(Invoice invoice) {
         this
-                .billingProfileId(invoice.billingProfileId().value())
+                .billingProfileId(invoice.billingProfileSnapshot().id().value())
                 .number(invoice.number().toString())
+                .createdBy(invoice.createdBy().value())
                 .createdAt(invoice.createdAt())
                 .status(Status.of(invoice.status()))
                 .url(invoice.url())
@@ -106,10 +106,7 @@ public class InvoiceEntity {
 
     public record Data(@NonNull ZonedDateTime dueAt,
                        @NonNull BigDecimal taxRate,
-                       Invoice.PersonalInfo personalInfo,
-                       Invoice.CompanyInfo companyInfo,
-                       Invoice.BankAccount bankAccount,
-                       @NonNull List<Invoice.Wallet> wallets,
+                       Invoice.BillingProfileSnapshot billingProfileSnapshot,
                        List<InvoiceRewardEntity> rewards
     ) implements Serializable {
 
@@ -117,10 +114,7 @@ public class InvoiceEntity {
             return new Data(
                     invoice.dueAt(),
                     invoice.taxRate(),
-                    invoice.personalInfo().orElse(null),
-                    invoice.companyInfo().orElse(null),
-                    invoice.bankAccount().orElse(null),
-                    invoice.wallets(),
+                    invoice.billingProfileSnapshot(),
                     invoice.rewards().stream().map(InvoiceRewardEntity::of).toList()
             );
         }

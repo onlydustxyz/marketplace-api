@@ -83,7 +83,7 @@ public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicing
     public ResponseEntity<InvoiceResponse> getInvoice(UUID invoiceId) {
         final var invoice = invoiceFacadePort.find(Invoice.Id.of(invoiceId))
                 .orElseThrow(() -> notFound("Invoice %s not found".formatted(invoiceId)));
-        final var billingProfileAdmins = billingProfileFacadePort.getCoworkers(invoice.billingProfileId(), Set.of(BillingProfile.User.Role.ADMIN));
+        final var billingProfileAdmins = billingProfileFacadePort.getCoworkers(invoice.billingProfileSnapshot().id(), Set.of(BillingProfile.User.Role.ADMIN));
         final var rewards = accountingRewardPort.findByInvoiceId(Invoice.Id.of(invoiceId));
 
         final var response = mapInvoiceToContract(invoice, billingProfileAdmins, rewards);
@@ -102,7 +102,8 @@ public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicing
 
     @Override
     public ResponseEntity<Void> updateInvoiceStatus(UUID invoiceId, UpdateInvoiceStatusRequest updateInvoiceStatusRequest) {
-        invoiceFacadePort.update(Invoice.Id.of(invoiceId), mapInvoiceStatus(updateInvoiceStatusRequest.getStatus()), updateInvoiceStatusRequest.getRejectionReason());
+        invoiceFacadePort.update(Invoice.Id.of(invoiceId), mapInvoiceStatus(updateInvoiceStatusRequest.getStatus()),
+                updateInvoiceStatusRequest.getRejectionReason());
         return ResponseEntity.noContent().build();
     }
 }

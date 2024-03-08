@@ -12,7 +12,6 @@ import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileAdminView;
 import onlydust.com.marketplace.accounting.domain.view.ShortSponsorView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -42,20 +41,15 @@ public class InvoiceRewardViewEntity {
     String projectName;
     String projectLogoUrl;
     ZonedDateTime processedAt;
-    String recipientLogin;
-    String recipientAvatarUrl;
-    String recipientName;
-    String recipientEmail;
     BigDecimal dollarsEquivalent;
     BigDecimal amount;
-    @Enumerated(EnumType.STRING)
-    @Type(type = "currency")
-    CurrencyEnumEntity currency;
     @Type(type = "billing_profile_type")
     @Enumerated(EnumType.STRING)
     BillingProfileEntity.Type billingProfileType;
     String billingProfileName;
     UUID billingProfileId;
+    @Type(type = "jsonb")
+    ShortBillingProfileAdminView.Admin invoiceCreator;
     @Type(type = "jsonb")
     List<SponsorLinkView> sponsors;
     @Type(type = "jsonb")
@@ -63,7 +57,8 @@ public class InvoiceRewardViewEntity {
     String currencyName;
     String currencyCode;
     String currencyLogoUrl;
-    String transactionHash;
+    @Type(type = "jsonb")
+    List<String> transactionReferences;
 
     @Data
     public static class SponsorLinkView {
@@ -87,10 +82,7 @@ public class InvoiceRewardViewEntity {
                 .projectName(this.projectName)
                 .projectLogoUrl(this.projectLogoUrl)
                 .billingProfileAdmin(ShortBillingProfileAdminView.builder()
-                        .adminGithubLogin(this.recipientLogin)
-                        .adminEmail(this.recipientEmail)
-                        .adminName(this.recipientName)
-                        .adminGithubAvatarUrl(this.recipientAvatarUrl)
+                        .admins(List.of(invoiceCreator))
                         .billingProfileId(BillingProfile.Id.of(this.billingProfileId))
                         .billingProfileName(this.billingProfileName)
                         .billingProfileType(switch (this.billingProfileType) {
@@ -109,7 +101,7 @@ public class InvoiceRewardViewEntity {
                         .currencyCode(this.currencyCode)
                         .currencyLogoUrl(this.currencyLogoUrl)
                         .build())
-                .transactionHash(this.transactionHash)
+                .transactionReferences(isNull(this.transactionReferences) ? List.of() : this.transactionReferences)
                 .build();
     }
 }

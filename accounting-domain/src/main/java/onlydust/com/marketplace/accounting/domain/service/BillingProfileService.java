@@ -72,26 +72,30 @@ public class BillingProfileService implements BillingProfileFacadePort {
     @Override
     @Transactional
     public Invoice previewInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull List<RewardId> rewardIds) {
-        if (!billingProfileStoragePort.isAdmin(billingProfileId,userId))
+        if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
             throw unauthorized("User is not allowed to generate invoice for this billing profile");
 
-        invoiceStoragePort.deleteDraftsOf(billingProfileId);
-
-        final var invoice = invoiceStoragePort.preview(billingProfileId, rewardIds);
-
-        if (invoice.rewards().stream().map(Invoice.Reward::invoiceId).filter(Objects::nonNull)
-                .anyMatch(i -> invoiceStoragePort.get(i).orElseThrow().status().isActive()))
+        final var rewards = invoiceStoragePort.findRewards(rewardIds);
+        if (rewards.stream().map(Invoice.Reward::invoiceId).filter(Objects::nonNull)
+                .anyMatch(i -> invoiceStoragePort.get(i).orElseThrow().status().isActive())) {
             throw badRequest("Some rewards are already invoiced");
+        }
 
+        final var billingProfile = billingProfileStoragePort.findById(billingProfileId)
+                .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
+
+        final int sequenceNumber = invoiceStoragePort.getNextSequenceNumber(billingProfileId);
+        final var invoice = Invoice.of(billingProfile, sequenceNumber, userId).rewards(rewards);
+
+        invoiceStoragePort.deleteDraftsOf(billingProfileId);
         invoiceStoragePort.create(invoice);
-
         return invoice;
     }
 
     @Override
     public Page<Invoice> invoicesOf(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull Integer pageNumber,
                                     final @NonNull Integer pageSize, final @NonNull Invoice.Sort sort, final @NonNull SortDirection direction) {
-        if (!billingProfileStoragePort.isAdmin(billingProfileId,userId))
+        if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
             throw unauthorized("User is not allowed to view invoices for this billing profile");
 
         return invoiceStoragePort.invoicesOf(billingProfileId, pageNumber, pageSize, sort, direction);
@@ -127,11 +131,11 @@ public class BillingProfileService implements BillingProfileFacadePort {
     private void uploadInvoice(@NonNull UserId userId, BillingProfile.@NonNull Id billingProfileId, Invoice.@NonNull Id invoiceId, String fileName,
                                @NonNull Invoice.Status status,
                                @NonNull InputStream data) {
-        if (!billingProfileStoragePort.isAdmin(billingProfileId,userId))
+        if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
             throw unauthorized("User is not allowed to upload an invoice for this billing profile");
 
         final var invoice = invoiceStoragePort.get(invoiceId)
-                .filter(i -> i.billingProfileId().equals(billingProfileId))
+                .filter(i -> i.billingProfileSnapshot().id().equals(billingProfileId))
                 .orElseThrow(() -> notFound("Invoice %s not found for billing profile %s".formatted(invoiceId, billingProfileId)));
 
         final var url = pdfStoragePort.upload(invoice.internalFileName(), data);
@@ -149,11 +153,11 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
     @Override
     public @NonNull InvoiceDownload downloadInvoice(@NonNull UserId userId, BillingProfile.@NonNull Id billingProfileId, Invoice.@NonNull Id invoiceId) {
-        if (!billingProfileStoragePort.isAdmin(billingProfileId,userId))
+        if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
             throw unauthorized("User %s is not allowed to download invoice %s of billing profile %s".formatted(userId, invoiceId, billingProfileId));
 
         final var invoice = invoiceStoragePort.get(invoiceId)
-                .filter(i -> i.billingProfileId().equals(billingProfileId))
+                .filter(i -> i.billingProfileSnapshot().id().equals(billingProfileId))
                 .orElseThrow(() -> notFound(("Invoice %s not found for billing profile %s").formatted(invoiceId, billingProfileId)));
 
         final var pdf = pdfStoragePort.download(invoice.internalFileName());
@@ -162,7 +166,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
     @Override
     public void updateInvoiceMandateAcceptanceDate(UserId userId, BillingProfile.Id billingProfileId) {
-        if (!billingProfileStoragePort.isAdmin(billingProfileId,userId))
+        if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
             throw unauthorized("User %s is not allowed to accept invoice mandate for billing profile %s".formatted(userId, billingProfileId));
 
         billingProfileStoragePort.updateInvoiceMandateAcceptanceDate(billingProfileId, ZonedDateTime.now());

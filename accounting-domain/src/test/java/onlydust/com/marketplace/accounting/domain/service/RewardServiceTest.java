@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.OldRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
@@ -54,7 +55,7 @@ public class RewardServiceTest {
                         .currencyLogoUrl("https://stark.logo")
                         .currencyName("strk")
                         .build())
-                .wallet(new Invoice.Wallet(Network.STARKNET, faker.internet().macAddress()))
+                .wallet(new Wallet(Network.STARKNET, faker.internet().macAddress()))
                 .build();
         final PayableRewardWithPayoutInfoView strk2 = PayableRewardWithPayoutInfoView.builder()
                 .id(UUID.randomUUID())
@@ -65,7 +66,7 @@ public class RewardServiceTest {
                         .currencyLogoUrl("https://stark.logo")
                         .currencyName("strk")
                         .build())
-                .wallet(new Invoice.Wallet(Network.STARKNET, faker.internet().macAddress()))
+                .wallet(new Wallet(Network.STARKNET, faker.internet().macAddress()))
                 .build();
         final PayableRewardWithPayoutInfoView eth = PayableRewardWithPayoutInfoView.builder()
                 .id(UUID.randomUUID())
@@ -76,7 +77,7 @@ public class RewardServiceTest {
                         .currencyLogoUrl("https://eth.logo")
                         .currencyName("eth")
                         .build())
-                .wallet(new Invoice.Wallet(Network.ETHEREUM, faker.internet().macAddress()))
+                .wallet(new Wallet(Network.ETHEREUM, faker.internet().macAddress()))
                 .build();
         final PayableRewardWithPayoutInfoView lords = PayableRewardWithPayoutInfoView.builder()
                 .id(UUID.randomUUID())
@@ -87,7 +88,7 @@ public class RewardServiceTest {
                         .currencyLogoUrl("https://lords.logo")
                         .currencyName("op")
                         .build())
-                .wallet(new Invoice.Wallet(Network.ETHEREUM, faker.internet().macAddress()))
+                .wallet(new Wallet(Network.ETHEREUM, faker.internet().macAddress()))
                 .build();
         final PayableRewardWithPayoutInfoView usdc1 = PayableRewardWithPayoutInfoView.builder()
                 .id(UUID.randomUUID())
@@ -98,7 +99,7 @@ public class RewardServiceTest {
                         .currencyLogoUrl("https://usdc.logo")
                         .currencyName("usdc")
                         .build())
-                .wallet(new Invoice.Wallet(Network.ETHEREUM, faker.internet().macAddress()))
+                .wallet(new Wallet(Network.ETHEREUM, faker.internet().macAddress()))
                 .build();
         final PayableRewardWithPayoutInfoView usdc2 = PayableRewardWithPayoutInfoView.builder()
                 .id(UUID.randomUUID())
@@ -109,7 +110,7 @@ public class RewardServiceTest {
                         .currencyLogoUrl("https://usdc.logo")
                         .currencyName("usdc")
                         .build())
-                .wallet(new Invoice.Wallet(Network.ETHEREUM, faker.internet().macAddress()))
+                .wallet(new Wallet(Network.ETHEREUM, faker.internet().macAddress()))
                 .build();
         when(accountingRewardStoragePort.findPayableRewardsWithPayoutInfoForInvoices(invoiceIds))
                 .thenReturn(List.of(
@@ -318,14 +319,16 @@ public class RewardServiceTest {
                         RewardView.builder()
                                 .id(UUID.randomUUID())
                                 .billingProfileAdmin(ShortBillingProfileAdminView.builder()
-                                        .adminEmail(faker.gameOfThrones().character())
+                                        .admins(List.of(
+                                                new ShortBillingProfileAdminView.Admin(faker.name().username(),
+                                                        faker.internet().avatar(),
+                                                        faker.internet().emailAddress(),
+                                                        faker.name().firstName(),
+                                                        faker.name().lastName())
+                                        ))
                                         .billingProfileName(faker.gameOfThrones().character())
-                                        .adminGithubLogin(faker.gameOfThrones().character())
-                                        .adminName(faker.gameOfThrones().character())
-                                        .adminEmail(faker.gameOfThrones().character())
                                         .billingProfileType(BillingProfile.Type.COMPANY)
                                         .billingProfileId(BillingProfile.Id.random())
-                                        .adminGithubAvatarUrl(faker.rickAndMorty().character())
                                         .build())
                                 .requestedAt(ZonedDateTime.now())
                                 .githubUrls(List.of())
@@ -337,24 +340,27 @@ public class RewardServiceTest {
                                         .currencyCode(Currency.Code.USDC_STR)
                                         .currencyName(faker.rickAndMorty().location())
                                         .build())
+                                .transactionReferences(List.of(faker.random().hex()))
                                 .build(),
                         RewardView.builder()
                                 .id(UUID.randomUUID())
                                 .billingProfileAdmin(ShortBillingProfileAdminView.builder()
-                                        .adminEmail(faker.gameOfThrones().character())
+                                        .admins(List.of(
+                                                new ShortBillingProfileAdminView.Admin(faker.name().username(),
+                                                        faker.internet().avatar(),
+                                                        faker.internet().emailAddress(),
+                                                        faker.name().firstName(),
+                                                        faker.name().lastName())
+                                        ))
                                         .billingProfileName(faker.gameOfThrones().character())
-                                        .adminGithubLogin(faker.gameOfThrones().character())
-                                        .adminName(faker.gameOfThrones().character())
-                                        .adminEmail(faker.gameOfThrones().character())
                                         .billingProfileType(BillingProfile.Type.COMPANY)
                                         .billingProfileId(BillingProfile.Id.random())
-                                        .adminGithubAvatarUrl(faker.rickAndMorty().character())
                                         .build())
                                 .requestedAt(ZonedDateTime.now())
                                 .githubUrls(List.of())
                                 .sponsors(List.of())
                                 .projectName(faker.rickAndMorty().character())
-                                .transactionHash(faker.random().hex())
+                                .transactionReferences(List.of(faker.random().hex()))
                                 .money(MoneyView.builder()
                                         .amount(BigDecimal.ONE)
                                         .currencyCode(Currency.Code.USDC_STR)
@@ -375,14 +381,16 @@ public class RewardServiceTest {
         return RewardView.builder()
                 .id(UUID.randomUUID())
                 .billingProfileAdmin(ShortBillingProfileAdminView.builder()
-                        .adminEmail(faker.gameOfThrones().character())
+                        .admins(List.of(
+                                new ShortBillingProfileAdminView.Admin(faker.name().username(),
+                                        faker.internet().avatar(),
+                                        faker.internet().emailAddress(),
+                                        faker.name().firstName(),
+                                        faker.name().lastName())
+                        ))
                         .billingProfileName(faker.gameOfThrones().character())
-                        .adminGithubLogin(faker.gameOfThrones().character())
-                        .adminName(faker.gameOfThrones().character())
-                        .adminEmail(faker.gameOfThrones().character())
                         .billingProfileType(BillingProfile.Type.COMPANY)
                         .billingProfileId(BillingProfile.Id.random())
-                        .adminGithubAvatarUrl(faker.rickAndMorty().character())
                         .build())
                 .requestedAt(ZonedDateTime.now())
                 .githubUrls(List.of())
@@ -393,6 +401,7 @@ public class RewardServiceTest {
                         .currencyCode(currencyCode)
                         .currencyName(faker.rickAndMorty().location())
                         .build())
+                .transactionReferences(List.of())
                 .build();
     }
 }

@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmAccountAddress;
-import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Wallet;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetAccountAddress;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class UserPayoutSettings {
     public boolean hasValidPayoutSettings() {
         return nonNull(this) && pendingPaymentsCurrencies.stream().allMatch(currency -> switch (currency) {
             case USD -> nonNull(this.sepaAccount) && this.sepaAccount.valid();
-            case ETH, LORDS, USDC -> nonNull(this.ethWallet);
+            case ETH, LORDS, USDC -> nonNull(this.ethWalletLocator);
             case APT -> nonNull(this.aptosAddress);
             case OP -> nonNull(this.optimismAddress);
             case STRK -> nonNull(this.starknetAddress);
@@ -50,7 +50,7 @@ public class UserPayoutSettings {
         return (pendingPaymentsCurrencies.contains(Currency.ETH)
                 || pendingPaymentsCurrencies.contains(Currency.LORDS)
                 || pendingPaymentsCurrencies.contains(Currency.USDC))
-               && isNull(this.ethWallet);
+               && isNull(this.ethWalletLocator);
     }
 
     public boolean isMissingSepaAccount() {
@@ -66,7 +66,7 @@ public class UserPayoutSettings {
     }
 
 
-    Wallet ethWallet;
+    WalletLocator ethWalletLocator;
     EvmAccountAddress optimismAddress;
     AptosAccountAddress aptosAddress;
     StarknetAccountAddress starknetAddress;

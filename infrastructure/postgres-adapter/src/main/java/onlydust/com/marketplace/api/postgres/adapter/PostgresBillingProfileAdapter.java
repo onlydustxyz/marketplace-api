@@ -2,13 +2,11 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileAdminView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
@@ -24,6 +22,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 import static java.time.ZonedDateTime.now;
+import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
@@ -137,6 +136,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                         .type(BillingProfile.Type.INDIVIDUAL)
                         .id(billingProfileId)
                         .name(billingProfileEntity.getName())
+                        .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
                         .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
                         .build();
                 final Optional<KycEntity> optionalKycEntity = kycRepository.findByBillingProfileId(billingProfileId.value());
@@ -153,6 +153,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                         .name(billingProfileEntity.getName())
                         .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                         .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
+                        .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
                         .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
                         .build();
                 final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
@@ -169,6 +170,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                         .name(billingProfileEntity.getName())
                         .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                         .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
+                        .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
                         .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
                         .build();
                 final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
@@ -313,10 +315,8 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<BillingProfileAdminView> findBillingProfileAdminForInvoice(Invoice.Id invoiceId) {
-//        return oldBillingProfileAdminViewRepository.findByInvoiceId(invoiceId.value())
-//                .map(OldBillingProfileAdminViewEntity::toDomain);
-        //TODO
-        return Optional.empty();
+    public Optional<BillingProfileCoworkerView> findBillingProfileAdmin(UserId userId, BillingProfile.Id billingProfileId) {
+        return billingProfileUserViewRepository.findBillingProfileAdminById(userId.value(), billingProfileId.value())
+                .map(BillingProfileUserViewEntity::toView);
     }
 }

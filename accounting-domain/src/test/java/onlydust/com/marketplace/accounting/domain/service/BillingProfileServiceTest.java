@@ -3,7 +3,6 @@ package onlydust.com.marketplace.accounting.domain.service;
 import com.github.javafaker.Faker;
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
@@ -16,6 +15,8 @@ import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
@@ -28,10 +29,15 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 import static onlydust.com.marketplace.accounting.domain.model.Invoice.Status.APPROVED;
 import static onlydust.com.marketplace.accounting.domain.model.Invoice.Status.TO_REVIEW;
+import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyb;
+import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyc;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,17 +53,30 @@ class BillingProfileServiceTest {
     final BillingProfileService billingProfileService = new BillingProfileService(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort,
             billingProfileObserver, indexerPort);
     final UserId userId = UserId.random();
-    final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
     final Currency ETH = Currencies.ETH;
     final Currency USD = Currencies.USD;
-    final List<Invoice.Reward> rewards = List.of(fakeReward(), fakeReward(), fakeReward());
-    final List<RewardId> rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
-    final Invoice invoice = Invoice.of(billingProfileId, 12,
-            new Invoice.PersonalInfo("John", "Doe", "12 rue de la paix, Paris", "FRA")).rewards(new ArrayList<>(rewards));
+    List<Invoice.Reward> rewards = List.of(fakeReward(), fakeReward(), fakeReward());
+    List<RewardId> rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
     final InputStream pdf = new ByteArrayInputStream(faker.lorem().paragraph().getBytes());
+    Invoice invoice;
+    BillingProfile.Id billingProfileId;
+    BillingProfileView companyBillingProfile;
+    PayoutInfo payoutInfo;
 
     @BeforeEach
     void setUp() {
+        payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
+        billingProfileId = BillingProfile.Id.random();
+        companyBillingProfile = BillingProfileView.builder()
+                .id(billingProfileId)
+                .type(BillingProfile.Type.COMPANY)
+                .payoutInfo(payoutInfo)
+                .verificationStatus(VerificationStatus.VERIFIED)
+                .name("OnlyDust")
+                .kyb(newKyb(billingProfileId, userId))
+                .build();
+        invoice = Invoice.of(companyBillingProfile, 1, userId)
+                .rewards(rewards);
         reset(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort, billingProfileObserver);
     }
 
@@ -76,7 +95,7 @@ class BillingProfileServiceTest {
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("User is not allowed to generate invoice for this billing profile");
 
-            verify(invoiceStoragePort, never()).preview(any(), any());
+            verify(invoiceStoragePort, never()).create(any());
         }
 
         @Test
@@ -90,7 +109,7 @@ class BillingProfileServiceTest {
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("User is not allowed to upload an invoice for this billing profile");
 
-            verify(invoiceStoragePort, never()).preview(any(), any());
+            verify(invoiceStoragePort, never()).create(any());
         }
 
         @Test
@@ -123,20 +142,24 @@ class BillingProfileServiceTest {
         @Test
         void should_generate_invoice_preview() {
             // Given
-            when(invoiceStoragePort.preview(billingProfileId, rewardIds)).thenReturn(invoice);
+            when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
+                    companyBillingProfile)
+            );
+            when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(1);
 
             // When
             final var preview = billingProfileService.previewInvoice(userId, billingProfileId, rewardIds);
 
             // Then
-            assertThat(preview).isEqualTo(invoice);
+            assertThat(preview).isEqualToIgnoringGivenFields(invoice, "id", "createdAt", "dueAt");
             verify(invoiceStoragePort).deleteDraftsOf(billingProfileId);
 
             final var invoiceCaptor = ArgumentCaptor.forClass(Invoice.class);
             verify(invoiceStoragePort).create(invoiceCaptor.capture());
             final var invoice = invoiceCaptor.getValue();
             assertThat(invoice.id()).isEqualTo(preview.id());
-            assertThat(invoice.billingProfileId()).isEqualTo(billingProfileId);
+            assertThat(invoice.billingProfileSnapshot().id()).isEqualTo(billingProfileId);
             assertThat(invoice.number()).isEqualTo(preview.number());
             assertThat(invoice.createdAt()).isEqualTo(preview.createdAt());
             assertThat(invoice.totalAfterTax()).isEqualTo(preview.totalAfterTax());
@@ -148,10 +171,24 @@ class BillingProfileServiceTest {
         void should_prevent_invoice_preview_if_rewards_are_already_invoiced() {
             // Given
             final var reward = fakeReward(Invoice.Id.random());
-            invoice.rewards().add(reward);
-            invoice.status(Invoice.Status.APPROVED);
-            when(invoiceStoragePort.preview(billingProfileId, rewardIds)).thenReturn(invoice);
+            rewards = List.of(fakeReward(), fakeReward(), reward, fakeReward());
+            rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
+
+            invoice = Invoice.of(companyBillingProfile, 1, userId)
+                    .rewards(rewards)
+                    .status(Invoice.Status.APPROVED);
             when(invoiceStoragePort.get(reward.invoiceId())).thenReturn(Optional.of(invoice));
+
+            when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
+                    BillingProfileView.builder()
+                            .id(billingProfileId)
+                            .type(BillingProfile.Type.INDIVIDUAL)
+                            .kyc(newKyc(billingProfileId, userId))
+                            .payoutInfo(payoutInfo)
+                            .build())
+            );
+            when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(42);
 
             // When
             assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))
@@ -218,7 +255,7 @@ class BillingProfileServiceTest {
             assertThat(invoices.getTotalPageNumber()).isEqualTo(1);
             assertThat(invoices.getContent()).hasSize(1);
             assertThat(invoices.getContent().get(0).id()).isEqualTo(invoice.id());
-            assertThat(invoices.getContent().get(0).billingProfileId()).isEqualTo(billingProfileId);
+            assertThat(invoices.getContent().get(0).billingProfileSnapshot().id()).isEqualTo(billingProfileId);
         }
 
         @Test

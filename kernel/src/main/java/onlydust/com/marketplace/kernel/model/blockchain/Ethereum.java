@@ -7,7 +7,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmContractAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmTransactionHash;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.EtherScan;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
-import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Wallet;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 
 public interface Ethereum {
     BlockExplorer<EvmTransactionHash> BLOCK_EXPLORER = new EtherScan();
@@ -24,12 +24,12 @@ public interface Ethereum {
         return new Name(value);
     }
 
-    static Wallet wallet(String wallet) {
+    static WalletLocator wallet(String wallet) {
         // TODO implement proper ENS check with Infura
         try {
-            return new Wallet(accountAddress(wallet));
+            return new WalletLocator(accountAddress(wallet));
         } catch (OnlyDustException e) {
-            return new Wallet(name(wallet));
+            return new WalletLocator(name(wallet));
         }
     }
 

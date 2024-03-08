@@ -237,9 +237,10 @@ public class PostgresConfiguration {
                                                        final PayableRewardWithPayoutInfoViewRepository payableRewardWithPayoutInfoViewRepository,
                                                        final BatchPaymentRepository batchPaymentRepository,
                                                        final BatchPaymentDetailsViewRepository batchPaymentDetailsViewRepository,
-                                                       final RewardViewRepository rewardViewRepository) {
+                                                       final RewardViewRepository rewardViewRepository,
+                                                       final RewardDetailsViewRepository rewardDetailsViewRepository) {
         return new PostgresRewardAdapter(shortProjectViewEntityRepository, invoiceRewardViewRepository, payableRewardWithPayoutInfoViewRepository,
-                batchPaymentRepository, batchPaymentDetailsViewRepository, rewardViewRepository);
+                batchPaymentRepository, batchPaymentDetailsViewRepository, rewardViewRepository, rewardDetailsViewRepository);
     }
 
     @Bean
@@ -340,11 +341,10 @@ public class PostgresConfiguration {
 
     @Bean
     InvoiceStoragePort invoicePreviewStoragePort(
-            final @NonNull BillingProfileRepository billingProfileRepository,
             final @NonNull InvoiceRewardRepository invoiceRewardRepository,
             final @NonNull InvoiceRepository invoiceRepository,
             final @NonNull RewardRepository rewardRepository) {
-        return new PostgresInvoiceStorage(billingProfileRepository, invoiceRewardRepository,
+        return new PostgresInvoiceStorage(invoiceRewardRepository,
                 invoiceRepository, rewardRepository);
     }
 

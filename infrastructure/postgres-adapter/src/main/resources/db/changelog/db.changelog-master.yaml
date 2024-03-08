@@ -155,3 +155,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000072_migrating_billing_profiles_to_accounting.sql
   - include:
       file: db/changelog/changelogs/00000073_add_payment_receipts.sql
+  - include:
+      file: db/changelog/changelogs/00000100_invoice_data_v2.sql

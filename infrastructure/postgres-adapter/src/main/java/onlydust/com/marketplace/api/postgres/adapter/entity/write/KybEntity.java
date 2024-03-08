@@ -4,7 +4,6 @@ import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Country;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
@@ -97,20 +96,5 @@ public class KybEntity {
                 .applicantId(kyb.getExternalApplicantId())
                 .ownerId(kyb.getOwnerId().value())
                 .build();
-    }
-
-    public Invoice.CompanyInfo forInvoice() {
-        final var country = Country.fromIso3(this.country);
-
-        return new Invoice.CompanyInfo(
-                registrationNumber,
-                name,
-                address,
-                country.iso3Code(),
-                subjectToEuVAT,
-                country.inEuropeanUnion(),
-                country.isFrance(),
-                euVATNumber
-        );
     }
 }

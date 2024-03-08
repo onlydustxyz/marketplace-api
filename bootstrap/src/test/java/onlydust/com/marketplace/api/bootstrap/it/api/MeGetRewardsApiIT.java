@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
-import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
@@ -16,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import java.util.Map;
+import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
@@ -32,7 +32,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     void setup() {
         pierre = userAuthHelper.authenticatePierre();
 
-        patchBillingProfile("20282367-56b0-42d3-81d3-5e4b38f67e3e", BillingProfileEntity.Type.COMPANY, VerificationStatusEntity.VERIFIED);
+        patchBillingProfile(UUID.fromString("20282367-56b0-42d3-81d3-5e4b38f67e3e"), BillingProfileEntity.Type.COMPANY, VerificationStatusEntity.VERIFIED);
 
         patchReward("40fda3c6-2a3f-4cdd-ba12-0499dd232d53", 10, "ETH", 15000, null, "2023-07-12");
         patchReward("e1498a17-5090-4071-a88a-6f0b0c337c3a", 50, "ETH", 75000, null, "2023-08-12");

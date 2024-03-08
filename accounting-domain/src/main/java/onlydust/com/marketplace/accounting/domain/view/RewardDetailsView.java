@@ -20,8 +20,8 @@ public record RewardDetailsView(
         ShortBillingProfileAdminView billingProfileAdmin,
         ShortContributorView recipient,
         ShortInvoiceView invoice,
-        String transactionHash,
-        String paidTo
+        @NonNull List<String> transactionReferences,
+        @NonNull List<String> paidToAccountNumbers
 ) {
 
     public enum Status {

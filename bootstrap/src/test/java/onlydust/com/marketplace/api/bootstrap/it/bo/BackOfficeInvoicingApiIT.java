@@ -3,15 +3,23 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
 import onlydust.com.marketplace.api.webhook.Config;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import onlydust.com.marketplace.project.domain.service.UserService;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -50,11 +58,16 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     Config webhookHttpClientProperties;
     @Autowired
     InvoiceStoragePort invoiceStoragePort;
+    @Autowired
+    KycRepository kycRepository;
+    @Autowired
+    KybRepository kybRepository;
     private final Faker faker = new Faker();
 
     UserId userId;
-    BillingProfile.Id companyBillingProfileId;
-    BillingProfile.Id individualBillingProfileId;
+    CompanyBillingProfile companyBillingProfile;
+    SelfEmployedBillingProfile selfEmployedBillingProfile;
+    IndividualBillingProfile individualBillingProfile;
 
     static final List<Invoice.Id> companyBillingProfileToReviewInvoices = new ArrayList<>();
 
@@ -63,57 +76,65 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
         final UserAuthHelper.AuthenticatedUser olivier = userAuthHelper.authenticateOlivier();
         userId = UserId.of(olivier.user().getId());
 
-        //TODO
-//        companyBillingProfile = userService.getCompanyBillingProfile(userId.value());
-//        postgresOldBillingProfileAdapter.saveCompanyProfile(companyBillingProfile.toBuilder()
-//                .name("Mr. Needful")
-//                .userId(userId.value())
-//                .address(faker.address().fullAddress())
-//                .euVATNumber("111")
-//                .subjectToEuropeVAT(false)
-//                .oldCountry(OldCountry.fromIso3("FRA"))
-//                .usEntity(false)
-//                .status(OldVerificationStatus.VERIFIED)
-//                .build()
-//        );
-//        companyBillingProfileId = BillingProfile.Id.of(companyBillingProfile.getId());
-//
-//        individualBillingProfile = userService.getIndividualBillingProfile(userId.value());
-//        postgresOldBillingProfileAdapter.saveIndividualProfile(individualBillingProfile.toBuilder()
-//                .firstName("Olivier")
-//                .lastName("Fu")
-//                .userId(userId.value())
-//                .address(faker.address().fullAddress())
-//                .oldCountry(OldCountry.fromIso3("FRA"))
-//                .usCitizen(false)
-//                .idDocumentType(OldIndividualBillingProfile.OldIdDocumentTypeEnum.PASSPORT)
-//                .idDocumentNumber(faker.idNumber().valid())
-//                .idDocumentCountryCode("FRA")
-//                .validUntil(Date.from(ZonedDateTime.now().plusYears(10).toInstant()))
-//                .status(OldVerificationStatus.VERIFIED)
-//                .build()
-//        );
-//        individualBillingProfileId = BillingProfile.Id.of(individualBillingProfile.getId());
-//
-//        // Select COMPANY as active billing profile
-//        userService.updateBillingProfileType(userId.value(), OldBillingProfileType.COMPANY);
+        companyBillingProfile = billingProfileService.createCompanyBillingProfile(userId, "Apple Inc.", null);
+        billingProfileService.updatePayoutInfo(companyBillingProfile.id(), userId,
+                PayoutInfo.builder().ethWallet(new WalletLocator(new Name(userId + ".eth"))).build());
 
+        selfEmployedBillingProfile = billingProfileService.createSelfEmployedBillingProfile(userId, "Olivier SASU", null);
+        billingProfileService.updatePayoutInfo(selfEmployedBillingProfile.id(), userId,
+                PayoutInfo.builder().ethWallet(new WalletLocator(new Name(userId + ".eth"))).build());
+
+        individualBillingProfile = billingProfileService.createIndividualBillingProfile(userId, "Olivier", null);
+        billingProfileService.updatePayoutInfo(individualBillingProfile.id(), userId,
+                PayoutInfo.builder().ethWallet(new WalletLocator(new Name(userId + ".eth"))).build());
+
+        kybRepository.findByBillingProfileId(companyBillingProfile.id().value())
+                .ifPresent(kyb -> kybRepository.save(kyb.toBuilder()
+                        .country("FRA")
+                        .address("1 Infinite Loop, Cupertino, CA 95014, United States")
+                        .euVATNumber("FR12345678901")
+                        .name("Apple Inc.")
+                        .registrationDate(faker.date().birthday())
+                        .registrationNumber("123456789")
+                        .usEntity(false)
+                        .subjectToEuVAT(true)
+                        .verificationStatus(VerificationStatusEntity.VERIFIED).build()));
+        kybRepository.findByBillingProfileId(selfEmployedBillingProfile.id().value())
+                .ifPresent(kyb -> kybRepository.save(kyb.toBuilder()
+                        .country("FRA")
+                        .address("2 Infinite Loop, Cupertino, CA 95014, United States")
+                        .euVATNumber("FR0987654321")
+                        .name("Olivier SASU")
+                        .registrationDate(faker.date().birthday())
+                        .registrationNumber("ABC123456789")
+                        .usEntity(false)
+                        .subjectToEuVAT(true)
+                        .verificationStatus(VerificationStatusEntity.VERIFIED).build()));
+        kycRepository.findByBillingProfileId(individualBillingProfile.id().value())
+                .ifPresent(kyc -> kycRepository.save(kyc.toBuilder()
+                        .country("FRA")
+                        .address("3 Infinite Loop, Cupertino, CA 95014, United States")
+                        .firstName("Olivier")
+                        .lastName("Fuxet")
+                        .birthdate(faker.date().birthday())
+                        .usCitizen(false)
+                        .verificationStatus(VerificationStatusEntity.VERIFIED).build()));
 
         // Given
-        newCompanyToReviewInvoice(List.of(
+        newCompanyInvoiceToReview(List.of(
                 RewardId.of("061e2c7e-bda4-49a8-9914-2e76926f70c2")));
-        newCompanyToReviewInvoice(List.of(
+        newCompanyInvoiceToReview(List.of(
                 RewardId.of("ee28315c-7a84-4052-9308-c2236eeafda1"),
                 RewardId.of("d067b24d-115a-45e9-92de-94dd1d01b184")));
-        newCompanyToReviewInvoice(List.of(
+        newCompanyInvoiceToReview(List.of(
                 RewardId.of("d506a05d-3739-452f-928d-45ea81d33079"),
                 RewardId.of("5083ac1f-4325-4d47-9760-cbc9ab82f25c"),
                 RewardId.of("e6ee79ae-b3f0-4f4e-b7e3-9e643bc27236")));
     }
 
-    private void newCompanyToReviewInvoice(List<RewardId> rewardIds) throws IOException {
-        final Invoice.Id invoiceId = billingProfileService.previewInvoice(userId, companyBillingProfileId, rewardIds).id();
-        billingProfileService.uploadExternalInvoice(userId, companyBillingProfileId, invoiceId, "foo.pdf",
+    private void newCompanyInvoiceToReview(List<RewardId> rewardIds) throws IOException {
+        final Invoice.Id invoiceId = billingProfileService.previewInvoice(userId, companyBillingProfile.id(), rewardIds).id();
+        billingProfileService.uploadExternalInvoice(userId, companyBillingProfile.id(), invoiceId, "foo.pdf",
                 new FileSystemResource(Objects.requireNonNull(getClass().getResource("/invoices/invoice-sample.pdf")).getFile()).getInputStream());
         companyBillingProfileToReviewInvoices.add(invoiceId);
     }
@@ -147,18 +168,18 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                             {
                               "status": "PROCESSING",
                               "internalStatus": "TO_REVIEW",
-                              "amount": 4765.00,
+                              "amount": 5718.000,
                               "currencyId": "f35155b5-6107-4677-85ac-23f8c2a63193",
                               "rewardIds": [
-                                "d506a05d-3739-452f-928d-45ea81d33079",
+                                "e6ee79ae-b3f0-4f4e-b7e3-9e643bc27236",
                                 "5083ac1f-4325-4d47-9760-cbc9ab82f25c",
-                                "e6ee79ae-b3f0-4f4e-b7e3-9e643bc27236"
+                                "d506a05d-3739-452f-928d-45ea81d33079"
                               ]
                             },
                             {
                               "status": "PROCESSING",
                               "internalStatus": "TO_REVIEW",
-                              "amount": 2777.50,
+                              "amount": 3333.000,
                               "currencyId": "f35155b5-6107-4677-85ac-23f8c2a63193",
                               "rewardIds": [
                                 "d067b24d-115a-45e9-92de-94dd1d01b184",
@@ -168,7 +189,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                             {
                               "status": "PROCESSING",
                               "internalStatus": "TO_REVIEW",
-                              "amount": 1010.00,
+                              "amount": 1212.000,
                               "currencyId": "f35155b5-6107-4677-85ac-23f8c2a63193",
                               "rewardIds": [
                                 "061e2c7e-bda4-49a8-9914-2e76926f70c2"
@@ -209,14 +230,15 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                             {
                               "status": "TO_REVIEW",
                               "billingProfile": {
-                                "name": "Mr. Needful",
+                                "name": "Apple Inc.",
                                 "type": "COMPANY",
+                                "verificationStatus": null,
                                 "admins": null
                               },
                               "rewardCount": 3,
                               "totalEquivalent": {
-                                "amount": 4765.00,
-                                "dollarsEquivalent": 4765.00,
+                                "amount": 5718.000,
+                                "dollarsEquivalent": 5718.000,
                                 "conversionRate": null,
                                 "currencyCode": "USD",
                                 "currencyName": "US Dollar",
@@ -224,11 +246,11 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               },
                               "totalPerCurrency": [
                                 {
-                                  "amount": 3250,
-                                  "dollarsEquivalent": 3250,
+                                  "amount": 500,
+                                  "dollarsEquivalent": 505.00,
                                   "conversionRate": null,
-                                  "currencyCode": "USD",
-                                  "currencyName": "US Dollar",
+                                  "currencyCode": "USDC",
+                                  "currencyName": "USD Coin",
                                   "currencyLogoUrl": null
                                 },
                                 {
@@ -240,11 +262,11 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                   "currencyLogoUrl": null
                                 },
                                 {
-                                  "amount": 500,
-                                  "dollarsEquivalent": 505.00,
+                                  "amount": 3250,
+                                  "dollarsEquivalent": 3250,
                                   "conversionRate": null,
-                                  "currencyCode": "USDC",
-                                  "currencyName": "USD Coin",
+                                  "currencyCode": "USD",
+                                  "currencyName": "US Dollar",
                                   "currencyLogoUrl": null
                                 }
                               ]
@@ -252,14 +274,15 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                             {
                               "status": "TO_REVIEW",
                               "billingProfile": {
-                                "name": "Mr. Needful",
+                                "name": "Apple Inc.",
                                 "type": "COMPANY",
+                                "verificationStatus": null,
                                 "admins": null
                               },
                               "rewardCount": 2,
                               "totalEquivalent": {
-                                "amount": 2777.50,
-                                "dollarsEquivalent": 2777.50,
+                                "amount": 3333.000,
+                                "dollarsEquivalent": 3333.000,
                                 "conversionRate": null,
                                 "currencyCode": "USD",
                                 "currencyName": "US Dollar",
@@ -287,14 +310,15 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                             {
                               "status": "TO_REVIEW",
                               "billingProfile": {
-                                "name": "Mr. Needful",
+                                "name": "Apple Inc.",
                                 "type": "COMPANY",
+                                "verificationStatus": null,
                                 "admins": null
                               },
                               "rewardCount": 1,
                               "totalEquivalent": {
-                                "amount": 1010.00,
-                                "dollarsEquivalent": 1010.00,
+                                "amount": 1212.000,
+                                "dollarsEquivalent": 1212.000,
                                 "conversionRate": null,
                                 "currencyCode": "USD",
                                 "currencyName": "US Dollar",
@@ -330,14 +354,24 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .expectBody()
                 .json("""
                         {
+                          "number": "OD-APPLEINC-001",
                           "status": "TO_REVIEW",
                           "billingProfile": {
-                            "name": "Mr. Needful",
+                            "name": "Apple Inc.",
                             "type": "COMPANY",
-                            "admins": []
+                            "verificationStatus": null,
+                            "admins": [
+                              {
+                                "login": null,
+                                "name": "ofux",
+                                "email": "olivier.fuxet@gmail.com",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
+                              }
+                            ]
                           },
+                          "rejectionReason": null,
                           "totalEquivalent": {
-                            "amount": 1010.00,
+                            "amount": 1212.000,
                             "currencyCode": "USD",
                             "currencyName": "US Dollar",
                             "currencyLogoUrl": null
@@ -345,7 +379,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "rewardsPerNetwork": [
                             {
                               "network": "ETHEREUM",
-                              "billingAccountNumber": null,
+                              "billingAccountNumber": "e461c019-ba23-4671-9b6c-3a5a18748af9.eth",
                               "dollarsEquivalent": 1010.00,
                               "totalPerCurrency": [
                                 {
@@ -378,7 +412,9 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                     "currencyName": "USD Coin",
                                     "currencyLogoUrl": null
                                   },
-                                  "transactionHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                                  "transactionReferences": [
+                                    "0x0000000000000000000000000000000000000000000000000000000000000000"
+                                  ]
                                 }
                               ]
                             }
@@ -423,39 +459,15 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "invoices": [
                             {
                               "status": "TO_REVIEW",
-                              "rewardCount": 3,
-                              "totalEquivalent": {
-                                "amount": 4765.00,
-                                "dollarsEquivalent": 4765.00,
-                                "conversionRate": null,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
-                              }
+                              "rewardCount": 3
                             },
                             {
                               "status": "TO_REVIEW",
-                              "rewardCount": 2,
-                              "totalEquivalent": {
-                                "amount": 2777.50,
-                                "dollarsEquivalent": 2777.50,
-                                "conversionRate": null,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
-                              }
+                              "rewardCount": 2
                             },
                             {
                               "status": "APPROVED",
-                              "rewardCount": 1,
-                              "totalEquivalent": {
-                                "amount": 1010.00,
-                                "dollarsEquivalent": 1010.00,
-                                "conversionRate": null,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
-                              }
+                              "rewardCount": 1
                             }
                           ]
                         }
@@ -535,39 +547,15 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "invoices": [
                             {
                               "status": "TO_REVIEW",
-                              "rewardCount": 3,
-                              "totalEquivalent": {
-                                "amount": 4765.00,
-                                "dollarsEquivalent": 4765.00,
-                                "conversionRate": null,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
-                              }
+                              "rewardCount": 3
                             },
                             {
                               "status": "REJECTED",
-                              "rewardCount": 2,
-                              "totalEquivalent": {
-                                "amount": 2777.50,
-                                "dollarsEquivalent": 2777.50,
-                                "conversionRate": null,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
-                              }
+                              "rewardCount": 2
                             },
                             {
                               "status": "APPROVED",
-                              "rewardCount": 1,
-                              "totalEquivalent": {
-                                "amount": 1010.00,
-                                "dollarsEquivalent": 1010.00,
-                                "conversionRate": null,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
-                              }
+                              "rewardCount": 1
                             }
                           ]
                         }
@@ -598,27 +586,11 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "invoices": [
                             {
                               "status": "TO_REVIEW",
-                              "rewardCount": 3,
-                              "totalEquivalent": {
-                                "amount": 4765.00,
-                                "dollarsEquivalent": 4765.00,
-                                "conversionRate": null,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
-                              }
+                              "rewardCount": 3
                             },
                             {
                               "status": "REJECTED",
-                              "rewardCount": 2,
-                              "totalEquivalent": {
-                                "amount": 2777.50,
-                                "dollarsEquivalent": 2777.50,
-                                "conversionRate": null,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
-                              }
+                              "rewardCount": 2
                             }
                           ]
                         }

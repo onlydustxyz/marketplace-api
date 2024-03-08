@@ -18,7 +18,7 @@ public record RewardView(@NonNull UUID id,
                          @NonNull List<ShortSponsorView> sponsors,
                          @NonNull MoneyView money,
                          @NonNull ShortBillingProfileAdminView billingProfileAdmin,
-                         String transactionHash
+                         @NonNull List<String> transactionReferences
 ) {
 
     @Deprecated

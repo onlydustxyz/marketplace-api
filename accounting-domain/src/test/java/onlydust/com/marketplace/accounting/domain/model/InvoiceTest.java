@@ -2,14 +2,25 @@ package onlydust.com.marketplace.accounting.domain.model;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
+import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyc;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class InvoiceTest {
@@ -30,13 +41,32 @@ class InvoiceTest {
 
     @Nested
     class GivenAnIndividual {
-        final Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1, new Invoice.PersonalInfo("John", "Doe", "123 Main St", "FRA"))
-                .rewards(List.of(
-                        new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
-                        new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
-                ));
+
+        BillingProfileView individualBillingProfile;
+        PayoutInfo payoutInfo;
+        Invoice invoice;
+
+        @BeforeEach
+        void setUp() {
+            payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
+            final var billingProfileId = BillingProfile.Id.random();
+            individualBillingProfile = BillingProfileView.builder()
+                    .id(billingProfileId)
+                    .type(BillingProfile.Type.INDIVIDUAL)
+                    .payoutInfo(payoutInfo)
+                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .name("John")
+                    .kyc(newKyc(billingProfileId, UserId.random()))
+                    .build();
+
+            invoice = Invoice.of(individualBillingProfile, 1, UserId.random())
+                    .rewards(List.of(
+                            new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
+                            new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
+                    ));
+        }
 
         @Test
         void should_compute_id() {
@@ -64,18 +94,49 @@ class InvoiceTest {
 
     @Nested
     class GivenACompanyOutsideOfEurope {
-        final Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1,
-                        new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", "USA", false, false, false, null))
-                .rewards(List.of(
-                        new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
-                        new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
-                ));
+
+        BillingProfileView companyBillingProfile;
+        PayoutInfo payoutInfo;
+        Invoice invoice;
+
+        @BeforeEach
+        void setUp() {
+            final var billingProfileId = BillingProfile.Id.random();
+            final var kyb = Kyb.builder()
+                    .id(UUID.randomUUID())
+                    .ownerId(UserId.random())
+                    .billingProfileId(billingProfileId)
+                    .country(Country.fromIso3("USA"))
+                    .registrationNumber("123456789")
+                    .euVATNumber(null)
+                    .registrationDate(new Date())
+                    .address("1 rue de la paix")
+                    .name("OnlyDust SAS")
+                    .subjectToEuropeVAT(false)
+                    .status(VerificationStatus.VERIFIED)
+                    .build();
+            payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
+            companyBillingProfile = BillingProfileView.builder()
+                    .id(billingProfileId)
+                    .type(BillingProfile.Type.COMPANY)
+                    .payoutInfo(payoutInfo)
+                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .name("OnlyDust")
+                    .kyb(kyb)
+                    .build();
+
+            invoice = Invoice.of(companyBillingProfile, 1, UserId.random())
+                    .rewards(List.of(
+                            new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
+                            new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
+                    ));
+        }
 
         @Test
         void should_compute_id() {
-            assertThat(invoice.number().value()).isEqualTo("OD-ONLYDUST-001");
+            assertThat(invoice.number().value()).isEqualTo("OD-ONLYDUSTSAS-001");
         }
 
         @Test
@@ -90,7 +151,7 @@ class InvoiceTest {
 
         @Test
         void should_compute_vat_regulation_state() {
-            assertThat(invoice.companyInfo().orElseThrow().vatRegulationState()).isEqualTo(Invoice.VatRegulationState.NOT_APPLICABLE_NON_UE);
+            assertThat(invoice.billingProfileSnapshot().kyb().orElseThrow().vatRegulationState()).isEqualTo(Invoice.VatRegulationState.NOT_APPLICABLE_NON_UE);
         }
 
         @Test
@@ -104,18 +165,48 @@ class InvoiceTest {
 
     @Nested
     class GivenAFrenchCompanySubjectToVAT {
-        final Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1,
-                        new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", "FRA", true, true, true, "666"))
-                .rewards(List.of(
-                        new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
-                        new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
-                ));
+        BillingProfileView companyBillingProfile;
+        PayoutInfo payoutInfo;
+        Invoice invoice;
+
+        @BeforeEach
+        void setUp() {
+            final var billingProfileId = BillingProfile.Id.random();
+            final var kyb = Kyb.builder()
+                    .id(UUID.randomUUID())
+                    .ownerId(UserId.random())
+                    .billingProfileId(billingProfileId)
+                    .country(Country.fromIso3("FRA"))
+                    .registrationNumber("123456789")
+                    .euVATNumber(null)
+                    .registrationDate(new Date())
+                    .address("1 rue de la paix")
+                    .name("OnlyDust SAS")
+                    .subjectToEuropeVAT(true)
+                    .status(VerificationStatus.VERIFIED)
+                    .build();
+            payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
+            companyBillingProfile = BillingProfileView.builder()
+                    .id(billingProfileId)
+                    .type(BillingProfile.Type.COMPANY)
+                    .payoutInfo(payoutInfo)
+                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .name("OnlyDust")
+                    .kyb(kyb)
+                    .build();
+
+            invoice = Invoice.of(companyBillingProfile, 1, UserId.random())
+                    .rewards(List.of(
+                            new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
+                            new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
+                    ));
+        }
 
         @Test
         void should_compute_id() {
-            assertThat(invoice.number().value()).isEqualTo("OD-ONLYDUST-001");
+            assertThat(invoice.number().value()).isEqualTo("OD-ONLYDUSTSAS-001");
         }
 
 
@@ -131,7 +222,7 @@ class InvoiceTest {
 
         @Test
         void should_compute_vat_regulation_state() {
-            assertThat(invoice.companyInfo().orElseThrow().vatRegulationState()).isEqualTo(Invoice.VatRegulationState.APPLICABLE);
+            assertThat(invoice.billingProfileSnapshot().kyb().orElseThrow().vatRegulationState()).isEqualTo(Invoice.VatRegulationState.APPLICABLE);
         }
 
         @Test
@@ -145,18 +236,48 @@ class InvoiceTest {
 
     @Nested
     class GivenAFrenchCompanyNonSubjectToVAT {
-        final Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1,
-                        new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", "FRA", false, true, true, "666"))
-                .rewards(List.of(
-                        new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
-                        new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
-                ));
+        BillingProfileView companyBillingProfile;
+        PayoutInfo payoutInfo;
+        Invoice invoice;
+
+        @BeforeEach
+        void setUp() {
+            final var billingProfileId = BillingProfile.Id.random();
+            final var kyb = Kyb.builder()
+                    .id(UUID.randomUUID())
+                    .ownerId(UserId.random())
+                    .billingProfileId(billingProfileId)
+                    .country(Country.fromIso3("FRA"))
+                    .registrationNumber("123456789")
+                    .euVATNumber(null)
+                    .registrationDate(new Date())
+                    .address("1 rue de la paix")
+                    .name("OnlyDust SAS")
+                    .subjectToEuropeVAT(false)
+                    .status(VerificationStatus.VERIFIED)
+                    .build();
+            payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
+            companyBillingProfile = BillingProfileView.builder()
+                    .id(billingProfileId)
+                    .type(BillingProfile.Type.COMPANY)
+                    .payoutInfo(payoutInfo)
+                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .name("OnlyDust")
+                    .kyb(kyb)
+                    .build();
+
+            invoice = Invoice.of(companyBillingProfile, 1, UserId.random())
+                    .rewards(List.of(
+                            new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
+                            new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
+                    ));
+        }
 
         @Test
         void should_compute_id() {
-            assertThat(invoice.number().value()).isEqualTo("OD-ONLYDUST-001");
+            assertThat(invoice.number().value()).isEqualTo("OD-ONLYDUSTSAS-001");
         }
 
 
@@ -172,7 +293,7 @@ class InvoiceTest {
 
         @Test
         void should_compute_vat_regulation_state() {
-            assertThat(invoice.companyInfo().orElseThrow().vatRegulationState()).isEqualTo(Invoice.VatRegulationState.NOT_APPLICABLE_FRENCH_NOT_SUBJECT);
+            assertThat(invoice.billingProfileSnapshot().kyb().orElseThrow().vatRegulationState()).isEqualTo(Invoice.VatRegulationState.NOT_APPLICABLE_FRENCH_NOT_SUBJECT);
         }
 
         @Test
@@ -186,18 +307,48 @@ class InvoiceTest {
 
     @Nested
     class GivenANonFrenchEuropeanCompany {
-        final Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1,
-                        new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", "ITA", false, true, false, "666"))
-                .rewards(List.of(
-                        new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
-                        new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
-                ));
+        BillingProfileView companyBillingProfile;
+        PayoutInfo payoutInfo;
+        Invoice invoice;
+
+        @BeforeEach
+        void setUp() {
+            final var billingProfileId = BillingProfile.Id.random();
+            final var kyb = Kyb.builder()
+                    .id(UUID.randomUUID())
+                    .ownerId(UserId.random())
+                    .billingProfileId(billingProfileId)
+                    .country(Country.fromIso3("DEU"))
+                    .registrationNumber("123456789")
+                    .euVATNumber("029834980")
+                    .registrationDate(new Date())
+                    .address("1 rue de la paix")
+                    .name("OnlyDust SAS")
+                    .subjectToEuropeVAT(true)
+                    .status(VerificationStatus.VERIFIED)
+                    .build();
+            payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
+            companyBillingProfile = BillingProfileView.builder()
+                    .id(billingProfileId)
+                    .type(BillingProfile.Type.COMPANY)
+                    .payoutInfo(payoutInfo)
+                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .name("OnlyDust")
+                    .kyb(kyb)
+                    .build();
+
+            invoice = Invoice.of(companyBillingProfile, 1, UserId.random())
+                    .rewards(List.of(
+                            new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
+                            new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
+                    ));
+        }
 
         @Test
         void should_compute_id() {
-            assertThat(invoice.number().value()).isEqualTo("OD-ONLYDUST-001");
+            assertThat(invoice.number().value()).isEqualTo("OD-ONLYDUSTSAS-001");
         }
 
 
@@ -213,7 +364,7 @@ class InvoiceTest {
 
         @Test
         void should_compute_vat_regulation_state() {
-            assertThat(invoice.companyInfo().orElseThrow().vatRegulationState()).isEqualTo(Invoice.VatRegulationState.REVERSE_CHARGE);
+            assertThat(invoice.billingProfileSnapshot().kyb().orElseThrow().vatRegulationState()).isEqualTo(Invoice.VatRegulationState.REVERSE_CHARGE);
         }
 
         @Test
