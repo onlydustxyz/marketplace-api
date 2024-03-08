@@ -25,8 +25,8 @@ public class RewardsPaidEmailDTO {
     public static RewardsPaidEmailDTO from(@NotNull final String email, @NotNull final List<RewardView> rewardViews) {
         return RewardsPaidEmailDTO.builder()
                 .recipientEmail(email)
-                .recipientName(isNull(rewardViews.get(0).billingProfileAdmin().adminName()) ? rewardViews.get(0).billingProfileAdmin().adminGithubLogin() :
-                        rewardViews.get(0).billingProfileAdmin().adminName())
+                .recipientName(isNull(rewardViews.get(0).billingProfileAdmin().admins().get(0).firstName()) ? rewardViews.get(0).billingProfileAdmin().admins().get(0).login():
+                        rewardViews.get(0).billingProfileAdmin().admins().get(0).firstName())
                 .rewardNames(String.join("<br>", rewardViews.stream()
                         .map(r -> String.join(" - ", RewardId.of(r.id()).pretty(), r.projectName(), r.money().currencyCode(), r.money().amount().toString()))
                         .toList()))

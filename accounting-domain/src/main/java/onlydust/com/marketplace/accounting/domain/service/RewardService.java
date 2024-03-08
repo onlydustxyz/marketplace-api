@@ -151,7 +151,7 @@ public class RewardService implements AccountingRewardPort {
     public void notifyAllNewPaidRewards() {
         final List<RewardView> rewardViews = accountingRewardStoragePort.findPaidRewardsToNotify();
         for (Map.Entry<String, List<RewardView>> listOfPaidRewardsMapToAdminEmail :
-                rewardViews.stream().collect(Collectors.groupingBy(rewardView -> rewardView.billingProfileAdmin().adminEmail())).entrySet()) {
+                rewardViews.stream().collect(Collectors.groupingBy(rewardView -> rewardView.billingProfileAdmin().admins().get(0).email())).entrySet()) {
             mailNotificationPort.sendRewardsPaidMail(listOfPaidRewardsMapToAdminEmail.getKey(), listOfPaidRewardsMapToAdminEmail.getValue());
         }
         accountingRewardStoragePort.markRewardsAsPaymentNotified(rewardViews.stream()
