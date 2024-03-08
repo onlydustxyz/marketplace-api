@@ -234,7 +234,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 ]
                               },
                               "invoice": {
-                                "number": "OD-AMYCOMPANY-002",
+                                "number": "OD-A-MY-COMPANY-002",
                                 "status": "APPROVED"
                               },
                               "status": "PROCESSING",
@@ -278,7 +278,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 ]
                               },
                               "invoice": {
-                                "number": "OD-AMYCOMPANY-002",
+                                "number": "OD-A-MY-COMPANY-002",
                                 "status": "APPROVED"
                               },
                               "status": "PROCESSING",
@@ -322,7 +322,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 ]
                               },
                               "invoice": {
-                                "number": "OD-OMYCOMPANY-002",
+                                "number": "OD-O-MY-COMPANY-002",
                                 "status": "APPROVED"
                               },
                               "status": "PROCESSING",
@@ -366,7 +366,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 ]
                               },
                               "invoice": {
-                                "number": "OD-OMYCOMPANY-002",
+                                "number": "OD-O-MY-COMPANY-002",
                                 "status": "APPROVED"
                               },
                               "status": "PROCESSING",
@@ -410,7 +410,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 ]
                               },
                               "invoice": {
-                                "number": "OD-AMYCOMPANY-002",
+                                "number": "OD-A-MY-COMPANY-002",
                                 "status": "APPROVED"
                               },
                               "status": "PROCESSING",

@@ -145,7 +145,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.dueAt").isNotEmpty()
                 .json("""
                         {
-                          "number": "OD-MYCOMPANY-001",
+                          "number": "OD-MY-COMPANY-001",
                           "billingProfileType": "COMPANY",
                           "individualBillingProfile": null,
                           "companyBillingProfile": {
@@ -275,7 +275,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectHeader()
-                .contentDisposition(ContentDisposition.attachment().filename("OD-MYCOMPANY-001.pdf").build())
+                .contentDisposition(ContentDisposition.attachment().filename("OD-MY-COMPANY-001.pdf").build())
                 .expectBody().returnResult().getResponseBody();
 
         assertThat(data).isEqualTo(pdfData);
@@ -302,7 +302,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.dueAt").isNotEmpty()
                 .json("""
                         {
-                          "number": "OD-MYCOMPANY-002",
+                          "number": "OD-MY-COMPANY-002",
                           "billingProfileType": "COMPANY",
                           "individualBillingProfile": null,
                           "companyBillingProfile": {
@@ -463,7 +463,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectHeader()
-                .contentDisposition(ContentDisposition.attachment().filename("OD-MYCOMPANY-002.pdf").build())
+                .contentDisposition(ContentDisposition.attachment().filename("OD-MY-COMPANY-002.pdf").build())
                 .expectBody().returnResult().getResponseBody();
 
         assertThat(data).isEqualTo(pdfData);
@@ -483,7 +483,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.number").isEqualTo("OD-MYCOMPANY-003");
+                .jsonPath("$.number").isEqualTo("OD-MY-COMPANY-003");
 
         client.get()
                 .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(billingProfileId), Map.of(
@@ -495,7 +495,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.number").isEqualTo("OD-MYCOMPANY-003");
+                .jsonPath("$.number").isEqualTo("OD-MY-COMPANY-003");
     }
 
     @Test
@@ -603,7 +603,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                         {
                            "invoices": [
                              {
-                               "number": "OD-MYCOMPANY-002",
+                               "number": "OD-MY-COMPANY-002",
                                "totalAfterTax": {
                                  "amount": 2424.000,
                                  "currency": "USD"
@@ -611,7 +611,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                                "status": "PROCESSING"
                              },
                              {
-                               "number": "OD-MYCOMPANY-001",
+                               "number": "OD-MY-COMPANY-001",
                                "totalAfterTax": {
                                  "amount": 2138376.000,
                                  "currency": "USD"

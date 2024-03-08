@@ -8,7 +8,6 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
-import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.net.URL;
@@ -135,8 +134,9 @@ public class Invoice {
         }
 
         private static String normalize(final @NonNull String part) {
-            return StringUtils.stripAccents(part)
-                    .replaceAll("[^a-zA-Z0-9]", "")
+            return part
+                    .replaceAll("\\p{P}", "-")
+                    .replaceAll("\\s", "-")
                     .toUpperCase();
         }
     }
