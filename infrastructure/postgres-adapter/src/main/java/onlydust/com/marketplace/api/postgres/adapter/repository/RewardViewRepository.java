@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -129,4 +130,16 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                 toDate,
                 pageRequest);
     }
+    Page<RewardDetailsViewEntity> findAllByStatusesAndDates(@NonNull List<String> statuses,
+                                                            Date fromRequestedAt, Date toRequestedAt,
+                                                            Date fromProcessedAt, Date toProcessedAt,
+                                                            Pageable pageable);
+
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            update payment_requests
+            set payment_notified_at = now()
+            where id in (:rewardIds)
+            """)
+    void markRewardAsPaymentNotified(List<UUID> rewardIds);
 }

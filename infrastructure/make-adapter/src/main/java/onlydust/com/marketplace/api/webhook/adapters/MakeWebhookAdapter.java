@@ -1,25 +1,23 @@
 package onlydust.com.marketplace.api.webhook.adapters;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceUploaded;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
+import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.api.webhook.Config;
 import onlydust.com.marketplace.api.webhook.MakeWebhookHttpClient;
 import onlydust.com.marketplace.api.webhook.dto.*;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.project.domain.model.notification.*;
 import onlydust.com.marketplace.kernel.port.output.WebhookPort;
+import org.jetbrains.annotations.NotNull;
 
-import java.math.BigDecimal;
-import java.net.URI;
-import java.net.http.HttpClient;
 import java.util.List;
 
 @AllArgsConstructor
-public class MakeWebhookAdapter implements WebhookPort {
+public class MakeWebhookAdapter implements WebhookPort, MailNotificationPort {
 
     private final MakeWebhookHttpClient makeWebhookHttpClient;
     private final Config config;
@@ -49,9 +47,14 @@ public class MakeWebhookAdapter implements WebhookPort {
         } else if (event instanceof InvoiceUploaded invoiceUploaded) {
             makeWebhookHttpClient.post(InvoiceUploadedEventDTO.of(invoiceUploaded, config.getEnvironment()));
         } else if (event instanceof InvoiceRejected invoiceRejected) {
-            makeWebhookHttpClient.post(InvoiceRejectedEventDTO.fromEvent(invoiceRejected), config.getSendRejectedInvoiceEmailUrl(), config.getApiKey());
+            makeWebhookHttpClient.post(InvoiceRejectedEventDTO.fromEvent(invoiceRejected), config.getSendRejectedInvoiceMailUrl(), config.getApiKey());
         } else {
             throw new IllegalArgumentException("Unknown notification type %s".formatted(event));
         }
+    }
+
+    @Override
+    public void sendRewardsPaidMail(@NotNull final String email, @NotNull final List<RewardView> rewardViews) {
+        makeWebhookHttpClient.post(RewardsPaidEmailDTO.from(email, rewardViews), config.getSendRewardsPaidMailUrl(), config.getApiKey());
     }
 }

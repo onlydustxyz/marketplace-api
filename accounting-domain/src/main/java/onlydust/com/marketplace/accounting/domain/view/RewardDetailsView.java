@@ -21,7 +21,8 @@ public record RewardDetailsView(
         ShortContributorView recipient,
         ShortInvoiceView invoice,
         @NonNull List<String> transactionReferences,
-        @NonNull List<String> paidToAccountNumbers
+        @NonNull List<String> paidToAccountNumbers,
+        ZonedDateTime paidNotificationSentAt
 ) {
 
     public enum Status {

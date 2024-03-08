@@ -1,13 +1,11 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
 import onlydust.com.marketplace.accounting.domain.port.out.OldRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
@@ -33,11 +31,12 @@ public class RewardServiceTest {
     private final Faker faker = new Faker();
     private final AccountingRewardStoragePort accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
     private final OldRewardStoragePort oldRewardStoragePort = mock(OldRewardStoragePort.class);
-    private final RewardService rewardService = new RewardService(accountingRewardStoragePort, oldRewardStoragePort);
+    private final MailNotificationPort mailNotificationPort = mock(MailNotificationPort.class);
+    private final RewardService rewardService = new RewardService(accountingRewardStoragePort, oldRewardStoragePort, mailNotificationPort);
 
     @BeforeEach
     void setUp() {
-        reset(accountingRewardStoragePort, oldRewardStoragePort);
+        reset(accountingRewardStoragePort, oldRewardStoragePort, mailNotificationPort);
     }
 
     @Test
@@ -377,14 +376,45 @@ public class RewardServiceTest {
         assertEquals(Currency.Code.STRK_STR, rewardViews.get(2).money().currencyCode());
     }
 
+    @Test
+    void should_notify_new_rewards_were_paid() {
+        // Given
+        final String email1 = faker.rickAndMorty().character();
+        final String email2 = faker.gameOfThrones().character();
+        final RewardView r11 = generateRewardStubForCurrencyAndEmail("USD", email1);
+        final RewardView r21 = generateRewardStubForCurrencyAndEmail("STRK", email2);
+        final RewardView r12 = generateRewardStubForCurrencyAndEmail("OP", email1);
+        final RewardView r22 = generateRewardStubForCurrencyAndEmail("APT", email2);
+        final List<RewardView> rewardViews = List.of(
+                r11,
+                r12,
+                r21,
+                r22
+        );
+
+        // When
+        when(accountingRewardStoragePort.findPaidRewardsToNotify())
+                .thenReturn(rewardViews);
+        rewardService.notifyAllNewPaidRewards();
+
+        // Then
+        verify(mailNotificationPort, times(1)).sendRewardsPaidMail(email1, List.of(r11, r12));
+        verify(mailNotificationPort, times(1)).sendRewardsPaidMail(email2, List.of(r21, r22));
+        verify(accountingRewardStoragePort).markRewardsAsPaymentNotified(rewardViews.stream().map(RewardView::id).map(RewardId::of).toList());
+    }
+
     private RewardView generateRewardStubForCurrency(final String currencyCode) {
+        return generateRewardStubForCurrencyAndEmail(currencyCode, faker.rickAndMorty().character());
+    }
+
+    private RewardView generateRewardStubForCurrencyAndEmail(final String currencyCode, final String email) {
         return RewardView.builder()
                 .id(UUID.randomUUID())
                 .billingProfileAdmin(ShortBillingProfileAdminView.builder()
                         .admins(List.of(
                                 new ShortBillingProfileAdminView.Admin(faker.name().username(),
                                         faker.internet().avatar(),
-                                        faker.internet().emailAddress(),
+                                        email,
                                         faker.name().firstName(),
                                         faker.name().lastName())
                         ))

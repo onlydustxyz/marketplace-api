@@ -159,4 +159,6 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000100_invoice_data_v2.sql
   - include:
       file: db/changelog/changelogs/00000073_unlock_op_on_projects_table.sql
+  - include:
+      file: db/changelog/changelogs/00000074_add_payment_notified_at_column.sql
 

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
@@ -158,5 +159,17 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<RewardView> findPaidRewardsToNotify() {
+        return invoiceRewardViewRepository.findPaidRewardsToNotify().stream().map(InvoiceRewardViewEntity::toDomain).toList();
+    }
+
+    @Override
+    @Transactional
+    public void markRewardsAsPaymentNotified(List<RewardId> rewardIds) {
+        rewardViewRepository.markRewardAsPaymentNotified(rewardIds.stream().map(UuidWrapper::value).toList());
     }
 }

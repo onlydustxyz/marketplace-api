@@ -116,7 +116,8 @@ infrastructure:
     webhook:
       url: ${BACKOFFICE_WEBHOOK_URL}
       environment: ${ENV}
-      send-rejected-invoice-email-url: ${MAKE_SEND_REJECTED_INVOICE_MAIL_WEBHOOK_URL}
+      send-rejected-invoice-mail-url: ${MAKE_SEND_REJECTED_INVOICE_MAIL_WEBHOOK_URL}
+      send-rewards-paid-mail-url: ${MAKE_SEND_REWARD_PAID_MAIL_WEBHOOK_URL}
       api-key: ${MAKE_WEBHOOK_API_KEY}
   auth0:
     api:

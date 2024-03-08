@@ -60,8 +60,9 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         @ConfigureWireMock(name = "auth0", property = "application.web.auth0.user-info-url"),
         @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri"),
         @ConfigureWireMock(name = "rust-api", property = "infrastructure.od.api.client.baseUri"),
-        @ConfigureWireMock(name = "make-webhook-send-rejected-invoice-mail", property = "infrastructure.make.webhook.sendRejectedInvoiceEmailUrl"),
+        @ConfigureWireMock(name = "make-webhook-send-rejected-invoice-mail", property = "infrastructure.make.webhook.sendRejectedInvoiceMailUrl"),
         @ConfigureWireMock(name = "make-webhook", property = "infrastructure.make.webhook.url"),
+        @ConfigureWireMock(name = "make-webhook-send-rewards-paid", property = "infrastructure.make.webhook.sendRewardsPaidMailUrl"),
 })
 public class AbstractMarketplaceBackOfficeApiIT {
     static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:14.3-alpine")
@@ -93,6 +94,8 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected WireMockServer rustApiWireMockServer;
     @InjectWireMock("make-webhook-send-rejected-invoice-mail")
     protected WireMockServer makeWebhookSendRejectedInvoiceMailWireMockServer;
+    @InjectWireMock("make-webhook-send-rewards-paid")
+    protected WireMockServer makeWebhookSendRewardsPaidMailWireMockServer;
     @InjectWireMock("make-webhook")
     protected WireMockServer makeWebhookWireMockServer;
 
@@ -179,6 +182,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String GET_REWARDS_BATCH_PAYMENTS = "/bo/v1/rewards/batch-payments";
     protected static final String REWARDS = "/bo/v1/rewards";
     protected static final String GET_REWARDS_CSV = "/bo/v1/rewards/csv";
+    protected static final String PUT_REWARDS_NOTIFY_PAYMENTS = "/bo/v1/rewards/notify-payments";
 
     protected String apiKey() {
         return backOfficeApiKeyAuthenticationConfig.getApiKey();

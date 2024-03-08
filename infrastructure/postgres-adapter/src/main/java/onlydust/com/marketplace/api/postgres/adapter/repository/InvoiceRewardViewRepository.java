@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.InvoiceRewardViewEntity;
 import org.intellij.lang.annotations.Language;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -92,5 +93,9 @@ public interface InvoiceRewardViewRepository extends JpaRepository<InvoiceReward
             where r.id in (:rewardIds)
             """, nativeQuery = true)
     List<InvoiceRewardViewEntity> findAllByRewardIds(@NonNull List<UUID> rewardIds);
+
+    @Query(nativeQuery = true, value = SELECT + " where r.processed_at is not null and pr.payment_notified_at is null")
+    List<InvoiceRewardViewEntity> findPaidRewardsToNotify();
+
 
 }

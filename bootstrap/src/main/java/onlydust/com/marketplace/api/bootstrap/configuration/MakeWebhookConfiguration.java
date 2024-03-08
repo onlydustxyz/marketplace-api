@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
 import onlydust.com.marketplace.api.webhook.Config;
 import onlydust.com.marketplace.api.webhook.MakeWebhookHttpClient;
 import onlydust.com.marketplace.api.webhook.adapters.MakeWebhookAdapter;
@@ -32,4 +33,12 @@ public class MakeWebhookConfiguration {
                                                final Config webhookHttpClientProperties) {
         return new MakeWebhookAdapter(makeWebhookHttpClient, webhookHttpClientProperties);
     }
+
+    @Bean
+    public MailNotificationPort mailNotificationPort(final MakeWebhookHttpClient makeWebhookHttpClient,
+                                                        final Config webhookHttpClientProperties) {
+        return new MakeWebhookAdapter(makeWebhookHttpClient, webhookHttpClientProperties);
+    }
+
+
 }

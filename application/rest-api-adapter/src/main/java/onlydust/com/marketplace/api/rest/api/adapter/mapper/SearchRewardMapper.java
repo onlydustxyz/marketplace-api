@@ -67,6 +67,7 @@ public interface SearchRewardMapper {
                 .requestedAt(rewardDetailsView.requestedAt())
                 .processedAt(rewardDetailsView.processedAt())
                 .githubUrls(rewardDetailsView.githubUrls())
+                .paidNotificationDate(rewardDetailsView.paidNotificationSentAt())
                 .project(new ProjectLinkResponse()
                         .name(rewardDetailsView.project().name())
                         .logoUrl(rewardDetailsView.project().logoUrl()))

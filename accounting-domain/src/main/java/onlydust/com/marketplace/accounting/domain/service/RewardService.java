@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
 import onlydust.com.marketplace.accounting.domain.port.out.OldRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -26,6 +27,7 @@ public class RewardService implements AccountingRewardPort {
 
     private final AccountingRewardStoragePort accountingRewardStoragePort;
     private final OldRewardStoragePort oldRewardStoragePort;
+    private final MailNotificationPort mailNotificationPort;
     private static final List<String> CURRENCY_CODES_AVAILABLE_FOR_BATCH_PAYMENT = List.of(Currency.Code.STRK_STR, Currency.Code.USDC_STR,
             Currency.Code.LORDS_STR);
 
@@ -143,6 +145,19 @@ public class RewardService implements AccountingRewardPort {
         }
 
         return RewardsExporter.csv(rewards.getContent());
+    }
+
+    @Override
+    public void notifyAllNewPaidRewards() {
+        final List<RewardView> rewardViews = accountingRewardStoragePort.findPaidRewardsToNotify();
+        for (Map.Entry<String, List<RewardView>> listOfPaidRewardsMapToAdminEmail :
+                rewardViews.stream().collect(Collectors.groupingBy(rewardView -> rewardView.billingProfileAdmin().adminEmail())).entrySet()) {
+            mailNotificationPort.sendRewardsPaidMail(listOfPaidRewardsMapToAdminEmail.getKey(), listOfPaidRewardsMapToAdminEmail.getValue());
+        }
+        accountingRewardStoragePort.markRewardsAsPaymentNotified(rewardViews.stream()
+                .map(RewardView::id)
+                .map(RewardId::of)
+                .toList());
     }
 
     private BatchPayment buildEthereumBatchPayment(final Map<String, List<PayableRewardWithPayoutInfoView>> ethereumRewardMapToCurrencyCode) {
