@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
-import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.ShortSponsorView;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -39,7 +39,7 @@ public class RewardsExporter {
             "Dollar Amount"
     };
 
-    public static String csv(List<RewardDetailsView> rewards) {
+    public static String csv(List<BackofficeRewardView> rewards) {
         final CSVFormat csvFormat = CSVFormat.DEFAULT.builder()
                 .setHeader(HEADERS)
                 .build();

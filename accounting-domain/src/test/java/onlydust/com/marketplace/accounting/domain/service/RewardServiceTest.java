@@ -312,7 +312,7 @@ public class RewardServiceTest {
                         generateRewardStubForCurrency(Currency.Code.APT_STR),
                         generateRewardStubForCurrency(Currency.Code.LORDS_STR),
                         generateRewardStubForCurrency(Currency.Code.STRK_STR),
-                        RewardDetailsView.builder()
+                        BackofficeRewardView.builder()
                                 .id(RewardId.random())
                                 .billingProfileAdmin(ShortBillingProfileAdminView.builder()
                                         .admins(List.of(
@@ -339,7 +339,7 @@ public class RewardServiceTest {
                                         .build())
                                 .transactionReferences(List.of(faker.random().hex()))
                                 .build(),
-                        RewardDetailsView.builder()
+                        BackofficeRewardView.builder()
                                 .id(RewardId.random())
                                 .billingProfileAdmin(ShortBillingProfileAdminView.builder()
                                         .admins(List.of(
@@ -366,7 +366,7 @@ public class RewardServiceTest {
                                         .build())
                                 .build()
                 ));
-        final List<RewardDetailsView> rewardViews = rewardService.searchForBatchPaymentByInvoiceIds(invoiceIds);
+        final List<BackofficeRewardView> rewardViews = rewardService.searchForBatchPaymentByInvoiceIds(invoiceIds);
 
         // Then
         assertEquals(3, rewardViews.size());
@@ -384,7 +384,7 @@ public class RewardServiceTest {
         final var r21 = generateRewardStubForCurrencyAndEmail("STRK", email2);
         final var r12 = generateRewardStubForCurrencyAndEmail("OP", email1);
         final var r22 = generateRewardStubForCurrencyAndEmail("APT", email2);
-        final List<RewardDetailsView> rewardViews = List.of(
+        final List<BackofficeRewardView> rewardViews = List.of(
                 r11,
                 r12,
                 r21,
@@ -399,15 +399,15 @@ public class RewardServiceTest {
         // Then
         verify(mailNotificationPort, times(1)).sendRewardsPaidMail(email1, List.of(r11, r12));
         verify(mailNotificationPort, times(1)).sendRewardsPaidMail(email2, List.of(r21, r22));
-        verify(accountingRewardStoragePort).markRewardsAsPaymentNotified(rewardViews.stream().map(RewardDetailsView::id).toList());
+        verify(accountingRewardStoragePort).markRewardsAsPaymentNotified(rewardViews.stream().map(BackofficeRewardView::id).toList());
     }
 
-    private RewardDetailsView generateRewardStubForCurrency(final String currencyCode) {
+    private BackofficeRewardView generateRewardStubForCurrency(final String currencyCode) {
         return generateRewardStubForCurrencyAndEmail(currencyCode, faker.rickAndMorty().character());
     }
 
-    private RewardDetailsView generateRewardStubForCurrencyAndEmail(final String currencyCode, final String email) {
-        return RewardDetailsView.builder()
+    private BackofficeRewardView generateRewardStubForCurrencyAndEmail(final String currencyCode, final String email) {
+        return BackofficeRewardView.builder()
                 .id(RewardId.random())
                 .billingProfileAdmin(ShortBillingProfileAdminView.builder()
                         .admins(List.of(

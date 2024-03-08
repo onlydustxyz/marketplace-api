@@ -9,7 +9,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 @Builder
-public record RewardDetailsView(
+public record BackofficeRewardView(
         @NonNull RewardId id,
         @NonNull Status status,
         @NonNull ZonedDateTime requestedAt,

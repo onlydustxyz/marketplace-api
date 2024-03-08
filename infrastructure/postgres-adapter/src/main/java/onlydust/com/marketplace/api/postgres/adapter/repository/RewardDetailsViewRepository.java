@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.RewardDetailsViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BackofficeRewardViewEntity;
 import org.intellij.lang.annotations.Language;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-public interface RewardDetailsViewRepository extends JpaRepository<RewardDetailsViewEntity, UUID> {
+public interface RewardDetailsViewRepository extends JpaRepository<BackofficeRewardViewEntity, UUID> {
 
     @Language("PostgreSQL")
     String SELECT = """
@@ -113,28 +113,28 @@ public interface RewardDetailsViewRepository extends JpaRepository<RewardDetails
                 and (coalesce(:fromProcessedAt) is null or receipts.processed_at  >= cast(cast(:fromProcessedAt as text) as timestamp))
                 and (coalesce(:toProcessedAt)   is null or receipts.processed_at  <= cast(cast(:toProcessedAt   as text) as timestamp))
             """, nativeQuery = true)
-    Page<RewardDetailsViewEntity> findAllByStatusesAndDates(@NonNull List<String> statuses,
-                                                            Date fromRequestedAt, Date toRequestedAt,
-                                                            Date fromProcessedAt, Date toProcessedAt,
-                                                            Pageable pageable);
+    Page<BackofficeRewardViewEntity> findAllByStatusesAndDates(@NonNull List<String> statuses,
+                                                               Date fromRequestedAt, Date toRequestedAt,
+                                                               Date fromProcessedAt, Date toProcessedAt,
+                                                               Pageable pageable);
 
     @Query(value = SELECT + """
             where (coalesce(:invoiceStatuses) is null or cast(i.status as text) in (:invoiceStatuses))
             and (coalesce(:invoiceIds) is null or i.id in (:invoiceIds))
             """, nativeQuery = true)
-    List<RewardDetailsViewEntity> findAllByInvoiceStatusesAndInvoiceIds(List<String> invoiceStatuses, List<UUID> invoiceIds);
+    List<BackofficeRewardViewEntity> findAllByInvoiceStatusesAndInvoiceIds(List<String> invoiceStatuses, List<UUID> invoiceIds);
 
     @Query(value = SELECT + """
             where i.id = :invoiceId
             """, nativeQuery = true)
-    List<RewardDetailsViewEntity> findAllByInvoiceId(@NonNull UUID invoiceId);
+    List<BackofficeRewardViewEntity> findAllByInvoiceId(@NonNull UUID invoiceId);
 
 
     @Query(value = SELECT + """
             where r.id in (:rewardIds)
             """, nativeQuery = true)
-    List<RewardDetailsViewEntity> findAllByRewardIds(@NonNull List<UUID> rewardIds);
+    List<BackofficeRewardViewEntity> findAllByRewardIds(@NonNull List<UUID> rewardIds);
 
     @Query(nativeQuery = true, value = SELECT + " where receipts.processed_at is not null and r.payment_notified_at is null")
-    List<RewardDetailsViewEntity> findPaidRewardsToNotify();
+    List<BackofficeRewardViewEntity> findPaidRewardsToNotify();
 }

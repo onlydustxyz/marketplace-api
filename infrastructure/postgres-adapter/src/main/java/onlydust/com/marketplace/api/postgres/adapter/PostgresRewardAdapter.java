@@ -6,10 +6,10 @@ import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
+import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
-import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.RewardDetailsViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BackofficeRewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BatchPaymentDetailsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.PayableRewardWithPayoutInfoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentEntity;
@@ -66,22 +66,22 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
 
     @Override
     @Transactional(readOnly = true)
-    public List<RewardDetailsView> searchRewards(List<Invoice.Status> statuses, List<Invoice.Id> invoiceIds) {
+    public List<BackofficeRewardView> searchRewards(List<Invoice.Status> statuses, List<Invoice.Id> invoiceIds) {
         return rewardDetailsViewRepository.findAllByInvoiceStatusesAndInvoiceIds(
                         statuses != null ? statuses.stream().map(Invoice.Status::toString).toList() : null,
                         invoiceIds != null ? invoiceIds.stream().map(Invoice.Id::value).toList() : null
                 )
                 .stream()
-                .map(RewardDetailsViewEntity::toDomain)
+                .map(BackofficeRewardViewEntity::toDomain)
                 .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<RewardDetailsView> getInvoiceRewards(@NonNull Invoice.Id invoiceId) {
+    public List<BackofficeRewardView> getInvoiceRewards(@NonNull Invoice.Id invoiceId) {
         return rewardDetailsViewRepository.findAllByInvoiceId(invoiceId.value())
                 .stream()
-                .map(RewardDetailsViewEntity::toDomain)
+                .map(BackofficeRewardViewEntity::toDomain)
                 .toList();
     }
 
@@ -133,17 +133,17 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
                         BatchPaymentDetailsView.builder()
                                 .batchPayment(batchPaymentDetailsView.toDomain())
                                 .rewardViews(rewardDetailsViewRepository.findAllByRewardIds(batchPaymentDetailsView.getRewardIds()).stream()
-                                        .map(RewardDetailsViewEntity::toDomain)
+                                        .map(BackofficeRewardViewEntity::toDomain)
                                         .toList())
                                 .build()
                 );
     }
 
     @Override
-    public Page<RewardDetailsView> findRewards(int pageIndex, int pageSize,
-                                               @NonNull Set<RewardDetailsView.Status> statuses,
-                                               Date fromRequestedAt, Date toRequestedAt,
-                                               Date fromProcessedAt, Date toProcessedAt) {
+    public Page<BackofficeRewardView> findRewards(int pageIndex, int pageSize,
+                                                  @NonNull Set<BackofficeRewardView.Status> statuses,
+                                                  Date fromRequestedAt, Date toRequestedAt,
+                                                  Date fromProcessedAt, Date toProcessedAt) {
         final var page = rewardDetailsViewRepository.findAllByStatusesAndDates(
                 statuses.stream().map(RewardStatusEntity.Status::from).map(RewardStatusEntity.Status::toString).toList(),
                 fromRequestedAt, toRequestedAt,
@@ -151,8 +151,8 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
                 PageRequest.of(pageIndex, pageSize, Sort.by("requested_at").descending())
         );
 
-        return Page.<RewardDetailsView>builder()
-                .content(page.getContent().stream().map(RewardDetailsViewEntity::toDomain).toList())
+        return Page.<BackofficeRewardView>builder()
+                .content(page.getContent().stream().map(BackofficeRewardViewEntity::toDomain).toList())
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();
@@ -160,8 +160,8 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
 
     @Override
     @Transactional(readOnly = true)
-    public List<RewardDetailsView> findPaidRewardsToNotify() {
-        return rewardDetailsViewRepository.findPaidRewardsToNotify().stream().map(RewardDetailsViewEntity::toDomain).toList();
+    public List<BackofficeRewardView> findPaidRewardsToNotify() {
+        return rewardDetailsViewRepository.findPaidRewardsToNotify().stream().map(BackofficeRewardViewEntity::toDomain).toList();
     }
 
     @Override

@@ -36,7 +36,7 @@ import static java.util.Objects.isNull;
 @TypeDef(name = "billing_profile_type", typeClass = PostgreSQLEnumType.class)
 @TypeDef(name = "invoice_status", typeClass = PostgreSQLEnumType.class)
 @TypeDef(name = "verification_status", typeClass = PostgreSQLEnumType.class)
-public class RewardDetailsViewEntity {
+public class BackofficeRewardViewEntity {
     @Id
     @NonNull UUID id;
     @NonNull String status;
@@ -99,10 +99,10 @@ public class RewardDetailsViewEntity {
         }
     }
 
-    public RewardDetailsView toDomain() {
-        return RewardDetailsView.builder()
+    public BackofficeRewardView toDomain() {
+        return BackofficeRewardView.builder()
                 .id(RewardId.of(this.id))
-                .status(RewardDetailsView.Status.valueOf(this.status))
+                .status(BackofficeRewardView.Status.valueOf(this.status))
                 .requestedAt(DateMapper.ofNullable(this.requestedAt))
                 .processedAt(DateMapper.ofNullable(this.processedAt))
                 .githubUrls(isNull(this.githubUrls) ? List.of() : this.githubUrls.stream().sorted().toList())

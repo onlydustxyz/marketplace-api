@@ -6,8 +6,8 @@ import onlydust.com.backoffice.api.contract.model.RewardStatus;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
+import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
-import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Hash;
@@ -322,7 +322,7 @@ public interface BackOfficeMapper {
 
     @SneakyThrows
     static InvoiceResponse mapInvoiceToContract(final Invoice invoice, List<BillingProfileCoworkerView> billingProfileAdmins,
-                                                final List<RewardDetailsView> rewards) {
+                                                final List<BackofficeRewardView> rewards) {
         return new InvoiceResponse()
                 .id(invoice.id().value())
                 .number(invoice.number().toString())
@@ -354,8 +354,8 @@ public interface BackOfficeMapper {
                 .rewardsPerNetwork(mapInvoiceRewardsPerNetworks(invoice, rewards));
     }
 
-    static List<InvoiceRewardsPerNetwork> mapInvoiceRewardsPerNetworks(final Invoice invoice, final List<RewardDetailsView> rewards) {
-        final Map<Network, List<RewardDetailsView>> rewardsPerNetworks = rewards.stream().collect(groupingBy(RewardDetailsView::network));
+    static List<InvoiceRewardsPerNetwork> mapInvoiceRewardsPerNetworks(final Invoice invoice, final List<BackofficeRewardView> rewards) {
+        final Map<Network, List<BackofficeRewardView>> rewardsPerNetworks = rewards.stream().collect(groupingBy(BackofficeRewardView::network));
 
         return rewardsPerNetworks.entrySet().stream()
                 .map(e -> {
@@ -378,7 +378,7 @@ public interface BackOfficeMapper {
                 .toList();
     }
 
-    static List<InvoiceRewardResponse> mapNetworkRewards(final List<RewardDetailsView> rewards) {
+    static List<InvoiceRewardResponse> mapNetworkRewards(final List<BackofficeRewardView> rewards) {
         return rewards.stream()
                 .map(reward -> new InvoiceRewardResponse()
                         .id(reward.id().value())
@@ -406,8 +406,8 @@ public interface BackOfficeMapper {
                 .toList();
     }
 
-    static List<MoneyLinkResponse> mapNetworkRewardTotals(final List<RewardDetailsView> rewards) {
-        final Map<String, List<RewardDetailsView>> rewardsPerCurrencyCode = rewards.stream().collect(groupingBy(r -> r.money().currencyCode()));
+    static List<MoneyLinkResponse> mapNetworkRewardTotals(final List<BackofficeRewardView> rewards) {
+        final Map<String, List<BackofficeRewardView>> rewardsPerCurrencyCode = rewards.stream().collect(groupingBy(r -> r.money().currencyCode()));
 
         return rewardsPerCurrencyCode.entrySet().stream()
                 .map(e -> {
@@ -615,16 +615,16 @@ public interface BackOfficeMapper {
                 .address(currency.address().map(Hash::toString).orElse(null));
     }
 
-    static RewardDetailsView.Status mapRewardStatus(RewardStatus rewardStatus) {
+    static BackofficeRewardView.Status mapRewardStatus(RewardStatus rewardStatus) {
         return switch (rewardStatus) {
-            case PENDING_INVOICE -> RewardDetailsView.Status.PENDING_INVOICE;
-            case PENDING_SIGNUP -> RewardDetailsView.Status.PENDING_SIGNUP;
-            case PENDING_CONTRIBUTOR -> RewardDetailsView.Status.PENDING_CONTRIBUTOR;
-            case PENDING_VERIFICATION -> RewardDetailsView.Status.PENDING_VERIFICATION;
-            case MISSING_PAYOUT_INFO -> RewardDetailsView.Status.MISSING_PAYOUT_INFO;
-            case PROCESSING -> RewardDetailsView.Status.PROCESSING;
-            case COMPLETE -> RewardDetailsView.Status.COMPLETE;
-            case LOCKED -> RewardDetailsView.Status.LOCKED;
+            case PENDING_INVOICE -> BackofficeRewardView.Status.PENDING_INVOICE;
+            case PENDING_SIGNUP -> BackofficeRewardView.Status.PENDING_SIGNUP;
+            case PENDING_CONTRIBUTOR -> BackofficeRewardView.Status.PENDING_CONTRIBUTOR;
+            case PENDING_VERIFICATION -> BackofficeRewardView.Status.PENDING_VERIFICATION;
+            case MISSING_PAYOUT_INFO -> BackofficeRewardView.Status.MISSING_PAYOUT_INFO;
+            case PROCESSING -> BackofficeRewardView.Status.PROCESSING;
+            case COMPLETE -> BackofficeRewardView.Status.COMPLETE;
+            case LOCKED -> BackofficeRewardView.Status.LOCKED;
         };
     }
 }

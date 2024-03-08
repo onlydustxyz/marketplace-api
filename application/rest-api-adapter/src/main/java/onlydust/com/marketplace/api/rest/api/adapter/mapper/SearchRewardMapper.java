@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
-import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileAdminView;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
@@ -15,7 +15,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMap
 
 public interface SearchRewardMapper {
 
-    static SearchRewardsResponse searchRewardToResponse(final List<RewardDetailsView> rewardViews) {
+    static SearchRewardsResponse searchRewardToResponse(final List<BackofficeRewardView> rewardViews) {
         final SearchRewardsResponse searchRewardsResponse = new SearchRewardsResponse();
         for (var view : rewardViews) {
             searchRewardsResponse.addRewardsItem(mapToItem(view));
@@ -23,7 +23,7 @@ public interface SearchRewardMapper {
         return searchRewardsResponse;
     }
 
-    static SearchRewardItemResponse mapToItem(RewardDetailsView view) {
+    static SearchRewardItemResponse mapToItem(BackofficeRewardView view) {
         return new SearchRewardItemResponse()
                 .id(view.id().value())
                 .githubUrls(view.githubUrls())
@@ -54,7 +54,7 @@ public interface SearchRewardMapper {
                 .dollarsEquivalent(view.dollarsEquivalent());
     }
 
-    static RewardPageResponse rewardPageToResponse(int pageIndex, Page<RewardDetailsView> page) {
+    static RewardPageResponse rewardPageToResponse(int pageIndex, Page<BackofficeRewardView> page) {
         final RewardPageResponse response = new RewardPageResponse();
         response.setTotalPageNumber(page.getTotalPageNumber());
         response.setTotalItemNumber(page.getTotalItemNumber());
