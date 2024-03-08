@@ -319,14 +319,16 @@ public class RewardServiceTest {
                         RewardView.builder()
                                 .id(UUID.randomUUID())
                                 .billingProfileAdmin(ShortBillingProfileAdminView.builder()
-                                        .adminEmail(faker.gameOfThrones().character())
+                                        .admins(List.of(
+                                                new ShortBillingProfileAdminView.Admin(faker.name().username(),
+                                                        faker.internet().avatar(),
+                                                        faker.internet().emailAddress(),
+                                                        faker.name().firstName(),
+                                                        faker.name().lastName())
+                                        ))
                                         .billingProfileName(faker.gameOfThrones().character())
-                                        .adminGithubLogin(faker.gameOfThrones().character())
-                                        .adminName(faker.gameOfThrones().character())
-                                        .adminEmail(faker.gameOfThrones().character())
                                         .billingProfileType(BillingProfile.Type.COMPANY)
                                         .billingProfileId(BillingProfile.Id.random())
-                                        .adminGithubAvatarUrl(faker.rickAndMorty().character())
                                         .build())
                                 .requestedAt(ZonedDateTime.now())
                                 .githubUrls(List.of())
@@ -338,18 +340,21 @@ public class RewardServiceTest {
                                         .currencyCode(Currency.Code.USDC_STR)
                                         .currencyName(faker.rickAndMorty().location())
                                         .build())
+                                .transactionReferences(List.of(faker.random().hex()))
                                 .build(),
                         RewardView.builder()
                                 .id(UUID.randomUUID())
                                 .billingProfileAdmin(ShortBillingProfileAdminView.builder()
-                                        .adminEmail(faker.gameOfThrones().character())
+                                        .admins(List.of(
+                                                new ShortBillingProfileAdminView.Admin(faker.name().username(),
+                                                        faker.internet().avatar(),
+                                                        faker.internet().emailAddress(),
+                                                        faker.name().firstName(),
+                                                        faker.name().lastName())
+                                        ))
                                         .billingProfileName(faker.gameOfThrones().character())
-                                        .adminGithubLogin(faker.gameOfThrones().character())
-                                        .adminName(faker.gameOfThrones().character())
-                                        .adminEmail(faker.gameOfThrones().character())
                                         .billingProfileType(BillingProfile.Type.COMPANY)
                                         .billingProfileId(BillingProfile.Id.random())
-                                        .adminGithubAvatarUrl(faker.rickAndMorty().character())
                                         .build())
                                 .requestedAt(ZonedDateTime.now())
                                 .githubUrls(List.of())
@@ -376,14 +381,16 @@ public class RewardServiceTest {
         return RewardView.builder()
                 .id(UUID.randomUUID())
                 .billingProfileAdmin(ShortBillingProfileAdminView.builder()
-                        .adminEmail(faker.gameOfThrones().character())
+                        .admins(List.of(
+                                new ShortBillingProfileAdminView.Admin(faker.name().username(),
+                                        faker.internet().avatar(),
+                                        faker.internet().emailAddress(),
+                                        faker.name().firstName(),
+                                        faker.name().lastName())
+                        ))
                         .billingProfileName(faker.gameOfThrones().character())
-                        .adminGithubLogin(faker.gameOfThrones().character())
-                        .adminName(faker.gameOfThrones().character())
-                        .adminEmail(faker.gameOfThrones().character())
                         .billingProfileType(BillingProfile.Type.COMPANY)
                         .billingProfileId(BillingProfile.Id.random())
-                        .adminGithubAvatarUrl(faker.rickAndMorty().character())
                         .build())
                 .requestedAt(ZonedDateTime.now())
                 .githubUrls(List.of())
@@ -394,6 +401,7 @@ public class RewardServiceTest {
                         .currencyCode(currencyCode)
                         .currencyName(faker.rickAndMorty().location())
                         .build())
+                .transactionReferences(List.of())
                 .build();
     }
 }

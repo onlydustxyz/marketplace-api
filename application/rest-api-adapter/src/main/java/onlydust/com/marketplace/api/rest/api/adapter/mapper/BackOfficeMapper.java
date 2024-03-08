@@ -379,8 +379,6 @@ public interface BackOfficeMapper {
     }
 
     static List<InvoiceRewardResponse> mapNetworkRewards(final List<RewardView> rewards) {
-        final Map<String, List<RewardView>> rewardsPerCurrencyCode = rewards.stream().collect(groupingBy(r -> r.money().currencyCode()));
-
         return rewards.stream()
                 .map(reward -> new InvoiceRewardResponse()
                         .id(reward.id())

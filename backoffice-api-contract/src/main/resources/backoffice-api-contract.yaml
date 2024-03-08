@@ -2939,8 +2939,10 @@ components:
             type: string
             example: 0x1234567890abcdef
         paidTo:
-          type: string
-          example: 0x1234567890abcdef
+          type: array
+          items:
+            type: string
+            example: 0x1234567890abcdef
 
     RewardStatus:
       enum:

@@ -315,11 +315,8 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public List<BillingProfileCoworkerView> findBillingProfileAdmins(BillingProfile.Id billingProfileId) {
-        //TODO: save "createdBy" in invoice so that we can return this admin first
-        return billingProfileUserViewRepository.findAdminsByBillingProfileId(billingProfileId.value())
-                .stream()
-                .map(BillingProfileUserViewEntity::toView)
-                .toList();
+    public Optional<BillingProfileCoworkerView> findBillingProfileAdmin(UserId userId, BillingProfile.Id billingProfileId) {
+        return billingProfileUserViewRepository.findBillingProfileAdminById(userId.value(), billingProfileId.value())
+                .map(BillingProfileUserViewEntity::toView);
     }
 }

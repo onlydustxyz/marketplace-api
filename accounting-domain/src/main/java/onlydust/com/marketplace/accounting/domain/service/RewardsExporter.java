@@ -49,8 +49,7 @@ public class RewardsExporter {
             for (final var reward : rewards) {
                 csvPrinter.printRecord(
                         reward.project().name(),
-                        isNull(reward.billingProfileAdmin()) ? null : reward.billingProfileAdmin().adminName(),
-                        isNull(reward.billingProfileAdmin()) ? null : reward.billingProfileAdmin().adminGithubLogin(),
+                        isNull(reward.billingProfileAdmin()) ? null : reward.billingProfileAdmin().admins(),
                         reward.money().amount(),
                         reward.money().currencyCode(),
                         reward.githubUrls(),
@@ -58,10 +57,9 @@ public class RewardsExporter {
                         reward.requestedAt(),
                         reward.processedAt(),
                         reward.transactionReferences(),
-                        reward.paidTo(),
+                        reward.paidToAccountNumbers(),
                         reward.id().pretty(),
                         reward.sponsors().stream().map(ShortSponsorView::name).toList(),
-                        isNull(reward.billingProfileAdmin()) ? null : reward.billingProfileAdmin().adminEmail(),
                         isNull(reward.billingProfileAdmin()) ? null : reward.billingProfileAdmin().verificationStatus(),
                         isNull(reward.billingProfileAdmin()) ? null : reward.billingProfileAdmin().billingProfileType(),
                         isNull(reward.invoice()) ? null : reward.invoice().number(),

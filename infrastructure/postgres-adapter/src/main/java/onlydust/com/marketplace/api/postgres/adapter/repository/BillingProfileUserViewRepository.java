@@ -92,6 +92,6 @@ public interface BillingProfileUserViewRepository extends JpaRepository<BillingP
     Optional<BillingProfileUserViewEntity> findUserByBillingProfileIdAndGithubId(UUID billingProfileId, Long githubUserId);
 
     @Query(value = SELECT_COWORKER +
-                   " WHERE bpu.billing_profile_id = :billingProfileId AND bpu.role = 'ADMIN' ", nativeQuery = true)
-    List<BillingProfileUserViewEntity> findAdminsByBillingProfileId(UUID billingProfileId);
+                   " WHERE u.id = :userId AND bpu.billing_profile_id = :billingProfileId AND bpu.role = 'ADMIN' ", nativeQuery = true)
+    Optional<BillingProfileUserViewEntity> findBillingProfileAdminById(UUID userId, UUID billingProfileId);
 }

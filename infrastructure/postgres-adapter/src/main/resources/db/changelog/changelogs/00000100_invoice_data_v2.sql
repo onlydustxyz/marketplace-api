@@ -1,5 +1,9 @@
+ALTER TABLE accounting.invoices
+    ADD COLUMN created_by UUID;
+
 UPDATE accounting.invoices
-SET data =
+SET created_by = (select bpu.user_id from accounting.billing_profiles_users bpu where bpu.billing_profile_id = billing_profile_id),
+    data       =
         jsonb_build_object
         (
                 'dueAt', data -> 'dueAt',
@@ -16,4 +20,5 @@ SET data =
                 )
         );
 
-
+ALTER TABLE accounting.invoices
+    ALTER COLUMN created_by SET NOT NULL;

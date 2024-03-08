@@ -170,7 +170,7 @@ public class AccountingObserverTest {
                     .kyb(newKyb(billingProfileId, UserId.random()))
                     .build();
 
-            var invoice = Invoice.of(companyBillingProfile, 1);
+            var invoice = Invoice.of(companyBillingProfile, 1, UserId.random());
             invoice = invoice.rewards(List.of(
                     new Invoice.Reward(rewardId, ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                             Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id()),
@@ -359,7 +359,7 @@ public class AccountingObserverTest {
                     .kyb(newKyb(billingProfileId, UserId.random()))
                     .build();
 
-            invoice = Invoice.of(companyBillingProfile, 1);
+            invoice = Invoice.of(companyBillingProfile, 1, UserId.random());
 
             invoice.rewards(List.of(
                     new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
@@ -410,7 +410,7 @@ public class AccountingObserverTest {
                     .kyb(newKyb(billingProfileId, UserId.random()))
                     .build();
 
-            invoice = Invoice.of(companyBillingProfile, 1);
+            invoice = Invoice.of(companyBillingProfile, 1, UserId.random());
 
             invoice.rewards(List.of(
                     new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),

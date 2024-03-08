@@ -188,7 +188,7 @@ public interface BillingProfileMapper {
                 .name(companyInfo.name())
                 .address(companyInfo.address())
                 .registrationNumber(companyInfo.registrationNumber())
-                .vatRegulationState(map(companyInfo.vatRegulationStateOf()))
+                .vatRegulationState(map(companyInfo.vatRegulationState()))
                 .euVATNumber(companyInfo.euVATNumber())
                 .countryCode(companyInfo.countryCode())
                 .country(companyInfo.countryName())

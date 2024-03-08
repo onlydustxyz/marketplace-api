@@ -86,7 +86,7 @@ public interface SearchRewardMapper {
                         : null
                 )
                 .transactionReferences(rewardDetailsView.transactionReferences())
-                .paidTo(rewardDetailsView.paidTo())
+                .paidTo(rewardDetailsView.paidToAccountNumbers())
                 .recipient(rewardDetailsView.recipient() != null ?
                         new RecipientLinkResponse()
                                 .login(rewardDetailsView.recipient().login())
@@ -116,11 +116,13 @@ public interface SearchRewardMapper {
                             case REJECTED -> VerificationStatus.REJECTED;
                             case CLOSED -> VerificationStatus.CLOSED;
                         })
-                .admins(List.of(new BillingProfileAdminResponse()
-                        .name(billingProfileAdminView.adminName())
-                        .email(billingProfileAdminView.adminEmail())
-                        .login(billingProfileAdminView.adminGithubLogin())
-                        .avatarUrl(billingProfileAdminView.adminGithubAvatarUrl()))
+                .admins(billingProfileAdminView.admins().stream()
+                        .map(admin -> new BillingProfileAdminResponse()
+                                .name(admin.firstName() + " " + admin.lastName())
+                                .email(admin.email())
+                                .login(admin.login())
+                                .avatarUrl(admin.avatarUrl()))
+                        .toList()
                 );
     }
 }

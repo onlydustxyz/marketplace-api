@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
@@ -32,6 +33,7 @@ public class Invoice {
 
     private final @NonNull Id id;
     private final @NonNull BillingProfileSnapshot billingProfileSnapshot;
+    private final @NonNull UserId createdBy;
     private final @NonNull ZonedDateTime createdAt;
     private final @NonNull ZonedDateTime dueAt;
     private final @NonNull Invoice.Number number;
@@ -41,7 +43,7 @@ public class Invoice {
     private String originalFileName;
     private String rejectionReason;
 
-    public static Invoice of(final @NonNull BillingProfileView billingProfile, int sequenceNumber) {
+    public static Invoice of(final @NonNull BillingProfileView billingProfile, int sequenceNumber, final @NonNull UserId createdBy) {
         if (billingProfile.getPayoutInfo() == null) {
             throw internalServerError("An invoice can only be created on a billing profile with payout info (billing profile %s)".formatted(billingProfile.getId()));
         }
@@ -49,6 +51,7 @@ public class Invoice {
         return new Invoice(
                 Id.random(),
                 BillingProfileSnapshot.of(billingProfile, billingProfile.getPayoutInfo()),
+                createdBy,
                 now,
                 now.plusDays(DUE_DAY_COUNT_AFTER_CREATION),
                 isNull(billingProfile.getKyc()) ?

@@ -48,13 +48,12 @@ public class InvoiceService implements InvoiceFacadePort {
         }
         invoiceStoragePort.update(invoice.status(status).rejectionReason(rejectionReason));
         if (status == Invoice.Status.REJECTED) {
-            final var billingProfileAdmins = billingProfileStoragePort.findBillingProfileAdmins(invoice.billingProfileSnapshot().id());
-            final var billingProfileAdminView = billingProfileAdmins.stream().findFirst()
+            final var billingProfileAdmin = billingProfileStoragePort.findBillingProfileAdmin(invoice.createdBy(), invoice.billingProfileSnapshot().id())
                     .orElseThrow(() -> notFound("Billing profile admin not found for billing profile %s".formatted(invoice.billingProfileSnapshot().id())));
 
-            billingProfileObserver.onInvoiceRejected(new InvoiceRejected(billingProfileAdminView.email(),
-                    (long) invoice.rewards().size(), billingProfileAdminView.login(),
-                    billingProfileAdminView.firstName(),
+            billingProfileObserver.onInvoiceRejected(new InvoiceRejected(billingProfileAdmin.email(),
+                    (long) invoice.rewards().size(), billingProfileAdmin.login(),
+                    billingProfileAdmin.firstName(),
                     invoice.number().value(),
                     invoice.rewards().stream()
                             .map(reward -> InvoiceRejected.ShortReward.builder()

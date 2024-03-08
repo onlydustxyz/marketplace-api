@@ -59,7 +59,7 @@ class InvoiceTest {
                     .kyc(newKyc(billingProfileId, UserId.random()))
                     .build();
 
-            invoice = Invoice.of(individualBillingProfile, 1)
+            invoice = Invoice.of(individualBillingProfile, 1, UserId.random())
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                     Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
@@ -125,7 +125,7 @@ class InvoiceTest {
                     .kyb(kyb)
                     .build();
 
-            invoice = Invoice.of(companyBillingProfile, 1)
+            invoice = Invoice.of(companyBillingProfile, 1, UserId.random())
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                     Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
@@ -195,7 +195,7 @@ class InvoiceTest {
                     .kyb(kyb)
                     .build();
 
-            invoice = Invoice.of(companyBillingProfile, 1)
+            invoice = Invoice.of(companyBillingProfile, 1, UserId.random())
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                     Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
@@ -266,7 +266,7 @@ class InvoiceTest {
                     .kyb(kyb)
                     .build();
 
-            invoice = Invoice.of(companyBillingProfile, 1)
+            invoice = Invoice.of(companyBillingProfile, 1, UserId.random())
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                     Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
@@ -337,7 +337,7 @@ class InvoiceTest {
                     .kyb(kyb)
                     .build();
 
-            invoice = Invoice.of(companyBillingProfile, 1)
+            invoice = Invoice.of(companyBillingProfile, 1, UserId.random())
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                     Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),

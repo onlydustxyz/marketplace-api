@@ -41,10 +41,6 @@ public class InvoiceRewardViewEntity {
     String projectName;
     String projectLogoUrl;
     ZonedDateTime processedAt;
-    String recipientLogin;
-    String recipientAvatarUrl;
-    String recipientName;
-    String recipientEmail;
     BigDecimal dollarsEquivalent;
     BigDecimal amount;
     @Type(type = "billing_profile_type")
@@ -52,6 +48,8 @@ public class InvoiceRewardViewEntity {
     BillingProfileEntity.Type billingProfileType;
     String billingProfileName;
     UUID billingProfileId;
+    @Type(type = "jsonb")
+    ShortBillingProfileAdminView.Admin invoiceCreator;
     @Type(type = "jsonb")
     List<SponsorLinkView> sponsors;
     @Type(type = "jsonb")
@@ -84,10 +82,7 @@ public class InvoiceRewardViewEntity {
                 .projectName(this.projectName)
                 .projectLogoUrl(this.projectLogoUrl)
                 .billingProfileAdmin(ShortBillingProfileAdminView.builder()
-                        .adminGithubLogin(this.recipientLogin)
-                        .adminEmail(this.recipientEmail)
-                        .adminName(this.recipientName)
-                        .adminGithubAvatarUrl(this.recipientAvatarUrl)
+                        .admins(List.of(invoiceCreator))
                         .billingProfileId(BillingProfile.Id.of(this.billingProfileId))
                         .billingProfileName(this.billingProfileName)
                         .billingProfileType(switch (this.billingProfileType) {

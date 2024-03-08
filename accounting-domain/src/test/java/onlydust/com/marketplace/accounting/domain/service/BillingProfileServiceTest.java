@@ -75,7 +75,7 @@ class BillingProfileServiceTest {
                 .name("OnlyDust")
                 .kyb(newKyb(billingProfileId, userId))
                 .build();
-        invoice = Invoice.of(companyBillingProfile, 1)
+        invoice = Invoice.of(companyBillingProfile, 1, userId)
                 .rewards(rewards);
         reset(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort, billingProfileObserver);
     }
@@ -174,7 +174,7 @@ class BillingProfileServiceTest {
             rewards = List.of(fakeReward(), fakeReward(), reward, fakeReward());
             rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
 
-            invoice = Invoice.of(companyBillingProfile, 1)
+            invoice = Invoice.of(companyBillingProfile, 1, userId)
                     .rewards(rewards)
                     .status(Invoice.Status.APPROVED);
             when(invoiceStoragePort.get(reward.invoiceId())).thenReturn(Optional.of(invoice));

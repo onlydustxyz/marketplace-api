@@ -75,5 +75,5 @@ public interface BillingProfileStoragePort {
 
     void deleteCoworker(BillingProfile.Id billingProfileId, UserId userId);
 
-    List<BillingProfileCoworkerView> findBillingProfileAdmins(BillingProfile.Id billingProfileId);
+    Optional<BillingProfileCoworkerView> findBillingProfileAdmin(UserId userId, BillingProfile.Id billingProfileId);
 }

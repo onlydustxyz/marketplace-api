@@ -324,6 +324,7 @@ public class AbstractMarketplaceApiIT {
                 id,
                 UUID.randomUUID(),
                 Invoice.Number.of(12, lastName, firstName).toString(),
+                UUID.randomUUID(),
                 ZonedDateTime.now().minusDays(1),
                 InvoiceEntity.Status.TO_REVIEW,
                 rewards.stream().map(InvoiceRewardEntity::targetAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add),

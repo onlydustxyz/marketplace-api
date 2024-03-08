@@ -16,7 +16,6 @@ import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserve
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileAdminView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -62,7 +61,7 @@ class InvoiceServiceTest {
                 .name("John")
                 .kyc(newKyc(billingProfileId, UserId.random()))
                 .build();
-        invoice = Invoice.of(individualBillingProfile, 1);
+        invoice = Invoice.of(individualBillingProfile, 1, UserId.random());
         reset(invoiceStoragePort, pdfStoragePort, billingProfileObserver);
     }
 
@@ -134,7 +133,7 @@ class InvoiceServiceTest {
         assertThatThrownBy(() -> invoiceService.update(invoice.id(), status, rejectionReason))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("BillingProfile admin for invoice %s was not found".formatted(invoice.id()));
+                .hasMessage("Billing profile admin not found for billing profile %s".formatted(invoice.billingProfileSnapshot().id()));
     }
 
     @Test
@@ -151,7 +150,19 @@ class InvoiceServiceTest {
                 .kyc(newKyc(billingProfileId, UserId.random()))
                 .build();
 
-        final var invoice = Invoice.of(individualBillingProfile, 1);
+        final var invoiceCreatorId = UserId.random();
+        final var invoiceCreator = BillingProfileCoworkerView.builder()
+                .login(faker.name().username())
+                .email(faker.internet().emailAddress())
+                .firstName(faker.name().firstName())
+                .githubUserId(GithubUserId.of(faker.number().randomNumber(10, true)))
+                .role(BillingProfile.User.Role.ADMIN)
+                .joinedAt(ZonedDateTime.now())
+                .invitedAt(null)
+                .rewardCount(0)
+                .billingProfileAdminCount(1)
+                .build();
+        final var invoice = Invoice.of(individualBillingProfile, 1, invoiceCreatorId);
         invoice.rewards(List.of(
                 new Invoice.Reward(RewardId.random(), ZonedDateTime.now(), faker.rickAndMorty().character(),
                         Money.of(BigDecimal.TEN, Currency.crypto("dustyCrypto", Currency.Code.of("DSTC"), 10)),
@@ -159,25 +170,10 @@ class InvoiceServiceTest {
         when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
         Invoice.Status status = Invoice.Status.REJECTED;
         final String rejectionReason = faker.rickAndMorty().character();
-        final BillingProfileAdminView billingProfileAdminView = BillingProfileAdminView.builder()
-                .email(faker.internet().emailAddress())
-                .firstName(faker.name().firstName())
-                .githubLogin(faker.name().lastName())
-                .build();
 
         // When
-        when(billingProfileStoragePort.findBillingProfileAdmins(invoice.billingProfileSnapshot().id()))
-                .thenReturn(List.of(BillingProfileCoworkerView.builder()
-                        .login(faker.name().username())
-                        .email(faker.internet().emailAddress())
-                        .firstName(faker.name().firstName())
-                        .githubUserId(GithubUserId.of(faker.number().randomNumber(10, true)))
-                        .role(BillingProfile.User.Role.ADMIN)
-                        .joinedAt(ZonedDateTime.now())
-                        .invitedAt(null)
-                        .rewardCount(0)
-                        .billingProfileAdminCount(1)
-                        .build()));
+        when(billingProfileStoragePort.findBillingProfileAdmin(invoiceCreatorId, invoice.billingProfileSnapshot().id()))
+                .thenReturn(Optional.of(invoiceCreator));
         invoiceService.update(invoice.id(), status, rejectionReason);
 
         // Then
@@ -189,9 +185,9 @@ class InvoiceServiceTest {
         verify(billingProfileObserver).onInvoiceRejected(rejectedArgumentCaptor.capture());
         assertThat(rejectedArgumentCaptor.getValue().rejectionReason()).isEqualTo(rejectionReason);
         assertThat(rejectedArgumentCaptor.getValue().invoiceName()).isEqualTo(invoice.number().value());
-        assertThat(rejectedArgumentCaptor.getValue().billingProfileAdminEmail()).isEqualTo(billingProfileAdminView.email());
-        assertThat(rejectedArgumentCaptor.getValue().billingProfileAdminFirstName()).isEqualTo(billingProfileAdminView.firstName());
-        assertThat(rejectedArgumentCaptor.getValue().billingProfileAdminGithubLogin()).isEqualTo(billingProfileAdminView.githubLogin());
+        assertThat(rejectedArgumentCaptor.getValue().billingProfileAdminEmail()).isEqualTo(invoiceCreator.email());
+        assertThat(rejectedArgumentCaptor.getValue().billingProfileAdminFirstName()).isEqualTo(invoiceCreator.firstName());
+        assertThat(rejectedArgumentCaptor.getValue().billingProfileAdminGithubLogin()).isEqualTo(invoiceCreator.login());
         assertThat(rejectedArgumentCaptor.getValue().rewardCount()).isEqualTo(invoice.rewards().size());
         assertThat(rejectedArgumentCaptor.getValue().rewards().get(0).projectName()).isEqualTo(invoice.rewards().get(0).projectName());
         assertThat(rejectedArgumentCaptor.getValue().rewards().get(0).amount()).isEqualTo(invoice.rewards().get(0).amount().getValue());

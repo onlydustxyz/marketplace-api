@@ -43,6 +43,9 @@ public class RewardDetailsViewEntity {
     @NonNull Date requestedAt;
     Date processedAt;
 
+    String recipientLogin;
+    String recipientAvatarUrl;
+
     @Type(type = "jsonb")
     List<String> githubUrls;
 
@@ -69,10 +72,8 @@ public class RewardDetailsViewEntity {
     @Type(type = "verification_status")
     @Enumerated(EnumType.STRING)
     VerificationStatusEntity billingProfileVerificationStatus;
-    String billingProfileAdminLogin;
-    String billingProfileAdminAvatarUrl;
-    String billingProfileAdminName;
-    String billingProfileAdminEmail;
+    @Type(type = "jsonb")
+    ShortBillingProfileAdminView.Admin invoiceCreator;
 
     UUID invoiceId;
     String invoiceNumber;
@@ -82,7 +83,8 @@ public class RewardDetailsViewEntity {
 
     @Type(type = "jsonb")
     List<String> transactionReferences;
-    String paidTo;
+    @Type(type = "jsonb")
+    List<String> paidToAccountNumbers;
 
     @Data
     public static class SponsorLinkView {
@@ -113,10 +115,7 @@ public class RewardDetailsViewEntity {
                         .build())
                 .billingProfileAdmin(isNull(this.billingProfileId) ? null :
                         ShortBillingProfileAdminView.builder()
-                                .adminGithubLogin(this.billingProfileAdminLogin)
-                                .adminEmail(this.billingProfileAdminEmail)
-                                .adminName(this.billingProfileAdminName)
-                                .adminGithubAvatarUrl(this.billingProfileAdminAvatarUrl)
+                                .admins(List.of(this.invoiceCreator))
                                 .billingProfileId(BillingProfile.Id.of(this.billingProfileId))
                                 .billingProfileName(this.billingProfileName)
                                 .billingProfileType(switch (this.billingProfileType) {
@@ -126,7 +125,7 @@ public class RewardDetailsViewEntity {
                                 })
                                 .verificationStatus(this.billingProfileVerificationStatus.toDomain())
                                 .build())
-                .recipient(new ShortContributorView(this.billingProfileAdminLogin, this.billingProfileAdminAvatarUrl))
+                .recipient(new ShortContributorView(this.recipientLogin, this.recipientAvatarUrl))
                 .sponsors(isNull(this.sponsors) ? List.of() : this.sponsors.stream()
                         .map(InvoiceRewardViewEntity.SponsorLinkView::toDomain)
                         .sorted(comparing(ShortSponsorView::name))
@@ -143,8 +142,8 @@ public class RewardDetailsViewEntity {
                         .number(Invoice.Number.fromString(this.invoiceNumber))
                         .status(Invoice.Status.valueOf(this.invoiceStatus.toString()))
                         .build())
-                .transactionReferences(this.transactionReferences)
-                .paidTo(this.paidTo)
+                .transactionReferences(isNull(this.transactionReferences) ? List.of() : this.transactionReferences)
+                .paidToAccountNumbers(isNull(this.paidToAccountNumbers) ? List.of() : this.paidToAccountNumbers)
                 .build();
     }
 }

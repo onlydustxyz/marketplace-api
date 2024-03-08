@@ -85,8 +85,8 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
 
         final int sequenceNumber = invoiceStoragePort.getNextSequenceNumber(billingProfileId);
-        final var invoice = Invoice.of(billingProfile, sequenceNumber).rewards(rewards);
-        
+        final var invoice = Invoice.of(billingProfile, sequenceNumber, userId).rewards(rewards);
+
         invoiceStoragePort.deleteDraftsOf(billingProfileId);
         invoiceStoragePort.create(invoice);
         return invoice;

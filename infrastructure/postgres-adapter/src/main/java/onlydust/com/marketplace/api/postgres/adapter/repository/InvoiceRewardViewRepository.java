@@ -19,10 +19,6 @@ public interface InvoiceRewardViewRepository extends JpaRepository<InvoiceReward
                    pd.name                                project_name,
                    pd.logo_url                            project_logo_url,
                    s2.s_list                              sponsors,
-                   u.github_login                         recipient_login,
-                   u.github_avatar_url                    recipient_avatar_url,
-                   u.email                                recipient_email,
-                   upi.first_name || ' ' || upi.last_name recipient_name,
                    g_urls.urls                            github_urls,
                    rsd.amount_usd_equivalent              dollars_equivalent,
                    i.billing_profile_id                   billing_profile_id,
@@ -30,7 +26,10 @@ public interface InvoiceRewardViewRepository extends JpaRepository<InvoiceReward
                    case
                        when kyc is not null then kyc.first_name || ' ' || kyc.last_name
                        when kyb is not null then kyb.name
-                       end                                billing_profile_name,
+                   end                                    billing_profile_name,
+                       
+                   creator.info                           invoice_creator,
+                   
                    c.name                                 currency_name,
                    c.code                                 currency_code,
                    c.logo_url                             currency_logo_url,
@@ -43,6 +42,19 @@ public interface InvoiceRewardViewRepository extends JpaRepository<InvoiceReward
                      left join accounting.invoices i on i.id = r.invoice_id
                      left join accounting.kyb kyb on kyb.billing_profile_id = i.billing_profile_id
                      left join accounting.kyc kyc on kyc.billing_profile_id = i.billing_profile_id
+                     
+                     left join (select creator.id, jsonb_build_object(
+                                        'login', coalesce(creator_ga.login, creator.github_login),
+                                        'avatarUrl', user_avatar_url(creator.github_user_id, creator_ga.avatar_url),
+                                        'email',creator.email,
+                                        'firstName',creator_kyc.first_name,
+                                        'lastName',creator_kyc.last_name
+                                ) as info
+                                from iam.users creator
+                                join accounting.kyc creator_kyc on creator_kyc.owner_id = creator.id
+                                left join indexer_exp.github_accounts creator_ga on creator_ga.id = creator.github_user_id
+                                ) creator on creator.id = i.created_by
+                     
                      left join (select ps2.project_id, jsonb_agg(json_build_object('name', s.name, 'logoUrl', s.logo_url)) s_list
                                 from sponsors s
                                          join projects_sponsors ps2 on ps2.sponsor_id = s.id
