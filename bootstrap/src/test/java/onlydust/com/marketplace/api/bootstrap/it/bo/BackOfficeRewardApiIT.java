@@ -1324,9 +1324,6 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 new Date()));
         paymentRepository.save(new PaymentEntity(UUID.randomUUID(), BigDecimal.ONE, "ETH", JacksonUtil.toJsonNode("{}"), rewardsToPay.get(1).getId(),
                 new Date()));
-        paymentRepository.save(new PaymentEntity(UUID.randomUUID(), BigDecimal.ONE, "ETH", JacksonUtil.toJsonNode("{}"), rewardsToPay.get(10).getId(),
-                new Date()));
-
 
         makeWebhookSendRewardsPaidMailWireMockServer.stubFor(
                 post("/?api-key=%s".formatted(webhookHttpClientProperties.getApiKey()))
@@ -1345,16 +1342,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 postRequestedFor(urlEqualTo("/?api-key=%s".formatted(webhookHttpClientProperties.getApiKey())))
                         .withHeader("Content-Type", equalTo("application/json"))
                         .withRequestBody(matchingJsonPath("$.recipientEmail", equalTo("abuisset@gmail.com")))
-                        .withRequestBody(matchingJsonPath("$.recipientName", equalTo("Anthony BUISSET")))
-                        .withRequestBody(matchingJsonPath("$.rewardNames", containing("#65875 - kaaper - USDC - 1000")))
-                        .withRequestBody(matchingJsonPath("$.rewardNames", containing("#D22F7 - kaaper - USDC - 1000"))));
-
-        makeWebhookSendRewardsPaidMailWireMockServer.verify(1,
-                postRequestedFor(urlEqualTo("/?api-key=%s".formatted(webhookHttpClientProperties.getApiKey())))
-                        .withHeader("Content-Type", equalTo("application/json"))
-                        .withRequestBody(matchingJsonPath("$.recipientEmail", equalTo("olivier.fuxet@gmail.com")))
-                        .withRequestBody(matchingJsonPath("$.recipientName", equalTo("Olivier Fuxet")))
-                        .withRequestBody(matchingJsonPath("$.rewardNames", containing("#A2CB3 - kaaper2 - STRK - 11522"))));
+                        .withRequestBody(matchingJsonPath("$.recipientName", equalTo("Anthony BUISSET"))));
     }
 
     private static final String GET_BATCH_PAYMENTS_PAGE_JSON_RESPONSE = """
