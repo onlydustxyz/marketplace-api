@@ -11,8 +11,7 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
-import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.RewardView;
+import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BatchPaymentMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
@@ -182,7 +181,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
 
-        final Page<RewardDetailsView> rewards = accountingRewardPort.getRewards(
+        final Page<BackofficeRewardView> rewards = accountingRewardPort.getRewards(
                 sanitizedPageIndex,
                 sanitizedPageSize,
                 statuses != null ? statuses.stream().map(BackOfficeMapper::mapRewardStatus).toList() : null,
@@ -219,7 +218,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     public ResponseEntity<SearchRewardsResponse> searchRewards(SearchRewardsRequest searchRewardsRequest) {
         final var invoiceIds = searchRewardsRequest.getInvoiceIds() != null ?
                 searchRewardsRequest.getInvoiceIds().stream().map(Invoice.Id::of).toList() : null;
-        final List<RewardView> rewardViews = accountingRewardPort.searchForBatchPaymentByInvoiceIds(invoiceIds);
+        final List<BackofficeRewardView> rewardViews = accountingRewardPort.searchForBatchPaymentByInvoiceIds(invoiceIds);
         return ResponseEntity.ok(SearchRewardMapper.searchRewardToResponse(rewardViews));
     }
 

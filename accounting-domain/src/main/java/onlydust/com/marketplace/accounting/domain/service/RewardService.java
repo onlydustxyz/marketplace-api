@@ -9,7 +9,10 @@ import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
 import onlydust.com.marketplace.accounting.domain.port.out.OldRewardStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.*;
+import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
+import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
+import onlydust.com.marketplace.accounting.domain.view.MoneyView;
+import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -32,7 +35,7 @@ public class RewardService implements AccountingRewardPort {
             Currency.Code.LORDS_STR);
 
     @Override
-    public List<RewardView> searchForBatchPaymentByInvoiceIds(List<Invoice.Id> invoiceIds) {
+    public List<BackofficeRewardView> searchForBatchPaymentByInvoiceIds(List<Invoice.Id> invoiceIds) {
         return accountingRewardStoragePort.searchRewards(List.of(Invoice.Status.APPROVED), invoiceIds)
                 .stream()
                 .filter(rewardView -> CURRENCY_CODES_AVAILABLE_FOR_BATCH_PAYMENT.contains(rewardView.money().currencyCode()))
@@ -42,7 +45,7 @@ public class RewardService implements AccountingRewardPort {
     }
 
     @Override
-    public List<RewardView> findByInvoiceId(Invoice.Id invoiceId) {
+    public List<BackofficeRewardView> findByInvoiceId(Invoice.Id invoiceId) {
         return accountingRewardStoragePort.getInvoiceRewards(invoiceId);
     }
 
@@ -120,13 +123,13 @@ public class RewardService implements AccountingRewardPort {
     }
 
     @Override
-    public Page<RewardDetailsView> getRewards(int pageIndex, int pageSize,
-                                              List<RewardDetailsView.Status> statuses,
-                                              Date fromRequestedAt, Date toRequestedAt,
-                                              Date fromProcessedAt, Date toProcessedAt) {
-        Set<RewardDetailsView.Status> sanitizedStatuses;
+    public Page<BackofficeRewardView> getRewards(int pageIndex, int pageSize,
+                                                 List<BackofficeRewardView.Status> statuses,
+                                                 Date fromRequestedAt, Date toRequestedAt,
+                                                 Date fromProcessedAt, Date toProcessedAt) {
+        Set<BackofficeRewardView.Status> sanitizedStatuses;
         if (statuses == null || statuses.isEmpty()) {
-            sanitizedStatuses = EnumSet.allOf(RewardDetailsView.Status.class).stream().collect(Collectors.toUnmodifiableSet());
+            sanitizedStatuses = EnumSet.allOf(BackofficeRewardView.Status.class).stream().collect(Collectors.toUnmodifiableSet());
         } else {
             sanitizedStatuses = statuses.stream().collect(Collectors.toUnmodifiableSet());
         }
@@ -134,7 +137,7 @@ public class RewardService implements AccountingRewardPort {
     }
 
     @Override
-    public String exportRewardsCSV(List<RewardDetailsView.Status> statuses,
+    public String exportRewardsCSV(List<BackofficeRewardView.Status> statuses,
                                    Date fromRequestedAt, Date toRequestedAt,
                                    Date fromProcessedAt, Date toProcessedAt) {
         final var rewards = accountingRewardStoragePort.findRewards(0, 1_000_000,
@@ -149,14 +152,13 @@ public class RewardService implements AccountingRewardPort {
 
     @Override
     public void notifyAllNewPaidRewards() {
-        final List<RewardView> rewardViews = accountingRewardStoragePort.findPaidRewardsToNotify();
-        for (Map.Entry<String, List<RewardView>> listOfPaidRewardsMapToAdminEmail :
+        final List<BackofficeRewardView> rewardViews = accountingRewardStoragePort.findPaidRewardsToNotify();
+        for (Map.Entry<String, List<BackofficeRewardView>> listOfPaidRewardsMapToAdminEmail :
                 rewardViews.stream().collect(Collectors.groupingBy(rewardView -> rewardView.billingProfileAdmin().admins().get(0).email())).entrySet()) {
             mailNotificationPort.sendRewardsPaidMail(listOfPaidRewardsMapToAdminEmail.getKey(), listOfPaidRewardsMapToAdminEmail.getValue());
         }
         accountingRewardStoragePort.markRewardsAsPaymentNotified(rewardViews.stream()
-                .map(RewardView::id)
-                .map(RewardId::of)
+                .map(BackofficeRewardView::id)
                 .toList());
     }
 

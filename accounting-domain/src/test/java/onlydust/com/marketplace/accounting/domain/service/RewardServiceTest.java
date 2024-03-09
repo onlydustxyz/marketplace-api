@@ -7,10 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
 import onlydust.com.marketplace.accounting.domain.port.out.OldRewardStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.MoneyView;
-import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
-import onlydust.com.marketplace.accounting.domain.view.RewardView;
-import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileAdminView;
+import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import org.junit.jupiter.api.BeforeEach;
@@ -315,8 +312,8 @@ public class RewardServiceTest {
                         generateRewardStubForCurrency(Currency.Code.APT_STR),
                         generateRewardStubForCurrency(Currency.Code.LORDS_STR),
                         generateRewardStubForCurrency(Currency.Code.STRK_STR),
-                        RewardView.builder()
-                                .id(UUID.randomUUID())
+                        BackofficeRewardView.builder()
+                                .id(RewardId.random())
                                 .billingProfileAdmin(ShortBillingProfileAdminView.builder()
                                         .admins(List.of(
                                                 new ShortBillingProfileAdminView.Admin(faker.name().username(),
@@ -332,7 +329,8 @@ public class RewardServiceTest {
                                 .requestedAt(ZonedDateTime.now())
                                 .githubUrls(List.of())
                                 .sponsors(List.of())
-                                .projectName(faker.rickAndMorty().character())
+                                .project(new ShortProjectView(ProjectId.random(), faker.rickAndMorty().character(), faker.internet().url(),
+                                        faker.weather().description(), faker.name().username()))
                                 .processedAt(ZonedDateTime.now())
                                 .money(MoneyView.builder()
                                         .amount(BigDecimal.ONE)
@@ -341,8 +339,8 @@ public class RewardServiceTest {
                                         .build())
                                 .transactionReferences(List.of(faker.random().hex()))
                                 .build(),
-                        RewardView.builder()
-                                .id(UUID.randomUUID())
+                        BackofficeRewardView.builder()
+                                .id(RewardId.random())
                                 .billingProfileAdmin(ShortBillingProfileAdminView.builder()
                                         .admins(List.of(
                                                 new ShortBillingProfileAdminView.Admin(faker.name().username(),
@@ -358,7 +356,8 @@ public class RewardServiceTest {
                                 .requestedAt(ZonedDateTime.now())
                                 .githubUrls(List.of())
                                 .sponsors(List.of())
-                                .projectName(faker.rickAndMorty().character())
+                                .project(new ShortProjectView(ProjectId.random(), faker.rickAndMorty().character(), faker.internet().url(),
+                                        faker.weather().description(), faker.name().username()))
                                 .transactionReferences(List.of(faker.random().hex()))
                                 .money(MoneyView.builder()
                                         .amount(BigDecimal.ONE)
@@ -367,7 +366,7 @@ public class RewardServiceTest {
                                         .build())
                                 .build()
                 ));
-        final List<RewardView> rewardViews = rewardService.searchForBatchPaymentByInvoiceIds(invoiceIds);
+        final List<BackofficeRewardView> rewardViews = rewardService.searchForBatchPaymentByInvoiceIds(invoiceIds);
 
         // Then
         assertEquals(3, rewardViews.size());
@@ -381,11 +380,11 @@ public class RewardServiceTest {
         // Given
         final String email1 = faker.rickAndMorty().character();
         final String email2 = faker.gameOfThrones().character();
-        final RewardView r11 = generateRewardStubForCurrencyAndEmail("USD", email1);
-        final RewardView r21 = generateRewardStubForCurrencyAndEmail("STRK", email2);
-        final RewardView r12 = generateRewardStubForCurrencyAndEmail("OP", email1);
-        final RewardView r22 = generateRewardStubForCurrencyAndEmail("APT", email2);
-        final List<RewardView> rewardViews = List.of(
+        final var r11 = generateRewardStubForCurrencyAndEmail("USD", email1);
+        final var r21 = generateRewardStubForCurrencyAndEmail("STRK", email2);
+        final var r12 = generateRewardStubForCurrencyAndEmail("OP", email1);
+        final var r22 = generateRewardStubForCurrencyAndEmail("APT", email2);
+        final List<BackofficeRewardView> rewardViews = List.of(
                 r11,
                 r12,
                 r21,
@@ -400,16 +399,16 @@ public class RewardServiceTest {
         // Then
         verify(mailNotificationPort, times(1)).sendRewardsPaidMail(email1, List.of(r11, r12));
         verify(mailNotificationPort, times(1)).sendRewardsPaidMail(email2, List.of(r21, r22));
-        verify(accountingRewardStoragePort).markRewardsAsPaymentNotified(rewardViews.stream().map(RewardView::id).map(RewardId::of).toList());
+        verify(accountingRewardStoragePort).markRewardsAsPaymentNotified(rewardViews.stream().map(BackofficeRewardView::id).toList());
     }
 
-    private RewardView generateRewardStubForCurrency(final String currencyCode) {
+    private BackofficeRewardView generateRewardStubForCurrency(final String currencyCode) {
         return generateRewardStubForCurrencyAndEmail(currencyCode, faker.rickAndMorty().character());
     }
 
-    private RewardView generateRewardStubForCurrencyAndEmail(final String currencyCode, final String email) {
-        return RewardView.builder()
-                .id(UUID.randomUUID())
+    private BackofficeRewardView generateRewardStubForCurrencyAndEmail(final String currencyCode, final String email) {
+        return BackofficeRewardView.builder()
+                .id(RewardId.random())
                 .billingProfileAdmin(ShortBillingProfileAdminView.builder()
                         .admins(List.of(
                                 new ShortBillingProfileAdminView.Admin(faker.name().username(),
@@ -425,7 +424,8 @@ public class RewardServiceTest {
                 .requestedAt(ZonedDateTime.now())
                 .githubUrls(List.of())
                 .sponsors(List.of())
-                .projectName(faker.rickAndMorty().character())
+                .project(new ShortProjectView(ProjectId.random(), faker.rickAndMorty().character(), faker.internet().url(), faker.weather().description(),
+                        faker.name().username()))
                 .money(MoneyView.builder()
                         .amount(BigDecimal.ONE)
                         .currencyCode(currencyCode)

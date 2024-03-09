@@ -4,19 +4,21 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
-import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.RewardView;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public interface AccountingRewardStoragePort {
 
-    List<RewardView> searchRewards(List<Invoice.Status> statuses, List<Invoice.Id> invoiceIds);
+    List<BackofficeRewardView> searchRewards(List<Invoice.Status> statuses, List<Invoice.Id> invoiceIds);
 
-    List<RewardView> getInvoiceRewards(@NonNull Invoice.Id invoiceId);
+    List<BackofficeRewardView> getInvoiceRewards(@NonNull Invoice.Id invoiceId);
 
     List<PayableRewardWithPayoutInfoView> findPayableRewardsWithPayoutInfoForInvoices(List<Invoice.Id> invoiceIds);
 
@@ -30,12 +32,12 @@ public interface AccountingRewardStoragePort {
 
     Optional<BatchPaymentDetailsView> findBatchPaymentDetailsById(BatchPayment.Id batchPaymentId);
 
-    Page<RewardDetailsView> findRewards(int pageIndex, int pageSize,
-                                        @NonNull Set<RewardDetailsView.Status> statuses,
-                                        Date fromRequestedAt, Date toRequestedAt,
-                                        Date fromProcessedAt, Date toProcessedAt);
+    Page<BackofficeRewardView> findRewards(int pageIndex, int pageSize,
+                                           @NonNull Set<BackofficeRewardView.Status> statuses,
+                                           Date fromRequestedAt, Date toRequestedAt,
+                                           Date fromProcessedAt, Date toProcessedAt);
 
-    List<RewardView> findPaidRewardsToNotify();
+    List<BackofficeRewardView> findPaidRewardsToNotify();
 
     void markRewardsAsPaymentNotified(List<RewardId> rewardId);
 }

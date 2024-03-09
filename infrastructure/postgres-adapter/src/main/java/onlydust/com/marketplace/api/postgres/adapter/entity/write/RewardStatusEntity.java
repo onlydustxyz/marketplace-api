@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
-import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.project.domain.view.UserRewardView;
 import org.hibernate.annotations.Type;
@@ -36,7 +36,7 @@ public class RewardStatusEntity {
         PENDING_BILLING_PROFILE, PENDING_VERIFICATION, PAYMENT_BLOCKED, PAYOUT_INFO_MISSING, LOCKED, PENDING_REQUEST, PROCESSING, COMPLETE;
 
         // TODO: Wtf? Why do we have many different status enums?
-        public static Status from(RewardDetailsView.Status status) {
+        public static Status from(BackofficeRewardView.Status status) {
             return switch (status) {
                 case PENDING_INVOICE -> Status.PENDING_REQUEST;
                 case PENDING_SIGNUP -> Status.PAYMENT_BLOCKED;//TODO?
