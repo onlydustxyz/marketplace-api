@@ -14,7 +14,7 @@ public class RewardStatus {
     public static final RewardStatus PENDING_REQUEST = new RewardStatus(AsUser.PENDING_REQUEST);
     public static final RewardStatus PROCESSING = new RewardStatus(AsUser.PROCESSING);
     public static final RewardStatus COMPLETE = new RewardStatus(AsUser.COMPLETE);
-    
+
     public enum AsUser {
         PENDING_SIGNUP, PENDING_BILLING_PROFILE, PENDING_VERIFICATION, PAYMENT_BLOCKED, PAYOUT_INFO_MISSING, LOCKED, PENDING_REQUEST, PROCESSING, COMPLETE;
     }
@@ -36,5 +36,10 @@ public class RewardStatus {
             case COMPLETE -> AsProjectLead.COMPLETE;
             default -> AsProjectLead.PENDING_CONTRIBUTOR;
         };
+    }
+
+    @Override
+    public String toString() {
+        return status.toString();
     }
 }
