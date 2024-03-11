@@ -232,8 +232,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 30,
-                          "totalItemNumber": 149,
+                          "totalPageNumber": 48,
+                          "totalItemNumber": 239,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "rewards": [
