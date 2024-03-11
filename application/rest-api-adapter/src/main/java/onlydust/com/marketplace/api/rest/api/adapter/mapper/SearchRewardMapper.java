@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardView;
@@ -107,6 +108,10 @@ public interface SearchRewardMapper {
                     case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
                     case COMPANY, SELF_EMPLOYED -> BillingProfileType.COMPANY;
                 })
+                .kyc(billingProfileAdminView.billingProfileType().equals(BillingProfile.Type.INDIVIDUAL) ?
+                        BackOfficeMapper.mapShortBillingProfileAdminToKyc(billingProfileAdminView) : null)
+                .kyb(billingProfileAdminView.billingProfileType().equals(BillingProfile.Type.COMPANY) ?
+                        BackOfficeMapper.mapShortBillingProfileAdminToKyb(billingProfileAdminView) : null)
                 .name(billingProfileAdminView.billingProfileName())
                 .verificationStatus(isNull(billingProfileAdminView.verificationStatus()) ? null :
                         switch (billingProfileAdminView.verificationStatus()) {

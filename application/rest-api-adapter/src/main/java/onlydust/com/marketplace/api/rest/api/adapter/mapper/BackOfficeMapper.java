@@ -5,9 +5,12 @@ import lombok.SneakyThrows;
 import onlydust.com.backoffice.api.contract.model.RewardStatus;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardView;
+import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileAdminView;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
@@ -23,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Comparator.comparing;
+import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.groupingBy;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.ETHEREUM;
@@ -326,24 +330,30 @@ public interface BackOfficeMapper {
 
     @SneakyThrows
     static InvoiceResponse mapInvoiceToContract(final Invoice invoice, List<BillingProfileCoworkerView> billingProfileAdmins, final List<RewardView> rewards) {
+        ;
+        final BillingProfileType type = invoice.companyInfo().isPresent() ? BillingProfileType.COMPANY : BillingProfileType.INDIVIDUAL;
+        final BillingProfileResponse billingProfileResponse = new BillingProfileResponse()
+                .id(invoice.billingProfileId().value())
+                .type(type)
+                .name(invoice.companyInfo().map(Invoice.CompanyInfo::name).orElse(invoice.personalInfo().map(Invoice.PersonalInfo::fullName).orElse(null)))
+                .admins(billingProfileAdmins.stream()
+                        .map(admin -> new BillingProfileAdminResponse()
+                                .name(admin.login())
+                                .avatarUrl(admin.avatarUrl())
+                                .email(admin.email())
+                        ).toList()
+                );
+        switch (type) {
+            case INDIVIDUAL -> billingProfileResponse.kyc(mapShortBillingProfileAdminToKyc(rewards.get(0).billingProfileAdmin()));
+            case COMPANY -> billingProfileResponse.kyb(mapShortBillingProfileAdminToKyb(rewards.get(0).billingProfileAdmin()));
+        }
         return new InvoiceResponse()
                 .id(invoice.id().value())
                 .number(invoice.number().toString())
                 .rejectionReason(invoice.rejectionReason())
                 .status(mapInvoiceInternalStatus(invoice.status()))
                 .createdAt(invoice.createdAt())
-                .billingProfile(new BillingProfileResponse()
-                        .id(invoice.billingProfileId().value())
-                        .type(invoice.companyInfo().isPresent() ? BillingProfileType.COMPANY : BillingProfileType.INDIVIDUAL)
-                        .name(invoice.companyInfo().map(Invoice.CompanyInfo::name).orElse(invoice.personalInfo().map(Invoice.PersonalInfo::fullName).orElse(null)))
-                        .admins(billingProfileAdmins.stream()
-                                .map(admin -> new BillingProfileAdminResponse()
-                                        .name(admin.login())
-                                        .avatarUrl(admin.avatarUrl())
-                                        .email(admin.email())
-                                ).toList()
-                        )
-                )
+                .billingProfile(billingProfileResponse)
                 .totalEquivalent(new MoneyResponse()
                         .amount(invoice.totalAfterTax().getValue())
                         .currencyCode(invoice.totalAfterTax().getCurrency().code().toString())
@@ -627,5 +637,38 @@ public interface BackOfficeMapper {
             case COMPLETE -> RewardDetailsView.Status.COMPLETE;
             case LOCKED -> RewardDetailsView.Status.LOCKED;
         };
+    }
+
+    static KycResponse mapShortBillingProfileAdminToKyc(final ShortBillingProfileAdminView view) {
+        final Kyc kyc = view.kyc();
+        return isNull(kyc) ? null :  new KycResponse()
+                .address(kyc.getAddress())
+                .birthdate(DateMapper.toZoneDateTime(kyc.getBirthdate()))
+                .firstName(kyc.getFirstName())
+                .lastName(kyc.getLastName())
+                .idDocumentNumber(kyc.getIdDocumentNumber())
+                .idDocumentCountryCode(kyc.getIdDocumentCountryCode())
+                .idDocumentType(switch (kyc.getIdDocumentType()) {
+                    case ID_CARD -> KycResponse.IdDocumentTypeEnum.ID_CARD;
+                    case PASSPORT -> KycResponse.IdDocumentTypeEnum.PASSPORT;
+                    case DRIVER_LICENSE -> KycResponse.IdDocumentTypeEnum.DRIVER_LICENSE;
+                    case RESIDENCE_PERMIT -> KycResponse.IdDocumentTypeEnum.RESIDENCE_PERMIT;
+                })
+                .country(kyc.getCountry().display().orElseGet(() -> kyc.getCountry().iso3Code()))
+                .usCitizen(kyc.getUsCitizen())
+                .validUntil(DateMapper.toZoneDateTime(kyc.getValidUntil()));
+    }
+
+    static KybResponse mapShortBillingProfileAdminToKyb(final ShortBillingProfileAdminView view) {
+        final Kyb kyb = view.kyb();
+        return isNull(view.kyb()) ? null : new KybResponse()
+                .address(kyb.getAddress())
+                .countryCode(kyb.getCountry().display().orElseGet(() -> kyb.getCountry().iso3Code()))
+                .name(kyb.getName())
+                .euVATNumber(kyb.getEuVATNumber())
+                .registrationNumber(kyb.getRegistrationNumber())
+                .registrationDate(DateMapper.toZoneDateTime(kyb.getRegistrationDate()))
+                .usEntity(kyb.getUsEntity())
+                .subjectToEuropeVAT(kyb.getSubjectToEuropeVAT());
     }
 }

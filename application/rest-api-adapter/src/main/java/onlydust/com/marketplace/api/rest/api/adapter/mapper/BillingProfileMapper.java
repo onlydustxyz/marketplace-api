@@ -76,16 +76,20 @@ public interface BillingProfileMapper {
         response.setLastName(kyc.getLastName());
         response.setIdDocumentCountryCode(kyc.getIdDocumentCountryCode());
         response.setIdDocumentNumber(kyc.getIdDocumentNumber());
-        response.setIdDocumentType(isNull(kyc.getIdDocumentType()) ? null : switch (kyc.getIdDocumentType()) {
-            case ID_CARD -> KYCResponse.IdDocumentTypeEnum.ID_CARD;
-            case PASSPORT -> KYCResponse.IdDocumentTypeEnum.PASSPORT;
-            case DRIVER_LICENSE -> KYCResponse.IdDocumentTypeEnum.DRIVER_LICENSE;
-            case RESIDENCE_PERMIT -> KYCResponse.IdDocumentTypeEnum.RESIDENCE_PERMIT;
-        });
+        response.setIdDocumentType(isNull(kyc.getIdDocumentType()) ? null : mapIdDocumentTypeToResponse(kyc));
         response.setStatus(verificationStatusToResponse(kyc.getStatus()));
         response.setUsCitizen(kyc.getUsCitizen());
         response.setValidUntil(DateMapper.toZoneDateTime(kyc.getValidUntil()));
         return response;
+    }
+
+    static KYCResponse.IdDocumentTypeEnum mapIdDocumentTypeToResponse(Kyc kyc) {
+        return switch (kyc.getIdDocumentType()) {
+            case ID_CARD -> KYCResponse.IdDocumentTypeEnum.ID_CARD;
+            case PASSPORT -> KYCResponse.IdDocumentTypeEnum.PASSPORT;
+            case DRIVER_LICENSE -> KYCResponse.IdDocumentTypeEnum.DRIVER_LICENSE;
+            case RESIDENCE_PERMIT -> KYCResponse.IdDocumentTypeEnum.RESIDENCE_PERMIT;
+        };
     }
 
     static @NotNull KYBResponse kybToResponse(final Kyb kyb) {
