@@ -18,11 +18,11 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
     void setup() {
         pierre = userAuthHelper.authenticatePierre();
 
-        patchReward("40fda3c6-2a3f-4cdd-ba12-0499dd232d53", 10, "ETH", 15000, null, "2023-07-12");
-        patchReward("e1498a17-5090-4071-a88a-6f0b0c337c3a", 50, "ETH", 75000, null, "2023-08-12");
-        patchReward("2ac80cc6-7e83-4eef-bc0c-932b58f683c0", 500, "APT", 100000, null, null);
-        patchReward("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0", 30, "OP", 6000, "2023-08-14", null);
-        patchReward("5b96ca1e-4ad2-41c1-8819-520b885d9223", 5, "STRK", null, null, null);
+        accountingHelper.patchReward("40fda3c6-2a3f-4cdd-ba12-0499dd232d53", 10, "ETH", 15000, null, "2023-07-12");
+        accountingHelper.patchReward("e1498a17-5090-4071-a88a-6f0b0c337c3a", 50, "ETH", 75000, null, "2023-08-12");
+        accountingHelper.patchReward("2ac80cc6-7e83-4eef-bc0c-932b58f683c0", 500, "APT", 100000, null, null);
+        accountingHelper.patchReward("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0", 30, "OP", 6000, "2023-08-14", null);
+        accountingHelper.patchReward("5b96ca1e-4ad2-41c1-8819-520b885d9223", 5, "STRK", null, null, null);
     }
 
     @Test

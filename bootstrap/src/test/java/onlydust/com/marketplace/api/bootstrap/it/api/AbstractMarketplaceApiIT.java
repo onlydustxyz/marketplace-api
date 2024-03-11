@@ -6,17 +6,11 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
 import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
 import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
-import lombok.NonNull;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.Network;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
+import onlydust.com.marketplace.api.bootstrap.helper.AccountingHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
@@ -31,7 +25,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -39,15 +32,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.MountableFile;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.URI;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -212,6 +198,9 @@ public class AbstractMarketplaceApiIT {
     @Autowired
     KycRepository kycRepository;
 
+    @Autowired
+    AccountingHelper accountingHelper;
+
     @BeforeAll
     static void beforeAll() throws IOException, InterruptedException {
         if (!postgresSQLContainer.isRunning()) {
@@ -275,102 +264,4 @@ public class AbstractMarketplaceApiIT {
     }
 
 
-    @SneakyThrows
-    protected void patchReward(@NonNull String id, Number amount, String currencyCode, Number usdAmount, String invoiceReceivedAt, String paidAt) {
-        final var rewardEntity = rewardRepository.findById(UUID.fromString(id)).orElseThrow();
-        final var rewardStatus = rewardStatusRepository.findById(rewardEntity.id()).orElseThrow();
-
-        if (amount != null) rewardEntity.amount(BigDecimal.valueOf(amount.doubleValue()));
-        if (currencyCode != null) {
-            final var currency = currencyRepository.findByCode(currencyCode).orElseThrow();
-            final var network = switch (currencyCode) {
-                case "ETH" -> NetworkEnumEntity.ethereum;
-                case "APT" -> NetworkEnumEntity.aptos;
-                case "OP" -> NetworkEnumEntity.optimism;
-                case "STRK" -> NetworkEnumEntity.starknet;
-                default -> throw new IllegalArgumentException("Currency code %s not mapped".formatted(currencyCode));
-            };
-
-            rewardEntity.currency(currency);
-            rewardStatus.networks(new NetworkEnumEntity[]{network});
-        }
-        rewardStatus.amountUsdEquivalent(usdAmount == null ? null : BigDecimal.valueOf(usdAmount.doubleValue()));
-
-        if (invoiceReceivedAt != null) {
-            final var invoiceEntity = fakeInvoice(UUID.randomUUID(), List.of(rewardEntity.id()));
-            invoiceRepository.save(invoiceEntity);
-            rewardEntity.invoice(invoiceEntity);
-            // TODO check if still needed and correctly updated when invoice is uploaded
-            rewardStatus.invoiceReceivedAt(new SimpleDateFormat("yyyy-MM-dd").parse(invoiceReceivedAt));
-        }
-
-        if (paidAt != null) {
-            rewardStatus.paidAt(new SimpleDateFormat("yyyy-MM-dd").parse(paidAt));
-        }
-
-        rewardRepository.save(rewardEntity);
-        rewardStatusRepository.save(rewardStatus);
-    }
-
-    @SneakyThrows
-    @Transactional
-    protected InvoiceEntity fakeInvoice(UUID id, List<UUID> rewardIds) {
-        final var firstName = faker.name().firstName();
-        final var lastName = faker.name().lastName();
-
-        final var rewards = invoiceRewardRepository.findAll(rewardIds);
-
-        return new InvoiceEntity(
-                id,
-                UUID.randomUUID(),
-                Invoice.Number.of(12, lastName, firstName).toString(),
-                UUID.randomUUID(),
-                ZonedDateTime.now().minusDays(1),
-                InvoiceEntity.Status.TO_REVIEW,
-                rewards.stream().map(InvoiceRewardEntity::targetAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add),
-                rewards.get(0).targetCurrency(),
-                new URL("https://s3.storage.com/invoice.pdf"),
-                null,
-                null,
-                new InvoiceEntity.Data(
-                        ZonedDateTime.now().plusDays(9),
-                        BigDecimal.ZERO,
-                        new Invoice.BillingProfileSnapshot(
-                                BillingProfile.Id.random(),
-                                BillingProfile.Type.INDIVIDUAL,
-                                new Invoice.BillingProfileSnapshot.KycSnapshot(
-                                        firstName,
-                                        lastName,
-                                        faker.address().fullAddress(),
-                                        faker.address().countryCode()
-                                ),
-                                null,
-                                null,
-                                List.of(new Wallet(Network.ETHEREUM, "vitalik.eth"))
-                        ),
-                        rewards
-                )
-        );
-    }
-
-    protected void patchBillingProfile(@NonNull UUID billingProfileId,
-                                       BillingProfileEntity.Type type,
-                                       VerificationStatusEntity status) {
-
-        final var billingProfile = billingProfileRepository.findById(billingProfileId).orElseThrow();
-
-        if (type != null) billingProfile.setType(type);
-
-        if (status != null) {
-            if (billingProfile.getKyb() != null) {
-                billingProfile.getKyb().verificationStatus(status);
-                kybRepository.save(billingProfile.getKyb());
-            } else {
-                billingProfile.getKyc().setVerificationStatus(status);
-                kycRepository.save(billingProfile.getKyc());
-            }
-        }
-
-        billingProfileRepository.save(billingProfile);
-    }
 }

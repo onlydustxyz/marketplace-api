@@ -42,7 +42,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
         final UUID rewardId = UUID.fromString("85f8358c-5339-42ac-a577-16d7760d1e28");
 
         final var billingProfile = billingProfileRepository.findById(UUID.fromString("20282367-56b0-42d3-81d3-5e4b38f67e3e")).orElseThrow();
-        patchBillingProfile(billingProfile.getId(), null, VerificationStatusEntity.VERIFIED);
+        accountingHelper.patchBillingProfile(billingProfile.getId(), null, VerificationStatusEntity.VERIFIED);
         billingProfileRepository.save(billingProfile);
 
         // When
