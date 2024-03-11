@@ -37,8 +37,8 @@ class InvoiceTest {
         assertThat(Invoice.Number.of(123456, "OnlyDust").value()).isEqualTo("OD-ONLYDUST-123456");
         assertThat(Invoice.Number.of(1, "Caisse d'Épargne").value()).isEqualTo("OD-CAISSE-D-ÉPARGNE-001");
         assertThat(Invoice.Number.of(2, "Doe", "Köseoğlu").value()).isEqualTo("OD-DOE-KÖSEOĞLU-002");
-        assertThat(Invoice.Number.of(1, "婷","陈").value()).isEqualTo("OD-婷-陈-001");
-        assertThat(Invoice.Number.of(1, "Ömer","Aydın").value()).isEqualTo("OD-ÖMER-AYDIN-001");
+        assertThat(Invoice.Number.of(1, "婷", "陈").value()).isEqualTo("OD-婷-陈-001");
+        assertThat(Invoice.Number.of(1, "Ömer", "Aydın").value()).isEqualTo("OD-ÖMER-AYDIN-001");
 
     }
 
@@ -140,7 +140,7 @@ class InvoiceTest {
 
         @Test
         void should_compute_id() {
-            assertThat(invoice.number().value()).isEqualTo("OD-ONLYDUSTSAS-001");
+            assertThat(invoice.number().value()).isEqualTo("OD-ONLYDUST-SAS-001");
         }
 
         @Test
@@ -210,7 +210,7 @@ class InvoiceTest {
 
         @Test
         void should_compute_id() {
-            assertThat(invoice.number().value()).isEqualTo("OD-ONLYDUSTSAS-001");
+            assertThat(invoice.number().value()).isEqualTo("OD-ONLYDUST-SAS-001");
         }
 
 
@@ -281,7 +281,7 @@ class InvoiceTest {
 
         @Test
         void should_compute_id() {
-            assertThat(invoice.number().value()).isEqualTo("OD-ONLYDUSTSAS-001");
+            assertThat(invoice.number().value()).isEqualTo("OD-ONLYDUST-SAS-001");
         }
 
 
@@ -352,7 +352,7 @@ class InvoiceTest {
 
         @Test
         void should_compute_id() {
-            assertThat(invoice.number().value()).isEqualTo("OD-ONLYDUSTSAS-001");
+            assertThat(invoice.number().value()).isEqualTo("OD-ONLYDUST-SAS-001");
         }
 
 

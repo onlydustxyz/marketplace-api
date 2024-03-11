@@ -314,6 +314,7 @@ public class RewardServiceTest {
                         generateRewardStubForCurrency(Currency.Code.STRK_STR),
                         BackofficeRewardView.builder()
                                 .id(RewardId.random())
+                                .status(BackofficeRewardView.Status.PROCESSING)
                                 .billingProfileAdmin(ShortBillingProfileAdminView.builder()
                                         .admins(List.of(
                                                 new ShortBillingProfileAdminView.Admin(faker.name().username(),
@@ -338,9 +339,11 @@ public class RewardServiceTest {
                                         .currencyName(faker.rickAndMorty().location())
                                         .build())
                                 .transactionReferences(List.of(faker.random().hex()))
+                                .paidToAccountNumbers(List.of(faker.random().hex()))
                                 .build(),
                         BackofficeRewardView.builder()
                                 .id(RewardId.random())
+                                .status(BackofficeRewardView.Status.PROCESSING)
                                 .billingProfileAdmin(ShortBillingProfileAdminView.builder()
                                         .admins(List.of(
                                                 new ShortBillingProfileAdminView.Admin(faker.name().username(),
@@ -359,6 +362,7 @@ public class RewardServiceTest {
                                 .project(new ShortProjectView(ProjectId.random(), faker.rickAndMorty().character(), faker.internet().url(),
                                         faker.weather().description(), faker.name().username()))
                                 .transactionReferences(List.of(faker.random().hex()))
+                                .paidToAccountNumbers(List.of(faker.random().hex()))
                                 .money(MoneyView.builder()
                                         .amount(BigDecimal.ONE)
                                         .currencyCode(Currency.Code.USDC_STR)
@@ -409,6 +413,7 @@ public class RewardServiceTest {
     private BackofficeRewardView generateRewardStubForCurrencyAndEmail(final String currencyCode, final String email) {
         return BackofficeRewardView.builder()
                 .id(RewardId.random())
+                .status(BackofficeRewardView.Status.PROCESSING)
                 .billingProfileAdmin(ShortBillingProfileAdminView.builder()
                         .admins(List.of(
                                 new ShortBillingProfileAdminView.Admin(faker.name().username(),
@@ -432,6 +437,7 @@ public class RewardServiceTest {
                         .currencyName(faker.rickAndMorty().location())
                         .build())
                 .transactionReferences(List.of())
+                .paidToAccountNumbers(List.of())
                 .build();
     }
 }
