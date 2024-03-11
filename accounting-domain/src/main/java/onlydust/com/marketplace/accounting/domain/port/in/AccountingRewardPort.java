@@ -4,6 +4,7 @@ import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
 import java.util.Date;
@@ -23,11 +24,11 @@ public interface AccountingRewardPort {
     BatchPaymentDetailsView findBatchPaymentById(BatchPayment.Id batchPaymentId);
 
     Page<BackofficeRewardView> getRewards(int pageIndex, int pageSize,
-                                          List<BackofficeRewardView.Status> statuses,
+                                          List<RewardStatus> statuses,
                                           Date fromRequestedAt, Date toRequestedAt,
                                           Date fromProcessedAt, Date toProcessedAt);
 
-    String exportRewardsCSV(List<BackofficeRewardView.Status> statuses,
+    String exportRewardsCSV(List<RewardStatus> statuses,
                             Date fromRequestedAt, Date toRequestedAt,
                             Date fromProcessedAt, Date toProcessedAt);
 

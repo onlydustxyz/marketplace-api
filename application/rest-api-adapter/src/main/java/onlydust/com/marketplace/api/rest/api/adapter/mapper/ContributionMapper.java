@@ -1,15 +1,15 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.project.domain.model.ContributionStatus;
-import onlydust.com.marketplace.project.domain.model.ContributionType;
-import onlydust.com.marketplace.project.domain.view.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
+import onlydust.com.marketplace.project.domain.model.ContributionStatus;
+import onlydust.com.marketplace.project.domain.model.ContributionType;
 import onlydust.com.marketplace.project.domain.view.*;
 
 import java.util.Optional;
 
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.rewardToResponse;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 
 public interface ContributionMapper {
@@ -120,7 +120,7 @@ public interface ContributionMapper {
         };
     }
 
-    static ContributionDetailsResponse mapContributionDetails(ContributionDetailsView contribution) {
+    static ContributionDetailsResponse mapContributionDetails(ContributionDetailsView contribution, boolean forUser) {
         return new ContributionDetailsResponse()
                 .id(contribution.getId())
                 .contributor(ContributorMapper.of(contribution.getContributor()))
@@ -141,7 +141,7 @@ public interface ContributionMapper {
                 .commitsCount(contribution.getGithubCommitsCount())
                 .userCommitsCount(contribution.getGithubUserCommitsCount())
                 .links(contribution.getLinks().stream().map(ContributionMapper::mapContributionLink).toList())
-                .rewards(contribution.getRewards().stream().map(RewardMapper::rewardToResponse).toList());
+                .rewards(contribution.getRewards().stream().map(r -> rewardToResponse(r, forUser)).toList());
     }
 
     static ProjectChurnedContributorsPageItemResponseAllOfLastContribution mapChurnedContribution(ChurnedContributorView.Contribution lastContribution) {

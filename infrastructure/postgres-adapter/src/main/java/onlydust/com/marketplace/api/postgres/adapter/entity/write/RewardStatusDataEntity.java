@@ -6,7 +6,7 @@ import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
+import onlydust.com.marketplace.accounting.domain.model.RewardStatusData;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -57,20 +57,20 @@ public class RewardStatusDataEntity {
     NetworkEnumEntity[] networks;
     BigDecimal amountUsdEquivalent;
 
-    public static RewardStatusDataEntity of(RewardStatus rewardStatus) {
+    public static RewardStatusDataEntity of(RewardStatusData rewardStatusData) {
         return RewardStatusDataEntity.builder()
-                .rewardId(rewardStatus.rewardId().value())
-                .sponsorHasEnoughFund(rewardStatus.sponsorHasEnoughFund())
-                .unlockDate(rewardStatus.unlockDate().map(ChronoZonedDateTime::toInstant).map(Date::from).orElse(null))
-                .invoiceReceivedAt(rewardStatus.invoiceReceivedAt().map(ChronoZonedDateTime::toInstant).map(Date::from).orElse(null))
-                .paidAt(rewardStatus.paidAt().map(ChronoZonedDateTime::toInstant).map(Date::from).orElse(null))
-                .networks(rewardStatus.networks().stream().map(NetworkEnumEntity::of).toArray(NetworkEnumEntity[]::new))
-                .amountUsdEquivalent(rewardStatus.amountUsdEquivalent().orElse(null))
+                .rewardId(rewardStatusData.rewardId().value())
+                .sponsorHasEnoughFund(rewardStatusData.sponsorHasEnoughFund())
+                .unlockDate(rewardStatusData.unlockDate().map(ChronoZonedDateTime::toInstant).map(Date::from).orElse(null))
+                .invoiceReceivedAt(rewardStatusData.invoiceReceivedAt().map(ChronoZonedDateTime::toInstant).map(Date::from).orElse(null))
+                .paidAt(rewardStatusData.paidAt().map(ChronoZonedDateTime::toInstant).map(Date::from).orElse(null))
+                .networks(rewardStatusData.networks().stream().map(NetworkEnumEntity::of).toArray(NetworkEnumEntity[]::new))
+                .amountUsdEquivalent(rewardStatusData.amountUsdEquivalent().orElse(null))
                 .build();
     }
 
-    public RewardStatus toRewardStatus() {
-        return new RewardStatus(RewardId.of(rewardId))
+    public RewardStatusData toRewardStatus() {
+        return new RewardStatusData(RewardId.of(rewardId))
                 .sponsorHasEnoughFund(Boolean.TRUE.equals(sponsorHasEnoughFund))
                 .unlockDate(unlockDate == null ? null : ZonedDateTime.ofInstant(unlockDate.toInstant(), ZoneOffset.UTC))
                 .invoiceReceivedAt(invoiceReceivedAt == null ? null : ZonedDateTime.ofInstant(invoiceReceivedAt.toInstant(), ZoneOffset.UTC))

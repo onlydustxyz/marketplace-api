@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 @Builder
 public record BackofficeRewardView(
         @NonNull RewardId id,
-        @NonNull Status status,
+        @NonNull RewardStatus status,
         @NonNull ZonedDateTime requestedAt,
         ZonedDateTime processedAt,
         @NonNull List<String> githubUrls,
@@ -29,16 +30,5 @@ public record BackofficeRewardView(
     @Deprecated
     public Network network() {
         return Network.fromCurrencyCode(money().currencyCode());
-    }
-
-    public enum Status {
-        PENDING_INVOICE,
-        PENDING_SIGNUP,
-        PENDING_CONTRIBUTOR,
-        PENDING_VERIFICATION,
-        MISSING_PAYOUT_INFO,
-        PROCESSING,
-        COMPLETE,
-        LOCKED
     }
 }

@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
 import onlydust.com.marketplace.accounting.domain.port.out.OldRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -314,7 +315,7 @@ public class RewardServiceTest {
                         generateRewardStubForCurrency(Currency.Code.STRK_STR),
                         BackofficeRewardView.builder()
                                 .id(RewardId.random())
-                                .status(BackofficeRewardView.Status.PROCESSING)
+                                .status(RewardStatus.PROCESSING)
                                 .billingProfileAdmin(ShortBillingProfileAdminView.builder()
                                         .admins(List.of(
                                                 new ShortBillingProfileAdminView.Admin(faker.name().username(),
@@ -343,7 +344,7 @@ public class RewardServiceTest {
                                 .build(),
                         BackofficeRewardView.builder()
                                 .id(RewardId.random())
-                                .status(BackofficeRewardView.Status.PROCESSING)
+                                .status(RewardStatus.PROCESSING)
                                 .billingProfileAdmin(ShortBillingProfileAdminView.builder()
                                         .admins(List.of(
                                                 new ShortBillingProfileAdminView.Admin(faker.name().username(),
@@ -413,7 +414,7 @@ public class RewardServiceTest {
     private BackofficeRewardView generateRewardStubForCurrencyAndEmail(final String currencyCode, final String email) {
         return BackofficeRewardView.builder()
                 .id(RewardId.random())
-                .status(BackofficeRewardView.Status.PROCESSING)
+                .status(RewardStatus.PROCESSING)
                 .billingProfileAdmin(ShortBillingProfileAdminView.builder()
                         .admins(List.of(
                                 new ShortBillingProfileAdminView.Admin(faker.name().username(),

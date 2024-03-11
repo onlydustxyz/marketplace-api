@@ -12,7 +12,7 @@ import java.util.Set;
 
 @Data
 @Accessors(fluent = true, chain = true)
-public class RewardStatus {
+public class RewardStatusData {
     @NonNull
     final RewardId rewardId;
 
@@ -37,12 +37,12 @@ public class RewardStatus {
         return Optional.ofNullable(paidAt);
     }
 
-    public RewardStatus withAdditionalNetworks(Set<Network> networks) {
+    public RewardStatusData withAdditionalNetworks(Set<Network> networks) {
         this.networks.addAll(networks);
         return this;
     }
 
-    public RewardStatus withAdditionalNetworks(Network... networks) {
+    public RewardStatusData withAdditionalNetworks(Network... networks) {
         return withAdditionalNetworks(Set.of(networks));
     }
 

@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
+import onlydust.com.marketplace.accounting.domain.model.RewardStatusData;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
@@ -17,12 +17,12 @@ public class PostgresRewardStatusAdapter implements RewardStatusStorage {
     private final RewardStatusRepository rewardStatusRepository;
 
     @Override
-    public void save(RewardStatus rewardStatus) {
-        rewardStatusRepository.save(RewardStatusDataEntity.of(rewardStatus));
+    public void save(RewardStatusData rewardStatusData) {
+        rewardStatusRepository.save(RewardStatusDataEntity.of(rewardStatusData));
     }
 
     @Override
-    public Optional<RewardStatus> get(final @NonNull RewardId rewardId) {
+    public Optional<RewardStatusData> get(final @NonNull RewardId rewardId) {
         return rewardStatusRepository.findById(rewardId.value())
                 .map(RewardStatusDataEntity::toRewardStatus);
     }
@@ -33,7 +33,7 @@ public class PostgresRewardStatusAdapter implements RewardStatusStorage {
     }
 
     @Override
-    public List<RewardStatus> notPaid() {
+    public List<RewardStatusData> notPaid() {
         return rewardStatusRepository.findByPaidAtIsNull()
                 .stream()
                 .map(RewardStatusDataEntity::toRewardStatus)
@@ -41,7 +41,7 @@ public class PostgresRewardStatusAdapter implements RewardStatusStorage {
     }
 
     @Override
-    public List<RewardStatus> notPaid(BillingProfile.Id billingProfileId) {
+    public List<RewardStatusData> notPaid(BillingProfile.Id billingProfileId) {
         return rewardStatusRepository.findNotPaidByBillingProfile(billingProfileId.value())
                 .stream()
                 .map(RewardStatusDataEntity::toRewardStatus)

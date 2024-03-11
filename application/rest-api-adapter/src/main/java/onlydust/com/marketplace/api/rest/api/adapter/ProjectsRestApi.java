@@ -324,7 +324,8 @@ public class ProjectsRestApi implements ProjectsApi {
         final var contribution = contributionsFacadePort.getContribution(projectId, contributionId,
                 authenticatedUser);
 
-        return ResponseEntity.ok(ContributionMapper.mapContributionDetails(contribution));
+        return ResponseEntity.ok(ContributionMapper.mapContributionDetails(contribution,
+                contribution.getContributor().getGithubUserId().equals(authenticatedUser.getGithubUserId())));
     }
 
     @Override

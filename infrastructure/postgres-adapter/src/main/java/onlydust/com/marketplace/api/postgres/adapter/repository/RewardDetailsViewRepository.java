@@ -17,7 +17,6 @@ public interface RewardDetailsViewRepository extends JpaRepository<BackofficeRew
     @Language("PostgreSQL")
     String SELECT = """
                 select r.id                                     id,
-                               rs.status_for_user                       status,
                                r.requested_at                           requested_at,
                                receipts.processed_at                    processed_at,
 
@@ -35,7 +34,6 @@ public interface RewardDetailsViewRepository extends JpaRepository<BackofficeRew
 
                                s2.s_list                                sponsors,
 
-                               rsd.amount_usd_equivalent                dollars_equivalent,
                                r.amount                                 amount,
                                c.name                                   currency_name,
                                c.code                                   currency_code,
@@ -60,7 +58,6 @@ public interface RewardDetailsViewRepository extends JpaRepository<BackofficeRew
 
                         from rewards r
                                  join accounting.reward_statuses rs on rs.reward_id = r.id
-                                 join accounting.reward_status_data rsd on rsd.reward_id = r.id
                                  join currencies c on c.id = r.currency_id
                                  join project_details pd on r.project_id = pd.project_id
                                  left join indexer_exp.github_accounts github_recipient ON github_recipient.id = r.recipient_id
@@ -107,7 +104,7 @@ public interface RewardDetailsViewRepository extends JpaRepository<BackofficeRew
                         
                      
                        
-            where cast(rs.status_for_user as text) in (:statuses)
+            where cast(rs.status as text) in (:statuses)
                 and (coalesce(:fromRequestedAt) is null or r.requested_at >= cast(cast(:fromRequestedAt as text) as timestamp))
                 and (coalesce(:toRequestedAt)   is null or r.requested_at <= cast(cast(:toRequestedAt   as text) as timestamp))
                 and (coalesce(:fromProcessedAt) is null or receipts.processed_at  >= cast(cast(:fromProcessedAt as text) as timestamp))

@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.view;
 
 import lombok.Builder;
 import lombok.Value;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.project.domain.model.Currency;
 import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
 
@@ -16,7 +17,7 @@ public class ContributionRewardView {
     Currency currency;
     BigDecimal amount;
     BigDecimal dollarsEquivalent;
-    UserRewardView.Status status;
+    RewardStatus status;
     GithubUserIdentity from;
     GithubUserIdentity to;
     Date createdAt;

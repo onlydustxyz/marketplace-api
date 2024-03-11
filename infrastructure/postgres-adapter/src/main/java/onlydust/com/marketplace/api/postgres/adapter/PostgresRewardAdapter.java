@@ -18,6 +18,7 @@ import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
@@ -141,11 +142,11 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
 
     @Override
     public Page<BackofficeRewardView> findRewards(int pageIndex, int pageSize,
-                                                  @NonNull Set<BackofficeRewardView.Status> statuses,
+                                                  @NonNull Set<RewardStatus> statuses,
                                                   Date fromRequestedAt, Date toRequestedAt,
                                                   Date fromProcessedAt, Date toProcessedAt) {
         final var page = rewardDetailsViewRepository.findAllByStatusesAndDates(
-                statuses.stream().map(RewardStatusEntity.Status::from).map(RewardStatusEntity.Status::toString).toList(),
+                statuses.stream().map(RewardStatusEntity::from).map(RewardStatusEntity.Status::toString).toList(),
                 fromRequestedAt, toRequestedAt,
                 fromProcessedAt, toProcessedAt,
                 PageRequest.of(pageIndex, pageSize, Sort.by("requested_at").descending())

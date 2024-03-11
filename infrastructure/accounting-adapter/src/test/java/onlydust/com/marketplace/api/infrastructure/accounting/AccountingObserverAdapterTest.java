@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.infrastructure.accounting;
 
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
+import onlydust.com.marketplace.accounting.domain.model.RewardStatusData;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
@@ -29,7 +29,7 @@ class AccountingObserverAdapterTest {
     void setup() {
         reset(rewardStatusStorage, rewardStatusFacadePort);
 
-        when(rewardStatusStorage.notPaid(billingProfileId)).thenReturn(List.of(new RewardStatus(rewardId)));
+        when(rewardStatusStorage.notPaid(billingProfileId)).thenReturn(List.of(new RewardStatusData(rewardId)));
         when(rewardStatusFacadePort.usdEquivalent(rewardId)).thenReturn(usdEquivalent);
 
     }
@@ -38,7 +38,8 @@ class AccountingObserverAdapterTest {
 //    @Test
 //    void onBillingProfileUpdated() {
 //        // When
-//        accountingObserverAdapter.onBillingProfileUpdated(new BillingProfileVerificationUpdated(billingProfileId.value(), OldBillingProfileType.INDIVIDUAL, null, null, null
+//        accountingObserverAdapter.onBillingProfileUpdated(new BillingProfileVerificationUpdated(billingProfileId.value(), OldBillingProfileType.INDIVIDUAL,
+//        null, null, null
 //                , null, null, null, null, null, null, null));
 //
 //        // Then
@@ -54,7 +55,7 @@ class AccountingObserverAdapterTest {
         accountingObserverAdapter.onBillingProfilePayoutSettingsUpdated(billingProfileId.value(), null);
 
         // Then
-        final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
+        final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
         verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
         final var rewardStatus = rewardStatusCaptor.getValue();
         assertThat(rewardStatus.amountUsdEquivalent()).contains(usdEquivalent);

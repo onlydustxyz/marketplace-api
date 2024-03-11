@@ -1,6 +1,9 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.contract.model.Money;
+import onlydust.com.marketplace.api.contract.model.RewardAmountResponse;
+import onlydust.com.marketplace.api.contract.model.RewardPageItemResponse;
+import onlydust.com.marketplace.api.contract.model.RewardsPageResponse;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.project.domain.view.ProjectRewardsPageView;
@@ -43,13 +46,7 @@ public interface ProjectRewardMapper {
         rewardPageItemResponse.setRewardedUserAvatar(view.getRewardedUserAvatar());
         final RewardAmountResponse amount = mapRewardAmountToResponse(view);
         rewardPageItemResponse.setAmount(amount);
-        rewardPageItemResponse.setStatus(switch (view.getStatus()) {
-            case complete -> RewardStatus.COMPLETE;
-            case pendingSignup -> RewardStatus.PENDING_SIGNUP;
-            case processing -> RewardStatus.PROCESSING;
-            case locked -> RewardStatus.LOCKED;
-            case pendingContributor -> RewardStatus.PENDING_CONTRIBUTOR;
-        });
+        rewardPageItemResponse.setStatus(RewardMapper.map(view.getStatus().asProjectLead()));
         rewardPageItemResponse.setRequestedAt(DateMapper.toZoneDateTime(view.getRequestedAt()));
         rewardPageItemResponse.setProcessedAt(DateMapper.toZoneDateTime(view.getProcessedAt()));
         rewardPageItemResponse.setUnlockDate(DateMapper.toZoneDateTime(view.getUnlockDate()));

@@ -32,7 +32,6 @@ public class RewardViewEntity {
     BigDecimal amount;
     @ManyToOne
     @NonNull CurrencyEntity currency;
-    BigDecimal dollarsEquivalent;
     Integer contributionCount;
     Long recipientId;
     UUID invoiceId;
@@ -68,9 +67,8 @@ public class RewardViewEntity {
                 .createdAt(requestedAt)
                 .processedAt(statusData.paidAt())
                 .currency(currency.toOldDomain())
-                .dollarsEquivalent(dollarsEquivalent)
-                .statusForUser(status.forUser())
-                .statusForProjectLead(status.forProjectLead())
+                .dollarsEquivalent(statusData.amountUsdEquivalent())
+                .status(status.toDomain())
                 .from(GithubUserIdentity.builder()
                         .githubUserId(requestorId)
                         .githubLogin(requestorLogin)
@@ -89,11 +87,11 @@ public class RewardViewEntity {
                 .processedAt(statusData.paidAt())
                 .rewardedOnProjectName(project.getName())
                 .rewardedOnProjectLogoUrl(project.getLogoUrl())
-                .status(status.forUser())
+                .status(status.toDomain())
                 .amount(UserRewardView.Amount.builder()
                         .total(amount)
                         .currency(currency.toOldDomain())
-                        .dollarsEquivalent(dollarsEquivalent)
+                        .dollarsEquivalent(statusData.amountUsdEquivalent())
                         .build())
                 .numberOfRewardedContributions(contributionCount)
                 .build();
@@ -107,11 +105,11 @@ public class RewardViewEntity {
                 .processedAt(statusData.paidAt())
                 .rewardedUserLogin(requestorLogin)
                 .rewardedUserAvatar(requestorAvatarUrl)
-                .status(status.forProjectLead())
+                .status(status.toDomain())
                 .amount(ProjectRewardView.Amount.builder()
                         .total(amount)
                         .currency(currency.toOldDomain())
-                        .dollarsEquivalent(dollarsEquivalent)
+                        .dollarsEquivalent(statusData.amountUsdEquivalent())
                         .build())
                 .numberOfRewardedContributions(contributionCount)
                 .build();

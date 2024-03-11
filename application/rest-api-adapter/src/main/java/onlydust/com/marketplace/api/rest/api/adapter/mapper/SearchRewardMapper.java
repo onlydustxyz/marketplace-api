@@ -11,6 +11,7 @@ import java.util.List;
 
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.map;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapInvoiceInternalStatus;
 
 public interface SearchRewardMapper {
@@ -62,7 +63,7 @@ public interface SearchRewardMapper {
         response.setNextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()));
         page.getContent().forEach(rewardDetailsView -> response.addRewardsItem(new RewardPageItemResponse()
                 .id(rewardDetailsView.id().value())
-                .status(RewardStatus.valueOf(rewardDetailsView.status().name()))
+                .status(map(rewardDetailsView.status().asUser()))
                 .requestedAt(rewardDetailsView.requestedAt())
                 .processedAt(rewardDetailsView.processedAt())
                 .githubUrls(rewardDetailsView.githubUrls())

@@ -23,7 +23,6 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                    r.project_id                 AS project_id,
                    r.amount                     AS amount,
                    r.currency_id                AS currency_id,
-                   rsd.amount_usd_equivalent    AS dollars_equivalent,
                    r.invoice_id                 AS invoice_id,
                    count(*)                     AS contribution_count,
                    github_recipient.id          AS recipient_id,
@@ -40,7 +39,7 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                  JOIN iam.users requestor ON requestor.id = r.requestor_id
                  JOIN indexer_exp.github_accounts github_requestor ON github_requestor.id = requestor.github_user_id
             WHERE (coalesce(:rewardIds) IS NULL OR r.id IN (:rewardIds))
-              AND (coalesce(:statuses) IS NULL OR CAST(rs.status_for_user AS TEXT) IN (:statuses))
+              AND (coalesce(:statuses) IS NULL OR CAST(rs.status AS TEXT) IN (:statuses))
               AND (coalesce(:contributorIds) IS NULL OR r.recipient_id IN (:contributorIds))
               AND (coalesce(:currencyIds) IS NULL OR r.currency_id IN (:currencyIds))
               AND (coalesce(:projectIds) IS NULL OR r.project_id IN (:projectIds))

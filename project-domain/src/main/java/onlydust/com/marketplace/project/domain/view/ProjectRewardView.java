@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.view;
 
 import lombok.Builder;
 import lombok.Data;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.project.domain.model.Currency;
 
 import java.math.BigDecimal;
@@ -18,7 +19,7 @@ public class ProjectRewardView {
     Date processedAt;
     String rewardedUserLogin;
     String rewardedUserAvatar;
-    Status status;
+    RewardStatus status;
     Amount amount;
 
     public Date getUnlockDate() {
@@ -31,10 +32,6 @@ public class ProjectRewardView {
         BigDecimal total;
         Currency currency;
         BigDecimal dollarsEquivalent;
-    }
-
-    public enum Status {
-        pendingSignup, processing, complete, locked, pendingContributor
     }
 
     @Builder

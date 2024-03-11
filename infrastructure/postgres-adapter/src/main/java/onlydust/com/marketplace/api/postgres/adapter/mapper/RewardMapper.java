@@ -2,10 +2,8 @@ package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardItemViewEntity;
 import onlydust.com.marketplace.project.domain.model.ContributionType;
-import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.project.domain.view.RewardItemStatus;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
-import onlydust.com.marketplace.project.domain.view.UserRewardView;
 
 public interface RewardMapper {
     static RewardItemView itemToDomain(RewardItemViewEntity rewardItemViewEntity) {
@@ -49,29 +47,6 @@ public interface RewardMapper {
             case "CHANGES_REQUESTED" -> RewardItemStatus.CHANGES_REQUESTED;
             case "DISMISSED" -> RewardItemStatus.DISMISSED;
             default -> RewardItemStatus.OPEN;
-        };
-    }
-
-    static UserRewardView.Status mapStatusForUser(String status) {
-        return switch (status) {
-            case "PENDING_INVOICE" -> UserRewardView.Status.pendingInvoice;
-            case "COMPLETE" -> UserRewardView.Status.complete;
-            case "MISSING_PAYOUT_INFO" -> UserRewardView.Status.missingPayoutInfo;
-            case "PENDING_VERIFICATION" -> UserRewardView.Status.pendingVerification;
-//    TODO        case "PENDING_CONTRIBUTOR" -> UserRewardView.Status.pendingContributor;
-//     TODO       case "PENDING_SIGNUP" -> UserRewardView.Status.pendingContributor;
-            case "LOCKED" -> UserRewardView.Status.locked;
-            default -> UserRewardView.Status.processing;
-        };
-    }
-
-    static ProjectRewardView.Status mapStatusForProject(String status) {
-        return switch (status) {
-            case "PENDING_SIGNUP" -> ProjectRewardView.Status.pendingSignup;
-            case "PENDING_CONTRIBUTOR" -> ProjectRewardView.Status.pendingContributor;
-            case "COMPLETE" -> ProjectRewardView.Status.complete;
-            case "LOCKED" -> ProjectRewardView.Status.locked;
-            default -> ProjectRewardView.Status.processing;
         };
     }
 }

@@ -67,7 +67,7 @@ public class AccountingObserverTest {
 
         when(rewardStatusStorage.get(any(RewardId.class))).then(invocation -> {
             final var rewardId = invocation.getArgument(0, RewardId.class);
-            return Optional.of(new RewardStatus(rewardId));
+            return Optional.of(new RewardStatusData(rewardId));
         });
         when(rewardUsdEquivalentStorage.get(any())).thenReturn(Optional.of(rewardUsdEquivalent));
         when(rewardUsdEquivalent.rewardAmount()).thenReturn(rewardAmount);
@@ -100,7 +100,7 @@ public class AccountingObserverTest {
         @Test
         public void should_create_status_and_update_usd_equivalent() {
             // Given
-            final var rewardStatus = new RewardStatus(rewardId)
+            final var rewardStatus = new RewardStatusData(rewardId)
                     .sponsorHasEnoughFund(true)
                     .unlockDate(ZonedDateTime.now().toInstant().atZone(ZoneOffset.UTC))
                     .invoiceReceivedAt(null)
@@ -142,7 +142,7 @@ public class AccountingObserverTest {
         @Test
         public void should_update_reward_and_invoice_status() {
             // Given
-            final var rewardStatus = new RewardStatus(rewardId)
+            final var rewardStatus = new RewardStatusData(rewardId)
                     .sponsorHasEnoughFund(true)
                     .unlockDate(ZonedDateTime.now().toInstant().atZone(ZoneOffset.UTC))
                     .invoiceReceivedAt(null)
@@ -150,7 +150,7 @@ public class AccountingObserverTest {
                     .withAdditionalNetworks(Set.of(Network.ETHEREUM, Network.OPTIMISM));
 
             final var rewardId2 = RewardId.random();
-            final var rewardStatus2 = new RewardStatus(rewardId2)
+            final var rewardStatus2 = new RewardStatusData(rewardId2)
                     .sponsorHasEnoughFund(true)
                     .unlockDate(ZonedDateTime.now().toInstant().atZone(ZoneOffset.UTC))
                     .invoiceReceivedAt(null)
@@ -189,7 +189,7 @@ public class AccountingObserverTest {
 
             // Then
             {
-                final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
+                final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
                 verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
                 final var newRewardStatus = rewardStatusCaptor.getValue();
                 assertThat(newRewardStatus.rewardId()).isEqualTo(rewardId);
@@ -220,7 +220,7 @@ public class AccountingObserverTest {
 
             // Then
             {
-                final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
+                final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
                 verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
                 final var newRewardStatus = rewardStatusCaptor.getValue();
                 assertThat(newRewardStatus.rewardId()).isEqualTo(rewardId2);
@@ -272,14 +272,14 @@ public class AccountingObserverTest {
 
             when(rewardStatusStorage.get(any())).then(invocation -> {
                 final var rewardId = invocation.getArgument(0, RewardId.class);
-                return Optional.of(new RewardStatus(rewardId));
+                return Optional.of(new RewardStatusData(rewardId));
             });
 
             // When
             accountingObserver.onSponsorAccountBalanceChanged(sponsorAccountStatement);
 
             // Then
-            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
+            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
             verify(rewardStatusStorage, times(2)).save(rewardStatusCaptor.capture());
             final var rewardStatuses = rewardStatusCaptor.getAllValues();
             assertThat(rewardStatuses).hasSize(2);
@@ -320,7 +320,7 @@ public class AccountingObserverTest {
 
             when(rewardStatusStorage.get(any())).then(invocation -> {
                 final var rewardId = invocation.getArgument(0, RewardId.class);
-                return Optional.of(new RewardStatus(rewardId)
+                return Optional.of(new RewardStatusData(rewardId)
                         .sponsorHasEnoughFund(rewardId.equals(rewardId1))
                         .unlockDate(unlockDate)
                         .withAdditionalNetworks(Set.of(Network.ETHEREUM, Network.OPTIMISM)));
@@ -330,7 +330,7 @@ public class AccountingObserverTest {
             accountingObserver.onSponsorAccountBalanceChanged(sponsorAccountStatement);
 
             // Then
-            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
+            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
             verify(rewardStatusStorage, times(2)).save(rewardStatusCaptor.capture());
             final var rewardStatuses = rewardStatusCaptor.getAllValues();
             assertThat(rewardStatuses).hasSize(2);
@@ -378,14 +378,14 @@ public class AccountingObserverTest {
             // Given
             when(rewardStatusStorage.get(any())).then(invocation -> {
                 final var rewardId = invocation.getArgument(0, RewardId.class);
-                return Optional.of(new RewardStatus(rewardId));
+                return Optional.of(new RewardStatusData(rewardId));
             });
 
             // When
             accountingObserver.onInvoiceUploaded(BillingProfile.Id.random(), invoice.id(), true);
 
             // Then
-            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
+            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
             verify(rewardStatusStorage, times(3)).save(rewardStatusCaptor.capture());
             final var rewardStatuses = rewardStatusCaptor.getAllValues();
             assertThat(rewardStatuses).hasSize(3);
@@ -429,14 +429,14 @@ public class AccountingObserverTest {
             // Given
             when(rewardStatusStorage.get(any())).then(invocation -> {
                 final var rewardId = invocation.getArgument(0, RewardId.class);
-                return Optional.of(new RewardStatus(rewardId).invoiceReceivedAt(invoice.createdAt()));
+                return Optional.of(new RewardStatusData(rewardId).invoiceReceivedAt(invoice.createdAt()));
             });
 
             // When
             //TODO: accountingObserver.onInvoiceRejected(invoice.id());
 
             // Then
-            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
+            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
             verify(rewardStatusStorage, times(3)).save(rewardStatusCaptor.capture());
             final var rewardStatuses = rewardStatusCaptor.getAllValues();
             assertThat(rewardStatuses).hasSize(3);
@@ -471,7 +471,7 @@ public class AccountingObserverTest {
 
             @BeforeEach
             void setup() {
-                when(rewardStatusStorage.get(rewardId)).thenReturn(Optional.of(new RewardStatus(rewardId)));
+                when(rewardStatusStorage.get(rewardId)).thenReturn(Optional.of(new RewardStatusData(rewardId)));
                 when(rewardUsdEquivalentStorage.get(rewardId)).thenReturn(Optional.of(rewardUsdEquivalent));
                 when(rewardUsdEquivalent.rewardAmount()).thenReturn(rewardAmount);
                 when(rewardUsdEquivalent.rewardCurrencyId()).thenReturn(currency.id());
@@ -486,7 +486,7 @@ public class AccountingObserverTest {
                 accountingObserver.updateUsdEquivalent(rewardId);
 
                 // Then
-                final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
+                final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
                 verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
                 final var rewardStatus = rewardStatusCaptor.getValue();
                 assertThat(rewardStatus.amountUsdEquivalent()).isEmpty();
@@ -505,7 +505,7 @@ public class AccountingObserverTest {
                 accountingObserver.updateUsdEquivalent(rewardId);
 
                 // Then
-                final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
+                final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
                 verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
                 final var rewardStatus = rewardStatusCaptor.getValue();
                 assertThat(rewardStatus.amountUsdEquivalent()).contains(price.multiply(rewardAmount));
@@ -521,15 +521,15 @@ public class AccountingObserverTest {
             final var rewardId1 = RewardId.random();
             final var rewardId2 = RewardId.random();
             when(rewardStatusStorage.notPaid()).thenReturn(List.of(
-                    new RewardStatus(rewardId1),
-                    new RewardStatus(rewardId2)
+                    new RewardStatusData(rewardId1),
+                    new RewardStatusData(rewardId2)
             ));
 
             // When
             accountingObserver.refreshRewardsUsdEquivalents();
 
             // Then
-            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
+            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
             verify(rewardStatusStorage, times(2)).save(rewardStatusCaptor.capture());
             final var rewardStatuses = rewardStatusCaptor.getAllValues();
             assertThat(rewardStatuses).hasSize(2);

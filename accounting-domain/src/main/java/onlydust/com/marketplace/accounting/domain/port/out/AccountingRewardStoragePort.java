@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
 import java.util.Date;
@@ -33,7 +34,7 @@ public interface AccountingRewardStoragePort {
     Optional<BatchPaymentDetailsView> findBatchPaymentDetailsById(BatchPayment.Id batchPaymentId);
 
     Page<BackofficeRewardView> findRewards(int pageIndex, int pageSize,
-                                           @NonNull Set<BackofficeRewardView.Status> statuses,
+                                           @NonNull Set<RewardStatus> statuses,
                                            Date fromRequestedAt, Date toRequestedAt,
                                            Date fromProcessedAt, Date toProcessedAt);
 
