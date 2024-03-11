@@ -80,7 +80,7 @@ public class RewardService implements RewardFacadePort {
     public void oldPayReward(OldPayRewardRequestCommand oldPayRewardRequestCommand) {
         final RewardView projectReward = projectRewardStoragePort.getProjectReward(oldPayRewardRequestCommand.getRewardId());
         if (nonNull(projectReward)) {
-            rewardServicePort.markPaymentAsReceived(projectReward.getAmount(), oldPayRewardRequestCommand);
+            rewardServicePort.markPaymentAsReceived(projectReward.getAmount(), projectReward.getCurrency(), oldPayRewardRequestCommand);
         } else {
             throw OnlyDustException.notFound("Reward %s was not found, failed to mark it to paid".formatted(oldPayRewardRequestCommand.getRewardId()));
         }

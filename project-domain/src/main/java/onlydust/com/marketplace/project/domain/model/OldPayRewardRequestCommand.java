@@ -15,6 +15,4 @@ public class OldPayRewardRequestCommand {
     String recipientAccount;
     @NonNull
     String transactionReference;
-    @NonNull
-    Currency currency;
 }

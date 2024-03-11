@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.MarkInvoiceAs
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.RequestRewardDTO;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.RequestRewardResponseDTO;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.mapper.RewardMapper;
+import onlydust.com.marketplace.project.domain.model.Currency;
 import onlydust.com.marketplace.project.domain.model.OldPayRewardRequestCommand;
 import onlydust.com.marketplace.project.domain.model.OldRequestRewardCommand;
 import onlydust.com.marketplace.project.domain.port.output.RewardServicePort;
@@ -40,9 +41,9 @@ public class OdRustApiClientAdapter implements RewardServicePort, OldRewardStora
     }
 
     @Override
-    public void markPaymentAsReceived(BigDecimal amount, OldPayRewardRequestCommand oldPayRewardRequestCommand) {
+    public void markPaymentAsReceived(BigDecimal amount, Currency currency, OldPayRewardRequestCommand oldPayRewardRequestCommand) {
         httpClient.send("/api/payments/%s/receipts".formatted(oldPayRewardRequestCommand.getRewardId()), HttpMethod.POST,
-                RewardMapper.mapOldPayRewardRequestCommandToDTO(oldPayRewardRequestCommand, amount), Void.class);
+                RewardMapper.mapOldPayRewardRequestCommandToDTO(oldPayRewardRequestCommand, currency, amount), Void.class);
     }
 
     @Override

@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import onlydust.com.backoffice.api.contract.model.OldPayRewardRequest;
 import onlydust.com.backoffice.api.contract.model.PayRewardRequest;
 import onlydust.com.backoffice.api.contract.model.TransactionNetwork;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.OdRustApiHttpClient;
@@ -54,8 +55,7 @@ public class BackOfficeV0ApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 {
                                     "receipt_id": "%s"
                                 }""".formatted(UUID.randomUUID()))));
-        final PayRewardRequest payRewardRequest = new PayRewardRequest()
-                .network(TransactionNetwork.SEPA)
+        final OldPayRewardRequest payRewardRequest = new OldPayRewardRequest()
                 .recipientAccount(iban)
                 .reference(transaction);
 

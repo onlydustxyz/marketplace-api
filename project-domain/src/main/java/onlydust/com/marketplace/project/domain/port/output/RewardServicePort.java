@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
+import onlydust.com.marketplace.project.domain.model.Currency;
 import onlydust.com.marketplace.project.domain.model.OldPayRewardRequestCommand;
 import onlydust.com.marketplace.project.domain.model.OldRequestRewardCommand;
 
@@ -15,5 +16,5 @@ public interface RewardServicePort {
 
     void markInvoiceAsReceived(List<UUID> rewardIds);
 
-    void markPaymentAsReceived(BigDecimal amount, OldPayRewardRequestCommand oldPayRewardRequestCommand);
+    void markPaymentAsReceived(BigDecimal amount, Currency currency, OldPayRewardRequestCommand oldPayRewardRequestCommand);
 }

@@ -4,6 +4,7 @@ import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutIn
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.MarkPaymentReceivedDTO;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.RequestRewardDTO;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.project.domain.model.Currency;
 import onlydust.com.marketplace.project.domain.model.OldPayRewardRequestCommand;
 import onlydust.com.marketplace.project.domain.model.OldRequestRewardCommand;
 
@@ -51,23 +52,24 @@ public interface RewardMapper {
     }
 
     static MarkPaymentReceivedDTO mapOldPayRewardRequestCommandToDTO(final OldPayRewardRequestCommand command,
+                                                                     final Currency currency,
                                                                      final BigDecimal amount) {
         return MarkPaymentReceivedDTO.builder()
                 .amount(amount)
                 .transactionReference(command.getTransactionReference())
-                .recipientWallet(switch (command.getCurrency()) {
+                .recipientWallet(switch (currency) {
                     case STRK, ETH, OP, LORDS, APT, USDC:
                         yield command.getRecipientAccount();
                     default:
                         yield null;
                 })
-                .recipientIban(switch (command.getCurrency()) {
+                .recipientIban(switch (currency) {
                     case USD:
                         yield command.getRecipientAccount();
                     default:
                         yield null;
                 })
-                .currency(switch (command.getCurrency()) {
+                .currency(switch (currency) {
                     case ETH -> "ETH";
                     case OP -> "OP";
                     case APT -> "APT";

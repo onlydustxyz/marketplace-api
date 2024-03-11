@@ -569,7 +569,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PayRewardRequest'
+              $ref: '#/components/schemas/OldPayRewardRequest'
       responses:
         "204":
           description: 'The reward has been marked as complete'
@@ -1960,12 +1960,22 @@ components:
     PayRewardRequest:
       type: object
       required:
-        - network
         - reference
         - recipientAccount
       properties:
         network:
           $ref: '#/components/schemas/TransactionNetwork'
+        reference:
+          type: string
+        recipientAccount:
+          type: string
+
+    OldPayRewardRequest:
+      type: object
+      required:
+        - reference
+        - recipientAccount
+      properties:
         reference:
           type: string
         recipientAccount:

@@ -155,19 +155,11 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
 
     @Override
-    public ResponseEntity<Void> oldPayReward(UUID rewardId, PayRewardRequest payRewardRequest) {
+    public ResponseEntity<Void> oldPayReward(UUID rewardId, OldPayRewardRequest payRewardRequest) {
         rewardFacadePortV2.oldPayReward(OldPayRewardRequestCommand.builder()
                 .rewardId(rewardId)
                 .recipientAccount(payRewardRequest.getRecipientAccount())
                 .transactionReference(payRewardRequest.getReference())
-                .currency(switch (payRewardRequest.getNetwork()) {
-                    case SWIFT -> onlydust.com.marketplace.project.domain.model.Currency.USD;
-                    case SEPA -> onlydust.com.marketplace.project.domain.model.Currency.USD;
-                    case ETHEREUM -> onlydust.com.marketplace.project.domain.model.Currency.ETH;
-                    case OPTIMISM -> onlydust.com.marketplace.project.domain.model.Currency.OP;
-                    case STARKNET -> onlydust.com.marketplace.project.domain.model.Currency.STRK;
-                    case APTOS -> onlydust.com.marketplace.project.domain.model.Currency.APT;
-                })
                 .build());
         return ResponseEntity.ok().build();
     }
