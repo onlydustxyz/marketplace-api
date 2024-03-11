@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
 import onlydust.com.marketplace.project.domain.model.OldCountry;
 import onlydust.com.marketplace.project.domain.model.OldIndividualBillingProfile;
 import org.hibernate.annotations.CreationTimestamp;
@@ -67,7 +68,7 @@ public class IndividualBillingProfileEntity {
         RESIDENCE_PERMIT,
         DRIVER_LICENSE;
 
-        public OldIndividualBillingProfile.OldIdDocumentTypeEnum toDomain() {
+        public OldIndividualBillingProfile.OldIdDocumentTypeEnum oldToDomain() {
             return switch (this) {
                 case ID_CARD -> OldIndividualBillingProfile.OldIdDocumentTypeEnum.ID_CARD;
                 case PASSPORT -> OldIndividualBillingProfile.OldIdDocumentTypeEnum.PASSPORT;
@@ -75,6 +76,16 @@ public class IndividualBillingProfileEntity {
                 case DRIVER_LICENSE -> OldIndividualBillingProfile.OldIdDocumentTypeEnum.DRIVER_LICENSE;
             };
         }
+
+        public Kyc.IdDocumentTypeEnum toDomain() {
+            return switch (this) {
+                case ID_CARD -> Kyc.IdDocumentTypeEnum.ID_CARD;
+                case PASSPORT -> Kyc.IdDocumentTypeEnum.PASSPORT;
+                case RESIDENCE_PERMIT -> Kyc.IdDocumentTypeEnum.RESIDENCE_PERMIT;
+                case DRIVER_LICENSE -> Kyc.IdDocumentTypeEnum.DRIVER_LICENSE;
+            };
+        }
+
 
         public static IdDocumentTypeEnumEntity fromDomain(OldIndividualBillingProfile.OldIdDocumentTypeEnum oldIdDocumentTypeEnum) {
             return isNull(oldIdDocumentTypeEnum) ? null : switch (oldIdDocumentTypeEnum) {
@@ -90,7 +101,7 @@ public class IndividualBillingProfileEntity {
         return OldIndividualBillingProfile.builder()
                 .id(this.id)
                 .status(this.verificationStatus.toDomain())
-                .idDocumentType(isNull(this.idDocumentType) ? null : this.idDocumentType.toDomain())
+                .idDocumentType(isNull(this.idDocumentType) ? null : this.idDocumentType.oldToDomain())
                 .address(this.address)
                 .oldCountry(this.country == null ? null : OldCountry.fromIso3(this.country))
                 .firstName(this.firstName)
