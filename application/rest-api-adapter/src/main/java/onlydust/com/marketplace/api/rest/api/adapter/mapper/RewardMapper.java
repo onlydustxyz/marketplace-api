@@ -1,12 +1,15 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import lombok.NonNull;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.OldRequestRewardCommand;
 import onlydust.com.marketplace.project.domain.model.Reward;
-import onlydust.com.marketplace.project.domain.view.*;
+import onlydust.com.marketplace.project.domain.view.ContributionRewardView;
+import onlydust.com.marketplace.project.domain.view.ReceiptView;
+import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.project.domain.view.RewardItemView;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -63,53 +66,39 @@ public interface RewardMapper {
                 .project(ProjectMapper.mapShortProjectResponse(rewardDetailsView.getProject()));
 
         if (forUser) {
-            response.status(mapRewardStatus(rewardDetailsView.getStatusForUser()));
+            response.status(map(rewardDetailsView.getStatus().asUser()));
         } else {
-            response.status(mapRewardStatus(rewardDetailsView.getStatusForProjectLead()));
+            response.status(map(rewardDetailsView.getStatus().asProjectLead()));
         }
 
         return response;
     }
 
-    @NonNull
-    private static RewardStatus mapRewardStatus(UserRewardView.Status rewardView) {
-        return switch (rewardView) {
-            case complete -> RewardStatus.COMPLETE;
-            case missingPayoutInfo -> RewardStatus.MISSING_PAYOUT_INFO;
-            case pendingInvoice -> RewardStatus.PENDING_INVOICE;
-            case processing -> RewardStatus.PROCESSING;
-            case locked -> RewardStatus.LOCKED;
-            case pendingVerification -> RewardStatus.PENDING_VERIFICATION;
-            //TODO case pendingContributor -> RewardStatus.PENDING_CONTRIBUTOR;
-            //TODO case pendingSignup -> RewardStatus.PENDING_SIGNUP;
+    static RewardStatusContract map(RewardStatus.AsUser status) {
+        return switch (status) {
+            case PENDING_SIGNUP -> RewardStatusContract.PENDING_SIGNUP;
+            case PENDING_BILLING_PROFILE -> RewardStatusContract.PENDING_BILLING_PROFILE;
+            case PENDING_VERIFICATION -> RewardStatusContract.PENDING_VERIFICATION;
+            case PAYMENT_BLOCKED -> RewardStatusContract.PAYMENT_BLOCKED;
+            case PAYOUT_INFO_MISSING -> RewardStatusContract.PAYOUT_INFO_MISSING;
+            case LOCKED -> RewardStatusContract.LOCKED;
+            case PENDING_REQUEST -> RewardStatusContract.PENDING_REQUEST;
+            case PROCESSING -> RewardStatusContract.PROCESSING;
+            case COMPLETE -> RewardStatusContract.COMPLETE;
         };
     }
 
-    @NonNull
-    private static RewardStatus mapRewardStatus(ProjectRewardView.Status rewardView) {
-        return switch (rewardView) {
-            case complete -> RewardStatus.COMPLETE;
-            case pendingContributor -> RewardStatus.PENDING_CONTRIBUTOR;
-            case pendingSignup -> RewardStatus.PENDING_SIGNUP;
-            case processing -> RewardStatus.PROCESSING;
-            case locked -> RewardStatus.LOCKED;
+    static RewardStatusContract map(RewardStatus.AsProjectLead status) {
+        return switch (status) {
+            case PENDING_SIGNUP -> RewardStatusContract.PENDING_SIGNUP;
+            case PENDING_CONTRIBUTOR -> RewardStatusContract.PENDING_CONTRIBUTOR;
+            case PROCESSING -> RewardStatusContract.PROCESSING;
+            case COMPLETE -> RewardStatusContract.COMPLETE;
         };
     }
 
-    @NonNull
-    private static RewardStatus mapRewardStatusToProject(UserRewardView.Status rewardView) {
-        return switch (rewardView) {
-            case complete -> RewardStatus.COMPLETE;
-            case missingPayoutInfo -> RewardStatus.PENDING_CONTRIBUTOR;
-            case locked -> RewardStatus.LOCKED;
-            case pendingVerification -> RewardStatus.PENDING_CONTRIBUTOR;
-            default -> RewardStatus.PROCESSING;
-        };
-    }
-
-
-    static RewardResponse rewardToResponse(ContributionRewardView rewardView) {
-        return new RewardResponse()
+    static RewardResponse rewardToResponse(ContributionRewardView rewardView, boolean forUser) {
+        final var response = new RewardResponse()
                 .from(new ContributorResponse()
                         .githubUserId(rewardView.getFrom().getGithubUserId())
                         .avatarUrl(rewardView.getFrom().getGithubAvatarUrl())
@@ -125,10 +114,17 @@ public interface RewardMapper {
                 .processedAt(DateMapper.toZoneDateTime(rewardView.getProcessedAt()))
                 .amount(rewardView.getAmount())
                 .currency(mapCurrency(rewardView.getCurrency()))
-                .status(mapRewardStatusToProject(rewardView.getStatus()))
                 .dollarsEquivalent(rewardView.getDollarsEquivalent())
-                .id(rewardView.getId())
-                ;
+                .id(rewardView.getId());
+
+
+        if (forUser) {
+            response.status(map(rewardView.getStatus().asUser()));
+        } else {
+            response.status(map(rewardView.getStatus().asProjectLead()));
+        }
+
+        return response;
     }
 
     static ReceiptResponse receiptToResponse(final ReceiptView receiptView) {

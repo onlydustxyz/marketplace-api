@@ -46,7 +46,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
 
     @Override
     public void onRewardCreated(RewardId rewardId, AccountBookFacade accountBookFacade) {
-        rewardStatusStorage.save(uptodateRewardStatus(accountBookFacade, new RewardStatus(rewardId)));
+        rewardStatusStorage.save(uptodateRewardStatus(accountBookFacade, new RewardStatusData(rewardId)));
         updateUsdEquivalent(rewardId);
     }
 
@@ -62,7 +62,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
         rewardStatusStorage.save(rewardStatus.paidAt(ZonedDateTime.now()));
 
         invoiceStorage.invoiceOf(rewardId).ifPresent(invoice -> {
-            if (invoice.rewards().stream().allMatch(reward -> rewardStatusStorage.get(reward.id()).map(RewardStatus::isPaid)
+            if (invoice.rewards().stream().allMatch(reward -> rewardStatusStorage.get(reward.id()).map(RewardStatusData::isPaid)
                     .orElseThrow(() -> notFound("RewardStatus not found for reward %s".formatted(rewardId))))) {
                 invoiceStorage.update(invoice.status(Invoice.Status.PAID));
             }
@@ -89,12 +89,12 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
                 .orElse(null);
     }
 
-    private RewardStatus uptodateRewardStatus(AccountBookFacade accountBookFacade, RewardStatus rewardStatus) {
-        return rewardStatus
-                .sponsorHasEnoughFund(accountBookFacade.isFunded(rewardStatus.rewardId()))
-                .unlockDate(accountBookFacade.unlockDateOf(rewardStatus.rewardId()).map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
-                .withAdditionalNetworks(accountBookFacade.networksOf(rewardStatus.rewardId()))
-                .amountUsdEquivalent(usdEquivalent(rewardStatus.rewardId()));
+    private RewardStatusData uptodateRewardStatus(AccountBookFacade accountBookFacade, RewardStatusData rewardStatusData) {
+        return rewardStatusData
+                .sponsorHasEnoughFund(accountBookFacade.isFunded(rewardStatusData.rewardId()))
+                .unlockDate(accountBookFacade.unlockDateOf(rewardStatusData.rewardId()).map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
+                .withAdditionalNetworks(accountBookFacade.networksOf(rewardStatusData.rewardId()))
+                .amountUsdEquivalent(usdEquivalent(rewardStatusData.rewardId()));
     }
 
     public void refreshRewardsUsdEquivalents() {

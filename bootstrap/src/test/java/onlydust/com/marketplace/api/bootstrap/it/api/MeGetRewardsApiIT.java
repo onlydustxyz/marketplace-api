@@ -70,7 +70,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "requestedAt": "2023-09-19T07:38:22.018458Z",
                               "processedAt": null,
                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                              "status": "PENDING_INVOICE",
+                              "status": "PENDING_REQUEST",
                               "unlockDate": null,
                               "amount": {
                                 "total": 500,
@@ -117,7 +117,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "requestedAt": "2023-09-19T07:38:52.590518Z",
                               "processedAt": null,
                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                              "status": "PENDING_INVOICE",
+                              "status": "PENDING_REQUEST",
                               "unlockDate": null,
                               "amount": {
                                 "total": 1000,
@@ -133,7 +133,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "requestedAt": "2023-09-19T07:39:54.45638Z",
                               "processedAt": null,
                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                              "status": "MISSING_PAYOUT_INFO",
+                              "status": "PAYOUT_INFO_MISSING",
                               "unlockDate": "2024-08-23T00:00:00Z",
                               "amount": {
                                 "total": 30,
@@ -149,7 +149,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "requestedAt": "2023-09-19T07:39:23.730967Z",
                               "processedAt": null,
                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                              "status": "MISSING_PAYOUT_INFO",
+                              "status": "PAYOUT_INFO_MISSING",
                               "unlockDate": null,
                               "amount": {
                                 "total": 9511147,
@@ -201,7 +201,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "requestedAt": "2023-09-19T07:38:22.018458Z",
                               "processedAt": null,
                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                              "status": "PENDING_INVOICE",
+                              "status": "PENDING_REQUEST",
                               "unlockDate": null,
                               "amount": {
                                 "total": 500,
@@ -217,7 +217,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "requestedAt": "2023-09-19T07:38:52.590518Z",
                               "processedAt": null,
                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                              "status": "PENDING_INVOICE",
+                              "status": "PENDING_REQUEST",
                               "unlockDate": null,
                               "amount": {
                                 "total": 1000,

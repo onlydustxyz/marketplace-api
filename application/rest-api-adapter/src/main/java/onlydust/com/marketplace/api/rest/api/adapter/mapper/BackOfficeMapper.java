@@ -2,12 +2,12 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import onlydust.com.backoffice.api.contract.model.RewardStatus;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Hash;
@@ -615,16 +615,31 @@ public interface BackOfficeMapper {
                 .address(currency.address().map(Hash::toString).orElse(null));
     }
 
-    static BackofficeRewardView.Status mapRewardStatus(RewardStatus rewardStatus) {
+    static RewardStatus map(RewardStatusContract rewardStatus) {
+        return new RewardStatus(switch (rewardStatus) {
+            case PENDING_SIGNUP -> RewardStatus.AsUser.PENDING_SIGNUP;
+            case PENDING_BILLING_PROFILE -> RewardStatus.AsUser.PENDING_BILLING_PROFILE;
+            case PENDING_VERIFICATION -> RewardStatus.AsUser.PENDING_VERIFICATION;
+            case PAYMENT_BLOCKED -> RewardStatus.AsUser.PAYMENT_BLOCKED;
+            case PAYOUT_INFO_MISSING -> RewardStatus.AsUser.PAYOUT_INFO_MISSING;
+            case LOCKED -> RewardStatus.AsUser.LOCKED;
+            case PENDING_REQUEST -> RewardStatus.AsUser.PENDING_REQUEST;
+            case PROCESSING -> RewardStatus.AsUser.PROCESSING;
+            case COMPLETE -> RewardStatus.AsUser.COMPLETE;
+        });
+    }
+
+    static RewardStatusContract map(RewardStatus.AsUser rewardStatus) {
         return switch (rewardStatus) {
-            case PENDING_INVOICE -> BackofficeRewardView.Status.PENDING_INVOICE;
-            case PENDING_SIGNUP -> BackofficeRewardView.Status.PENDING_SIGNUP;
-            case PENDING_CONTRIBUTOR -> BackofficeRewardView.Status.PENDING_CONTRIBUTOR;
-            case PENDING_VERIFICATION -> BackofficeRewardView.Status.PENDING_VERIFICATION;
-            case MISSING_PAYOUT_INFO -> BackofficeRewardView.Status.MISSING_PAYOUT_INFO;
-            case PROCESSING -> BackofficeRewardView.Status.PROCESSING;
-            case COMPLETE -> BackofficeRewardView.Status.COMPLETE;
-            case LOCKED -> BackofficeRewardView.Status.LOCKED;
+            case PENDING_SIGNUP -> RewardStatusContract.PENDING_SIGNUP;
+            case PENDING_BILLING_PROFILE -> RewardStatusContract.PENDING_BILLING_PROFILE;
+            case PENDING_VERIFICATION -> RewardStatusContract.PENDING_VERIFICATION;
+            case PAYMENT_BLOCKED -> RewardStatusContract.PAYMENT_BLOCKED;
+            case PAYOUT_INFO_MISSING -> RewardStatusContract.PAYOUT_INFO_MISSING;
+            case LOCKED -> RewardStatusContract.LOCKED;
+            case PENDING_REQUEST -> RewardStatusContract.PENDING_REQUEST;
+            case PROCESSING -> RewardStatusContract.PROCESSING;
+            case COMPLETE -> RewardStatusContract.COMPLETE;
         };
     }
 }

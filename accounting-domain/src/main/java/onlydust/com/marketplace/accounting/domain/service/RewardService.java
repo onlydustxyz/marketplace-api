@@ -14,6 +14,7 @@ import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
@@ -124,12 +125,12 @@ public class RewardService implements AccountingRewardPort {
 
     @Override
     public Page<BackofficeRewardView> getRewards(int pageIndex, int pageSize,
-                                                 List<BackofficeRewardView.Status> statuses,
+                                                 List<RewardStatus> statuses,
                                                  Date fromRequestedAt, Date toRequestedAt,
                                                  Date fromProcessedAt, Date toProcessedAt) {
-        Set<BackofficeRewardView.Status> sanitizedStatuses;
+        Set<RewardStatus> sanitizedStatuses;
         if (statuses == null || statuses.isEmpty()) {
-            sanitizedStatuses = EnumSet.allOf(BackofficeRewardView.Status.class).stream().collect(Collectors.toUnmodifiableSet());
+            sanitizedStatuses = EnumSet.allOf(RewardStatus.AsUser.class).stream().map(RewardStatus::new).collect(Collectors.toUnmodifiableSet());
         } else {
             sanitizedStatuses = statuses.stream().collect(Collectors.toUnmodifiableSet());
         }
@@ -137,7 +138,7 @@ public class RewardService implements AccountingRewardPort {
     }
 
     @Override
-    public String exportRewardsCSV(List<BackofficeRewardView.Status> statuses,
+    public String exportRewardsCSV(List<RewardStatus> statuses,
                                    Date fromRequestedAt, Date toRequestedAt,
                                    Date fromProcessedAt, Date toProcessedAt) {
         final var rewards = accountingRewardStoragePort.findRewards(0, 1_000_000,

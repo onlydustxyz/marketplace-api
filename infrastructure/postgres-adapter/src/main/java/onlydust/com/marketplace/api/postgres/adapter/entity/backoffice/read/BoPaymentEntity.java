@@ -1,22 +1,19 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
 
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
 import onlydust.com.marketplace.project.domain.model.OldAccountNumber;
 import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
 import onlydust.com.marketplace.project.domain.view.backoffice.PaymentView;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +38,6 @@ public class BoPaymentEntity {
     @Type(type = "jsonb")
     List<String> items;
     ZonedDateTime requestedAt;
-    ZonedDateTime processedAt;
     Integer pullRequestsCount;
     Integer issuesCount;
     Integer dustyIssuesCount;
@@ -54,6 +50,10 @@ public class BoPaymentEntity {
     List<Wallet> recipientWallets;
     String recipientIban;
     String recipientBic;
+
+    @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "reward_id")
+    @NonNull RewardStatusDataEntity statusData;
 
 
     // TODO : use KYC/KYB data
@@ -111,7 +111,7 @@ public class BoPaymentEntity {
                 .requestorId(requestorId)
                 .items(items)
                 .requestedAt(requestedAt)
-                .processedAt(processedAt)
+                .processedAt(statusData.paidAt().toInstant().atZone(ZoneOffset.UTC))
                 .pullRequestsCount(pullRequestsCount)
                 .issuesCount(issuesCount)
                 .dustyIssuesCount(dustyIssuesCount)

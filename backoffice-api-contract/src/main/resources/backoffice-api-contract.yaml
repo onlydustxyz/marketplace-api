@@ -605,7 +605,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/RewardStatus'
+              $ref: '#/components/schemas/RewardStatusContract'
           style: form
         - in: query
           name: fromRequestedAt
@@ -660,7 +660,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/RewardStatus'
+              $ref: '#/components/schemas/RewardStatusContract'
           style: form
         - in: query
           name: fromRequestedAt
@@ -2928,7 +2928,7 @@ components:
         invoice:
           $ref: '#/components/schemas/InvoiceLinkResponse'
         status:
-          $ref: '#/components/schemas/RewardStatus'
+          $ref: '#/components/schemas/RewardStatusContract'
         requestedAt:
           type: string
           format: date-time
@@ -2963,16 +2963,17 @@ components:
             type: string
             example: 0x1234567890abcdef
 
-    RewardStatus:
+    RewardStatusContract:
       enum:
-        - PENDING_INVOICE
         - PENDING_SIGNUP
-        - PENDING_CONTRIBUTOR
+        - PENDING_BILLING_PROFILE
         - PENDING_VERIFICATION
-        - MISSING_PAYOUT_INFO
+        - PAYMENT_BLOCKED
+        - PAYOUT_INFO_MISSING
+        - LOCKED
+        - PENDING_REQUEST
         - PROCESSING
         - COMPLETE
-        - LOCKED
 
     RecipientLinkResponse:
       type: object

@@ -1,14 +1,14 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
-import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
 import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.view.ContributionRewardView;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
@@ -20,12 +20,15 @@ public class ContributionRewardViewEntity {
     @Id
     UUID id;
     Date requestedAt;
-    Date paidAt;
     BigDecimal amount;
     @ManyToOne
     CurrencyEntity currency;
-    BigDecimal dollarsEquivalent;
-    String status;
+    @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "reward_id")
+    @NonNull RewardStatusEntity status;
+    @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "reward_id")
+    @NonNull RewardStatusDataEntity statusData;
 
     String requestorLogin;
     String requestorAvatarUrl;
@@ -51,12 +54,12 @@ public class ContributionRewardViewEntity {
                 .id(id)
                 .currency(currency.toOldDomain())
                 .amount(amount)
-                .dollarsEquivalent(dollarsEquivalent)
-                .status(RewardMapper.mapStatusForUser(status))
+                .dollarsEquivalent(statusData.amountUsdEquivalent())
+                .status(status.toDomain())
                 .from(requestor)
                 .to(recipient)
                 .createdAt(requestedAt)
-                .processedAt(paidAt)
+                .processedAt(statusData.paidAt())
                 .build();
     }
 }

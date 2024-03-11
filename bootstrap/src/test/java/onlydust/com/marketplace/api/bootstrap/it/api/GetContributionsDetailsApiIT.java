@@ -119,7 +119,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "currency": "USDC",
                               "amount": 1000,
                               "dollarsEquivalent": 1010,
-                              "status": "PROCESSING",
+                              "status": "PENDING_REQUEST",
                               "from": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
@@ -140,7 +140,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "currency": "USDC",
                               "amount": 1000,
                               "dollarsEquivalent": 1010,
-                              "status": "PROCESSING",
+                              "status": "PENDING_REQUEST",
                               "from": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
@@ -161,7 +161,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "currency": "USDC",
                               "amount": 1000,
                               "dollarsEquivalent": 1010,
-                              "status": "PROCESSING",
+                              "status": "PENDING_REQUEST",
                               "from": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
@@ -182,7 +182,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "currency": "USDC",
                               "amount": 1000,
                               "dollarsEquivalent": 1010,
-                              "status": "PROCESSING",
+                              "status": "PENDING_REQUEST",
                               "from": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
@@ -203,7 +203,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "currency": "USDC",
                               "amount": 1000,
                               "dollarsEquivalent": 1010,
-                              "status": "PROCESSING",
+                              "status": "PENDING_REQUEST",
                               "from": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
@@ -224,7 +224,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "currency": "USDC",
                               "amount": 1000,
                               "dollarsEquivalent": 1010,
-                              "status": "PROCESSING",
+                              "status": "PENDING_REQUEST",
                               "from": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
@@ -245,7 +245,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "currency": "USDC",
                               "amount": 1000,
                               "dollarsEquivalent": 1010,
-                              "status": "PROCESSING",
+                              "status": "PENDING_REQUEST",
                               "from": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
@@ -266,7 +266,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "currency": "USDC",
                               "amount": 1000,
                               "dollarsEquivalent": 1010,
-                              "status": "PROCESSING",
+                              "status": "PENDING_REQUEST",
                               "from": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",

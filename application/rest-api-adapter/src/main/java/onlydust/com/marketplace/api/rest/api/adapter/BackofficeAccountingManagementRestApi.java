@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeAccountingManagementApi;
-import onlydust.com.backoffice.api.contract.model.RewardStatus;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
@@ -173,7 +172,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
     @Override
     public ResponseEntity<RewardPageResponse> getRewards(Integer pageIndex, Integer pageSize,
-                                                         List<RewardStatus> statuses,
+                                                         List<RewardStatusContract> statuses,
                                                          String fromRequestedAt,
                                                          String toRequestedAt,
                                                          String fromProcessedAt,
@@ -184,7 +183,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
         final Page<BackofficeRewardView> rewards = accountingRewardPort.getRewards(
                 sanitizedPageIndex,
                 sanitizedPageSize,
-                statuses != null ? statuses.stream().map(BackOfficeMapper::mapRewardStatus).toList() : null,
+                statuses != null ? statuses.stream().map(BackOfficeMapper::map).toList() : null,
                 DateMapper.parseNullable(fromRequestedAt),
                 DateMapper.parseNullable(toRequestedAt),
                 DateMapper.parseNullable(fromProcessedAt),
@@ -194,7 +193,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     }
 
     @Override
-    public ResponseEntity<String> exportRewardsCSV(List<RewardStatus> statuses,
+    public ResponseEntity<String> exportRewardsCSV(List<RewardStatusContract> statuses,
                                                    String fromRequestedAt,
                                                    String toRequestedAt,
                                                    String fromProcessedAt,
@@ -205,7 +204,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
             throw badRequest("At least one of the date filters must be set");
 
         final String csv = accountingRewardPort.exportRewardsCSV(
-                statuses.stream().map(BackOfficeMapper::mapRewardStatus).toList(),
+                statuses.stream().map(BackOfficeMapper::map).toList(),
                 DateMapper.parseNullable(fromRequestedAt),
                 DateMapper.parseNullable(toRequestedAt),
                 DateMapper.parseNullable(fromProcessedAt),

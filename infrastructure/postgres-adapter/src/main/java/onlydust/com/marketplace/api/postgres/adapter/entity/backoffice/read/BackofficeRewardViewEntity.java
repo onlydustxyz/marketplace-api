@@ -8,17 +8,12 @@ import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.view.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -39,9 +34,7 @@ import static java.util.Objects.isNull;
 public class BackofficeRewardViewEntity {
     @Id
     @NonNull UUID id;
-    @NonNull String status;
     @NonNull Date requestedAt;
-    Date processedAt;
 
     String recipientLogin;
     String recipientAvatarUrl;
@@ -58,7 +51,6 @@ public class BackofficeRewardViewEntity {
     @Type(type = "jsonb")
     List<SponsorLinkView> sponsors;
 
-    @NonNull BigDecimal dollarsEquivalent;
     @NonNull BigDecimal amount;
     String currencyName;
     @NonNull String currencyCode;
@@ -86,6 +78,13 @@ public class BackofficeRewardViewEntity {
     @Type(type = "jsonb")
     List<String> paidToAccountNumbers;
 
+    @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "reward_id")
+    @NonNull RewardStatusEntity status;
+    @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "reward_id")
+    @NonNull RewardStatusDataEntity statusData;
+
     @Data
     public static class SponsorLinkView {
         String name;
@@ -102,9 +101,9 @@ public class BackofficeRewardViewEntity {
     public BackofficeRewardView toDomain() {
         return BackofficeRewardView.builder()
                 .id(RewardId.of(this.id))
-                .status(BackofficeRewardView.Status.valueOf(this.status))
+                .status(status.toDomain())
                 .requestedAt(DateMapper.ofNullable(this.requestedAt))
-                .processedAt(DateMapper.ofNullable(this.processedAt))
+                .processedAt(DateMapper.ofNullable(this.statusData.paidAt()))
                 .githubUrls(isNull(this.githubUrls) ? List.of() : this.githubUrls.stream().sorted().toList())
                 .project(ShortProjectView.builder()
                         .id(ProjectId.of(this.projectId))
@@ -132,7 +131,7 @@ public class BackofficeRewardViewEntity {
                         .toList())
                 .money(MoneyView.builder()
                         .amount(this.amount)
-                        .dollarsEquivalent(this.dollarsEquivalent)
+                        .dollarsEquivalent(this.statusData.amountUsdEquivalent())
                         .currencyName(this.currencyName)
                         .currencyCode(this.currencyCode)
                         .currencyLogoUrl(this.currencyLogoUrl)

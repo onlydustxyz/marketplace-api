@@ -39,14 +39,7 @@ public interface MyRewardMapper {
                 .rewardedOnProjectLogoUrl(view.getRewardedOnProjectLogoUrl())
                 .rewardedOnProjectName(view.getRewardedOnProjectName())
                 .amount(mapRewardAmountToResponse(view))
-                .status(switch (view.getStatus()) {
-                    case complete -> RewardStatus.COMPLETE;
-                    case pendingInvoice -> RewardStatus.PENDING_INVOICE;
-                    default -> RewardStatus.PROCESSING;
-                    case missingPayoutInfo -> RewardStatus.MISSING_PAYOUT_INFO;
-                    case locked -> RewardStatus.LOCKED;
-                    case pendingVerification -> RewardStatus.PENDING_VERIFICATION;
-                })
+                .status(RewardMapper.map(view.getStatus().asUser()))
                 .requestedAt(DateMapper.toZoneDateTime(view.getRequestedAt()))
                 .processedAt(DateMapper.toZoneDateTime(view.getProcessedAt()))
                 .unlockDate(DateMapper.toZoneDateTime(view.getUnlockDate()))

@@ -23,7 +23,6 @@ public interface BoPaymentRepository extends JpaRepository<BoPaymentEntity, UUID
             	r.requestor_id,
             	Items.urls AS items,
             	r.requested_at,
-            	rsd.paid_at as processed_at,
             	Counters.*,
             	upi.identity as recipient_identity,
             	upi.location as recipient_location,
@@ -48,7 +47,6 @@ public interface BoPaymentRepository extends JpaRepository<BoPaymentEntity, UUID
                     GROUP BY 
                         billing_profile_id
             	) user_wallets ON user_wallets.billing_profile_id = pp.billing_profile_id
-            	LEFT JOIN accounting.reward_status_data rsd ON rsd.reward_id = r.id
             	INNER JOIN (
             		SELECT
             			jsonb_agg(coalesce(pr.html_url, i.html_url)) AS urls,
