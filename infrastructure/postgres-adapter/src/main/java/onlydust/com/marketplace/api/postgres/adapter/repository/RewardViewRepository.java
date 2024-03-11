@@ -21,17 +21,13 @@ public interface RewardViewRepository extends JpaRepository<RewardDetailsViewEnt
                    reward_status.value                      status,
                    pr.requested_at                          requested_at,
                    r.processed_at                           processed_at,
-                   
                    g_urls.urls                              github_urls,
-                   
                    pd.project_id                            project_id,
                    pd.name                                  project_name,
                    pd.logo_url                              project_logo_url,
                    pd.short_description                     project_short_description,
                    pd.key                                   project_slug,
-                   
                    s2.s_list                                sponsors,
-                   
                    pr.usd_amount                            dollars_equivalent,
                    pr.amount                                amount,
                    c.name                                   currency_name,
@@ -46,15 +42,13 @@ public interface RewardViewRepository extends JpaRepository<RewardDetailsViewEnt
                    coalesce(ibp.id, cbp.id)                 billing_profile_id,
                    coalesce(ibp.verification_status,
                             cbp.verification_status)        billing_profile_verification_status,
-                   u.github_login                           billing_profile_admin_login,
-                   u.github_avatar_url                      billing_profile_admin_avatar_url,
+                   gu.login                           billing_profile_admin_login,
+                   gu.avatar_url                      billing_profile_admin_avatar_url,
                    upi.first_name || ' ' || upi.last_name   billing_profile_admin_name,
                    u.email                                  billing_profile_admin_email,
-                   
                    i.id                                     invoice_id,
                    i.number                                 invoice_number,
                    i.status                                 invoice_status,
-                   
                    case
                         when r.receipt -> 'Ethereum' is not null then r.receipt -> 'Ethereum' ->> 'transaction_hash'
                         when r.receipt -> 'Optimism' is not null then r.receipt -> 'Optimism' ->> 'transaction_hash'
@@ -78,6 +72,7 @@ public interface RewardViewRepository extends JpaRepository<RewardDetailsViewEnt
                        join projects_sponsors ps2 on ps2.sponsor_id = s.id
                        group by ps2.project_id) s2 on s2.project_id = pr.project_id
             left join iam.users u on u.github_user_id = pr.recipient_id
+            left join indexer_exp.github_accounts gu on gu.id = pr.recipient_id
             left join user_profile_info upi on upi.id = u.id
             left join user_billing_profile_types ubpt on ubpt.user_id = u.id
             left join individual_billing_profiles ibp on ubpt.billing_profile_type = 'INDIVIDUAL' and ibp.user_id = ubpt.user_id
@@ -121,6 +116,7 @@ public interface RewardViewRepository extends JpaRepository<RewardDetailsViewEnt
                         
                     select case
                        when r.id is not null then 'COMPLETE'
+                       when u.id is null then 'PENDING_SIGNUP'
                        when not coalesce(bpc.billing_profile_verified, false) then 'PENDING_VERIFICATION'
                        when (case
                                  when pr.currency in ('eth', 'lords', 'usdc')

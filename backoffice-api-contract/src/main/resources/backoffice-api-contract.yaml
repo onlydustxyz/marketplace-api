@@ -2404,6 +2404,8 @@ components:
           format: date-time
         idDocumentCountryCode:
           type: string
+        sumsubUrl:
+          type: string
 
     KybResponse:
       type: object
@@ -2428,6 +2430,8 @@ components:
         subjectToEuropeVAT:
           type: boolean
         euVATNumber:
+          type: string
+        sumsubUrl:
           type: string
 
     InvoiceRewardsPerNetwork:

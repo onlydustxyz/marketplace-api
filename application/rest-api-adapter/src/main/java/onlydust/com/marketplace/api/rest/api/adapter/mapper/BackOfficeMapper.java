@@ -656,6 +656,7 @@ public interface BackOfficeMapper {
                 })
                 .country(kyc.getCountry().display().orElseGet(() -> kyc.getCountry().iso3Code()))
                 .usCitizen(kyc.getUsCitizen())
+                .sumsubUrl("https://cockpit.sumsub.com/checkus/#/applicant/%s/basicInfo?clientId=onlydust".formatted(kyc.getExternalApplicantId()))
                 .validUntil(DateMapper.toZoneDateTime(kyc.getValidUntil()));
     }
 
@@ -669,6 +670,7 @@ public interface BackOfficeMapper {
                 .registrationNumber(kyb.getRegistrationNumber())
                 .registrationDate(DateMapper.toZoneDateTime(kyb.getRegistrationDate()))
                 .usEntity(kyb.getUsEntity())
+                .sumsubUrl("https://cockpit.sumsub.com/checkus/#/applicant/%s/basicInfo?clientId=onlydust".formatted(kyb.getExternalApplicantId()))
                 .subjectToEuropeVAT(kyb.getSubjectToEuropeVAT());
     }
 }
