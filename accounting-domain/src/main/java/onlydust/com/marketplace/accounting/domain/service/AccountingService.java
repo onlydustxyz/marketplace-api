@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookS
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 
+import javax.transaction.Transactional;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +29,7 @@ public class AccountingService implements AccountingFacadePort {
     private final ProjectAccountingObserver projectAccountingObserver;
 
     @Override
+    @Transactional
     public SponsorAccountStatement createSponsorAccount(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount allowance,
                                                         ZonedDateTime lockedUntil) {
         final var currency = getCurrency(currencyId);
@@ -39,6 +41,7 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
+    @Transactional
     public SponsorAccountStatement createSponsorAccount(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount allowance,
                                                         ZonedDateTime lockedUntil, @NonNull SponsorAccount.Transaction transaction) {
         final var sponsorAccount = createSponsorAccount(sponsorId, currencyId, allowance, lockedUntil);
@@ -46,6 +49,7 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
+    @Transactional
     public SponsorAccountStatement increaseAllowance(SponsorAccount.Id sponsorAccountId, Amount amount) {
         final var sponsorAccount = mustGetSponsorAccount(sponsorAccountId);
         final var accountBook = getAccountBook(sponsorAccount.currency());
@@ -58,6 +62,7 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
+    @Transactional
     public void allocate(SponsorAccount.Id from, ProjectId to, PositiveAmount amount, Currency.Id currencyId) {
         final var accountBook = transfer(from, to, amount, currencyId);
 
@@ -66,12 +71,14 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
+    @Transactional
     public void unallocate(ProjectId from, SponsorAccount.Id to, PositiveAmount amount, Currency.Id currencyId) {
         final var accountBook = refund(from, to, amount, currencyId);
         onAllowanceUpdated(from, currencyId, accountBook.state());
     }
 
     @Override
+    @Transactional
     public SponsorAccountStatement fund(@NonNull SponsorAccount.Id sponsorAccountId, @NonNull SponsorAccount.Transaction transaction) {
         final var sponsorAccount = mustGetSponsorAccount(sponsorAccountId);
         final var accountBook = getAccountBook(sponsorAccount.currency());
@@ -79,6 +86,7 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
+    @Transactional
     public void createReward(ProjectId from, RewardId to, PositiveAmount amount, Currency.Id currencyId) {
         final var accountBook = transfer(from, to, amount, currencyId);
         accountingObserver.onRewardCreated(to, new AccountBookFacade(sponsorAccountStorage, accountBook));
@@ -86,6 +94,7 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
+    @Transactional
     public void pay(final @NonNull RewardId rewardId, final @NonNull Currency.Id currencyId, final @NonNull SponsorAccount.PaymentReference paymentReference) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
@@ -106,6 +115,7 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
+    @Transactional
     public void cancel(@NonNull RewardId rewardId, @NonNull Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
@@ -147,6 +157,7 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
+    @Transactional
     public SponsorAccountStatement updateSponsorAccount(SponsorAccount.@NonNull Id sponsorAccountId, ZonedDateTime lockedUntil) {
         final var sponsorAccount = mustGetSponsorAccount(sponsorAccountId);
         sponsorAccount.lockUntil(lockedUntil);

@@ -25,6 +25,7 @@ public class AccountBookEntity {
     private final UUID currencyId;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "accountBookId")
+    @OrderBy("tech_created_at")
     private final List<AccountBookEventEntity> events = new ArrayList<>();
 
     public static AccountBookEntity of(UUID currencyId) {

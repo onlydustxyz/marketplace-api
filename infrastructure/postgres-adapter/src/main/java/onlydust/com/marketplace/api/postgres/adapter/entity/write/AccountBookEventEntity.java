@@ -1,9 +1,11 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookEvent;
+import onlydust.com.marketplace.kernel.model.EventIdResolver;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -39,7 +41,8 @@ public class AccountBookEventEntity {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Payload implements Serializable {
-        @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "className")
+        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "@type")
+        @JsonTypeIdResolver(EventIdResolver.class)
         private AccountBookEvent event;
     }
 }
