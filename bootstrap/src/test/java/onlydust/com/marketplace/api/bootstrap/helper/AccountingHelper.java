@@ -43,6 +43,30 @@ public class AccountingHelper {
     @Autowired
     KycRepository kycRepository;
 
+    public CurrencyEntity strk() {
+        return currencyRepository.findByCode("STRK").orElseThrow();
+    }
+
+    public CurrencyEntity usdc() {
+        return currencyRepository.findByCode("USDC").orElseThrow();
+    }
+
+    public CurrencyEntity usd() {
+        return currencyRepository.findByCode("USD").orElseThrow();
+    }
+
+    public CurrencyEntity op() {
+        return currencyRepository.findByCode("OP").orElseThrow();
+    }
+
+    public CurrencyEntity apt() {
+        return currencyRepository.findByCode("APT").orElseThrow();
+    }
+
+    public CurrencyEntity lords() {
+        return currencyRepository.findByCode("LORDS").orElseThrow();
+    }
+
     @SneakyThrows
     public void patchReward(@NonNull String id, Number amount, String currencyCode, Number usdAmount, String invoiceReceivedAt, String paidAt) {
         final var rewardEntity = rewardRepository.findById(UUID.fromString(id)).orElseThrow();
@@ -52,7 +76,7 @@ public class AccountingHelper {
         if (currencyCode != null) {
             final var currency = currencyRepository.findByCode(currencyCode).orElseThrow();
             final var network = switch (currencyCode) {
-                case "ETH" -> NetworkEnumEntity.ethereum;
+                case "ETH", "USDC" -> NetworkEnumEntity.ethereum;
                 case "APT" -> NetworkEnumEntity.aptos;
                 case "OP" -> NetworkEnumEntity.optimism;
                 case "STRK" -> NetworkEnumEntity.starknet;

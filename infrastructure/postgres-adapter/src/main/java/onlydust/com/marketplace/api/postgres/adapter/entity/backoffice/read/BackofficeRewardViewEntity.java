@@ -114,7 +114,7 @@ public class BackofficeRewardViewEntity {
                         .build())
                 .billingProfileAdmin(isNull(this.billingProfileId) ? null :
                         ShortBillingProfileAdminView.builder()
-                                .admins(List.of(this.invoiceCreator))
+                                .admins(isNull(this.invoiceCreator) ? List.of() : List.of(this.invoiceCreator))
                                 .billingProfileId(BillingProfile.Id.of(this.billingProfileId))
                                 .billingProfileName(this.billingProfileName)
                                 .billingProfileType(switch (this.billingProfileType) {

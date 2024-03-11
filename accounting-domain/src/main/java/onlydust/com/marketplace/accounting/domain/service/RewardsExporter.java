@@ -49,7 +49,8 @@ public class RewardsExporter {
             for (final var reward : rewards) {
                 csvPrinter.printRecord(
                         reward.project().name(),
-                        isNull(reward.billingProfileAdmin()) ? null : reward.billingProfileAdmin().admins(),
+                        isNull(reward.billingProfileAdmin()) ? null : reward.billingProfileAdmin().admins().stream()
+                                .map(a -> new InvoiceCreator(a.login(), a.email(), a.firstName() + " " + a.lastName())).toList(),
                         reward.money().amount(),
                         reward.money().currencyCode(),
                         reward.githubUrls(),
@@ -76,5 +77,12 @@ public class RewardsExporter {
         }
 
         return sw.toString();
+    }
+
+    private record InvoiceCreator(String login, String email, String fullName) {
+        @Override
+        public String toString() {
+            return login + "," + email + "," + fullName;
+        }
     }
 }
