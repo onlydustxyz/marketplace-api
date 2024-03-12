@@ -65,9 +65,9 @@ public interface BackOfficeMapper {
     }
 
 
-    static SponsorPage mapSponsorPageToContract(final Page<SponsorView> sponsorPage, int pageIndex) {
-        return new SponsorPage()
-                .sponsors(sponsorPage.getContent().stream().map(sponsor -> new SponsorPageItemResponse()
+    static OldSponsorPage mapSponsorPageToContract(final Page<SponsorView> sponsorPage, int pageIndex) {
+        return new OldSponsorPage()
+                .sponsors(sponsorPage.getContent().stream().map(sponsor -> new OldSponsorPageItemResponse()
                         .id(sponsor.id())
                         .name(sponsor.name())
                         .url(sponsor.url())
