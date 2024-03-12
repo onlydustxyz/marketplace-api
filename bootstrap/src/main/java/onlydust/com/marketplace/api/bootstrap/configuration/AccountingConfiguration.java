@@ -99,4 +99,9 @@ public class AccountingConfiguration {
                 billingProfileVerificationProviderPort,
                 billingProfileObservers, notificationPort, webhookNotificationPort);
     }
+
+    @Bean
+    public SponsorFacadePort sponsorFacadePort(final SponsorStoragePort sponsorStoragePort) {
+        return new SponsorService(sponsorStoragePort);
+    }
 }

@@ -57,7 +57,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
     void should_get_sponsors() {
         // When
         client.get()
-                .uri(getApiURI(GET_SPONSORS, Map.of("pageIndex", "0", "pageSize", "5")))
+                .uri(getApiURI(OLD_GET_SPONSORS, Map.of("pageIndex", "0", "pageSize", "5")))
                 .header("Api-Key", apiKey())
                 // Then
                 .exchange()
@@ -122,7 +122,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         """);
 
         client.get()
-                .uri(getApiURI(GET_SPONSORS, Map.of(
+                .uri(getApiURI(OLD_GET_SPONSORS, Map.of(
                         "pageIndex", "0",
                         "pageSize", "5",
                         "projectIds", "467cb27c-9726-4f94-818e-6aa49bbf5e75,b0f54343-3732-4118-8054-dba40f1ffb85")
@@ -167,7 +167,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
 
         client.get()
-                .uri(getApiURI(GET_SPONSORS, Map.of(
+                .uri(getApiURI(OLD_GET_SPONSORS, Map.of(
                         "pageIndex", "0",
                         "pageSize", "5",
                         "sponsorIds", "eb04a5de-4802-4071-be7b-9007b563d48d,2639563e-4437-4bde-a4f4-654977c0cb39")
@@ -361,7 +361,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         """.formatted(BRETZEL));
 
         client.get()
-                .uri(getApiURI(GET_SPONSORS, Map.of(
+                .uri(getApiURI(OLD_GET_SPONSORS, Map.of(
                         "pageIndex", "0",
                         "pageSize", "5",
                         "sponsorIds", sponsor.getId().toString())))
@@ -412,7 +412,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         """);
 
         client.get()
-                .uri(getApiURI(GET_SPONSORS, Map.of(
+                .uri(getApiURI(OLD_GET_SPONSORS, Map.of(
                         "pageIndex", "0",
                         "pageSize", "5",
                         "sponsorIds", sponsor.getId().toString())))
@@ -439,5 +439,226 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           ]
                         }
                         """.formatted(sponsor.getId()));
+    }
+
+    @Test
+    @Order(6)
+    void should_get_sponsors_for_new_bo() {
+
+        // When
+        client.get()
+                .uri(getApiURI(GET_SPONSORS, Map.of("pageIndex", "0", "pageSize", "10")))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 2,
+                          "totalItemNumber": 14,
+                          "hasMore": true,
+                          "nextPageIndex": 1,
+                          "sponsors": [
+                            {
+                              "id": "58a0a05c-c81e-447c-910f-629817a987b8",
+                              "name": "Captain America",
+                              "url": "https://www.marvel.com/characters/captain-america-steve-rogers",
+                              "logoUrl": "https://www.ed92.org/wp-content/uploads/2021/06/captain-america-2-scaled.jpg",
+                              "projects": [
+                                {
+                                  "name": "Marketplace",
+                                  "logoUrl": null
+                                }
+                              ]
+                            },
+                            {
+                              "id": "4202fd03-f316-458f-a642-421c7b3c7026",
+                              "name": "ChatGPT",
+                              "url": "https://chat.openai.com/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4216570625498269873.png",
+                              "projects": []
+                            },
+                            {
+                              "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
+                              "name": "Coca Cola",
+                              "url": null,
+                              "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
+                              "projects": [
+                                {
+                                  "name": "Bretzel",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                                },
+                                {
+                                  "name": "Aiolia du Lion",
+                                  "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c"
+                                }
+                              ]
+                            },
+                            {
+                              "id": "44c6807c-48d1-4987-a0a6-ac63f958bdae",
+                              "name": "Coca Colax",
+                              "url": "https://www.coca-cola-france.fr/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg",
+                              "projects": [
+                                {
+                                  "name": "Aiolia du Lion",
+                                  "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c"
+                                }
+                              ]
+                            },
+                            {
+                              "id": "6511500c-e6f2-41a4-9f8f-f15289969d09",
+                              "name": "Creepy sponsor",
+                              "url": "https://bretzel.club/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10742744717192724286.jpg",
+                              "projects": []
+                            },
+                            {
+                              "name": "Foobaaaar",
+                              "url": "https://www.foobaaaar.com",
+                              "logoUrl": "https://www.foobaaaar.com/logo.png",
+                              "projects": [
+                                {
+                                  "name": "Aiolia du Lion",
+                                  "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c"
+                                },
+                                {
+                                  "name": "Aldébaran du Taureau",
+                                  "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aldebaran_taureau.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=ab78704b124d2de9525a8af91ef7c4ed"
+                                }
+                              ]
+                            },
+                            {
+                              "name": "Foobar",
+                              "url": "https://www.foobar.com",
+                              "logoUrl": "https://www.foobar.com/logo.png",
+                              "projects": []
+                            },
+                            {
+                              "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
+                              "name": "OGC Nissa Ineos",
+                              "url": "https://www.ogcnice.com/fr/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png",
+                              "projects": [
+                                {
+                                  "name": "Aiolia du Lion",
+                                  "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c"
+                                },
+                                {
+                                  "name": "Anthology project",
+                                  "logoUrl": "https://cdn.filestackcontent.com/pgjvFWS8Teq2Yns89IKg"
+                                },
+                                {
+                                  "name": "Aldébaran du Taureau",
+                                  "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aldebaran_taureau.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=ab78704b124d2de9525a8af91ef7c4ed"
+                                },
+                                {
+                                  "name": "Bretzel",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                                }
+                              ]
+                            },
+                            {
+                              "id": "1774fd34-a8b6-43b0-b376-f2c2b256d478",
+                              "name": "PSG",
+                              "url": "https://www.psg.fr/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png",
+                              "projects": [
+                                {
+                                  "name": "toto",
+                                  "logoUrl": null
+                                }
+                              ]
+                            },
+                            {
+                              "id": "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
+                              "name": "Red Bull",
+                              "url": "https://www.redbull.com/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg",
+                              "projects": [
+                                {
+                                  "name": "Taco Tuesday",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                        """);
+
+        // When
+        client.get()
+                .uri(getApiURI(GET_SPONSORS, Map.of("pageIndex", "1", "pageSize", "10")))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 2,
+                          "totalItemNumber": 14,
+                          "hasMore": false,
+                          "nextPageIndex": 1,
+                          "sponsors": [
+                            {
+                              "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
+                              "name": "Starknet Foundation",
+                              "url": "https://starknet.io",
+                              "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png",
+                              "projects": [
+                                {
+                                  "name": "Zero title 11",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Mooooooonlight",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                }
+                              ]
+                            },
+                            {
+                              "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
+                              "name": "Theodo",
+                              "url": null,
+                              "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png",
+                              "projects": [
+                                {
+                                  "name": "Zero title 11",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Mooooooonlight",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                }
+                              ]
+                            },
+                            {
+                              "name": "Virgin sponsor",
+                              "url": "https://www.foobar.com",
+                              "logoUrl": "https://www.foobar.com/logo.png",
+                              "projects": [
+                                {
+                                  "name": "Bretzel",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                                }
+                              ]
+                            },
+                            {
+                              "id": "9181a1b6-d4a4-4a23-9c5c-1d1386828bc1",
+                              "name": "We are super sponsors!",
+                              "url": null,
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4216570625498269873.png",
+                              "projects": []
+                            }
+                          ]
+                        }
+
+                        """);
+
+
     }
 }

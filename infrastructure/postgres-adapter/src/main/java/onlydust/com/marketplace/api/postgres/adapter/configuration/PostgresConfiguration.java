@@ -391,4 +391,9 @@ public class PostgresConfiguration {
     PostgresReceiptStorage postgresReceiptStorage(final RewardRepository rewardRepository) {
         return new PostgresReceiptStorage(rewardRepository);
     }
+
+    @Bean
+    PostgresSponsorAdapter postgresSponsorAdapter(final SponsorViewRepository sponsorViewRepository){
+        return new PostgresSponsorAdapter(sponsorViewRepository);
+    }
 }
