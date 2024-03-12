@@ -72,7 +72,7 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
         return switch (sortBy) {
             case AMOUNT -> JpaSort.unsafe(direction, "coalesce(rsd.amount_usd_equivalent, 0)").and(Sort.by("requested_at").descending());
             case CONTRIBUTION -> Sort.by(direction, "contribution_count").and(Sort.by("requested_at").descending());
-            case STATUS -> Sort.by(direction, "status").and(Sort.by("requested_at").descending());
+            case STATUS -> Sort.by(direction, "rs.status").and(Sort.by("requested_at").descending());
             case REQUESTED_AT -> Sort.by(direction, "requested_at");
         };
     }
