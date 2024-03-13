@@ -12,10 +12,7 @@ import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -130,7 +127,7 @@ public class Invoice {
         }
 
         private static String normalize(String... parts) {
-            return Stream.of(parts).map(Number::normalize).collect(Collectors.joining("-"));
+            return Stream.of(parts).filter(Objects::nonNull).map(Number::normalize).collect(Collectors.joining("-"));
         }
 
         private static String normalize(final @NonNull String part) {
@@ -194,7 +191,7 @@ public class Invoice {
             return Optional.ofNullable(kybSnapshot);
         }
 
-        public record KycSnapshot(@NonNull String firstName, @NonNull String lastName, @NonNull String address, @NonNull String countryCode) {
+        public record KycSnapshot(@NonNull String firstName, String lastName, @NonNull String address, @NonNull String countryCode) {
             public static KycSnapshot of(Kyc kyc) {
                 return new KycSnapshot(kyc.getFirstName(), kyc.getLastName(), kyc.getAddress(), kyc.getCountry().iso3Code());
             }
@@ -205,7 +202,7 @@ public class Invoice {
             }
 
             public String fullName() {
-                return "%s %s".formatted(firstName, lastName);
+                return lastName == null ? firstName : "%s %s".formatted(firstName, lastName);
             }
         }
 

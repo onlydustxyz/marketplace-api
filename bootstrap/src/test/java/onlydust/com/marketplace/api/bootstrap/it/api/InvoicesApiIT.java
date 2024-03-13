@@ -62,7 +62,6 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     UserAuthHelper.AuthenticatedUser antho;
     UserAuthHelper.AuthenticatedUser olivier;
     UUID billingProfileId;
-    UUID individualBillingProfileId;
 
     private static final ProjectId PROJECT_ID = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
 

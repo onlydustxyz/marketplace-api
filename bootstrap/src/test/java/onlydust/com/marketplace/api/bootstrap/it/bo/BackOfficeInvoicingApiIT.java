@@ -15,7 +15,6 @@ import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
 import onlydust.com.marketplace.api.webhook.Config;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
@@ -50,8 +49,6 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     BillingProfileService billingProfileService;
     @Autowired
     UserService userService;
-    @Autowired
-    private RewardRepository rewardRepository;
     @Autowired
     OutboxConsumerJob notificationOutboxJob;
     @Autowired
@@ -115,7 +112,6 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         .country("FRA")
                         .address("3 Infinite Loop, Cupertino, CA 95014, United States")
                         .firstName("Olivier")
-                        .lastName("Fuxet")
                         .birthdate(faker.date().birthday())
                         .usCitizen(false)
                         .verificationStatus(VerificationStatusEntity.VERIFIED).build()));
@@ -354,7 +350,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .expectBody()
                 .json("""
                         {
-                          "number": "OD-APPLEINC-001",
+                          "number": "OD-APPLE-INC--001",
                           "status": "TO_REVIEW",
                           "billingProfile": {
                             "name": "Apple Inc.",
@@ -395,7 +391,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 {
                                   "id": "061e2c7e-bda4-49a8-9914-2e76926f70c2",
                                   "requestedAt": "2023-05-15T12:15:54.25529Z",
-                                  "processedAt": "2023-07-27T10:27:14.522708Z",
+                                  "processedAt": "2023-07-27T10:27:14.522Z",
                                   "githubUrls": [
                                     "https://github.com/od-mocks/cool-repo-A/pull/397"
                                   ],
