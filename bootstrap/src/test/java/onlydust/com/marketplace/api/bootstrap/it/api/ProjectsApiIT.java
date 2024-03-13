@@ -600,7 +600,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "id": null
                 }
               ],
-              "sponsors": [],
               "technologies": {
                 "CSS": 323507,
                 "Rust": 527,
@@ -616,7 +615,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 "ignoreContributionsBefore": null
               }
             }
-                        
             """;
     private static final String GET_PROJECTS_FOR_AUTHENTICATED_USER_FOR_MINE_JSON_RESPONSE = """
             {

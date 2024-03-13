@@ -3,10 +3,7 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 import lombok.SneakyThrows;
 import onlydust.com.backoffice.api.contract.model.CurrencyResponse;
 import onlydust.com.backoffice.api.contract.model.CurrencyType;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.HistoricalQuoteRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.RewardStatusRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -40,12 +37,24 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
     @Autowired
     private RewardStatusRepository rewardStatusRepository;
 
+    @Autowired
+    private AccountBookRepository accountBookRepository;
+
+    @Autowired
+    private SponsorAccountRepository sponsorAccountRepository;
+
+    @Autowired
+    private ProjectAllowanceRepository projectAllowanceRepository;
+
     @Test
     @Order(0)
     void cleanup() {
         historicalQuoteRepository.deleteAll();
         rewardStatusRepository.deleteAll();
         rewardRepository.deleteAll();
+        accountBookRepository.deleteAll();
+        sponsorAccountRepository.deleteAll();
+        projectAllowanceRepository.deleteAll();
         currencyRepository.deleteAll();
     }
 
