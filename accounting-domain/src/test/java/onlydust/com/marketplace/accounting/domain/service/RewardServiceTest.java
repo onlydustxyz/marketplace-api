@@ -250,8 +250,8 @@ public class RewardServiceTest {
         // When
         when(accountingRewardStoragePort.findBatchPayment(batchPaymentId))
                 .thenReturn(Optional.of(batchPayment));
-        when(accountingRewardStoragePort.findPayableRewardsWithPayoutInfoForBatchPayment(batchPaymentId))
-                .thenReturn(payableRewardWithPayoutInfoViews);
+// TODO       when(accountingRewardStoragePort.findPayableRewardsWithPayoutInfoForBatchPayment(batchPaymentId))
+//                .thenReturn(payableRewardWithPayoutInfoViews);
         rewardService.markBatchPaymentAsPaid(batchPaymentId, transactionHash);
 
         // Then

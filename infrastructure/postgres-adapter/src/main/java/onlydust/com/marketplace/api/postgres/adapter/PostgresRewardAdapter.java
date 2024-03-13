@@ -8,15 +8,16 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
+import onlydust.com.marketplace.accounting.domain.view.RewardWithPayoutInfoView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BackofficeRewardViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoRewardWithPayoutInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BatchPaymentDetailsViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.PayableRewardWithPayoutInfoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoRewardWithPayoutInfoRepository;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
@@ -40,6 +41,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     private final BatchPaymentDetailsViewRepository batchPaymentDetailsViewRepository;
     private final RewardViewRepository rewardViewRepository;
     private final RewardDetailsViewRepository rewardDetailsViewRepository;
+    private final BoRewardWithPayoutInfoRepository boRewardWithPayoutInfoRepository;
 
     @Override
     public void save(Reward reward) {
@@ -83,23 +85,6 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
         return rewardDetailsViewRepository.findAllByInvoiceId(invoiceId.value())
                 .stream()
                 .map(BackofficeRewardViewEntity::toDomain)
-                .toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<PayableRewardWithPayoutInfoView> findPayableRewardsWithPayoutInfoForInvoices(List<Invoice.Id> invoiceIds) {
-        return payableRewardWithPayoutInfoViewRepository.findAllByInvoiceIds(invoiceIds.stream().map(UuidWrapper::value).toList())
-                .stream().map(PayableRewardWithPayoutInfoViewEntity::toDomain)
-                .toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<PayableRewardWithPayoutInfoView> findPayableRewardsWithPayoutInfoForBatchPayment(BatchPayment.Id batchPaymentId) {
-        return payableRewardWithPayoutInfoViewRepository.findAllByBatchPaymentId(batchPaymentId.value())
-                .stream()
-                .map(PayableRewardWithPayoutInfoViewEntity::toDomain)
                 .toList();
     }
 
@@ -169,5 +154,14 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     @Transactional
     public void markRewardsAsPaymentNotified(List<RewardId> rewardIds) {
         rewardViewRepository.markRewardAsPaymentNotified(rewardIds.stream().map(UuidWrapper::value).toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<RewardWithPayoutInfoView> getRewardWithPayoutInfoOfInvoices(List<Invoice.Id> invoiceIds) {
+        return boRewardWithPayoutInfoRepository.findByInvoiceIds(invoiceIds.stream().map(UuidWrapper::value).toList())
+                .stream()
+                .map(BoRewardWithPayoutInfoEntity::toDomain)
+                .toList();
     }
 }

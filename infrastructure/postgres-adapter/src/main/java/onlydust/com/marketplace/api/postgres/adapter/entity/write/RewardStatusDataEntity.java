@@ -26,6 +26,8 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
+
 @Entity
 @Data
 @Table(name = "reward_status_data", schema = "accounting")
@@ -80,6 +82,7 @@ public class RewardStatusDataEntity {
                 .invoiceReceivedAt(invoiceReceivedAt == null ? null : ZonedDateTime.ofInstant(invoiceReceivedAt.toInstant(), ZoneOffset.UTC))
                 .paidAt(paidAt == null ? null : ZonedDateTime.ofInstant(paidAt.toInstant(), ZoneOffset.UTC))
                 .withAdditionalNetworks(Arrays.stream(networks).map(NetworkEnumEntity::toNetwork).collect(Collectors.toSet()))
-                .usdAmount(new ConvertedAmount(Amount.of(amountUsdEquivalent), usdConversionRate));
+                .usdAmount(isNull(usdConversionRate) || isNull(amountUsdEquivalent) ? null : new ConvertedAmount(Amount.of(amountUsdEquivalent),
+                        usdConversionRate));
     }
 }

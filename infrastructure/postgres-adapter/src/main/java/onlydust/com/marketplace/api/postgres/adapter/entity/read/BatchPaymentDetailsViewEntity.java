@@ -61,7 +61,7 @@ public class BatchPaymentDetailsViewEntity {
                 .id(BatchPayment.Id.of(this.id))
                 .rewardIds(this.rewardIds.stream().map(RewardId::of).toList())
                 .moneys(moneyMapToCurrency.values().stream().toList())
-                .blockchain(this.network.toBlockchain())
+                .network(this.network.toNetwork())
                 .transactionHash(this.transactionHash)
                 .status(switch (this.status) {
                     case PAID -> BatchPayment.Status.PAID;
