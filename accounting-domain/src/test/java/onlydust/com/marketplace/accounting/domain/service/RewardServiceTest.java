@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
+import onlydust.com.marketplace.accounting.domain.stubs.ERC20Tokens;
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
@@ -23,7 +24,7 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.*;
 
-import static onlydust.com.marketplace.accounting.domain.stubs.Currencies.*;
+import static onlydust.com.marketplace.accounting.domain.stubs.Currencies.ETH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -43,9 +44,13 @@ public class RewardServiceTest {
     List<RewardWithPayoutInfoView> rewardWithPayoutInfoViewList;
     PayoutInfo payoutInfo1;
     PayoutInfo payoutInfo2;
+    Currency USDC;
+    Currency STRK;
 
     @BeforeEach
     void setUp() {
+        USDC = Currency.of(ERC20Tokens.ETH_USDC).withERC20(ERC20Tokens.OP_USDC);
+        STRK = Currency.of(ERC20Tokens.STRK).withERC20(ERC20Tokens.STARKNET_STRK);
         invoiceIds = List.of(Invoice.Id.random(), Invoice.Id.random(), Invoice.Id.random());
         rewardIds = List.of(RewardId.random(), RewardId.random(), RewardId.random(), RewardId.random(), RewardId.random(), RewardId.random());
 
