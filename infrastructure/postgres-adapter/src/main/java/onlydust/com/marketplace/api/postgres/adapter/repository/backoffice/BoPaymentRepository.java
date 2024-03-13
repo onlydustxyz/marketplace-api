@@ -16,9 +16,8 @@ public interface BoPaymentRepository extends JpaRepository<BoPaymentEntity, UUID
             SELECT
             	r.id,
             	r.project_id,
-            	b.id as budget_id,
             	r.amount,
-            	c.id as currency_id,
+            	r.currency_id as currency_id,
             	r.recipient_id,
             	r.requestor_id,
             	Items.urls AS items,
@@ -31,9 +30,6 @@ public interface BoPaymentRepository extends JpaRepository<BoPaymentEntity, UUID
             	ba.bic as recipient_bic
             FROM
             	rewards r
-            	INNER JOIN projects_budgets pb on pb.project_id = r.project_id
-            	INNER JOIN currencies c on r.currency_id = c.id
-            	INNER JOIN budgets b on b.id = pb.budget_id AND UPPER(CAST(b.currency AS TEXT)) = c.code
             	LEFT JOIN iam.users u ON u.github_user_id = r.recipient_id
             	LEFT JOIN user_payout_info upi ON upi.user_id = u.id
             	LEFT JOIN accounting.payout_preferences pp on pp.project_id = r.project_id AND pp.user_id = u.id

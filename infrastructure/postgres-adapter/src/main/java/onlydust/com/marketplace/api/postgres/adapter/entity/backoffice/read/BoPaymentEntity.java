@@ -28,7 +28,6 @@ import java.util.UUID;
 public class BoPaymentEntity {
     @Id
     UUID id;
-    UUID budgetId;
     UUID projectId;
     BigDecimal amount;
     @ManyToOne
@@ -103,7 +102,6 @@ public class BoPaymentEntity {
 
         return PaymentView.builder()
                 .id(id)
-                .budgetId(budgetId)
                 .projectId(projectId)
                 .amount(amount)
                 .currency(currency.toOldDomain())

@@ -957,14 +957,13 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 48,
-                          "totalItemNumber": 239,
+                          "totalPageNumber": 49,
+                          "totalItemNumber": 244,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "payments": [
                             {
                               "id": "5f9060a7-6f9e-4ef7-a1e4-1aaa4c85f03c",
-                              "budgetId": "ce2929d8-01eb-42d6-8285-89a1e6eea3d0",
                               "projectId": "7d04163c-4187-4313-8066-61504d34fc56",
                               "amount": 1000.00,
                               "currency": "USD",
@@ -984,7 +983,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             },
                             {
                               "id": "fab7aaf4-9b0c-4e52-bc9b-72ce08131617",
-                              "budgetId": "ce2929d8-01eb-42d6-8285-89a1e6eea3d0",
                               "projectId": "7d04163c-4187-4313-8066-61504d34fc56",
                               "amount": 1000.00,
                               "currency": "USD",
@@ -1004,7 +1002,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             },
                             {
                               "id": "64fb2732-5632-4b09-a8b1-217485648129",
-                              "budgetId": "ce2929d8-01eb-42d6-8285-89a1e6eea3d0",
                               "projectId": "7d04163c-4187-4313-8066-61504d34fc56",
                               "amount": 1000.00,
                               "currency": "USD",
@@ -1024,7 +1021,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             },
                             {
                               "id": "736e0554-f30e-4315-9731-7611fa089dcf",
-                              "budgetId": "08f002e2-c954-4a4b-8898-e5e717281fd3",
                               "projectId": "7d04163c-4187-4313-8066-61504d34fc56",
                               "amount": 1000.00,
                               "currency": "USDC",
@@ -1044,7 +1040,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             },
                             {
                               "id": "1c56d096-5284-4ae3-af3c-dd2b3211fb73",
-                              "budgetId": "08f002e2-c954-4a4b-8898-e5e717281fd3",
                               "projectId": "7d04163c-4187-4313-8066-61504d34fc56",
                               "amount": 1000.00,
                               "currency": "USDC",
@@ -1087,7 +1082,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           "payments": [
                             {
                               "id": "3310dd67-3d3f-456a-af1d-9b881d173af7",
-                              "budgetId": "51c40f51-f1e4-43c1-8d2f-8de97e51dca5",
                               "projectId": "6d955622-c1ce-4227-85ea-51cb1b3207b1",
                               "amount": 1000,
                               "currency": "USDC",
@@ -1107,7 +1101,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             },
                             {
                               "id": "46b09548-5c6f-4e78-b314-8310d5e66c45",
-                              "budgetId": "51c40f51-f1e4-43c1-8d2f-8de97e51dca5",
                               "projectId": "6d955622-c1ce-4227-85ea-51cb1b3207b1",
                               "amount": 300,
                               "currency": "USDC",
@@ -1127,7 +1120,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             },
                             {
                               "id": "c3299729-583f-4028-b783-a679e2148d43",
-                              "budgetId": "51c40f51-f1e4-43c1-8d2f-8de97e51dca5",
                               "projectId": "6d955622-c1ce-4227-85ea-51cb1b3207b1",
                               "amount": 500,
                               "currency": "USDC",
@@ -1148,7 +1140,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             },
                             {
                               "id": "74afd7bd-893b-4fed-a55f-24077b4fc44a",
-                              "budgetId": "51c40f51-f1e4-43c1-8d2f-8de97e51dca5",
                               "projectId": "6d955622-c1ce-4227-85ea-51cb1b3207b1",
                               "amount": 500,
                               "currency": "USDC",
@@ -1168,7 +1159,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             },
                             {
                               "id": "3232aacd-859d-4e1e-bd93-52597e978845",
-                              "budgetId": "51c40f51-f1e4-43c1-8d2f-8de97e51dca5",
                               "projectId": "6d955622-c1ce-4227-85ea-51cb1b3207b1",
                               "amount": 1000,
                               "currency": "USDC",
@@ -1215,7 +1205,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                              "payments": [
                                {
                                  "id": "1325c03f-348b-48e5-80c9-a589df5fe400",
-                                 "budgetId": "51c40f51-f1e4-43c1-8d2f-8de97e51dca5",
                                  "projectId": "6d955622-c1ce-4227-85ea-51cb1b3207b1",
                                  "amount": 3000,
                                  "currency": "USDC",
@@ -1239,7 +1228,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                },
                                {
                                  "id": "150817bb-8484-4e31-a332-ac8378d0a6e2",
-                                 "budgetId": "51c40f51-f1e4-43c1-8d2f-8de97e51dca5",
                                  "projectId": "6d955622-c1ce-4227-85ea-51cb1b3207b1",
                                  "amount": 500,
                                  "currency": "USDC",

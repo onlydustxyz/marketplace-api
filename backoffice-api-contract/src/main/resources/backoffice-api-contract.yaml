@@ -2300,9 +2300,6 @@ components:
         id:
           type: string
           format: uuid
-        budgetId:
-          type: string
-          format: uuid
         projectId:
           type: string
           format: uuid
