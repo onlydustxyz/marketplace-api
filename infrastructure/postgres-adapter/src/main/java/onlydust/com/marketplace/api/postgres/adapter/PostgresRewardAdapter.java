@@ -11,11 +11,13 @@ import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardWithPayoutInfoView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BackofficeRewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoRewardWithPayoutInfoEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.BatchPaymentDetailsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
-import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.PayableRewardWithPayoutInfoViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.RewardDetailsViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.RewardViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ShortProjectViewEntityRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoRewardWithPayoutInfoRepository;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -38,7 +40,6 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     private final ShortProjectViewEntityRepository shortProjectViewEntityRepository;
     private final PayableRewardWithPayoutInfoViewRepository payableRewardWithPayoutInfoViewRepository;
     private final BatchPaymentRepository batchPaymentRepository;
-    private final BatchPaymentDetailsViewRepository batchPaymentDetailsViewRepository;
     private final RewardViewRepository rewardViewRepository;
     private final RewardDetailsViewRepository rewardDetailsViewRepository;
     private final BoRewardWithPayoutInfoRepository boRewardWithPayoutInfoRepository;
@@ -103,9 +104,11 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     @Override
     @Transactional(readOnly = true)
     public Page<BatchPayment> findBatchPayments(int pageIndex, int pageSize) {
-        final int count = batchPaymentDetailsViewRepository.countAll().intValue();
+        final int count = batchPaymentRepository.countAllByStatus(BatchPaymentEntity.Status.PAID);
         return Page.<BatchPayment>builder()
-                .content(batchPaymentDetailsViewRepository.findAllBy(pageIndex, pageSize).stream().map(BatchPaymentDetailsViewEntity::toDomain).toList())
+                .content(batchPaymentRepository.findAllByStatus(BatchPaymentEntity.Status.PAID,
+                                PageRequest.of(pageIndex, pageSize, Sort.by("createdAt").descending()))
+                        .stream().map(BatchPaymentEntity::toDomain).toList())
                 .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
                 .totalItemNumber(count)
                 .build();
@@ -114,11 +117,11 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     @Override
     @Transactional(readOnly = true)
     public Optional<BatchPaymentDetailsView> findBatchPaymentDetailsById(BatchPayment.Id batchPaymentId) {
-        return batchPaymentDetailsViewRepository.findById(batchPaymentId.value())
-                .map(batchPaymentDetailsView ->
+        return batchPaymentRepository.findById(batchPaymentId.value())
+                .map(batchPayment ->
                         BatchPaymentDetailsView.builder()
-                                .batchPayment(batchPaymentDetailsView.toDomain())
-                                .rewardViews(rewardDetailsViewRepository.findAllByRewardIds(batchPaymentDetailsView.getRewardIds()).stream()
+                                .batchPayment(batchPayment.toDomain())
+                                .rewardViews(rewardDetailsViewRepository.findAllByRewardIds(batchPayment.getRewardIds()).stream()
                                         .map(BackofficeRewardViewEntity::toDomain)
                                         .toList())
                                 .build()

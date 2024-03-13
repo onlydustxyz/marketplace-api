@@ -1,9 +1,11 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
@@ -26,6 +28,7 @@ import java.util.UUID;
 @EntityListeners(AuditingEntityListener.class)
 @TypeDef(name = "batch_payment_status", typeClass = PostgreSQLEnumType.class)
 @TypeDef(name = "network", typeClass = PostgreSQLEnumType.class)
+@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class BatchPaymentEntity {
 
     @Id
@@ -45,6 +48,8 @@ public class BatchPaymentEntity {
     )
     @Column(name = "reward_id")
     List<UUID> rewardIds;
+    @Type(type = "jsonb")
+    List<MoneyView> totalAmountsPerCurrency;
     @CreationTimestamp
     @Column(name = "tech_created_at", nullable = false, updatable = false)
     @EqualsAndHashCode.Exclude
@@ -65,6 +70,7 @@ public class BatchPaymentEntity {
                     case PAID -> Status.PAID;
                     case TO_PAY -> Status.TO_PAY;
                 })
+                .totalAmountsPerCurrency(batchPayment.moneys())
                 .rewardIds(batchPayment.rewardIds().stream().map(UuidWrapper::value).toList())
                 .build();
     }
@@ -81,6 +87,7 @@ public class BatchPaymentEntity {
                 .id(BatchPayment.Id.of(this.id))
                 .transactionHash(this.transactionHash)
                 .rewardIds(this.rewardIds.stream().map(RewardId::of).toList())
+                .moneys(this.totalAmountsPerCurrency)
                 .status(switch (this.status) {
                     case PAID -> BatchPayment.Status.PAID;
                     case TO_PAY -> BatchPayment.Status.TO_PAY;
