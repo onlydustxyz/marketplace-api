@@ -31,6 +31,8 @@ class InvoiceTest {
     @Test
     void should_compute_id() {
         assertThat(Invoice.Number.of(1, "Doe", "John").value()).isEqualTo("OD-DOE-JOHN-001");
+        assertThat(Invoice.Number.of(1, "Doe", null).value()).isEqualTo("OD-DOE-001");
+        assertThat(Invoice.Number.of(1, null, "Doe").value()).isEqualTo("OD-DOE-001");
         assertThat(Invoice.Number.of(2, "Doe", "John").value()).isEqualTo("OD-DOE-JOHN-002");
         assertThat(Invoice.Number.of(1, "A peu près", "Jean-Michel").value()).isEqualTo("OD-A-PEU-PRÈS-JEAN-MICHEL-001");
         assertThat(Invoice.Number.of(1, "OnlyDust").value()).isEqualTo("OD-ONLYDUST-001");
@@ -39,13 +41,11 @@ class InvoiceTest {
         assertThat(Invoice.Number.of(2, "Doe", "Köseoğlu").value()).isEqualTo("OD-DOE-KÖSEOĞLU-002");
         assertThat(Invoice.Number.of(1, "婷", "陈").value()).isEqualTo("OD-婷-陈-001");
         assertThat(Invoice.Number.of(1, "Ömer", "Aydın").value()).isEqualTo("OD-ÖMER-AYDIN-001");
-
     }
 
 
     @Nested
     class GivenAnIndividual {
-
         BillingProfileView individualBillingProfile;
         PayoutInfo payoutInfo;
         Invoice invoice;
@@ -98,7 +98,6 @@ class InvoiceTest {
 
     @Nested
     class GivenACompanyOutsideOfEurope {
-
         BillingProfileView companyBillingProfile;
         PayoutInfo payoutInfo;
         Invoice invoice;
