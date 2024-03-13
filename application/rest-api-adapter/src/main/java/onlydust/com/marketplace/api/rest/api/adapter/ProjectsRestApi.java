@@ -185,14 +185,6 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<ProjectBudgetsResponse> getProjectBudgets(UUID projectId) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final ProjectBudgetsView projectBudgetsView = projectRewardFacadePort.getBudgets(projectId,
-                authenticatedUser.getId());
-        return ResponseEntity.ok(mapProjectBudgetsViewToResponse(projectBudgetsView));
-    }
-
-    @Override
     public ResponseEntity<ProjectBudgetsResponse> getProjectBudgetsV2(UUID projectId) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final ProjectBudgetsView projectBudgetsView = projectRewardFacadePortV2.getBudgets(projectId,
@@ -202,16 +194,6 @@ public class ProjectsRestApi implements ProjectsApi {
 
     @Override
     public ResponseEntity<CreateRewardResponse> createReward(UUID projectId, RewardRequest rewardRequest) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var rewardId = rewardFacadePort.createReward(authenticatedUser.getId(),
-                RewardMapper.rewardRequestToDomain(rewardRequest, projectId));
-        final var response = new CreateRewardResponse();
-        response.setId(rewardId);
-        return ResponseEntity.ok(response);
-    }
-
-    @Override
-    public ResponseEntity<CreateRewardResponse> createRewardV2(UUID projectId, RewardRequest rewardRequest) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var rewardId = rewardFacadePortV2.createReward(authenticatedUser.getId(),
                 RewardMapper.rewardRequestToDomain(rewardRequest, projectId));
