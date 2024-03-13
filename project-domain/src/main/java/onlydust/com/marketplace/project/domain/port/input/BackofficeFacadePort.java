@@ -12,8 +12,6 @@ import java.util.UUID;
 public interface BackofficeFacadePort {
     Page<ProjectRepositoryView> getProjectRepositoryPage(Integer pageIndex, Integer pageSize, List<UUID> projectIds);
 
-    Page<ProjectBudgetView> getBudgetPage(int sanitizedPageIndex, int sanitizedPageSize, List<UUID> projectIds);
-
     Page<ProjectLeadInvitationView> getProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids, List<UUID> projectIds);
 
     Page<UserView> listUsers(int pageIndex, int pageSize, UserView.Filters filters);

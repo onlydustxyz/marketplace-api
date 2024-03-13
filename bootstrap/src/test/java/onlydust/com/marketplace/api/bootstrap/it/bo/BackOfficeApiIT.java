@@ -2,9 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import onlydust.com.backoffice.api.contract.model.EcosystemRequest;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoEcosystemEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoEcosystemRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.BudgetRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,11 +11,8 @@ import org.springframework.web.reactive.function.BodyInserters;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
-    @Autowired
-    BudgetRepository budgetRepository;
     @Autowired
     BoEcosystemRepository ecosystemRepository;
 
@@ -26,16 +21,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(GET_GITHUB_REPOS, Map.of("pageIndex", "0", "pageSize", "5")))
-                .exchange()
-                .expectStatus()
-                .isUnauthorized();
-    }
-
-    @Test
-    void should_raise_missing_authentication_given_no_api_key_when_getting_budgets() {
-        // When
-        client.get()
-                .uri(getApiURI(GET_BUDGETS, Map.of("pageIndex", "0", "pageSize", "5")))
                 .exchange()
                 .expectStatus()
                 .isUnauthorized();
@@ -388,173 +373,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .jsonPath("$.url").isEqualTo(ecosystemRequest.getUrl())
                 .jsonPath("$.logoUrl").isEqualTo(ecosystemRequest.getLogoUrl())
                 .jsonPath("$.id").isNotEmpty();
-    }
-
-
-    @Test
-    void should_get_budgets() {
-        // When
-        client.get()
-                .uri(getApiURI(GET_BUDGETS, Map.of("pageIndex", "0", "pageSize", "5")))
-                .header("Api-Key", apiKey())
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json("""
-                        {
-                          "totalPageNumber": 16,
-                          "totalItemNumber": 78,
-                          "hasMore": true,
-                          "nextPageIndex": 1,
-                          "budgets": [
-                            {
-                              "id": "04c100a0-2f97-452a-8ebc-04ee64e44be9",
-                              "currency": "USDC",
-                              "initialAmount": 20000,
-                              "remainingAmount": 20000,
-                              "spentAmount": 0,
-                              "remainingAmountDollarsEquivalent": 20200.00,
-                              "initialAmountDollarsEquivalent": 20200.00,
-                              "spentAmountDollarsEquivalent": 0.00,
-                              "projectId": "b0f54343-3732-4118-8054-dba40f1ffb85"
-                            },
-                            {
-                              "id": "08f002e2-c954-4a4b-8898-e5e717281fd3",
-                              "currency": "USDC",
-                              "initialAmount": 106250.00,
-                              "remainingAmount": 99250.00,
-                              "spentAmount": 7000.00,
-                              "remainingAmountDollarsEquivalent": 100242.5000,
-                              "initialAmountDollarsEquivalent": 107312.5000,
-                              "spentAmountDollarsEquivalent": 7070.0000,
-                              "projectId": "7d04163c-4187-4313-8066-61504d34fc56"
-                            },
-                            {
-                              "id": "0b3478c2-3ff5-4943-86c3-cda5aa0e0aaf",
-                              "currency": "USDC",
-                              "initialAmount": 100000,
-                              "remainingAmount": 100000,
-                              "spentAmount": 0,
-                              "remainingAmountDollarsEquivalent": 101000.00,
-                              "initialAmountDollarsEquivalent": 101000.00,
-                              "spentAmountDollarsEquivalent": 0.00,
-                              "projectId": "00490be6-2c03-4720-993b-aea3e07edd81"
-                            },
-                            {
-                              "id": "1762565f-f9d9-4f0e-8bc3-65df00a7e1e5",
-                              "currency": "USDC",
-                              "initialAmount": 66666,
-                              "remainingAmount": 62166,
-                              "spentAmount": 4500,
-                              "remainingAmountDollarsEquivalent": 62787.66,
-                              "initialAmountDollarsEquivalent": 67332.66,
-                              "spentAmountDollarsEquivalent": 4545.00,
-                              "projectId": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9"
-                            },
-                            {
-                              "id": "1775ca35-333a-456d-b9d3-7c8fd1890fa2",
-                              "currency": "USDC",
-                              "initialAmount": 50000,
-                              "remainingAmount": 50000,
-                              "spentAmount": 0,
-                              "remainingAmountDollarsEquivalent": 50500.00,
-                              "initialAmountDollarsEquivalent": 50500.00,
-                              "spentAmountDollarsEquivalent": 0.00,
-                              "projectId": "27ca7e18-9e71-468f-8825-c64fe6b79d66"
-                            }
-                          ]
-                        }
-                        """);
-
-        client.get()
-                .uri(getApiURI(GET_BUDGETS, Map.of("pageIndex", "0", "pageSize", "5", "projectIds",
-                        "ccf90dcf-a91b-42c6-b5ca-49d687b4401a,56504731-0398-441f-80ac-90edbd14675f")))
-                .header("Api-Key", apiKey())
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json("""
-                        {
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 2,
-                          "hasMore": false,
-                          "nextPageIndex": 0,
-                          "budgets": [
-                            {
-                              "id": "4b702cb1-28d2-49ef-8a7b-48f23ebe5ddd",
-                              "currency": "USDC",
-                              "initialAmount": 1789654,
-                              "remainingAmount": 1789654,
-                              "spentAmount": 0,
-                              "remainingAmountDollarsEquivalent": 1807550.54,
-                              "initialAmountDollarsEquivalent": 1807550.54,
-                              "spentAmountDollarsEquivalent": 0.00,
-                              "projectId": "ccf90dcf-a91b-42c6-b5ca-49d687b4401a"
-                            },
-                            {
-                              "id": "6bdc7650-266c-4854-ac20-1073c0218774",
-                              "currency": "USDC",
-                              "initialAmount": 1789654,
-                              "remainingAmount": 1789654,
-                              "spentAmount": 0,
-                              "remainingAmountDollarsEquivalent": 1807550.54,
-                              "initialAmountDollarsEquivalent": 1807550.54,
-                              "spentAmountDollarsEquivalent": 0.00,
-                              "projectId": "56504731-0398-441f-80ac-90edbd14675f"
-                            }
-                          ]
-                        }
-                        """);
-    }
-
-    @Test
-    void should_get_stark_budgets_with_no_usd_equivalent() {
-        // Given
-        {
-            final var budget = budgetRepository.findById(UUID.fromString("7dcf96a0-ea20-4f95-99f4-89cee2bf3911"))
-                    .orElseThrow();
-            budget.setCurrency(CurrencyEnumEntity.strk);
-            budgetRepository.save(budget);
-        }
-
-        // When
-        client.get()
-                .uri(getApiURI(GET_BUDGETS, Map.of(
-                        "pageIndex", "0",
-                        "pageSize", "5",
-                        "projectIds", "02a533f5-6cbb-4cb6-90fe-f6bee220443c"
-                )))
-                .header("Api-Key", apiKey())
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json("""
-                        {
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 1,
-                          "hasMore": false,
-                          "nextPageIndex": 0,
-                          "budgets": [
-                            {
-                              "id": "7dcf96a0-ea20-4f95-99f4-89cee2bf3911",
-                              "currency": "STRK",
-                              "initialAmount": 10000,
-                              "remainingAmount": 9000,
-                              "spentAmount": 1000,
-                              "remainingAmountDollarsEquivalent": null,
-                              "initialAmountDollarsEquivalent": null,
-                              "spentAmountDollarsEquivalent": null,
-                              "projectId": "02a533f5-6cbb-4cb6-90fe-f6bee220443c"
-                            }
-                          ]
-                        }
-                        """);
     }
 
     @Test

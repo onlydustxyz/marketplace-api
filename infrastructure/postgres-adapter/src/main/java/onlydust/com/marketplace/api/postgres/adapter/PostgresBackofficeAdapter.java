@@ -1,15 +1,14 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.project.domain.model.Ecosystem;
-import onlydust.com.marketplace.project.domain.model.Sponsor;
-import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
-import onlydust.com.marketplace.project.domain.view.backoffice.*;
-import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.EcosystemRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
+import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.project.domain.model.Ecosystem;
+import onlydust.com.marketplace.project.domain.model.Sponsor;
+import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.project.domain.view.backoffice.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -25,7 +24,6 @@ import static java.util.Objects.isNull;
 public class PostgresBackofficeAdapter implements BackofficeStoragePort {
 
     private final GithubRepositoryLinkedToProjectRepository githubRepositoryLinkedToProjectRepository;
-    private final ProjectBudgetRepository projectBudgetRepository;
     private final BoSponsorRepository boSponsorRepository;
     private final ProjectLeadInvitationRepository projectLeadInvitationRepository;
     private final BoUserRepository boUserRepository;
@@ -55,31 +53,6 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
                 .totalPageNumber(page.getTotalPages())
                 .build();
     }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<ProjectBudgetView> findProjectBudgetPage(int pageIndex, int pageSize, List<UUID> projectIds) {
-        final var page = projectBudgetRepository.findAllByProjectIds(PageRequest.of(pageIndex, pageSize, Sort.by("id")),
-                isNull(projectIds) ? List.of() : projectIds);
-        return Page.<ProjectBudgetView>builder()
-                .content(page.getContent().stream().map(entity ->
-                        ProjectBudgetView.builder()
-                                .projectId(entity.getId().getProjectId())
-                                .id(entity.getId().getId())
-                                .currency(entity.getCurrency().toDomain())
-                                .initialAmount(entity.getInitialAmount())
-                                .remainingAmount(entity.getRemainingAmount())
-                                .spentAmount(entity.getSpentAmount())
-                                .initialAmountDollarsEquivalent(entity.getInitialAmountDollarsEquivalent())
-                                .remainingAmountDollarsEquivalent(entity.getRemainingAmountDollarsEquivalent())
-                                .spentAmountDollarsEquivalent(entity.getSpentAmountDollarsEquivalent())
-                                .build()
-                ).toList())
-                .totalItemNumber((int) page.getTotalElements())
-                .totalPageNumber(page.getTotalPages())
-                .build();
-    }
-
 
     @Override
     public Page<EcosystemView> listEcosystems(int pageIndex, int pageSize, EcosystemView.Filters filters) {

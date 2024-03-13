@@ -5,10 +5,9 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeApi;
 import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
-import onlydust.com.marketplace.project.domain.view.backoffice.*;
-import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.view.backoffice.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +17,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.*;
 
 @RestController
 @Tags(@Tag(name = "Backoffice"))
@@ -63,21 +62,6 @@ public class BackofficeRestApi implements BackofficeApi {
         return response.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
                 ResponseEntity.ok(response);
-    }
-
-    @Override
-    public ResponseEntity<BudgetPage> getBudgetPage(Integer pageIndex, Integer pageSize, List<UUID> projectIds) {
-        final int sanitizedPageSize = sanitizePageSize(pageSize, MAX_PAGE_SIZE);
-        final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
-        Page<ProjectBudgetView> budgetViewPage =
-                backofficeFacadePort.getBudgetPage(sanitizedPageIndex, sanitizedPageSize, projectIds);
-
-        final BudgetPage budgetPage = mapBudgetPageToResponse(budgetViewPage
-                , sanitizedPageIndex);
-
-        return budgetPage.getTotalPageNumber() > 1 ?
-                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(budgetPage) :
-                ResponseEntity.ok(budgetPage);
     }
 
     @Override

@@ -159,7 +159,6 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String POST_REWARDS_PAY = "/bo/v1/rewards/%s/pay";
     protected static final String GET_PENDING_PAYMENTS = "/bo/v1/pending-payments";
     protected static final String GET_ECOSYSTEMS = "/bo/v1/ecosystems";
-    protected static final String GET_BUDGETS = "/bo/v1/budgets";
     protected static final String GET_USERS = "/bo/v1/users";
     protected static final String GET_PAYMENTS = "/bo/v1/payments";
     protected static final String GET_PROJECTS = "/bo/v1/projects";

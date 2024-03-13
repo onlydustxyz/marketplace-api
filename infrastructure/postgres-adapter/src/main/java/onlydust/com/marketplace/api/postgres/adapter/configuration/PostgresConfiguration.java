@@ -244,14 +244,13 @@ public class PostgresConfiguration {
     @Bean
     public PostgresBackofficeAdapter postgresBackofficeAdapter(final GithubRepositoryLinkedToProjectRepository githubRepositoryLinkedToProjectRepository,
                                                                final BoSponsorRepository boSponsorRepository,
-                                                               final ProjectBudgetRepository projectBudgetRepository,
                                                                final ProjectLeadInvitationRepository projectLeadInvitationRepository,
                                                                final BoUserRepository boUserRepository,
                                                                final BoPaymentRepository boPaymentRepository,
                                                                final BoProjectRepository boProjectRepository,
                                                                final BoEcosystemRepository boEcosystemRepository,
                                                                final EcosystemRepository ecosystemRepository) {
-        return new PostgresBackofficeAdapter(githubRepositoryLinkedToProjectRepository, projectBudgetRepository,
+        return new PostgresBackofficeAdapter(githubRepositoryLinkedToProjectRepository,
                 boSponsorRepository,
                 projectLeadInvitationRepository, boUserRepository, boPaymentRepository, boProjectRepository, boEcosystemRepository, ecosystemRepository);
     }
