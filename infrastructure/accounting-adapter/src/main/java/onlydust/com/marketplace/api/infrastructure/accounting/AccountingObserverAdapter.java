@@ -21,7 +21,7 @@ public class AccountingObserverAdapter implements AccountingUserObserverPort {
 
     private void refreshRewardsUsdEquivalentOf(BillingProfile.Id billingProfileId) {
         rewardStatusStorage.notPaid(billingProfileId).forEach(rewardStatus ->
-                rewardStatusStorage.save(rewardStatus.amountUsdEquivalent(rewardStatusFacadePort.usdEquivalent(rewardStatus.rewardId())))
+                rewardStatusStorage.save(rewardStatus.usdAmount(rewardStatusFacadePort.usdAmountOf(rewardStatus.rewardId()).orElse(null)))
         );
     }
 }

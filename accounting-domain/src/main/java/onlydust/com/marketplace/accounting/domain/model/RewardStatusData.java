@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
-import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Optional;
@@ -23,7 +22,7 @@ public class RewardStatusData {
     @NonNull
     final Set<Network> networks = new HashSet<>();
 
-    BigDecimal amountUsdEquivalent;
+    ConvertedAmount usdAmount;
 
     public Optional<ZonedDateTime> unlockDate() {
         return Optional.ofNullable(unlockDate);
@@ -46,8 +45,8 @@ public class RewardStatusData {
         return withAdditionalNetworks(Set.of(networks));
     }
 
-    public Optional<BigDecimal> amountUsdEquivalent() {
-        return Optional.ofNullable(amountUsdEquivalent);
+    public Optional<ConvertedAmount> usdAmount() {
+        return Optional.ofNullable(usdAmount);
     }
 
     public boolean isPaid() {

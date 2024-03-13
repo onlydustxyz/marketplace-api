@@ -1,9 +1,10 @@
 package onlydust.com.marketplace.accounting.domain.port.in;
 
+import onlydust.com.marketplace.accounting.domain.model.ConvertedAmount;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 
-import java.math.BigDecimal;
+import java.util.Optional;
 
 public interface RewardStatusFacadePort {
-    BigDecimal usdEquivalent(RewardId rewardId);
+    Optional<ConvertedAmount> usdAmountOf(RewardId rewardId);
 }
