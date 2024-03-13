@@ -7,12 +7,11 @@ import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HistoricalQuoteEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.HistoricalQuoteRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectToBudgetIdRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.BudgetRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
 import onlydust.com.marketplace.project.domain.service.RewardV2Service;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,6 +40,16 @@ public class ProjectBudgetsApiV2IT extends AbstractMarketplaceApiIT {
     RewardV2Service rewardV2Service;
     @Autowired
     SponsorRepository sponsorRepository;
+    @Autowired
+    SponsorAccountRepository sponsorAccountRepository;
+    @Autowired
+    AccountBookRepository accountBookRepository;
+
+    @BeforeEach
+    void setup() {
+        sponsorAccountRepository.deleteAll();
+        accountBookRepository.deleteAll();
+    }
 
     @Test
     void should_return_forbidden_status_when_getting_project_budgets_given_user_not_project_lead() {

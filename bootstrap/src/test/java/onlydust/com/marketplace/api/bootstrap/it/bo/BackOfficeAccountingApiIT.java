@@ -7,7 +7,11 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.api.contract.model.CreateRewardResponse;
+import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 
@@ -26,6 +30,17 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
     static final Currency.Id BTC = Currency.Id.of("3f6e1c98-8659-493a-b941-943a803bd91f");
     static final Currency.Id STRK = Currency.Id.of("81b7e948-954f-4718-bad3-b70a0edd27e1");
+
+    @Autowired
+    private SponsorAccountRepository sponsorAccountRepository;
+    @Autowired
+    private AccountBookRepository accountBookRepository;
+
+    @BeforeEach
+    void setup() {
+        accountBookRepository.deleteAll();
+        sponsorAccountRepository.deleteAll();
+    }
 
     @Test
     void should_allocate_budget_to_project_and_get_refunded_of_unspent_budget() {

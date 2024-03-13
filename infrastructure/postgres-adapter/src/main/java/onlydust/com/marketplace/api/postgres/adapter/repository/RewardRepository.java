@@ -4,6 +4,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface RewardRepository extends JpaRepository<RewardEntity, UUID> {
@@ -14,4 +15,6 @@ public interface RewardRepository extends JpaRepository<RewardEntity, UUID> {
             where r.project_id = :projectId
             """, nativeQuery = true)
     Long countAllByRecipientIdAndProjectId(UUID userId, UUID projectId);
+
+    List<RewardEntity> findAllByInvoiceId(UUID invoiceId);
 }

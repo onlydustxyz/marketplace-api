@@ -65,9 +65,8 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
         final var drafts = invoiceRepository.findAllByBillingProfileIdAndStatus(billingProfileId.value(), InvoiceEntity.Status.DRAFT);
 
         drafts.forEach(invoice -> {
-            //TODO
-//            final var rewards = rewardRepository.findAllByInvoiceId(invoice.id());
-//            rewardRepository.saveAll(rewards.stream().map(pr -> pr.invoice(null)).toList());
+            final var rewards = rewardRepository.findAllByInvoiceId(invoice.id());
+            rewardRepository.saveAll(rewards.stream().map(pr -> pr.invoice(null)).toList());
         });
 
         invoiceRepository.deleteAll(drafts);

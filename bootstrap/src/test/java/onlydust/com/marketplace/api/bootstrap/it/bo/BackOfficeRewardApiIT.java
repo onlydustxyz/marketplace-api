@@ -676,7 +676,12 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "name": "QA new contributions",
                                 "logoUrl": null
                               },
-                              "sponsors": [],
+                              "sponsors": [
+                                {
+                                  "name": "No Sponsor",
+                                  "avatarUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
+                                }
+                              ],
                               "money": {
                                 "amount": 1000,
                                 "dollarsEquivalent": 1010.00,
@@ -709,7 +714,12 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "name": "kaaper",
                                 "logoUrl": null
                               },
-                              "sponsors": [],
+                              "sponsors": [
+                                {
+                                  "name": "No Sponsor",
+                                  "avatarUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
+                                }
+                              ],
                               "money": {
                                 "amount": 1000,
                                 "dollarsEquivalent": null,
