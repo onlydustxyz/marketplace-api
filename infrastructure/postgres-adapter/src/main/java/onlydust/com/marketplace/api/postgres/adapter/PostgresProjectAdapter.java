@@ -425,14 +425,14 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
                         .build())
                 .remainingBudget(budgetStats.size() == 1 ?
                         new Money(budgetStats.get(0).getRemainingAmount(),
-                                budgetStats.get(0).getCurrency().toDomain(),
+                                budgetStats.get(0).getCurrency().toOldDomain(),
                                 budgetStats.get(0).getRemainingUsdAmount()) :
                         new Money(null, null,
                                 budgetStats.stream().map(BudgetStatsEntity::getRemainingUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,
                                         BigDecimal::add)))
                 .spentAmount(budgetStats.size() == 1 ?
                         new Money(budgetStats.get(0).getSpentAmount(),
-                                budgetStats.get(0).getCurrency().toDomain(),
+                                budgetStats.get(0).getCurrency().toOldDomain(),
                                 budgetStats.get(0).getSpentUsdAmount()) :
                         new Money(null, null,
                                 budgetStats.stream().map(BudgetStatsEntity::getSpentUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,
