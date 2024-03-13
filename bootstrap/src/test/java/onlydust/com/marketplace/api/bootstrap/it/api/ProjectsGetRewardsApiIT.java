@@ -1,8 +1,15 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
+import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import java.util.Map;
@@ -14,15 +21,26 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
     UserAuthHelper.AuthenticatedUser pierre;
 
+    @Autowired
+    private BillingProfileStoragePort billingProfileStoragePort;
+
     @BeforeEach
     void setup() {
         pierre = userAuthHelper.authenticatePierre();
+
+        accountingHelper.patchBillingProfile(UUID.fromString("20282367-56b0-42d3-81d3-5e4b38f67e3e"), BillingProfileEntity.Type.COMPANY,
+                VerificationStatusEntity.VERIFIED);
 
         accountingHelper.patchReward("40fda3c6-2a3f-4cdd-ba12-0499dd232d53", 10, "ETH", 15000, null, "2023-07-12");
         accountingHelper.patchReward("e1498a17-5090-4071-a88a-6f0b0c337c3a", 50, "ETH", 75000, null, "2023-08-12");
         accountingHelper.patchReward("2ac80cc6-7e83-4eef-bc0c-932b58f683c0", 500, "APT", 100000, null, null);
         accountingHelper.patchReward("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0", 30, "OP", 6000, "2023-08-14", null);
         accountingHelper.patchReward("5b96ca1e-4ad2-41c1-8819-520b885d9223", 5, "STRK", null, null, null);
+
+
+        billingProfileStoragePort.savePayoutInfoForBillingProfile(PayoutInfo.builder()
+                .optimismAddress(Optimism.accountAddress("0x" + faker.random().hex(40)))
+                .build(), BillingProfile.Id.of("20282367-56b0-42d3-81d3-5e4b38f67e3e"));
     }
 
     @Test
