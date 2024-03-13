@@ -229,7 +229,6 @@ public interface BackOfficeMapper {
         return new PaymentPage()
                 .payments(paymentPage.getContent().stream().map(payment -> new PaymentPageItemResponse()
                         .id(payment.getId())
-                        .budgetId(payment.getBudgetId())
                         .projectId(payment.getProjectId())
                         .amount(payment.getAmount())
                         .currency(mapCurrency(payment.getCurrency()))

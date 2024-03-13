@@ -51,7 +51,12 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_BUDGETS, projectId)))
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "20",
+                        "sort", "AMOUNT",
+                        "direction", "DESC"
+                )))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()

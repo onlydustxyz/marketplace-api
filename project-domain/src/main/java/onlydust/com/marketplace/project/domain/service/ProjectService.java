@@ -249,11 +249,7 @@ public class ProjectService implements ProjectFacadePort, ProjectRewardFacadePor
 
     @Override
     public ProjectBudgetsView getBudgets(UUID projectId, UUID projectLeadId) {
-        if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            return projectRewardStoragePort.findBudgets(projectId);
-        } else {
-            throw OnlyDustException.forbidden("Only project leads can read budgets on their projects");
-        }
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override

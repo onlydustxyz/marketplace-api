@@ -19,7 +19,6 @@ import static java.util.Objects.nonNull;
 @EqualsAndHashCode
 public class PaymentView {
     UUID id;
-    UUID budgetId;
     UUID projectId;
     BigDecimal amount;
     Currency currency;

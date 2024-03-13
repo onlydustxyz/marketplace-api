@@ -126,13 +126,13 @@ public class CustomUserRepository {
     private final static String GET_PROJECT_STATS_BY_USER = """
             with granted_usd as (
               select 
-                pb.project_id,
-                SUM(b.initial_amount * COALESCE(CASE WHEN b.currency = 'usd' then 1 ELSE cuq.price END, 0) -
-                     b.remaining_amount * COALESCE(CASE WHEN b.currency = 'usd' then 1 ELSE cuq.price END, 0)) total
-              from projects_budgets pb
-                join budgets b on b.id = pb.budget_id
-                left join crypto_usd_quotes cuq on cuq.currency = b.currency
-              group by pb.project_id
+                pa.project_id,
+                SUM(pa.initial_allowance * COALESCE(CASE WHEN c.code = 'USD' then 1 ELSE cuq.price END, 0) -
+                     pa.current_allowance * COALESCE(CASE WHEN c.code = 'USD' then 1 ELSE cuq.price END, 0)) total
+              from project_allowances pa
+                join currencies c on c.id = pa.currency_id 
+                left join crypto_usd_quotes cuq on upper(cast(cuq.currency as text)) = c.code
+              group by pa.project_id
             )
             select  p.project_id,
                     p.key as slug,

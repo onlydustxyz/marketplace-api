@@ -12,8 +12,6 @@ import java.util.UUID;
 public interface BackofficeStoragePort {
     Page<ProjectRepositoryView> findProjectRepositoryPage(Integer pageIndex, Integer pageSize, List<UUID> projectIds);
 
-    Page<ProjectBudgetView> findProjectBudgetPage(int pageIndex, int pageSize, List<UUID> projectIds);
-
     Page<ProjectLeadInvitationView> findProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids, List<UUID> projectIds);
 
     Page<UserView> listUsers(int pageIndex, int pageSize, UserView.Filters filters);

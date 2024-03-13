@@ -48,7 +48,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
     private final ProjectRepoRepository projectRepoRepository;
     private final CustomProjectRepository customProjectRepository;
     private final CustomContributorRepository customContributorRepository;
-    private final CustomProjectBudgetRepository customProjectBudgetRepository;
     private final ProjectLeadViewRepository projectLeadViewRepository;
     private final CustomRewardRepository customRewardRepository;
     private final ProjectsPageRepository projectsPageRepository;
@@ -63,8 +62,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
     private final ContributionViewEntityRepository contributionViewEntityRepository;
     private final HiddenContributorRepository hiddenContributorRepository;
     private final ProjectTagRepository projectTagRepository;
-    private final HistoricalQuoteRepository historicalQuoteRepository;
-    private final CurrencyRepository currencyRepository;
     private final RewardViewRepository rewardViewRepository;
 
     @Override
@@ -425,14 +422,14 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
                         .build())
                 .remainingBudget(budgetStats.size() == 1 ?
                         new Money(budgetStats.get(0).getRemainingAmount(),
-                                budgetStats.get(0).getCurrency().toDomain(),
+                                budgetStats.get(0).getCurrency().toOldDomain(),
                                 budgetStats.get(0).getRemainingUsdAmount()) :
                         new Money(null, null,
                                 budgetStats.stream().map(BudgetStatsEntity::getRemainingUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,
                                         BigDecimal::add)))
                 .spentAmount(budgetStats.size() == 1 ?
                         new Money(budgetStats.get(0).getSpentAmount(),
-                                budgetStats.get(0).getCurrency().toDomain(),
+                                budgetStats.get(0).getCurrency().toOldDomain(),
                                 budgetStats.get(0).getSpentUsdAmount()) :
                         new Money(null, null,
                                 budgetStats.stream().map(BudgetStatsEntity::getSpentUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,
@@ -444,12 +441,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
     }
 
     @Override
-    @Transactional(readOnly = true)
     public ProjectBudgetsView findBudgets(UUID projectId) {
-        return ProjectBudgetsView.builder().budgets(customProjectBudgetRepository.findProjectBudgetByProjectId(projectId)
-                        .stream().map(BudgetMapper::entityToDomain)
-                        .toList())
-                .build();
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override

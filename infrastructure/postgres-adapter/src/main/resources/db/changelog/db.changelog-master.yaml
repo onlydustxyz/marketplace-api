@@ -167,3 +167,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000102_fix_billing_profile_events_sequence.sql
   - include:
       file: db/changelog/changelogs/00000103_add_event_timestamp.sql
+  - include:
+      file: db/changelog/changelogs/00000104_remove_budgets_from_views.sql
