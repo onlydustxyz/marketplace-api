@@ -25,13 +25,20 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.*;
 
+import static java.util.stream.Collectors.groupingBy;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
 @Slf4j
 @Profile("cli")
 public class NewAccountingMigration implements CommandLineRunner {
-    public static final String UNKNOWN = "UNKNOWN";
+    private static final String UNKNOWN = "UNKNOWN";
+    private static final Set<ProjectId> UNLOCKED_OP_PROJECTS = Set.of(
+            ProjectId.of("10961e98-16c7-4fe6-935f-f2f420d6c020"),
+            ProjectId.of("403997b5-2b34-4b3a-ada1-cdad37c83243"),
+            ProjectId.of("f39b827f-df73-498c-8853-99bc3f562723")
+    );
+
     private final @NonNull EventRepository eventRepository;
     private final @NonNull CurrencyStorage currencyStorage;
     private final @NonNull AccountingFacadePort accountingFacadePort;
@@ -59,8 +66,11 @@ public class NewAccountingMigration implements CommandLineRunner {
 
             stopWatch.start("Creating sponsor accounts");
             sponsorBudgets.forEach((sponsorId, value) -> value.forEach((currency, budgets) -> {
-                final var sponsorAccountStatement = createSponsorAccount(sponsorId, currency, budgets);
-                allocateBudgetToProjects(sponsorAccountStatement.account(), currency, budgets);
+                final var budgetsByUnlockDate = budgets.stream().collect(groupingBy(this::unlockDateOf));
+                budgetsByUnlockDate.forEach((unlockDate, b) -> {
+                    final var sponsorAccountStatement = createSponsorAccount(sponsorId, currency, b, unlockDate.orElse(null));
+                    allocateBudgetToProjects(sponsorAccountStatement.account(), currency, b);
+                });
             }));
             stopWatch.stop();
 
@@ -112,7 +122,7 @@ public class NewAccountingMigration implements CommandLineRunner {
                 c -> new ArrayList<>()).add(budget));
     }
 
-    private SponsorAccountStatement createSponsorAccount(SponsorId sponsorId, Currency currency, List<Budget> budgets) {
+    private SponsorAccountStatement createSponsorAccount(SponsorId sponsorId, Currency currency, List<Budget> budgets, ZonedDateTime unlockDate) {
         final var total = budgets.stream().map(b -> b.amount).reduce(PositiveAmount.ZERO, Amount::add);
         final var sponsor = sponsorRepository.findById(sponsorId.value()).orElseThrow(() -> notFound("Sponsor not found: %s".formatted(sponsorId)));
 
@@ -120,7 +130,7 @@ public class NewAccountingMigration implements CommandLineRunner {
         final var transaction = new SponsorAccount.Transaction(Network.fromCurrencyCode(currency.code().toString()), UNKNOWN, total, sponsor.getName(),
                 UNKNOWN);
 
-        return accountingFacadePort.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(total), unlockDateOf(currency), transaction);
+        return accountingFacadePort.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(total), unlockDate, transaction);
     }
 
     private void allocateBudgetToProjects(SponsorAccount sponsorAccount, Currency currency, List<Budget> budgets) {
@@ -137,8 +147,11 @@ public class NewAccountingMigration implements CommandLineRunner {
         });
     }
 
-    private ZonedDateTime unlockDateOf(Currency currency) {
-        return Optional.ofNullable(onlydust.com.marketplace.project.domain.model.Currency.valueOf(currency.code().toString().toUpperCase()).unlockDate()).map(d -> d.toInstant().atZone(ZoneOffset.UTC)).orElse(null);
+    private @NonNull Optional<ZonedDateTime> unlockDateOf(Budget budget) {
+        if (budget.currency.code().toString().equals(Currency.Code.OP_STR) && UNLOCKED_OP_PROJECTS.contains(budget.projectId))
+            return Optional.empty();
+
+        return Optional.ofNullable(onlydust.com.marketplace.project.domain.model.Currency.valueOf(budget.currency.code().toString().toUpperCase()).unlockDate()).map(d -> d.toInstant().atZone(ZoneOffset.UTC));
     }
 
     private void readOldEvents() {
@@ -196,7 +209,8 @@ public class NewAccountingMigration implements CommandLineRunner {
         LOGGER.info("Reading Payment.Requested event: " + value);
         final var reward = reward(RewardId.of(value.get("id").asText()));
         reward.amount = PositiveAmount.of(new BigDecimal(value.get("amount").get("amount").asText()));
-        reward.currency = currencyStorage.findByCode(Currency.Code.of(value.get("amount").get("currency").asText())).orElseThrow(() -> notFound(("Currency not" +
+        reward.currency = currencyStorage.findByCode(Currency.Code.of(value.get("amount").get("currency").asText())).orElseThrow(() -> notFound(("Currency " +
+                                                                                                                                                 "not" +
                                                                                                                                                  " found: %s").formatted(value.get("amount").get("currency").asText())));
         reward.projectId = ProjectId.of(value.get("project_id").asText());
         reward.recipientId = value.get("recipient_id").asLong();

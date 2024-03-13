@@ -11,6 +11,7 @@ import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Entity
@@ -27,6 +28,8 @@ public class AccountBookEventEntity {
     private final Long id;
 
     private final UUID accountBookId;
+
+    ZonedDateTime timestamp;
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb", nullable = false)
