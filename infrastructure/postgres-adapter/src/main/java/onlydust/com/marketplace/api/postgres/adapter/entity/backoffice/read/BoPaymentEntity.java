@@ -111,7 +111,7 @@ public class BoPaymentEntity {
                 .requestorId(requestorId)
                 .items(items)
                 .requestedAt(requestedAt)
-                .processedAt(statusData.paidAt().toInstant().atZone(ZoneOffset.UTC))
+                .processedAt(statusData.paidAt() == null ? null : statusData.paidAt().toInstant().atZone(ZoneOffset.UTC))
                 .pullRequestsCount(pullRequestsCount)
                 .issuesCount(issuesCount)
                 .dustyIssuesCount(dustyIssuesCount)
