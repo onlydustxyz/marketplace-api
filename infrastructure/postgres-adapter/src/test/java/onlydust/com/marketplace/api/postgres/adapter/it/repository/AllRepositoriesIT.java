@@ -32,8 +32,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     @Autowired
     OnboardingRepository onboardingRepository;
     @Autowired
-    BudgetRepository budgetRepository;
-    @Autowired
     ApplicationRepository applicationRepository;
     @Autowired
     UserProfileInfoRepository userProfileInfoRepository;
@@ -149,19 +147,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .build();
 
         assertIsSaved(expected, onboardingRepository);
-    }
-
-    @Test
-    void should_create_budget() {
-        // Given
-        final BudgetEntity expected = BudgetEntity.builder()
-                .id(UUID.randomUUID())
-                .currency(CurrencyEnumEntity.strk)
-                .initialAmount(BigDecimal.ZERO)
-                .remainingAmount(BigDecimal.ZERO)
-                .build();
-
-        assertIsSaved(expected, budgetRepository);
     }
 
     @Test

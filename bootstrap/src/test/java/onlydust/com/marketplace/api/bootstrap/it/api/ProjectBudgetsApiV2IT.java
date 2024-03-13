@@ -7,8 +7,10 @@ import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HistoricalQuoteEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.*;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.BudgetRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.HistoricalQuoteRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
 import onlydust.com.marketplace.project.domain.service.RewardV2Service;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,12 +26,6 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 
 
 public class ProjectBudgetsApiV2IT extends AbstractMarketplaceApiIT {
-
-
-    @Autowired
-    ProjectToBudgetIdRepository projectToBudgetIdRepository;
-    @Autowired
-    BudgetRepository budgetRepository;
     @Autowired
     HistoricalQuoteRepository historicalQuoteRepository;
     @Autowired
