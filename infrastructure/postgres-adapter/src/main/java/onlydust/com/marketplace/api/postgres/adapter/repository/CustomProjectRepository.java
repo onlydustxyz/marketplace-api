@@ -33,10 +33,9 @@ public class CustomProjectRepository {
     public Boolean hasRemainingBudget(final UUID projectId) {
         final List remainingBudgets = entityManager.createNativeQuery("""
                         select 1
-                        from projects_budgets pb
-                        join budgets b on pb.budget_id = b.id
-                        where b.remaining_amount > 0
-                        and pb.project_id = :projectId""")
+                        from project_allowances pa
+                        where pa.current_allowance > 0
+                        and pa.project_id = :projectId""")
                 .setParameter("projectId", projectId)
                 .getResultList();
         return isNull(remainingBudgets) || remainingBudgets.isEmpty() ? false : true;
