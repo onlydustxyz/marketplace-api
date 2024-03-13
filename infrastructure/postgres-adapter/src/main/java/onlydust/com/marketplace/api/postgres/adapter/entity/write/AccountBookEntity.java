@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookEvent;
 
 import javax.persistence.*;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +26,7 @@ public class AccountBookEntity {
     private final UUID currencyId;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "accountBookId")
+    @OrderBy("timestamp, id")
     private final List<AccountBookEventEntity> events = new ArrayList<>();
 
     public static AccountBookEntity of(UUID currencyId) {
@@ -32,6 +34,10 @@ public class AccountBookEntity {
     }
 
     public void add(AccountBookEvent event) {
-        events.add(AccountBookEventEntity.builder().accountBookId(id).payload(new AccountBookEventEntity.Payload(event)).build());
+        events.add(AccountBookEventEntity.builder()
+                .accountBookId(id)
+                .timestamp(ZonedDateTime.now())
+                .payload(new AccountBookEventEntity.Payload(event))
+                .build());
     }
 }

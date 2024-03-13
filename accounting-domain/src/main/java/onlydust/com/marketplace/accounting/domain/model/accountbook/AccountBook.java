@@ -22,6 +22,7 @@ public interface AccountBook {
 
     Set<AccountId> refund(AccountId from);
 
+    @ToString
     @EqualsAndHashCode
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

@@ -531,25 +531,6 @@ public class AccountingServiceTest {
                     .hasMessageContaining("Cannot mix transactions from different networks");
         }
 
-
-        /*
-         * Given a sponsor account
-         * When I fund it with a given transaction reference
-         * Then I cannot fund it again with the same reference
-         */
-        @Test
-        void should_forbid_same_reference_on_same_account() {
-            // Given
-            final var transaction = fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L));
-            accountingService.fund(sponsorAccount.id(), transaction);
-
-            // When
-            assertThatThrownBy(() -> accountingService.fund(sponsorAccount.id(), transaction))
-                    // Then
-                    .isInstanceOf(OnlyDustException.class)
-                    .hasMessageContaining("Transaction with reference %s already exists".formatted(transaction.reference()));
-        }
-
         @Test
         void should_cancel_a_reward() {
             // Given

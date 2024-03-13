@@ -1,1 +1,2 @@
 web: ./heroku/start-dyno-with-datadog-apm.sh -Dspring.profiles.active=api,jobs
+cli: ./heroku/start-dyno-with-datadog-apm.sh -Dspring.profiles.active=local,cli -Ddd.service=marketplace-cli

@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.kernel.model.EventType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -67,6 +68,7 @@ public class AccountBookAggregate implements AccountBook {
         return state.accept(event);
     }
 
+    @EventType("Mint")
     public record MintEvent(@NonNull AccountId account, @NonNull PositiveAmount amount) implements AccountBookEvent<Void> {
         @Override
         public Void visit(AccountBookState state) {
@@ -75,6 +77,7 @@ public class AccountBookAggregate implements AccountBook {
         }
     }
 
+    @EventType("Burn")
     public record BurnEvent(@NonNull AccountId account, @NonNull PositiveAmount amount) implements AccountBookEvent<List<Transaction>> {
         @Override
         public List<Transaction> visit(AccountBookState state) {
@@ -82,6 +85,7 @@ public class AccountBookAggregate implements AccountBook {
         }
     }
 
+    @EventType("Transfer")
     public record TransferEvent(@NonNull AccountId from, @NonNull AccountId to, @NonNull PositiveAmount amount) implements AccountBookEvent<Void> {
         @Override
         public Void visit(AccountBookState state) {
@@ -90,6 +94,7 @@ public class AccountBookAggregate implements AccountBook {
         }
     }
 
+    @EventType("Refund")
     public record RefundEvent(@NonNull AccountId from, @NonNull AccountId to, @NonNull PositiveAmount amount) implements AccountBookEvent<Void> {
         @Override
         public Void visit(AccountBookState state) {
@@ -98,6 +103,7 @@ public class AccountBookAggregate implements AccountBook {
         }
     }
 
+    @EventType("FullRefund")
     public record FullRefundEvent(@NonNull AccountId from) implements AccountBookEvent<Set<AccountId>> {
         @Override
         public Set<AccountId> visit(AccountBookState state) {
