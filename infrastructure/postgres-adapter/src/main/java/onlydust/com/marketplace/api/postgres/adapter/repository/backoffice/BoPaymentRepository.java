@@ -37,7 +37,7 @@ public interface BoPaymentRepository extends JpaRepository<BoPaymentEntity, UUID
             	        jsonb_agg(jsonb_build_object('network', network, 'type', type, 'address', address)) AS wallets
                     FROM
                         accounting.wallets
-                    GROUP BY 
+                    GROUP BY
                         billing_profile_id
             	) user_wallets ON user_wallets.billing_profile_id = pp.billing_profile_id
             	INNER JOIN (

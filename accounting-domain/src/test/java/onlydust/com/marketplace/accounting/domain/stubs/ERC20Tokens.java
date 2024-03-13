@@ -4,6 +4,7 @@ import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
+import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetContractAddress;
 
 import java.math.BigInteger;
 
@@ -15,5 +16,8 @@ public interface ERC20Tokens {
     ERC20 OP_USDC = new ERC20(Blockchain.OPTIMISM, Ethereum.contractAddress("0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85"), "USD Coin", "USDC", 6,
             BigInteger.TEN);
     ERC20 STRK = new ERC20(Blockchain.ETHEREUM, Ethereum.contractAddress("0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766"), "Starknet Token", "STRK", 18,
+            BigInteger.TEN);
+    ERC20 STARKNET_STRK = new ERC20(Blockchain.STARKNET, new StarknetContractAddress("0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766"), "Starknet Token", "STRK",
+            18,
             BigInteger.TEN);
 }

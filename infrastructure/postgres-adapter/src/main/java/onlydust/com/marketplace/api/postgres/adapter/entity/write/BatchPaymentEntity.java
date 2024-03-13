@@ -60,7 +60,7 @@ public class BatchPaymentEntity {
                 .id(batchPayment.id().value())
                 .csv(batchPayment.csv())
                 .transactionHash(batchPayment.transactionHash())
-                .network(NetworkEnumEntity.of(batchPayment.blockchain()))
+                .network(NetworkEnumEntity.of(batchPayment.network()))
                 .status(switch (batchPayment.status()) {
                     case PAID -> Status.PAID;
                     case TO_PAY -> Status.TO_PAY;
@@ -76,7 +76,7 @@ public class BatchPaymentEntity {
     public BatchPayment toDomain() {
         return BatchPayment.builder()
                 .moneys(List.of())
-                .blockchain(this.network.toBlockchain())
+                .network(this.network.toNetwork())
                 .csv(this.csv)
                 .id(BatchPayment.Id.of(this.id))
                 .transactionHash(this.transactionHash)

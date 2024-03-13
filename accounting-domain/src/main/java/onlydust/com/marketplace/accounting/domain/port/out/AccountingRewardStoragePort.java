@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
+import onlydust.com.marketplace.accounting.domain.view.RewardWithPayoutInfoView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
@@ -41,4 +42,6 @@ public interface AccountingRewardStoragePort {
     List<BackofficeRewardView> findPaidRewardsToNotify();
 
     void markRewardsAsPaymentNotified(List<RewardId> rewardId);
+
+    List<RewardWithPayoutInfoView> getRewardWithPayoutInfoOfInvoices(List<Invoice.Id> invoiceIds);
 }

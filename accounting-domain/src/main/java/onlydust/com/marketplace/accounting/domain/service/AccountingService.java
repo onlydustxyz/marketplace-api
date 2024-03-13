@@ -13,6 +13,7 @@ import javax.transaction.Transactional;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -130,12 +131,7 @@ public class AccountingService implements AccountingFacadePort {
     @Override
     public boolean isPayable(RewardId rewardId, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
-        final var accountBook = getAccountBook(currency);
-
-        return accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).entrySet().stream().allMatch(entry -> {
-            final var sponsorAccount = sponsorAccountStorage.get(entry.getKey().sponsorAccountId()).orElseThrow();
-            return sponsorAccount.unlockedBalance().isGreaterThanOrEqual(entry.getValue());
-        });
+        return new PayableRewardAggregator(sponsorAccountStorage, currency).isPayable(rewardId);
     }
 
 
@@ -170,6 +166,11 @@ public class AccountingService implements AccountingFacadePort {
     @Override
     public List<PayableReward> getPayableRewards() {
         return currencyStorage.all().stream().flatMap(currency -> new PayableRewardAggregator(sponsorAccountStorage, currency).getPayableRewards()).toList();
+    }
+
+    @Override
+    public List<PayableReward> getPayableRewards(Set<RewardId> rewardIds) {
+        return currencyStorage.all().stream().flatMap(currency -> new PayableRewardAggregator(sponsorAccountStorage, currency).getPayableRewards(rewardIds)).toList();
     }
 
     private <From, To> AccountBookAggregate transfer(From from, To to, PositiveAmount amount, Currency.Id currencyId) {
@@ -239,14 +240,27 @@ public class AccountingService implements AccountingFacadePort {
         }
 
         public Stream<PayableReward> getPayableRewards() {
+            return getPayableRewards(null);
+        }
+
+        public Stream<PayableReward> getPayableRewards(Set<RewardId> rewardIds) {
             final var distinctPayableRewards =
-                    accountBook.state().unspentChildren().keySet().stream().filter(AccountId::isReward).filter(rewardAccountId -> isPayable(rewardAccountId.rewardId(), currency.id())).flatMap(this::trySpend).collect(groupingBy(PayableReward::key, reducing(PayableReward::add)));
+                    accountBook.state().unspentChildren().keySet().stream()
+                            .filter(AccountId::isReward)
+                            .filter(rewardAccountId -> rewardIds == null || rewardIds.contains(rewardAccountId.rewardId()))
+                            .filter(rewardAccountId -> isPayable(rewardAccountId.rewardId()))
+                            .flatMap(this::trySpend)
+                            .collect(groupingBy(PayableReward::key, reducing(PayableReward::add)));
 
             return distinctPayableRewards.values().stream().filter(Optional::isPresent).map(Optional::get);
         }
 
         private Stream<PayableReward> trySpend(AccountId rewardAccountId) {
-            return accountBook.state().transferredAmountPerOrigin(rewardAccountId).entrySet().stream().filter(e -> e.getValue().isStrictlyPositive()).filter(e -> stillEnoughBalance(e.getKey().sponsorAccountId(), e.getValue())).peek(e -> spend(e.getKey().sponsorAccountId(), rewardAccountId.rewardId(), e.getValue())).map(e -> createPayableReward(e.getKey().sponsorAccountId(), rewardAccountId.rewardId(), e.getValue()));
+            return accountBook.state().transferredAmountPerOrigin(rewardAccountId).entrySet().stream()
+                    .filter(e -> e.getValue().isStrictlyPositive())
+                    .filter(e -> stillEnoughBalance(e.getKey().sponsorAccountId(), e.getValue()))
+                    .peek(e -> spend(e.getKey().sponsorAccountId(), rewardAccountId.rewardId(), e.getValue()))
+                    .map(e -> createPayableReward(e.getKey().sponsorAccountId(), rewardAccountId.rewardId(), e.getValue()));
         }
 
         private void spend(SponsorAccount.Id sponsorAccountId, RewardId rewardId, PositiveAmount amount) {
@@ -267,6 +281,14 @@ public class AccountingService implements AccountingFacadePort {
 
         private SponsorAccount sponsorAccount(SponsorAccount.Id sponsorAccountId) {
             return sponsorAccountProvider.get(sponsorAccountId).orElseThrow(() -> notFound("Sponsor account %s not found".formatted(sponsorAccountId)));
+        }
+
+        private boolean isPayable(RewardId rewardId) {
+            return accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).entrySet().stream().allMatch(entry -> {
+                final var sponsorAccount = sponsorAccountProvider.get(entry.getKey().sponsorAccountId())
+                        .orElseThrow(() -> notFound(("Sponsor account %s not found").formatted(entry.getKey().sponsorAccountId())));
+                return sponsorAccount.unlockedBalance().isGreaterThanOrEqual(entry.getValue());
+            });
         }
     }
 }

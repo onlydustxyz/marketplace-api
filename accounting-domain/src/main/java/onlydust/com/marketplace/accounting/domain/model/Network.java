@@ -26,6 +26,18 @@ public enum Network {
         return blockchain;
     }
 
+    public static Network fromBlockchain(Blockchain blockchain) {
+        if (blockchain == null)
+            return Network.SEPA;
+        
+        return switch (blockchain) {
+            case ETHEREUM -> Network.ETHEREUM;
+            case OPTIMISM -> Network.OPTIMISM;
+            case STARKNET -> Network.STARKNET;
+            case APTOS -> Network.APTOS;
+        };
+    }
+
     @Deprecated
     public static Network fromCurrencyCode(String currencyCode) {
         return switch (currencyCode) {

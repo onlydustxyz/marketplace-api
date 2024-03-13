@@ -5,9 +5,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
-import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 
-import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -21,7 +19,7 @@ public class BatchPayment {
     @NonNull
     String csv;
     @NonNull
-    Blockchain blockchain;
+    Network network;
     List<MoneyView> moneys;
     @NonNull
     @Builder.Default

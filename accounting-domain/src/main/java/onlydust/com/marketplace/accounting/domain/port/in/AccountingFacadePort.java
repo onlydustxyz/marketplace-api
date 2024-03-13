@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface AccountingFacadePort {
     SponsorAccountStatement createSponsorAccount(final @NonNull SponsorId sponsorId, final @NonNull Currency.Id currencyId,
@@ -45,4 +46,6 @@ public interface AccountingFacadePort {
     SponsorAccountStatement updateSponsorAccount(final @NonNull SponsorAccount.Id sponsorAccountId, ZonedDateTime lockedUntil);
 
     List<PayableReward> getPayableRewards();
+
+    List<PayableReward> getPayableRewards(Set<RewardId> rewardIds);
 }

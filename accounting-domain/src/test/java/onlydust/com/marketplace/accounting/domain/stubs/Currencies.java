@@ -6,9 +6,9 @@ import java.net.URI;
 
 public interface Currencies {
     Currency OP = Currency.of(ERC20Tokens.OP);
-    Currency USDC = Currency.of(ERC20Tokens.ETH_USDC);
+    Currency USDC = Currency.of(ERC20Tokens.ETH_USDC).withERC20(ERC20Tokens.OP_USDC);
     Currency LORDS = Currency.of(ERC20Tokens.LORDS);
-    Currency STRK = Currency.of(ERC20Tokens.STRK);
+    Currency STRK = Currency.of(ERC20Tokens.STRK).withERC20(ERC20Tokens.STARKNET_STRK);
     Currency USD = Currency.fiat("US Dollar", Currency.Code.of("USD"), 2);
     Currency EUR = Currency.fiat("Euro", Currency.Code.of("EUR"), 2);
     Currency ETH = Currency.crypto("Ether", Currency.Code.of("ETH"), 18)

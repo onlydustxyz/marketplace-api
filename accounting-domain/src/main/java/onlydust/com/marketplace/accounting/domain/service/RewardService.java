@@ -1,36 +1,39 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
+import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
-import onlydust.com.marketplace.accounting.domain.port.out.OldRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
-import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
+import onlydust.com.marketplace.accounting.domain.view.RewardWithPayoutInfoView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
-import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.pagination.Page;
+import org.jetbrains.annotations.NotNull;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.net.URI;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.groupingBy;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @AllArgsConstructor
 public class RewardService implements AccountingRewardPort {
 
     private final AccountingRewardStoragePort accountingRewardStoragePort;
-    private final OldRewardStoragePort oldRewardStoragePort;
+    private final AccountingFacadePort accountingFacadePort;
     private final MailNotificationPort mailNotificationPort;
     private static final List<String> CURRENCY_CODES_AVAILABLE_FOR_BATCH_PAYMENT = List.of(Currency.Code.STRK_STR, Currency.Code.USDC_STR,
             Currency.Code.LORDS_STR);
@@ -53,21 +56,24 @@ public class RewardService implements AccountingRewardPort {
     @Override
     @Transactional
     public void markBatchPaymentAsPaid(BatchPayment.Id batchPaymentId, String transactionHash) {
-        final BatchPayment batchPayment = accountingRewardStoragePort.findBatchPayment(batchPaymentId)
-                .orElseThrow(() -> OnlyDustException.notFound("Batch payment %s not found".formatted(batchPaymentId.value())));
-        if (!transactionHash.startsWith("0x")) {
-            throw badRequest("Wrong transaction hash format %s".formatted(transactionHash));
-        }
-
-        final List<PayableRewardWithPayoutInfoView> rewardViews = accountingRewardStoragePort.findPayableRewardsWithPayoutInfoForBatchPayment(batchPaymentId);
-        for (PayableRewardWithPayoutInfoView rewardView : rewardViews) {
-            oldRewardStoragePort.markRewardAsPaid(rewardView, transactionHash);
-        }
-        final BatchPayment updatedBatchPayment = batchPayment.toBuilder()
-                .status(BatchPayment.Status.PAID)
-                .transactionHash(transactionHash)
-                .build();
-        accountingRewardStoragePort.saveBatchPayment(updatedBatchPayment);
+        //TODO
+        //TODO
+        //TODO
+//        final BatchPayment batchPayment = accountingRewardStoragePort.findBatchPayment(batchPaymentId)
+//                .orElseThrow(() -> OnlyDustException.notFound("Batch payment %s not found".formatted(batchPaymentId.value())));
+//        if (!transactionHash.startsWith("0x")) {
+//            throw badRequest("Wrong transaction hash format %s".formatted(transactionHash));
+//        }
+//
+//        final List<PayableRewardWithPayoutInfoView> rewardViews = accountingRewardStoragePort.findPayableRewardsWithPayoutInfoForBatchPayment(batchPaymentId);
+//        for (PayableRewardWithPayoutInfoView rewardView : rewardViews) {
+//            oldRewardStoragePort.markRewardAsPaid(rewardView, transactionHash);
+//        }
+//        final BatchPayment updatedBatchPayment = batchPayment.toBuilder()
+//                .status(BatchPayment.Status.PAID)
+//                .transactionHash(transactionHash)
+//                .build();
+//        accountingRewardStoragePort.saveBatchPayment(updatedBatchPayment);
     }
 
     @Override
@@ -83,44 +89,56 @@ public class RewardService implements AccountingRewardPort {
 
     @Override
     public List<BatchPayment> createBatchPaymentsForInvoices(List<Invoice.Id> invoiceIds) {
-        final List<PayableRewardWithPayoutInfoView> rewardViews = accountingRewardStoragePort.findPayableRewardsWithPayoutInfoForInvoices(invoiceIds)
-                .stream()
-                .filter(r -> CURRENCY_CODES_AVAILABLE_FOR_BATCH_PAYMENT.contains(r.money().currencyCode()))
-                .toList();
-        if (rewardViews.isEmpty()) {
-            return List.of();
-        }
-        final Map<String, List<PayableRewardWithPayoutInfoView>> ethereumRewardMapToCurrencyCode = new HashMap<>();
-        final List<PayableRewardWithPayoutInfoView> starknetRewards = new ArrayList<>();
-        for (PayableRewardWithPayoutInfoView rewardView : rewardViews) {
-            final String currencyCode = rewardView.money().currencyCode();
-            if (List.of(Currency.Code.USDC_STR, Currency.Code.LORDS_STR).contains(rewardView.money().currencyCode())) {
-                if (ethereumRewardMapToCurrencyCode.containsKey(currencyCode)) {
-                    ethereumRewardMapToCurrencyCode.get(currencyCode).add(rewardView);
-                } else {
-                    final List<PayableRewardWithPayoutInfoView> rewardViewsForCurrencyCode = new ArrayList<>();
-                    rewardViewsForCurrencyCode.add(rewardView);
-                    ethereumRewardMapToCurrencyCode.put(currencyCode, rewardViewsForCurrencyCode);
-                }
-            } else if (rewardView.money().currencyCode().equals(Currency.Code.STRK_STR)) {
-                starknetRewards.add(rewardView);
-            } else {
-                throw OnlyDustException.forbidden("Currency %s is not supported in batch payment".formatted(currencyCode));
-            }
+        final Map<RewardId, RewardWithPayoutInfoView> rewardsWithPayoutInfo = accountingRewardStoragePort.getRewardWithPayoutInfoOfInvoices(invoiceIds)
+                .stream().collect(Collectors.toMap(RewardWithPayoutInfoView::id, Function.identity()));
 
-        }
-        final List<BatchPayment> batchPayments = new ArrayList<>();
-        if (!ethereumRewardMapToCurrencyCode.isEmpty()) {
-            final BatchPayment batchPayment = buildEthereumBatchPayment(ethereumRewardMapToCurrencyCode);
-            accountingRewardStoragePort.saveBatchPayment(batchPayment);
-            batchPayments.add(batchPayment);
-        }
-        if (!starknetRewards.isEmpty()) {
-            final BatchPayment batchPayment = buildStarknetBatchPayment(starknetRewards);
-            accountingRewardStoragePort.saveBatchPayment(batchPayment);
-            batchPayments.add(batchPayment);
-        }
-        return batchPayments;
+        final Map<Network, List<PayableReward>> payableRewardsByNetwork = accountingFacadePort.getPayableRewards(rewardsWithPayoutInfo.keySet()).stream()
+                .collect(groupingBy(r -> r.currency().network()));
+
+        return payableRewardsByNetwork
+                .entrySet()
+                .stream()
+                .map(e -> {
+                    final var network = e.getKey();
+                    final var rewards = e.getValue();
+                    final var moneys = totalAmountsPerCurrency(rewards, rewardsWithPayoutInfo);
+                    final Map<RewardId, Wallet> wallets = walletsPerRewardForNetwork(rewardsWithPayoutInfo, network);
+
+                    final var batchPayment = BatchPayment.builder()
+                            .id(BatchPayment.Id.random())
+                            .moneys(moneys)
+                            .network(network)
+                            .csv(BatchPaymentExporter.csv(rewards, wallets))
+                            .rewardIds(rewards.stream().map(PayableReward::id).toList())
+                            .build();
+                    accountingRewardStoragePort.saveBatchPayment(batchPayment);
+                    return batchPayment;
+                })
+                .toList();
+    }
+
+    @NotNull
+    private static Map<RewardId, Wallet> walletsPerRewardForNetwork(Map<RewardId, RewardWithPayoutInfoView> rewardsWithPayoutInfo, Network network) {
+        return rewardsWithPayoutInfo.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        e -> e.getValue().payoutInfo().orElseThrow(() -> internalServerError("No payout info for reward %s".formatted(e.getKey())))
+                                .wallet(network).orElseThrow(() -> internalServerError("No wallet for reward %s on network %s".formatted(e.getKey(), network)))));
+    }
+
+    @NotNull
+    private static List<MoneyView> totalAmountsPerCurrency(List<PayableReward> rewards, Map<RewardId, RewardWithPayoutInfoView> rewardsWithPayoutInfo) {
+        return rewards.stream()
+                .collect(groupingBy(PayableReward::currency))
+                .entrySet()
+                .stream()
+                .map(e -> new MoneyView(
+                        e.getValue().stream().map(PayableReward::amount).reduce(PositiveAmount::add).orElseThrow().getValue(),
+                        e.getKey().name(),
+                        e.getKey().code().toString(),
+                        e.getKey().logoUrl().map(URI::toString).orElse(null),
+                        e.getValue().stream().map(r -> r.amount().getValue().multiply(rewardsWithPayoutInfo.get(r.id()).usdConversionRate()))
+                                .reduce(BigDecimal::add).orElseThrow()
+                )).toList();
     }
 
     @Override
@@ -155,73 +173,11 @@ public class RewardService implements AccountingRewardPort {
     public void notifyAllNewPaidRewards() {
         final List<BackofficeRewardView> rewardViews = accountingRewardStoragePort.findPaidRewardsToNotify();
         for (Map.Entry<String, List<BackofficeRewardView>> listOfPaidRewardsMapToAdminEmail :
-                rewardViews.stream().collect(Collectors.groupingBy(rewardView -> rewardView.billingProfileAdmin().admins().get(0).email())).entrySet()) {
+                rewardViews.stream().collect(groupingBy(rewardView -> rewardView.billingProfileAdmin().admins().get(0).email())).entrySet()) {
             mailNotificationPort.sendRewardsPaidMail(listOfPaidRewardsMapToAdminEmail.getKey(), listOfPaidRewardsMapToAdminEmail.getValue());
         }
         accountingRewardStoragePort.markRewardsAsPaymentNotified(rewardViews.stream()
                 .map(BackofficeRewardView::id)
                 .toList());
-    }
-
-    private BatchPayment buildEthereumBatchPayment(final Map<String, List<PayableRewardWithPayoutInfoView>> ethereumRewardMapToCurrencyCode) {
-        final List<String[]> csvLines = new ArrayList<>();
-        final Map<String, MoneyView> moneyViewByCurrencyCode = new HashMap<>();
-        for (Map.Entry<String, List<PayableRewardWithPayoutInfoView>> rewardsByCurrencyCode : ethereumRewardMapToCurrencyCode.entrySet()) {
-            for (PayableRewardWithPayoutInfoView payableRewardWithPayoutInfoView : rewardsByCurrencyCode.getValue()) {
-                final String currencyCode = rewardsByCurrencyCode.getKey();
-                switch (currencyCode) {
-                    case Currency.Code.USDC_STR ->
-                            csvLines.add(new String[]{"erc20", "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", payableRewardWithPayoutInfoView.wallet().address(),
-                                    payableRewardWithPayoutInfoView.money().amount().toString(), " "});
-                    case Currency.Code.LORDS_STR ->
-                            csvLines.add(new String[]{"erc20", "0x686f2404e77Ab0d9070a46cdfb0B7feCDD2318b0", payableRewardWithPayoutInfoView.wallet().address(),
-                                    payableRewardWithPayoutInfoView.money().amount().toString(), " "});
-                }
-                if (moneyViewByCurrencyCode.containsKey(currencyCode)) {
-                    final MoneyView moneyView = moneyViewByCurrencyCode.get(currencyCode);
-                    moneyViewByCurrencyCode.replace(currencyCode, moneyView.toBuilder()
-                            .dollarsEquivalent(moneyView.dollarsEquivalent().add(payableRewardWithPayoutInfoView.money().dollarsEquivalent()))
-                            .amount(moneyView.amount().add(payableRewardWithPayoutInfoView.money().amount()))
-                            .build());
-                } else {
-                    moneyViewByCurrencyCode.put(currencyCode, payableRewardWithPayoutInfoView.money());
-                }
-            }
-        }
-        return BatchPayment.builder()
-                .id(BatchPayment.Id.random())
-                .moneys(moneyViewByCurrencyCode.values().stream().toList())
-                .blockchain(Blockchain.ETHEREUM)
-                .csv(csvLines.stream().map(lineData -> String.join(",", lineData)).collect(Collectors.joining("\n")))
-                .rewardIds(ethereumRewardMapToCurrencyCode.values().stream()
-                        .flatMap(payableRewardWithPayoutInfoViews -> payableRewardWithPayoutInfoViews.stream()
-                                .map(r -> RewardId.of(r.id())).toList().stream()).toList())
-                .build();
-    }
-
-    private BatchPayment buildStarknetBatchPayment(final List<PayableRewardWithPayoutInfoView> starknetRewards) {
-        final List<String[]> csvLines = new ArrayList<>();
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        BigDecimal totalAmountDollarsEquivalent = BigDecimal.ZERO;
-        for (PayableRewardWithPayoutInfoView starknetReward : starknetRewards) {
-            totalAmount = totalAmount.add(starknetReward.money().amount());
-            totalAmountDollarsEquivalent = totalAmountDollarsEquivalent.add(starknetReward.money().dollarsEquivalent());
-            csvLines.add(new String[]{"erc20", "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d", starknetReward.wallet().address(),
-                    starknetReward.money().amount().toString(), " "});
-        }
-        return BatchPayment.builder()
-                .id(BatchPayment.Id.random())
-                .blockchain(Blockchain.STARKNET)
-                .csv(csvLines.stream().map(lineData -> String.join(",", lineData)).collect(Collectors.joining("\n")))
-                .rewardIds(starknetRewards.stream().map(r -> RewardId.of(r.id())).toList())
-                .moneys(List.of(MoneyView.builder()
-                        .amount(totalAmount)
-                        .dollarsEquivalent(totalAmountDollarsEquivalent)
-                        .currencyLogoUrl(starknetRewards.get(0).money().currencyLogoUrl())
-                        .currencyName(starknetRewards.get(0).money().currencyName())
-                        .currencyCode(starknetRewards.get(0).money().currencyCode())
-                        .build())
-                )
-                .build();
     }
 }
