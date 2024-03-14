@@ -92,12 +92,12 @@ public interface RewardDetailsViewRepository extends JpaRepository<BackofficeRew
                                             from accounting.receipts re
                                             join accounting.rewards_receipts rr on rr.receipt_id = re.id
                                             group by rr.reward_id) receipts on receipts.reward_id = r.id
-                                 left join (select wi.payment_id, jsonb_agg(coalesce(gpr.html_url, gcr.html_url, gi.html_url)) urls
-                                       from work_items wi
-                                                left join indexer_exp.github_pull_requests gpr on cast(gpr.id as text) = wi.id
-                                                left join indexer_exp.github_code_reviews gcr on gcr.id = wi.id
-                                                left join indexer_exp.github_issues gi on cast(gi.id as text) = wi.id
-                                       group by wi.payment_id) g_urls on g_urls.payment_id = r.id
+                                 left join (select ri.reward_id, jsonb_agg(coalesce(gpr.html_url, gcr.html_url, gi.html_url)) urls
+                                       from reward_items ri
+                                                left join indexer_exp.github_pull_requests gpr on cast(gpr.id as text) = ri.id
+                                                left join indexer_exp.github_code_reviews gcr on gcr.id = ri.id
+                                                left join indexer_exp.github_issues gi on cast(gi.id as text) = ri.id
+                                       group by ri.reward_id) g_urls on g_urls.reward_id = r.id
             """;
 
     @Query(value = SELECT + """

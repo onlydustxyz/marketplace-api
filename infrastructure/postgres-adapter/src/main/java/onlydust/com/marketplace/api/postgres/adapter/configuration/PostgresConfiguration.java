@@ -49,7 +49,6 @@ public class PostgresConfiguration {
     @Bean
     public ProjectStoragePort projectStoragePort(final ProjectRepository projectRepository,
                                                  final ProjectViewRepository projectViewRepository,
-                                                 final ProjectIdRepository projectIdRepository,
                                                  final ProjectLeaderInvitationRepository projectLeaderInvitationRepository,
                                                  final ProjectRepoRepository projectRepoRepository,
                                                  final CustomProjectRepository customProjectRepository,
@@ -72,7 +71,6 @@ public class PostgresConfiguration {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
-                projectIdRepository,
                 projectLeaderInvitationRepository,
                 projectRepoRepository,
                 customProjectRepository,
@@ -98,7 +96,6 @@ public class PostgresConfiguration {
     @Bean
     public PostgresProjectAdapter projectRewardStoragePort(final ProjectRepository projectRepository,
                                                            final ProjectViewRepository projectViewRepository,
-                                                           final ProjectIdRepository projectIdRepository,
                                                            final ProjectLeaderInvitationRepository projectLeaderInvitationRepository,
                                                            final ProjectRepoRepository projectRepoRepository,
                                                            final CustomProjectRepository customProjectRepository,
@@ -121,7 +118,6 @@ public class PostgresConfiguration {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
-                projectIdRepository,
                 projectLeaderInvitationRepository,
                 projectRepoRepository,
                 customProjectRepository,
@@ -172,7 +168,7 @@ public class PostgresConfiguration {
                                                    final ProjectLeaderInvitationRepository projectLeaderInvitationRepository,
                                                    final ProjectLeadRepository projectLeadRepository,
                                                    final ApplicationRepository applicationRepository,
-                                                   final ProjectIdRepository projectIdRepository,
+                                                   final ProjectRepository projectRepository,
                                                    final UserProfileInfoRepository userProfileInfoRepository,
                                                    final CustomRewardRepository customRewardRepository,
                                                    final ProjectLedIdRepository projectLedIdRepository,
@@ -189,7 +185,7 @@ public class PostgresConfiguration {
                 projectLeaderInvitationRepository,
                 projectLeadRepository,
                 applicationRepository,
-                projectIdRepository,
+                projectRepository,
                 userProfileInfoRepository,
                 customRewardRepository,
                 projectLedIdRepository,
@@ -234,11 +230,6 @@ public class PostgresConfiguration {
     @Bean
     public CustomRewardRepository customRewardRepository(final EntityManager entityManager) {
         return new CustomRewardRepository(entityManager);
-    }
-
-    @Bean
-    public PostgresEventStorageAdapter postgresEventStorageAdapter(final EventRepository eventRepository) {
-        return new PostgresEventStorageAdapter(eventRepository);
     }
 
     @Bean

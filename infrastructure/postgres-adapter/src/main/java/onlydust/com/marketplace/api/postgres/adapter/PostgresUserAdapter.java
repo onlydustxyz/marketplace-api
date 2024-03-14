@@ -45,7 +45,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
     private final ProjectLeadRepository projectLeadRepository;
     private final ApplicationRepository applicationRepository;
-    private final ProjectIdRepository projectIdRepository;
+    private final ProjectRepository projectRepository;
     private final UserProfileInfoRepository userProfileInfoRepository;
     private final CustomRewardRepository customRewardRepository;
     private final ProjectLedIdRepository projectLedIdRepository;
@@ -203,7 +203,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Transactional
     public UUID createApplicationOnProject(UUID userId, UUID projectId) {
         final var applicationId = UUID.randomUUID();
-        projectIdRepository.findById(projectId)
+        projectRepository.findById(projectId)
                 .orElseThrow(() -> notFound(format("Project with id %s not found", projectId)));
         applicationRepository.findByProjectIdAndApplicantId(projectId, userId)
                 .ifPresentOrElse(applicationEntity -> {

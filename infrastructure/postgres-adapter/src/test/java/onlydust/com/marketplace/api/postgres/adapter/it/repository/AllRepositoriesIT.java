@@ -41,8 +41,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     @Autowired
     ProjectRepository projectRepository;
     @Autowired
-    ProjectIdRepository projectIdRepository;
-    @Autowired
     UserRepository userRepository;
     @Autowired
     UserViewRepository userViewRepository;
@@ -115,7 +113,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
         );
         sponsorRepository.saveAll(sponsors);
         final UUID projectId = UUID.randomUUID();
-        projectIdRepository.save(ProjectIdEntity.builder().id(projectId).build());
         final ProjectEntity expected = ProjectEntity.builder()
                 .key(faker.address().fullAddress())
                 .name(faker.name().name())
