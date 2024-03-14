@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -33,4 +32,11 @@ public interface BillingProfileRepository extends JpaRepository<BillingProfileEn
                     where id = :billingProfileId
             """, nativeQuery = true)
     void updateBillingProfileVerificationStatus(UUID billingProfileId, String verificationStatus);
+
+    @Query(value = """
+                select count(*) > 0
+                from accounting.invoices
+                where billing_profile_id = :billingProfileId
+            """, nativeQuery = true)
+    boolean hasInvoices(UUID billingProfileId);
 }

@@ -1239,4 +1239,60 @@ class BillingProfileServiceTest {
         verify(billingProfileStoragePort, never()).deleteCoworker(eq(billingProfileId), eq(invitedUserId));
     }
 
+
+    @Test
+    void should_not_delete_billing_profile_given_a_user_not_admin() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
+        final UserId userId = UserId.random();
+
+        // When
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userId))
+                .thenReturn(false);
+
+        // Then
+        assertThatThrownBy(() -> billingProfileService.deleteBillingProfile(userId, billingProfileId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("User %s must be admin to delete billing profile %s".formatted(userId.value(), billingProfileId.value()));
+        verify(billingProfileStoragePort, never()).doesBillingProfileHaveSomeInvoices(billingProfileId);
+        verify(billingProfileStoragePort, never()).deleteBillingProfile(billingProfileId);
+    }
+
+    @Test
+    void should_not_delete_billing_profile_given_linked_rewards() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
+        final UserId userId = UserId.random();
+
+        // When
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userId))
+                .thenReturn(true);
+        when(billingProfileStoragePort.doesBillingProfileHaveSomeInvoices(billingProfileId))
+                .thenReturn(true);
+
+        // Then
+        assertThatThrownBy(() -> billingProfileService.deleteBillingProfile(userId, billingProfileId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Cannot delete billing profile %s with invoice(s)".formatted(billingProfileId.value()));
+        verify(billingProfileStoragePort, never()).deleteBillingProfile(billingProfileId);
+    }
+
+    @Test
+    void should_delete_billing_profile() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
+        final UserId userId = UserId.random();
+
+        // When
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userId))
+                .thenReturn(true);
+        when(billingProfileStoragePort.doesBillingProfileHaveSomeInvoices(billingProfileId))
+                .thenReturn(false);
+        billingProfileService.deleteBillingProfile(userId, billingProfileId);
+
+        // Then
+        verify(billingProfileStoragePort).deleteBillingProfile(billingProfileId);
+    }
 }

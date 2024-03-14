@@ -38,6 +38,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     private final @NonNull ChildrenKycRepository childrenKycRepository;
     private final @NonNull BillingProfileUserInvitationRepository billingProfileUserInvitationRepository;
     private final @NonNull PayoutPreferenceRepository payoutPreferenceRepository;
+    private final @NonNull BankAccountRepository bankAccountRepository;
 
 
     @Override
@@ -318,5 +319,25 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     public Optional<BillingProfileCoworkerView> findBillingProfileAdmin(UserId userId, BillingProfile.Id billingProfileId) {
         return billingProfileUserViewRepository.findBillingProfileAdminById(userId.value(), billingProfileId.value())
                 .map(BillingProfileUserViewEntity::toView);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean doesBillingProfileHaveSomeInvoices(BillingProfile.Id billingProfileId) {
+        return billingProfileRepository.hasInvoices(billingProfileId.value());
+    }
+
+    @Override
+    @Transactional
+    public void deleteBillingProfile(BillingProfile.Id billingProfileId) {
+        kybRepository.findByBillingProfileId(billingProfileId.value())
+                .ifPresent(kybEntity -> childrenKycRepository.deleteAllByParentApplicantId(kybEntity.applicantId()));
+        kybRepository.deleteByBillingProfileId(billingProfileId.value());
+        kycRepository.deleteByBillingProfileId(billingProfileId.value());
+        billingProfileUserInvitationRepository.deleteAllByBillingProfileId(billingProfileId.value());
+        payoutPreferenceRepository.deleteAllByBillingProfileId(billingProfileId.value());
+        walletRepository.deleteByBillingProfileId(billingProfileId.value());
+        bankAccountRepository.deleteByBillingProfileId(billingProfileId.value());
+        billingProfileRepository.deleteById(billingProfileId.value());
     }
 }

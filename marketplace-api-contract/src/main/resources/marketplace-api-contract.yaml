@@ -2431,6 +2431,32 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+    delete:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BillingProfiles
+      summary: Delete billing profile by id
+      operationId: deleteBillingProfile
+      description: |
+        Delete billing profile by id
+      parameters:
+        - in: path
+          name: billingProfileId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BillingProfileId'
+      responses:
+        "204":
+          description: 'Billing profile was successfully deleted'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/billing-profiles/{billingProfileId}/type:
     put:
       security:
@@ -2455,6 +2481,38 @@ paths:
       responses:
         "204":
           description: 'User billing profile type updated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/billing-profiles/{billingProfileId}/disable:
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BillingProfiles
+      summary: Disable billing profile
+      operationId: disableBillingProfile
+      description: |
+        Disable billing profile
+      parameters:
+        - in: path
+          name: billingProfileId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BillingProfileId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingProfileDisableRequest'
+      responses:
+        "204":
+          description: 'Billing profile was disabled or activated'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":
@@ -4776,6 +4834,14 @@ components:
       properties:
         type:
           $ref: '#/components/schemas/BillingProfileType'
+
+    BillingProfileDisableRequest:
+      type: object
+      required:
+        - disable
+      properties:
+        disable:
+          type: boolean
 
     MyBillingProfilesResponse:
       type: object

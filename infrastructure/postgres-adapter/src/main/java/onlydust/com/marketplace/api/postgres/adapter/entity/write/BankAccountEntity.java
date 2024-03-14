@@ -21,12 +21,11 @@ public class BankAccountEntity {
 
     @Id
     UUID billingProfileId;
+    String bic;
+    String number;
     @OneToOne
     @JoinColumn(name = "billingProfileId", insertable = false, updatable = false)
     BillingProfileEntity billingProfile;
-
-    String bic;
-    String number;
     @CreationTimestamp
     @Column(name = "tech_created_at", nullable = false, updatable = false)
     @EqualsAndHashCode.Exclude
