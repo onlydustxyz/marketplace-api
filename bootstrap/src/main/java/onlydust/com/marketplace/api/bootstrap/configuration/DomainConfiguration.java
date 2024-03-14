@@ -7,10 +7,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.CurrencyService;
 import onlydust.com.marketplace.api.infrastructure.accounting.AccountingServiceAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.PostgresRewardAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
+import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.port.output.*;
@@ -49,7 +46,7 @@ public class DomainConfiguration {
     @Bean
     public ProjectFacadePort projectFacadePort(final ProjectObserverPort projectObserverPort,
                                                final ProjectStoragePort projectStoragePort,
-                                               final ProjectRewardStoragePort projectRewardStoragePort,
+                                               final PostgresProjectRewardAdapter postgresProjectRewardAdapter,
                                                final ImageStoragePort imageStoragePort,
                                                final UUIDGeneratorPort uuidGeneratorPort,
                                                final PermissionService permissionService,
@@ -60,7 +57,7 @@ public class DomainConfiguration {
                                                final GithubStoragePort githubStoragePort) {
         return new ProjectService(projectObserverPort,
                 projectStoragePort,
-                projectRewardStoragePort,
+                postgresProjectRewardAdapter,
                 imageStoragePort,
                 uuidGeneratorPort,
                 permissionService,
@@ -74,7 +71,7 @@ public class DomainConfiguration {
     @Bean
     public ProjectRewardFacadePort projectRewardFacadePort(final ProjectObserverPort projectObserverPort,
                                                            final ProjectStoragePort projectStoragePort,
-                                                           final ProjectRewardStoragePort projectRewardStoragePort,
+                                                           final PostgresProjectRewardAdapter postgresProjectRewardAdapter,
                                                            final ImageStoragePort imageStoragePort,
                                                            final UUIDGeneratorPort uuidGeneratorPort,
                                                            final PermissionService permissionService,
@@ -85,7 +82,7 @@ public class DomainConfiguration {
                                                            final GithubStoragePort githubStoragePort) {
         return new ProjectService(projectObserverPort,
                 projectStoragePort,
-                projectRewardStoragePort,
+                postgresProjectRewardAdapter,
                 imageStoragePort,
                 uuidGeneratorPort,
                 permissionService,
