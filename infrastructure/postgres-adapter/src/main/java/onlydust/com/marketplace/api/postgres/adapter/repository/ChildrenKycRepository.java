@@ -8,4 +8,6 @@ import java.util.List;
 public interface ChildrenKycRepository extends JpaRepository<ChildrenKycEntity, String> {
 
     List<ChildrenKycEntity> findAllByParentApplicantId(String parentApplicantId);
+
+    void deleteAllByParentApplicantId(String parentApplicantId);
 }

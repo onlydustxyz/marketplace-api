@@ -260,4 +260,13 @@ public class BillingProfileService implements BillingProfileFacadePort {
             billingProfileStoragePort.deleteCoworkerInvitation(billingProfileId, coworker.githubUserId());
         }
     }
+
+    @Override
+    public void deleteBillingProfile(UserId userId, BillingProfile.Id billingProfileId) {
+        if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
+            throw unauthorized("User %s must be admin to delete billing profile %s".formatted(userId.value(), billingProfileId.value()));
+        if (billingProfileStoragePort.doesBillingProfileHaveSomeInvoices(billingProfileId))
+            throw unauthorized("Cannot delete billing profile %s with invoice(s)".formatted(billingProfileId.value()));
+        billingProfileStoragePort.deleteBillingProfile(billingProfileId);
+    }
 }

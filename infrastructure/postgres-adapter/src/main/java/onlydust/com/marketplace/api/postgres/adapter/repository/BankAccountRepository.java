@@ -1,20 +1,17 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.KycEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.BankAccountEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.Optional;
 import java.util.UUID;
 
-public interface KycRepository extends JpaRepository<KycEntity, UUID> {
-
-    Optional<KycEntity> findByBillingProfileId(UUID billingProfileId);
+public interface BankAccountRepository extends JpaRepository<BankAccountEntity, UUID> {
 
     @Modifying
     @Query(nativeQuery = true, value = """
-            delete from accounting.kyc where billing_profile_id = :billingProfileId
+                delete from accounting.bank_accounts where billing_profile_id = :billingProfileId
             """)
     void deleteByBillingProfileId(UUID billingProfileId);
 }

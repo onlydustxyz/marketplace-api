@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import net.minidev.json.JSONArray;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import org.junit.jupiter.api.Assertions;
@@ -181,7 +181,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
     BillingProfileService billingProfileService;
 
     @Test
-    void should_get_billing_profile_by_id() {
+    void should_get_and_delete_billing_profile_by_id() {
         // Given
         final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
                 faker.number().randomNumber() + faker.number().randomNumber(), faker.name().name(),
@@ -239,6 +239,15 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.type").isEqualTo(individualBillingProfile.type().name())
                 .jsonPath("$.status").isEqualTo(individualBillingProfile.status().name())
                 .jsonPath("$.kyb").isEmpty();
+
+        // When
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_DELETE_BY_ID.formatted(individualBillingProfile.id().value().toString())))
+                .header("Authorization", "Bearer " + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
     }
 
     @Test

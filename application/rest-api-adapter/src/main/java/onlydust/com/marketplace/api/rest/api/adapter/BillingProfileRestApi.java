@@ -193,4 +193,11 @@ public class BillingProfileRestApi implements BillingProfilesApi {
                 GithubUserId.of(githubUserId));
         return ResponseEntity.noContent().build();
     }
+
+    @Override
+    public ResponseEntity<Void> deleteBillingProfile(UUID billingProfileId) {
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        billingProfileFacadePort.deleteBillingProfile(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId));
+        return ResponseEntity.ok().build();
+    }
 }
