@@ -1,8 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
-import com.github.tomakehurst.wiremock.client.WireMock;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.CurrencyContract;
@@ -20,7 +18,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.IMPERSONATION_HEADER;
 
@@ -84,12 +81,6 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
         final var rewardId = UUID.fromString("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0");
 
         // When
-        rustApiWireMockServer.stubFor(WireMock.delete(
-                        WireMock.urlEqualTo("/api/payments/8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withHeader("Api-Key", equalTo("some-rust-api-key"))
-                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
-
         client.delete()
                 .uri(getApiURI(String.format(PROJECTS_REWARD, projectId, rewardId)))
                 .header("Authorization", BEARER_PREFIX + jwt)
@@ -112,12 +103,6 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
         final var rewardId = UUID.fromString("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0");
 
         // When
-        rustApiWireMockServer.stubFor(WireMock.delete(
-                        WireMock.urlEqualTo("/api/payments/8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withHeader("Api-Key", equalTo("some-rust-api-key"))
-                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
-
         client.delete()
                 .uri(getApiURI(String.format(PROJECTS_REWARD, projectId, rewardId)))
                 .header("Authorization", BEARER_PREFIX + jwt)

@@ -48,7 +48,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @EnableWireMock({
         @ConfigureWireMock(name = "github", stubLocation = "", property = "infrastructure.github.baseUri"),
         @ConfigureWireMock(name = "dustyBot", stubLocation = "", property = "infrastructure.dustyBot.baseUri"),
-        @ConfigureWireMock(name = "rust-api", property = "infrastructure.od.api.client.baseUri"),
         @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri"),
         @ConfigureWireMock(name = "webhook", property = "infrastructure.make.webhook.url"),
         @ConfigureWireMock(name = "linear", property = "infrastructure.linear.base-uri"),
@@ -142,8 +141,6 @@ public class AbstractMarketplaceApiIT {
             .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
     @InjectWireMock("github")
     protected WireMockServer githubWireMockServer;
-    @InjectWireMock("rust-api")
-    protected WireMockServer rustApiWireMockServer;
     @InjectWireMock("indexer-api")
     protected WireMockServer indexerApiWireMockServer;
     @InjectWireMock("dustyBot")
