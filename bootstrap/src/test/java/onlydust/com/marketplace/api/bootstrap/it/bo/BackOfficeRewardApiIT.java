@@ -66,7 +66,6 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
     void setUp() throws IOException {
         // Given
-        final UserAuthHelper.AuthenticatedUser olivier = userAuthHelper.authenticateOlivier();
         this.anthony = UserId.of(userAuthHelper.authenticateAnthony().user().getId());
         this.olivier = UserId.of(userAuthHelper.authenticateOlivier().user().getId());
         this.pierre = UserId.of(userAuthHelper.authenticatePierre().user().getId());
@@ -268,7 +267,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "money": {
                                 "amount": 1000.00,
                                 "dollarsEquivalent": 1000.00,
-                                "conversionRate": null,
+                                "conversionRate": 1.0,
                                 "currencyCode": "USD",
                                 "currencyName": "US Dollar",
                                 "currencyLogoUrl": null
@@ -324,7 +323,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "money": {
                                 "amount": 1000.00,
                                 "dollarsEquivalent": 1000.00,
-                                "conversionRate": null,
+                                "conversionRate": 1.0,
                                 "currencyCode": "USD",
                                 "currencyName": "US Dollar",
                                 "currencyLogoUrl": null
@@ -365,7 +364,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "money": {
                                 "amount": 1000.00,
                                 "dollarsEquivalent": 1000.00,
-                                "conversionRate": null,
+                                "conversionRate": 1.0,
                                 "currencyCode": "USD",
                                 "currencyName": "US Dollar",
                                 "currencyLogoUrl": null
@@ -421,7 +420,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "money": {
                                 "amount": 1000.00,
                                 "dollarsEquivalent": 1010.0000,
-                                "conversionRate": null,
+                                "conversionRate": 1.01,
                                 "currencyCode": "USDC",
                                 "currencyName": "USD Coin",
                                 "currencyLogoUrl": null
@@ -466,7 +465,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "money": {
                                 "amount": 1000.00,
                                 "dollarsEquivalent": 1010.0000,
-                                "conversionRate": null,
+                                "conversionRate": 1.01,
                                 "currencyCode": "USDC",
                                 "currencyName": "USD Coin",
                                 "currencyLogoUrl": null
@@ -551,7 +550,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "money": {
                                 "amount": 1000.00,
                                 "dollarsEquivalent": 1000.00,
-                                "conversionRate": null,
+                                "conversionRate": 1.0,
                                 "currencyCode": "USD",
                                 "currencyName": "US Dollar",
                                 "currencyLogoUrl": null
@@ -607,7 +606,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "money": {
                                 "amount": 1000.00,
                                 "dollarsEquivalent": 1000.00,
-                                "conversionRate": null,
+                                "conversionRate": 1.0,
                                 "currencyCode": "USD",
                                 "currencyName": "US Dollar",
                                 "currencyLogoUrl": null
@@ -648,7 +647,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "money": {
                                 "amount": 1000.00,
                                 "dollarsEquivalent": 1000.00,
-                                "conversionRate": null,
+                                "conversionRate": 1.0,
                                 "currencyCode": "USD",
                                 "currencyName": "US Dollar",
                                 "currencyLogoUrl": null
@@ -685,7 +684,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "money": {
                                 "amount": 1000,
                                 "dollarsEquivalent": 1010.00,
-                                "conversionRate": null,
+                                "conversionRate": 1.01,
                                 "currencyCode": "USDC",
                                 "currencyName": "USD Coin",
                                 "currencyLogoUrl": null
@@ -793,17 +792,22 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "name": "Starklings",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
                               },
-                              "sponsors": [],
+                              "sponsors": [
+                                {
+                                  "name": "No Sponsor",
+                                  "avatarUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
+                                }
+                              ],
                               "money": {
                                 "amount": 1000,
                                 "dollarsEquivalent": 1010.00,
-                                "conversionRate": null,
+                                "conversionRate": 1.0100000000000000,
                                 "currencyCode": "USDC",
                                 "currencyName": "USD Coin",
                                 "currencyLogoUrl": null
                               },
                               "transactionReferences": [
-                                "0x0000000000000000000000000000000000000000000000000000000000000000"
+                                "0x0"
                               ],
                               "paidTo": [
                                 "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea"
@@ -844,17 +848,22 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "name": "Starklings",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
                               },
-                              "sponsors": [],
+                              "sponsors": [
+                                {
+                                  "name": "No Sponsor",
+                                  "avatarUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
+                                }
+                              ],
                               "money": {
                                 "amount": 2500,
                                 "dollarsEquivalent": 2525.00,
-                                "conversionRate": null,
+                                "conversionRate": 1.0100000000000000,
                                 "currencyCode": "USDC",
                                 "currencyName": "USD Coin",
                                 "currencyLogoUrl": null
                               },
                               "transactionReferences": [
-                                "0x0000000000000000000000000000000000000000000000000000000000000000"
+                                "0x0"
                               ],
                               "paidTo": [
                                 "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea"
@@ -895,17 +904,22 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "name": "Starklings",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
                               },
-                              "sponsors": [],
+                              "sponsors": [
+                                {
+                                  "name": "No Sponsor",
+                                  "avatarUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
+                                }
+                              ],
                               "money": {
                                 "amount": 750,
                                 "dollarsEquivalent": 757.50,
-                                "conversionRate": null,
+                                "conversionRate": 1.0100000000000000,
                                 "currencyCode": "USDC",
                                 "currencyName": "USD Coin",
                                 "currencyLogoUrl": null
                               },
                               "transactionReferences": [
-                                "0x0000000000000000000000000000000000000000000000000000000000000000"
+                                "0x0"
                               ],
                               "paidTo": [
                                 "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea"
@@ -946,17 +960,22 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "name": "Starklings",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
                               },
-                              "sponsors": [],
+                              "sponsors": [
+                                {
+                                  "name": "No Sponsor",
+                                  "avatarUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
+                                }
+                              ],
                               "money": {
                                 "amount": 1000,
                                 "dollarsEquivalent": 1010.00,
-                                "conversionRate": null,
+                                "conversionRate": 1.0100000000000000,
                                 "currencyCode": "USDC",
                                 "currencyName": "USD Coin",
                                 "currencyLogoUrl": null
                               },
                               "transactionReferences": [
-                                "0x0000000000000000000000000000000000000000000000000000000000000000"
+                                "0x0"
                               ],
                               "paidTo": [
                                 "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea"
@@ -997,17 +1016,22 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "name": "oscar's awesome project",
                                 "logoUrl": null
                               },
-                              "sponsors": [],
+                              "sponsors": [
+                                {
+                                  "name": "No Sponsor",
+                                  "avatarUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
+                                }
+                              ],
                               "money": {
                                 "amount": 500,
                                 "dollarsEquivalent": 505.00,
-                                "conversionRate": null,
+                                "conversionRate": 1.0100000000000000,
                                 "currencyCode": "USDC",
                                 "currencyName": "USD Coin",
                                 "currencyLogoUrl": null
                               },
                               "transactionReferences": [
-                                "0x0000000000000000000000000000000000000000000000000000000000000000"
+                                "0x0"
                               ],
                               "paidTo": [
                                 "0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
@@ -1037,11 +1061,11 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
         assertThat(csv).isEqualToIgnoringWhitespace("""
                 Project,Recipient,Recipient Github,Amount,Currency,Contributions,Status,Requested at,Processed at,Transaction Hash,Payout information,Pretty ID,Sponsors,Recipient email,Verification status,Account type,Invoice number,Invoice id,Budget,Conversion rate,Dollar Amount
-                Starklings,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:48.146947Z,2023-02-09T07:35:03.828Z,[0x0000000000000000000000000000000000000000000000000000000000000000],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#BDB59",[],NOT_STARTED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.01,1010.00
-                Starklings,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",2500,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:40.924453Z,2023-02-09T07:35:03.417Z,[0x0000000000000000000000000000000000000000000000000000000000000000],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#E23AD",[],NOT_STARTED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.01,2525.00
-                Starklings,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",750,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:31.946777Z,2023-02-09T07:35:02.985Z,[0x0000000000000000000000000000000000000000000000000000000000000000],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#72F25",[],NOT_STARTED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.01,757.50
-                Starklings,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:20.274391Z,2023-02-09T07:35:02.582Z,[0x0000000000000000000000000000000000000000000000000000000000000000],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#91C7E",[],NOT_STARTED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.01,1010.00
-                oscar's awesome project,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",500,USDC,[https://github.com/onlydustxyz/marketplace-frontend/pull/663],COMPLETE,2023-02-08T09:14:56.053584Z,2023-02-27T11:56:28.044Z,[0x0000000000000000000000000000000000000000000000000000000000000000],[0xd8da6bf26964af9d7eed9e03e53415d37aa96045],"#E6152",[],NOT_STARTED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,oscar's awesome project - USDC,1.01,505.00
+                Starklings,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:48.146947Z,2023-02-09T07:35:03.828Z,[0x0],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#BDB59",[No Sponsor],NOT_STARTED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.01,1010.00
+                Starklings,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",2500,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:40.924453Z,2023-02-09T07:35:03.417Z,[0x0],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#E23AD",[No Sponsor],NOT_STARTED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.01,2525.00
+                Starklings,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",750,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:31.946777Z,2023-02-09T07:35:02.985Z,[0x0],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#72F25",[No Sponsor],NOT_STARTED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.01,757.50
+                Starklings,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:20.274391Z,2023-02-09T07:35:02.582Z,[0x0],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#91C7E",[No Sponsor],NOT_STARTED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.01,1010.00
+                oscar's awesome project,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",500,USDC,[https://github.com/onlydustxyz/marketplace-frontend/pull/663],COMPLETE,2023-02-08T09:14:56.053584Z,2023-02-27T11:56:28.044Z,[0x0],[0xd8da6bf26964af9d7eed9e03e53415d37aa96045],"#E6152",[No Sponsor],NOT_STARTED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,oscar's awesome project - USDC,1.01,505.00
                 """.formatted(pierreInvoiceIds.get(0),
                 pierreInvoiceIds.get(0),
                 pierreInvoiceIds.get(0),
@@ -1075,7 +1099,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 Bretzel,,1000,USDC,[https://github.com/gregcha/bretzel-site/issues/1],COMPLETE,2023-07-26T10:06:57.034426Z,2023-09-26T21:25:48.826952Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#B69D6","[Coca Cola, OGC Nissa Ineos]",,,,,Bretzel - USDC,1.01,1010.00
                 Taco Tuesday,,1000,USD,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-07-23T08:34:56.803043Z,2023-09-26T21:28:32.053680Z,[OK cool],[FR7640618802650004034616528],"#0D951",[Red Bull],,,,,Taco Tuesday - USD,1,1000
                 Mooooooonlight,,1000,USDC,[https://github.com/onlydustxyz/marketplace-frontend/pull/743],COMPLETE,2023-03-01T12:48:51.425766Z,2023-09-26T20:22:12.865097Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#AB855","[Starknet Foundation, Theodo]",,,,,Mooooooonlight - USDC,1.01,1010.00
-                Marketplace 2,,438,USD,[https://github.com/onlydustxyz/marketplace-frontend/pull/642],COMPLETE,2023-02-02T15:20:35.665817Z,2023-09-26T20:24:00.439566Z,[Coucou les filles],[GB33BUKB20201555555555],"#C5AE2",[],,,,,Marketplace 2 - USD,1,438
+                Marketplace 2,,438,USD,[https://github.com/onlydustxyz/marketplace-frontend/pull/642],COMPLETE,2023-02-02T15:20:35.665817Z,2023-09-26T20:24:00.439566Z,[Coucou les filles],[GB33BUKB20201555555555],"#C5AE2",[No Sponsor],,,,,Marketplace 2 - USD,1,438
                 """.formatted(anthonyInvoiceIds.get(0)));
     }
 

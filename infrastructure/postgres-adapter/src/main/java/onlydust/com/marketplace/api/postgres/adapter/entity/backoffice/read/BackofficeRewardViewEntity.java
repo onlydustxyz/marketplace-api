@@ -132,6 +132,7 @@ public class BackofficeRewardViewEntity {
                 .money(MoneyView.builder()
                         .amount(this.amount)
                         .dollarsEquivalent(this.statusData.amountUsdEquivalent())
+                        .usdConversionRate(this.statusData.usdConversionRate())
                         .currencyName(this.currencyName)
                         .currencyCode(this.currencyCode)
                         .currencyLogoUrl(this.currencyLogoUrl)
