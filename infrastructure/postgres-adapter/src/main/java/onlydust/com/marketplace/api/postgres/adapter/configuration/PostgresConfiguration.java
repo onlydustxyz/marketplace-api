@@ -214,15 +214,11 @@ public class PostgresConfiguration {
     public PostgresRewardAdapter postgresRewardAdapter(final ShortProjectViewEntityRepository shortProjectViewEntityRepository,
                                                        final BatchPaymentRepository batchPaymentRepository,
                                                        final RewardViewRepository rewardViewRepository,
-                                                       final RewardDetailsViewRepository rewardDetailsViewRepository) {
+                                                       final RewardDetailsViewRepository rewardDetailsViewRepository,
+                                                       final RewardRepository rewardRepository,
+                                                       final CurrencyStorage currencyStorage) {
         return new PostgresRewardAdapter(shortProjectViewEntityRepository,
-                batchPaymentRepository, rewardViewRepository, rewardDetailsViewRepository);
-    }
-
-    @Bean
-    public PostgresRewardV2Adapter postgresRewardV2Adapter(final RewardRepository rewardRepository,
-                                                           final CurrencyStorage currencyStorage) {
-        return new PostgresRewardV2Adapter(rewardRepository, currencyStorage);
+                batchPaymentRepository, rewardViewRepository, rewardDetailsViewRepository, rewardRepository, currencyStorage);
     }
 
     @Bean

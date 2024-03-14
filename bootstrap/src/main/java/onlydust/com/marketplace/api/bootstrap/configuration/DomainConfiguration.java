@@ -7,7 +7,10 @@ import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.CurrencyService;
 import onlydust.com.marketplace.api.infrastructure.accounting.AccountingServiceAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.*;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresRewardAdapter;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.port.output.*;
@@ -152,11 +155,11 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public RewardFacadePort rewardFacadePort(final PostgresRewardV2Adapter postgresRewardV2Adapter,
+    public RewardFacadePort rewardFacadePort(final PostgresRewardAdapter postgresRewardAdapter,
                                              final PermissionService permissionService,
                                              final IndexerPort indexerPort,
                                              final AccountingServicePort accountingServicePort) {
-        return new RewardV2Service(postgresRewardV2Adapter, permissionService, indexerPort, accountingServicePort);
+        return new RewardV2Service(postgresRewardAdapter, permissionService, indexerPort, accountingServicePort);
     }
 
     @Bean

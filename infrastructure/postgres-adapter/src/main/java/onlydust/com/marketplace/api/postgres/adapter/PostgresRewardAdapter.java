@@ -3,17 +3,21 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BackofficeRewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentRewardEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardDetailsViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ShortProjectViewEntityRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
@@ -33,25 +37,29 @@ import java.util.*;
 
 @AllArgsConstructor
 public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewardStoragePort {
-
     private final ShortProjectViewEntityRepository shortProjectViewEntityRepository;
     private final BatchPaymentRepository batchPaymentRepository;
     private final RewardViewRepository rewardViewRepository;
     private final RewardDetailsViewRepository rewardDetailsViewRepository;
+    private final RewardRepository rewardRepository;
+    private final CurrencyStorage currencyStorage;
 
     @Override
     public void save(Reward reward) {
-        throw OnlyDustException.internalServerError("Not implemented for v1");
+        // TODO remove
+        final var currency = currencyStorage.findByCode(Currency.Code.of(reward.currency().name().toUpperCase()))
+                .orElseThrow(() -> OnlyDustException.internalServerError("Currency %s not found".formatted(reward.currency().name())));
+        rewardRepository.save(RewardEntity.of(reward, currency));
     }
 
     @Override
     public void delete(UUID rewardId) {
-        throw OnlyDustException.internalServerError("Not implemented for v1");
+        rewardRepository.deleteById(rewardId);
     }
 
     @Override
     public Optional<Reward> get(UUID rewardId) {
-        throw OnlyDustException.internalServerError("Not implemented for v1");
+        return rewardRepository.findById(rewardId).map(RewardEntity::toReward);
     }
 
     @Override

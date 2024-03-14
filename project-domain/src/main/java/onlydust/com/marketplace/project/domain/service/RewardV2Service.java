@@ -18,7 +18,6 @@ import java.util.UUID;
 
 @AllArgsConstructor
 public class RewardV2Service implements RewardFacadePort {
-
     private final RewardStoragePort rewardStoragePort;
     private final PermissionService permissionService;
     private final IndexerPort indexerPort;
