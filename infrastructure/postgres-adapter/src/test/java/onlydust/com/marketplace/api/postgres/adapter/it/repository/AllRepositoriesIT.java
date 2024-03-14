@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -37,8 +36,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     UserProfileInfoRepository userProfileInfoRepository;
     @Autowired
     ContactInformationRepository contactInformationRepository;
-    @Autowired
-    CryptoUsdQuotesRepository cryptoUsdQuotesRepository;
     @Autowired
     SponsorRepository sponsorRepository;
     @Autowired
@@ -202,18 +199,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .build();
 
         assertIsSaved(expected, contactInformationRepository);
-    }
-
-    @Test
-    void should_create_crypto_usd_quotes() {
-        // Given
-        final CryptoUsdQuotesEntity expected = CryptoUsdQuotesEntity.builder()
-                .currency(CurrencyEnumEntity.usd)
-                .price(BigDecimal.ZERO)
-                .updatedAt(new Date())
-                .build();
-
-        assertIsSaved(expected, cryptoUsdQuotesRepository);
     }
 
     @Test

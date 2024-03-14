@@ -127,11 +127,9 @@ public class CustomUserRepository {
             with granted_usd as (
               select 
                 pa.project_id,
-                SUM(pa.initial_allowance * COALESCE(CASE WHEN c.code = 'USD' then 1 ELSE cuq.price END, 0) -
-                     pa.current_allowance * COALESCE(CASE WHEN c.code = 'USD' then 1 ELSE cuq.price END, 0)) total
+                SUM(pa.initial_allowance * COALESCE(luq.price, 0) - pa.current_allowance * COALESCE(luq.price, 0)) total
               from project_allowances pa
-                join currencies c on c.id = pa.currency_id 
-                left join crypto_usd_quotes cuq on upper(cast(cuq.currency as text)) = c.code
+                left join accounting.latest_usd_quotes luq on luq.currency_id = pa.currency_id
               group by pa.project_id
             )
             select  p.project_id,
