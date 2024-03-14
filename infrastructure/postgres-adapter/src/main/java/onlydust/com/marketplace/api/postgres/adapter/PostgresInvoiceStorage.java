@@ -36,6 +36,13 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     }
 
     @Override
+    public List<Invoice> getAll(List<Invoice.Id> invoiceIds) {
+        return invoiceRepository.findAllById(invoiceIds.stream().map(Invoice.Id::value).toList())
+                .stream()
+                .map(InvoiceEntity::toDomain).toList();
+    }
+
+    @Override
     @Transactional
     public void create(final @NonNull Invoice invoice) {
         final var entity = new InvoiceEntity().id(invoice.id().value());

@@ -11,6 +11,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetAccount
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Builder(toBuilder = true)
 @Getter
@@ -36,5 +37,16 @@ public class PayoutInfo {
             wallets.add(new Wallet(Network.STARKNET, starknetAddress.toString()));
         }
         return wallets;
+    }
+
+    public Optional<Wallet> wallet(Network network) {
+        return switch (network) {
+            case ETHEREUM -> Optional.ofNullable(ethWallet).map(a -> new Wallet(Network.ETHEREUM, a.asString()));
+            case OPTIMISM -> Optional.ofNullable(optimismAddress).map(a -> new Wallet(Network.OPTIMISM, a.toString()));
+            case STARKNET -> Optional.ofNullable(starknetAddress).map(a -> new Wallet(Network.STARKNET, a.toString()));
+            case APTOS -> Optional.ofNullable(aptosAddress).map(a -> new Wallet(Network.APTOS, a.toString()));
+            case SEPA -> Optional.ofNullable(bankAccount).map(ba -> new Wallet(Network.SEPA, ba.accountNumber()));
+            case SWIFT -> Optional.ofNullable(bankAccount).map(ba -> new Wallet(Network.SWIFT, ba.accountNumber()));
+        };
     }
 }

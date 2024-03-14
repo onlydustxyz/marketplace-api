@@ -1,25 +1,37 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
-import onlydust.com.marketplace.accounting.domain.port.out.OldRewardStoragePort;
+import onlydust.com.marketplace.accounting.domain.stubs.ERC20Tokens;
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
-import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
+import onlydust.com.marketplace.kernel.model.bank.BankAccount;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmAccountAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
+import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetAccountAddress;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
+import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyc;
+import static onlydust.com.marketplace.accounting.domain.stubs.Currencies.ETH;
+import static onlydust.com.marketplace.accounting.domain.stubs.Currencies.USD;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
@@ -28,172 +40,159 @@ public class RewardServiceTest {
 
     private final Faker faker = new Faker();
     private final AccountingRewardStoragePort accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
-    private final OldRewardStoragePort oldRewardStoragePort = mock(OldRewardStoragePort.class);
+    private final AccountingService accountingService = mock(AccountingService.class);
     private final MailNotificationPort mailNotificationPort = mock(MailNotificationPort.class);
-    private final RewardService rewardService = new RewardService(accountingRewardStoragePort, oldRewardStoragePort, mailNotificationPort);
+    private final InvoiceStoragePort invoiceStoragePort = mock(InvoiceStoragePort.class);
+    private final RewardService rewardService = new RewardService(accountingRewardStoragePort, invoiceStoragePort, accountingService, mailNotificationPort);
+
+    List<Invoice.Id> invoiceIds;
+    List<Invoice> invoices;
+    List<RewardId> rewardIds;
+    Set<RewardId> rewardIdsSet;
+    List<PayableReward> payableRewards;
+    PayoutInfo payoutInfo1;
+    PayoutInfo payoutInfo2;
+    Currency USDC;
+    Currency STRK;
+    BillingProfileView billingProfile1;
+    BillingProfileView billingProfile2;
 
     @BeforeEach
     void setUp() {
-        reset(accountingRewardStoragePort, oldRewardStoragePort, mailNotificationPort);
+        USDC = Currency.of(ERC20Tokens.ETH_USDC).withERC20(ERC20Tokens.OP_USDC);
+        STRK = Currency.of(ERC20Tokens.STRK).withERC20(ERC20Tokens.STARKNET_STRK);
+        invoiceIds = List.of(Invoice.Id.random(), Invoice.Id.random(), Invoice.Id.random());
+        rewardIds = List.of(RewardId.random(), RewardId.random(), RewardId.random(), RewardId.random(), RewardId.random(), RewardId.random());
+
+        payoutInfo1 = PayoutInfo.builder()
+                .ethWallet(new WalletLocator(new Name("vitalik.eth")))
+                .bankAccount(new BankAccount("PLOP", "9988776655"))
+                .starknetAddress(new StarknetAccountAddress("0x1234"))
+                .optimismAddress(new EvmAccountAddress("0x111"))
+                .build();
+        payoutInfo2 = PayoutInfo.builder()
+                .ethWallet(new WalletLocator(new Name("foo.eth")))
+                .bankAccount(new BankAccount("PLOP", "aabbccddee"))
+                .starknetAddress(new StarknetAccountAddress("0x666"))
+                .optimismAddress(new EvmAccountAddress("0x222"))
+                .build();
+
+        final var billingProfileId1 = BillingProfile.Id.random();
+        billingProfile1 = BillingProfileView.builder()
+                .id(billingProfileId1)
+                .type(BillingProfile.Type.INDIVIDUAL)
+                .payoutInfo(payoutInfo1)
+                .verificationStatus(VerificationStatus.VERIFIED)
+                .name("John")
+                .kyc(newKyc(billingProfileId1, UserId.random()))
+                .build();
+        final var billingProfileId2 = BillingProfile.Id.random();
+        billingProfile2 = BillingProfileView.builder()
+                .id(billingProfileId2)
+                .type(BillingProfile.Type.INDIVIDUAL)
+                .payoutInfo(payoutInfo2)
+                .verificationStatus(VerificationStatus.VERIFIED)
+                .name("John")
+                .kyc(newKyc(billingProfileId2, UserId.random()))
+                .build();
+
+        invoices = List.of(
+                Invoice.of(billingProfile1, 1, UserId.random())
+                        .rewards(List.of(
+                                new Invoice.Reward(rewardIds.get(0), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                                        Money.of(0L, ETH), Money.of(0L, USD), null),
+                                new Invoice.Reward(rewardIds.get(2), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                                        Money.of(0L, ETH), Money.of(0L, USD), null),
+                                new Invoice.Reward(rewardIds.get(4), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                                        Money.of(0L, ETH), Money.of(0L, USD), null)
+                        )),
+                Invoice.of(billingProfile2, 1, UserId.random())
+                        .rewards(List.of(
+                                new Invoice.Reward(rewardIds.get(1), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                                        Money.of(0L, ETH), Money.of(0L, USD), null),
+                                new Invoice.Reward(rewardIds.get(3), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                                        Money.of(0L, ETH), Money.of(0L, USD), null),
+                                new Invoice.Reward(rewardIds.get(5), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                                        Money.of(0L, ETH), Money.of(0L, USD), null)
+                        ))
+        );
+        payableRewards = List.of(
+                new PayableReward(rewardIds.get(0), USDC.forNetwork(Network.ETHEREUM), PositiveAmount.of(100L)),
+                new PayableReward(rewardIds.get(1), USDC.forNetwork(Network.OPTIMISM), PositiveAmount.of(200L)),
+                new PayableReward(rewardIds.get(2), STRK.forNetwork(Network.ETHEREUM), PositiveAmount.of(300L)),
+                new PayableReward(rewardIds.get(3), STRK.forNetwork(Network.STARKNET), PositiveAmount.of(400L)),
+                new PayableReward(rewardIds.get(4), ETH.forNetwork(Network.ETHEREUM), PositiveAmount.of(500L)),
+                new PayableReward(rewardIds.get(5), USDC.forNetwork(Network.ETHEREUM), PositiveAmount.of(600L))
+        );
+        rewardIdsSet = new HashSet<>(rewardIds);
+        reset(accountingRewardStoragePort, invoiceStoragePort, accountingService, mailNotificationPort);
     }
 
     @Test
-    void should_generate_batch_payment_given_all_currencies() {
+    void should_not_generate_any_batch_given_no_payable_reward() {
         // Given
-        final List<Invoice.Id> invoiceIds = List.of(Invoice.Id.random(), Invoice.Id.random());
+        when(invoiceStoragePort.getAll(invoiceIds)).thenReturn(invoices);
+        when(accountingService.getPayableRewards(rewardIdsSet)).thenReturn(List.of());
 
         // When
-        final PayableRewardWithPayoutInfoView strk1 = PayableRewardWithPayoutInfoView.builder()
-                .id(UUID.randomUUID())
-                .money(MoneyView.builder()
-                        .amount(BigDecimal.valueOf(11.22))
-                        .dollarsEquivalent(BigDecimal.valueOf(311.22))
-                        .currencyCode(Currency.Code.STRK_STR)
-                        .currencyLogoUrl("https://stark.logo")
-                        .currencyName("strk")
-                        .build())
-                .wallet(new Wallet(Network.STARKNET, faker.internet().macAddress()))
-                .build();
-        final PayableRewardWithPayoutInfoView strk2 = PayableRewardWithPayoutInfoView.builder()
-                .id(UUID.randomUUID())
-                .money(MoneyView.builder()
-                        .amount(BigDecimal.valueOf(405.38))
-                        .dollarsEquivalent(BigDecimal.valueOf(5960))
-                        .currencyCode(Currency.Code.STRK_STR)
-                        .currencyLogoUrl("https://stark.logo")
-                        .currencyName("strk")
-                        .build())
-                .wallet(new Wallet(Network.STARKNET, faker.internet().macAddress()))
-                .build();
-        final PayableRewardWithPayoutInfoView eth = PayableRewardWithPayoutInfoView.builder()
-                .id(UUID.randomUUID())
-                .money(MoneyView.builder()
-                        .amount(BigDecimal.valueOf(67.54))
-                        .dollarsEquivalent(BigDecimal.valueOf(8909))
-                        .currencyCode(Currency.Code.ETH_STR)
-                        .currencyLogoUrl("https://eth.logo")
-                        .currencyName("eth")
-                        .build())
-                .wallet(new Wallet(Network.ETHEREUM, faker.internet().macAddress()))
-                .build();
-        final PayableRewardWithPayoutInfoView lords = PayableRewardWithPayoutInfoView.builder()
-                .id(UUID.randomUUID())
-                .money(MoneyView.builder()
-                        .amount(BigDecimal.valueOf(105.4))
-                        .dollarsEquivalent(BigDecimal.valueOf(6885))
-                        .currencyCode(Currency.Code.LORDS_STR)
-                        .currencyLogoUrl("https://lords.logo")
-                        .currencyName("op")
-                        .build())
-                .wallet(new Wallet(Network.ETHEREUM, faker.internet().macAddress()))
-                .build();
-        final PayableRewardWithPayoutInfoView usdc1 = PayableRewardWithPayoutInfoView.builder()
-                .id(UUID.randomUUID())
-                .money(MoneyView.builder()
-                        .amount(BigDecimal.valueOf(23.9))
-                        .dollarsEquivalent(BigDecimal.valueOf(2234))
-                        .currencyCode(Currency.Code.USDC_STR)
-                        .currencyLogoUrl("https://usdc.logo")
-                        .currencyName("usdc")
-                        .build())
-                .wallet(new Wallet(Network.ETHEREUM, faker.internet().macAddress()))
-                .build();
-        final PayableRewardWithPayoutInfoView usdc2 = PayableRewardWithPayoutInfoView.builder()
-                .id(UUID.randomUUID())
-                .money(MoneyView.builder()
-                        .amount(BigDecimal.valueOf(95666))
-                        .dollarsEquivalent(BigDecimal.valueOf(95623))
-                        .currencyCode(Currency.Code.USDC_STR)
-                        .currencyLogoUrl("https://usdc.logo")
-                        .currencyName("usdc")
-                        .build())
-                .wallet(new Wallet(Network.ETHEREUM, faker.internet().macAddress()))
-                .build();
-        when(accountingRewardStoragePort.findPayableRewardsWithPayoutInfoForInvoices(invoiceIds))
-                .thenReturn(List.of(
-                        PayableRewardWithPayoutInfoView.builder()
-                                .id(UUID.randomUUID())
-                                .money(MoneyView.builder()
-                                        .amount(BigDecimal.valueOf(1))
-                                        .dollarsEquivalent(BigDecimal.valueOf(1))
-                                        .currencyCode(Currency.Code.USD_STR)
-                                        .currencyLogoUrl("https://usd.logo")
-                                        .currencyName("usd")
-                                        .build())
-                                .wallet(null)
-                                .build(),
-                        PayableRewardWithPayoutInfoView.builder()
-                                .id(UUID.randomUUID())
-                                .money(MoneyView.builder()
-                                        .amount(BigDecimal.valueOf(1))
-                                        .dollarsEquivalent(BigDecimal.valueOf(1))
-                                        .currencyCode(Currency.Code.EUR_STR)
-                                        .currencyLogoUrl("https://eur.logo")
-                                        .currencyName("eur")
-                                        .build())
-                                .wallet(null)
-                                .build(),
-                        PayableRewardWithPayoutInfoView.builder()
-                                .id(UUID.randomUUID())
-                                .money(MoneyView.builder()
-                                        .amount(BigDecimal.valueOf(1))
-                                        .dollarsEquivalent(BigDecimal.valueOf(1))
-                                        .currencyCode(Currency.Code.OP_STR)
-                                        .currencyLogoUrl("https://op.logo")
-                                        .currencyName("OP")
-                                        .build())
-                                .wallet(null)
-                                .build(),
-                        strk1,
-                        strk2,
-                        eth,
-                        lords,
-                        usdc1,
-                        usdc2
-                ));
-        final List<BatchPayment> batchPaymentsForInvoices = rewardService.createBatchPaymentsForInvoices(invoiceIds);
+        final var batches = rewardService.createBatchPaymentsForInvoices(invoiceIds);
 
         // Then
-        assertEquals(2, batchPaymentsForInvoices.size());
-        final BatchPayment starknetBatchPayment =
-                batchPaymentsForInvoices.stream().filter(batchPayment -> batchPayment.blockchain().equals(Blockchain.STARKNET)).findFirst().orElseThrow();
-        verify(accountingRewardStoragePort).saveBatchPayment(starknetBatchPayment);
-        assertEquals(2, starknetBatchPayment.rewardIds().size());
-        assertEquals(1, starknetBatchPayment.moneys().size());
-        assertEquals(strk1.money().amount().add(strk2.money().amount()), starknetBatchPayment.moneys().get(0).amount());
-        assertEquals(strk1.money().dollarsEquivalent().add(strk2.money().dollarsEquivalent()), starknetBatchPayment.moneys().get(0).dollarsEquivalent());
-        assertEquals(strk1.money().currencyName(), starknetBatchPayment.moneys().get(0).currencyName());
-        assertEquals(strk1.money().currencyCode(), starknetBatchPayment.moneys().get(0).currencyCode());
-        assertEquals(strk1.money().currencyLogoUrl(), starknetBatchPayment.moneys().get(0).currencyLogoUrl());
-        assertEquals("""
-                        erc20,0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d,%s,%s,\s
-                        erc20,0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d,%s,%s,\s"""
-                        .formatted(strk1.wallet().address(), strk1.money().amount(),
-                                strk2.wallet().address(), strk2.money().amount()),
-                starknetBatchPayment.csv());
-
-        final BatchPayment ethereumBatchPayment =
-                batchPaymentsForInvoices.stream().filter(batchPayment -> batchPayment.blockchain().equals(Blockchain.ETHEREUM)).findFirst().orElseThrow();
-        verify(accountingRewardStoragePort).saveBatchPayment(ethereumBatchPayment);
-        assertEquals(3, ethereumBatchPayment.rewardIds().size());
-        assertEquals(2, ethereumBatchPayment.moneys().size());
-        assertEquals(0,
-                ethereumBatchPayment.moneys().stream().filter(moneyView -> moneyView.currencyCode().equals(Currency.Code.ETH_STR)).toList().size());
-        assertEquals(lords.money(),
-                ethereumBatchPayment.moneys().stream().filter(moneyView -> moneyView.currencyCode().equals(Currency.Code.LORDS_STR)).findFirst().orElseThrow());
-        assertEquals(usdc1.money().toBuilder()
-                        .dollarsEquivalent(usdc1.money().dollarsEquivalent().add(usdc2.money().dollarsEquivalent()))
-                        .amount(usdc1.money().amount().add(usdc2.money().amount()))
-                        .build()
-                ,
-                ethereumBatchPayment.moneys().stream().filter(moneyView -> moneyView.currencyCode().equals(Currency.Code.USDC_STR)).findFirst().orElseThrow());
-        assertEquals("""
-                erc20,0x686f2404e77Ab0d9070a46cdfb0B7feCDD2318b0,%s,%s,\s
-                erc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,%s,%s,\s
-                erc20,0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48,%s,%s,\s"""
-                .formatted(lords.wallet().address(), lords.money().amount().toString(), usdc1.wallet().address(),
-                        usdc1.money().amount().toString(), usdc2.wallet().address(), usdc2.money().amount().toString()), ethereumBatchPayment.csv());
+        assertThat(batches).isEmpty();
+        verify(accountingRewardStoragePort, never()).saveBatchPayment(any());
     }
+
+    @Test
+    void should_generate_batch_given_payable_rewards() {
+        // Given
+        when(invoiceStoragePort.getAll(invoiceIds)).thenReturn(invoices);
+        when(accountingService.getPayableRewards(rewardIdsSet)).thenReturn(payableRewards);
+
+        // When
+        final var batches = rewardService.createBatchPaymentsForInvoices(invoiceIds);
+
+        // Then
+        assertThat(batches).hasSize(3);
+        assertThat(batches).extracting(BatchPayment::network).containsExactlyInAnyOrder(Network.ETHEREUM, Network.OPTIMISM, Network.STARKNET);
+        {
+            final var ethereumBatch = batches.stream().filter(batch -> batch.network().equals(Network.ETHEREUM)).findFirst().orElseThrow();
+            assertThat(ethereumBatch.rewards()).containsExactlyInAnyOrder(payableRewards.get(0), payableRewards.get(2), payableRewards.get(4),
+                    payableRewards.get(5));
+            assertThat(ethereumBatch.invoices()).containsAll(invoices);
+//            assertThat(getMoneyView(ethereumBatch, Currency.Code.USDC_STR).amount()).isEqualTo(BigDecimal.valueOf(700L));
+//            assertThat(getMoneyView(ethereumBatch, Currency.Code.USDC_STR).dollarsEquivalent()).isEqualTo(BigDecimal.valueOf(4400L));
+//            assertThat(getMoneyView(ethereumBatch, Currency.Code.STRK_STR).amount()).isEqualTo(BigDecimal.valueOf(300L));
+//            assertThat(getMoneyView(ethereumBatch, Currency.Code.STRK_STR).dollarsEquivalent()).isEqualTo(BigDecimal.valueOf(1200L));
+//            assertThat(getMoneyView(ethereumBatch, Currency.Code.ETH_STR).amount()).isEqualTo(BigDecimal.valueOf(500L));
+//            assertThat(getMoneyView(ethereumBatch, Currency.Code.ETH_STR).dollarsEquivalent()).isEqualTo(BigDecimal.valueOf(3000L));
+            assertThat(ethereumBatch.csv()).isEqualToIgnoringWhitespace("""
+                    erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,vitalik.eth,100
+                    erc20,0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766,vitalik.eth,300
+                    native,,vitalik.eth,500
+                    erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,foo.eth,600
+                    """);
+        }
+        {
+            final var optimismBatch = batches.stream().filter(batch -> batch.network().equals(Network.OPTIMISM)).findFirst().orElseThrow();
+            assertThat(optimismBatch.rewards()).containsExactlyInAnyOrder(payableRewards.get(1));
+            assertThat(optimismBatch.invoices()).containsAll(invoices);
+            assertThat(optimismBatch.csv()).isEqualToIgnoringWhitespace("""
+                    erc20,0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85,0x0222,200
+                    """);
+        }
+        {
+            final var starknetBatch = batches.stream().filter(batch -> batch.network().equals(Network.STARKNET)).findFirst().orElseThrow();
+            assertThat(starknetBatch.rewards()).containsExactlyInAnyOrder(payableRewards.get(3));
+            assertThat(starknetBatch.invoices()).containsAll(invoices);
+            assertThat(starknetBatch.csv()).isEqualToIgnoringWhitespace("""
+                    erc20,0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766,0x0666,400
+                    """);
+        }
+        final var savedBatches = ArgumentCaptor.forClass(List.class);
+        verify(accountingRewardStoragePort).saveAll(savedBatches.capture());
+        assertThat(savedBatches.getValue()).containsAll(batches);
+    }
+
 
     @Test
     void should_raise_not_found_exception_given_not_existing_batch_payment() {
@@ -203,17 +202,10 @@ public class RewardServiceTest {
         // When
         when(accountingRewardStoragePort.findBatchPayment(batchPaymentId))
                 .thenReturn(Optional.empty());
-        Exception exception = null;
-        try {
-            rewardService.markBatchPaymentAsPaid(batchPaymentId, faker.random().hex());
-        } catch (Exception e) {
-            exception = e;
-        }
 
-        // Then
-        assertTrue(exception instanceof OnlyDustException);
-        assertEquals(404, ((OnlyDustException) exception).getStatus());
-        assertEquals("Batch payment %s not found".formatted(batchPaymentId.value()), exception.getMessage());
+        assertThatThrownBy(() -> rewardService.markBatchPaymentAsPaid(batchPaymentId, faker.random().hex()))
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Batch payment %s not found".formatted(batchPaymentId.value()));
     }
 
 
@@ -228,9 +220,9 @@ public class RewardServiceTest {
                 .thenReturn(Optional.of(BatchPayment.builder()
                         .csv("")
                         .id(BatchPayment.Id.random())
-                        .moneys(List.of())
-                        .blockchain(Blockchain.STARKNET)
-                        .rewardIds(List.of())
+                        .network(Network.STARKNET)
+                        .rewards(List.of())
+                        .invoices(List.of())
                         .build()));
         Exception exception = null;
         try {
@@ -242,7 +234,7 @@ public class RewardServiceTest {
         // Then
         assertTrue(exception instanceof OnlyDustException);
         assertEquals(400, ((OnlyDustException) exception).getStatus());
-        assertEquals("Wrong transaction hash format %s".formatted(transactionHash), exception.getMessage());
+        assertEquals("Provided hash is not hexadecimal", exception.getMessage());
     }
 
     @Test
@@ -252,31 +244,11 @@ public class RewardServiceTest {
         final String transactionHash = "0x" + faker.random().hex();
         final BatchPayment batchPayment = BatchPayment.builder()
                 .id(batchPaymentId)
-                .moneys(List.of())
-                .blockchain(Blockchain.STARKNET)
+                .network(Network.ETHEREUM)
                 .csv(faker.gameOfThrones().character())
-                .rewardIds(List.of())
+                .rewards(payableRewards.stream().filter(pr -> pr.currency().network().equals(Network.ETHEREUM)).toList())
+                .invoices(invoices)
                 .build();
-        final List<PayableRewardWithPayoutInfoView> payableRewardWithPayoutInfoViews = List.of(
-                PayableRewardWithPayoutInfoView.builder()
-                        .id(UUID.randomUUID())
-                        .money(MoneyView.builder()
-                                .amount(BigDecimal.ONE)
-                                .currencyCode(faker.gameOfThrones().city())
-                                .currencyName(faker.gameOfThrones().dragon())
-                                .currencyLogoUrl(faker.gameOfThrones().quote())
-                                .build())
-                        .build(),
-                PayableRewardWithPayoutInfoView.builder()
-                        .id(UUID.randomUUID())
-                        .money(MoneyView.builder()
-                                .amount(BigDecimal.ONE)
-                                .currencyCode(faker.gameOfThrones().city())
-                                .currencyName(faker.gameOfThrones().dragon())
-                                .currencyLogoUrl(faker.gameOfThrones().quote())
-                                .build())
-                        .build()
-        );
         final BatchPayment updatedBatchPayment = batchPayment.toBuilder()
                 .status(BatchPayment.Status.PAID)
                 .transactionHash(transactionHash)
@@ -284,16 +256,26 @@ public class RewardServiceTest {
 
 
         // When
-        when(accountingRewardStoragePort.findBatchPayment(batchPaymentId))
-                .thenReturn(Optional.of(batchPayment));
-        when(accountingRewardStoragePort.findPayableRewardsWithPayoutInfoForBatchPayment(batchPaymentId))
-                .thenReturn(payableRewardWithPayoutInfoViews);
+        when(accountingRewardStoragePort.findBatchPayment(batchPaymentId)).thenReturn(Optional.of(batchPayment));
         rewardService.markBatchPaymentAsPaid(batchPaymentId, transactionHash);
 
         // Then
-        verify(oldRewardStoragePort).markRewardAsPaid(payableRewardWithPayoutInfoViews.get(0), transactionHash);
-        verify(oldRewardStoragePort).markRewardAsPaid(payableRewardWithPayoutInfoViews.get(1), transactionHash);
         verify(accountingRewardStoragePort).saveBatchPayment(updatedBatchPayment);
+        verify(accountingService).pay(payableRewards.get(0).id(),
+                payableRewards.get(0).currency().id(),
+                new SponsorAccount.PaymentReference(Network.ETHEREUM, transactionHash, invoices.get(0).billingProfileSnapshot().subject(), "vitalik.eth"));
+
+        verify(accountingService).pay(payableRewards.get(2).id(),
+                payableRewards.get(2).currency().id(),
+                new SponsorAccount.PaymentReference(Network.ETHEREUM, transactionHash, invoices.get(0).billingProfileSnapshot().subject(), "vitalik.eth"));
+
+        verify(accountingService).pay(payableRewards.get(4).id(),
+                payableRewards.get(4).currency().id(),
+                new SponsorAccount.PaymentReference(Network.ETHEREUM, transactionHash, invoices.get(0).billingProfileSnapshot().subject(), "vitalik.eth"));
+
+        verify(accountingService).pay(payableRewards.get(5).id(),
+                payableRewards.get(5).currency().id(),
+                new SponsorAccount.PaymentReference(Network.ETHEREUM, transactionHash, invoices.get(1).billingProfileSnapshot().subject(), "foo.eth"));
     }
 
     @Test

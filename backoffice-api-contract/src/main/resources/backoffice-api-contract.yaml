@@ -3098,14 +3098,14 @@ components:
         - csv
         - rewardCount
         - totalAmounts
-        - blockchain
+        - network
       properties:
         id:
           $ref: '#/components/schemas/BatchPaymentId'
         csv:
           type: string
-        blockchain:
-          $ref: '#/components/schemas/BlockchainContract'
+        network:
+          $ref: '#/components/schemas/TransactionNetwork'
         rewardCount:
           type: integer
           format: int64
@@ -3148,7 +3148,7 @@ components:
       required:
         - id
         - createdAt
-        - blockchain
+        - network
         - rewardCount
         - totalAmounts
         - totalAmountUsd
@@ -3158,8 +3158,8 @@ components:
         createdAt:
           type: string
           format: date-time
-        blockchain:
-          $ref: '#/components/schemas/BlockchainContract'
+        network:
+          $ref: '#/components/schemas/TransactionNetwork'
         rewardCount:
           type: integer
           format: int64

@@ -14,5 +14,7 @@ public interface AccountingObserverPort {
 
     void onRewardCancelled(RewardId rewardId);
 
-    void onRewardPaid(RewardId rewardId, SponsorAccount.PaymentReference reference);
+    void onRewardPaid(RewardId rewardId);
+
+    void onPaymentReceived(RewardId rewardId, SponsorAccount.PaymentReference reference);
 }

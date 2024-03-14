@@ -191,6 +191,10 @@ public class Invoice {
             return Optional.ofNullable(kybSnapshot);
         }
 
+        public Optional<Wallet> wallet(Network network) {
+            return wallets.stream().filter(w -> w.network() == network).findFirst();
+        }
+
         public record KycSnapshot(@NonNull String firstName, String lastName, @NonNull String address, @NonNull String countryCode) {
             public static KycSnapshot of(Kyc kyc) {
                 return new KycSnapshot(kyc.getFirstName(), kyc.getLastName(), kyc.getAddress(), kyc.getCountry().iso3Code());

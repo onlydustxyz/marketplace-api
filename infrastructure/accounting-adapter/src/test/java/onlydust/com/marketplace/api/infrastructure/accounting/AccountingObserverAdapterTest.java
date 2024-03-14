@@ -1,5 +1,7 @@
 package onlydust.com.marketplace.api.infrastructure.accounting;
 
+import onlydust.com.marketplace.accounting.domain.model.Amount;
+import onlydust.com.marketplace.accounting.domain.model.ConvertedAmount;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardStatusData;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
@@ -11,6 +13,7 @@ import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,7 +25,7 @@ class AccountingObserverAdapterTest {
     final AccountingObserverAdapter accountingObserverAdapter = new AccountingObserverAdapter(rewardStatusStorage, rewardStatusFacadePort);
     final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
     final RewardId rewardId = RewardId.random();
-    final BigDecimal usdEquivalent = BigDecimal.TEN;
+    final Amount usdEquivalent = Amount.of(10L);
     final UUID userId = UUID.randomUUID();
 
     @BeforeEach
@@ -30,7 +33,7 @@ class AccountingObserverAdapterTest {
         reset(rewardStatusStorage, rewardStatusFacadePort);
 
         when(rewardStatusStorage.notPaid(billingProfileId)).thenReturn(List.of(new RewardStatusData(rewardId)));
-        when(rewardStatusFacadePort.usdEquivalent(rewardId)).thenReturn(usdEquivalent);
+        when(rewardStatusFacadePort.usdAmountOf(rewardId)).thenReturn(Optional.of(new ConvertedAmount(usdEquivalent, BigDecimal.valueOf(1.3))));
 
     }
 
@@ -58,7 +61,7 @@ class AccountingObserverAdapterTest {
         final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
         verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
         final var rewardStatus = rewardStatusCaptor.getValue();
-        assertThat(rewardStatus.amountUsdEquivalent()).contains(usdEquivalent);
+        assertThat(rewardStatus.usdAmount().get().convertedAmount()).isEqualTo(usdEquivalent);
     }
 
     // TODO : migrate to accounting

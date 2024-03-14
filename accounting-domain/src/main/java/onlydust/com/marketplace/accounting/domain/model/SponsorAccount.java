@@ -115,6 +115,8 @@ public class SponsorAccount {
     @AllArgsConstructor
     @Accessors(fluent = true)
     @Getter
+    @EqualsAndHashCode
+    @ToString
     public static class PaymentReference {
         private final @NonNull Network network;
         private final @NonNull String reference;

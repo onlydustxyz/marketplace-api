@@ -6,7 +6,6 @@ import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.PayableRewardWithPayoutInfoView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
@@ -20,10 +19,6 @@ public interface AccountingRewardStoragePort {
     List<BackofficeRewardView> searchRewards(List<Invoice.Status> statuses, List<Invoice.Id> invoiceIds);
 
     List<BackofficeRewardView> getInvoiceRewards(@NonNull Invoice.Id invoiceId);
-
-    List<PayableRewardWithPayoutInfoView> findPayableRewardsWithPayoutInfoForInvoices(List<Invoice.Id> invoiceIds);
-
-    List<PayableRewardWithPayoutInfoView> findPayableRewardsWithPayoutInfoForBatchPayment(BatchPayment.Id batchPaymentId);
 
     Optional<BatchPayment> findBatchPayment(BatchPayment.Id batchPaymentId);
 
@@ -41,4 +36,6 @@ public interface AccountingRewardStoragePort {
     List<BackofficeRewardView> findPaidRewardsToNotify();
 
     void markRewardsAsPaymentNotified(List<RewardId> rewardId);
+
+    void saveAll(List<BatchPayment> batchPayments);
 }

@@ -38,6 +38,10 @@ public class PayableCurrency {
         return Optional.ofNullable(blockchain);
     }
 
+    public Network network() {
+        return Network.fromBlockchain(blockchain);
+    }
+
     public Optional<Hash> address() {
         return Optional.ofNullable(address);
     }

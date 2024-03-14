@@ -46,7 +46,6 @@ public class InvoiceEntity {
     String rejectionReason;
 
     @Type(type = "jsonb")
-    @Deprecated
     Data data;
 
     public Invoice toDomain() {
@@ -63,6 +62,12 @@ public class InvoiceEntity {
                 originalFileName,
                 rejectionReason
         );
+    }
+
+    public static InvoiceEntity fromDomain(Invoice invoice) {
+        final var invoiceEntity = new InvoiceEntity().id(invoice.id().value());
+        invoiceEntity.updateWith(invoice);
+        return invoiceEntity;
     }
 
     public void updateWith(Invoice invoice) {

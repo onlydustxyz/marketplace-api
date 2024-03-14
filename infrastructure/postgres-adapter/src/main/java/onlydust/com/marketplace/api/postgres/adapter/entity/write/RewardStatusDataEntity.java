@@ -5,6 +5,8 @@ import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.accounting.domain.model.Amount;
+import onlydust.com.marketplace.accounting.domain.model.ConvertedAmount;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardStatusData;
 import org.hibernate.annotations.Parameter;
@@ -23,6 +25,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.isNull;
 
 @Entity
 @Data
@@ -56,6 +60,7 @@ public class RewardStatusDataEntity {
     @Column(columnDefinition = "accounting.network[]")
     NetworkEnumEntity[] networks;
     BigDecimal amountUsdEquivalent;
+    BigDecimal usdConversionRate;
 
     public static RewardStatusDataEntity of(RewardStatusData rewardStatusData) {
         return RewardStatusDataEntity.builder()
@@ -65,7 +70,8 @@ public class RewardStatusDataEntity {
                 .invoiceReceivedAt(rewardStatusData.invoiceReceivedAt().map(ChronoZonedDateTime::toInstant).map(Date::from).orElse(null))
                 .paidAt(rewardStatusData.paidAt().map(ChronoZonedDateTime::toInstant).map(Date::from).orElse(null))
                 .networks(rewardStatusData.networks().stream().map(NetworkEnumEntity::of).toArray(NetworkEnumEntity[]::new))
-                .amountUsdEquivalent(rewardStatusData.amountUsdEquivalent().orElse(null))
+                .amountUsdEquivalent(rewardStatusData.usdAmount().map(ConvertedAmount::convertedAmount).map(Amount::getValue).orElse(null))
+                .usdConversionRate(rewardStatusData.usdAmount().map(ConvertedAmount::conversionRate).orElse(null))
                 .build();
     }
 
@@ -76,6 +82,7 @@ public class RewardStatusDataEntity {
                 .invoiceReceivedAt(invoiceReceivedAt == null ? null : ZonedDateTime.ofInstant(invoiceReceivedAt.toInstant(), ZoneOffset.UTC))
                 .paidAt(paidAt == null ? null : ZonedDateTime.ofInstant(paidAt.toInstant(), ZoneOffset.UTC))
                 .withAdditionalNetworks(Arrays.stream(networks).map(NetworkEnumEntity::toNetwork).collect(Collectors.toSet()))
-                .amountUsdEquivalent(amountUsdEquivalent);
+                .usdAmount(isNull(usdConversionRate) || isNull(amountUsdEquivalent) ? null : new ConvertedAmount(Amount.of(amountUsdEquivalent),
+                        usdConversionRate));
     }
 }

@@ -98,4 +98,7 @@ public class Amount {
     }
 
 
+    public boolean isZero() {
+        return value.compareTo(BigDecimal.ZERO) == 0;
+    }
 }

@@ -117,7 +117,7 @@ public class AccountingObserverTest {
 
             // Then
             verify(rewardStatusStorage, times(2)).save(any());
-            assertThat(rewardStatus.amountUsdEquivalent()).isPresent();
+            assertThat(rewardStatus.usdAmount()).isPresent();
         }
     }
 
@@ -185,10 +185,9 @@ public class AccountingObserverTest {
             when(invoiceStorage.invoiceOf(rewardId)).thenReturn(Optional.of(invoice));
             when(invoiceStorage.invoiceOf(rewardId2)).thenReturn(Optional.of(invoice));
 
-            accountingObserver.onRewardPaid(rewardId, reference);
-
-            // Then
+            accountingObserver.onRewardPaid(rewardId);
             {
+                // Then
                 final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
                 verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
                 final var newRewardStatus = rewardStatusCaptor.getValue();
@@ -196,7 +195,11 @@ public class AccountingObserverTest {
                 assertThat(newRewardStatus.paidAt()).isNotNull();
 
                 verify(invoiceStorage, never()).update(invoice.status(Invoice.Status.PAID));
+            }
 
+            accountingObserver.onPaymentReceived(rewardId, reference);
+            {
+                // Then
                 final var receiptCaptor = ArgumentCaptor.forClass(Receipt.class);
                 verify(receiptStorage).save(receiptCaptor.capture());
                 final var receipt = receiptCaptor.getValue();
@@ -216,10 +219,9 @@ public class AccountingObserverTest {
             when(invoiceStorage.invoiceOf(rewardId)).thenReturn(Optional.of(invoice));
             when(invoiceStorage.invoiceOf(rewardId2)).thenReturn(Optional.of(invoice));
 
-            accountingObserver.onRewardPaid(rewardId2, reference);
-
-            // Then
+            accountingObserver.onRewardPaid(rewardId2);
             {
+                // Then
                 final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
                 verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
                 final var newRewardStatus = rewardStatusCaptor.getValue();
@@ -227,7 +229,11 @@ public class AccountingObserverTest {
                 assertThat(newRewardStatus.paidAt()).isNotNull();
 
                 verify(invoiceStorage).update(invoice.status(Invoice.Status.PAID));
+            }
 
+            accountingObserver.onPaymentReceived(rewardId2, reference);
+            {
+                // Then
                 final var receiptCaptor = ArgumentCaptor.forClass(Receipt.class);
                 verify(receiptStorage).save(receiptCaptor.capture());
                 final var receipt = receiptCaptor.getValue();
@@ -338,7 +344,7 @@ public class AccountingObserverTest {
             assertThat(rewardStatuses.stream().filter(r -> r.rewardId().equals(rewardId2)).findFirst().orElseThrow().sponsorHasEnoughFund()).isTrue();
             assertThat(rewardStatuses).allMatch(r -> r.networks().containsAll(Set.of(Network.APTOS, Network.OPTIMISM)));
             assertThat(rewardStatuses).allMatch(r -> r.unlockDate().orElseThrow().toInstant().equals(unlockDate.plusDays(1).toInstant()));
-            assertThat(rewardStatuses).allMatch(r -> r.amountUsdEquivalent().isPresent());
+            assertThat(rewardStatuses).allMatch(r -> r.usdAmount().isPresent());
         }
     }
 
@@ -489,7 +495,7 @@ public class AccountingObserverTest {
                 final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
                 verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
                 final var rewardStatus = rewardStatusCaptor.getValue();
-                assertThat(rewardStatus.amountUsdEquivalent()).isEmpty();
+                assertThat(rewardStatus.usdAmount()).isEmpty();
             }
 
             @Test
@@ -508,7 +514,8 @@ public class AccountingObserverTest {
                 final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
                 verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
                 final var rewardStatus = rewardStatusCaptor.getValue();
-                assertThat(rewardStatus.amountUsdEquivalent()).contains(price.multiply(rewardAmount));
+                assertThat(rewardStatus.usdAmount().get().convertedAmount().getValue()).isEqualTo(price.multiply(rewardAmount));
+                assertThat(rewardStatus.usdAmount().get().conversionRate()).isEqualTo(price);
             }
         }
     }
@@ -533,7 +540,7 @@ public class AccountingObserverTest {
             verify(rewardStatusStorage, times(2)).save(rewardStatusCaptor.capture());
             final var rewardStatuses = rewardStatusCaptor.getAllValues();
             assertThat(rewardStatuses).hasSize(2);
-            assertThat(rewardStatuses).allMatch(r -> r.amountUsdEquivalent().isPresent());
+            assertThat(rewardStatuses).allMatch(r -> r.usdAmount().isPresent());
         }
     }
 }

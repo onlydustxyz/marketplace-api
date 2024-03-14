@@ -3,11 +3,8 @@ package onlydust.com.marketplace.accounting.domain.model;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
-import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
-import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 
-import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -21,14 +18,15 @@ public class BatchPayment {
     @NonNull
     String csv;
     @NonNull
-    Blockchain blockchain;
-    List<MoneyView> moneys;
+    Network network;
     @NonNull
     @Builder.Default
     Status status = Status.TO_PAY;
     String transactionHash;
     @NonNull
-    List<RewardId> rewardIds;
+    List<Invoice> invoices;
+    @NonNull
+    List<PayableReward> rewards;
     Date createdAt;
 
     @NoArgsConstructor(staticName = "random")

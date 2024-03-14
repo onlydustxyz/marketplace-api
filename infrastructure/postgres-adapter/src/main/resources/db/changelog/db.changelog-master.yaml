@@ -173,3 +173,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000105_create_latest_usd_quotes_view.sql
   - include:
       file: db/changelog/changelogs/00000106_remove_dependencies_to_legacy_tables.sql
+  - include:
+      file: db/changelog/changelogs/00000107_refactor_batch_payments.sql

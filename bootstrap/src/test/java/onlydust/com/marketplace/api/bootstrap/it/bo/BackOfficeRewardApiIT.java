@@ -394,7 +394,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               },
                               "status": "COMPLETE",
                               "requestedAt": "2023-09-26T15:57:29.834949Z",
-                              "processedAt": "2023-09-26T21:08:01.957813Z",
+                              "processedAt": "2023-09-26T21:08:01.957Z",
                               "githubUrls": [
                                 "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
                               ],
@@ -779,7 +779,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               },
                               "status": "COMPLETE",
                               "requestedAt": "2023-02-09T07:24:48.146947Z",
-                              "processedAt": "2023-02-09T07:35:03.828144Z",
+                              "processedAt": "2023-02-09T07:35:03.828Z",
                               "githubUrls": [
                                 "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
                               ],
@@ -830,7 +830,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               },
                               "status": "COMPLETE",
                               "requestedAt": "2023-02-09T07:24:40.924453Z",
-                              "processedAt": "2023-02-09T07:35:03.417235Z",
+                              "processedAt": "2023-02-09T07:35:03.417Z",
                               "githubUrls": [
                                 "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
                               ],
@@ -881,7 +881,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               },
                               "status": "COMPLETE",
                               "requestedAt": "2023-02-09T07:24:31.946777Z",
-                              "processedAt": "2023-02-09T07:35:02.985188Z",
+                              "processedAt": "2023-02-09T07:35:02.985Z",
                               "githubUrls": [
                                 "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
                               ],
@@ -932,7 +932,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               },
                               "status": "COMPLETE",
                               "requestedAt": "2023-02-09T07:24:20.274391Z",
-                              "processedAt": "2023-02-09T07:35:02.582428Z",
+                              "processedAt": "2023-02-09T07:35:02.582Z",
                               "githubUrls": [
                                 "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
                               ],
@@ -983,7 +983,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               },
                               "status": "COMPLETE",
                               "requestedAt": "2023-02-08T09:14:56.053584Z",
-                              "processedAt": "2023-02-27T11:56:28.044044Z",
+                              "processedAt": "2023-02-27T11:56:28.044Z",
                               "githubUrls": [
                                 "https://github.com/onlydustxyz/marketplace-frontend/pull/663"
                               ],
@@ -1037,11 +1037,11 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
         assertThat(csv).isEqualToIgnoringWhitespace("""
                 Project,Recipient,Recipient Github,Amount,Currency,Contributions,Status,Requested at,Processed at,Transaction Hash,Payout information,Pretty ID,Sponsors,Recipient email,Verification status,Account type,Invoice number,Invoice id,Budget,Conversion rate,Dollar Amount
-                Starklings,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:48.146947Z,2023-02-09T07:35:03.828144Z,[0x0000000000000000000000000000000000000000000000000000000000000000],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#BDB59",[],NOT_STARTED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.01,1010.00
-                Starklings,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",2500,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:40.924453Z,2023-02-09T07:35:03.417235Z,[0x0000000000000000000000000000000000000000000000000000000000000000],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#E23AD",[],NOT_STARTED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.01,2525.00
-                Starklings,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",750,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:31.946777Z,2023-02-09T07:35:02.985188Z,[0x0000000000000000000000000000000000000000000000000000000000000000],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#72F25",[],NOT_STARTED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.01,757.50
-                Starklings,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:20.274391Z,2023-02-09T07:35:02.582428Z,[0x0000000000000000000000000000000000000000000000000000000000000000],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#91C7E",[],NOT_STARTED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.01,1010.00
-                oscar's awesome project,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",500,USDC,[https://github.com/onlydustxyz/marketplace-frontend/pull/663],COMPLETE,2023-02-08T09:14:56.053584Z,2023-02-27T11:56:28.044044Z,[0x0000000000000000000000000000000000000000000000000000000000000000],[0xd8da6bf26964af9d7eed9e03e53415d37aa96045],"#E6152",[],NOT_STARTED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,oscar's awesome project - USDC,1.01,505.00
+                Starklings,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:48.146947Z,2023-02-09T07:35:03.828Z,[0x0000000000000000000000000000000000000000000000000000000000000000],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#BDB59",[],NOT_STARTED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.01,1010.00
+                Starklings,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",2500,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:40.924453Z,2023-02-09T07:35:03.417Z,[0x0000000000000000000000000000000000000000000000000000000000000000],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#E23AD",[],NOT_STARTED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.01,2525.00
+                Starklings,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",750,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:31.946777Z,2023-02-09T07:35:02.985Z,[0x0000000000000000000000000000000000000000000000000000000000000000],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#72F25",[],NOT_STARTED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.01,757.50
+                Starklings,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:20.274391Z,2023-02-09T07:35:02.582Z,[0x0000000000000000000000000000000000000000000000000000000000000000],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#91C7E",[],NOT_STARTED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.01,1010.00
+                oscar's awesome project,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",500,USDC,[https://github.com/onlydustxyz/marketplace-frontend/pull/663],COMPLETE,2023-02-08T09:14:56.053584Z,2023-02-27T11:56:28.044Z,[0x0000000000000000000000000000000000000000000000000000000000000000],[0xd8da6bf26964af9d7eed9e03e53415d37aa96045],"#E6152",[],NOT_STARTED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,oscar's awesome project - USDC,1.01,505.00
                 """.formatted(pierreInvoiceIds.get(0),
                 pierreInvoiceIds.get(0),
                 pierreInvoiceIds.get(0),
@@ -1067,7 +1067,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
         assertThat(csv).isEqualToIgnoringWhitespace("""
                 Project,Recipient,Recipient Github,Amount,Currency,Contributions,Status,Requested at,Processed at,Transaction Hash,Payout information,Pretty ID,Sponsors,Recipient email,Verification status,Account type,Invoice number,Invoice id,Budget,Conversion rate,Dollar Amount
-                Bretzel,"[AnthonyBuisset,abuisset@gmail.com,Anthony BUISSET]",1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-26T15:57:29.834949Z,2023-09-26T21:08:01.957813Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#736E0","[Coca Cola, OGC Nissa Ineos]",NOT_STARTED,SELF_EMPLOYED,OD-ANTHO-SASU-001,%s,Bretzel - USDC,1.0100,1010.0000
+                Bretzel,"[AnthonyBuisset,abuisset@gmail.com,Anthony BUISSET]",1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-26T15:57:29.834949Z,2023-09-26T21:08:01.957Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#736E0","[Coca Cola, OGC Nissa Ineos]",NOT_STARTED,SELF_EMPLOYED,OD-ANTHO-SASU-001,%s,Bretzel - USDC,1.0100,1010.0000
                 Bretzel,,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-26T08:43:36.823851Z,2023-09-26T21:08:01.735916Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#1C56D","[Coca Cola, OGC Nissa Ineos]",,,,,Bretzel - USDC,1.0100,1010.0000
                 Bretzel,,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-25T13:12:26.971685Z,2023-09-26T21:08:01.601831Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#4CCF3","[Coca Cola, OGC Nissa Ineos]",,,,,Bretzel - USDC,1.0100,1010.0000
                 Bretzel,,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-25T13:01:35.433511Z,2023-09-26T21:25:50.605546Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#CF65A","[Coca Cola, OGC Nissa Ineos]",,,,,Bretzel - USDC,1.0100,1010.0000
