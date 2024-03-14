@@ -22,7 +22,6 @@ import onlydust.com.marketplace.project.domain.model.GithubAccount;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.GithubOrganizationFacadePort;
-import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.view.*;
 import org.springframework.core.io.Resource;
@@ -48,10 +47,8 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 @Tags(@Tag(name = "Me"))
 @AllArgsConstructor
 public class MeRestApi implements MeApi {
-
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final UserFacadePort userFacadePort;
-    private final RewardFacadePort rewardFacadePort;
     private final ContributorFacadePort contributorFacadePort;
     private final GithubOrganizationFacadePort githubOrganizationFacadePort;
     private final BillingProfileFacadePort billingProfileFacadePort;
@@ -289,13 +286,6 @@ public class MeRestApi implements MeApi {
         final UploadImageResponse response = new UploadImageResponse();
         response.url(imageUrl.toString());
         return ResponseEntity.ok(response);
-    }
-
-    @Override
-    public ResponseEntity<Void> markInvoiceAsReceived() {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        rewardFacadePort.markInvoiceAsReceived(authenticatedUser.getGithubUserId());
-        return ResponseEntity.noContent().build();
     }
 
     @Override

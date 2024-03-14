@@ -129,12 +129,12 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresProjectRewardAdapter projectRewardStoragePort(final ProjectAllowanceRepository projectAllowanceRepository,
-                                                                 final HistoricalQuoteRepository historicalQuoteRepository,
-                                                                 final CurrencyRepository currencyRepository,
-                                                                 final CustomRewardRepository customRewardRepository,
-                                                                 final BudgetStatsRepository budgetStatsRepository,
-                                                                 final RewardViewRepository rewardViewRepository
+    public PostgresProjectRewardAdapter postgresProjectRewardAdapter(final ProjectAllowanceRepository projectAllowanceRepository,
+                                                                     final HistoricalQuoteRepository historicalQuoteRepository,
+                                                                     final CurrencyRepository currencyRepository,
+                                                                     final CustomRewardRepository customRewardRepository,
+                                                                     final BudgetStatsRepository budgetStatsRepository,
+                                                                     final RewardViewRepository rewardViewRepository
     ) {
         return new PostgresProjectRewardAdapter(projectAllowanceRepository, historicalQuoteRepository, currencyRepository, budgetStatsRepository,
                 rewardViewRepository, customRewardRepository);

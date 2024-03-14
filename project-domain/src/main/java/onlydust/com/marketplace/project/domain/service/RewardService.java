@@ -3,7 +3,6 @@ package onlydust.com.marketplace.project.domain.service;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
-import onlydust.com.marketplace.project.domain.model.OldPayRewardRequestCommand;
 import onlydust.com.marketplace.project.domain.model.OldRequestRewardCommand;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
@@ -79,20 +78,7 @@ public class RewardService implements RewardFacadePort {
     }
 
     @Override
-    public void markInvoiceAsReceived(Long recipientId) {
-        // TODO
-        throw OnlyDustException.internalServerError("Not implemented yet");
-    }
-
-    @Override
     public Optional<Reward> getReward(UUID rewardId) {
         return rewardStoragePort.get(rewardId);
-    }
-
-    @Override
-    @Deprecated
-    public void oldPayReward(OldPayRewardRequestCommand oldPayRewardRequestCommand) {
-        // TODO : to delete
-        throw OnlyDustException.internalServerError("Deprecated method not implemented and to delete");
     }
 }

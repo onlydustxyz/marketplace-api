@@ -30,8 +30,6 @@ import java.util.UUID;
 @Configuration
 @EnableRetry
 public class DomainConfiguration {
-
-
     @Bean
     public UUIDGeneratorPort uuidGeneratorPort() {
         return UUID::randomUUID;
@@ -100,7 +98,6 @@ public class DomainConfiguration {
     ) {
         return new ProjectRewardService(projectRewardStoragePortV2, permissionService);
     }
-
 
     @Bean
     public GithubInstallationFacadePort githubInstallationFacadePort(

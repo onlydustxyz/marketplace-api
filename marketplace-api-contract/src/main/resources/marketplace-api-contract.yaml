@@ -639,28 +639,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/me/invoices:
-    post:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Me
-      summary: Mark invoice as received
-      operationId: markInvoiceAsReceived
-      description: |
-        Mark invoice as received for all caller's pending-invoice rewards
-      responses:
-        "204":
-          description: 'Invoice marked as received'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "403":
-          $ref: '#/components/responses/ProjectForbiddenError'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
   /api/v1/me/billing-profiles/{billingProfileId}/invitations:
     post:
       security:
