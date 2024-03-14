@@ -20,7 +20,6 @@ import onlydust.com.marketplace.project.domain.observer.UserObserver;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.service.*;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
@@ -153,23 +152,10 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public RewardService rewardFacadePort(@Qualifier("rewardStoragePort") final RewardServicePort rewardServicePort,
-                                          final ProjectRewardStoragePort projectRewardStoragePort,
-                                          final PermissionService permissionService,
-                                          final IndexerPort indexerPort,
-                                          final UserStoragePort userStoragePort) {
-        return new RewardService(rewardServicePort,
-                projectRewardStoragePort,
-                permissionService,
-                indexerPort,
-                userStoragePort);
-    }
-
-    @Bean
-    public RewardV2Service rewardFacadePortV2(final PostgresRewardV2Adapter postgresRewardV2Adapter,
-                                              final PermissionService permissionService,
-                                              final IndexerPort indexerPort,
-                                              final AccountingServicePort accountingServicePort) {
+    public RewardFacadePort rewardFacadePort(final PostgresRewardV2Adapter postgresRewardV2Adapter,
+                                             final PermissionService permissionService,
+                                             final IndexerPort indexerPort,
+                                             final AccountingServicePort accountingServicePort) {
         return new RewardV2Service(postgresRewardV2Adapter, permissionService, indexerPort, accountingServicePort);
     }
 

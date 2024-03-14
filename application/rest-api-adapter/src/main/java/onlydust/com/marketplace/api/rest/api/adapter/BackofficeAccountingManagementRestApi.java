@@ -41,7 +41,6 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     private final RewardFacadePort rewardFacadePort;
     private final CurrencyFacadePort currencyFacadePort;
     private final UserFacadePort userFacadePort;
-    private final RewardFacadePort rewardFacadePortV2;
     private final AccountingRewardPort accountingRewardPort;
 
     @Override
@@ -154,7 +153,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
     @Override
     public ResponseEntity<Void> oldPayReward(UUID rewardId, PayRewardRequest payRewardRequest) {
-        rewardFacadePortV2.oldPayReward(OldPayRewardRequestCommand.builder()
+        rewardFacadePort.oldPayReward(OldPayRewardRequestCommand.builder()
                 .rewardId(rewardId)
                 .recipientAccount(payRewardRequest.getRecipientAccount())
                 .transactionReference(payRewardRequest.getReference())
