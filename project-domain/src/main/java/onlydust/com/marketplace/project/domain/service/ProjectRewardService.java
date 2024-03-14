@@ -13,8 +13,8 @@ import java.util.UUID;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 
 @AllArgsConstructor
-public class ProjectRewardV2Service implements ProjectRewardFacadePort {
-    private final ProjectRewardStoragePort projectRewardStoragePortV2;
+public class ProjectRewardService implements ProjectRewardFacadePort {
+    private final ProjectRewardStoragePort projectRewardStoragePort;
     private final PermissionService permissionService;
 
     @Override
@@ -23,7 +23,7 @@ public class ProjectRewardV2Service implements ProjectRewardFacadePort {
                                              ProjectRewardView.Filters filters, Integer pageIndex, Integer pageSize,
                                              Reward.SortBy sortBy, SortDirection sortDirection) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            return projectRewardStoragePortV2.findRewards(projectId, filters, sortBy, sortDirection, pageIndex, pageSize);
+            return projectRewardStoragePort.findRewards(projectId, filters, sortBy, sortDirection, pageIndex, pageSize);
         } else {
             throw forbidden("Only project leads can read rewards on their projects");
         }
@@ -32,7 +32,7 @@ public class ProjectRewardV2Service implements ProjectRewardFacadePort {
     @Override
     public ProjectBudgetsView getBudgets(UUID projectId, UUID projectLeadId) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            return projectRewardStoragePortV2.findBudgets(projectId);
+            return projectRewardStoragePort.findBudgets(projectId);
         } else {
             throw forbidden("Only project leads can read budgets on their projects");
         }
@@ -41,7 +41,7 @@ public class ProjectRewardV2Service implements ProjectRewardFacadePort {
     @Override
     public RewardDetailsView getRewardByIdForProjectLead(UUID projectId, UUID rewardId, UUID projectLeadId) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            return projectRewardStoragePortV2.getProjectReward(rewardId);
+            return projectRewardStoragePort.getProjectReward(rewardId);
         } else {
             throw forbidden("Only project leads can read reward on their projects");
         }
@@ -51,7 +51,7 @@ public class ProjectRewardV2Service implements ProjectRewardFacadePort {
     public Page<RewardItemView> getRewardItemsPageByIdForProjectLead(UUID projectId, UUID rewardId,
                                                                      UUID projectLeadId, int pageIndex, int pageSize) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            return projectRewardStoragePortV2.getProjectRewardItems(rewardId, pageIndex, pageSize);
+            return projectRewardStoragePort.getProjectRewardItems(rewardId, pageIndex, pageSize);
         } else {
             throw forbidden("Only project leads can read reward items on their projects");
         }

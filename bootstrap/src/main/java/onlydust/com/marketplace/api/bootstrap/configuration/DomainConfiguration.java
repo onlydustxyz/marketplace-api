@@ -98,7 +98,7 @@ public class DomainConfiguration {
             final ProjectRewardStoragePort projectRewardStoragePortV2,
             final PermissionService permissionService
     ) {
-        return new ProjectRewardV2Service(projectRewardStoragePortV2, permissionService);
+        return new ProjectRewardService(projectRewardStoragePortV2, permissionService);
     }
 
 
@@ -156,7 +156,7 @@ public class DomainConfiguration {
                                              final PermissionService permissionService,
                                              final IndexerPort indexerPort,
                                              final AccountingServicePort accountingServicePort) {
-        return new RewardV2Service(postgresRewardAdapter, permissionService, indexerPort, accountingServicePort);
+        return new RewardService(postgresRewardAdapter, permissionService, indexerPort, accountingServicePort);
     }
 
     @Bean

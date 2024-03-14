@@ -32,7 +32,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.intern
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
-public class PostgresProjectRewardV2Adapter implements ProjectRewardStoragePort {
+public class PostgresProjectRewardAdapter implements ProjectRewardStoragePort {
     private final ProjectAllowanceRepository projectAllowanceRepository;
     private final HistoricalQuoteRepository historicalQuoteRepository;
     private final CurrencyRepository currencyRepository;

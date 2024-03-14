@@ -23,12 +23,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
-public class RewardV2ServiceTest {
+public class RewardServiceTest {
     final RewardStoragePort rewardStoragePort = mock(RewardStoragePort.class);
     final PermissionService permissionService = mock(PermissionService.class);
     final IndexerPort indexerPort = mock(IndexerPort.class);
     final AccountingServicePort accountingServicePort = mock(AccountingServicePort.class);
-    final RewardV2Service rewardService = new RewardV2Service(
+    final RewardService rewardService = new RewardService(
             rewardStoragePort,
             permissionService,
             indexerPort,

@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
-public class RewardV2Service implements RewardFacadePort {
+public class RewardService implements RewardFacadePort {
     private final RewardStoragePort rewardStoragePort;
     private final PermissionService permissionService;
     private final IndexerPort indexerPort;
