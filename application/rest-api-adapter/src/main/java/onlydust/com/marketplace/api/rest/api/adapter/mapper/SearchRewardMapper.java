@@ -52,6 +52,7 @@ public interface SearchRewardMapper {
                 .currencyCode(view.currencyCode())
                 .currencyName(view.currencyName())
                 .currencyLogoUrl(view.currencyLogoUrl())
+                .conversionRate(view.usdConversionRate())
                 .dollarsEquivalent(view.dollarsEquivalent());
     }
 

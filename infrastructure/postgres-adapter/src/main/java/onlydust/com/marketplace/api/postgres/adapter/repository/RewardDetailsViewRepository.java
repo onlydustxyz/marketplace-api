@@ -16,9 +16,9 @@ public interface RewardDetailsViewRepository extends JpaRepository<BackofficeRew
 
     @Language("PostgreSQL")
     String SELECT = """
-                select r.id                                     id,
+                select r.id                                             id,
                                r.requested_at                           requested_at,
-                               receipts.processed_at                    processed_at,
+                               rsd.paid_at                              processed_at,
 
                                github_recipient.id                      recipient_id,
                                github_recipient.login                   recipient_login,
@@ -58,6 +58,7 @@ public interface RewardDetailsViewRepository extends JpaRepository<BackofficeRew
 
                         from rewards r
                                  join accounting.reward_statuses rs on rs.reward_id = r.id
+                                 join accounting.reward_status_data rsd on rsd.reward_id = r.id
                                  join currencies c on c.id = r.currency_id
                                  join project_details pd on r.project_id = pd.project_id
                                  left join indexer_exp.github_accounts github_recipient ON github_recipient.id = r.recipient_id
@@ -87,8 +88,7 @@ public interface RewardDetailsViewRepository extends JpaRepository<BackofficeRew
                                  left join user_profile_info upi on upi.id = u.id
                                  left join (select rr.reward_id,
                                                    jsonb_agg(re.transaction_reference) transaction_references,
-                                                   jsonb_agg(re.third_party_account_number) paid_to_account_numbers,
-                                                   max(re.created_at) processed_at
+                                                   jsonb_agg(re.third_party_account_number) paid_to_account_numbers
                                             from accounting.receipts re
                                             join accounting.rewards_receipts rr on rr.receipt_id = re.id
                                             group by rr.reward_id) receipts on receipts.reward_id = r.id
@@ -107,8 +107,8 @@ public interface RewardDetailsViewRepository extends JpaRepository<BackofficeRew
             where cast(rs.status as text) in (:statuses)
                 and (coalesce(:fromRequestedAt) is null or r.requested_at >= cast(cast(:fromRequestedAt as text) as timestamp))
                 and (coalesce(:toRequestedAt)   is null or r.requested_at <= cast(cast(:toRequestedAt   as text) as timestamp))
-                and (coalesce(:fromProcessedAt) is null or receipts.processed_at  >= cast(cast(:fromProcessedAt as text) as timestamp))
-                and (coalesce(:toProcessedAt)   is null or receipts.processed_at  <= cast(cast(:toProcessedAt   as text) as timestamp))
+                and (coalesce(:fromProcessedAt) is null or rsd.paid_at  >= cast(cast(:fromProcessedAt as text) as timestamp))
+                and (coalesce(:toProcessedAt)   is null or rsd.paid_at  <= cast(cast(:toProcessedAt   as text) as timestamp))
             """, nativeQuery = true)
     Page<BackofficeRewardViewEntity> findAllByStatusesAndDates(@NonNull List<String> statuses,
                                                                Date fromRequestedAt, Date toRequestedAt,
@@ -132,6 +132,6 @@ public interface RewardDetailsViewRepository extends JpaRepository<BackofficeRew
             """, nativeQuery = true)
     List<BackofficeRewardViewEntity> findAllByRewardIds(@NonNull List<UUID> rewardIds);
 
-    @Query(nativeQuery = true, value = SELECT + " where receipts.processed_at is not null and r.payment_notified_at is null")
+    @Query(nativeQuery = true, value = SELECT + " where rsd.paid_at is not null and r.payment_notified_at is null")
     List<BackofficeRewardViewEntity> findPaidRewardsToNotify();
 }

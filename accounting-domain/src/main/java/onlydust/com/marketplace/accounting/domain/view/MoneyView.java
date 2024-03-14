@@ -10,5 +10,6 @@ public record MoneyView(@NonNull BigDecimal amount,
                         @NonNull String currencyName,
                         @NonNull String currencyCode,
                         String currencyLogoUrl,
+                        BigDecimal usdConversionRate,
                         BigDecimal dollarsEquivalent) {
 }

@@ -399,7 +399,12 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                     "name": "Pizzeria Yoshi !",
                                     "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png"
                                   },
-                                  "sponsors": [],
+                                  "sponsors": [
+                                    {
+                                      "name": "No Sponsor",
+                                      "avatarUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
+                                    }
+                                  ],
                                   "money": {
                                     "amount": 1000,
                                     "dollarsEquivalent": 1010.00,
@@ -409,7 +414,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                     "currencyLogoUrl": null
                                   },
                                   "transactionReferences": [
-                                    "0x0000000000000000000000000000000000000000000000000000000000000000"
+                                    "0x0"
                                   ]
                                 }
                               ]
