@@ -4,11 +4,13 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HiddenContributorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEcosystemEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRepoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -43,7 +45,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
     private static final int TOP_CONTRIBUTOR_COUNT = 3;
     private final ProjectRepository projectRepository;
     private final ProjectViewRepository projectViewRepository;
-    private final ProjectIdRepository projectIdRepository;
     private final ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
     private final ProjectRepoRepository projectRepoRepository;
     private final CustomProjectRepository customProjectRepository;
@@ -244,7 +245,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
                         .rank(0)
                         .build();
 
-        this.projectIdRepository.save(new ProjectIdEntity(projectId));
         this.projectRepository.save(projectEntity);
 
         return projectRepository.getKeyById(projectId);

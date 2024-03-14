@@ -16,12 +16,13 @@ public interface ProjectLeadViewRepository extends JpaRepository<ProjectLeadView
             select
                 u.github_user_id,
                 u.id,
-                u.login,
-                user_avatar_url(u.github_user_id, u.avatar_url) as avatar_url,
-                u.html_url,
+                u.github_login as login,
+                user_avatar_url(u.github_user_id, u.github_avatar_url) as avatar_url,
+                ga.html_url,
                 true as has_accepted_invitation
-            from registered_users u
+            from iam.users u
             join project_leads pl on pl.user_id = u.id and pl.project_id = :projectId
+            left join indexer_exp.github_accounts ga on ga.id = u.github_user_id
             """, nativeQuery = true)
     List<ProjectLeadViewEntity> findProjectLeaders(UUID projectId);
 
@@ -30,12 +31,13 @@ public interface ProjectLeadViewRepository extends JpaRepository<ProjectLeadView
             select
                 u.github_user_id,
                 u.id,
-                u.login,
-                user_avatar_url(u.github_user_id, u.avatar_url) as avatar_url,
-                u.html_url,
+                u.github_login as login,
+                user_avatar_url(u.github_user_id, u.github_avatar_url) as avatar_url,
+                ga.html_url,
                 true as has_accepted_invitation
-            from registered_users u
+            from iam.users u
             join project_leads pl on pl.user_id = u.id and pl.project_id = :projectId
+            left join indexer_exp.github_accounts ga on ga.id = u.github_user_id
             )
             UNION
             (

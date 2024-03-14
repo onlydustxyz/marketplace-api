@@ -43,7 +43,6 @@ public class ProjectService implements ProjectFacadePort, ProjectRewardFacadePor
     private final PermissionService permissionService;
     private final IndexerPort indexerPort;
     private final DateProvider dateProvider;
-    private final EventStoragePort eventStoragePort;
     private final ContributionStoragePort contributionStoragePort;
     private final DustyBotStoragePort dustyBotStoragePort;
     private final GithubStoragePort githubStoragePort;
@@ -104,8 +103,6 @@ public class ProjectService implements ProjectFacadePort, ProjectRewardFacadePor
                 ProjectVisibility.PUBLIC,
                 command.getImageUrl(),
                 ProjectRewardSettings.defaultSettings(dateProvider.now()), command.getEcosystemIds());
-
-        eventStoragePort.saveEvent(new ProjectCreatedOldEvent(projectId));
 
         projectObserverPort.onProjectCreated(projectId);
         projectObserverPort.onLeaderAssigned(projectId, command.getFirstProjectLeaderId());

@@ -41,10 +41,6 @@ public class BoPaymentEntity {
     Integer issuesCount;
     Integer dustyIssuesCount;
     Integer codeReviewsCount;
-    //    @Type(type = "jsonb")
-//    Identity recipientIdentity;
-//    @Type(type = "jsonb")
-//    Location recipientLocation;
     @Type(type = "jsonb")
     List<Wallet> recipientWallets;
     String recipientIban;

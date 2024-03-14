@@ -23,15 +23,12 @@ public interface BoPaymentRepository extends JpaRepository<BoPaymentEntity, UUID
             	Items.urls AS items,
             	r.requested_at,
             	Counters.*,
-            	upi.identity as recipient_identity,
-            	upi.location as recipient_location,
             	user_wallets.wallets as recipient_wallets,
             	ba.number as recipient_iban,
             	ba.bic as recipient_bic
             FROM
             	rewards r
             	LEFT JOIN iam.users u ON u.github_user_id = r.recipient_id
-            	LEFT JOIN user_payout_info upi ON upi.user_id = u.id
             	LEFT JOIN accounting.payout_preferences pp on pp.project_id = r.project_id AND pp.user_id = u.id
             	LEFT JOIN accounting.bank_accounts ba ON ba.billing_profile_id = pp.billing_profile_id
             	LEFT JOIN (

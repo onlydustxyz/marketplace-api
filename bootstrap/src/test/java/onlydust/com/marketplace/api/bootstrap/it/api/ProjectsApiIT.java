@@ -586,7 +586,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 134486697,
                   "login": "axelbconseil",
-                  "htmlUrl": "https://github.com/axelbconseil",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/134486697?v=4",
                   "id": "83612081-949a-47c4-a467-6f28f6adad6d"
                 }

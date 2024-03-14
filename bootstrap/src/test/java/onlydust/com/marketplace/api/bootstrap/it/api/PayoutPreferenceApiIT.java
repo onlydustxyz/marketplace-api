@@ -8,12 +8,10 @@ import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectIdEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -42,8 +40,6 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
     BillingProfileService billingProfileService;
     @Autowired
     ProjectRepository projectRepository;
-    @Autowired
-    ProjectIdRepository projectIdRepository;
     @Autowired
     RewardRepository rewardRepository;
     @Autowired
@@ -267,7 +263,6 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 faker.gameOfThrones().character() + faker.number().randomNumber(),
                 faker.rickAndMorty().character(), faker.pokemon().name(), null, faker.internet().url(), false, 0, null, ProjectVisibilityEnumEntity.PRIVATE,
                 false, false, false, new Date(), null, null, null, null, null, null, null));
-        projectIdRepository.save(new ProjectIdEntity(projectEntity.getId()));
         // To get the slug
         return projectRepository.findById(projectEntity.getId()).orElseThrow();
     }

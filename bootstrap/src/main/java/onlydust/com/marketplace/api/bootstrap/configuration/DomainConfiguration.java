@@ -53,7 +53,6 @@ public class DomainConfiguration {
                                                final PermissionService permissionService,
                                                final IndexerPort indexerPort,
                                                final DateProvider dateProvider,
-                                               final EventStoragePort eventStoragePort,
                                                final ContributionStoragePort contributionStoragePort,
                                                final DustyBotStoragePort dustyBotStoragePort,
                                                final GithubStoragePort githubStoragePort) {
@@ -65,7 +64,6 @@ public class DomainConfiguration {
                 permissionService,
                 indexerPort,
                 dateProvider,
-                eventStoragePort,
                 contributionStoragePort,
                 dustyBotStoragePort,
                 githubStoragePort);
@@ -80,7 +78,6 @@ public class DomainConfiguration {
                                                            final PermissionService permissionService,
                                                            final IndexerPort indexerPort,
                                                            final DateProvider dateProvider,
-                                                           final EventStoragePort eventStoragePort,
                                                            final ContributionStoragePort contributionStoragePort,
                                                            final DustyBotStoragePort dustyBotStoragePort,
                                                            final GithubStoragePort githubStoragePort) {
@@ -92,7 +89,6 @@ public class DomainConfiguration {
                 permissionService,
                 indexerPort,
                 dateProvider,
-                eventStoragePort,
                 contributionStoragePort,
                 dustyBotStoragePort,
                 githubStoragePort);

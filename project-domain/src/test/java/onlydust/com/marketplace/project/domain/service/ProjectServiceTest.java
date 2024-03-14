@@ -36,7 +36,6 @@ public class ProjectServiceTest {
     private final PermissionService permissionService = mock(PermissionService.class);
     private final DustyBotStoragePort dustyBotStoragePort = mock(DustyBotStoragePort.class);
     private final IndexerPort indexerPort = mock(IndexerPort.class);
-    private final EventStoragePort eventStoragePort = mock(EventStoragePort.class);
     private final UUIDGeneratorPort uuidGeneratorPort = mock(UUIDGeneratorPort.class);
     private final GithubStoragePort githubStoragePort = mock(GithubStoragePort.class);
     private final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
@@ -45,8 +44,7 @@ public class ProjectServiceTest {
     private final ProjectService projectService = new ProjectService(projectObserverPort, projectStoragePort, projectRewardStoragePort,
             imageStoragePort,
             uuidGeneratorPort, permissionService, indexerPort, dateProvider,
-            eventStoragePort, contributionStoragePort, dustyBotStoragePort,
-            githubStoragePort);
+            contributionStoragePort, dustyBotStoragePort, githubStoragePort);
 
     @BeforeEach
     void setUp() {
@@ -157,7 +155,6 @@ public class ProjectServiceTest {
         assertNotNull(projectIdentity.getLeft());
         assertThat(projectIdentity.getRight()).isEqualTo("slug");
         verify(indexerPort, times(1)).indexUsers(usersToInviteAsProjectLeaders);
-        verify(eventStoragePort).saveEvent(new ProjectCreatedOldEvent(projectIdentity.getLeft()));
         verify(projectObserverPort).onProjectCreated(expectedProjectId);
         verify(projectObserverPort).onLeaderAssigned(expectedProjectId, command.getFirstProjectLeaderId());
         verify(projectObserverPort).onLeaderInvited(expectedProjectId, usersToInviteAsProjectLeaders.get(0));
@@ -642,8 +639,7 @@ public class ProjectServiceTest {
         final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort, mock(ProjectRewardStoragePort.class),
                 mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, indexerPort, dateProvider,
-                mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class),
-                mock(GithubStoragePort.class));
+                mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class), mock(GithubStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final UUID projectLeadId = UUID.randomUUID();
         final String githubRepoOwner = faker.name().username();
@@ -715,8 +711,7 @@ public class ProjectServiceTest {
         final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort, mock(ProjectRewardStoragePort.class),
                 mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, indexerPort, dateProvider,
-                mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class),
-                mock(GithubStoragePort.class));
+                mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class), mock(GithubStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final UUID projectLeadId = UUID.randomUUID();
         final String githubRepoOwner = faker.name().username();
