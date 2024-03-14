@@ -184,7 +184,7 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<ProjectBudgetsResponse> getProjectBudgetsV2(UUID projectId) {
+    public ResponseEntity<ProjectBudgetsResponse> getProjectBudgets(UUID projectId) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final ProjectBudgetsView projectBudgetsView = projectRewardFacadePortV2.getBudgets(projectId,
                 authenticatedUser.getId());
@@ -229,13 +229,6 @@ public class ProjectsRestApi implements ProjectsApi {
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardItemsPageResponse) :
                 ResponseEntity.ok(rewardItemsPageResponse);
     }
-
-    @Override
-    public ResponseEntity<RewardItemsPageResponse> getProjectRewardItemsPageV2(UUID projectId, UUID rewardId, Integer pageIndex, Integer pageSize) {
-        // TODO
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
 
     @Override
     public ResponseEntity<RewardableItemsPageResponse> getProjectRewardableContributions(UUID projectId,

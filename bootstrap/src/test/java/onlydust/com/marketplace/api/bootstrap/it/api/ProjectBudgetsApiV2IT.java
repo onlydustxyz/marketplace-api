@@ -55,7 +55,7 @@ public class ProjectBudgetsApiV2IT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_BUDGETS_V2, projectId)))
+                .uri(getApiURI(String.format(PROJECTS_GET_BUDGETS, projectId)))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -104,7 +104,7 @@ public class ProjectBudgetsApiV2IT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_BUDGETS_V2, projectId)))
+                .uri(getApiURI(String.format(PROJECTS_GET_BUDGETS, projectId)))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
