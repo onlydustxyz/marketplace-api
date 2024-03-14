@@ -35,7 +35,7 @@ FROM reward_to_batch_payment r2bp
 CREATE TABLE accounting.batch_payment_invoices
 (
     batch_payment_id UUID      NOT NULL REFERENCES accounting.batch_payments (id),
-    invoice_id       UUID      NOT NULL REFERENCES invoices (id),
+    invoice_id       UUID      NOT NULL REFERENCES accounting.invoices (id),
     tech_created_at  TIMESTAMP NOT NULL DEFAULT now(),
     tech_updated_at  TIMESTAMP NOT NULL DEFAULT now(),
     PRIMARY KEY (batch_payment_id, invoice_id)
