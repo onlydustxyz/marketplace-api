@@ -169,3 +169,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000103_add_event_timestamp.sql
   - include:
       file: db/changelog/changelogs/00000104_remove_budgets_from_views.sql
+  - include:
+      file: db/changelog/changelogs/00000105_create_latest_usd_quotes_view.sql
