@@ -129,9 +129,9 @@ public class RewardService implements AccountingRewardPort {
     @NotNull
     private static Map<RewardId, Wallet> walletsPerRewardForNetwork(Map<RewardId, Invoice> rewardInvoices, Network network) {
         return rewardInvoices.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey,
-                        e -> e.getValue().billingProfileSnapshot().wallet(network)
-                                .orElseThrow(() -> internalServerError("No wallet for reward %s on network %s".formatted(e.getKey(), network)))));
+                .map(e -> Map.entry(e.getKey(), e.getValue().billingProfileSnapshot().wallet(network)))
+                .filter(e -> e.getValue().isPresent())
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().get()));
     }
 
 //    @NotNull

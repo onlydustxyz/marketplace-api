@@ -67,9 +67,6 @@ public class RewardServiceTest {
 
         payoutInfo1 = PayoutInfo.builder()
                 .ethWallet(new WalletLocator(new Name("vitalik.eth")))
-                .bankAccount(new BankAccount("PLOP", "9988776655"))
-                .starknetAddress(new StarknetAccountAddress("0x1234"))
-                .optimismAddress(new EvmAccountAddress("0x111"))
                 .build();
         payoutInfo2 = PayoutInfo.builder()
                 .ethWallet(new WalletLocator(new Name("foo.eth")))
@@ -160,12 +157,6 @@ public class RewardServiceTest {
             assertThat(ethereumBatch.rewards()).containsExactlyInAnyOrder(payableRewards.get(0), payableRewards.get(2), payableRewards.get(4),
                     payableRewards.get(5));
             assertThat(ethereumBatch.invoices()).containsAll(invoices);
-//            assertThat(getMoneyView(ethereumBatch, Currency.Code.USDC_STR).amount()).isEqualTo(BigDecimal.valueOf(700L));
-//            assertThat(getMoneyView(ethereumBatch, Currency.Code.USDC_STR).dollarsEquivalent()).isEqualTo(BigDecimal.valueOf(4400L));
-//            assertThat(getMoneyView(ethereumBatch, Currency.Code.STRK_STR).amount()).isEqualTo(BigDecimal.valueOf(300L));
-//            assertThat(getMoneyView(ethereumBatch, Currency.Code.STRK_STR).dollarsEquivalent()).isEqualTo(BigDecimal.valueOf(1200L));
-//            assertThat(getMoneyView(ethereumBatch, Currency.Code.ETH_STR).amount()).isEqualTo(BigDecimal.valueOf(500L));
-//            assertThat(getMoneyView(ethereumBatch, Currency.Code.ETH_STR).dollarsEquivalent()).isEqualTo(BigDecimal.valueOf(3000L));
             assertThat(ethereumBatch.csv()).isEqualToIgnoringWhitespace("""
                     erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,vitalik.eth,100
                     erc20,0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766,vitalik.eth,300

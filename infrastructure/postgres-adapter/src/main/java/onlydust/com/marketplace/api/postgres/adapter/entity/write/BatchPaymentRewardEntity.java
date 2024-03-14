@@ -29,7 +29,10 @@ public class BatchPaymentRewardEntity {
     UUID rewardId;
     BigDecimal amount;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "batchPaymentId", referencedColumnName = "id", insertable = false, updatable = false)
+    BatchPaymentEntity batchPayment;
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rewardId", referencedColumnName = "id", insertable = false, updatable = false)
     RewardEntity reward;
 
