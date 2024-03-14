@@ -52,3 +52,11 @@ SELECT r2bp.batch_payment_id, r.invoice_id
 FROM reward_to_batch_payment r2bp
          JOIN rewards r ON r2bp.reward_id = r.id
 WHERE r.invoice_id IS NOT NULL;
+
+ALTER TABLE rewards
+    ADD COLUMN payment_notified_at TIMESTAMP;
+
+UPDATE rewards
+SET payment_notified_at = pr.payment_notified_at
+FROM payment_requests pr
+WHERE rewards.id = pr.id;

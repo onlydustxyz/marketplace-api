@@ -133,7 +133,7 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
 
     @Modifying
     @Query(nativeQuery = true, value = """
-            update payment_requests
+            update rewards
             set payment_notified_at = now()
             where id in (:rewardIds)
             """)
