@@ -8,18 +8,15 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.RewardWithPayoutInfoView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BackofficeRewardViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoRewardWithPayoutInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentRewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
-import onlydust.com.marketplace.api.postgres.adapter.repository.PayableRewardWithPayoutInfoViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardDetailsViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ShortProjectViewEntityRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoRewardWithPayoutInfoRepository;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
@@ -38,11 +35,9 @@ import java.util.*;
 public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewardStoragePort {
 
     private final ShortProjectViewEntityRepository shortProjectViewEntityRepository;
-    private final PayableRewardWithPayoutInfoViewRepository payableRewardWithPayoutInfoViewRepository;
     private final BatchPaymentRepository batchPaymentRepository;
     private final RewardViewRepository rewardViewRepository;
     private final RewardDetailsViewRepository rewardDetailsViewRepository;
-    private final BoRewardWithPayoutInfoRepository boRewardWithPayoutInfoRepository;
 
     @Override
     public void save(Reward reward) {
@@ -121,9 +116,10 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
                 .map(batchPayment ->
                         BatchPaymentDetailsView.builder()
                                 .batchPayment(batchPayment.toDomain())
-                                .rewardViews(rewardDetailsViewRepository.findAllByRewardIds(batchPayment.getRewardIds()).stream()
-                                        .map(BackofficeRewardViewEntity::toDomain)
-                                        .toList())
+                                .rewardViews(
+                                        rewardDetailsViewRepository.findAllByRewardIds(batchPayment.getRewards().stream().map(BatchPaymentRewardEntity::rewardId).toList()).stream()
+                                                .map(BackofficeRewardViewEntity::toDomain)
+                                                .toList())
                                 .build()
                 );
     }
@@ -160,11 +156,8 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<RewardWithPayoutInfoView> getRewardWithPayoutInfoOfInvoices(List<Invoice.Id> invoiceIds) {
-        return boRewardWithPayoutInfoRepository.findByInvoiceIds(invoiceIds.stream().map(UuidWrapper::value).toList())
-                .stream()
-                .map(BoRewardWithPayoutInfoEntity::toDomain)
-                .toList();
+    @Transactional
+    public void saveAll(List<BatchPayment> batchPayments) {
+        batchPaymentRepository.saveAll(batchPayments.stream().map(BatchPaymentEntity::fromDomain).toList());
     }
 }

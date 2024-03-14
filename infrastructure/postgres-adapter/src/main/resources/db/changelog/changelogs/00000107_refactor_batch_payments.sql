@@ -10,26 +10,45 @@ FROM (SELECT rsd.reward_id, rsd.amount_usd_equivalent / r.amount AS usd_conversi
         AND rsd.amount_usd_equivalent IS NOT NULL) AS ucr
 WHERE accounting.reward_status_data.reward_id = ucr.reward_id;
 
-ALTER TABLE accounting.batch_payments
-    ADD COLUMN total_amounts_per_currency JSONB;
 
-UPDATE accounting.batch_payments
-SET total_amounts_per_currency = ba.amounts
-FROM (select ba.id,
-             jsonb_agg(jsonb_build_object(
-                     'amount', r.amount,
-                     'currencyName', c.name,
-                     'currencyCode', c.code,
-                     'currencyLogoUrl', c.logo_url,
-                     'dollarsEquivalent', rsd.amount_usd_equivalent
-                       )) amounts
-      from accounting.batch_payments ba
-               join reward_to_batch_payment r2bp on r2bp.batch_payment_id = ba.id
-               join rewards r on r.id = r2bp.reward_id
-               join currencies c on c.id = r.currency_id
-               join accounting.reward_status_data rsd on rsd.reward_id = r.id
-      group by ba.id) AS ba
-WHERE accounting.batch_payments.id = ba.id;
+CREATE TABLE accounting.batch_payment_rewards
+(
+    batch_payment_id UUID      NOT NULL REFERENCES accounting.batch_payments (id),
+    reward_id        UUID      NOT NULL REFERENCES rewards (id),
+    amount           NUMERIC   NOT NULL,
+    tech_created_at  TIMESTAMP NOT NULL DEFAULT now(),
+    tech_updated_at  TIMESTAMP NOT NULL DEFAULT now(),
+    PRIMARY KEY (batch_payment_id, reward_id)
+);
 
-ALTER TABLE accounting.batch_payments
-    ALTER COLUMN total_amounts_per_currency SET NOT NULL;
+CREATE TRIGGER batch_payment_rewards_set_tech_updated_at
+    BEFORE UPDATE
+    ON accounting.batch_payment_rewards
+    FOR EACH ROW
+EXECUTE PROCEDURE set_tech_updated_at();
+
+INSERT INTO accounting.batch_payment_rewards (batch_payment_id, reward_id, amount)
+SELECT r2bp.batch_payment_id, r2bp.reward_id, r.amount
+FROM reward_to_batch_payment r2bp
+         JOIN rewards r ON r2bp.reward_id = r.id;
+
+CREATE TABLE accounting.batch_payment_invoices
+(
+    batch_payment_id UUID      NOT NULL REFERENCES accounting.batch_payments (id),
+    invoice_id       UUID      NOT NULL REFERENCES invoices (id),
+    tech_created_at  TIMESTAMP NOT NULL DEFAULT now(),
+    tech_updated_at  TIMESTAMP NOT NULL DEFAULT now(),
+    PRIMARY KEY (batch_payment_id, invoice_id)
+);
+
+CREATE TRIGGER batch_payment_rewards_set_tech_updated_at
+    BEFORE UPDATE
+    ON accounting.batch_payment_invoices
+    FOR EACH ROW
+EXECUTE PROCEDURE set_tech_updated_at();
+
+INSERT INTO accounting.batch_payment_invoices (batch_payment_id, invoice_id)
+SELECT r2bp.batch_payment_id, r.invoice_id
+FROM reward_to_batch_payment r2bp
+         JOIN rewards r ON r2bp.reward_id = r.id
+WHERE r.invoice_id IS NOT NULL;

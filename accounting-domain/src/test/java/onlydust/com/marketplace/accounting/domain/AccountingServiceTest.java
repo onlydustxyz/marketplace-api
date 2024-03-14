@@ -429,7 +429,8 @@ public class AccountingServiceTest {
             final var reference = fakePaymentReference(network);
             accountingService.pay(rewardId2, currency.id(), reference);
             verify(accountingObserver).onSponsorAccountBalanceChanged(any());
-            verify(accountingObserver).onRewardPaid(rewardId2, reference);
+            verify(accountingObserver).onPaymentReceived(rewardId2, reference);
+            verify(accountingObserver).onRewardPaid(rewardId2);
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
@@ -893,7 +894,8 @@ public class AccountingServiceTest {
             final var reference = fakePaymentReference(Network.ETHEREUM);
             accountingService.pay(rewardId, currency.id(), reference);
             verify(accountingObserver, times(2)).onSponsorAccountBalanceChanged(any());
-            verify(accountingObserver).onRewardPaid(rewardId, reference);
+            verify(accountingObserver).onPaymentReceived(rewardId, reference);
+            verify(accountingObserver).onRewardPaid(rewardId);
 
             // Then
             assertThat(sponsorAccountStorage.get(unlockedSponsorSponsorAccount1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
@@ -1252,7 +1254,8 @@ public class AccountingServiceTest {
             final var reference = fakePaymentReference(Network.ETHEREUM);
             accountingService.pay(rewardId3, usdc.id(), reference);
             verify(accountingObserver).onSponsorAccountBalanceChanged(any());
-            verify(accountingObserver).onRewardPaid(rewardId3, reference);
+            verify(accountingObserver).onPaymentReceived(rewardId3, reference);
+            verify(accountingObserver, never()).onRewardPaid(rewardId3);
             {
                 // When
                 final var payableRewards = accountingService.getPayableRewards();

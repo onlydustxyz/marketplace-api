@@ -30,4 +30,6 @@ public interface InvoiceStoragePort {
     int getNextSequenceNumber(BillingProfile.Id billingProfileId);
 
     List<Invoice.Reward> findRewards(List<RewardId> rewardIds);
+
+    List<Invoice> getAll(List<Invoice.Id> invoiceIds);
 }

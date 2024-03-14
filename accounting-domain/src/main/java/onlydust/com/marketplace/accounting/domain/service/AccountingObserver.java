@@ -56,7 +56,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
     }
 
     @Override
-    public void onRewardPaid(RewardId rewardId, SponsorAccount.PaymentReference reference) {
+    public void onRewardPaid(RewardId rewardId) {
         final var rewardStatus = rewardStatusStorage.get(rewardId)
                 .orElseThrow(() -> internalServerError("RewardStatus not found for reward %s".formatted(rewardId)));
         rewardStatusStorage.save(rewardStatus.paidAt(ZonedDateTime.now()));
@@ -67,7 +67,10 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
                 invoiceStorage.update(invoice.status(Invoice.Status.PAID));
             }
         });
+    }
 
+    @Override
+    public void onPaymentReceived(RewardId rewardId, SponsorAccount.PaymentReference reference) {
         receiptStorage.save(Receipt.of(rewardId, reference));
     }
 

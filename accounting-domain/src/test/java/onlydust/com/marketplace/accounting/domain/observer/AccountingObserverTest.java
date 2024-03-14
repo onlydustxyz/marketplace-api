@@ -185,10 +185,9 @@ public class AccountingObserverTest {
             when(invoiceStorage.invoiceOf(rewardId)).thenReturn(Optional.of(invoice));
             when(invoiceStorage.invoiceOf(rewardId2)).thenReturn(Optional.of(invoice));
 
-            accountingObserver.onRewardPaid(rewardId, reference);
-
-            // Then
+            accountingObserver.onRewardPaid(rewardId);
             {
+                // Then
                 final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
                 verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
                 final var newRewardStatus = rewardStatusCaptor.getValue();
@@ -196,7 +195,11 @@ public class AccountingObserverTest {
                 assertThat(newRewardStatus.paidAt()).isNotNull();
 
                 verify(invoiceStorage, never()).update(invoice.status(Invoice.Status.PAID));
+            }
 
+            accountingObserver.onPaymentReceived(rewardId, reference);
+            {
+                // Then
                 final var receiptCaptor = ArgumentCaptor.forClass(Receipt.class);
                 verify(receiptStorage).save(receiptCaptor.capture());
                 final var receipt = receiptCaptor.getValue();
@@ -216,10 +219,9 @@ public class AccountingObserverTest {
             when(invoiceStorage.invoiceOf(rewardId)).thenReturn(Optional.of(invoice));
             when(invoiceStorage.invoiceOf(rewardId2)).thenReturn(Optional.of(invoice));
 
-            accountingObserver.onRewardPaid(rewardId2, reference);
-
-            // Then
+            accountingObserver.onRewardPaid(rewardId2);
             {
+                // Then
                 final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
                 verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
                 final var newRewardStatus = rewardStatusCaptor.getValue();
@@ -227,7 +229,11 @@ public class AccountingObserverTest {
                 assertThat(newRewardStatus.paidAt()).isNotNull();
 
                 verify(invoiceStorage).update(invoice.status(Invoice.Status.PAID));
+            }
 
+            accountingObserver.onPaymentReceived(rewardId2, reference);
+            {
+                // Then
                 final var receiptCaptor = ArgumentCaptor.forClass(Receipt.class);
                 verify(receiptStorage).save(receiptCaptor.capture());
                 final var receipt = receiptCaptor.getValue();

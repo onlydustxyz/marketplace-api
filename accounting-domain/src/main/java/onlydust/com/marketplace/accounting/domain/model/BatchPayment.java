@@ -3,7 +3,6 @@ package onlydust.com.marketplace.accounting.domain.model;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
-import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.util.Date;
@@ -20,13 +19,14 @@ public class BatchPayment {
     String csv;
     @NonNull
     Network network;
-    List<MoneyView> moneys;
     @NonNull
     @Builder.Default
     Status status = Status.TO_PAY;
     String transactionHash;
     @NonNull
-    List<RewardId> rewardIds;
+    List<Invoice> invoices;
+    @NonNull
+    List<PayableReward> rewards;
     Date createdAt;
 
     @NoArgsConstructor(staticName = "random")
