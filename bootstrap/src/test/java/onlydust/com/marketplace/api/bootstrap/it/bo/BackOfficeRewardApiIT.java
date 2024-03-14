@@ -14,7 +14,6 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.AccountingHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.od.rust.api.client.adapter.OdRustApiHttpClient;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
@@ -1193,8 +1192,6 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
     @Autowired
     BatchPaymentRepository batchPaymentRepository;
-    @Autowired
-    OdRustApiHttpClient.Properties odRustApiHttpClientProperties;
     @Autowired
     ApiKeyAuthenticationService.Config backOfficeApiKeyAuthenticationConfig;
 

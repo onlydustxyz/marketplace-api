@@ -54,20 +54,17 @@ public class PostgresConfiguration {
                                                  final CustomProjectRepository customProjectRepository,
                                                  final CustomContributorRepository customContributorRepository,
                                                  final ProjectLeadViewRepository projectLeadViewRepository,
-                                                 final CustomRewardRepository customRewardRepository,
                                                  final ProjectsPageRepository projectsPageRepository,
                                                  final ProjectsPageFiltersRepository projectsPageFiltersRepository,
                                                  final RewardableItemRepository rewardableItemRepository,
                                                  final CustomProjectRankingRepository customProjectRankingRepository,
-                                                 final BudgetStatsRepository budgetStatsRepository,
                                                  final ChurnedContributorViewEntityRepository churnedContributorViewEntityRepository,
                                                  final NewcomerViewEntityRepository newcomerViewEntityRepository,
                                                  final ContributorActivityViewEntityRepository contributorActivityViewEntityRepository,
                                                  final ApplicationRepository applicationRepository,
                                                  final ContributionViewEntityRepository contributionViewEntityRepository,
                                                  final HiddenContributorRepository hiddenContributorRepository,
-                                                 final ProjectTagRepository projectTagRepository,
-                                                 final RewardViewRepository rewardViewRepository) {
+                                                 final ProjectTagRepository projectTagRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -76,20 +73,17 @@ public class PostgresConfiguration {
                 customProjectRepository,
                 customContributorRepository,
                 projectLeadViewRepository,
-                customRewardRepository,
                 projectsPageRepository,
                 projectsPageFiltersRepository,
                 rewardableItemRepository,
                 customProjectRankingRepository,
-                budgetStatsRepository,
                 churnedContributorViewEntityRepository,
                 newcomerViewEntityRepository,
                 contributorActivityViewEntityRepository,
                 applicationRepository,
                 contributionViewEntityRepository,
                 hiddenContributorRepository,
-                projectTagRepository,
-                rewardViewRepository
+                projectTagRepository
         );
     }
 
@@ -101,20 +95,17 @@ public class PostgresConfiguration {
                                                            final CustomProjectRepository customProjectRepository,
                                                            final CustomContributorRepository customContributorRepository,
                                                            final ProjectLeadViewRepository projectLeadViewRepository,
-                                                           final CustomRewardRepository customRewardRepository,
                                                            final ProjectsPageRepository projectsPageRepository,
                                                            final ProjectsPageFiltersRepository projectsPageFiltersRepository,
                                                            final RewardableItemRepository rewardableItemRepository,
                                                            final CustomProjectRankingRepository customProjectRankingRepository,
-                                                           final BudgetStatsRepository budgetStatsRepository,
                                                            final ChurnedContributorViewEntityRepository churnedContributorViewEntityRepository,
                                                            final NewcomerViewEntityRepository newcomerViewEntityRepository,
                                                            final ContributorActivityViewEntityRepository contributorActivityViewEntityRepository,
                                                            final ApplicationRepository applicationRepository,
                                                            final ContributionViewEntityRepository contributionViewEntityRepository,
                                                            final HiddenContributorRepository hiddenContributorRepository,
-                                                           final ProjectTagRepository projectTagRepository,
-                                                           final RewardViewRepository rewardViewRepository) {
+                                                           final ProjectTagRepository projectTagRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -123,28 +114,30 @@ public class PostgresConfiguration {
                 customProjectRepository,
                 customContributorRepository,
                 projectLeadViewRepository,
-                customRewardRepository,
                 projectsPageRepository,
                 projectsPageFiltersRepository,
                 rewardableItemRepository,
                 customProjectRankingRepository,
-                budgetStatsRepository,
                 churnedContributorViewEntityRepository,
                 newcomerViewEntityRepository,
                 contributorActivityViewEntityRepository,
                 applicationRepository,
                 contributionViewEntityRepository,
                 hiddenContributorRepository,
-                projectTagRepository,
-                rewardViewRepository
+                projectTagRepository
         );
     }
 
     @Bean
-    public PostgresProjectRewardV2Adapter projectRewardStoragePortV2(final ProjectAllowanceRepository projectAllowanceRepository,
+    public PostgresProjectRewardAdapter postgresProjectRewardAdapter(final ProjectAllowanceRepository projectAllowanceRepository,
                                                                      final HistoricalQuoteRepository historicalQuoteRepository,
-                                                                     final CurrencyRepository currencyRepository) {
-        return new PostgresProjectRewardV2Adapter(projectAllowanceRepository, historicalQuoteRepository, currencyRepository);
+                                                                     final CurrencyRepository currencyRepository,
+                                                                     final CustomRewardRepository customRewardRepository,
+                                                                     final BudgetStatsRepository budgetStatsRepository,
+                                                                     final RewardViewRepository rewardViewRepository
+    ) {
+        return new PostgresProjectRewardAdapter(projectAllowanceRepository, historicalQuoteRepository, currencyRepository, budgetStatsRepository,
+                rewardViewRepository, customRewardRepository);
     }
 
     @Bean
@@ -214,15 +207,11 @@ public class PostgresConfiguration {
     public PostgresRewardAdapter postgresRewardAdapter(final ShortProjectViewEntityRepository shortProjectViewEntityRepository,
                                                        final BatchPaymentRepository batchPaymentRepository,
                                                        final RewardViewRepository rewardViewRepository,
-                                                       final RewardDetailsViewRepository rewardDetailsViewRepository) {
+                                                       final RewardDetailsViewRepository rewardDetailsViewRepository,
+                                                       final RewardRepository rewardRepository,
+                                                       final CurrencyStorage currencyStorage) {
         return new PostgresRewardAdapter(shortProjectViewEntityRepository,
-                batchPaymentRepository, rewardViewRepository, rewardDetailsViewRepository);
-    }
-
-    @Bean
-    public PostgresRewardV2Adapter postgresRewardV2Adapter(final RewardRepository rewardRepository,
-                                                           final CurrencyStorage currencyStorage) {
-        return new PostgresRewardV2Adapter(rewardRepository, currencyStorage);
+                batchPaymentRepository, rewardViewRepository, rewardDetailsViewRepository, rewardRepository, currencyStorage);
     }
 
     @Bean

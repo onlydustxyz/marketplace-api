@@ -8,7 +8,10 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEnt
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRepoEntity;
-import onlydust.com.marketplace.api.postgres.adapter.mapper.*;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectContributorsMapper;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardableItemMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
@@ -17,7 +20,6 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.port.output.ProjectRewardStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.view.*;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +28,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -39,7 +40,7 @@ import static onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
-public class PostgresProjectAdapter implements ProjectStoragePort, ProjectRewardStoragePort {
+public class PostgresProjectAdapter implements ProjectStoragePort {
     private static final int CHURNED_CONTRIBUTOR_THRESHOLD_IN_DAYS = 10;
     private static final int CONTRIBUTOR_ACTIVITY_COUNTS_THRESHOLD_IN_WEEKS = 5;
     private static final int TOP_CONTRIBUTOR_COUNT = 3;
@@ -50,12 +51,10 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
     private final CustomProjectRepository customProjectRepository;
     private final CustomContributorRepository customContributorRepository;
     private final ProjectLeadViewRepository projectLeadViewRepository;
-    private final CustomRewardRepository customRewardRepository;
     private final ProjectsPageRepository projectsPageRepository;
     private final ProjectsPageFiltersRepository projectsPageFiltersRepository;
     private final RewardableItemRepository rewardableItemRepository;
     private final CustomProjectRankingRepository customProjectRankingRepository;
-    private final BudgetStatsRepository budgetStatsRepository;
     private final ChurnedContributorViewEntityRepository churnedContributorViewEntityRepository;
     private final NewcomerViewEntityRepository newcomerViewEntityRepository;
     private final ContributorActivityViewEntityRepository contributorActivityViewEntityRepository;
@@ -63,7 +62,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
     private final ContributionViewEntityRepository contributionViewEntityRepository;
     private final HiddenContributorRepository hiddenContributorRepository;
     private final ProjectTagRepository projectTagRepository;
-    private final RewardViewRepository rewardViewRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -397,81 +395,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
                 .stream()
                 .map(ProjectLeaderInvitationEntity::getGithubUserId)
                 .collect(Collectors.toSet());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public ProjectRewardsPageView findRewards(UUID projectId, ProjectRewardView.Filters filters,
-                                              Reward.SortBy sort, SortDirection sortDirection,
-                                              int pageIndex, int pageSize) {
-        final var format = new SimpleDateFormat("yyyy-MM-dd");
-        final var fromDate = isNull(filters.getFrom()) ? null : format.format(filters.getFrom());
-        final var toDate = isNull(filters.getTo()) ? null : format.format(filters.getTo());
-
-        final var pageRequest = PageRequest.of(pageIndex, pageSize,
-                RewardViewRepository.sortBy(sort, sortDirection == SortDirection.asc ? Sort.Direction.ASC : Sort.Direction.DESC));
-
-        final var page = rewardViewRepository.findProjectRewards(projectId, filters.getCurrencies(), filters.getContributors(), fromDate, toDate, pageRequest);
-        final var budgetStats = budgetStatsRepository.findByProject(projectId, filters.getCurrencies(), filters.getContributors(), fromDate, toDate);
-
-        return ProjectRewardsPageView.builder().
-                rewards(Page.<ProjectRewardView>builder()
-                        .content(page.getContent().stream().map(RewardViewEntity::toProjectReward).toList())
-                        .totalItemNumber((int) page.getTotalElements())
-                        .totalPageNumber(page.getTotalPages())
-                        .build())
-                .remainingBudget(budgetStats.size() == 1 ?
-                        new Money(budgetStats.get(0).getRemainingAmount(),
-                                budgetStats.get(0).getCurrency().toOldDomain(),
-                                budgetStats.get(0).getRemainingUsdAmount()) :
-                        new Money(null, null,
-                                budgetStats.stream().map(BudgetStatsEntity::getRemainingUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,
-                                        BigDecimal::add)))
-                .spentAmount(budgetStats.size() == 1 ?
-                        new Money(budgetStats.get(0).getSpentAmount(),
-                                budgetStats.get(0).getCurrency().toOldDomain(),
-                                budgetStats.get(0).getSpentUsdAmount()) :
-                        new Money(null, null,
-                                budgetStats.stream().map(BudgetStatsEntity::getSpentUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,
-                                        BigDecimal::add)))
-                .sentRewardsCount(budgetStats.stream().map(BudgetStatsEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
-                .rewardedContributionsCount(budgetStats.stream().map(BudgetStatsEntity::getRewardItemIds).flatMap(Collection::stream).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
-                .rewardedContributorsCount(budgetStats.stream().map(BudgetStatsEntity::getRewardRecipientIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
-                .build();
-    }
-
-    @Override
-    public ProjectBudgetsView findBudgets(UUID projectId) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public RewardDetailsView getProjectReward(UUID rewardId) {
-        return rewardViewRepository.find(rewardId)
-                .orElseThrow(() -> notFound("Reward %s not found".formatted(rewardId)))
-                .toDomain();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<RewardItemView> getProjectRewardItems(UUID rewardId, int pageIndex, int pageSize) {
-        final Integer count = customRewardRepository.countRewardItemsForRewardId(rewardId);
-        final List<RewardItemView> rewardItemViews =
-                customRewardRepository.findRewardItemsByRewardId(rewardId, pageIndex, pageSize)
-                        .stream()
-                        .map(RewardMapper::itemToDomain)
-                        .toList();
-        return Page.<RewardItemView>builder()
-                .content(rewardItemViews)
-                .totalItemNumber(count)
-                .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
-                .build();
-    }
-
-    @Override
-    public void updateUsdAmount(UUID rewardId) {
-        // TODO remove
     }
 
     @Override

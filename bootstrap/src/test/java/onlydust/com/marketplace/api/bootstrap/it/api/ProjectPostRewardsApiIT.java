@@ -7,7 +7,6 @@ import onlydust.com.marketplace.api.contract.model.CurrencyContract;
 import onlydust.com.marketplace.api.contract.model.RewardItemRequest;
 import onlydust.com.marketplace.api.contract.model.RewardRequest;
 import onlydust.com.marketplace.api.contract.model.RewardType;
-import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.RequestRewardResponseDTO;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import org.junit.jupiter.api.Test;
@@ -131,50 +130,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                                 .repoId(4L)
                 ));
 
-        final var newRewardId = UUID.randomUUID();
-
         // When
-        rustApiWireMockServer.stubFor(WireMock.post(
-                        WireMock.urlEqualTo("/api/payments"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withHeader("Api-Key", equalTo("some-rust-api-key"))
-                .withRequestBody(WireMock.equalToJson("""
-                        {
-                          "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                          "recipientId": 16590657,
-                          "requestorId": "fc92397c-3431-4a84-8054-845376b630a0",
-                          "amount": 12.95,
-                          "currency": "ETH",
-                          "reason": {
-                            "workItems": [
-                              {
-                                "id": "pr1",
-                                "type": "PULL_REQUEST",
-                                "repoId": 2,
-                                "number": 1
-                              },
-                              {
-                                "id": "issue1",
-                                "type": "ISSUE",
-                                "repoId": 3,
-                                "number": 2
-                              },
-                              {
-                                "id": "codeReview1",
-                                "type": "CODE_REVIEW",
-                                "repoId": 4,
-                                "number": 3
-                              }
-                            ]
-                          }
-                        }""")
-                ).willReturn(
-                        ResponseDefinitionBuilder.okForJson(RequestRewardResponseDTO.builder()
-                                .commandId(UUID.randomUUID())
-                                .paymentId(newRewardId)
-                                .build())
-                ));
-
         indexerApiWireMockServer.stubFor(WireMock.put(
                         WireMock.urlEqualTo("/api/v1/users/16590657"))
                 .withHeader("Content-Type", equalTo("application/json"))

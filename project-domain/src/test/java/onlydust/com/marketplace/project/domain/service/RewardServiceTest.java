@@ -1,367 +1,197 @@
 package onlydust.com.marketplace.project.domain.service;
 
+import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.project.domain.model.Currency;
 import onlydust.com.marketplace.project.domain.model.OldRequestRewardCommand;
-import onlydust.com.marketplace.project.domain.port.output.ProjectRewardStoragePort;
-import onlydust.com.marketplace.project.domain.port.output.RewardServicePort;
-import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
-import onlydust.com.marketplace.project.domain.view.BudgetView;
-import onlydust.com.marketplace.project.domain.view.ProjectBudgetsView;
-import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
-import onlydust.com.marketplace.project.domain.view.UserRewardView;
-import org.junit.jupiter.api.Assertions;
+import onlydust.com.marketplace.project.domain.model.Reward;
+import onlydust.com.marketplace.project.domain.port.output.AccountingServicePort;
+import onlydust.com.marketplace.project.domain.port.output.RewardStoragePort;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 public class RewardServiceTest {
+    final RewardStoragePort rewardStoragePort = mock(RewardStoragePort.class);
+    final PermissionService permissionService = mock(PermissionService.class);
+    final IndexerPort indexerPort = mock(IndexerPort.class);
+    final AccountingServicePort accountingServicePort = mock(AccountingServicePort.class);
+    final RewardService rewardService = new RewardService(
+            rewardStoragePort,
+            permissionService,
+            indexerPort,
+            accountingServicePort
+    );
+    final UUID projectLeadId = UUID.randomUUID();
+    final UUID projectId = UUID.randomUUID();
+    final Faker faker = new Faker();
+    final Long recipientId = faker.number().randomNumber(5, true);
 
-    @Test
-    void should_request_reward_given_a_project_lead() {
-        // Given
-        final RewardServicePort rewardServicePort = mock(RewardServicePort.class);
-        final PermissionService permissionService = mock(PermissionService.class);
-        final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
-        final IndexerPort indexerPort = mock(IndexerPort.class);
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-
-        final RewardService rewardService =
-                new RewardService(rewardServicePort, projectRewardStoragePort, permissionService, indexerPort,
-                        userStoragePort);
-
-        final UUID projectLeadId = UUID.randomUUID();
-        final OldRequestRewardCommand oldRequestRewardCommand =
-                OldRequestRewardCommand.builder()
-                        .projectId(UUID.randomUUID())
-                        .amount(BigDecimal.valueOf(10L))
-                        .currency(Currency.STRK)
-                        .build();
-        final var newRewardId = UUID.randomUUID();
-
-        // When
-        when(rewardServicePort.create(projectLeadId, oldRequestRewardCommand))
-                .thenReturn(newRewardId);
-        when(permissionService.isUserProjectLead(oldRequestRewardCommand.getProjectId(), projectLeadId))
-                .thenReturn(true);
-        when(projectRewardStoragePort.findBudgets(oldRequestRewardCommand.getProjectId()))
-                .thenReturn(ProjectBudgetsView.builder()
-                        .budgets(List.of(BudgetView.builder()
-                                .currency(Currency.STRK)
-                                .remaining(BigDecimal.valueOf(100L))
-                                .build()))
-                        .build());
-        final UUID rewardId = rewardService.createReward(projectLeadId,
-                oldRequestRewardCommand);
-
-        // Then
-        assertThat(rewardId).isEqualTo(newRewardId);
-        verify(indexerPort, times(1)).indexUser(oldRequestRewardCommand.getRecipientId());
+    @BeforeEach
+    void setup() {
+        reset(rewardStoragePort, permissionService, indexerPort, accountingServicePort);
     }
 
-    @Test
-    void should_throw_a_forbidden_exception_given_not_a_project_lead() {
-        // Given
-        final RewardServicePort rewardServicePort = mock(RewardServicePort.class);
-        final PermissionService permissionService = mock(PermissionService.class);
-        final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
-        final IndexerPort indexerPort = mock(IndexerPort.class);
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
+    @Nested
+    class GivenAProject {
+        @Test
+        void should_create_reward() {
+            // Given
+            when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
+            final var command = OldRequestRewardCommand.builder()
+                    .projectId(projectId)
+                    .recipientId(recipientId)
+                    .amount(BigDecimal.TEN)
+                    .currency(Currency.USDC)
+                    .items(List.of())
+                    .build();
 
-        final RewardService rewardService =
-                new RewardService(rewardServicePort, projectRewardStoragePort, permissionService, indexerPort,
-                        userStoragePort);
 
-        final UUID projectLeadId = UUID.randomUUID();
-        final OldRequestRewardCommand oldRequestRewardCommand =
-                OldRequestRewardCommand.builder().projectId(UUID.randomUUID())
-                        .amount(BigDecimal.valueOf(10L))
-                        .currency(Currency.STRK)
-                        .build();
+            // When
+            final var rewardId = rewardService.createReward(projectLeadId, command);
 
-        // When
-        when(permissionService.isUserProjectLead(oldRequestRewardCommand.getProjectId(), projectLeadId))
-                .thenReturn(false);
-        when(projectRewardStoragePort.findBudgets(oldRequestRewardCommand.getProjectId()))
-                .thenReturn(ProjectBudgetsView.builder()
-                        .budgets(List.of(BudgetView.builder()
-                                .currency(Currency.STRK)
-                                .remaining(BigDecimal.valueOf(100L))
-                                .build()))
-                        .build());
-        OnlyDustException onlyDustException = null;
-        try {
-            rewardService.createReward(projectLeadId, oldRequestRewardCommand);
-        } catch (OnlyDustException e) {
-            onlyDustException = e;
+            // Then
+            assertThat(rewardId).isNotNull();
+            verify(indexerPort).indexUser(recipientId);
+
+            final var reward = ArgumentCaptor.forClass(Reward.class);
+            verify(rewardStoragePort).save(reward.capture());
+            final var capturedReward = reward.getValue();
+            assertThat(capturedReward.id()).isEqualTo(rewardId);
+            assertThat(capturedReward.projectId()).isEqualTo(projectId);
+            assertThat(capturedReward.requestorId()).isEqualTo(projectLeadId);
+            assertThat(capturedReward.recipientId()).isEqualTo(recipientId);
+            assertThat(capturedReward.amount()).isEqualTo(BigDecimal.TEN);
+            assertThat(capturedReward.currency()).isEqualTo(Currency.USDC);
+            assertThat(capturedReward.rewardItems()).isEmpty();
+
+            verify(accountingServicePort).createReward(projectId, rewardId, BigDecimal.TEN, "USDC");
         }
 
-        // Then
-        Assertions.assertNotNull(onlyDustException);
-        Assertions.assertEquals(403, onlyDustException.getStatus());
-        Assertions.assertEquals("User must be project lead to request a reward", onlyDustException.getMessage());
-        verify(indexerPort, never()).indexUser(oldRequestRewardCommand.getRecipientId());
-    }
+        @Test
+        void should_prevent_non_project_lead_to_create_reward() {
+            // Given
+            when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
+            final var command = OldRequestRewardCommand.builder()
+                    .projectId(projectId)
+                    .recipientId(recipientId)
+                    .amount(BigDecimal.TEN)
+                    .currency(Currency.USDC)
+                    .build();
 
-    @Test
-    void should_throw_a_forbidden_exception_given_not_amount_equals_to_0() {
-        // Given
-        final RewardServicePort rewardServicePort = mock(RewardServicePort.class);
-        final PermissionService permissionService = mock(PermissionService.class);
-        final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
-        final IndexerPort indexerPort = mock(IndexerPort.class);
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-
-        final RewardService rewardService =
-                new RewardService(rewardServicePort, projectRewardStoragePort, permissionService, indexerPort,
-                        userStoragePort);
-
-        final UUID projectLeadId = UUID.randomUUID();
-        final OldRequestRewardCommand oldRequestRewardCommand =
-                OldRequestRewardCommand.builder().projectId(UUID.randomUUID())
-                        .amount(BigDecimal.valueOf(0L))
-                        .currency(Currency.STRK)
-                        .build();
-
-        // When
-        when(permissionService.isUserProjectLead(oldRequestRewardCommand.getProjectId(), projectLeadId))
-                .thenReturn(true);
-        when(projectRewardStoragePort.findBudgets(oldRequestRewardCommand.getProjectId()))
-                .thenReturn(ProjectBudgetsView.builder()
-                        .budgets(List.of(BudgetView.builder()
-                                .currency(Currency.STRK)
-                                .remaining(BigDecimal.valueOf(100L))
-                                .build()))
-                        .build());
-        OnlyDustException onlyDustException = null;
-        try {
-            rewardService.createReward(projectLeadId, oldRequestRewardCommand);
-        } catch (OnlyDustException e) {
-            onlyDustException = e;
+            // When
+            assertThatThrownBy(() -> rewardService.createReward(projectLeadId, command))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("User must be project lead to request a reward");
         }
 
-        // Then
-        Assertions.assertNotNull(onlyDustException);
-        Assertions.assertEquals(403, onlyDustException.getStatus());
-        Assertions.assertEquals("Amount must be greater than 0", onlyDustException.getMessage());
-        verify(indexerPort, never()).indexUser(oldRequestRewardCommand.getRecipientId());
-    }
+        @Test
+        void should_prevent_creating_reward_with_negative_amount() {
+            // Given
+            when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
+            final var command = OldRequestRewardCommand.builder()
+                    .projectId(projectId)
+                    .recipientId(recipientId)
+                    .amount(BigDecimal.TEN.negate())
+                    .currency(Currency.USDC)
+                    .build();
 
-
-    @Test
-    void should_throw_a_invalid_input_exception_when_there_is_no_budget_of_such_currency() {
-        // Given
-        final RewardServicePort rewardServicePort = mock(RewardServicePort.class);
-        final PermissionService permissionService = mock(PermissionService.class);
-        final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
-        final IndexerPort indexerPort = mock(IndexerPort.class);
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-
-        final RewardService rewardService =
-                new RewardService(rewardServicePort, projectRewardStoragePort, permissionService, indexerPort,
-                        userStoragePort);
-
-        final UUID projectLeadId = UUID.randomUUID();
-        final OldRequestRewardCommand oldRequestRewardCommand =
-                OldRequestRewardCommand.builder().projectId(UUID.randomUUID())
-                        .amount(BigDecimal.valueOf(10L))
-                        .currency(Currency.STRK)
-                        .build();
-
-        // When
-        when(permissionService.isUserProjectLead(oldRequestRewardCommand.getProjectId(), projectLeadId))
-                .thenReturn(true);
-        when(projectRewardStoragePort.findBudgets(oldRequestRewardCommand.getProjectId()))
-                .thenReturn(ProjectBudgetsView.builder()
-                        .budgets(List.of())
-                        .build());
-        OnlyDustException onlyDustException = null;
-        try {
-            rewardService.createReward(projectLeadId, oldRequestRewardCommand);
-        } catch (OnlyDustException e) {
-            onlyDustException = e;
+            // When
+            assertThatThrownBy(() -> rewardService.createReward(projectLeadId, command))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Amount must be greater than 0");
         }
 
-        // Then
-        Assertions.assertNotNull(onlyDustException);
-        Assertions.assertEquals(400, onlyDustException.getStatus());
-        Assertions.assertEquals(("Not enough budget of currency STRK for project %s to request a reward with an " +
-                                 "amount of 10").formatted(oldRequestRewardCommand.getProjectId()),
-                onlyDustException.getMessage());
-        verify(indexerPort, never()).indexUser(oldRequestRewardCommand.getRecipientId());
-    }
+        @Test
+        void should_prevent_creating_reward_with_zero_amount() {
+            // Given
+            when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
+            final var command = OldRequestRewardCommand.builder()
+                    .projectId(projectId)
+                    .recipientId(recipientId)
+                    .amount(BigDecimal.ZERO)
+                    .currency(Currency.USDC)
+                    .build();
 
-    @Test
-    void should_throw_a_invalid_input_exception_when_there_is_not_enough_budget_of_such_currency() {
-        // Given
-        final RewardServicePort rewardServicePort = mock(RewardServicePort.class);
-        final PermissionService permissionService = mock(PermissionService.class);
-        final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
-        final IndexerPort indexerPort = mock(IndexerPort.class);
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-
-        final RewardService rewardService =
-                new RewardService(rewardServicePort, projectRewardStoragePort, permissionService, indexerPort,
-                        userStoragePort);
-
-        final UUID projectLeadId = UUID.randomUUID();
-        final OldRequestRewardCommand oldRequestRewardCommand =
-                OldRequestRewardCommand.builder().projectId(UUID.randomUUID())
-                        .amount(BigDecimal.valueOf(10L))
-                        .currency(Currency.STRK)
-                        .build();
-
-        // When
-        when(permissionService.isUserProjectLead(oldRequestRewardCommand.getProjectId(), projectLeadId))
-                .thenReturn(true);
-        when(projectRewardStoragePort.findBudgets(oldRequestRewardCommand.getProjectId()))
-                .thenReturn(ProjectBudgetsView.builder()
-                        .budgets(List.of(BudgetView.builder()
-                                .currency(Currency.STRK)
-                                .remaining(BigDecimal.valueOf(9L))
-                                .build()))
-                        .build());
-        OnlyDustException onlyDustException = null;
-        try {
-            rewardService.createReward(projectLeadId, oldRequestRewardCommand);
-        } catch (OnlyDustException e) {
-            onlyDustException = e;
+            // When
+            assertThatThrownBy(() -> rewardService.createReward(projectLeadId, command))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Amount must be greater than 0");
         }
 
-        // Then
-        Assertions.assertNotNull(onlyDustException);
-        Assertions.assertEquals(400, onlyDustException.getStatus());
-        Assertions.assertEquals(("Not enough budget of currency STRK for project %s to request a reward with an " +
-                                 "amount of 10").formatted(oldRequestRewardCommand.getProjectId()),
-                onlyDustException.getMessage());
-        verify(indexerPort, never()).indexUser(oldRequestRewardCommand.getRecipientId());
+        @Test
+        void should_prevent_cancelling_a_non_existing_reward() {
+            // Given
+            final var rewardId = UUID.randomUUID();
+            when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
+            when(rewardStoragePort.get(rewardId)).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> rewardService.cancelReward(projectLeadId, projectId, rewardId))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Reward %s not found".formatted(rewardId));
+        }
     }
 
-    @Test
-    void should_cancel_reward_given_a_project_lead() {
-        // Given
-        final RewardServicePort rewardServicePort = mock(RewardServicePort.class);
-        final PermissionService permissionService = mock(PermissionService.class);
-        final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
-        final IndexerPort indexerPort = mock(IndexerPort.class);
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
+    @Nested
+    class GivenAProjectWithAReward {
+        final UUID rewardId = UUID.randomUUID();
 
-        final RewardService rewardService =
-                new RewardService(rewardServicePort, projectRewardStoragePort, permissionService, indexerPort,
-                        userStoragePort);
+        final Reward reward = new Reward(
+                rewardId,
+                projectId,
+                projectLeadId,
+                recipientId,
+                BigDecimal.TEN,
+                Currency.USDC,
+                new Date(),
+                List.of()
+        );
 
-        final UUID projectLeadId = UUID.randomUUID();
-        final UUID projectId = UUID.randomUUID();
-        final var rewardId = UUID.randomUUID();
+        @BeforeEach
+        void setup() {
+            when(rewardStoragePort.get(rewardId)).thenReturn(Optional.of(reward));
+        }
 
-        // When
-        when(permissionService.isUserProjectLead(projectId, projectLeadId))
-                .thenReturn(true);
-        when(userStoragePort.findRewardById(rewardId)).thenReturn(RewardDetailsView.builder().id(rewardId).build());
-        rewardService.cancelReward(projectLeadId, projectId, rewardId);
+        @Test
+        void should_cancel_reward() {
+            // Given
+            when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
 
-        // Then
-        verify(rewardServicePort).cancel(rewardId);
-    }
-
-    @Test
-    void should_throw_a_forbidden_exception_when_cancelling_reward_given_not_a_project_lead() {
-        // Given
-        final RewardServicePort rewardServicePort = mock(RewardServicePort.class);
-        final PermissionService permissionService = mock(PermissionService.class);
-        final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
-        final IndexerPort indexerPort = mock(IndexerPort.class);
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-
-        final RewardService rewardService =
-                new RewardService(rewardServicePort, projectRewardStoragePort, permissionService, indexerPort,
-                        userStoragePort);
-
-        final UUID projectLeadId = UUID.randomUUID();
-        final UUID projectId = UUID.randomUUID();
-        final var rewardId = UUID.randomUUID();
-
-        // When
-        when(permissionService.isUserProjectLead(projectId, projectLeadId))
-                .thenReturn(false);
-        OnlyDustException onlyDustException = null;
-        try {
+            // When
             rewardService.cancelReward(projectLeadId, projectId, rewardId);
-        } catch (OnlyDustException e) {
-            onlyDustException = e;
+
+            // Then
+            verify(rewardStoragePort).delete(rewardId);
+            verify(accountingServicePort).cancelReward(rewardId, "USDC");
         }
 
-        // Then
-        Assertions.assertNotNull(onlyDustException);
-        Assertions.assertEquals(403, onlyDustException.getStatus());
-        Assertions.assertEquals("User must be project lead to cancel a reward", onlyDustException.getMessage());
-    }
+        @Test
+        void should_prevent_non_project_lead_to_cancel_reward() {
+            // Given
+            when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
 
-    @Test
-    void should_throw_a_forbidden_exception_when_cancelling_a_reward_already_contained_in_an_invoice() {
-        final RewardServicePort rewardServicePort = mock(RewardServicePort.class);
-        final PermissionService permissionService = mock(PermissionService.class);
-        final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
-        final IndexerPort indexerPort = mock(IndexerPort.class);
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-
-        final RewardService rewardService =
-                new RewardService(rewardServicePort, projectRewardStoragePort, permissionService, indexerPort,
-                        userStoragePort);
-
-        final UUID projectLeadId = UUID.randomUUID();
-        final UUID projectId = UUID.randomUUID();
-        final var rewardId = UUID.randomUUID();
-
-        // When
-        when(permissionService.isUserProjectLead(projectId, projectLeadId))
-                .thenReturn(true);
-        when(userStoragePort.findRewardById(rewardId))
-                .thenReturn(RewardDetailsView.builder().id(rewardId).invoiceId(UUID.randomUUID()).build());
-        OnlyDustException onlyDustException = null;
-        try {
-            rewardService.cancelReward(projectLeadId, projectId, rewardId);
-        } catch (OnlyDustException e) {
-            onlyDustException = e;
+            // When
+            assertThatThrownBy(() -> rewardService.cancelReward(projectLeadId, projectId, rewardId))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("User must be project lead to cancel a reward");
         }
-
-        // Then
-        Assertions.assertNotNull(onlyDustException);
-        Assertions.assertEquals(403, onlyDustException.getStatus());
-        Assertions.assertEquals("Cannot cancel reward %s which is already contained in an invoice".formatted(rewardId), onlyDustException.getMessage());
     }
-
-    @Test
-    void should_mark_invoice_as_received() {
-        // Given
-        final RewardServicePort rewardServicePort = mock(RewardServicePort.class);
-        final PermissionService permissionService = mock(PermissionService.class);
-        final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
-        final IndexerPort indexerPort = mock(IndexerPort.class);
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-
-        final RewardService rewardService =
-                new RewardService(rewardServicePort, projectRewardStoragePort, permissionService, indexerPort,
-                        userStoragePort);
-        final var rewardIds = List.of(UUID.randomUUID(), UUID.randomUUID());
-
-        // When
-        when(userStoragePort.findPendingInvoiceRewardsForRecipientId(1L))
-                .thenReturn(List.of(UserRewardView.builder()
-                        .id(rewardIds.get(0))
-                        .build(), UserRewardView.builder()
-                        .id(rewardIds.get(1))
-                        .build()));
-        rewardService.markInvoiceAsReceived(1L);
-
-        // Then
-        verify(rewardServicePort).markInvoiceAsReceived(rewardIds);
-    }
-
 }

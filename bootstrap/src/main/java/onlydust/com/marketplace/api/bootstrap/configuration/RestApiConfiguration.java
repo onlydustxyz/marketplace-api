@@ -7,8 +7,6 @@ import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.service.GithubAccountService;
-import onlydust.com.marketplace.project.domain.service.RewardService;
-import onlydust.com.marketplace.project.domain.service.RewardV2Service;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -22,16 +20,14 @@ public class RestApiConfiguration {
                                           final ProjectRewardFacadePort projectRewardFacadePort,
                                           final ProjectRewardFacadePort projectRewardFacadePortV2,
                                           final AuthenticatedAppUserService authenticatedAppUserService,
-                                          final RewardService rewardService,
-                                          final RewardV2Service rewardV2Service,
+                                          final RewardFacadePort rewardFacadePort,
                                           final ContributionFacadePort contributionFacadePort) {
         return new ProjectsRestApi(
                 projectFacadePort,
                 projectRewardFacadePort,
                 projectRewardFacadePortV2,
                 authenticatedAppUserService,
-                rewardService,
-                rewardV2Service,
+                rewardFacadePort,
                 contributionFacadePort);
     }
 
@@ -44,12 +40,11 @@ public class RestApiConfiguration {
     @Bean
     public MeRestApi meRestApi(final AuthenticatedAppUserService authenticatedAppUserService,
                                final UserFacadePort userFacadePort,
-                               final RewardFacadePort rewardFacadePort,
                                final ContributorFacadePort contributorFacadePort,
                                final GithubAccountService githubAccountService,
                                final BillingProfileFacadePort billingProfileFacadePort,
                                final PayoutPreferenceFacadePort payoutPreferenceFacadePort) {
-        return new MeRestApi(authenticatedAppUserService, userFacadePort, rewardFacadePort, contributorFacadePort,
+        return new MeRestApi(authenticatedAppUserService, userFacadePort, contributorFacadePort,
                 githubAccountService, billingProfileFacadePort, payoutPreferenceFacadePort);
     }
 

@@ -53,7 +53,6 @@ public class ProjectsRestApi implements ProjectsApi {
     private final ProjectRewardFacadePort projectRewardFacadePortV2;
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final RewardFacadePort rewardFacadePort;
-    private final RewardFacadePort rewardFacadePortV2;
     private final ContributionFacadePort contributionsFacadePort;
 
 
@@ -185,7 +184,7 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<ProjectBudgetsResponse> getProjectBudgetsV2(UUID projectId) {
+    public ResponseEntity<ProjectBudgetsResponse> getProjectBudgets(UUID projectId) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final ProjectBudgetsView projectBudgetsView = projectRewardFacadePortV2.getBudgets(projectId,
                 authenticatedUser.getId());
@@ -195,7 +194,7 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<CreateRewardResponse> createReward(UUID projectId, RewardRequest rewardRequest) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var rewardId = rewardFacadePortV2.createReward(authenticatedUser.getId(),
+        final var rewardId = rewardFacadePort.createReward(authenticatedUser.getId(),
                 RewardMapper.rewardRequestToDomain(rewardRequest, projectId));
         final var response = new CreateRewardResponse();
         response.setId(rewardId);
@@ -210,24 +209,11 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<Void> cancelRewardV2(UUID projectId, UUID rewardId) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        rewardFacadePortV2.cancelReward(authenticatedUser.getId(), projectId, rewardId);
-        return ResponseEntity.noContent().build();
-    }
-
-    @Override
     public ResponseEntity<RewardDetailsResponse> getProjectReward(UUID projectId, UUID rewardId) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final RewardDetailsView rewardDetailsView = projectRewardFacadePort.getRewardByIdForProjectLead(projectId, rewardId,
                 authenticatedUser.getId());
         return ResponseEntity.ok(RewardMapper.rewardDetailsToResponse(rewardDetailsView, false));
-    }
-
-    @Override
-    public ResponseEntity<RewardDetailsResponse> getProjectRewardV2(UUID projectId, UUID rewardId) {
-        // TODO
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
     @Override
@@ -243,13 +229,6 @@ public class ProjectsRestApi implements ProjectsApi {
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardItemsPageResponse) :
                 ResponseEntity.ok(rewardItemsPageResponse);
     }
-
-    @Override
-    public ResponseEntity<RewardItemsPageResponse> getProjectRewardItemsPageV2(UUID projectId, UUID rewardId, Integer pageIndex, Integer pageSize) {
-        // TODO
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
 
     @Override
     public ResponseEntity<RewardableItemsPageResponse> getProjectRewardableContributions(UUID projectId,

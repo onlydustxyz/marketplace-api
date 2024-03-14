@@ -20,7 +20,6 @@ import onlydust.com.marketplace.project.domain.observer.UserObserver;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.service.*;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
@@ -31,8 +30,6 @@ import java.util.UUID;
 @Configuration
 @EnableRetry
 public class DomainConfiguration {
-
-
     @Bean
     public UUIDGeneratorPort uuidGeneratorPort() {
         return UUID::randomUUID;
@@ -47,7 +44,7 @@ public class DomainConfiguration {
     @Bean
     public ProjectFacadePort projectFacadePort(final ProjectObserverPort projectObserverPort,
                                                final ProjectStoragePort projectStoragePort,
-                                               final ProjectRewardStoragePort projectRewardStoragePort,
+                                               final PostgresProjectRewardAdapter postgresProjectRewardAdapter,
                                                final ImageStoragePort imageStoragePort,
                                                final UUIDGeneratorPort uuidGeneratorPort,
                                                final PermissionService permissionService,
@@ -58,7 +55,7 @@ public class DomainConfiguration {
                                                final GithubStoragePort githubStoragePort) {
         return new ProjectService(projectObserverPort,
                 projectStoragePort,
-                projectRewardStoragePort,
+                postgresProjectRewardAdapter,
                 imageStoragePort,
                 uuidGeneratorPort,
                 permissionService,
@@ -72,7 +69,7 @@ public class DomainConfiguration {
     @Bean
     public ProjectRewardFacadePort projectRewardFacadePort(final ProjectObserverPort projectObserverPort,
                                                            final ProjectStoragePort projectStoragePort,
-                                                           final ProjectRewardStoragePort projectRewardStoragePort,
+                                                           final PostgresProjectRewardAdapter postgresProjectRewardAdapter,
                                                            final ImageStoragePort imageStoragePort,
                                                            final UUIDGeneratorPort uuidGeneratorPort,
                                                            final PermissionService permissionService,
@@ -83,7 +80,7 @@ public class DomainConfiguration {
                                                            final GithubStoragePort githubStoragePort) {
         return new ProjectService(projectObserverPort,
                 projectStoragePort,
-                projectRewardStoragePort,
+                postgresProjectRewardAdapter,
                 imageStoragePort,
                 uuidGeneratorPort,
                 permissionService,
@@ -99,9 +96,8 @@ public class DomainConfiguration {
             final ProjectRewardStoragePort projectRewardStoragePortV2,
             final PermissionService permissionService
     ) {
-        return new ProjectRewardV2Service(projectRewardStoragePortV2, permissionService);
+        return new ProjectRewardService(projectRewardStoragePortV2, permissionService);
     }
-
 
     @Bean
     public GithubInstallationFacadePort githubInstallationFacadePort(
@@ -153,24 +149,11 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public RewardService rewardFacadePort(@Qualifier("rewardStoragePort") final RewardServicePort rewardServicePort,
-                                          final ProjectRewardStoragePort projectRewardStoragePort,
-                                          final PermissionService permissionService,
-                                          final IndexerPort indexerPort,
-                                          final UserStoragePort userStoragePort) {
-        return new RewardService(rewardServicePort,
-                projectRewardStoragePort,
-                permissionService,
-                indexerPort,
-                userStoragePort);
-    }
-
-    @Bean
-    public RewardV2Service rewardFacadePortV2(final PostgresRewardV2Adapter postgresRewardV2Adapter,
-                                              final PermissionService permissionService,
-                                              final IndexerPort indexerPort,
-                                              final AccountingServicePort accountingServicePort) {
-        return new RewardV2Service(postgresRewardV2Adapter, permissionService, indexerPort, accountingServicePort);
+    public RewardFacadePort rewardFacadePort(final PostgresRewardAdapter postgresRewardAdapter,
+                                             final PermissionService permissionService,
+                                             final IndexerPort indexerPort,
+                                             final AccountingServicePort accountingServicePort) {
+        return new RewardService(postgresRewardAdapter, permissionService, indexerPort, accountingServicePort);
     }
 
     @Bean

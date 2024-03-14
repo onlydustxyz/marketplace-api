@@ -12,7 +12,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyReposito
 import onlydust.com.marketplace.api.postgres.adapter.repository.HistoricalQuoteRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
-import onlydust.com.marketplace.project.domain.service.RewardV2Service;
+import onlydust.com.marketplace.project.domain.service.RewardService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ import java.util.UUID;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 
-public class ProjectBudgetsApiV2IT extends AbstractMarketplaceApiIT {
+public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     HistoricalQuoteRepository historicalQuoteRepository;
     @Autowired
@@ -33,7 +33,7 @@ public class ProjectBudgetsApiV2IT extends AbstractMarketplaceApiIT {
     @Autowired
     AccountingFacadePort accountingFacadePort;
     @Autowired
-    RewardV2Service rewardV2Service;
+    RewardService rewardService;
     @Autowired
     SponsorRepository sponsorRepository;
     @Autowired
@@ -55,7 +55,7 @@ public class ProjectBudgetsApiV2IT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_BUDGETS_V2, projectId)))
+                .uri(getApiURI(String.format(PROJECTS_GET_BUDGETS, projectId)))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -104,7 +104,7 @@ public class ProjectBudgetsApiV2IT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_BUDGETS_V2, projectId)))
+                .uri(getApiURI(String.format(PROJECTS_GET_BUDGETS, projectId)))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()

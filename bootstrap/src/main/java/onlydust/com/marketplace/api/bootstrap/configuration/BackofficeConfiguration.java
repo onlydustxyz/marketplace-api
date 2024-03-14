@@ -8,11 +8,10 @@ import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
+import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.project.domain.service.BackofficeService;
-import onlydust.com.marketplace.project.domain.service.RewardService;
-import onlydust.com.marketplace.project.domain.service.RewardV2Service;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -53,13 +52,11 @@ public class BackofficeConfiguration {
     @Bean
     public BackofficeAccountingManagementRestApi backofficeAccountingManagementRestApi(
             final AccountingFacadePort accountingFacadePort,
-            final RewardV2Service rewardV2Service,
+            final RewardFacadePort rewardFacadePort,
             final CurrencyFacadePort currencyFacadePort,
             final UserFacadePort userFacadePort,
-            final RewardService rewardService,
             final AccountingRewardPort accountingRewardPort) {
-        return new BackofficeAccountingManagementRestApi(accountingFacadePort, rewardV2Service, currencyFacadePort, userFacadePort, rewardService,
-                accountingRewardPort);
+        return new BackofficeAccountingManagementRestApi(accountingFacadePort, rewardFacadePort, currencyFacadePort, userFacadePort, accountingRewardPort);
     }
 
     @Bean

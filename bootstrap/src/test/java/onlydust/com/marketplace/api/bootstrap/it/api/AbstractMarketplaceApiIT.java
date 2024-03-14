@@ -48,7 +48,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @EnableWireMock({
         @ConfigureWireMock(name = "github", stubLocation = "", property = "infrastructure.github.baseUri"),
         @ConfigureWireMock(name = "dustyBot", stubLocation = "", property = "infrastructure.dustyBot.baseUri"),
-        @ConfigureWireMock(name = "rust-api", property = "infrastructure.od.api.client.baseUri"),
         @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri"),
         @ConfigureWireMock(name = "webhook", property = "infrastructure.make.webhook.url"),
         @ConfigureWireMock(name = "linear", property = "infrastructure.linear.base-uri"),
@@ -90,7 +89,7 @@ public class AbstractMarketplaceApiIT {
                                                                          "-issues";
     protected static final String PROJECTS_POST_REWARDABLE_OTHER_PR = "/api/v1/projects/%s/rewardable-items/other" +
                                                                       "-pull-requests";
-    protected static final String PROJECTS_GET_BUDGETS_V2 = "/api/v2/projects/%s/budgets";
+    protected static final String PROJECTS_GET_BUDGETS = "/api/v1/projects/%s/budgets";
     protected static final String PROJECTS_POST = "/api/v1/projects";
     protected static final String PROJECTS_PUT = "/api/v1/projects/%s";
     protected static final String PROJECTS_IGNORED_CONTRIBUTIONS_PUT = "/api/v1/projects/%s/ignored-contributions";
@@ -142,8 +141,6 @@ public class AbstractMarketplaceApiIT {
             .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
     @InjectWireMock("github")
     protected WireMockServer githubWireMockServer;
-    @InjectWireMock("rust-api")
-    protected WireMockServer rustApiWireMockServer;
     @InjectWireMock("indexer-api")
     protected WireMockServer indexerApiWireMockServer;
     @InjectWireMock("dustyBot")
