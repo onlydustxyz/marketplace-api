@@ -37,8 +37,9 @@ public class BackofficeConfiguration {
 
     @Bean
     public BackofficeSponsorManagementRestApi backofficeSponsorManagementRestApi(final BackofficeFacadePort backofficeFacadePort,
-                                                                                 final SponsorFacadePort sponsorFacadePort) {
-        return new BackofficeSponsorManagementRestApi(backofficeFacadePort, sponsorFacadePort);
+                                                                                 final SponsorFacadePort sponsorFacadePort,
+                                                                                 final AccountingFacadePort accountingFacadePort) {
+        return new BackofficeSponsorManagementRestApi(backofficeFacadePort, sponsorFacadePort, accountingFacadePort);
     }
 
     @Bean

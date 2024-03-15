@@ -43,9 +43,45 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           "name": "AS Nancy Lorraine",
                           "url": null,
                           "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png",
-                          "projectIds": [
-                            "98873240-31df-431a-81dc-7d6fe01143a0",
-                            "a0c91aee-9770-4000-a893-953ddcbd62a7"
+                          "availableBudgets": [
+                            {
+                              "currency": {
+                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                "code": "USDC",
+                                "name": "USD Coin",
+                                "logoUrl": null
+                              },
+                              "initialBalance": 19823190,
+                              "currentBalance": 19822690,
+                              "initialAllowance": 19823190,
+                              "currentAllowance": 0,
+                              "debt": 0,
+                              "awaitingPaymentAmount": 0
+                            },
+                            {
+                              "currency": {
+                                "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                "code": "USD",
+                                "name": "US Dollar",
+                                "logoUrl": null
+                              },
+                              "initialBalance": 4000,
+                              "currentBalance": 0,
+                              "initialAllowance": 4000,
+                              "currentAllowance": 0,
+                              "debt": 0,
+                              "awaitingPaymentAmount": 0
+                            }
+                          ],
+                          "projects": [
+                            {
+                              "name": "Aiolia du Lion",
+                              "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c"
+                            },
+                            {
+                              "name": "Aldébaran du Taureau",
+                              "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aldebaran_taureau.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=ab78704b124d2de9525a8af91ef7c4ed"
+                            }
                           ]
                         }
                         """);
@@ -224,7 +260,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ]
                             }
                           ]
-                        }                        
+                        }
                         """);
 
 
@@ -296,8 +332,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         {
                           "name": "Foobar",
                           "url": "https://www.foobar.com",
-                          "logoUrl": "https://www.foobar.com/logo.png",
-                          "projectIds": []
+                          "logoUrl": "https://www.foobar.com/logo.png"
                         }
                         """)
                 .jsonPath("$.id").isNotEmpty();
@@ -328,11 +363,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
                           "name": "Foobaaaar",
                           "url": "https://www.foobaaaar.com",
-                          "logoUrl": "https://www.foobaaaar.com/logo.png",
-                          "projectIds": [
-                            "98873240-31df-431a-81dc-7d6fe01143a0",
-                            "a0c91aee-9770-4000-a893-953ddcbd62a7"
-                          ]
+                          "logoUrl": "https://www.foobaaaar.com/logo.png"
                         }
                         """);
     }
@@ -386,7 +417,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .json("""
                         {
                           "name": "Virgin sponsor",
-                          "projectIds": []
+                          "projects": []
                         }
                         """);
 
@@ -416,60 +447,30 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .json("""
                         {
                           "name": "Virgin sponsor",
-                          "projectIds": [
-                            "%s"
-                          ]
-                        }
-                        """.formatted(BRETZEL));
-
-        client.get()
-                .uri(getApiURI(OLD_GET_SPONSORS, Map.of(
-                        "pageIndex", "0",
-                        "pageSize", "5",
-                        "sponsorIds", sponsor.getId().toString())))
-                .header("Api-Key", apiKey())
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json("""
-                        {
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 1,
-                          "hasMore": false,
-                          "nextPageIndex": 0,
-                          "sponsors": [
+                          "url": "https://www.foobar.com",
+                          "logoUrl": "https://www.foobar.com/logo.png",
+                          "availableBudgets": [
                             {
-                              "id": "%s",
-                              "name": "Virgin sponsor",
-                              "url": "https://www.foobar.com",
-                              "logoUrl": "https://www.foobar.com/logo.png",
-                              "projectIds": [
-                                "7d04163c-4187-4313-8066-61504d34fc56"
-                              ]
+                              "currency": {
+                                "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                "code": "STRK",
+                                "name": "StarkNet Token",
+                                "logoUrl": null
+                              },
+                              "initialBalance": 0,
+                              "currentBalance": 0,
+                              "initialAllowance": 1000,
+                              "currentAllowance": 600,
+                              "debt": 1000,
+                              "awaitingPaymentAmount": 0
+                            }
+                          ],
+                          "projects": [
+                            {
+                              "name": "Bretzel",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                             }
                           ]
-                        }
-                        """.formatted(sponsor.getId()));
-
-        // And when
-        projectSponsorRepository.save(new ProjectSponsorEntity(BRETZEL.value(), sponsorAccount.getSponsorId(),
-                Date.from(ZonedDateTime.now().minusMonths(6).minusDays(1).toInstant())));
-
-
-        client.get()
-                .uri(getApiURI(GET_SPONSOR.formatted(sponsorAccount.getSponsorId())))
-                .header("Api-Key", apiKey())
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json("""
-                        {
-                          "name": "Virgin sponsor",
-                          "projectIds": []
                         }
                         """);
 
@@ -495,8 +496,55 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "id": "%s",
                               "name": "Virgin sponsor",
                               "url": "https://www.foobar.com",
-                              "logoUrl": "https://www.foobar.com/logo.png",
-                              "projectIds": []
+                              "logoUrl": "https://www.foobar.com/logo.png"
+                            }
+                          ]
+                        }
+                        """.formatted(sponsor.getId()));
+
+        // And when
+        projectSponsorRepository.save(new ProjectSponsorEntity(BRETZEL.value(), sponsorAccount.getSponsorId(),
+                Date.from(ZonedDateTime.now().minusMonths(6).minusDays(1).toInstant())));
+
+
+        client.get()
+                .uri(getApiURI(GET_SPONSOR.formatted(sponsorAccount.getSponsorId())))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "name": "Virgin sponsor",
+                          "projects": []
+                        }
+                        """);
+
+        client.get()
+                .uri(getApiURI(OLD_GET_SPONSORS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "sponsorIds", sponsor.getId().toString())))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 1,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "sponsors": [
+                            {
+                              "id": "%s",
+                              "name": "Virgin sponsor",
+                              "url": "https://www.foobar.com",
+                              "logoUrl": "https://www.foobar.com/logo.png"
                             }
                           ]
                         }

@@ -29,10 +29,10 @@ public class SponsorView {
         this.projects = projects;
     }
 
-    public Set<UUID> projectIdsWhereSponsorIsActive() {
+    public Set<ProjectSponsorView> projectsWhereSponsorIsActive() {
         return projects.stream()
                 .filter(ProjectSponsorView::isActive)
-                .map(ProjectSponsorView::projectId).collect(Collectors.toSet());
+                .collect(Collectors.toSet());
     }
 
     @Value

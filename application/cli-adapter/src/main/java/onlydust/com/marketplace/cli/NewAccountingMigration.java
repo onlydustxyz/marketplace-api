@@ -127,8 +127,8 @@ public class NewAccountingMigration implements CommandLineRunner {
         final var sponsor = sponsorRepository.findById(sponsorId.value()).orElseThrow(() -> notFound("Sponsor not found: %s".formatted(sponsorId)));
 
         LOGGER.info("Creating %s account for sponsor %s (budget: %s)".formatted(currency.code(), sponsor.getName(), total));
-        final var transaction = new SponsorAccount.Transaction(currency.legacyNetwork(), UNKNOWN, total, sponsor.getName(),
-                UNKNOWN);
+        final var transaction = new SponsorAccount.Transaction(SponsorAccount.Transaction.Type.DEPOSIT, currency.legacyNetwork(), UNKNOWN, total,
+                sponsor.getName(), UNKNOWN);
 
         return accountingFacadePort.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(total), unlockDate, transaction);
     }

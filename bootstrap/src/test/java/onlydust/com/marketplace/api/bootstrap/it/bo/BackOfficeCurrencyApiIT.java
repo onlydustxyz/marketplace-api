@@ -311,7 +311,8 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                               "type": "CRYPTO",
                               "tokens": [],
                               "decimals": 18,
-                              "description": "Ethereum (ETH) is a cryptocurrency"
+                              "description": "Ethereum (ETH) is a cryptocurrency",
+                              "supportedOn": ["ETHEREUM"]
                             },
                             {
                               "code": "EUR",
@@ -320,7 +321,8 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                               "type": "FIAT",
                               "tokens": [],
                               "decimals": 3,
-                              "description": "Euro is the official currency of the European Union"
+                              "description": "Euro is the official currency of the European Union",
+                              "supportedOn": ["SEPA", "SWIFT"]
                             },
                             {
                               "code": "USDC",
@@ -351,7 +353,8 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                                 }
                               ],
                               "decimals": 6,
-                              "description": "USDC (USDC) is a cryptocurrency and operates on the Ethereum platform."
+                              "description": "USDC (USDC) is a cryptocurrency and operates on the Ethereum platform.",
+                              "supportedOn": ["ETHEREUM", "OPTIMISM", "STARKNET"]
                             }
                           ]
                         }

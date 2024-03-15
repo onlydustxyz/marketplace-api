@@ -45,7 +45,7 @@ public class AccountingServiceTest {
     }
 
     private Transaction fakeTransaction(Network network, Amount amount) {
-        return new Transaction(fakePaymentReference(network), amount);
+        return new Transaction(Transaction.Type.SPEND, fakePaymentReference(network), amount);
     }
 
     private void assertOnRewardCreated(RewardId rewardId, boolean isFunded, ZonedDateTime unlockDate, Set<Network> networks) {
@@ -275,7 +275,7 @@ public class AccountingServiceTest {
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
                     new MintEvent(AccountId.of(sponsorAccount.id()), amount),
-                    new BurnEvent(AccountId.of(sponsorAccount.id()), amount)
+                    new RefundEvent(AccountId.of(sponsorAccount.id()), AccountId.ROOT, amount)
             );
         }
 
@@ -289,7 +289,7 @@ public class AccountingServiceTest {
             // When
             assertThatThrownBy(() -> accountingService.increaseAllowance(sponsorAccount.id(), Amount.of(-110L)))
                     // Then
-                    .isInstanceOf(OnlyDustException.class).hasMessageContaining("Cannot burn");
+                    .isInstanceOf(OnlyDustException.class).hasMessageContaining("Cannot refund 110");
         }
 
         /*
@@ -463,7 +463,8 @@ public class AccountingServiceTest {
             accountingService.createReward(projectId2, rewardId2, PositiveAmount.of(100L), currency.id());
             assertOnRewardCreated(rewardId2, true, null, Set.of(network));
 
-            final var transaction = new Transaction(Network.ETHEREUM, "0x123456", PositiveAmount.of(1000L), "StarkNet Foundation", "starknet.eth");
+            final var transaction = new Transaction(Transaction.Type.DEPOSIT, Network.ETHEREUM, "0x123456", PositiveAmount.of(1000L), "StarkNet Foundation",
+                    "starknet.eth");
             accountingService.pay(rewardId2, currency.id(), transaction);
 
             // Then
@@ -589,7 +590,7 @@ public class AccountingServiceTest {
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
                     new MintEvent(AccountId.of(sponsorAccount.id()), amount),
-                    new BurnEvent(AccountId.of(sponsorAccount.id()), amount)
+                    new RefundEvent(AccountId.of(sponsorAccount.id()), AccountId.ROOT, amount)
             );
         }
 

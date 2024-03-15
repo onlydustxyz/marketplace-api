@@ -67,8 +67,11 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         assertThat(accountId).isNotNull();
         assertThat(response.getSponsorId()).isEqualTo(COCA_COLAX.value());
         assertThat(response.getCurrency().getId()).isEqualTo(STRK.value());
-        assertThat(response.getAllowance()).isEqualTo(BigDecimal.valueOf(100));
-        assertThat(response.getBalance()).isEqualTo(BigDecimal.ZERO);
+        assertThat(response.getInitialAllowance()).isEqualTo(BigDecimal.valueOf(100));
+        assertThat(response.getCurrentAllowance()).isEqualTo(BigDecimal.valueOf(100));
+        assertThat(response.getInitialBalance()).isEqualTo(BigDecimal.ZERO);
+        assertThat(response.getCurrentBalance()).isEqualTo(BigDecimal.ZERO);
+        assertThat(response.getDebt()).isEqualTo(BigDecimal.valueOf(100));
         assertThat(response.getLockedUntil()).isNull();
         assertThat(response.getAwaitingPaymentAmount()).isEqualTo(BigDecimal.ZERO);
 
@@ -176,8 +179,11 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .jsonPath("$.balance").isEqualTo(40)
-                .jsonPath("$.allowance").isEqualTo(20)
+                .jsonPath("$.initialBalance").isEqualTo(40)
+                .jsonPath("$.currentBalance").isEqualTo(40)
+                .jsonPath("$.initialAllowance").isEqualTo(60)
+                .jsonPath("$.currentAllowance").isEqualTo(20)
+                .jsonPath("$.debt").isEqualTo(20)
                 .jsonPath("$.awaitingPaymentAmount").isEqualTo(0)
         ;
     }
@@ -242,8 +248,11 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                 "name": "StarkNet Token",
                                 "logoUrl": null
                               },
-                              "balance": 100,
-                              "allowance": 100,
+                              "initialBalance": 100,
+                              "currentBalance": 100,
+                              "initialAllowance": 100,
+                              "currentAllowance": 100,
+                              "debt": 0,
                               "awaitingPaymentAmount": 0,
                               "lockedUntil": null,
                               "receipts": [
@@ -264,8 +273,8 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                 "name": "Bitcoin",
                                 "logoUrl": null
                               },
-                              "balance": 0,
-                              "allowance": 200,
+                              "currentBalance": 0,
+                              "currentAllowance": 200,
                               "awaitingPaymentAmount": 0,
                               "lockedUntil": null,
                               "receipts": []
@@ -310,8 +319,11 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .jsonPath("$.balance").isEqualTo(0)
-                .jsonPath("$.allowance").isEqualTo(100)
+                .jsonPath("$.initialBalance").isEqualTo(0)
+                .jsonPath("$.currentBalance").isEqualTo(0)
+                .jsonPath("$.initialAllowance").isEqualTo(100)
+                .jsonPath("$.currentAllowance").isEqualTo(100)
+                .jsonPath("$.debt").isEqualTo(100)
                 .jsonPath("$.receipts.size()").isEqualTo(0)
         ;
     }
@@ -465,8 +477,11 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .jsonPath("$.accounts[0].balance").isEqualTo(100)
-                .jsonPath("$.accounts[0].allowance").isEqualTo(0)
+                .jsonPath("$.accounts[0].initialBalance").isEqualTo(100)
+                .jsonPath("$.accounts[0].currentBalance").isEqualTo(100)
+                .jsonPath("$.accounts[0].initialAllowance").isEqualTo(100)
+                .jsonPath("$.accounts[0].currentAllowance").isEqualTo(0)
+                .jsonPath("$.accounts[0].debt").isEqualTo(0)
                 .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(30)
         ;
 
@@ -544,6 +559,21 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                          }
                          """
                 );
+
+        client.get()
+                .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(REDBULL)))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.accounts[0].initialBalance").isEqualTo(100)
+                .jsonPath("$.accounts[0].currentBalance").isEqualTo(70)
+                .jsonPath("$.accounts[0].initialAllowance").isEqualTo(100)
+                .jsonPath("$.accounts[0].currentAllowance").isEqualTo(0)
+                .jsonPath("$.accounts[0].debt").isEqualTo(0)
+                .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(0)
+        ;
     }
 
     @Test

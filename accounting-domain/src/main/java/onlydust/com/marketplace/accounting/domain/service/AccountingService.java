@@ -56,7 +56,7 @@ public class AccountingService implements AccountingFacadePort {
         final var accountBook = getAccountBook(sponsorAccount.currency());
 
         if (amount.isPositive()) accountBook.mint(AccountId.of(sponsorAccountId), PositiveAmount.of(amount));
-        else accountBook.burn(AccountId.of(sponsorAccountId), PositiveAmount.of(amount.negate()));
+        else accountBook.refund(AccountId.of(sponsorAccountId), AccountId.ROOT, PositiveAmount.of(amount.negate()));
 
         accountBookEventStorage.save(sponsorAccount.currency(), accountBook.pendingEvents());
         return sponsorAccountStatement(sponsorAccount, accountBook);
@@ -107,7 +107,8 @@ public class AccountingService implements AccountingFacadePort {
 
             if (paymentReference.network().equals(sponsorAccountNetwork)) {
                 accountBook.burn(AccountId.of(rewardId), amount);
-                registerSponsorAccountTransaction(accountBook, sponsorAccount, new SponsorAccount.Transaction(paymentReference, amount.negate()));
+                registerSponsorAccountTransaction(accountBook, sponsorAccount,
+                        new SponsorAccount.Transaction(SponsorAccount.Transaction.Type.SPEND, paymentReference, amount.negate()));
             }
         });
 
@@ -269,7 +270,8 @@ public class AccountingService implements AccountingFacadePort {
             final var sponsorAccount = sponsorAccount(sponsorAccountId);
 
             final var sponsorAccountNetwork = sponsorAccount.network().orElseThrow();
-            sponsorAccount.add(new SponsorAccount.Transaction(sponsorAccountNetwork, rewardId.toString(), amount.negate(), "", ""));
+            sponsorAccount.add(new SponsorAccount.Transaction(SponsorAccount.Transaction.Type.SPEND, sponsorAccountNetwork, rewardId.toString(),
+                    amount.negate(), "", ""));
         }
 
         private PayableReward createPayableReward(SponsorAccount.Id sponsorAccountId, RewardId rewardId, PositiveAmount amount) {

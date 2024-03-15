@@ -14,6 +14,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Hash;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
+import onlydust.com.marketplace.project.domain.view.ProjectSponsorView;
 import onlydust.com.marketplace.project.domain.view.backoffice.*;
 
 import java.math.BigDecimal;
@@ -23,6 +24,7 @@ import java.util.List;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.reducing;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.SearchRewardMapper.moneyViewToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.SearchRewardMapper.totalMoneyViewToResponse;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
@@ -33,17 +35,34 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPa
 public interface BackOfficeMapper {
 
     static AccountResponse mapAccountToResponse(final SponsorAccountStatement accountStatement) {
+        final var balance = mapAccountBalance(accountStatement);
         final var account = accountStatement.account();
+
         return new AccountResponse()
                 .id(account.id().value())
                 .sponsorId(account.sponsorId().value())
-                .currency(toShortCurrency(account.currency()))
                 .lockedUntil(account.lockedUntil().map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
-                .balance(account.balance().getValue())
-                .allowance(accountStatement.allowance().getValue())
-                .awaitingPaymentAmount(accountStatement.awaitingPaymentAmount().getValue())
-                .receipts(account.getTransactions().stream()
-                        .map(transaction -> mapTransactionToReceipt(account, transaction)).toList());
+                .receipts(account.getTransactions().stream().map(transaction -> mapTransactionToReceipt(account, transaction)).toList())
+                .currency(balance.getCurrency())
+                .initialBalance(balance.getInitialBalance())
+                .currentBalance(balance.getCurrentBalance())
+                .initialAllowance(balance.getInitialAllowance())
+                .currentAllowance(balance.getCurrentAllowance())
+                .debt(balance.getDebt())
+                .awaitingPaymentAmount(balance.getAwaitingPaymentAmount())
+                ;
+    }
+
+    static AccountBalance mapAccountBalance(final SponsorAccountStatement accountStatement) {
+        final var account = accountStatement.account();
+        return new AccountBalance()
+                .currency(toShortCurrency(account.currency()))
+                .initialBalance(account.initialBalance().getValue())
+                .currentBalance(account.balance().getValue())
+                .initialAllowance(accountStatement.initialAllowance().getValue())
+                .currentAllowance(accountStatement.allowance().getValue())
+                .debt(accountStatement.initialAllowance().subtract(account.initialBalance()).getValue())
+                .awaitingPaymentAmount(accountStatement.awaitingPaymentAmount().getValue());
     }
 
     static TransactionReceipt mapTransactionToReceipt(final SponsorAccount sponsorAccount, final SponsorAccount.Transaction transaction) {
@@ -58,13 +77,13 @@ public interface BackOfficeMapper {
 
     static SponsorAccount.Transaction mapReceiptToTransaction(final TransactionReceipt transaction) {
         return new SponsorAccount.Transaction(
+                SponsorAccount.Transaction.Type.DEPOSIT,
                 mapTransactionNetwork(transaction.getNetwork()),
                 transaction.getReference(),
                 Amount.of(transaction.getAmount()),
                 transaction.getThirdPartyName(),
                 transaction.getThirdPartyAccountNumber());
     }
-
 
     static OldSponsorPage mapSponsorPageToContract(final Page<SponsorView> sponsorPage, int pageIndex) {
         return new OldSponsorPage()
@@ -73,7 +92,7 @@ public interface BackOfficeMapper {
                         .name(sponsor.name())
                         .url(sponsor.url())
                         .logoUrl(sponsor.logoUrl())
-                        .projectIds(sponsor.projectIdsWhereSponsorIsActive().stream().toList())
+                        .projectIds(sponsor.projectsWhereSponsorIsActive().stream().map(ProjectSponsorView::projectId).toList())
                 ).toList())
                 .totalPageNumber(sponsorPage.getTotalPageNumber())
                 .totalItemNumber(sponsorPage.getTotalItemNumber())
@@ -86,8 +105,48 @@ public interface BackOfficeMapper {
                 .id(sponsor.id())
                 .name(sponsor.name())
                 .url(sponsor.url())
+                .logoUrl(sponsor.logoUrl());
+    }
+
+    static SponsorDetailsResponse mapSponsorToDetailsResponse(final SponsorView sponsor, List<SponsorAccountStatement> accountStatements) {
+        final var emptyBalance = new AccountBalance()
+                .initialBalance(BigDecimal.ZERO)
+                .currentBalance(BigDecimal.ZERO)
+                .initialAllowance(BigDecimal.ZERO)
+                .currentAllowance(BigDecimal.ZERO)
+                .debt(BigDecimal.ZERO)
+                .awaitingPaymentAmount(BigDecimal.ZERO);
+
+        return new SponsorDetailsResponse()
+                .id(sponsor.id())
+                .name(sponsor.name())
+                .url(sponsor.url())
                 .logoUrl(sponsor.logoUrl())
-                .projectIds(sponsor.projectIdsWhereSponsorIsActive().stream().toList());
+                .projects(sponsor.projectsWhereSponsorIsActive().stream().map(BackOfficeMapper::mapToProjectLink).toList())
+                .availableBudgets(accountStatements.stream()
+                        .map(BackOfficeMapper::mapAccountBalance)
+                        .collect(groupingBy(AccountBalance::getCurrency, reducing(emptyBalance, BackOfficeMapper::merge)))
+                        .values().stream().toList())
+                ;
+    }
+
+    static AccountBalance merge(AccountBalance balance1, AccountBalance balance2) {
+        return new AccountBalance()
+                .currency(balance2.getCurrency())
+                .initialBalance(balance1.getInitialBalance().add(balance2.getInitialBalance()))
+                .currentBalance(balance1.getCurrentBalance().add(balance2.getCurrentBalance()))
+                .initialAllowance(balance1.getInitialAllowance().add(balance2.getInitialAllowance()))
+                .currentAllowance(balance1.getCurrentAllowance().add(balance2.getCurrentAllowance()))
+                .debt(balance1.getDebt().add(balance2.getDebt()))
+                .awaitingPaymentAmount(balance1.getAwaitingPaymentAmount().add(balance2.getAwaitingPaymentAmount()))
+                ;
+    }
+
+    static ProjectLinkResponse mapToProjectLink(final ProjectSponsorView projectSponsorView) {
+        return new ProjectLinkResponse()
+                .name(projectSponsorView.projectName())
+                .logoUrl(projectSponsorView.projectLogoUrl())
+                ;
     }
 
     static EcosystemPage mapEcosystemPageToContract(final Page<EcosystemView> ecosystemViewPage, int pageIndex) {
@@ -482,6 +541,7 @@ public interface BackOfficeMapper {
                 .decimals(currency.decimals())
                 .description(currency.description().orElse(null))
                 .tokens(currency.erc20().stream().map(BackOfficeMapper::mapToken).toList())
+                .supportedOn(currency.supportedNetworks().stream().map(BackOfficeMapper::mapNetwork).toList())
                 ;
     }
 
