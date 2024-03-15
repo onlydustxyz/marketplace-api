@@ -15,11 +15,11 @@ public interface AccountingRewardPort {
 
     List<BackofficeRewardView> findByInvoiceId(Invoice.Id invoiceId);
 
-    List<BatchPayment> createBatchPaymentsForInvoices(List<Invoice.Id> invoiceIds);
+    List<BatchPaymentDetailsView> createBatchPaymentsForInvoices(List<Invoice.Id> invoiceIds);
 
     void markBatchPaymentAsPaid(BatchPayment.Id batchPaymentId, String transactionHash);
 
-    Page<BatchPayment> findBatchPayments(int pageIndex, int pageSize);
+    Page<BatchPaymentDetailsView> findBatchPayments(int pageIndex, int pageSize);
 
     BatchPaymentDetailsView findBatchPaymentById(BatchPayment.Id batchPaymentId);
 

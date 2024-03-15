@@ -4,6 +4,7 @@ import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileAdminView;
+import onlydust.com.marketplace.accounting.domain.view.TotalMoneyView;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 
@@ -42,14 +43,24 @@ public interface SearchRewardMapper {
                 .billingProfile(mapBillingProfile(view.billingProfileAdmin()));
     }
 
-    static MoneyLinkResponse moneyViewToResponse(final MoneyView view) {
+    static MoneyWithUsdEquivalentResponse moneyViewToResponse(final MoneyView view) {
         if (view == null) {
             return null;
         }
-        return new MoneyLinkResponse()
+        return new MoneyWithUsdEquivalentResponse()
                 .amount(view.amount())
                 .currency(toShortCurrency(view.currency()))
                 .conversionRate(view.usdConversionRate())
+                .dollarsEquivalent(view.dollarsEquivalent());
+    }
+
+    static TotalMoneyWithUsdEquivalentResponse totalMoneyViewToResponse(final TotalMoneyView view) {
+        if (view == null) {
+            return null;
+        }
+        return new TotalMoneyWithUsdEquivalentResponse()
+                .amount(view.amount())
+                .currency(toShortCurrency(view.currency()))
                 .dollarsEquivalent(view.dollarsEquivalent());
     }
 

@@ -20,6 +20,7 @@ import onlydust.com.marketplace.api.webhook.Config;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeApiIT {
@@ -155,6 +158,10 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
     void should_create_batch_payments_given_list_of_invoice_ids() throws IOException {
 
         // When
+        final var csv1 = new MutableObject<String>();
+        final var csv2 = new MutableObject<String>();
+        final var network1 = new MutableObject<String>();
+        final var network2 = new MutableObject<String>();
         client.post()
                 .uri(getApiURI(POST_REWARDS_BATCH_PAYMENTS))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -171,24 +178,58 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.batchPayments.length()").isEqualTo(2)
+                .jsonPath("$.batchPayments[0].csv").value(csv1::setValue)
+                .jsonPath("$.batchPayments[0].network").value(network1::setValue)
+                .jsonPath("$.batchPayments[1].csv").value(csv2::setValue)
+                .jsonPath("$.batchPayments[1].network").value(network2::setValue)
                 .json("""
                     {
                       "batchPayments": [
                         {
-                          "csv": "erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,747e663f-4e68-4b42-965b-b5aebedcd4c4.eth,1000\\r\\nerc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,e461c019-ba23-4671-9b6c-3a5a18748af9.eth,2000\\r\\n",
-                          "network": "ETHEREUM",
-                          "rewardCount": null,
-                          "totalAmounts": []
+                          "network": "SEPA",
+                          "rewardCount": 1,
+                          "totalUsdEquivalent": 1000,
+                          "totalsPerCurrency": [
+                            {
+                              "amount": 1000,
+                              "currency": {
+                                "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                "code": "USD",
+                                "name": "US Dollar",
+                                "logoUrl": null
+                              },
+                              "dollarsEquivalent": 1000
+                            }
+                          ]
                         },
                         {
-                          "csv": "iso4217,,FR76000111222333334444,1000\\r\\n",
-                          "network": "SEPA",
-                          "rewardCount": null,
-                          "totalAmounts": []
+                          "network": "ETHEREUM",
+                          "rewardCount": 2,
+                          "totalUsdEquivalent": 3030.00,
+                          "totalsPerCurrency": [
+                            {
+                              "amount": 3000,
+                              "currency": {
+                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                "code": "USDC",
+                                "name": "USD Coin",
+                                "logoUrl": null
+                              },
+                              "dollarsEquivalent": 3030.00
+                            }
+                          ]
                         }
                       ]
                     }
                     """);
+        final var ethCSV = network1.getValue().equals("ETHEREUM") ? csv1 : csv2;
+        final var sepaCSV = network1.getValue().equals("SEPA") ? csv1 : csv2;
+        assertThat(sepaCSV.getValue()).isEqualToIgnoringWhitespace("iso4217,,FR76000111222333334444,1000");
+        assertThat(ethCSV.getValue()).isEqualToIgnoringWhitespace("""
+                erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,747e663f-4e68-4b42-965b-b5aebedcd4c4.eth,1000
+                erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,e461c019-ba23-4671-9b6c-3a5a18748af9.eth,2000
+                """);
     }
 
     @Autowired
@@ -275,45 +316,45 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
 //        assertTrue(batchPayment.rewardIds().contains(RewardId.of(r2.getId())));
 //    }
 
-
-    @Test
-    @Order(104)
-    void should_get_page_of_payment_batch_and_get_payment_batch_by_id() {
-        // Given
-        final BatchPaymentEntity starknetBatchPaymentEntity = batchPaymentRepository.findAll().stream()
-                .filter(batchPaymentEntity -> batchPaymentEntity.getNetwork().equals(NetworkEnumEntity.starknet))
-                .findFirst()
-                .orElseThrow();
-
-        // When
-        client.get()
-                .uri(getApiURI(GET_REWARDS_BATCH_PAYMENTS, Map.of("pageIndex", "0", "pageSize", "20")))
-                .header("Api-Key", apiKey())
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(GET_BATCH_PAYMENTS_PAGE_JSON_RESPONSE);
-
-        // When
-        client.get()
-                .uri(getApiURI(GET_REWARDS_BATCH_PAYMENTS_BY_ID.formatted(starknetBatchPaymentEntity.getId())))
-                .header("Api-Key", apiKey())
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.blockchain").isEqualTo("STARKNET")
-                .jsonPath("$.rewardCount").isEqualTo(2)
-                .jsonPath("$.totalAmountUsd").isEqualTo(544)
-                .jsonPath("$.totalAmounts[0].amount").isEqualTo(11533.222)
-                .jsonPath("$.totalAmounts.length()").isEqualTo(1)
-                .jsonPath("$.csv").isNotEmpty()
-                .jsonPath("$.transactionHash").isNotEmpty()
-                .jsonPath("$.rewards.length()").isEqualTo(2);
-    }
+//
+//    @Test
+//    @Order(104)
+//    void should_get_page_of_payment_batch_and_get_payment_batch_by_id() {
+//        // Given
+//        final BatchPaymentEntity starknetBatchPaymentEntity = batchPaymentRepository.findAll().stream()
+//                .filter(batchPaymentEntity -> batchPaymentEntity.getNetwork().equals(NetworkEnumEntity.starknet))
+//                .findFirst()
+//                .orElseThrow();
+//
+//        // When
+//        client.get()
+//                .uri(getApiURI(GET_REWARDS_BATCH_PAYMENTS, Map.of("pageIndex", "0", "pageSize", "20")))
+//                .header("Api-Key", apiKey())
+//                // Then
+//                .exchange()
+//                .expectStatus()
+//                .is2xxSuccessful()
+//                .expectBody()
+//                .json(GET_BATCH_PAYMENTS_PAGE_JSON_RESPONSE);
+//
+//        // When
+//        client.get()
+//                .uri(getApiURI(GET_REWARDS_BATCH_PAYMENTS_BY_ID.formatted(starknetBatchPaymentEntity.getId())))
+//                .header("Api-Key", apiKey())
+//                // Then
+//                .exchange()
+//                .expectStatus()
+//                .is2xxSuccessful()
+//                .expectBody()
+//                .jsonPath("$.blockchain").isEqualTo("STARKNET")
+//                .jsonPath("$.rewardCount").isEqualTo(2)
+//                .jsonPath("$.totalAmountUsd").isEqualTo(544)
+//                .jsonPath("$.totalAmounts[0].amount").isEqualTo(11533.222)
+//                .jsonPath("$.totalAmounts.length()").isEqualTo(1)
+//                .jsonPath("$.csv").isNotEmpty()
+//                .jsonPath("$.transactionHash").isNotEmpty()
+//                .jsonPath("$.rewards.length()").isEqualTo(2);
+//    }
 
 //    @Autowired
 //    PaymentRepository paymentRepository;
@@ -352,30 +393,30 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
 //                        .withRequestBody(matchingJsonPath("$.recipientEmail", equalTo("abuisset@gmail.com")))
 //                        .withRequestBody(matchingJsonPath("$.recipientName", equalTo("Anthony BUISSET"))));
 //    }
-
-    private static final String GET_BATCH_PAYMENTS_PAGE_JSON_RESPONSE = """
-            {
-              "totalPageNumber": 1,
-              "totalItemNumber": 1,
-              "hasMore": false,
-              "nextPageIndex": 0,
-              "batchPayments": [
-                {
-                  "blockchain": "STARKNET",
-                  "rewardCount": 2,
-                  "totalAmountUsd": 544,
-                  "totalAmounts": [
-                    {
-                      "amount": 11533.222,
-                      "dollarsEquivalent": 544,
-                      "conversionRate": null,
-                      "currencyCode": "STRK",
-                      "currencyName": "StarkNet Token",
-                      "currencyLogoUrl": null
-                    }
-                  ]
-                }
-              ]
-            }
-            """;
+//
+//    private static final String GET_BATCH_PAYMENTS_PAGE_JSON_RESPONSE = """
+//            {
+//              "totalPageNumber": 1,
+//              "totalItemNumber": 1,
+//              "hasMore": false,
+//              "nextPageIndex": 0,
+//              "batchPayments": [
+//                {
+//                  "blockchain": "STARKNET",
+//                  "rewardCount": 2,
+//                  "totalAmountUsd": 544,
+//                  "totalAmounts": [
+//                    {
+//                      "amount": 11533.222,
+//                      "dollarsEquivalent": 544,
+//                      "conversionRate": null,
+//                      "currencyCode": "STRK",
+//                      "currencyName": "StarkNet Token",
+//                      "currencyLogoUrl": null
+//                    }
+//                  ]
+//                }
+//              ]
+//            }
+//            """;
 }

@@ -25,7 +25,6 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.output.RewardStoragePort;
@@ -106,30 +105,38 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
 
     @Override
     @Transactional(readOnly = true)
-    public Page<BatchPayment> findBatchPayments(int pageIndex, int pageSize) {
-        final int count = batchPaymentRepository.countAllByStatus(BatchPaymentEntity.Status.PAID);
-        return Page.<BatchPayment>builder()
-                .content(batchPaymentRepository.findAllByStatus(BatchPaymentEntity.Status.PAID,
-                                PageRequest.of(pageIndex, pageSize, Sort.by("createdAt").descending()))
-                        .stream().map(BatchPaymentEntity::toDomain).toList())
-                .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
-                .totalItemNumber(count)
+    public Page<BatchPaymentDetailsView> findBatchPaymentDetails(int pageIndex, int pageSize) {
+        final var page = batchPaymentRepository.findAllByStatus(BatchPaymentEntity.Status.PAID,
+                PageRequest.of(pageIndex, pageSize, Sort.by("createdAt").descending()));
+        return Page.<BatchPaymentDetailsView>builder()
+                .content(page.getContent().stream().map(this::getBatchPaymentDetailsView).toList())
+                .totalPageNumber(page.getTotalPages())
+                .totalItemNumber((int) page.getTotalElements())
                 .build();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<BatchPaymentDetailsView> findBatchPaymentDetailsById(BatchPayment.Id batchPaymentId) {
-        return batchPaymentRepository.findById(batchPaymentId.value())
-                .map(batchPayment ->
-                        BatchPaymentDetailsView.builder()
-                                .batchPayment(batchPayment.toDomain())
-                                .rewardViews(
-                                        rewardDetailsViewRepository.findAllByRewardIds(batchPayment.getRewards().stream().map(BatchPaymentRewardEntity::rewardId).toList()).stream()
-                                                .map(BackofficeRewardViewEntity::toDomain)
-                                                .toList())
-                                .build()
-                );
+        return batchPaymentRepository.findById(batchPaymentId.value()).map(this::getBatchPaymentDetailsView);
+    }
+
+    private BatchPaymentDetailsView getBatchPaymentDetailsView(BatchPaymentEntity batchPayment) {
+        return BatchPaymentDetailsView.builder()
+                .batchPayment(batchPayment.toDomain())
+                .rewardViews(
+                        rewardDetailsViewRepository.findAllByRewardIds(batchPayment.getRewards().stream().map(BatchPaymentRewardEntity::rewardId).toList()).stream()
+                                .map(BackofficeRewardViewEntity::toDomain)
+                                .toList())
+                .build();
+    }
+
+    @Override
+    public List<BackofficeRewardView> findRewardsById(Set<RewardId> rewardIds) {
+        return rewardDetailsViewRepository.findAllByRewardIds(rewardIds.stream().map(UuidWrapper::value).toList())
+                .stream()
+                .map(BackofficeRewardViewEntity::toDomain)
+                .toList();
     }
 
     @Override

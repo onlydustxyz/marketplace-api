@@ -5,7 +5,10 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
 
+import java.math.BigDecimal;
 import java.util.List;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Builder
 @Accessors(chain = true, fluent = true)
@@ -15,4 +18,16 @@ public record BatchPaymentDetailsView(
         @NonNull
         List<BackofficeRewardView> rewardViews
 ) {
+
+    public List<TotalMoneyView> totalsPerCurrency() {
+        return rewardViews.stream()
+                .collect(groupingBy(r->r.money().currency()))
+                .entrySet()
+                .stream()
+                .map(e -> new TotalMoneyView(
+                        e.getValue().stream().map(r->r.money().amount()).reduce(BigDecimal::add).orElseThrow(),
+                        e.getKey(),
+                        e.getValue().stream().map(r->r.money().dollarsEquivalent()).reduce(BigDecimal::add).orElseThrow()
+                )).toList();
+    }
 }

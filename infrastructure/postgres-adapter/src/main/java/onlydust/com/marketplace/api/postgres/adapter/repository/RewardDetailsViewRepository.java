@@ -82,7 +82,7 @@ public interface RewardDetailsViewRepository extends JpaRepository<BackofficeRew
                                             from sponsors s
                                                      join projects_sponsors ps2 on ps2.sponsor_id = s.id
                                             group by ps2.project_id) s2 on s2.project_id = r.project_id
-                                 join iam.users u on u.github_user_id = r.recipient_id
+                                 left join iam.users u on u.github_user_id = r.recipient_id
                                  left join user_profile_info upi on upi.id = u.id
                                  left join (select rr.reward_id,
                                                    jsonb_agg(re.transaction_reference) transaction_references,

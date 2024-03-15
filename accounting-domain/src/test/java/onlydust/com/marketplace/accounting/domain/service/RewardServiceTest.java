@@ -147,7 +147,7 @@ public class RewardServiceTest {
         when(accountingService.getPayableRewards(rewardIdsSet)).thenReturn(payableRewards);
 
         // When
-        final var batches = rewardService.createBatchPaymentsForInvoices(invoiceIds);
+        final var batches = rewardService.createBatchPaymentsForInvoices(invoiceIds).stream().map(BatchPaymentDetailsView::batchPayment).toList();
 
         // Then
         assertThat(batches).hasSize(3);
@@ -157,12 +157,11 @@ public class RewardServiceTest {
             assertThat(ethereumBatch.rewards()).containsExactlyInAnyOrder(payableRewards.get(0), payableRewards.get(2), payableRewards.get(4),
                     payableRewards.get(5));
             assertThat(ethereumBatch.invoices()).containsAll(invoices);
-            assertThat(ethereumBatch.csv()).isEqualToIgnoringWhitespace("""
-                    erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,vitalik.eth,100
-                    erc20,0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766,vitalik.eth,300
-                    native,,vitalik.eth,500
-                    erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,foo.eth,600
-                    """);
+            assertThat(ethereumBatch.csv()).hasLineCount(4);
+            assertThat(ethereumBatch.csv()).contains("erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,vitalik.eth,100");
+            assertThat(ethereumBatch.csv()).contains("erc20,0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766,vitalik.eth,300");
+            assertThat(ethereumBatch.csv()).contains("native,,vitalik.eth,500");
+            assertThat(ethereumBatch.csv()).contains("erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,foo.eth,600");
         }
         {
             final var optimismBatch = batches.stream().filter(batch -> batch.network().equals(Network.OPTIMISM)).findFirst().orElseThrow();
