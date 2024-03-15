@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
-import onlydust.com.marketplace.project.domain.view.backoffice.ProjectView;
+import onlydust.com.marketplace.project.domain.view.backoffice.OldProjectView;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -52,8 +52,8 @@ public class BoProjectEntity {
     BigDecimal dollarsEquivalentAmountSent;
     BigDecimal strkAmountSent;
 
-    public ProjectView toView() {
-        return ProjectView.builder()
+    public OldProjectView toView() {
+        return OldProjectView.builder()
                 .id(id)
                 .name(name)
                 .shortDescription(shortDescription)

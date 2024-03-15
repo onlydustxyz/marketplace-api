@@ -46,9 +46,15 @@ public class BackofficeService implements BackofficeFacadePort {
     }
 
     @Override
-    public Page<ProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds) {
+    public Page<OldProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds) {
         return backofficeStoragePort.listProjects(pageIndex, pageSize, projectIds);
     }
+
+    @Override
+    public Page<ProjectView> searchProjects(int pageIndex, int pageSize, String search) {
+        return backofficeStoragePort.searchProjects(pageIndex, pageSize, search);
+    }
+
 
     @Override
     public Ecosystem createEcosystem(Ecosystem ecosystem) {

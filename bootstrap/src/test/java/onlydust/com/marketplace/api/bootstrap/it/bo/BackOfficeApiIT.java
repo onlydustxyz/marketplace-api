@@ -1069,7 +1069,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
     }
 
     @Test
-    void should_get_projects() {
+    void should_get_projects_old() {
         // When
         client.get()
                 .uri(getApiURI(GET_PROJECTS, Map.of("pageIndex", "0", "pageSize", "5")))
@@ -1254,5 +1254,70 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           ]
                         }
                         """);
+    }
+
+    @Test
+    void should_get_projects() {
+        // When
+        client.get()
+                .uri(getApiURI(GET_PROJECTS_V2, Map.of("pageIndex", "0", "pageSize", "5")))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 15,
+                          "totalItemNumber": 75,
+                          "hasMore": true,
+                          "nextPageIndex": 1,
+                          "projects": [
+                            {
+                              "id": "98873240-31df-431a-81dc-7d6fe01143a0",
+                              "name": "Aiolia du Lion",
+                              "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c"
+                            },
+                            {
+                              "id": "a0c91aee-9770-4000-a893-953ddcbd62a7",
+                              "name": "Aldébaran du Taureau",
+                              "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aldebaran_taureau.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=ab78704b124d2de9525a8af91ef7c4ed"
+                            },
+                            {
+                              "id": "97f6b849-1545-4064-83f1-bc5ded33a8b3",
+                              "name": "Anthology project",
+                              "logoUrl": "https://cdn.filestackcontent.com/pgjvFWS8Teq2Yns89IKg"
+                            },
+                            {
+                              "id": "2073b3b2-60f4-488c-8a0a-ab7121ed850c",
+                              "name": "Apibara",
+                              "logoUrl": null
+                            },
+                            {
+                              "id": "27ca7e18-9e71-468f-8825-c64fe6b79d66",
+                              "name": "B Conseil",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png"
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+
+    @Test
+    void should_search_projects_by_name() {
+        // When
+        client.get()
+                .uri(getApiURI(GET_PROJECTS_V2, Map.of("pageIndex", "0", "pageSize", "5", "search", "Du")))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.projects[?(@.name =~ /.*du.*/i)]").isNotEmpty()
+                .jsonPath("$.projects[?(!(@.name =~ /.*du.*/i))]").isEmpty()
+        ;
     }
 }

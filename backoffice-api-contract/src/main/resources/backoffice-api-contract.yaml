@@ -1281,7 +1281,7 @@ paths:
       tags:
         - Backoffice
       summary: Get project page
-      operationId: getProjectPage
+      operationId: getOldProjectPage
       description: |
         Get project page
       parameters:
@@ -1304,6 +1304,44 @@ paths:
               type: string
               format: uuid
           style: form
+      responses:
+        "200":
+          description: 'Project page'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OldProjectPage'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v2/projects:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - Backoffice
+      summary: Get project page
+      operationId: getProjectPage
+      description: |
+        Get project page
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: search
+          required: false
+          schema:
+            type: string
       responses:
         "200":
           description: 'Project page'
@@ -2621,7 +2659,31 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProjectPageItemResponse'
-    ProjectPageItemResponse:
+
+    OldProjectPage:
+      type: object
+      required:
+        - projects
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/OldProjectPageItemResponse'
+
+    OldProjectPageItemResponse:
       type: object
       properties:
         id:
@@ -2672,6 +2734,17 @@ components:
           type: number
         strkAmountSent:
           type: number
+
+    ProjectPageItemResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        logoUrl:
+          type: string
 
     CurrencyCode:
       type: string

@@ -21,7 +21,9 @@ public interface BackofficeFacadePort {
 
     Page<EcosystemView> listEcosystems(int pageIndex, int pageSize, EcosystemView.Filters filters);
 
-    Page<ProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds);
+    Page<OldProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds);
+
+    Page<ProjectView> searchProjects(int pageIndex, int pageSize, String search);
 
     Ecosystem createEcosystem(final Ecosystem ecosystem);
 
