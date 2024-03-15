@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
+import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
 import onlydust.com.marketplace.accounting.domain.view.TotalMoneyView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
@@ -85,6 +86,37 @@ public interface BackOfficeMapper {
                 transaction.getThirdPartyAccountNumber());
     }
 
+    static TransactionHistoryPageResponse mapTransactionHistory(final Page<HistoricalTransaction> page, final int pageIndex) {
+        return new TransactionHistoryPageResponse()
+                .transactions(page.getContent().stream().map(BackOfficeMapper::mapHistoricalTransaction).toList())
+                .totalPageNumber(page.getTotalPageNumber())
+                .totalItemNumber(page.getTotalItemNumber())
+                .hasMore(hasMore(pageIndex, page.getTotalPageNumber()))
+                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPageNumber()));
+    }
+
+    static TransactionHistoryPageItemResponse mapHistoricalTransaction(HistoricalTransaction historicalTransaction) {
+        return new TransactionHistoryPageItemResponse()
+                .date(historicalTransaction.timestamp())
+                .type(mapTransactionType(historicalTransaction.type()))
+                .network(historicalTransaction.sponsorAccount().network().map(BackOfficeMapper::mapNetwork).orElse(null))
+                .lockedUntil(historicalTransaction.sponsorAccount().lockedUntil().map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
+                .project(mapToProjectLink(historicalTransaction.project()))
+                .amount(new MoneyWithUsdEquivalentResponse()
+                        .amount(historicalTransaction.amount().getValue())
+                        .currency(toShortCurrency(historicalTransaction.sponsorAccount().currency()))
+                        .dollarsEquivalent(historicalTransaction.usdAmount() == null ? null : historicalTransaction.usdAmount().convertedAmount().getValue())
+                        .conversionRate(historicalTransaction.usdAmount() == null ? null : historicalTransaction.usdAmount().conversionRate())
+                );
+    }
+
+    static HistoricalTransactionType mapTransactionType(HistoricalTransaction.Type type) {
+        return switch (type) {
+            case DEPOSIT -> HistoricalTransactionType.DEPOSIT;
+            case ALLOCATION -> HistoricalTransactionType.ALLOCATION;
+        };
+    }
+
     static OldSponsorPage mapSponsorPageToContract(final Page<SponsorView> sponsorPage, int pageIndex) {
         return new OldSponsorPage()
                 .sponsors(sponsorPage.getContent().stream().map(sponsor -> new OldSponsorPageItemResponse()
@@ -146,6 +178,15 @@ public interface BackOfficeMapper {
         return new ProjectLinkResponse()
                 .name(projectSponsorView.projectName())
                 .logoUrl(projectSponsorView.projectLogoUrl())
+                ;
+    }
+
+    static ProjectLinkResponse mapToProjectLink(final ShortProjectView project) {
+        if (project == null) return null;
+
+        return new ProjectLinkResponse()
+                .name(project.name())
+                .logoUrl(project.logoUrl())
                 ;
     }
 

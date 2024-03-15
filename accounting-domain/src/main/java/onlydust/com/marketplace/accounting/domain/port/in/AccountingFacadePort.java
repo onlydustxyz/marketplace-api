@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain.port.in;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.kernel.pagination.Page;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -48,4 +49,6 @@ public interface AccountingFacadePort {
     List<PayableReward> getPayableRewards();
 
     List<PayableReward> getPayableRewards(Set<RewardId> rewardIds);
+
+    Page<HistoricalTransaction> transactionHistory(SponsorId sponsorId, Integer pageIndex, Integer pageSize);
 }

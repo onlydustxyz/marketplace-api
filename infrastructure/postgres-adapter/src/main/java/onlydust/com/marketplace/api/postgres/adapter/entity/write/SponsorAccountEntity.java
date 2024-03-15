@@ -32,7 +32,7 @@ public class SponsorAccountEntity {
     @Builder.Default
     Set<SponsorAccountTransactionsEntity> transactions = new HashSet<>();
 
-    public SponsorAccount toLedger() {
+    public SponsorAccount toDomain() {
         final var ledger = new SponsorAccount(SponsorAccount.Id.of(id), SponsorId.of(sponsorId), currency.toDomain(), lockedUntil);
         ledger.getTransactions().addAll(transactions.stream().map(SponsorAccountTransactionsEntity::toTransaction).toList());
         return ledger;

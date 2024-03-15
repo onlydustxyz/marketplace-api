@@ -10,16 +10,20 @@ import onlydust.com.marketplace.api.contract.model.CreateRewardResponse;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiIT {
     static final SponsorId COCA_COLAX = SponsorId.of("44c6807c-48d1-4987-a0a6-ac63f958bdae");
     static final SponsorId THEODO = SponsorId.of("2639563e-4437-4bde-a4f4-654977c0cb39");
@@ -186,6 +190,83 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .jsonPath("$.debt").isEqualTo(20)
                 .jsonPath("$.awaitingPaymentAmount").isEqualTo(0)
         ;
+
+
+        client.get()
+                .uri(getApiURI(GET_SPONSORS_TRANSACTIONS.formatted(COCA_COLAX), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10"
+                )))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 3,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "transactions": [
+                            {
+                              "type": "DEPOSIT",
+                              "network": "ETHEREUM",
+                              "lockedUntil": null,
+                              "project": null,
+                              "amount": {
+                                "amount": -60,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null
+                                },
+                                "dollarsEquivalent": null,
+                                "conversionRate": null
+                              }
+                            },
+                            {
+                              "type": "ALLOCATION",
+                              "network": "ETHEREUM",
+                              "lockedUntil": null,
+                              "project": {
+                                "name": "Bretzel",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                              },
+                              "amount": {
+                                "amount": 90,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null
+                                },
+                                "dollarsEquivalent": null,
+                                "conversionRate": null
+                              }
+                            },
+                            {
+                              "type": "DEPOSIT",
+                              "network": "ETHEREUM",
+                              "lockedUntil": null,
+                              "project": null,
+                              "amount": {
+                                "amount": 100,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null
+                                },
+                                "dollarsEquivalent": null,
+                                "conversionRate": null
+                              }
+                            }
+                          ]
+                        }
+                        """);
+
     }
 
     @Test
@@ -574,6 +655,64 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .jsonPath("$.accounts[0].debt").isEqualTo(0)
                 .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(0)
         ;
+
+        client.get()
+                .uri(getApiURI(GET_SPONSORS_TRANSACTIONS.formatted(REDBULL), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10"
+                )))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "transactions": [
+                            {
+                              "type": "ALLOCATION",
+                              "network": "ETHEREUM",
+                              "lockedUntil": null,
+                              "project": {
+                                "name": "kaaper",
+                                "logoUrl": null
+                              },
+                              "amount": {
+                                "amount": 100,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null
+                                },
+                                "dollarsEquivalent": null,
+                                "conversionRate": null
+                              }
+                            },
+                            {
+                              "type": "DEPOSIT",
+                              "network": "ETHEREUM",
+                              "lockedUntil": null,
+                              "project": null,
+                              "amount": {
+                                "amount": 100,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null
+                                },
+                                "dollarsEquivalent": null,
+                                "conversionRate": null
+                              }
+                            }
+                          ]
+                        }
+                        """);
     }
 
     @Test

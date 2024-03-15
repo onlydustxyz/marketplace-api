@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeAccountingManagementApi;
 import onlydust.com.backoffice.api.contract.model.*;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
@@ -61,6 +60,17 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     public ResponseEntity<AccountListResponse> getSponsorAccounts(UUID sponsorId) {
         final var sponsorAccounts = accountingFacadePort.getSponsorAccounts(SponsorId.of(sponsorId));
         return ResponseEntity.ok(new AccountListResponse().accounts(sponsorAccounts.stream().map(BackOfficeMapper::mapAccountToResponse).toList()));
+    }
+
+    @Override
+    public ResponseEntity<TransactionHistoryPageResponse> getSponsorTransactionHistory(UUID sponsorId, Integer pageIndex, Integer pageSize) {
+        final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
+        final var page = accountingFacadePort.transactionHistory(SponsorId.of(sponsorId), sanitizedPageIndex, sanitizePageSize(pageSize));
+        final var response = mapTransactionHistory(page, sanitizedPageIndex);
+
+        return response.getTotalPageNumber() > 1 ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
+                ResponseEntity.ok(response);
     }
 
     @Override
