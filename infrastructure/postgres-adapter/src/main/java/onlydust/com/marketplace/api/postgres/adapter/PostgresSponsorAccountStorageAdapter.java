@@ -1,12 +1,18 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.accounting.domain.model.HistoricalTransaction;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.HistoricalTransactionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.SponsorAccountEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.HistoricalTransactionRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.pagination.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,10 +21,11 @@ import java.util.Optional;
 @AllArgsConstructor
 public class PostgresSponsorAccountStorageAdapter implements SponsorAccountStorage {
     private final SponsorAccountRepository sponsorAccountRepository;
+    private final HistoricalTransactionRepository historicalTransactionRepository;
 
     @Override
     public Optional<SponsorAccount> get(SponsorAccount.Id id) {
-        return sponsorAccountRepository.findById(id.value()).map(SponsorAccountEntity::toLedger);
+        return sponsorAccountRepository.findById(id.value()).map(SponsorAccountEntity::toDomain);
     }
 
     @Override
@@ -37,6 +44,18 @@ public class PostgresSponsorAccountStorageAdapter implements SponsorAccountStora
 
     @Override
     public List<SponsorAccount> getSponsorAccounts(SponsorId sponsorId) {
-        return sponsorAccountRepository.findAllBySponsorId(sponsorId.value()).stream().map(SponsorAccountEntity::toLedger).toList();
+        return sponsorAccountRepository.findAllBySponsorId(sponsorId.value()).stream().map(SponsorAccountEntity::toDomain).toList();
+    }
+
+    @Override
+    public Page<HistoricalTransaction> transactionsOf(SponsorId sponsorId, Integer pageIndex, Integer pageSize) {
+        final var page = historicalTransactionRepository.findAll(sponsorId.value(), PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC,
+                "timestamp")));
+
+        return Page.<HistoricalTransaction>builder()
+                .content(page.getContent().stream().map(HistoricalTransactionEntity::toDomain).toList())
+                .totalItemNumber((int) page.getTotalElements())
+                .totalPageNumber(page.getTotalPages())
+                .build();
     }
 }

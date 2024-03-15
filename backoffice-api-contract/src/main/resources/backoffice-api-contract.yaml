@@ -287,6 +287,42 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/sponsors/{sponsorId}/transactions:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Get the list of all transactions related to this sponsor
+      operationId: getSponsorTransactionHistory
+      parameters:
+        - in: path
+          name: sponsorId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorId'
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'The sponsor transaction history'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionHistoryPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /bo/v1/sponsor-accounts/{accountId}/allowance:
     put:
       security:
@@ -2553,6 +2589,12 @@ components:
             conversionRate:
               type: number
 
+    HistoricalTransactionType:
+      type: string
+      enum:
+        - DEPOSIT
+        - ALLOCATION
+    
     TotalMoneyWithUsdEquivalentResponse:
       description: |
         Represents a total amount with its currency and the total equivalent in USD.
@@ -2981,6 +3023,52 @@ components:
           items:
             $ref: '#/components/schemas/SponsorLinkResponse'
         money:
+          $ref: '#/components/schemas/MoneyWithUsdEquivalentResponse'
+
+    TransactionHistoryPageResponse:
+      type: object
+      required:
+        - transactions
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionHistoryPageItemResponse'
+
+    TransactionHistoryPageItemResponse:
+      type: object
+      required:
+        - date
+        - type
+        - amount
+        - currency
+      properties:
+        date:
+          type: string
+          format: date-time
+        type:
+          $ref: '#/components/schemas/HistoricalTransactionType'
+        network:
+          $ref: '#/components/schemas/TransactionNetwork'
+        lockedUntil:
+          type: string
+          format: date-time
+        project:
+          $ref: '#/components/schemas/ProjectLinkResponse'
+        amount:
           $ref: '#/components/schemas/MoneyWithUsdEquivalentResponse'
 
     RewardPageResponse:

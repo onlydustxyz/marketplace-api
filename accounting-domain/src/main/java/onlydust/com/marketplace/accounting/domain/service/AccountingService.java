@@ -8,6 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookA
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookState;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
+import onlydust.com.marketplace.kernel.pagination.Page;
 
 import javax.transaction.Transactional;
 import java.time.ZonedDateTime;
@@ -294,5 +295,10 @@ public class AccountingService implements AccountingFacadePort {
                 return sponsorAccount.unlockedBalance().isGreaterThanOrEqual(entry.getValue());
             });
         }
+    }
+
+    @Override
+    public Page<HistoricalTransaction> transactionHistory(SponsorId sponsorId, Integer pageIndex, Integer pageSize) {
+        return sponsorAccountStorage.transactionsOf(sponsorId, pageIndex, pageSize);
     }
 }
