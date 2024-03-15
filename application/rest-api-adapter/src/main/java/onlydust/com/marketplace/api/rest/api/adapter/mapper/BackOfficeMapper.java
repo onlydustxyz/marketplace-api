@@ -12,7 +12,6 @@ import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Hash;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.project.domain.model.Currency;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.view.backoffice.*;
 
@@ -20,7 +19,6 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.Map;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
@@ -36,7 +34,7 @@ public interface BackOfficeMapper {
         return new AccountResponse()
                 .id(account.id().value())
                 .sponsorId(account.sponsorId().value())
-                .currencyId(account.currency().id().value())
+                .currency(toShortCurrency(account.currency()))
                 .lockedUntil(account.lockedUntil().map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
                 .balance(account.balance().getValue())
                 .allowance(accountStatement.allowance().getValue())
@@ -125,39 +123,12 @@ public interface BackOfficeMapper {
         return githubRepositoryPage;
     }
 
-    static BudgetPage mapBudgetPageToResponse(Page<ProjectBudgetView> projectBudgetViewPage, int sanitizedPageIndex) {
-        final BudgetPage budgetPage = new BudgetPage();
-        for (ProjectBudgetView view : projectBudgetViewPage.getContent()) {
-            budgetPage.addBudgetsItem(new BudgetResponse()
-                    .initialAmount(view.getInitialAmount())
-                    .remainingAmount(view.getRemainingAmount())
-                    .spentAmount(view.getSpentAmount())
-                    .id(view.getId())
-                    .currency(mapCurrency(view.getCurrency()))
-                    .projectId(view.getProjectId())
-                    .initialAmountDollarsEquivalent(view.getInitialAmountDollarsEquivalent())
-                    .remainingAmountDollarsEquivalent(view.getRemainingAmountDollarsEquivalent())
-                    .spentAmountDollarsEquivalent(view.getSpentAmountDollarsEquivalent()));
-        }
-        budgetPage.setNextPageIndex(nextPageIndex(sanitizedPageIndex,
-                projectBudgetViewPage.getTotalPageNumber()));
-        budgetPage.setTotalPageNumber(projectBudgetViewPage.getTotalPageNumber());
-        budgetPage.setTotalItemNumber(projectBudgetViewPage.getTotalItemNumber());
-        budgetPage.setHasMore(hasMore(sanitizedPageIndex,
-                projectBudgetViewPage.getTotalPageNumber()));
-        return budgetPage;
-    }
-
-    static CurrencyCode mapCurrency(final Currency currency) {
-        return switch (currency) {
-            case STRK -> CurrencyCode.STRK;
-            case USD -> CurrencyCode.USD;
-            case APT -> CurrencyCode.APT;
-            case OP -> CurrencyCode.OP;
-            case ETH -> CurrencyCode.ETH;
-            case LORDS -> CurrencyCode.LORDS;
-            case USDC -> CurrencyCode.USDC;
-        };
+    static ShortCurrencyResponse toShortCurrency(final Currency currency) {
+        return new ShortCurrencyResponse()
+                .id(currency.id().value())
+                .code(currency.code().toString())
+                .name(currency.name())
+                .logoUrl(currency.logoUri().orElse(null));
     }
 
     static ProjectLeadInvitationPage mapProjectLeadInvitationPageToContract(final Page<ProjectLeadInvitationView> projectLeadInvitationViewPage,
@@ -231,7 +202,15 @@ public interface BackOfficeMapper {
                         .id(payment.getId())
                         .projectId(payment.getProjectId())
                         .amount(payment.getAmount())
-                        .currency(mapCurrency(payment.getCurrency()))
+                        .currency(switch (payment.getCurrency()) {
+                            case STRK -> CurrencyCode.STRK;
+                            case USD -> CurrencyCode.USD;
+                            case APT -> CurrencyCode.APT;
+                            case OP -> CurrencyCode.OP;
+                            case ETH -> CurrencyCode.ETH;
+                            case LORDS -> CurrencyCode.LORDS;
+                            case USDC -> CurrencyCode.USDC;
+                        })
                         .recipientId(payment.getRecipientId())
                         .requestorId(payment.getRequestorId())
                         .isPayable(payment.recipientPayoutInfoValid())
@@ -269,7 +248,7 @@ public interface BackOfficeMapper {
                 .createdAt(invoice.createdAt())
                 .dueAt(invoice.dueAt())
                 .amount(invoice.totalAfterTax().getValue())
-                .currencyId(invoice.totalAfterTax().getCurrency().id().value())
+                .currency(toShortCurrency(invoice.totalAfterTax().getCurrency()))
                 .rewardIds(invoice.rewards().stream().map(Invoice.Reward::id).map(UuidWrapper::value).toList())
                 .downloadUrl(URI.create("%s/bo/v1/external/invoices/%s?token=%s".formatted(baseUri, invoice.id().value(), token)));
     }
@@ -302,19 +281,15 @@ public interface BackOfficeMapper {
                 .rewardCount(invoice.rewards().size())
                 .totalEquivalent(new MoneyLinkResponse()
                         .amount(invoice.totalAfterTax().getValue())
+                        .currency(toShortCurrency(invoice.totalAfterTax().getCurrency()))
                         .dollarsEquivalent(invoice.totalAfterTax().getValue())
-                        .currencyCode(invoice.totalAfterTax().getCurrency().code().toString())
-                        .currencyName(invoice.totalAfterTax().getCurrency().name())
-                        .currencyLogoUrl(invoice.totalAfterTax().getCurrency().logoUri().map(URI::toString).orElse(null))
                         .conversionRate(null) //TODO: add conversion rate when implementing the new version for pennylane
                 )
                 .totalPerCurrency(invoice.rewards().stream().map(reward ->
                         new MoneyLinkResponse()
                                 .amount(reward.amount().getValue())
+                                .currency(toShortCurrency(reward.amount().getCurrency()))
                                 .dollarsEquivalent(reward.target().getValue())
-                                .currencyCode(reward.amount().getCurrency().code().toString())
-                                .currencyName(reward.amount().getCurrency().name())
-                                .currencyLogoUrl(reward.amount().getCurrency().logoUri().map(URI::toString).orElse(null))
                                 .conversionRate(null) //TODO: add conversion rate when implementing the new version for pennylane
                 ).toList());
     }
@@ -346,17 +321,14 @@ public interface BackOfficeMapper {
                 )
                 .totalEquivalent(new MoneyResponse()
                         .amount(invoice.totalAfterTax().getValue())
-                        .currencyCode(invoice.totalAfterTax().getCurrency().code().toString())
-                        .currencyName(invoice.totalAfterTax().getCurrency().name())
-                        .currencyLogoUrl(invoice.totalAfterTax().getCurrency().logoUri().map(URI::toString).orElse(null))
+                        .currency(toShortCurrency(invoice.totalAfterTax().getCurrency()))
                 )
                 .rewardsPerNetwork(mapInvoiceRewardsPerNetworks(invoice, rewards));
     }
 
     static List<InvoiceRewardsPerNetwork> mapInvoiceRewardsPerNetworks(final Invoice invoice, final List<BackofficeRewardView> rewards) {
-        final Map<Network, List<BackofficeRewardView>> rewardsPerNetworks = rewards.stream().collect(groupingBy(BackofficeRewardView::network));
-
-        return rewardsPerNetworks.entrySet().stream()
+        return rewards.stream().collect(groupingBy(BackofficeRewardView::network))
+                .entrySet().stream()
                 .map(e -> {
                             final var totalEquivalent = e.getValue().stream().map(r -> r.money().dollarsEquivalent()).reduce(BigDecimal::add)
                                     .orElseThrow(() -> internalServerError("No reward found for network %s".formatted(e.getKey())));
@@ -395,9 +367,7 @@ public interface BackOfficeMapper {
                         .money(new MoneyLinkResponse()
                                 .amount(reward.money().amount())
                                 .dollarsEquivalent(reward.money().dollarsEquivalent())
-                                .currencyCode(reward.money().currencyCode())
-                                .currencyName(reward.money().currencyName())
-                                .currencyLogoUrl(reward.money().currencyLogoUrl())
+                                .currency(toShortCurrency(reward.money().currency()))
                         )
                         .transactionReferences(reward.transactionReferences())
                 )
@@ -406,13 +376,10 @@ public interface BackOfficeMapper {
     }
 
     static List<MoneyLinkResponse> mapNetworkRewardTotals(final List<BackofficeRewardView> rewards) {
-        final Map<String, List<BackofficeRewardView>> rewardsPerCurrencyCode = rewards.stream().collect(groupingBy(r -> r.money().currencyCode()));
-
-        return rewardsPerCurrencyCode.entrySet().stream()
+        return rewards.stream().collect(groupingBy(r -> r.money().currency()))
+                .entrySet().stream()
                 .map(e -> {
-                            final var currencyCode = e.getKey();
-                            final var currencyName = rewards.stream().findFirst().map(r -> r.money().currencyName()).orElse(null);
-                            final var currencyLogoUrl = rewards.stream().findFirst().map(r -> r.money().currencyLogoUrl()).orElse(null);
+                            final var currency = e.getKey();
                             final var total = e.getValue().stream().map(r -> r.money().amount()).reduce(BigDecimal::add)
                                     .orElseThrow(() -> internalServerError("No reward found for currency %s".formatted(e.getKey())));
                             final var totalEquivalent = e.getValue().stream().map(r -> r.money().dollarsEquivalent()).reduce(BigDecimal::add)
@@ -421,12 +388,10 @@ public interface BackOfficeMapper {
                             return new MoneyLinkResponse()
                                     .amount(total)
                                     .dollarsEquivalent(totalEquivalent)
-                                    .currencyCode(currencyCode)
-                                    .currencyName(currencyName)
-                                    .currencyLogoUrl(currencyLogoUrl);
+                                    .currency(toShortCurrency(currency));
                         }
                 )
-                .sorted(comparing(MoneyLinkResponse::getCurrencyCode))
+                .sorted(comparing(r -> r.getCurrency().getCode()))
                 .toList();
     }
 
@@ -602,8 +567,8 @@ public interface BackOfficeMapper {
                 ;
     }
 
-    static TransactionalCurrency mapTransactionalCurrency(PayableCurrency currency) {
-        return new TransactionalCurrency()
+    static TransactionalCurrencyResponse mapTransactionalCurrency(PayableCurrency currency) {
+        return new TransactionalCurrencyResponse()
                 .id(currency.id().value())
                 .code(currency.code().toString())
                 .name(currency.name())

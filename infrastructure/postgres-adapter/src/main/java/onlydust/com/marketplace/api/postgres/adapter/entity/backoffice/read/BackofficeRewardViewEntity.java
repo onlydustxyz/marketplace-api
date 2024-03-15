@@ -52,9 +52,8 @@ public class BackofficeRewardViewEntity {
     List<SponsorLinkView> sponsors;
 
     @NonNull BigDecimal amount;
-    String currencyName;
-    @NonNull String currencyCode;
-    String currencyLogoUrl;
+    @ManyToOne
+    CurrencyEntity currency;
 
     @Type(type = "billing_profile_type")
     @Enumerated(EnumType.STRING)
@@ -133,9 +132,7 @@ public class BackofficeRewardViewEntity {
                         .amount(this.amount)
                         .dollarsEquivalent(this.statusData.amountUsdEquivalent())
                         .usdConversionRate(this.statusData.usdConversionRate())
-                        .currencyName(this.currencyName)
-                        .currencyCode(this.currencyCode)
-                        .currencyLogoUrl(this.currencyLogoUrl)
+                        .currency(this.currency.toDomain())
                         .build())
                 .invoice(isNull(this.invoiceId) ? null : ShortInvoiceView.builder()
                         .id(Invoice.Id.of(this.invoiceId))

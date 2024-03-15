@@ -66,7 +66,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         final var accountId = response.getId();
         assertThat(accountId).isNotNull();
         assertThat(response.getSponsorId()).isEqualTo(COCA_COLAX.value());
-        assertThat(response.getCurrencyId()).isEqualTo(STRK.value());
+        assertThat(response.getCurrency().getId()).isEqualTo(STRK.value());
         assertThat(response.getAllowance()).isEqualTo(BigDecimal.valueOf(100));
         assertThat(response.getBalance()).isEqualTo(BigDecimal.ZERO);
         assertThat(response.getLockedUntil()).isNull();
@@ -236,7 +236,12 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                           "accounts": [
                             {
                               "sponsorId": "2639563e-4437-4bde-a4f4-654977c0cb39",
-                              "currencyId": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                              "currency": {
+                                "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                "code": "STRK",
+                                "name": "StarkNet Token",
+                                "logoUrl": null
+                              },
                               "balance": 100,
                               "allowance": 100,
                               "awaitingPaymentAmount": 0,
@@ -253,7 +258,12 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                             },
                             {
                               "sponsorId": "2639563e-4437-4bde-a4f4-654977c0cb39",
-                              "currencyId": "3f6e1c98-8659-493a-b941-943a803bd91f",
+                              "currency": {
+                                "id": "3f6e1c98-8659-493a-b941-943a803bd91f",
+                                "code": "BTC",
+                                "name": "Bitcoin",
+                                "logoUrl": null
+                              },
                               "balance": 0,
                               "allowance": 200,
                               "awaitingPaymentAmount": 0,

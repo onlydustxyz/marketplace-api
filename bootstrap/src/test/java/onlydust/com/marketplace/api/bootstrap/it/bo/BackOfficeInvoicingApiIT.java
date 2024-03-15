@@ -165,7 +165,12 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "status": "PROCESSING",
                               "internalStatus": "TO_REVIEW",
                               "amount": 5718.000,
-                              "currencyId": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                              "currency": {
+                                "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                "code": "USD",
+                                "name": "US Dollar",
+                                "logoUrl": null
+                              },
                               "rewardIds": [
                                 "e6ee79ae-b3f0-4f4e-b7e3-9e643bc27236",
                                 "5083ac1f-4325-4d47-9760-cbc9ab82f25c",
@@ -176,7 +181,12 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "status": "PROCESSING",
                               "internalStatus": "TO_REVIEW",
                               "amount": 3333.000,
-                              "currencyId": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                              "currency": {
+                                "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                "code": "USD",
+                                "name": "US Dollar",
+                                "logoUrl": null
+                              },
                               "rewardIds": [
                                 "d067b24d-115a-45e9-92de-94dd1d01b184",
                                 "ee28315c-7a84-4052-9308-c2236eeafda1"
@@ -186,7 +196,12 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "status": "PROCESSING",
                               "internalStatus": "TO_REVIEW",
                               "amount": 1212.000,
-                              "currencyId": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                              "currency": {
+                                "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                "code": "USD",
+                                "name": "US Dollar",
+                                "logoUrl": null
+                              },
                               "rewardIds": [
                                 "061e2c7e-bda4-49a8-9914-2e76926f70c2"
                               ]
@@ -234,36 +249,48 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "rewardCount": 3,
                               "totalEquivalent": {
                                 "amount": 5718.000,
+                                "currency": {
+                                  "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                  "code": "USD",
+                                  "name": "US Dollar",
+                                  "logoUrl": null
+                                },
                                 "dollarsEquivalent": 5718.000,
-                                "conversionRate": null,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
+                                "conversionRate": null
                               },
                               "totalPerCurrency": [
                                 {
-                                  "amount": 500,
-                                  "dollarsEquivalent": 505.00,
-                                  "conversionRate": null,
-                                  "currencyCode": "USDC",
-                                  "currencyName": "USD Coin",
-                                  "currencyLogoUrl": null
+                                  "amount": 1000,
+                                  "currency": {
+                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                    "code": "USDC",
+                                    "name": "USD Coin",
+                                    "logoUrl": null
+                                  },
+                                  "dollarsEquivalent": 1010.00,
+                                  "conversionRate": null
                                 },
                                 {
-                                  "amount": 1000,
-                                  "dollarsEquivalent": 1010.00,
-                                  "conversionRate": null,
-                                  "currencyCode": "USDC",
-                                  "currencyName": "USD Coin",
-                                  "currencyLogoUrl": null
+                                  "amount": 500,
+                                  "currency": {
+                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                    "code": "USDC",
+                                    "name": "USD Coin",
+                                    "logoUrl": null
+                                  },
+                                  "dollarsEquivalent": 505.00,
+                                  "conversionRate": null
                                 },
                                 {
                                   "amount": 3250,
+                                  "currency": {
+                                    "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                    "code": "USD",
+                                    "name": "US Dollar",
+                                    "logoUrl": null
+                                  },
                                   "dollarsEquivalent": 3250,
-                                  "conversionRate": null,
-                                  "currencyCode": "USD",
-                                  "currencyName": "US Dollar",
-                                  "currencyLogoUrl": null
+                                  "conversionRate": null
                                 }
                               ]
                             },
@@ -278,28 +305,37 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "rewardCount": 2,
                               "totalEquivalent": {
                                 "amount": 3333.000,
+                                "currency": {
+                                  "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                  "code": "USD",
+                                  "name": "US Dollar",
+                                  "logoUrl": null
+                                },
                                 "dollarsEquivalent": 3333.000,
-                                "conversionRate": null,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
+                                "conversionRate": null
                               },
                               "totalPerCurrency": [
                                 {
                                   "amount": 1000,
+                                  "currency": {
+                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                    "code": "USDC",
+                                    "name": "USD Coin",
+                                    "logoUrl": null
+                                  },
                                   "dollarsEquivalent": 1010.00,
-                                  "conversionRate": null,
-                                  "currencyCode": "USDC",
-                                  "currencyName": "USD Coin",
-                                  "currencyLogoUrl": null
+                                  "conversionRate": null
                                 },
                                 {
                                   "amount": 1750,
+                                  "currency": {
+                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                    "code": "USDC",
+                                    "name": "USD Coin",
+                                    "logoUrl": null
+                                  },
                                   "dollarsEquivalent": 1767.50,
-                                  "conversionRate": null,
-                                  "currencyCode": "USDC",
-                                  "currencyName": "USD Coin",
-                                  "currencyLogoUrl": null
+                                  "conversionRate": null
                                 }
                               ]
                             },
@@ -314,20 +350,26 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "rewardCount": 1,
                               "totalEquivalent": {
                                 "amount": 1212.000,
+                                "currency": {
+                                  "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                  "code": "USD",
+                                  "name": "US Dollar",
+                                  "logoUrl": null
+                                },
                                 "dollarsEquivalent": 1212.000,
-                                "conversionRate": null,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
+                                "conversionRate": null
                               },
                               "totalPerCurrency": [
                                 {
                                   "amount": 1000,
+                                  "currency": {
+                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                    "code": "USDC",
+                                    "name": "USD Coin",
+                                    "logoUrl": null
+                                  },
                                   "dollarsEquivalent": 1010.00,
-                                  "conversionRate": null,
-                                  "currencyCode": "USDC",
-                                  "currencyName": "USD Coin",
-                                  "currencyLogoUrl": null
+                                  "conversionRate": null
                                 }
                               ]
                             }
@@ -368,9 +410,12 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "rejectionReason": null,
                           "totalEquivalent": {
                             "amount": 1212.000,
-                            "currencyCode": "USD",
-                            "currencyName": "US Dollar",
-                            "currencyLogoUrl": null
+                            "currency": {
+                              "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                              "code": "USD",
+                              "name": "US Dollar",
+                              "logoUrl": null
+                            }
                           },
                           "rewardsPerNetwork": [
                             {
@@ -380,11 +425,14 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "totalPerCurrency": [
                                 {
                                   "amount": 1000,
+                                  "currency": {
+                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                    "code": "USDC",
+                                    "name": "USD Coin",
+                                    "logoUrl": null
+                                  },
                                   "dollarsEquivalent": 1010.00,
-                                  "conversionRate": null,
-                                  "currencyCode": "USDC",
-                                  "currencyName": "USD Coin",
-                                  "currencyLogoUrl": null
+                                  "conversionRate": null
                                 }
                               ],
                               "rewards": [
@@ -407,11 +455,14 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                   ],
                                   "money": {
                                     "amount": 1000,
+                                    "currency": {
+                                      "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                      "code": "USDC",
+                                      "name": "USD Coin",
+                                      "logoUrl": null
+                                    },
                                     "dollarsEquivalent": 1010.00,
-                                    "conversionRate": null,
-                                    "currencyCode": "USDC",
-                                    "currencyName": "USD Coin",
-                                    "currencyLogoUrl": null
+                                    "conversionRate": null
                                   },
                                   "transactionReferences": [
                                     "0x0"

@@ -11,8 +11,7 @@ import java.util.List;
 
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.map;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapInvoiceInternalStatus;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.*;
 
 public interface SearchRewardMapper {
 
@@ -49,9 +48,7 @@ public interface SearchRewardMapper {
         }
         return new MoneyLinkResponse()
                 .amount(view.amount())
-                .currencyCode(view.currencyCode())
-                .currencyName(view.currencyName())
-                .currencyLogoUrl(view.currencyLogoUrl())
+                .currency(toShortCurrency(view.currency()))
                 .conversionRate(view.usdConversionRate())
                 .dollarsEquivalent(view.dollarsEquivalent());
     }

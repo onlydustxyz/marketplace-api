@@ -9,9 +9,10 @@ public interface Currencies {
     Currency USDC = Currency.of(ERC20Tokens.ETH_USDC);
     Currency LORDS = Currency.of(ERC20Tokens.LORDS);
     Currency STRK = Currency.of(ERC20Tokens.STRK);
-    Currency USD = Currency.fiat("US Dollar", Currency.Code.of("USD"), 2);
-    Currency EUR = Currency.fiat("Euro", Currency.Code.of("EUR"), 2);
-    Currency ETH = Currency.crypto("Ether", Currency.Code.of("ETH"), 18)
+    Currency USD = Currency.fiat("US Dollar", Currency.Code.USD, 2);
+    Currency EUR = Currency.fiat("Euro", Currency.Code.EUR, 2);
+    Currency APT = Currency.crypto("Aptos", Currency.Code.APT, 9);
+    Currency ETH = Currency.crypto("Ether", Currency.Code.ETH, 18)
             .withMetadata(new Currency.Metadata("Ether", "Ethereum (ETH) is a cryptocurrency",
                     URI.create("https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png")));
 }

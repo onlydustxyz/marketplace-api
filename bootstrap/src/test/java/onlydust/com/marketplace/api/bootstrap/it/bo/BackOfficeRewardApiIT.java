@@ -13,7 +13,6 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmplo
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.AccountingHelper;
-import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
@@ -194,7 +193,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
         );
         for (SearchRewardItemResponse reward : searchRewardsResponse.getRewards()) {
             assertThat(expectedRewardIds).contains(reward.getId());
-            assertThat(List.of(Currency.Code.USDC_STR, Currency.Code.LORDS_STR, Currency.Code.STRK_STR)).contains(reward.getMoney().getCurrencyCode());
+            assertThat(List.of(Currency.Code.USDC_STR, Currency.Code.LORDS_STR, Currency.Code.STRK_STR)).contains(reward.getMoney().getCurrency().getCode());
         }
     }
 
@@ -265,11 +264,14 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ],
                               "money": {
                                 "amount": 1000.00,
+                                "currency": {
+                                  "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                  "code": "USD",
+                                  "name": "US Dollar",
+                                  "logoUrl": null
+                                },
                                 "dollarsEquivalent": 1000.00,
-                                "conversionRate": 1.0,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
+                                "conversionRate": 1.00000000000000000000
                               },
                               "transactionReferences": [],
                               "paidTo": []
@@ -321,11 +323,14 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ],
                               "money": {
                                 "amount": 1000.00,
+                                "currency": {
+                                  "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                  "code": "USD",
+                                  "name": "US Dollar",
+                                  "logoUrl": null
+                                },
                                 "dollarsEquivalent": 1000.00,
-                                "conversionRate": 1.0,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
+                                "conversionRate": 1.00000000000000000000
                               },
                               "transactionReferences": [],
                               "paidTo": []
@@ -362,11 +367,14 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ],
                               "money": {
                                 "amount": 1000.00,
+                                "currency": {
+                                  "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                  "code": "USD",
+                                  "name": "US Dollar",
+                                  "logoUrl": null
+                                },
                                 "dollarsEquivalent": 1000.00,
-                                "conversionRate": 1.0,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
+                                "conversionRate": 1.00000000000000000000
                               },
                               "transactionReferences": [],
                               "paidTo": []
@@ -418,11 +426,14 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ],
                               "money": {
                                 "amount": 1000.00,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": null
+                                },
                                 "dollarsEquivalent": 1010.0000,
-                                "conversionRate": 1.01,
-                                "currencyCode": "USDC",
-                                "currencyName": "USD Coin",
-                                "currencyLogoUrl": null
+                                "conversionRate": 1.0100000000000000
                               },
                               "transactionReferences": [
                                 "0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db"
@@ -463,11 +474,14 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ],
                               "money": {
                                 "amount": 1000.00,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": null
+                                },
                                 "dollarsEquivalent": 1010.0000,
-                                "conversionRate": 1.01,
-                                "currencyCode": "USDC",
-                                "currencyName": "USD Coin",
-                                "currencyLogoUrl": null
+                                "conversionRate": 1.0100000000000000
                               },
                               "transactionReferences": [
                                 "0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db"
@@ -548,11 +562,14 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ],
                               "money": {
                                 "amount": 1000.00,
+                                "currency": {
+                                  "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                  "code": "USD",
+                                  "name": "US Dollar",
+                                  "logoUrl": null
+                                },
                                 "dollarsEquivalent": 1000.00,
-                                "conversionRate": 1.0,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
+                                "conversionRate": 1.00000000000000000000
                               },
                               "transactionReferences": [],
                               "paidTo": []
@@ -604,11 +621,14 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ],
                               "money": {
                                 "amount": 1000.00,
+                                "currency": {
+                                  "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                  "code": "USD",
+                                  "name": "US Dollar",
+                                  "logoUrl": null
+                                },
                                 "dollarsEquivalent": 1000.00,
-                                "conversionRate": 1.0,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
+                                "conversionRate": 1.00000000000000000000
                               },
                               "transactionReferences": [],
                               "paidTo": []
@@ -645,11 +665,14 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ],
                               "money": {
                                 "amount": 1000.00,
+                                "currency": {
+                                  "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                  "code": "USD",
+                                  "name": "US Dollar",
+                                  "logoUrl": null
+                                },
                                 "dollarsEquivalent": 1000.00,
-                                "conversionRate": 1.0,
-                                "currencyCode": "USD",
-                                "currencyName": "US Dollar",
-                                "currencyLogoUrl": null
+                                "conversionRate": 1.00000000000000000000
                               },
                               "transactionReferences": [],
                               "paidTo": []
@@ -682,11 +705,14 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ],
                               "money": {
                                 "amount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": null
+                                },
                                 "dollarsEquivalent": 1010.00,
-                                "conversionRate": 1.01,
-                                "currencyCode": "USDC",
-                                "currencyName": "USD Coin",
-                                "currencyLogoUrl": null
+                                "conversionRate": 1.0100000000000000
                               },
                               "transactionReferences": [],
                               "paidTo": []
@@ -720,11 +746,14 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ],
                               "money": {
                                 "amount": 1000,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null
+                                },
                                 "dollarsEquivalent": null,
-                                "conversionRate": null,
-                                "currencyCode": "STRK",
-                                "currencyName": "StarkNet Token",
-                                "currencyLogoUrl": null
+                                "conversionRate": null
                               },
                               "transactionReferences": [],
                               "paidTo": []
@@ -799,11 +828,14 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ],
                               "money": {
                                 "amount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": null
+                                },
                                 "dollarsEquivalent": 1010.00,
-                                "conversionRate": 1.0100000000000000,
-                                "currencyCode": "USDC",
-                                "currencyName": "USD Coin",
-                                "currencyLogoUrl": null
+                                "conversionRate": 1.0100000000000000
                               },
                               "transactionReferences": [
                                 "0x0"
@@ -855,11 +887,14 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ],
                               "money": {
                                 "amount": 2500,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": null
+                                },
                                 "dollarsEquivalent": 2525.00,
-                                "conversionRate": 1.0100000000000000,
-                                "currencyCode": "USDC",
-                                "currencyName": "USD Coin",
-                                "currencyLogoUrl": null
+                                "conversionRate": 1.0100000000000000
                               },
                               "transactionReferences": [
                                 "0x0"
@@ -911,11 +946,14 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ],
                               "money": {
                                 "amount": 750,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": null
+                                },
                                 "dollarsEquivalent": 757.50,
-                                "conversionRate": 1.0100000000000000,
-                                "currencyCode": "USDC",
-                                "currencyName": "USD Coin",
-                                "currencyLogoUrl": null
+                                "conversionRate": 1.0100000000000000
                               },
                               "transactionReferences": [
                                 "0x0"
@@ -967,11 +1005,14 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ],
                               "money": {
                                 "amount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": null
+                                },
                                 "dollarsEquivalent": 1010.00,
-                                "conversionRate": 1.0100000000000000,
-                                "currencyCode": "USDC",
-                                "currencyName": "USD Coin",
-                                "currencyLogoUrl": null
+                                "conversionRate": 1.0100000000000000
                               },
                               "transactionReferences": [
                                 "0x0"
@@ -1023,11 +1064,14 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ],
                               "money": {
                                 "amount": 500,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": null
+                                },
                                 "dollarsEquivalent": 505.00,
-                                "conversionRate": 1.0100000000000000,
-                                "currencyCode": "USDC",
-                                "currencyName": "USD Coin",
-                                "currencyLogoUrl": null
+                                "conversionRate": 1.0100000000000000
                               },
                               "transactionReferences": [
                                 "0x0"
