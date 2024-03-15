@@ -2270,16 +2270,16 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  /api/v1/billing-profiles/{billingProfileId}/disable:
+  /api/v1/billing-profiles/{billingProfileId}/enable:
     put:
       security:
         - bearerAuth: [ ]
       tags:
         - BillingProfiles
-      summary: Disable billing profile
-      operationId: disableBillingProfile
+      summary: Enable billing profile
+      operationId: enableBillingProfile
       description: |
-        Disable billing profile
+        Enable billing profile
       parameters:
         - in: path
           name: billingProfileId
@@ -2290,7 +2290,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BillingProfileDisableRequest'
+              $ref: '#/components/schemas/BillingProfileEnableRequest'
       responses:
         "204":
           description: 'Billing profile was disabled or activated'
@@ -4616,12 +4616,12 @@ components:
         type:
           $ref: '#/components/schemas/BillingProfileType'
 
-    BillingProfileDisableRequest:
+    BillingProfileEnableRequest:
       type: object
       required:
-        - disable
+        - enable
       properties:
-        disable:
+        enable:
           type: boolean
 
     MyBillingProfilesResponse:
@@ -4638,6 +4638,7 @@ components:
         - name
         - type
         - invoiceMandateAccepted
+        - enabled
       properties:
         id:
           type: string
@@ -4649,6 +4650,8 @@ components:
         rewardCount:
           type: integer
         invoiceMandateAccepted:
+          type: boolean
+        enabled:
           type: boolean
     ProjectLedShortResponse:
       type: object
@@ -5407,6 +5410,7 @@ components:
         - type
         - name
         - me
+        - enabled
       properties:
         id:
           $ref: '#/components/schemas/BillingProfileId'
@@ -5425,6 +5429,8 @@ components:
         isSwitchableToSelfEmployed:
           type: boolean
           description: True if the billing profile can be switched from company to self-employed type (eg. no other coworkers)
+        enabled:
+          type: boolean
         me:
           type: object
           required:

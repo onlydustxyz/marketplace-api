@@ -101,6 +101,7 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload() {
             // Given
+            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
 
             // When
@@ -142,6 +143,7 @@ class BillingProfileServiceTest {
         @Test
         void should_generate_invoice_preview() {
             // Given
+            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
             when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
                     companyBillingProfile)
@@ -168,6 +170,18 @@ class BillingProfileServiceTest {
         }
 
         @Test
+        void should_prevent_invoice_preview_given_a_disabled_billing_profile() {
+            // When
+            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(false);
+
+            // Then
+            assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Cannot generate invoice on a disabled billing profile");
+        }
+
+
+        @Test
         void should_prevent_invoice_preview_if_rewards_are_already_invoiced() {
             // Given
             final var reward = fakeReward(Invoice.Id.random());
@@ -177,6 +191,7 @@ class BillingProfileServiceTest {
             invoice = Invoice.of(companyBillingProfile, 1, userId)
                     .rewards(rewards)
                     .status(Invoice.Status.APPROVED);
+            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(reward.invoiceId())).thenReturn(Optional.of(invoice));
 
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
@@ -200,7 +215,9 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_if_not_found() {
             // Given
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
+            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+                    .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
 
             // When
@@ -211,11 +228,28 @@ class BillingProfileServiceTest {
         }
 
         @Test
+        void should_prevent_invoice_upload_given_a_disabled_billing_profile() {
+            // Given
+            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(false);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+                    .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Cannot upload an invoice on a disabled billing profile %s".formatted(billingProfileId));
+        }
+
+        @Test
         void should_prevent_invoice_upload_if_billing_profile_does_not_match() {
             // Given
             final var otherBillingProfileId = BillingProfile.Id.random();
             when(billingProfileStoragePort.isAdmin(otherBillingProfileId, userId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(otherBillingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(otherBillingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
+            when(billingProfileStoragePort.isEnabled(otherBillingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.findById(otherBillingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(otherBillingProfileId)
+                    .type(BillingProfile.Type.INDIVIDUAL).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
             // When
@@ -231,13 +265,30 @@ class BillingProfileServiceTest {
             // Given
             final var otherBillingProfileId = BillingProfile.Id.random();
             when(billingProfileStoragePort.isAdmin(otherBillingProfileId, userId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(otherBillingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(otherBillingProfileId).type(BillingProfile.Type.COMPANY).build()));
+            when(billingProfileStoragePort.isEnabled(otherBillingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.findById(otherBillingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+                    .id(otherBillingProfileId).type(BillingProfile.Type.COMPANY).build()));
 
             // When
             assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, otherBillingProfileId, invoice.id(), "foo.pdf", pdf))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Invoice %s not found for billing profile %s".formatted(invoice.id(), otherBillingProfileId));
+        }
+
+        @Test
+        void should_prevent_external_invoice_upload_given_a_disabled_billing_profile() {
+            // Given
+            final var otherBillingProfileId = BillingProfile.Id.random();
+            when(billingProfileStoragePort.isAdmin(otherBillingProfileId, userId)).thenReturn(true);
+            when(billingProfileStoragePort.isEnabled(otherBillingProfileId)).thenReturn(false);
+            when(billingProfileStoragePort.findById(otherBillingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+                    .id(otherBillingProfileId).type(BillingProfile.Type.COMPANY).build()));
+
+            assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, otherBillingProfileId, invoice.id(), "foo.pdf", pdf))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Cannot upload an invoice on a disabled billing profile %s".formatted(otherBillingProfileId));
         }
 
         @SneakyThrows
@@ -310,6 +361,7 @@ class BillingProfileServiceTest {
             @Test
             void should_prevent_external_invoice_upload() {
                 // When
+                when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
                 assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf))
                         // Then
                         .isInstanceOf(OnlyDustException.class)
@@ -322,6 +374,7 @@ class BillingProfileServiceTest {
                 // Given
                 final var url = new URL("https://" + faker.internet().url());
                 when(pdfStoragePort.upload(invoice.id() + ".pdf", pdf)).thenReturn(url);
+                when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
 
                 // When
                 billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf);
@@ -349,6 +402,7 @@ class BillingProfileServiceTest {
             @Test
             void should_prevent_generated_invoice_upload() {
                 // When
+                when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
                 assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
                         // Then
                         .isInstanceOf(OnlyDustException.class)
@@ -361,6 +415,7 @@ class BillingProfileServiceTest {
                 // Given
                 final var url = new URL("https://" + faker.internet().url());
                 when(pdfStoragePort.upload(invoice.id() + ".pdf", pdf)).thenReturn(url);
+                when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
 
                 // When
                 billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf);
@@ -379,6 +434,7 @@ class BillingProfileServiceTest {
             @Test
             void should_prevent_external_invoice_upload_if_not_found() {
                 // Given
+                when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
                 when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
 
                 // When
@@ -1294,5 +1350,63 @@ class BillingProfileServiceTest {
 
         // Then
         verify(billingProfileStoragePort).deleteBillingProfile(billingProfileId);
+    }
+
+    @Test
+    void should_not_enable_billing_profile_given_a_user_not_admin() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
+        final UserId userId = UserId.random();
+
+        // When
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userId))
+                .thenReturn(false);
+
+        // Then
+        assertThatThrownBy(() -> billingProfileService.enableBillingProfile(userId, billingProfileId, false))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("User %s must be admin to enable billing profile %s".formatted(userId.value(), billingProfileId.value()));
+        verify(billingProfileStoragePort, never()).enableBillingProfile(billingProfileId, false);
+    }
+
+    @Test
+    void should_enable_billing_profile() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
+        final UserId userId = UserId.random();
+
+        // When
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userId))
+                .thenReturn(true);
+        billingProfileService.enableBillingProfile(userId, billingProfileId, true);
+
+        // Then
+        verify(billingProfileStoragePort).enableBillingProfile(billingProfileId, true);
+    }
+
+    @Test
+    void should_prevent_update_mandate_acceptance_date_given_a_user_not_admin() {
+        // Given
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userId)).thenReturn(false);
+
+        // When
+        assertThatThrownBy(() -> billingProfileService.updateInvoiceMandateAcceptanceDate(userId, billingProfileId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("User %s is not allowed to accept invoice mandate for billing profile %s".formatted(userId, billingProfileId));
+    }
+
+    @Test
+    void should_prevent_update_mandate_acceptance_date_given_a_disabled_billing_profile() {
+        // Given
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userId)).thenReturn(true);
+        when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(false);
+
+        // When
+        assertThatThrownBy(() -> billingProfileService.updateInvoiceMandateAcceptanceDate(userId, billingProfileId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Cannot update mandateAcceptanceDate on a disabled billing profile %s".formatted(billingProfileId));
     }
 }

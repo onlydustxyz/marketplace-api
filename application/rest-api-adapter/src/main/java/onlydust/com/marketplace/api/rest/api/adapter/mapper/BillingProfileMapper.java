@@ -31,6 +31,7 @@ public interface BillingProfileMapper {
 
     static BillingProfileResponse billingProfileToResponse(final BillingProfile billingProfile) {
         final BillingProfileResponse billingProfileResponse = new BillingProfileResponse();
+        billingProfileResponse.setEnabled(billingProfile.enabled());
         if (billingProfile instanceof IndividualBillingProfile individualBillingProfile) {
             return individualBillingProfileToResponse(individualBillingProfile, billingProfileResponse);
         } else if (billingProfile instanceof CompanyBillingProfile companyBillingProfile) {
@@ -267,6 +268,7 @@ public interface BillingProfileMapper {
                 .map(view -> new ShortBillingProfileResponse()
                         .name(view.getName())
                         .id(view.getId().value())
+                        .enabled(view.getEnabled())
                         .invoiceMandateAccepted(view.isInvoiceMandateAccepted())
                         .type(switch (view.getType()) {
                             case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
@@ -285,6 +287,7 @@ public interface BillingProfileMapper {
         billingProfileResponse.setKyb(isNull(billingProfileView.getKyb()) ? null : kybToResponse(billingProfileView.getKyb()));
         billingProfileResponse.setKyc(isNull(billingProfileView.getKyc()) ? null : kycToResponse(billingProfileView.getKyc()));
         billingProfileResponse.setStatus(verificationStatusToResponse(billingProfileView.getVerificationStatus()));
+        billingProfileResponse.setEnabled(billingProfileView.getEnabled());
         return billingProfileResponse;
     }
 

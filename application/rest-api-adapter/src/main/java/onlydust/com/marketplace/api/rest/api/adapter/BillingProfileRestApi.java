@@ -200,4 +200,12 @@ public class BillingProfileRestApi implements BillingProfilesApi {
         billingProfileFacadePort.deleteBillingProfile(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId));
         return ResponseEntity.ok().build();
     }
+
+    @Override
+    public ResponseEntity<Void> enableBillingProfile(UUID billingProfileId, BillingProfileEnableRequest billingProfileEnableRequest) {
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        billingProfileFacadePort.enableBillingProfile(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId),
+                billingProfileEnableRequest.getEnable());
+        return ResponseEntity.ok().build();
+    }
 }

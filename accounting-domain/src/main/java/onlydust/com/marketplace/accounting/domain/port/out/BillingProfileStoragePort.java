@@ -80,4 +80,8 @@ public interface BillingProfileStoragePort {
     boolean doesBillingProfileHaveSomeInvoices(BillingProfile.Id billingProfileId);
 
     void deleteBillingProfile(BillingProfile.Id billingProfileId);
+
+    void enableBillingProfile(BillingProfile.Id billingProfileId, Boolean enabled);
+
+    boolean isEnabled(BillingProfile.Id billingProfileId);
 }

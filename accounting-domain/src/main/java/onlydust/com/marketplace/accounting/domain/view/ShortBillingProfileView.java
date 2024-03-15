@@ -14,6 +14,7 @@ public class ShortBillingProfileView {
     BillingProfile.Id id;
     BillingProfile.Type type;
     String name;
+    Boolean enabled;
 
     @Getter(AccessLevel.NONE)
     ZonedDateTime invoiceMandateAcceptedAt;
