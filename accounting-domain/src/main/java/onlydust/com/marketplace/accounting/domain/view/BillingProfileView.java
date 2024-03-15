@@ -25,6 +25,10 @@ public class BillingProfileView {
     @Getter(AccessLevel.NONE)
     ZonedDateTime invoiceMandateLatestVersionDate;
 
+    public boolean isVerified() {
+        return verificationStatus == VerificationStatus.VERIFIED;
+    }
+
     public boolean isInvoiceMandateAccepted() {
         if (type == BillingProfile.Type.INDIVIDUAL) return true;
 

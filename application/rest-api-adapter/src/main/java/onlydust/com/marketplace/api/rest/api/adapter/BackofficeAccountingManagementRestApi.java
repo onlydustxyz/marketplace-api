@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
@@ -218,9 +219,9 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     }
 
     @Override
-    public ResponseEntity<Void> updateBatchPayments(UUID batchPaymentId, BatchPaymentRequest batchPaymentRequest) {
+    public ResponseEntity<Void> updateBatchPayment(UUID batchPaymentId, BatchPaymentRequest batchPaymentRequest) {
         accountingRewardPort.markBatchPaymentAsPaid(BatchPayment.Id.of(batchPaymentId), batchPaymentRequest.getTransactionHash());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @Override
@@ -229,11 +230,12 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     }
 
     @Override
-    public ResponseEntity<BatchPaymentPageResponse> getBatchPayments(Integer pageIndex, Integer pageSize) {
+    public ResponseEntity<BatchPaymentPageResponse> getBatchPayments(Integer pageIndex, Integer pageSize, List<BatchPaymentStatus> statuses) {
         final int sanitizePageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
         final int sanitizedPageSize = PaginationHelper.sanitizePageSize(pageSize);
         final BatchPaymentPageResponse batchPaymentPageResponse = BatchPaymentMapper.pageToResponse(
-                accountingRewardPort.findBatchPayments(sanitizePageIndex, sanitizedPageSize),
+                accountingRewardPort.findBatchPayments(sanitizePageIndex, sanitizedPageSize, statuses == null ? null :
+                        statuses.stream().map(BatchPaymentMapper::map).collect(Collectors.toSet())),
                 pageIndex);
         return batchPaymentPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(batchPaymentPageResponse) :

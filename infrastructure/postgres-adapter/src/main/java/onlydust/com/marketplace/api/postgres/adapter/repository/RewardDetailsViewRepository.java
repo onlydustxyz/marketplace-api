@@ -40,8 +40,8 @@ public interface RewardDetailsViewRepository extends JpaRepository<BackofficeRew
                                i.billing_profile_id                     billing_profile_id,
                                bp.type                                  billing_profile_type,
                                case
-                                   when kyc is not null then kyc.first_name || ' ' || kyc.last_name
-                                   when kyb is not null then kyb.name
+                                   when kyc.id is not null then kyc.first_name || ' ' || kyc.last_name
+                                   when kyb.id is not null then kyb.name
                                end                                      billing_profile_name,
                                bp.verification_status                   billing_profile_verification_status,
 

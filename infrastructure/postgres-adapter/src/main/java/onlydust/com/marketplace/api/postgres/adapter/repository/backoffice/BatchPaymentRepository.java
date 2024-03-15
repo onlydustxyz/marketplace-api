@@ -5,8 +5,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Set;
 import java.util.UUID;
 
 public interface BatchPaymentRepository extends JpaRepository<BatchPaymentEntity, UUID> {
-    Page<BatchPaymentEntity> findAllByStatus(BatchPaymentEntity.Status status, Pageable pageable);
+    Page<BatchPaymentEntity> findAllByStatusIsIn(Set<BatchPaymentEntity.Status> statuses, Pageable pageable);
 }

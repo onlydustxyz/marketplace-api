@@ -427,7 +427,9 @@ public interface BackOfficeMapper {
         return rewards.stream().collect(groupingBy(BackofficeRewardView::network))
                 .entrySet().stream()
                 .map(e -> {
-                            final var totalUsdEquivalent = e.getValue().stream().map(r -> r.money().dollarsEquivalent()).reduce(BigDecimal::add)
+                            final var totalUsdEquivalent = e.getValue().stream()
+                                    .map(r -> r.money().dollarsEquivalent().orElse(BigDecimal.ZERO))
+                                    .reduce(BigDecimal::add)
                                     .orElseThrow(() -> internalServerError("No reward found for network %s".formatted(e.getKey())));
 
                             return new InvoiceRewardsPerNetwork()
@@ -475,7 +477,9 @@ public interface BackOfficeMapper {
                             final var currency = e.getKey();
                             final var total = e.getValue().stream().map(r -> r.money().amount()).reduce(BigDecimal::add)
                                     .orElseThrow(() -> internalServerError("No reward found for currency %s".formatted(e.getKey())));
-                            final var totalUsdEquivalent = e.getValue().stream().map(r -> r.money().dollarsEquivalent()).reduce(BigDecimal::add)
+                            final var totalUsdEquivalent = e.getValue().stream()
+                                    .map(r -> r.money().dollarsEquivalent().orElse(BigDecimal.ZERO))
+                                    .reduce(BigDecimal::add)
                                     .orElseThrow(() -> internalServerError("No reward found for currency %s".formatted(e.getKey())));
                             return totalMoneyViewToResponse(new TotalMoneyView(total, currency, totalUsdEquivalent));
                         }

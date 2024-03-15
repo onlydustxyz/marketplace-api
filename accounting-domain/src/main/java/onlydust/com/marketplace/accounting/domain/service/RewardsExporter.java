@@ -6,8 +6,6 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
 import java.io.StringWriter;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 
 import static java.util.Objects.isNull;
@@ -67,10 +65,8 @@ public class RewardsExporter {
                         isNull(reward.invoice()) ? null : reward.invoice().number(),
                         isNull(reward.invoice()) ? null : reward.invoice().id(),
                         "%s - %s".formatted(reward.project().name(), reward.money().currency().code()),
-                        //TODO: get the real conversion rate instead of computing it
-                        isNull(reward.money().dollarsEquivalent()) || BigDecimal.ZERO.compareTo(reward.money().amount()) == 0 ? null :
-                                reward.money().dollarsEquivalent().divide(reward.money().amount(), RoundingMode.FLOOR),
-                        reward.money().dollarsEquivalent()
+                        reward.money().usdConversionRate().orElseThrow(() -> internalServerError("Dollars conversion rate not found for reward %s".formatted(reward.id().value()))),
+                        reward.money().dollarsEquivalent().orElseThrow(() -> internalServerError("Dollars equivalent not found for reward %s".formatted(reward.id().value())))
                 );
             }
         } catch (final Exception e) {

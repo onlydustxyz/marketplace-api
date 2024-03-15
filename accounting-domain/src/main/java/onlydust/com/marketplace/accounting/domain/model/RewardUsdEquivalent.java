@@ -24,7 +24,7 @@ public class RewardUsdEquivalent {
     @NonNull BigDecimal rewardAmount;
 
     public Optional<ZonedDateTime> equivalenceSealingDate() {
-        if (kycNotVerified() || notLiquid() || locked()) return Optional.empty();
+        if (kycbNotVerified() || notLiquid() || locked()) return Optional.empty();
         return max(rewardCreatedAt, kycbVerifiedAt, currencyQuoteAvailableAt, unlockDate);
     }
 
@@ -40,7 +40,7 @@ public class RewardUsdEquivalent {
         return currencyQuoteAvailableAt == null;
     }
 
-    private boolean kycNotVerified() {
+    private boolean kycbNotVerified() {
         return kycbVerifiedAt == null;
     }
 }

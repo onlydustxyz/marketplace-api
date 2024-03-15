@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.groupingBy;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
 public class RewardService implements AccountingRewardPort {
@@ -64,7 +65,11 @@ public class RewardService implements AccountingRewardPort {
     @Transactional
     public void markBatchPaymentAsPaid(BatchPayment.Id batchPaymentId, String transactionReference) {
         final var batchPayment = accountingRewardStoragePort.findBatchPayment(batchPaymentId)
-                .orElseThrow(() -> OnlyDustException.notFound("Batch payment %s not found".formatted(batchPaymentId.value())));
+                .orElseThrow(() -> notFound("Batch payment %s not found".formatted(batchPaymentId.value())));
+
+        if (batchPayment.status() != BatchPayment.Status.TO_PAY) {
+            throw badRequest("Batch payment %s is already paid".formatted(batchPaymentId.value()));
+        }
 
         batchPayment.network().validateTransactionReference(transactionReference);
 
@@ -90,14 +95,14 @@ public class RewardService implements AccountingRewardPort {
     }
 
     @Override
-    public Page<BatchPaymentDetailsView> findBatchPayments(int pageIndex, int pageSize) {
-        return accountingRewardStoragePort.findBatchPaymentDetails(pageIndex, pageSize);
+    public Page<BatchPaymentDetailsView> findBatchPayments(int pageIndex, int pageSize, Set<BatchPayment.Status> statuses) {
+        return accountingRewardStoragePort.findBatchPaymentDetails(pageIndex, pageSize, statuses);
     }
 
     @Override
     public BatchPaymentDetailsView findBatchPaymentById(BatchPayment.Id batchPaymentId) {
         return accountingRewardStoragePort.findBatchPaymentDetailsById(batchPaymentId)
-                .orElseThrow(() -> OnlyDustException.notFound("Batch payment details %s not found".formatted(batchPaymentId.value())));
+                .orElseThrow(() -> notFound("Batch payment details %s not found".formatted(batchPaymentId.value())));
     }
 
     @Override

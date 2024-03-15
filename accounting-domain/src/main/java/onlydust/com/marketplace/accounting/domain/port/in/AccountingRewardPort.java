@@ -9,6 +9,7 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 public interface AccountingRewardPort {
     List<BackofficeRewardView> searchForBatchPaymentByInvoiceIds(List<Invoice.Id> invoiceIds);
@@ -19,7 +20,7 @@ public interface AccountingRewardPort {
 
     void markBatchPaymentAsPaid(BatchPayment.Id batchPaymentId, String transactionHash);
 
-    Page<BatchPaymentDetailsView> findBatchPayments(int pageIndex, int pageSize);
+    Page<BatchPaymentDetailsView> findBatchPayments(int pageIndex, int pageSize, Set<BatchPayment.Status> statuses);
 
     BatchPaymentDetailsView findBatchPaymentById(BatchPayment.Id batchPaymentId);
 

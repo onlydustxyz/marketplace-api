@@ -183,3 +183,6 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000110_add_enabled_column_to_billing_profiles.sql
   - include:
       file: db/changelog/changelogs/00000111_migrate_transaction_types.sql
+  - include:
+      file: db/changelog/changelogs/00000112_fix_reward_usd_equivalent_data_view.sql
+

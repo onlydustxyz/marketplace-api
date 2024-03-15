@@ -33,6 +33,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewardStoragePort {
@@ -105,8 +106,11 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
 
     @Override
     @Transactional(readOnly = true)
-    public Page<BatchPaymentDetailsView> findBatchPaymentDetails(int pageIndex, int pageSize) {
-        final var page = batchPaymentRepository.findAllByStatus(BatchPaymentEntity.Status.PAID,
+    public Page<BatchPaymentDetailsView> findBatchPaymentDetails(int pageIndex, int pageSize, Set<BatchPayment.Status> statuses) {
+        if (statuses == null || statuses.isEmpty()) {
+            statuses = EnumSet.allOf(BatchPayment.Status.class);
+        }
+        final var page = batchPaymentRepository.findAllByStatusIsIn(statuses.stream().map(BatchPaymentEntity.Status::of).collect(Collectors.toSet()),
                 PageRequest.of(pageIndex, pageSize, Sort.by("createdAt").descending()));
         return Page.<BatchPaymentDetailsView>builder()
                 .content(page.getContent().stream().map(this::getBatchPaymentDetailsView).toList())

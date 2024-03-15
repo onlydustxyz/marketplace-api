@@ -50,8 +50,8 @@ public interface SearchRewardMapper {
         return new MoneyWithUsdEquivalentResponse()
                 .amount(view.amount())
                 .currency(toShortCurrency(view.currency()))
-                .conversionRate(view.usdConversionRate())
-                .dollarsEquivalent(view.dollarsEquivalent());
+                .conversionRate(view.usdConversionRate().orElse(null))
+                .dollarsEquivalent(view.dollarsEquivalent().orElse(null));
     }
 
     static TotalMoneyWithUsdEquivalentResponse totalMoneyViewToResponse(final TotalMoneyView view) {

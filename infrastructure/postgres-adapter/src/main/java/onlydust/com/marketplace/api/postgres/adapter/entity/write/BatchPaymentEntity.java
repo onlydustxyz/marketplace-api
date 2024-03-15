@@ -77,6 +77,20 @@ public class BatchPaymentEntity {
 
     public enum Status {
         TO_PAY, PAID;
+
+        public static Status of(BatchPayment.Status status) {
+            return switch (status) {
+                case TO_PAY -> TO_PAY;
+                case PAID -> PAID;
+            };
+        }
+
+        public BatchPayment.Status toDomain() {
+            return switch (this) {
+                case TO_PAY -> BatchPayment.Status.TO_PAY;
+                case PAID -> BatchPayment.Status.PAID;
+            };
+        }
     }
 
     public BatchPayment toDomain() {
@@ -92,10 +106,7 @@ public class BatchPaymentEntity {
                                 PositiveAmount.of(r.amount())
                         )).toList())
                 .invoices(this.invoices.stream().map(InvoiceEntity::toDomain).toList())
-                .status(switch (this.status) {
-                    case PAID -> BatchPayment.Status.PAID;
-                    case TO_PAY -> BatchPayment.Status.TO_PAY;
-                })
+                .status(this.status.toDomain())
                 .createdAt(this.createdAt)
                 .build();
     }

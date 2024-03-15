@@ -781,6 +781,14 @@ paths:
           required: true
           schema:
             type: integer
+        - in: query
+          name: statuses
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/BatchPaymentStatus'
+          style: form
       responses:
         "200":
           description: 'Page of paid batch payments'
@@ -826,7 +834,7 @@ paths:
       tags:
         - BackofficeAccountingManagement
       summary: Update batch payment with transaction hash
-      operationId: updateBatchPayments
+      operationId: updateBatchPayment
       description: |
         Update batch payment with transaction hash
       parameters:
@@ -3256,6 +3264,8 @@ components:
         createdAt:
           type: string
           format: date-time
+        status:
+          $ref: '#/components/schemas/BatchPaymentStatus'
         csv:
           type: string
         network:
@@ -3269,6 +3279,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TotalMoneyWithUsdEquivalentResponse'
+
+    BatchPaymentStatus:
+      type: string
+      enum:
+        - TO_PAY
+        - PAID
 
     BatchPaymentRequest:
       type: object
