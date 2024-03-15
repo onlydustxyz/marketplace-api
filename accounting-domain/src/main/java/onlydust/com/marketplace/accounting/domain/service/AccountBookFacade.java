@@ -25,6 +25,10 @@ public class AccountBookFacade {
         return accountBook.state().balanceOf(AccountBook.AccountId.of(ownerId));
     }
 
+    public <T> PositiveAmount initialBalanceOf(T ownerId) {
+        return accountBook.state().amountReceivedBy(AccountBook.AccountId.of(ownerId));
+    }
+
     public Map<RewardId, PositiveAmount> unpaidRewards(SponsorAccount.Id sponsorAccountId) {
         return accountBook.state().unspentChildren(AccountBook.AccountId.of(sponsorAccountId)).entrySet().stream()
                 .filter(e -> e.getKey().isReward())

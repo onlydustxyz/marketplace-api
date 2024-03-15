@@ -41,7 +41,7 @@ public interface BackOfficeMapper {
                 .lockedUntil(account.lockedUntil().map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
                 .initialBalance(account.initialBalance().getValue())
                 .currentBalance(account.balance().getValue())
-                .initialAllowance(null) // TODO Antho
+                .initialAllowance(accountStatement.initialAllowance().getValue())
                 .currentAllowance(accountStatement.allowance().getValue())
                 .debt(null) // TODO Antho
                 .awaitingPaymentAmount(accountStatement.awaitingPaymentAmount().getValue())

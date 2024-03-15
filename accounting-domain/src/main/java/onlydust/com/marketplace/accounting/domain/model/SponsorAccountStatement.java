@@ -19,6 +19,10 @@ public class SponsorAccountStatement {
         return accountBookFacade.balanceOf(sponsorAccount.id());
     }
 
+    public PositiveAmount initialAllowance() {
+        return accountBookFacade.initialBalanceOf(sponsorAccount.id());
+    }
+
     public PositiveAmount awaitingPaymentAmount() {
         return awaitingPayments().values().stream().reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }

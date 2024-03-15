@@ -56,7 +56,7 @@ public class AccountingService implements AccountingFacadePort {
         final var accountBook = getAccountBook(sponsorAccount.currency());
 
         if (amount.isPositive()) accountBook.mint(AccountId.of(sponsorAccountId), PositiveAmount.of(amount));
-        else accountBook.burn(AccountId.of(sponsorAccountId), PositiveAmount.of(amount.negate()));
+        else accountBook.refund(AccountId.of(sponsorAccountId), AccountId.ROOT, PositiveAmount.of(amount.negate()));
 
         accountBookEventStorage.save(sponsorAccount.currency(), accountBook.pendingEvents());
         return sponsorAccountStatement(sponsorAccount, accountBook);

@@ -275,7 +275,7 @@ public class AccountingServiceTest {
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
                     new MintEvent(AccountId.of(sponsorAccount.id()), amount),
-                    new BurnEvent(AccountId.of(sponsorAccount.id()), amount)
+                    new RefundEvent(AccountId.of(sponsorAccount.id()), AccountId.ROOT, amount)
             );
         }
 
@@ -289,7 +289,7 @@ public class AccountingServiceTest {
             // When
             assertThatThrownBy(() -> accountingService.increaseAllowance(sponsorAccount.id(), Amount.of(-110L)))
                     // Then
-                    .isInstanceOf(OnlyDustException.class).hasMessageContaining("Cannot burn");
+                    .isInstanceOf(OnlyDustException.class).hasMessageContaining("Cannot refund 110");
         }
 
         /*
@@ -590,7 +590,7 @@ public class AccountingServiceTest {
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
                     new MintEvent(AccountId.of(sponsorAccount.id()), amount),
-                    new BurnEvent(AccountId.of(sponsorAccount.id()), amount)
+                    new RefundEvent(AccountId.of(sponsorAccount.id()), AccountId.ROOT, amount)
             );
         }
 
