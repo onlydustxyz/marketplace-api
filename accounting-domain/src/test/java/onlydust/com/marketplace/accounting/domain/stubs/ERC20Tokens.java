@@ -18,6 +18,9 @@ public interface ERC20Tokens {
     ERC20 STRK = new ERC20(Blockchain.ETHEREUM, Ethereum.contractAddress("0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766"), "Starknet Token", "STRK", 18,
             BigInteger.TEN);
     ERC20 STARKNET_STRK = new ERC20(Blockchain.STARKNET, new StarknetContractAddress("0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766"), "Starknet Token", "STRK",
-            18,
-            BigInteger.TEN);
+            18, BigInteger.TEN);
+
+    ERC20 STARKNET_ETH = new ERC20(Blockchain.STARKNET, new StarknetContractAddress("0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"),
+            "Ether", "ETH",
+            18, BigInteger.TEN);
 }

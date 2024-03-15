@@ -495,7 +495,7 @@ public interface BackOfficeMapper {
                 .decimals(currency.decimals())
                 .description(currency.description().orElse(null))
                 .tokens(currency.erc20().stream().map(BackOfficeMapper::mapToken).toList())
-                .supportedOnNetworks(null) // TODO Antho
+                .supportedOn(currency.supportedNetworks().stream().map(BackOfficeMapper::mapNetwork).toList())
                 ;
     }
 

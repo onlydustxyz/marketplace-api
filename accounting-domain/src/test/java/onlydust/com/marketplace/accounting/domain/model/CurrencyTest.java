@@ -148,4 +148,52 @@ class CurrencyTest {
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Currency USDC is not supported on network OPTIMISM");
     }
+
+    @Test
+    void should_return_supported_network_for_fiat() {
+        // Given
+        final var euro = Currency.fiat("Euro", Currency.Code.of("EUR"), 2);
+
+        // When
+        final var networks = euro.supportedNetworks();
+
+        // Then
+        assertThat(networks).containsExactlyInAnyOrder(Network.SEPA, Network.SWIFT);
+    }
+
+    @Test
+    void should_return_supported_network_for_crypto() {
+        // Given
+        final var ether = Currency.crypto("Ether", Currency.Code.of("ETH"), 18);
+
+        // When
+        final var networks = ether.supportedNetworks();
+
+        // Then
+        assertThat(networks).containsExactlyInAnyOrder(Network.ETHEREUM);
+    }
+
+    @Test
+    void should_return_supported_network_for_erc20() {
+        // Given
+        final var usdc = Currency.of(ERC20Tokens.OP_USDC).withERC20(ERC20Tokens.ETH_USDC);
+
+        // When
+        final var networks = usdc.supportedNetworks();
+
+        // Then
+        assertThat(networks).containsExactlyInAnyOrder(Network.ETHEREUM, Network.OPTIMISM);
+    }
+
+    @Test
+    void should_return_supported_network_for_mix_native_and_erc20() {
+        // Given
+        final var eth = Currency.crypto("Ether", Currency.Code.of("ETH"), 18).withERC20(ERC20Tokens.STARKNET_ETH);
+
+        // When
+        final var networks = eth.supportedNetworks();
+
+        // Then
+        assertThat(networks).containsExactlyInAnyOrder(Network.ETHEREUM, Network.STARKNET);
+    }
 }

@@ -6,10 +6,8 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.net.URI;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Stream;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
@@ -104,6 +102,16 @@ public class Currency implements Cloneable {
 
     public Set<ERC20> erc20() {
         return erc20;
+    }
+
+    public List<Network> supportedNetworks() {
+        return switch (type) {
+            case FIAT -> List.of(Network.SEPA, Network.SWIFT);
+            case CRYPTO -> Stream.concat(
+                            erc20.stream().map(ERC20::getBlockchain).map(Network::fromBlockchain),
+                            Stream.ofNullable(nativeNetwork()))
+                    .toList();
+        };
     }
 
     @Override
