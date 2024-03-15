@@ -24,6 +24,7 @@ import java.util.List;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.reducing;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.SearchRewardMapper.moneyViewToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.SearchRewardMapper.totalMoneyViewToResponse;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
@@ -34,20 +35,34 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPa
 public interface BackOfficeMapper {
 
     static AccountResponse mapAccountToResponse(final SponsorAccountStatement accountStatement) {
+        final var balance = mapAccountBalance(accountStatement);
         final var account = accountStatement.account();
+
         return new AccountResponse()
                 .id(account.id().value())
                 .sponsorId(account.sponsorId().value())
-                .currency(toShortCurrency(account.currency()))
                 .lockedUntil(account.lockedUntil().map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
+                .receipts(account.getTransactions().stream().map(transaction -> mapTransactionToReceipt(account, transaction)).toList())
+                .currency(balance.getCurrency())
+                .initialBalance(balance.getInitialBalance())
+                .currentBalance(balance.getCurrentBalance())
+                .initialAllowance(balance.getInitialAllowance())
+                .currentAllowance(balance.getCurrentAllowance())
+                .debt(balance.getDebt())
+                .awaitingPaymentAmount(balance.getAwaitingPaymentAmount())
+                ;
+    }
+
+    static AccountBalance mapAccountBalance(final SponsorAccountStatement accountStatement) {
+        final var account = accountStatement.account();
+        return new AccountBalance()
+                .currency(toShortCurrency(account.currency()))
                 .initialBalance(account.initialBalance().getValue())
                 .currentBalance(account.balance().getValue())
                 .initialAllowance(accountStatement.initialAllowance().getValue())
                 .currentAllowance(accountStatement.allowance().getValue())
                 .debt(accountStatement.initialAllowance().subtract(account.initialBalance()).getValue())
-                .awaitingPaymentAmount(accountStatement.awaitingPaymentAmount().getValue())
-                .receipts(account.getTransactions().stream()
-                        .map(transaction -> mapTransactionToReceipt(account, transaction)).toList());
+                .awaitingPaymentAmount(accountStatement.awaitingPaymentAmount().getValue());
     }
 
     static TransactionReceipt mapTransactionToReceipt(final SponsorAccount sponsorAccount, final SponsorAccount.Transaction transaction) {
@@ -93,14 +108,37 @@ public interface BackOfficeMapper {
                 .logoUrl(sponsor.logoUrl());
     }
 
-    static SponsorDetailsResponse mapSponsorToDetailsResponse(final SponsorView sponsor) {
+    static SponsorDetailsResponse mapSponsorToDetailsResponse(final SponsorView sponsor, List<SponsorAccountStatement> accountStatements) {
+        final var emptyBalance = new AccountBalance()
+                .initialBalance(BigDecimal.ZERO)
+                .currentBalance(BigDecimal.ZERO)
+                .initialAllowance(BigDecimal.ZERO)
+                .currentAllowance(BigDecimal.ZERO)
+                .debt(BigDecimal.ZERO)
+                .awaitingPaymentAmount(BigDecimal.ZERO);
+
         return new SponsorDetailsResponse()
                 .id(sponsor.id())
                 .name(sponsor.name())
                 .url(sponsor.url())
                 .logoUrl(sponsor.logoUrl())
                 .projects(sponsor.projectsWhereSponsorIsActive().stream().map(BackOfficeMapper::mapToProjectLink).toList())
-                .availableBudgets(List.of()) // TODO Antho
+                .availableBudgets(accountStatements.stream()
+                        .map(BackOfficeMapper::mapAccountBalance)
+                        .collect(groupingBy(AccountBalance::getCurrency, reducing(emptyBalance, BackOfficeMapper::merge)))
+                        .values().stream().toList())
+                ;
+    }
+
+    static AccountBalance merge(AccountBalance balance1, AccountBalance balance2) {
+        return new AccountBalance()
+                .currency(balance2.getCurrency())
+                .initialBalance(balance1.getInitialBalance().add(balance2.getInitialBalance()))
+                .currentBalance(balance1.getCurrentBalance().add(balance2.getCurrentBalance()))
+                .initialAllowance(balance1.getInitialAllowance().add(balance2.getInitialAllowance()))
+                .currentAllowance(balance1.getCurrentAllowance().add(balance2.getCurrentAllowance()))
+                .debt(balance1.getDebt().add(balance2.getDebt()))
+                .awaitingPaymentAmount(balance1.getAwaitingPaymentAmount().add(balance2.getAwaitingPaymentAmount()))
                 ;
     }
 

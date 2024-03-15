@@ -43,7 +43,36 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           "name": "AS Nancy Lorraine",
                           "url": null,
                           "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png",
-                          "availableBudgets": [],
+                          "availableBudgets": [
+                            {
+                              "currency": {
+                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                "code": "USDC",
+                                "name": "USD Coin",
+                                "logoUrl": null
+                              },
+                              "initialBalance": 19823190,
+                              "currentBalance": 19822690,
+                              "initialAllowance": 19823190,
+                              "currentAllowance": 0,
+                              "debt": 0,
+                              "awaitingPaymentAmount": 0
+                            },
+                            {
+                              "currency": {
+                                "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                "code": "USD",
+                                "name": "US Dollar",
+                                "logoUrl": null
+                              },
+                              "initialBalance": 4000,
+                              "currentBalance": 0,
+                              "initialAllowance": 4000,
+                              "currentAllowance": 0,
+                              "debt": 0,
+                              "awaitingPaymentAmount": 0
+                            }
+                          ],
                           "projects": [
                             {
                               "name": "Aiolia du Lion",
@@ -231,7 +260,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ]
                             }
                           ]
-                        }                        
+                        }
                         """);
 
 
@@ -420,7 +449,22 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           "name": "Virgin sponsor",
                           "url": "https://www.foobar.com",
                           "logoUrl": "https://www.foobar.com/logo.png",
-                          "availableBudgets": [],
+                          "availableBudgets": [
+                            {
+                              "currency": {
+                                "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                "code": "STRK",
+                                "name": "StarkNet Token",
+                                "logoUrl": null
+                              },
+                              "initialBalance": 0,
+                              "currentBalance": 0,
+                              "initialAllowance": 1000,
+                              "currentAllowance": 600,
+                              "debt": 1000,
+                              "awaitingPaymentAmount": 0
+                            }
+                          ],
                           "projects": [
                             {
                               "name": "Bretzel",

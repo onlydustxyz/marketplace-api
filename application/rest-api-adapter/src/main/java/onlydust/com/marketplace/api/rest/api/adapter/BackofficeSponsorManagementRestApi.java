@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeSponsorManagementApi;
 import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.accounting.domain.model.SponsorId;
+import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.SponsorFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SponsorMapper;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -30,6 +32,7 @@ public class BackofficeSponsorManagementRestApi implements BackofficeSponsorMana
     final static Integer MAX_PAGE_SIZE = Integer.MAX_VALUE;
     private final BackofficeFacadePort backofficeFacadePort;
     private final SponsorFacadePort sponsorFacadePort;
+    private final AccountingFacadePort accountingFacadePort;
 
     @Override
     public ResponseEntity<SponsorResponse> createSponsor(SponsorRequest sponsorRequest) {
@@ -66,7 +69,8 @@ public class BackofficeSponsorManagementRestApi implements BackofficeSponsorMana
     public ResponseEntity<SponsorDetailsResponse> getSponsor(UUID sponsorId) {
         final var sponsor = backofficeFacadePort.getSponsor(sponsorId)
                 .orElseThrow(() -> OnlyDustException.notFound("Sponsor %s not found".formatted(sponsorId)));
-        return ResponseEntity.ok(mapSponsorToDetailsResponse(sponsor));
+        final var sponsorAccountStatements = accountingFacadePort.getSponsorAccounts(SponsorId.of(sponsorId));
+        return ResponseEntity.ok(mapSponsorToDetailsResponse(sponsor, sponsorAccountStatements));
     }
 
     @Override
