@@ -307,10 +307,7 @@ public class RewardServiceTest {
                                 .project(new ShortProjectView(ProjectId.random(), faker.rickAndMorty().character(), faker.internet().url(),
                                         faker.weather().description(), faker.name().username()))
                                 .processedAt(ZonedDateTime.now())
-                                .money(MoneyView.builder()
-                                        .amount(BigDecimal.ONE)
-                                        .currency(Currencies.USDC)
-                                        .build())
+                                .money(new MoneyView(BigDecimal.ONE, Currencies.USDC, null, null))
                                 .transactionReferences(List.of(faker.random().hex()))
                                 .paidToAccountNumbers(List.of(faker.random().hex()))
                                 .build(),
@@ -336,10 +333,7 @@ public class RewardServiceTest {
                                         faker.weather().description(), faker.name().username()))
                                 .transactionReferences(List.of(faker.random().hex()))
                                 .paidToAccountNumbers(List.of(faker.random().hex()))
-                                .money(MoneyView.builder()
-                                        .amount(BigDecimal.ONE)
-                                        .currency(Currencies.USDC)
-                                        .build())
+                                .money(new MoneyView(BigDecimal.ONE, Currencies.USDC, null, null))
                                 .build()
                 ));
         final List<BackofficeRewardView> rewardViews = rewardService.searchForBatchPaymentByInvoiceIds(invoiceIds);
@@ -403,10 +397,7 @@ public class RewardServiceTest {
                 .sponsors(List.of())
                 .project(new ShortProjectView(ProjectId.random(), faker.rickAndMorty().character(), faker.internet().url(), faker.weather().description(),
                         faker.name().username()))
-                .money(MoneyView.builder()
-                        .amount(BigDecimal.ONE)
-                        .currency(currency)
-                        .build())
+                .money(new MoneyView(BigDecimal.ONE, currency, null, null))
                 .transactionReferences(List.of())
                 .paidToAccountNumbers(List.of())
                 .build();

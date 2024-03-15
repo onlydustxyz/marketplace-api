@@ -170,6 +170,30 @@ class BillingProfileServiceTest {
         }
 
         @Test
+        void should_prevent_invoice_preview_if_billing_profile_is_not_verified() {
+            // Given
+            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
+            when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
+                    BillingProfileView.builder()
+                            .id(billingProfileId)
+                            .type(BillingProfile.Type.COMPANY)
+                            .payoutInfo(payoutInfo)
+                            .verificationStatus(VerificationStatus.UNDER_REVIEW)
+                            .name("OnlyDust")
+                            .kyb(newKyb(billingProfileId, userId))
+                            .build())
+            );
+            when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(1);
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Billing profile %s is not verified".formatted(billingProfileId));
+        }
+
+        @Test
         void should_prevent_invoice_preview_given_a_disabled_billing_profile() {
             // When
             when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(false);

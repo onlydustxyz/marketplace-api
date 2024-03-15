@@ -86,6 +86,9 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
         final var billingProfile = billingProfileStoragePort.findById(billingProfileId)
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
+        if (!billingProfile.isVerified()) {
+            throw badRequest("Billing profile %s is not verified".formatted(billingProfileId));
+        }
 
         final int sequenceNumber = invoiceStoragePort.getNextSequenceNumber(billingProfileId);
         final var invoice = Invoice.of(billingProfile, sequenceNumber, userId).rewards(rewards);
