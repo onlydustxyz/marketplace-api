@@ -170,8 +170,9 @@ public class PayoutPreferenceServiceTest {
         final List<PayoutPreferenceView> payoutPreferences = payoutPreferenceService.getPayoutPreferences(userId);
 
         // Then
-        assertEquals(2, payoutPreferences.size());
+        assertEquals(3, payoutPreferences.size());
         assertEquals(payoutPreferenceViews.get(0), payoutPreferences.get(0));
-        assertEquals(payoutPreferenceViews.get(2), payoutPreferences.get(1));
+        assertEquals(payoutPreferenceViews.get(1).toBuilder().shortBillingProfileView(null).build(), payoutPreferences.get(1));
+        assertEquals(payoutPreferenceViews.get(2), payoutPreferences.get(2));
     }
 }
