@@ -39,7 +39,7 @@ public interface BackOfficeMapper {
                 .sponsorId(account.sponsorId().value())
                 .currency(toShortCurrency(account.currency()))
                 .lockedUntil(account.lockedUntil().map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
-                .initialBalance(null) // TODO Antho
+                .initialBalance(account.initialBalance().getValue())
                 .currentBalance(account.balance().getValue())
                 .initialAllowance(null) // TODO Antho
                 .currentAllowance(accountStatement.allowance().getValue())
@@ -61,6 +61,7 @@ public interface BackOfficeMapper {
 
     static SponsorAccount.Transaction mapReceiptToTransaction(final TransactionReceipt transaction) {
         return new SponsorAccount.Transaction(
+                SponsorAccount.Transaction.Type.DEPOSIT,
                 mapTransactionNetwork(transaction.getNetwork()),
                 transaction.getReference(),
                 Amount.of(transaction.getAmount()),

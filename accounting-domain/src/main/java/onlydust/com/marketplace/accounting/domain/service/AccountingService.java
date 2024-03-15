@@ -107,7 +107,8 @@ public class AccountingService implements AccountingFacadePort {
 
             if (paymentReference.network().equals(sponsorAccountNetwork)) {
                 accountBook.burn(AccountId.of(rewardId), amount);
-                registerSponsorAccountTransaction(accountBook, sponsorAccount, new SponsorAccount.Transaction(paymentReference, amount.negate()));
+                registerSponsorAccountTransaction(accountBook, sponsorAccount,
+                        new SponsorAccount.Transaction(SponsorAccount.Transaction.Type.SPEND, paymentReference, amount.negate()));
             }
         });
 
@@ -269,7 +270,8 @@ public class AccountingService implements AccountingFacadePort {
             final var sponsorAccount = sponsorAccount(sponsorAccountId);
 
             final var sponsorAccountNetwork = sponsorAccount.network().orElseThrow();
-            sponsorAccount.add(new SponsorAccount.Transaction(sponsorAccountNetwork, rewardId.toString(), amount.negate(), "", ""));
+            sponsorAccount.add(new SponsorAccount.Transaction(SponsorAccount.Transaction.Type.SPEND, sponsorAccountNetwork, rewardId.toString(),
+                    amount.negate(), "", ""));
         }
 
         private PayableReward createPayableReward(SponsorAccount.Id sponsorAccountId, RewardId rewardId, PositiveAmount amount) {

@@ -68,6 +68,13 @@ public class SponsorAccount {
                 .reduce(Amount.ZERO, Amount::add);
     }
 
+    public Amount initialBalance() {
+        return transactions.stream()
+                .filter(transaction -> transaction.type() == Transaction.Type.DEPOSIT)
+                .map(Transaction::amount)
+                .reduce(Amount.ZERO, Amount::add);
+    }
+
     public Optional<Network> network() {
         return transactions.stream().map(Transaction::network).findFirst();
     }
@@ -129,27 +136,31 @@ public class SponsorAccount {
     public static class Transaction extends PaymentReference {
         private final @NonNull Amount amount;
         private final @NonNull Id id;
+        final @NonNull Type type;
 
         public Transaction(
+                final @NonNull Type type,
                 final @NonNull PaymentReference paymentReference,
                 final @NonNull Amount amount
         ) {
-            this(paymentReference.network(), paymentReference.reference(), amount, paymentReference.thirdPartyName(),
+            this(type, paymentReference.network(), paymentReference.reference(), amount, paymentReference.thirdPartyName(),
                     paymentReference.thirdPartyAccountNumber());
         }
 
         public Transaction(
+                final @NonNull Type type,
                 final @NonNull Network network,
                 final @NonNull String reference,
                 final @NonNull Amount amount,
                 final @NonNull String thirdPartyName,
                 final @NonNull String thirdPartyAccountNumber
         ) {
-            this(Id.random(), network, reference, amount, thirdPartyName, thirdPartyAccountNumber);
+            this(Id.random(), type, network, reference, amount, thirdPartyName, thirdPartyAccountNumber);
         }
 
         public Transaction(
                 final @NonNull Id id,
+                final @NonNull Type type,
                 final @NonNull Network network,
                 final @NonNull String reference,
                 final @NonNull Amount amount,
@@ -159,6 +170,7 @@ public class SponsorAccount {
             super(network, reference, thirdPartyName, thirdPartyAccountNumber);
             this.amount = amount;
             this.id = id;
+            this.type = type;
         }
 
 
@@ -173,6 +185,11 @@ public class SponsorAccount {
             public static Id of(@NonNull final String uuid) {
                 return Id.of(UUID.fromString(uuid));
             }
+        }
+
+        public enum Type {
+            DEPOSIT, // Money received/refunded from the sponsor
+            SPEND // Money spent to pay rewards
         }
     }
 }
