@@ -43,9 +43,17 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           "name": "AS Nancy Lorraine",
                           "url": null,
                           "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png",
-                          "refundableBalances": [],
                           "availableBudgets": [],
-                          "projects": []
+                          "projects": [
+                            {
+                              "name": "Aiolia du Lion",
+                              "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c"
+                            },
+                            {
+                              "name": "Aldébaran du Taureau",
+                              "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aldebaran_taureau.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=ab78704b124d2de9525a8af91ef7c4ed"
+                            }
+                          ]
                         }
                         """);
     }
@@ -343,8 +351,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         {
                           "name": "Virgin sponsor",
                           "url": "https://www.foobar.com",
-                          "logoUrl": "https://www.foobar.com/logo.png",
-                          "projects": []
+                          "logoUrl": "https://www.foobar.com/logo.png"
                         }
                         """)
                 .exchange()
@@ -411,7 +418,15 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .json("""
                         {
                           "name": "Virgin sponsor",
-                          "projects": []
+                          "url": "https://www.foobar.com",
+                          "logoUrl": "https://www.foobar.com/logo.png",
+                          "availableBudgets": [],
+                          "projects": [
+                            {
+                              "name": "Bretzel",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                            }
+                          ]
                         }
                         """);
 

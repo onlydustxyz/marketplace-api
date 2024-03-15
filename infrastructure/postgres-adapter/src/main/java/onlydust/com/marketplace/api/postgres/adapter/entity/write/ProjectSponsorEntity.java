@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import lombok.*;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 
 import javax.persistence.*;
@@ -32,6 +33,11 @@ public class ProjectSponsorEntity {
     @JoinColumn(insertable = false, updatable = false, name = "sponsor_id")
     @EqualsAndHashCode.Exclude
     SponsorEntity sponsor;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(insertable = false, updatable = false, name = "project_id")
+    @EqualsAndHashCode.Exclude
+    ProjectEntity project;
 
     public ProjectSponsorEntity(@NonNull UUID projectId, @NonNull UUID sponsorId, Date lastAllocationDate) {
         this.projectId = projectId;

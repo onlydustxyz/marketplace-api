@@ -19,6 +19,8 @@ public class ProjectSponsorView {
     String sponsorName;
     String sponsorUrl;
     ZonedDateTime lastAllocationDate;
+    String projectName;
+    String projectLogoUrl;
 
     public boolean isActive() {
         return lastAllocationDate == null || lastAllocationDate.isAfter(ZonedDateTime.now().minusMonths(MONTHS_SINCE_LAST_ALLOCATION_TO_BE_A_SPONSOR));

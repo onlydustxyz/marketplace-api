@@ -14,6 +14,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Hash;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
+import onlydust.com.marketplace.project.domain.view.ProjectSponsorView;
 import onlydust.com.marketplace.project.domain.view.backoffice.*;
 
 import java.math.BigDecimal;
@@ -76,7 +77,7 @@ public interface BackOfficeMapper {
                         .name(sponsor.name())
                         .url(sponsor.url())
                         .logoUrl(sponsor.logoUrl())
-                        .projectIds(sponsor.projectIdsWhereSponsorIsActive().stream().toList())
+                        .projectIds(sponsor.projectsWhereSponsorIsActive().stream().map(ProjectSponsorView::projectId).toList())
                 ).toList())
                 .totalPageNumber(sponsorPage.getTotalPageNumber())
                 .totalItemNumber(sponsorPage.getTotalItemNumber())
@@ -98,8 +99,15 @@ public interface BackOfficeMapper {
                 .name(sponsor.name())
                 .url(sponsor.url())
                 .logoUrl(sponsor.logoUrl())
-                .projects(List.of()) // TODO Antho
+                .projects(sponsor.projectsWhereSponsorIsActive().stream().map(BackOfficeMapper::mapToProjectLink).toList())
                 .availableBudgets(List.of()) // TODO Antho
+                ;
+    }
+
+    static ProjectLinkResponse mapToProjectLink(final ProjectSponsorView projectSponsorView) {
+        return new ProjectLinkResponse()
+                .name(projectSponsorView.projectName())
+                .logoUrl(projectSponsorView.projectLogoUrl())
                 ;
     }
 
