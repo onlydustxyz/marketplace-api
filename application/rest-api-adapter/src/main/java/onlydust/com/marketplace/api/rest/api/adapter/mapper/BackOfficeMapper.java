@@ -478,9 +478,9 @@ public interface BackOfficeMapper {
         };
     }
 
-    static ProjectPage mapProjectPageToContract(final Page<ProjectView> projectViewPage, int pageIndex) {
-        return new ProjectPage()
-                .projects(projectViewPage.getContent().stream().map(project -> new ProjectPageItemResponse()
+    static OldProjectPage mapOldProjectPageToContract(final Page<OldProjectView> projectViewPage, int pageIndex) {
+        return new OldProjectPage()
+                .projects(projectViewPage.getContent().stream().map(project -> new OldProjectPageItemResponse()
                         .id(project.getId())
                         .name(project.getName())
                         .shortDescription(project.getShortDescription())
@@ -499,6 +499,19 @@ public interface BackOfficeMapper {
                         .contributions(project.getContributions())
                         .dollarsEquivalentAmountSent(project.getDollarsEquivalentAmountSent())
                         .strkAmountSent(project.getStrkAmountSent())
+                ).toList())
+                .totalPageNumber(projectViewPage.getTotalPageNumber())
+                .totalItemNumber(projectViewPage.getTotalItemNumber())
+                .hasMore(hasMore(pageIndex, projectViewPage.getTotalPageNumber()))
+                .nextPageIndex(nextPageIndex(pageIndex, projectViewPage.getTotalPageNumber()));
+    }
+
+    static ProjectPage mapProjectPageToContract(final Page<ProjectView> projectViewPage, int pageIndex) {
+        return new ProjectPage()
+                .projects(projectViewPage.getContent().stream().map(project -> new ProjectPageItemResponse()
+                        .id(project.getId())
+                        .name(project.getName())
+                        .logoUrl(project.getLogoUrl())
                 ).toList())
                 .totalPageNumber(projectViewPage.getTotalPageNumber())
                 .totalItemNumber(projectViewPage.getTotalItemNumber())

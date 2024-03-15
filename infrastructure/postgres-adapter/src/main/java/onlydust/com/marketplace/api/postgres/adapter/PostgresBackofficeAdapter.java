@@ -3,7 +3,9 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.EcosystemRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
@@ -31,6 +33,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     private final BoProjectRepository boProjectRepository;
     private final BoEcosystemRepository boEcosystemRepository;
     private final EcosystemRepository ecosystemRepository;
+    private final ProjectRepository projectRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -107,11 +110,26 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     }
 
     @Override
-    public Page<ProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds) {
+    public Page<OldProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds) {
         final var page = boProjectRepository.findAll(isNull(projectIds) ? List.of() : projectIds,
                 PageRequest.of(pageIndex, pageSize));
-        return Page.<ProjectView>builder()
+        return Page.<OldProjectView>builder()
                 .content(page.getContent().stream().map(BoProjectEntity::toView).toList())
+                .totalItemNumber((int) page.getTotalElements())
+                .totalPageNumber(page.getTotalPages())
+                .build();
+    }
+
+    @Override
+    public Page<ProjectView> searchProjects(int pageIndex, int pageSize, String search) {
+        final var pageRequest = PageRequest.of(pageIndex, pageSize, Sort.by("name"));
+        
+        final var page = search != null
+                ? projectRepository.findAllByNameContainingIgnoreCase(search, pageRequest)
+                : projectRepository.findAll(pageRequest);
+
+        return Page.<ProjectView>builder()
+                .content(page.getContent().stream().map(ProjectEntity::toBoView).toList())
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();

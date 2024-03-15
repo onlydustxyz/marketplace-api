@@ -5,6 +5,7 @@ import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.project.domain.model.Project;
+import onlydust.com.marketplace.project.domain.view.backoffice.ProjectView;
 import org.hibernate.annotations.*;
 
 import javax.persistence.CascadeType;
@@ -97,6 +98,14 @@ public class ProjectEntity {
                 .moreInfoUrl(moreInfos.stream().findFirst().map(ProjectMoreInfoEntity::getUrl).orElse(null))
                 .hiring(hiring)
                 .visibility(visibility.toDomain())
+                .build();
+    }
+
+    public ProjectView toBoView() {
+        return ProjectView.builder()
+                .id(id)
+                .name(name)
+                .logoUrl(logoUrl)
                 .build();
     }
 }
