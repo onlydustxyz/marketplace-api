@@ -256,7 +256,7 @@ public class Invoice {
                          @NonNull Money amount, @NonNull Money target, Invoice.Id invoiceId) {
         @Deprecated
         public Network network() {
-            return Network.fromCurrencyCode(amount.currency.code().toString());
+            return amount.currency.legacyNetwork();
         }
     }
 

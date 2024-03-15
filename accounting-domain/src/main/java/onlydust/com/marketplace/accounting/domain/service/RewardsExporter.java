@@ -53,7 +53,7 @@ public class RewardsExporter {
                         isNull(reward.billingProfileAdmin()) ? null : reward.billingProfileAdmin().admins().stream()
                                 .map(a -> new InvoiceCreator(a.login(), a.email(), a.firstName() + " " + a.lastName())).toList(),
                         reward.money().amount(),
-                        reward.money().currencyCode(),
+                        reward.money().currency().code(),
                         reward.githubUrls(),
                         reward.status(),
                         reward.requestedAt(),
@@ -66,7 +66,7 @@ public class RewardsExporter {
                         isNull(reward.billingProfileAdmin()) ? null : reward.billingProfileAdmin().billingProfileType(),
                         isNull(reward.invoice()) ? null : reward.invoice().number(),
                         isNull(reward.invoice()) ? null : reward.invoice().id(),
-                        "%s - %s".formatted(reward.project().name(), reward.money().currencyCode()),
+                        "%s - %s".formatted(reward.project().name(), reward.money().currency().code()),
                         //TODO: get the real conversion rate instead of computing it
                         isNull(reward.money().dollarsEquivalent()) || BigDecimal.ZERO.compareTo(reward.money().amount()) == 0 ? null :
                                 reward.money().dollarsEquivalent().divide(reward.money().amount(), RoundingMode.FLOOR),

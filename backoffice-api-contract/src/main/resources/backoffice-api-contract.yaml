@@ -1802,7 +1802,7 @@ components:
       required:
         - id
         - sponsorId
-        - currencyId
+        - currency
         - balance
         - allowance
         - receipts
@@ -1811,8 +1811,8 @@ components:
           $ref: '#/components/schemas/SponsorAccountId'
         sponsorId:
           $ref: '#/components/schemas/SponsorId'
-        currencyId:
-          $ref: '#/components/schemas/CurrencyId'
+        currency:
+          $ref: '#/components/schemas/ShortCurrencyResponse'
         balance:
           type: number
           description: This is equal to the sum of receipts amounts (including credits and debits)
@@ -1893,7 +1893,7 @@ components:
         amount:
           type: number
         currency:
-          $ref: '#/components/schemas/TransactionalCurrency'
+          $ref: '#/components/schemas/TransactionalCurrencyResponse'
 
     TransactionType:
       type: string
@@ -2313,8 +2313,8 @@ components:
           format: date-time
         amount:
           type: number
-        currencyId:
-          $ref: '#/components/schemas/CurrencyId'
+        currency:
+          $ref: '#/components/schemas/ShortCurrencyResponse'
         rewardIds:
           type: array
           items:
@@ -2451,40 +2451,23 @@ components:
       description: An amount and its currency
       required:
         - amount
-        - currencyCode
-        - currencyName
-        - currencyLogoUrl
+        - currency
       properties:
         amount:
           type: number
-        currencyCode:
-          type: string
-        currencyName:
-          type: string
-        currencyLogoUrl:
-          type: string
+        currency:
+          $ref: '#/components/schemas/ShortCurrencyResponse'
 
     MoneyLinkResponse:
-      type: object
-      description: An amount and its currency
-      required:
-        - amount
-        - currencyCode
-        - currencyName
-        - currencyLogoUrl
-      properties:
-        amount:
-          type: number
-        dollarsEquivalent:
-          type: number
-        conversionRate:
-          type: number
-        currencyCode:
-          type: string
-        currencyName:
-          type: string
-        currencyLogoUrl:
-          type: string
+      allOf:
+        - $ref: '#/components/schemas/MoneyResponse'
+        - type: object
+          description: An amount and its currency
+          properties:
+            dollarsEquivalent:
+              type: number
+            conversionRate:
+              type: number
 
     BillingProfileId:
       type: string
@@ -2694,7 +2677,7 @@ components:
 
     CurrencyResponse:
       allOf:
-        - $ref: '#/components/schemas/Currency'
+        - $ref: '#/components/schemas/ShortCurrencyResponse'
         - type: object
           required:
             - type
@@ -2745,7 +2728,7 @@ components:
         amount:
           type: number
         currency:
-          $ref: '#/components/schemas/TransactionalCurrency'
+          $ref: '#/components/schemas/TransactionalCurrencyResponse'
 
     AllocationData:
       type: object
@@ -2757,9 +2740,9 @@ components:
         amount:
           type: number
         currency:
-          $ref: '#/components/schemas/Currency'
+          $ref: '#/components/schemas/ShortCurrencyResponse'
 
-    Currency:
+    ShortCurrencyResponse:
       type: object
       description: Minimal information about a currency
       properties:
@@ -2775,9 +2758,9 @@ components:
           type: string
           format: uri
 
-    TransactionalCurrency:
+    TransactionalCurrencyResponse:
       allOf:
-        - $ref: '#/components/schemas/Currency'
+        - $ref: '#/components/schemas/ShortCurrencyResponse'
         - type: object
           description: Information about a currency that can be used to perform transactions
           required:

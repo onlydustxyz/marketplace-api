@@ -32,14 +32,17 @@ public class RewardService implements AccountingRewardPort {
     private final InvoiceStoragePort invoiceStoragePort;
     private final AccountingFacadePort accountingFacadePort;
     private final MailNotificationPort mailNotificationPort;
-    private static final List<String> CURRENCY_CODES_AVAILABLE_FOR_BATCH_PAYMENT = List.of(Currency.Code.STRK_STR, Currency.Code.USDC_STR,
-            Currency.Code.LORDS_STR);
+    private static final List<Currency.Code> CURRENCY_CODES_AVAILABLE_FOR_BATCH_PAYMENT = List.of(
+            Currency.Code.STRK,
+            Currency.Code.USDC,
+            Currency.Code.LORDS
+    );
 
     @Override
     public List<BackofficeRewardView> searchForBatchPaymentByInvoiceIds(List<Invoice.Id> invoiceIds) {
         return accountingRewardStoragePort.searchRewards(List.of(Invoice.Status.APPROVED), invoiceIds)
                 .stream()
-                .filter(rewardView -> CURRENCY_CODES_AVAILABLE_FOR_BATCH_PAYMENT.contains(rewardView.money().currencyCode()))
+                .filter(rewardView -> CURRENCY_CODES_AVAILABLE_FOR_BATCH_PAYMENT.contains(rewardView.money().currency().code()))
                 // TODO: the following filter won't work when reward has multiple receipts
                 .filter(rewardView -> isNull(rewardView.processedAt()) && rewardView.transactionReferences().isEmpty())
                 .toList();

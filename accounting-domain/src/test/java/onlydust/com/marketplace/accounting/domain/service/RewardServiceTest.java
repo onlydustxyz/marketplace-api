@@ -10,6 +10,7 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
+import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.stubs.ERC20Tokens;
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -286,15 +287,15 @@ public class RewardServiceTest {
         // When
         when(accountingRewardStoragePort.searchRewards(List.of(Invoice.Status.APPROVED), invoiceIds))
                 .thenReturn(List.of(
-                        generateRewardStubForCurrency(Currency.Code.ETH_STR),
-                        generateRewardStubForCurrency(Currency.Code.EUR_STR),
-                        generateRewardStubForCurrency(Currency.Code.OP_STR),
-                        generateRewardStubForCurrency(Currency.Code.USD_STR),
-                        generateRewardStubForCurrency(Currency.Code.USD_STR),
-                        generateRewardStubForCurrency(Currency.Code.USDC_STR),
-                        generateRewardStubForCurrency(Currency.Code.APT_STR),
-                        generateRewardStubForCurrency(Currency.Code.LORDS_STR),
-                        generateRewardStubForCurrency(Currency.Code.STRK_STR),
+                        generateRewardStubForCurrency(Currencies.ETH),
+                        generateRewardStubForCurrency(Currencies.EUR),
+                        generateRewardStubForCurrency(Currencies.OP),
+                        generateRewardStubForCurrency(Currencies.USD),
+                        generateRewardStubForCurrency(Currencies.USD),
+                        generateRewardStubForCurrency(Currencies.USDC),
+                        generateRewardStubForCurrency(Currencies.APT),
+                        generateRewardStubForCurrency(Currencies.LORDS),
+                        generateRewardStubForCurrency(Currencies.STRK),
                         BackofficeRewardView.builder()
                                 .id(RewardId.random())
                                 .status(RewardStatus.PROCESSING)
@@ -318,8 +319,7 @@ public class RewardServiceTest {
                                 .processedAt(ZonedDateTime.now())
                                 .money(MoneyView.builder()
                                         .amount(BigDecimal.ONE)
-                                        .currencyCode(Currency.Code.USDC_STR)
-                                        .currencyName(faker.rickAndMorty().location())
+                                        .currency(Currencies.USDC)
                                         .build())
                                 .transactionReferences(List.of(faker.random().hex()))
                                 .paidToAccountNumbers(List.of(faker.random().hex()))
@@ -348,8 +348,7 @@ public class RewardServiceTest {
                                 .paidToAccountNumbers(List.of(faker.random().hex()))
                                 .money(MoneyView.builder()
                                         .amount(BigDecimal.ONE)
-                                        .currencyCode(Currency.Code.USDC_STR)
-                                        .currencyName(faker.rickAndMorty().location())
+                                        .currency(Currencies.USDC)
                                         .build())
                                 .build()
                 ));
@@ -357,9 +356,9 @@ public class RewardServiceTest {
 
         // Then
         assertEquals(3, rewardViews.size());
-        assertEquals(Currency.Code.USDC_STR, rewardViews.get(0).money().currencyCode());
-        assertEquals(Currency.Code.LORDS_STR, rewardViews.get(1).money().currencyCode());
-        assertEquals(Currency.Code.STRK_STR, rewardViews.get(2).money().currencyCode());
+        assertEquals(Currency.Code.USDC, rewardViews.get(0).money().currency().code());
+        assertEquals(Currency.Code.LORDS, rewardViews.get(1).money().currency().code());
+        assertEquals(Currency.Code.STRK, rewardViews.get(2).money().currency().code());
     }
 
     @Test
@@ -367,10 +366,10 @@ public class RewardServiceTest {
         // Given
         final String email1 = faker.rickAndMorty().character();
         final String email2 = faker.gameOfThrones().character();
-        final var r11 = generateRewardStubForCurrencyAndEmail("USD", email1);
-        final var r21 = generateRewardStubForCurrencyAndEmail("STRK", email2);
-        final var r12 = generateRewardStubForCurrencyAndEmail("OP", email1);
-        final var r22 = generateRewardStubForCurrencyAndEmail("APT", email2);
+        final var r11 = generateRewardStubForCurrencyAndEmail(Currencies.USD, email1);
+        final var r21 = generateRewardStubForCurrencyAndEmail(Currencies.STRK, email2);
+        final var r12 = generateRewardStubForCurrencyAndEmail(Currencies.OP, email1);
+        final var r22 = generateRewardStubForCurrencyAndEmail(Currencies.APT, email2);
         final List<BackofficeRewardView> rewardViews = List.of(
                 r11,
                 r12,
@@ -389,11 +388,11 @@ public class RewardServiceTest {
         verify(accountingRewardStoragePort).markRewardsAsPaymentNotified(rewardViews.stream().map(BackofficeRewardView::id).toList());
     }
 
-    private BackofficeRewardView generateRewardStubForCurrency(final String currencyCode) {
-        return generateRewardStubForCurrencyAndEmail(currencyCode, faker.rickAndMorty().character());
+    private BackofficeRewardView generateRewardStubForCurrency(final Currency currency) {
+        return generateRewardStubForCurrencyAndEmail(currency, faker.rickAndMorty().character());
     }
 
-    private BackofficeRewardView generateRewardStubForCurrencyAndEmail(final String currencyCode, final String email) {
+    private BackofficeRewardView generateRewardStubForCurrencyAndEmail(final Currency currency, final String email) {
         return BackofficeRewardView.builder()
                 .id(RewardId.random())
                 .status(RewardStatus.PROCESSING)
@@ -416,8 +415,7 @@ public class RewardServiceTest {
                         faker.name().username()))
                 .money(MoneyView.builder()
                         .amount(BigDecimal.ONE)
-                        .currencyCode(currencyCode)
-                        .currencyName(faker.rickAndMorty().location())
+                        .currency(currency)
                         .build())
                 .transactionReferences(List.of())
                 .paidToAccountNumbers(List.of())

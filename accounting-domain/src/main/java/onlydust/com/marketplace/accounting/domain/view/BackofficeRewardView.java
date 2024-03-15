@@ -29,6 +29,6 @@ public record BackofficeRewardView(
 
     @Deprecated
     public Network network() {
-        return Network.fromCurrencyCode(money().currencyCode());
+        return money().currency().legacyNetwork();
     }
 }

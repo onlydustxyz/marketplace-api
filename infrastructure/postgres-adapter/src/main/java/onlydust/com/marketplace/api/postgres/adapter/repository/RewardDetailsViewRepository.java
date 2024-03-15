@@ -35,9 +35,7 @@ public interface RewardDetailsViewRepository extends JpaRepository<BackofficeRew
                                s2.s_list                                sponsors,
 
                                r.amount                                 amount,
-                               c.name                                   currency_name,
-                               c.code                                   currency_code,
-                               c.logo_url                               currency_logo_url,
+                               c.id                                     currency_id,
 
                                i.billing_profile_id                     billing_profile_id,
                                bp.type                                  billing_profile_type,

@@ -142,13 +142,25 @@ public class Currency implements Cloneable {
         };
     }
 
+    @Deprecated
+    public Network legacyNetwork() {
+        return switch (code.toString()) {
+            case Currency.Code.USD_STR, Currency.Code.EUR_STR -> Network.SEPA;
+            case Currency.Code.APT_STR -> Network.APTOS;
+            case Currency.Code.ETH_STR, Currency.Code.LORDS_STR, Currency.Code.USDC_STR -> Network.ETHEREUM;
+            case Currency.Code.OP_STR -> Network.OPTIMISM;
+            case Currency.Code.STRK_STR -> Network.STARKNET;
+
+            default -> throw new IllegalArgumentException("Currency %s not supported".formatted(code));
+        };
+    }
+
     @Override
     public Currency clone() {
         return toBuilder().id(Id.random())
                 .erc20(new HashSet<>(erc20))
                 .build();
     }
-
 
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)
@@ -177,6 +189,12 @@ public class Currency implements Cloneable {
 
         public final static Code EUR = Code.of(EUR_STR);
         public final static Code USD = Code.of(USD_STR);
+        public final static Code ETH = Code.of(ETH_STR);
+        public final static Code APT = Code.of(APT_STR);
+        public final static Code STRK = Code.of(STRK_STR);
+        public final static Code OP = Code.of(OP_STR);
+        public final static Code USDC = Code.of(USDC_STR);
+        public final static Code LORDS = Code.of(LORDS_STR);
 
         String inner;
 

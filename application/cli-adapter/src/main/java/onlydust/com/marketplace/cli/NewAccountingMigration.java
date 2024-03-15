@@ -127,7 +127,7 @@ public class NewAccountingMigration implements CommandLineRunner {
         final var sponsor = sponsorRepository.findById(sponsorId.value()).orElseThrow(() -> notFound("Sponsor not found: %s".formatted(sponsorId)));
 
         LOGGER.info("Creating %s account for sponsor %s (budget: %s)".formatted(currency.code(), sponsor.getName(), total));
-        final var transaction = new SponsorAccount.Transaction(Network.fromCurrencyCode(currency.code().toString()), UNKNOWN, total, sponsor.getName(),
+        final var transaction = new SponsorAccount.Transaction(currency.legacyNetwork(), UNKNOWN, total, sponsor.getName(),
                 UNKNOWN);
 
         return accountingFacadePort.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(total), unlockDate, transaction);
@@ -209,12 +209,11 @@ public class NewAccountingMigration implements CommandLineRunner {
         LOGGER.info("Reading Payment.Requested event: " + value);
         final var reward = reward(RewardId.of(value.get("id").asText()));
         reward.amount = PositiveAmount.of(new BigDecimal(value.get("amount").get("amount").asText()));
-        reward.currency = currencyStorage.findByCode(Currency.Code.of(value.get("amount").get("currency").asText())).orElseThrow(() -> notFound(("Currency " +
-                                                                                                                                                 "not" +
-                                                                                                                                                 " found: %s").formatted(value.get("amount").get("currency").asText())));
+        reward.currency = currencyStorage.findByCode(Currency.Code.of(value.get("amount").get("currency").asText()))
+                .orElseThrow(() -> notFound(("Currency not found: %s").formatted(value.get("amount").get("currency").asText())));
         reward.projectId = ProjectId.of(value.get("project_id").asText());
         reward.recipientId = value.get("recipient_id").asLong();
-        reward.network = Network.fromCurrencyCode(reward.currency.code().toString());
+        reward.network = reward.currency.legacyNetwork();
     }
 
     private void readPaymentCancelled(JsonNode value) {

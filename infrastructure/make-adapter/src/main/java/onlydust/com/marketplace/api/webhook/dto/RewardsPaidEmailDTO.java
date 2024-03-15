@@ -28,7 +28,8 @@ public class RewardsPaidEmailDTO {
                         rewardViews.get(0).billingProfileAdmin().admins().get(0).login() :
                         rewardViews.get(0).billingProfileAdmin().admins().get(0).firstName())
                 .rewardNames(String.join("<br>", rewardViews.stream()
-                        .map(r -> String.join(" - ", r.id().pretty(), r.project().name(), r.money().currencyCode(), r.money().amount().toString()))
+                        .map(r -> String.join(" - ", r.id().pretty(), r.project().name(), r.money().currency().code().toString(),
+                                r.money().amount().toString()))
                         .toList()))
                 .build();
     }

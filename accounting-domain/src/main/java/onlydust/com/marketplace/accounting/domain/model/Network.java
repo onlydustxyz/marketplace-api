@@ -49,17 +49,4 @@ public enum Network {
             }
         }
     }
-
-    @Deprecated
-    public static Network fromCurrencyCode(String currencyCode) {
-        return switch (currencyCode) {
-            case Currency.Code.USD_STR, Currency.Code.EUR_STR -> Network.SEPA;
-            case Currency.Code.APT_STR -> Network.APTOS;
-            case Currency.Code.ETH_STR, Currency.Code.LORDS_STR, Currency.Code.USDC_STR -> Network.ETHEREUM;
-            case Currency.Code.OP_STR -> Network.OPTIMISM;
-            case Currency.Code.STRK_STR -> Network.STARKNET;
-
-            default -> throw new IllegalArgumentException("Currency %s not supported".formatted(currencyCode));
-        };
-    }
 }
