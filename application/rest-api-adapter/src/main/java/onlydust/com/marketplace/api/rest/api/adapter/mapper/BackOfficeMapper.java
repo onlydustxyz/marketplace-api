@@ -43,7 +43,7 @@ public interface BackOfficeMapper {
                 .currentBalance(account.balance().getValue())
                 .initialAllowance(accountStatement.initialAllowance().getValue())
                 .currentAllowance(accountStatement.allowance().getValue())
-                .debt(null) // TODO Antho
+                .debt(accountStatement.initialAllowance().subtract(account.initialBalance()).getValue())
                 .awaitingPaymentAmount(accountStatement.awaitingPaymentAmount().getValue())
                 .receipts(account.getTransactions().stream()
                         .map(transaction -> mapTransactionToReceipt(account, transaction)).toList());

@@ -71,6 +71,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         assertThat(response.getCurrentAllowance()).isEqualTo(BigDecimal.valueOf(100));
         assertThat(response.getInitialBalance()).isEqualTo(BigDecimal.ZERO);
         assertThat(response.getCurrentBalance()).isEqualTo(BigDecimal.ZERO);
+        assertThat(response.getDebt()).isEqualTo(BigDecimal.valueOf(100));
         assertThat(response.getLockedUntil()).isNull();
         assertThat(response.getAwaitingPaymentAmount()).isEqualTo(BigDecimal.ZERO);
 
@@ -182,6 +183,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .jsonPath("$.currentBalance").isEqualTo(40)
                 .jsonPath("$.initialAllowance").isEqualTo(60)
                 .jsonPath("$.currentAllowance").isEqualTo(20)
+                .jsonPath("$.debt").isEqualTo(20)
                 .jsonPath("$.awaitingPaymentAmount").isEqualTo(0)
         ;
     }
@@ -250,6 +252,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                               "currentBalance": 100,
                               "initialAllowance": 100,
                               "currentAllowance": 100,
+                              "debt": 0,
                               "awaitingPaymentAmount": 0,
                               "lockedUntil": null,
                               "receipts": [
@@ -320,6 +323,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .jsonPath("$.currentBalance").isEqualTo(0)
                 .jsonPath("$.initialAllowance").isEqualTo(100)
                 .jsonPath("$.currentAllowance").isEqualTo(100)
+                .jsonPath("$.debt").isEqualTo(100)
                 .jsonPath("$.receipts.size()").isEqualTo(0)
         ;
     }
@@ -477,6 +481,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .jsonPath("$.accounts[0].currentBalance").isEqualTo(100)
                 .jsonPath("$.accounts[0].initialAllowance").isEqualTo(100)
                 .jsonPath("$.accounts[0].currentAllowance").isEqualTo(0)
+                .jsonPath("$.accounts[0].debt").isEqualTo(0)
                 .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(30)
         ;
 
@@ -566,6 +571,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .jsonPath("$.accounts[0].currentBalance").isEqualTo(70)
                 .jsonPath("$.accounts[0].initialAllowance").isEqualTo(100)
                 .jsonPath("$.accounts[0].currentAllowance").isEqualTo(0)
+                .jsonPath("$.accounts[0].debt").isEqualTo(0)
                 .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(0)
         ;
     }
