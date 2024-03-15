@@ -23,10 +23,11 @@ public interface AccountingRewardStoragePort {
     Optional<BatchPayment> findBatchPayment(BatchPayment.Id batchPaymentId);
 
     void saveBatchPayment(BatchPayment updatedBatchPayment);
-
-    Page<BatchPayment> findBatchPayments(int pageIndex, int pageSize);
+    Page<BatchPaymentDetailsView> findBatchPaymentDetails(int pageIndex, int pageSize);
 
     Optional<BatchPaymentDetailsView> findBatchPaymentDetailsById(BatchPayment.Id batchPaymentId);
+
+    List<BackofficeRewardView> findRewardsById(Set<RewardId> rewardIds);
 
     Page<BackofficeRewardView> findRewards(int pageIndex, int pageSize,
                                            @NonNull Set<RewardStatus> statuses,
@@ -38,4 +39,5 @@ public interface AccountingRewardStoragePort {
     void markRewardsAsPaymentNotified(List<RewardId> rewardId);
 
     void saveAll(List<BatchPayment> batchPayments);
+
 }

@@ -23,20 +23,27 @@ import java.util.stream.Collectors;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.groupingBy;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @AllArgsConstructor
 public class RewardService implements AccountingRewardPort {
 
-    private final AccountingRewardStoragePort accountingRewardStoragePort;
-    private final InvoiceStoragePort invoiceStoragePort;
-    private final AccountingFacadePort accountingFacadePort;
-    private final MailNotificationPort mailNotificationPort;
     private static final List<Currency.Code> CURRENCY_CODES_AVAILABLE_FOR_BATCH_PAYMENT = List.of(
             Currency.Code.STRK,
             Currency.Code.USDC,
             Currency.Code.LORDS
     );
+    private final AccountingRewardStoragePort accountingRewardStoragePort;
+    private final InvoiceStoragePort invoiceStoragePort;
+    private final AccountingFacadePort accountingFacadePort;
+    private final MailNotificationPort mailNotificationPort;
+
+    @NotNull
+    private static Map<RewardId, Wallet> walletsPerRewardForNetwork(Map<RewardId, Invoice> rewardInvoices, Network network) {
+        return rewardInvoices.entrySet().stream()
+                .map(e -> Map.entry(e.getKey(), e.getValue().billingProfileSnapshot().wallet(network)))
+                .filter(e -> e.getValue().isPresent())
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().get()));
+    }
 
     @Override
     public List<BackofficeRewardView> searchForBatchPaymentByInvoiceIds(List<Invoice.Id> invoiceIds) {
@@ -83,8 +90,8 @@ public class RewardService implements AccountingRewardPort {
     }
 
     @Override
-    public Page<BatchPayment> findBatchPayments(int pageIndex, int pageSize) {
-        return accountingRewardStoragePort.findBatchPayments(pageIndex, pageSize);
+    public Page<BatchPaymentDetailsView> findBatchPayments(int pageIndex, int pageSize) {
+        return accountingRewardStoragePort.findBatchPaymentDetails(pageIndex, pageSize);
     }
 
     @Override
@@ -94,7 +101,7 @@ public class RewardService implements AccountingRewardPort {
     }
 
     @Override
-    public List<BatchPayment> createBatchPaymentsForInvoices(List<Invoice.Id> invoiceIds) {
+    public List<BatchPaymentDetailsView> createBatchPaymentsForInvoices(List<Invoice.Id> invoiceIds) {
 
         final var invoices = invoiceStoragePort.getAll(invoiceIds);
         final Map<RewardId, Invoice> rewardInvoices = invoices.stream()
@@ -110,6 +117,7 @@ public class RewardService implements AccountingRewardPort {
                 .map(e -> {
                     final var network = e.getKey();
                     final var rewards = e.getValue();
+                    rewards.sort(Comparator.comparing(r -> r.id().value()));
                     final Map<RewardId, Wallet> wallets = walletsPerRewardForNetwork(rewardInvoices, network);
 
                     return BatchPayment.builder()
@@ -123,35 +131,14 @@ public class RewardService implements AccountingRewardPort {
                 .toList();
 
         accountingRewardStoragePort.saveAll(batchPayments);
-        return batchPayments;
+        return batchPayments.stream().map(batchPayment -> {
+            final var rewards = accountingRewardStoragePort.findRewardsById(batchPayment.rewards().stream().map(PayableReward::id).collect(Collectors.toSet()));
+            return BatchPaymentDetailsView.builder()
+                    .batchPayment(batchPayment)
+                    .rewardViews(rewards)
+                    .build();
+        }).toList();
     }
-
-    @NotNull
-    private static Map<RewardId, Wallet> walletsPerRewardForNetwork(Map<RewardId, Invoice> rewardInvoices, Network network) {
-        return rewardInvoices.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey,
-                        e -> e.getValue().billingProfileSnapshot().wallet(network)
-                                .orElseThrow(() -> internalServerError("No wallet for reward %s on network %s".formatted(e.getKey(), network)))));
-    }
-
-//    @NotNull
-//    private static List<MoneyView> totalAmountsPerCurrency(List<PayableReward> rewards, Map<RewardId, RewardWithPayoutInfoView> rewardsWithPayoutInfo,
-//                                                           Map<RewardId, Wallet> wallets) {
-//        return rewards.stream()
-//                .collect(groupingBy(PayableReward::currency))
-//                .entrySet()
-//                .stream()
-//                .map(e -> new MoneyView(
-//                        e.getValue().stream().map(PayableReward::amount).reduce(PositiveAmount::add).orElseThrow().getValue(),
-//                        e.getKey().id(),
-//                        e.getKey().name(),
-//                        e.getKey().code().toString(),
-//                        e.getKey().logoUrl().map(URI::toString).orElse(null),
-//                        wallets.get(e.getValue().stream().findFirst().map(PayableReward::id).orElseThrow()),
-//                        e.getValue().stream().map(r -> r.amount().getValue().multiply(rewardsWithPayoutInfo.get(r.id()).usdConversionRate()))
-//                                .reduce(BigDecimal::add).orElseThrow()
-//                )).toList();
-//    }
 
     @Override
     public Page<BackofficeRewardView> getRewards(int pageIndex, int pageSize,

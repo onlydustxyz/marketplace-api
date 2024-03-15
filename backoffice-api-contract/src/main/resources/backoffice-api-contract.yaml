@@ -2382,12 +2382,12 @@ components:
         billingAccountNumber:
           type: string
           description: IBAN, account number, ENS or wallet address
-        dollarsEquivalent:
+        totalUsdEquivalent:
           type: number
-        totalPerCurrency:
+        totalsPerCurrency:
           type: array
           items:
-            $ref: '#/components/schemas/MoneyLinkResponse'
+            $ref: '#/components/schemas/TotalMoneyWithUsdEquivalentResponse'
         rewards:
           type: array
           items:
@@ -2439,12 +2439,12 @@ components:
           format: date-time
         rewardCount:
           type: integer
-        totalEquivalent:
-          $ref: '#/components/schemas/MoneyLinkResponse'
-        totalPerCurrency:
+        totalUsdEquivalent:
+          type: number
+        totalsPerCurrency:
           type: array
           items:
-            $ref: '#/components/schemas/MoneyLinkResponse'
+            $ref: '#/components/schemas/TotalMoneyWithUsdEquivalentResponse'
 
     MoneyResponse:
       type: object
@@ -2458,7 +2458,10 @@ components:
         currency:
           $ref: '#/components/schemas/ShortCurrencyResponse'
 
-    MoneyLinkResponse:
+    MoneyWithUsdEquivalentResponse:
+      description: |
+        Represents an amount with its currency, its equivalent in USD and its
+        conversion rate to USD.
       allOf:
         - $ref: '#/components/schemas/MoneyResponse'
         - type: object
@@ -2467,6 +2470,19 @@ components:
             dollarsEquivalent:
               type: number
             conversionRate:
+              type: number
+
+    TotalMoneyWithUsdEquivalentResponse:
+      description: |
+        Represents a total amount with its currency and the total equivalent in USD.
+        Unlike MoneyWithUsdEquivalentResponse, this does not have a conversion rate,
+        as it is made out of multiple amounts with potentially different conversion rates.
+      allOf:
+        - $ref: '#/components/schemas/MoneyResponse'
+        - type: object
+          description: An amount and its currency
+          properties:
+            dollarsEquivalent:
               type: number
 
     BillingProfileId:
@@ -2869,7 +2885,7 @@ components:
           items:
             $ref: '#/components/schemas/SponsorLinkResponse'
         money:
-          $ref: '#/components/schemas/MoneyLinkResponse'
+          $ref: '#/components/schemas/MoneyWithUsdEquivalentResponse'
 
     RewardPageResponse:
       type: object
@@ -2932,7 +2948,7 @@ components:
           items:
             $ref: '#/components/schemas/SponsorLinkResponse'
         money:
-          $ref: '#/components/schemas/MoneyLinkResponse'
+          $ref: '#/components/schemas/MoneyWithUsdEquivalentResponse'
         transactionReferences:
           type: array
           items:
@@ -2991,7 +3007,7 @@ components:
           items:
             $ref: '#/components/schemas/SponsorLinkResponse'
         money:
-          $ref: '#/components/schemas/MoneyLinkResponse'
+          $ref: '#/components/schemas/MoneyWithUsdEquivalentResponse'
         transactionReferences:
           type: array
           items:
@@ -3053,6 +3069,9 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/BatchPaymentId'
+        createdAt:
+          type: string
+          format: date-time
         csv:
           type: string
         network:
@@ -3060,9 +3079,12 @@ components:
         rewardCount:
           type: integer
           format: int64
-        totalAmounts:
+        totalUsdEquivalent:
+          type: number
+        totalsPerCurrency:
+          type: array
           items:
-            $ref: '#/components/schemas/MoneyLinkResponse'
+            $ref: '#/components/schemas/TotalMoneyWithUsdEquivalentResponse'
 
     BatchPaymentRequest:
       type: object
@@ -3092,37 +3114,11 @@ components:
         batchPayments:
           type: array
           items:
-            $ref: '#/components/schemas/BatchPaymentItemResponse'
-
-    BatchPaymentItemResponse:
-      type: object
-      required:
-        - id
-        - createdAt
-        - network
-        - rewardCount
-        - totalAmounts
-        - totalAmountUsd
-      properties:
-        id:
-          $ref: '#/components/schemas/BatchPaymentId'
-        createdAt:
-          type: string
-          format: date-time
-        network:
-          $ref: '#/components/schemas/TransactionNetwork'
-        rewardCount:
-          type: integer
-          format: int64
-        totalAmountUsd:
-          type: number
-        totalAmounts:
-          items:
-            $ref: '#/components/schemas/MoneyLinkResponse'
+            $ref: '#/components/schemas/BatchPaymentResponse'
 
     BatchPaymentDetailsResponse:
       allOf:
-        - $ref: '#/components/schemas/BatchPaymentItemResponse'
+        - $ref: '#/components/schemas/BatchPaymentResponse'
         - $ref: '#/components/schemas/SearchRewardsResponse'
         - type: object
           properties:

@@ -202,7 +202,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
     @Override
     public ResponseEntity<BatchPaymentsResponse> createBatchPayments(PostBatchPaymentRequest postBatchPaymentRequest) {
-        final List<BatchPayment> batchPayments =
+        final var batchPayments =
                 accountingRewardPort.createBatchPaymentsForInvoices(postBatchPaymentRequest.getInvoiceIds().stream().map(Invoice.Id::of).toList());
         return ResponseEntity.ok(BatchPaymentMapper.domainToResponse(batchPayments));
     }
@@ -215,15 +215,16 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
     @Override
     public ResponseEntity<BatchPaymentDetailsResponse> getBatchPayment(UUID batchPaymentId) {
-        return ResponseEntity.ok(BatchPaymentMapper.detailsToResponse(accountingRewardPort.findBatchPaymentById(BatchPayment.Id.of(batchPaymentId))));
+        return ResponseEntity.ok(BatchPaymentMapper.domainToDetailedResponse(accountingRewardPort.findBatchPaymentById(BatchPayment.Id.of(batchPaymentId))));
     }
 
     @Override
     public ResponseEntity<BatchPaymentPageResponse> getBatchPayments(Integer pageIndex, Integer pageSize) {
         final int sanitizePageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
         final int sanitizedPageSize = PaginationHelper.sanitizePageSize(pageSize);
-        final BatchPaymentPageResponse batchPaymentPageResponse = BatchPaymentMapper.pageToResponse(accountingRewardPort.findBatchPayments(sanitizePageIndex,
-                sanitizedPageSize), pageIndex);
+        final BatchPaymentPageResponse batchPaymentPageResponse = BatchPaymentMapper.pageToResponse(
+                accountingRewardPort.findBatchPayments(sanitizePageIndex, sanitizedPageSize),
+                pageIndex);
         return batchPaymentPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(batchPaymentPageResponse) :
                 ResponseEntity.ok(batchPaymentPageResponse);

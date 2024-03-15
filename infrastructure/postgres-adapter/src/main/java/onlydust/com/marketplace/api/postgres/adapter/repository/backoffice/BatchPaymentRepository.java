@@ -9,6 +9,4 @@ import java.util.UUID;
 
 public interface BatchPaymentRepository extends JpaRepository<BatchPaymentEntity, UUID> {
     Page<BatchPaymentEntity> findAllByStatus(BatchPaymentEntity.Status status, Pageable pageable);
-
-    int countAllByStatus(BatchPaymentEntity.Status status);
 }

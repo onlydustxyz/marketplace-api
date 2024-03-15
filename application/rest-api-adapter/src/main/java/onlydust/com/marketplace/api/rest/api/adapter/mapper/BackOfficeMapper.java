@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
+import onlydust.com.marketplace.accounting.domain.view.TotalMoneyView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
@@ -22,6 +23,8 @@ import java.util.List;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.SearchRewardMapper.moneyViewToResponse;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.SearchRewardMapper.totalMoneyViewToResponse;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.ETHEREUM;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
@@ -279,18 +282,12 @@ public interface BackOfficeMapper {
                         .admins(null) //TODO: add admins when implementing the new version for pennylane
                 )
                 .rewardCount(invoice.rewards().size())
-                .totalEquivalent(new MoneyLinkResponse()
-                        .amount(invoice.totalAfterTax().getValue())
-                        .currency(toShortCurrency(invoice.totalAfterTax().getCurrency()))
-                        .dollarsEquivalent(invoice.totalAfterTax().getValue())
-                        .conversionRate(null) //TODO: add conversion rate when implementing the new version for pennylane
-                )
-                .totalPerCurrency(invoice.rewards().stream().map(reward ->
-                        new MoneyLinkResponse()
+                .totalUsdEquivalent(invoice.totalAfterTax().getValue())
+                .totalsPerCurrency(invoice.rewards().stream().map(reward ->
+                        new TotalMoneyWithUsdEquivalentResponse()
                                 .amount(reward.amount().getValue())
                                 .currency(toShortCurrency(reward.amount().getCurrency()))
                                 .dollarsEquivalent(reward.target().getValue())
-                                .conversionRate(null) //TODO: add conversion rate when implementing the new version for pennylane
                 ).toList());
     }
 
@@ -330,7 +327,7 @@ public interface BackOfficeMapper {
         return rewards.stream().collect(groupingBy(BackofficeRewardView::network))
                 .entrySet().stream()
                 .map(e -> {
-                            final var totalEquivalent = e.getValue().stream().map(r -> r.money().dollarsEquivalent()).reduce(BigDecimal::add)
+                            final var totalUsdEquivalent = e.getValue().stream().map(r -> r.money().dollarsEquivalent()).reduce(BigDecimal::add)
                                     .orElseThrow(() -> internalServerError("No reward found for network %s".formatted(e.getKey())));
 
                             return new InvoiceRewardsPerNetwork()
@@ -340,8 +337,8 @@ public interface BackOfficeMapper {
                                             .findFirst()
                                             .map(Wallet::address)
                                             .orElse(null))
-                                    .dollarsEquivalent(totalEquivalent)
-                                    .totalPerCurrency(mapNetworkRewardTotals(e.getValue()))
+                                    .totalUsdEquivalent(totalUsdEquivalent)
+                                    .totalsPerCurrency(mapNetworkRewardTotals(e.getValue()))
                                     .rewards(mapNetworkRewards(e.getValue()));
                         }
                 )
@@ -364,31 +361,23 @@ public interface BackOfficeMapper {
                                         .name(sponsor.name())
                                         .avatarUrl(sponsor.logoUrl())
                         ).toList())
-                        .money(new MoneyLinkResponse()
-                                .amount(reward.money().amount())
-                                .dollarsEquivalent(reward.money().dollarsEquivalent())
-                                .currency(toShortCurrency(reward.money().currency()))
-                        )
+                        .money(moneyViewToResponse(reward.money()))
                         .transactionReferences(reward.transactionReferences())
                 )
                 .sorted(comparing(InvoiceRewardResponse::getRequestedAt))
                 .toList();
     }
 
-    static List<MoneyLinkResponse> mapNetworkRewardTotals(final List<BackofficeRewardView> rewards) {
+    static List<TotalMoneyWithUsdEquivalentResponse> mapNetworkRewardTotals(final List<BackofficeRewardView> rewards) {
         return rewards.stream().collect(groupingBy(r -> r.money().currency()))
                 .entrySet().stream()
                 .map(e -> {
                             final var currency = e.getKey();
                             final var total = e.getValue().stream().map(r -> r.money().amount()).reduce(BigDecimal::add)
                                     .orElseThrow(() -> internalServerError("No reward found for currency %s".formatted(e.getKey())));
-                            final var totalEquivalent = e.getValue().stream().map(r -> r.money().dollarsEquivalent()).reduce(BigDecimal::add)
+                            final var totalUsdEquivalent = e.getValue().stream().map(r -> r.money().dollarsEquivalent()).reduce(BigDecimal::add)
                                     .orElseThrow(() -> internalServerError("No reward found for currency %s".formatted(e.getKey())));
-
-                            return new MoneyLinkResponse()
-                                    .amount(total)
-                                    .dollarsEquivalent(totalEquivalent)
-                                    .currency(toShortCurrency(currency));
+                            return totalMoneyViewToResponse(new TotalMoneyView(total, currency, totalUsdEquivalent));
                         }
                 )
                 .sorted(comparing(r -> r.getCurrency().getCode()))

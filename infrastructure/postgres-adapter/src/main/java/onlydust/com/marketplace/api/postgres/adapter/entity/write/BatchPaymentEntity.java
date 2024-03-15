@@ -41,11 +41,12 @@ public class BatchPaymentEntity {
     @Type(type = "batch_payment_status")
     @Enumerated(EnumType.STRING)
     Status status;
-    @OneToMany
+    @OneToMany(mappedBy = "batchPayment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     List<BatchPaymentRewardEntity> rewards;
     @ManyToMany
     @JoinTable(
             name = "batch_payment_invoices",
+            schema = "accounting",
             joinColumns = @JoinColumn(name = "batch_payment_id"),
             inverseJoinColumns = @JoinColumn(name = "invoice_id")
     )
