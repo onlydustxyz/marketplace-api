@@ -177,4 +177,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000107_refactor_batch_payments.sql
   - include:
       file: db/changelog/changelogs/00000108_fix_billing_profiles_linked_tables.sql
-
+  - include:
+      file: db/changelog/changelogs/00000109_migrate_baseAmount_to_targetAmount.sql
