@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 
-@Builder
+@Builder(toBuilder = true)
 public record PayoutPreferenceView(
         ShortBillingProfileView shortBillingProfileView,
         @NonNull ShortProjectView shortProjectView) {

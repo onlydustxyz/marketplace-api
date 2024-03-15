@@ -836,6 +836,41 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
         }
     }
 
+    @Test
+    @Order(104)
+    void should_prevent_invoice_preview_on_disabled_billing_profiles() {
+        // Given
+        final var otherReward = "dd7d445f-6915-4955-9bae-078173627b05";
+
+        // When
+        client.put()
+                .uri(getApiURI(BILLING_PROFILES_ENABLE_BY_ID.formatted(billingProfileId)))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "enable": false
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // When
+        client.get()
+                .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(billingProfileId), Map.of(
+                        "rewardIds", "%s".formatted(otherReward)
+                )))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isUnauthorized()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("Cannot generate invoice on a disabled billing profile");
+    }
+
     //TODO
 //    @SneakyThrows
 //    @Test
