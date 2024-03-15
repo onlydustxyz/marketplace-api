@@ -23,7 +23,7 @@ public interface AccountingRewardStoragePort {
     Optional<BatchPayment> findBatchPayment(BatchPayment.Id batchPaymentId);
 
     void saveBatchPayment(BatchPayment updatedBatchPayment);
-    Page<BatchPaymentDetailsView> findBatchPaymentDetails(int pageIndex, int pageSize);
+    Page<BatchPaymentDetailsView> findBatchPaymentDetails(int pageIndex, int pageSize, Set<BatchPayment.Status> statuses);
 
     Optional<BatchPaymentDetailsView> findBatchPaymentDetailsById(BatchPayment.Id batchPaymentId);
 

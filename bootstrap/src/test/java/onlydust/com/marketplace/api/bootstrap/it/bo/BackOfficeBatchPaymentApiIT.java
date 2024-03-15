@@ -31,6 +31,7 @@ import javax.persistence.EntityManagerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -267,6 +268,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                 .json("""
                 {
                   "network": "ETHEREUM",
+                  "status": "TO_PAY",
                   "rewardCount": 2,
                   "totalUsdEquivalent": 3030.00,
                   "totalsPerCurrency": [
@@ -450,190 +452,171 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
 
     @Test
     @Order(4)
-    void should_mark_batch_payment_as_paid() {
+    void should_get_batch_payments() {
+        client.get()
+                .uri(getApiURI(GET_REWARDS_BATCH_PAYMENTS, Map.of("pageIndex", "0", "pageSize", "10")))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                {
+                  "totalPageNumber": 1,
+                  "totalItemNumber": 2,
+                  "hasMore": false,
+                  "nextPageIndex": 0,
+                  "batchPayments": [
+                    {
+                      "status": "TO_PAY",
+                      "network": "SEPA",
+                      "rewardCount": 1,
+                      "totalUsdEquivalent": 1000,
+                      "totalsPerCurrency": [
+                        {
+                          "amount": 1000,
+                          "currency": {
+                            "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                            "code": "USD",
+                            "name": "US Dollar",
+                            "logoUrl": null
+                          },
+                          "dollarsEquivalent": 1000
+                        }
+                      ]
+                    },
+                    {
+                      "status": "TO_PAY",
+                      "network": "ETHEREUM",
+                      "rewardCount": 2,
+                      "totalUsdEquivalent": 3030.00,
+                      "totalsPerCurrency": [
+                        {
+                          "amount": 3000,
+                          "currency": {
+                            "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                            "code": "USDC",
+                            "name": "USD Coin",
+                            "logoUrl": null
+                          },
+                          "dollarsEquivalent": 3030.00
+                        }
+                      ]
+                    }
+                  ]
+                }
+                """);
     }
 
+    @Test
+    @Order(5)
+    void should_fail_to_mark_batch_payment_as_paid_when_transaction_reference_is_invalid() {
+        client.put()
+                .uri(getApiURI(PUT_REWARDS_BATCH_PAYMENTS.formatted(ethBatchPaymentId)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "transactionHash": "0xfoobar"
+                        }
+                        """)
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is4xxClientError();
+    }
 
+    @Test
+    @Order(6)
+    void should_mark_batch_payment_as_paid() {
+        client.put()
+                .uri(getApiURI(PUT_REWARDS_BATCH_PAYMENTS.formatted(ethBatchPaymentId)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "transactionHash": "0x313d09b7aa7d113ebd99cd58a59741d9e547813989d94ece7725b841a776b47e"
+                        }
+                        """)
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
 
-    //TODO
-//    @Test
-//    @Order(103)
-//    void should_pay_strk_batch_payment() {
-//        // Given
-//        final var toto = batchPaymentRepository.findAll();
-//        final BatchPaymentEntity starknetBatchPaymentEntity = batchPaymentRepository.findAll().stream()
-//                .filter(batchPaymentEntity -> batchPaymentEntity.getNetwork().equals(NetworkEnumEntity.starknet))
-//                .findFirst()
-//                .orElseThrow();
-//        final String transactionHash = "0x" + faker.random().hex();
-//
-//        final PaymentRequestEntity r1 = paymentRequestRepository.findById(starknetBatchPaymentEntity.getRewardIds().get(0)).orElseThrow();
-//        final PaymentRequestEntity r2 = paymentRequestRepository.findById(starknetBatchPaymentEntity.getRewardIds().get(1)).orElseThrow();
-//
-//
-//        rustApiWireMockServer.stubFor(
-//                WireMock.post("/api/payments/%s/receipts".formatted(r1.getId()))
-//                        .withHeader("Api-Key", WireMock.equalTo(odRustApiHttpClientProperties.getApiKey()))
-//                        .withRequestBody(WireMock.equalToJson(
-//                                """
-//                                        {
-//                                           "amount": %s,
-//                                           "currency": "%s",
-//                                           "recipientWallet": "%s",
-//                                           "recipientIban" : null,
-//                                           "transactionReference" : "%s"
-//                                        }
-//                                            """.formatted(r1.getAmount().toString(), r1.getCurrency().toDomain().name(), anthoStarknetAddress,
-//                                            transactionHash)
-//                        ))
-//                        .willReturn(ResponseDefinitionBuilder.okForJson("""
-//                                {
-//                                    "receipt_id": "%s"
-//                                }""".formatted(UUID.randomUUID()))));
-//
-//        rustApiWireMockServer.stubFor(
-//                WireMock.post("/api/payments/%s/receipts".formatted(r2.getId()))
-//                        .withHeader("Api-Key", WireMock.equalTo(odRustApiHttpClientProperties.getApiKey()))
-//                        .withRequestBody(WireMock.equalToJson(
-//                                """
-//                                        {
-//                                           "amount": %s,
-//                                           "currency": "%s",
-//                                           "recipientWallet": "%s",
-//                                           "recipientIban" : null,
-//                                           "transactionReference" : "%s"
-//                                        }
-//                                        """.formatted(r2.getAmount().toString(), r2.getCurrency().toDomain().name(), olivierStarknetAddress,
-//                                        transactionHash)
-//                        ))
-//                        .willReturn(ResponseDefinitionBuilder.okForJson("""
-//                                {
-//                                    "receipt_id": "%s"
-//                                }""".formatted(UUID.randomUUID()))));
-//
-//
-//        // When
-//        client.put()
-//                .uri(getApiURI(PUT_REWARDS_BATCH_PAYMENTS.formatted(starknetBatchPaymentEntity.getId())))
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .header("Api-Key", apiKey())
-//                .bodyValue("""
-//                                          {
-//                                            "transactionHash": "%s"
-//                                          }
-//                        """.formatted(transactionHash))
-//                // Then
-//                .exchange()
-//                .expectStatus()
-//                .is2xxSuccessful();
-//
-//        final BatchPayment batchPayment = batchPaymentRepository.findById(starknetBatchPaymentEntity.getId()).orElseThrow().toDomain();
-//        assertEquals(BatchPayment.Status.PAID, batchPayment.status());
-//        assertTrue(batchPayment.rewardIds().contains(RewardId.of(r1.getId())));
-//        assertTrue(batchPayment.rewardIds().contains(RewardId.of(r2.getId())));
-//    }
+        client.get()
+                .uri(getApiURI(GET_REWARDS_BATCH_PAYMENTS_BY_ID.formatted(ethBatchPaymentId)))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(ethBatchPaymentId.toString())
+                .json("""
+                {
+                  "network": "ETHEREUM",
+                  "status": "PAID",
+                  "rewardCount": 2,
+                  "totalUsdEquivalent": 3030.00,
+                  "transactionHash": "0x313d09b7aa7d113ebd99cd58a59741d9e547813989d94ece7725b841a776b47e"
+                }
+                """);
 
-//
-//    @Test
-//    @Order(104)
-//    void should_get_page_of_payment_batch_and_get_payment_batch_by_id() {
-//        // Given
-//        final BatchPaymentEntity starknetBatchPaymentEntity = batchPaymentRepository.findAll().stream()
-//                .filter(batchPaymentEntity -> batchPaymentEntity.getNetwork().equals(NetworkEnumEntity.starknet))
-//                .findFirst()
-//                .orElseThrow();
-//
-//        // When
-//        client.get()
-//                .uri(getApiURI(GET_REWARDS_BATCH_PAYMENTS, Map.of("pageIndex", "0", "pageSize", "20")))
-//                .header("Api-Key", apiKey())
-//                // Then
-//                .exchange()
-//                .expectStatus()
-//                .is2xxSuccessful()
-//                .expectBody()
-//                .json(GET_BATCH_PAYMENTS_PAGE_JSON_RESPONSE);
-//
-//        // When
-//        client.get()
-//                .uri(getApiURI(GET_REWARDS_BATCH_PAYMENTS_BY_ID.formatted(starknetBatchPaymentEntity.getId())))
-//                .header("Api-Key", apiKey())
-//                // Then
-//                .exchange()
-//                .expectStatus()
-//                .is2xxSuccessful()
-//                .expectBody()
-//                .jsonPath("$.blockchain").isEqualTo("STARKNET")
-//                .jsonPath("$.rewardCount").isEqualTo(2)
-//                .jsonPath("$.totalAmountUsd").isEqualTo(544)
-//                .jsonPath("$.totalAmounts[0].amount").isEqualTo(11533.222)
-//                .jsonPath("$.totalAmounts.length()").isEqualTo(1)
-//                .jsonPath("$.csv").isNotEmpty()
-//                .jsonPath("$.transactionHash").isNotEmpty()
-//                .jsonPath("$.rewards.length()").isEqualTo(2);
-//    }
+        client.get()
+                .uri(getApiURI(GET_REWARDS_BATCH_PAYMENTS, Map.of("pageIndex", "0", "pageSize", "10", "statuses", "PAID")))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                {
+                  "totalPageNumber": 1,
+                  "totalItemNumber": 1,
+                  "hasMore": false,
+                  "nextPageIndex": 0,
+                  "batchPayments": [
+                    {
+                      "status": "PAID",
+                      "network": "ETHEREUM",
+                      "rewardCount": 2,
+                      "totalUsdEquivalent": 3030.00,
+                      "totalsPerCurrency": [
+                        {
+                          "amount": 3000,
+                          "currency": {
+                            "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                            "code": "USDC",
+                            "name": "USD Coin",
+                            "logoUrl": null
+                          },
+                          "dollarsEquivalent": 3030.00
+                        }
+                      ]
+                    }
+                  ]
+                }
+                """);
+    }
 
-//    @Autowired
-//    PaymentRepository paymentRepository;
-//    @Autowired
-//    Config webhookHttpClientProperties;
-//
-//    @Test
-//    @Order(110)
-//    void should_notify_new_rewards_paid() {
-//        // Given
-//        final List<PaymentRequestEntity> rewardsToPay = paymentRequestRepository.findAllById(
-//                batchPaymentRepository.findAll().stream()
-//                        .flatMap(batchPaymentEntity -> batchPaymentEntity.getRewardIds().stream())
-//                        .toList());
-//        paymentRepository.save(new PaymentEntity(UUID.randomUUID(), BigDecimal.ONE, "ETH", JacksonUtil.toJsonNode("{}"), rewardsToPay.get(0).getId(),
-//                new Date()));
-//        paymentRepository.save(new PaymentEntity(UUID.randomUUID(), BigDecimal.ONE, "ETH", JacksonUtil.toJsonNode("{}"), rewardsToPay.get(1).getId(),
-//                new Date()));
-//
-//        makeWebhookSendRewardsPaidMailWireMockServer.stubFor(
-//                post("/?api-key=%s".formatted(webhookHttpClientProperties.getApiKey()))
-//                        .willReturn(ok()));
-//
-//        // When
-//        client.put()
-//                .uri(getApiURI(PUT_REWARDS_NOTIFY_PAYMENTS))
-//                .header("Api-Key", apiKey())
-//                // Then
-//                .exchange()
-//                .expectStatus()
-//                .is2xxSuccessful();
-//
-//        makeWebhookSendRewardsPaidMailWireMockServer.verify(1,
-//                postRequestedFor(urlEqualTo("/?api-key=%s".formatted(webhookHttpClientProperties.getApiKey())))
-//                        .withHeader("Content-Type", equalTo("application/json"))
-//                        .withRequestBody(matchingJsonPath("$.recipientEmail", equalTo("abuisset@gmail.com")))
-//                        .withRequestBody(matchingJsonPath("$.recipientName", equalTo("Anthony BUISSET"))));
-//    }
-//
-//    private static final String GET_BATCH_PAYMENTS_PAGE_JSON_RESPONSE = """
-//            {
-//              "totalPageNumber": 1,
-//              "totalItemNumber": 1,
-//              "hasMore": false,
-//              "nextPageIndex": 0,
-//              "batchPayments": [
-//                {
-//                  "blockchain": "STARKNET",
-//                  "rewardCount": 2,
-//                  "totalAmountUsd": 544,
-//                  "totalAmounts": [
-//                    {
-//                      "amount": 11533.222,
-//                      "dollarsEquivalent": 544,
-//                      "conversionRate": null,
-//                      "currencyCode": "STRK",
-//                      "currencyName": "StarkNet Token",
-//                      "currencyLogoUrl": null
-//                    }
-//                  ]
-//                }
-//              ]
-//            }
-//            """;
+    @Test
+    @Order(7)
+    void should_fail_to_mark_batch_payment_as_paid_when_it_is_already_paid() {
+        client.put()
+                .uri(getApiURI(PUT_REWARDS_BATCH_PAYMENTS.formatted(ethBatchPaymentId)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "transactionHash": "0x313d09b7aa7d113ebd99cd58a59741d9e547813989d94ece7725b841a776b47e"
+                        }
+                        """)
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is4xxClientError();
+    }
+
 }
