@@ -134,6 +134,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
         return billingProfileRepository.findById(billingProfileId.value()).map(billingProfileEntity -> switch (billingProfileEntity.getType()) {
             case INDIVIDUAL -> {
                 BillingProfileView billingProfileView = BillingProfileView.builder()
+                        .enabled(billingProfileEntity.getEnabled())
                         .type(BillingProfile.Type.INDIVIDUAL)
                         .id(billingProfileId)
                         .name(billingProfileEntity.getName())
@@ -152,6 +153,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                 BillingProfileView billingProfileView = BillingProfileView.builder().type(BillingProfile.Type.COMPANY)
                         .id(billingProfileId)
                         .name(billingProfileEntity.getName())
+                        .enabled(billingProfileEntity.getEnabled())
                         .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                         .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                         .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
@@ -169,6 +171,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                 BillingProfileView billingProfileView = BillingProfileView.builder().type(BillingProfile.Type.SELF_EMPLOYED)
                         .id(billingProfileId)
                         .name(billingProfileEntity.getName())
+                        .enabled(billingProfileEntity.getEnabled())
                         .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                         .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                         .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
@@ -339,5 +342,17 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
         walletRepository.deleteByBillingProfileId(billingProfileId.value());
         bankAccountRepository.deleteByBillingProfileId(billingProfileId.value());
         billingProfileRepository.deleteById(billingProfileId.value());
+    }
+
+    @Override
+    @Transactional
+    public void enableBillingProfile(BillingProfile.Id billingProfileId, Boolean enabled) {
+        billingProfileRepository.updateEnabled(billingProfileId.value(), enabled);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isEnabled(BillingProfile.Id billingProfileId) {
+        return billingProfileRepository.isBillingProfileEnabled(billingProfileId.value());
     }
 }

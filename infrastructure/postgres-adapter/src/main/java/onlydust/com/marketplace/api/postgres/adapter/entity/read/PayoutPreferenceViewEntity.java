@@ -41,6 +41,7 @@ public class PayoutPreferenceViewEntity {
     @org.hibernate.annotations.Type(type = "billing_profile_type")
     @Enumerated(EnumType.STRING)
     BillingProfileEntity.Type billingProfileType;
+    Boolean billingProfileEnabled;
 
     @EqualsAndHashCode
     public static class PrimaryKey implements Serializable {
@@ -56,6 +57,7 @@ public class PayoutPreferenceViewEntity {
                                 .id(BillingProfile.Id.of(this.billingProfileId))
                                 .name(this.billingProfileName)
                                 .type(this.billingProfileType.toDomain())
+                                .enabled(this.billingProfileEnabled)
                                 .build()
                 )
                 .shortProjectView(

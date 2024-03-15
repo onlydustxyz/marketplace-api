@@ -179,3 +179,6 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000108_fix_billing_profiles_linked_tables.sql
   - include:
       file: db/changelog/changelogs/00000109_migrate_baseAmount_to_targetAmount.sql
+  - include:
+      file: db/changelog/changelogs/00000110_add_enabled_column_to_billing_profiles.sql
+

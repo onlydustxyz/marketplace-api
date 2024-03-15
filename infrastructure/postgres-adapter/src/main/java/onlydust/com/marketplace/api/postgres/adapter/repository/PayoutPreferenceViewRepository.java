@@ -17,13 +17,14 @@ public interface PayoutPreferenceViewRepository extends JpaRepository<PayoutPref
                    pd.short_description as project_short_description,
                    pd.key as project_key,
                    pp.billing_profile_id,
-                   bf.name as billing_profile_name,
-                   bf.type as billing_profile_type
+                   bp.name as billing_profile_name,
+                   bp.type as billing_profile_type,
+                   bp.enabled as billing_profile_enabled
             from iam.users u
             join (select distinct r.project_id, r.recipient_id  from rewards r) p on p.recipient_id = u.github_user_id
             join project_details pd on pd.project_id = p.project_id
             left join accounting.payout_preferences pp on pp.project_id = p.project_id and pp.user_id = u.id
-            left join accounting.billing_profiles bf on bf.id = pp.billing_profile_id
+            left join accounting.billing_profiles bp on bp.id = pp.billing_profile_id
             where u.id = :userId
             order by pd.name
             """, nativeQuery = true)

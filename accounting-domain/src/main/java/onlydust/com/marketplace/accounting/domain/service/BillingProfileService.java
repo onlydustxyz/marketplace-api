@@ -75,6 +75,9 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
             throw unauthorized("User is not allowed to generate invoice for this billing profile");
 
+        if (!billingProfileStoragePort.isEnabled(billingProfileId))
+            throw unauthorized("Cannot generate invoice on a disabled billing profile");
+
         final var rewards = invoiceStoragePort.findRewards(rewardIds);
         if (rewards.stream().map(Invoice.Reward::invoiceId).filter(Objects::nonNull)
                 .anyMatch(i -> invoiceStoragePort.get(i).orElseThrow().status().isActive())) {
@@ -108,6 +111,9 @@ public class BillingProfileService implements BillingProfileFacadePort {
         final var billingProfile = billingProfileStoragePort.findById(billingProfileId)
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
 
+        if (!billingProfileStoragePort.isEnabled(billingProfileId))
+            throw unauthorized("Cannot upload an invoice on a disabled billing profile %s".formatted(billingProfileId.value()));
+
         if (!billingProfile.isInvoiceMandateAccepted())
             throw forbidden("Invoice mandate has not been accepted for billing profile %s".formatted(billingProfileId));
 
@@ -120,6 +126,9 @@ public class BillingProfileService implements BillingProfileFacadePort {
                                       @NonNull InputStream data) {
         final var billingProfile = billingProfileStoragePort.findById(billingProfileId)
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
+
+        if (!billingProfileStoragePort.isEnabled(billingProfileId))
+            throw unauthorized("Cannot upload an invoice on a disabled billing profile %s".formatted(billingProfileId.value()));
 
         if (billingProfile.isInvoiceMandateAccepted())
             throw forbidden("External invoice upload is forbidden when mandate has been accepted (billing profile %s)".formatted(billingProfileId));
@@ -168,7 +177,8 @@ public class BillingProfileService implements BillingProfileFacadePort {
     public void updateInvoiceMandateAcceptanceDate(UserId userId, BillingProfile.Id billingProfileId) {
         if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
             throw unauthorized("User %s is not allowed to accept invoice mandate for billing profile %s".formatted(userId, billingProfileId));
-
+        if (!billingProfileStoragePort.isEnabled(billingProfileId))
+            throw unauthorized("Cannot update mandateAcceptanceDate on a disabled billing profile %s".formatted(billingProfileId));
         billingProfileStoragePort.updateInvoiceMandateAcceptanceDate(billingProfileId, ZonedDateTime.now());
     }
 
@@ -268,5 +278,12 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (billingProfileStoragePort.doesBillingProfileHaveSomeInvoices(billingProfileId))
             throw unauthorized("Cannot delete billing profile %s with invoice(s)".formatted(billingProfileId.value()));
         billingProfileStoragePort.deleteBillingProfile(billingProfileId);
+    }
+
+    @Override
+    public void enableBillingProfile(UserId userId, BillingProfile.Id billingProfileId, Boolean enabled) {
+        if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
+            throw unauthorized("User %s must be admin to enable billing profile %s".formatted(userId.value(), billingProfileId.value()));
+        billingProfileStoragePort.enableBillingProfile(billingProfileId, enabled);
     }
 }

@@ -59,6 +59,7 @@ public class BillingProfileEntity {
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "billingProfile")
     PayoutInfoEntity payoutInfo;
+    Boolean enabled;
 
     @CreationTimestamp
     @Column(name = "tech_created_at", nullable = false, updatable = false)
@@ -104,6 +105,7 @@ public class BillingProfileEntity {
                         .joinedAt(Date.from(ownerJoinedAt.toInstant()))
                         .build())
                 )
+                .enabled(billingProfile.enabled())
                 .build();
     }
 
@@ -114,6 +116,7 @@ public class BillingProfileEntity {
                 .name(this.name)
                 .type(this.type.toDomain())
                 .invoiceMandateAcceptedAt(this.getInvoiceMandateAcceptedAt())
+                .enabled(this.enabled)
                 .build();
     }
 }

@@ -18,6 +18,7 @@ public class BillingProfileView {
     BillingProfile.User me;
     VerificationStatus verificationStatus;
     PayoutInfo payoutInfo;
+    Boolean enabled;
 
     @Getter(AccessLevel.NONE)
     ZonedDateTime invoiceMandateAcceptedAt;

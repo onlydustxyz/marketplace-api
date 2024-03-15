@@ -255,6 +255,85 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$[2].billingProfile.name").isEqualTo(individualBillingProfile.name())
                 .jsonPath("$[2].billingProfile.id").isEqualTo(individualBillingProfile.id().value().toString())
                 .jsonPath("$[2].billingProfile.type").isEqualTo(individualBillingProfile.type().name());
+
+        // When
+        client.put()
+                .uri(getApiURI(BILLING_PROFILES_ENABLE_BY_ID.formatted(companyBillingProfile.id().value())))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "enable": false
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_PAYOUT_PREFERENCES))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.length()").isEqualTo(3)
+                .jsonPath("$[0].project.name").isEqualTo(projectEntities.get(0).getName())
+                .jsonPath("$[0].project.slug").isEqualTo(projectEntities.get(0).getKey())
+                .jsonPath("$[0].project.logoUrl").isEqualTo(projectEntities.get(0).getLogoUrl())
+                .jsonPath("$[0].project.shortDescription").isEqualTo(projectEntities.get(0).getShortDescription())
+                .jsonPath("$[0].billingProfile").isEmpty()
+
+                .jsonPath("$[1].project.name").isEqualTo(projectEntities.get(1).getName())
+                .jsonPath("$[1].project.slug").isEqualTo(projectEntities.get(1).getKey())
+                .jsonPath("$[1].project.logoUrl").isEqualTo(projectEntities.get(1).getLogoUrl())
+                .jsonPath("$[1].project.shortDescription").isEqualTo(projectEntities.get(1).getShortDescription())
+                .jsonPath("$[1].billingProfile.name").isEqualTo(selfEmployedBillingProfile.name())
+                .jsonPath("$[1].billingProfile.id").isEqualTo(selfEmployedBillingProfile.id().value().toString())
+                .jsonPath("$[1].billingProfile.type").isEqualTo(selfEmployedBillingProfile.type().name())
+
+                .jsonPath("$[2].project.name").isEqualTo(projectEntities.get(2).getName())
+                .jsonPath("$[2].project.slug").isEqualTo(projectEntities.get(2).getKey())
+                .jsonPath("$[2].project.logoUrl").isEqualTo(projectEntities.get(2).getLogoUrl())
+                .jsonPath("$[2].project.shortDescription").isEqualTo(projectEntities.get(2).getShortDescription())
+                .jsonPath("$[2].billingProfile.name").isEqualTo(individualBillingProfile.name())
+                .jsonPath("$[2].billingProfile.id").isEqualTo(individualBillingProfile.id().value().toString())
+                .jsonPath("$[2].billingProfile.type").isEqualTo(individualBillingProfile.type().name());
+
+        // when
+        client.put()
+                .uri(getApiURI(ME_PUT_PAYOUT_PREFERENCES))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "billingProfileId": "%s",
+                          "projectId": "%s"
+                        }
+                        """.formatted(companyBillingProfile.id().value(), projectEntities.get(0).getId()))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is4xxClientError();
+
+        // when
+        client.put()
+                .uri(getApiURI(ME_PUT_PAYOUT_PREFERENCES))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "billingProfileId": "%s",
+                          "projectId": "%s"
+                        }
+                        """.formatted(individualBillingProfile.id().value(), projectEntities.get(0).getId()))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
     }
 
 

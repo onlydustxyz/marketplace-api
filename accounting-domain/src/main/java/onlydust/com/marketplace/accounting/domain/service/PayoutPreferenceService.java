@@ -8,9 +8,11 @@ import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacade
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PayoutPreferenceStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.PayoutPreferenceView;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.util.List;
+
+import static java.util.Objects.nonNull;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 
 @AllArgsConstructor
 public class PayoutPreferenceService implements PayoutPreferenceFacadePort {
@@ -20,16 +22,27 @@ public class PayoutPreferenceService implements PayoutPreferenceFacadePort {
 
     @Override
     public List<PayoutPreferenceView> getPayoutPreferences(UserId userId) {
-        return payoutPreferenceStoragePort.findAllByUserId(userId);
+        return payoutPreferenceStoragePort.findAllByUserId(userId)
+                .stream()
+                .map(view -> {
+                    if (nonNull(view.shortBillingProfileView()) && !view.shortBillingProfileView().getEnabled()) {
+                        return view.toBuilder().shortBillingProfileView(null).build();
+                    }
+                    return view;
+                })
+                .toList();
     }
 
     @Override
     public void setPayoutPreference(ProjectId projectId, BillingProfile.Id billingProfileId, UserId userId) {
         if (!billingProfileStoragePort.isUserMemberOf(billingProfileId, userId))
-            throw OnlyDustException.forbidden("User %s is not member of billing profile %s".formatted(userId.value(), billingProfileId.value()));
+            throw forbidden("User %s is not member of billing profile %s".formatted(userId.value(), billingProfileId.value()));
         if (!payoutPreferenceStoragePort.hasUserReceivedSomeRewardsOnProject(userId, projectId))
-            throw OnlyDustException.forbidden("Cannot set payout preference for user %s on project %s because user has not received any rewards on it"
+            throw forbidden("Cannot set payout preference for user %s on project %s because user has not received any rewards on it"
                     .formatted(userId.value(), projectId.value()));
+        if (!billingProfileStoragePort.isEnabled(billingProfileId))
+            throw forbidden("Cannot set payout preference for user %s on project %s because billing profile %s is disabled"
+                    .formatted(userId, projectId, billingProfileId));
         payoutPreferenceStoragePort.save(projectId, billingProfileId, userId);
     }
 }
