@@ -67,8 +67,8 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         assertThat(accountId).isNotNull();
         assertThat(response.getSponsorId()).isEqualTo(COCA_COLAX.value());
         assertThat(response.getCurrency().getId()).isEqualTo(STRK.value());
-        assertThat(response.getAllowance()).isEqualTo(BigDecimal.valueOf(100));
-        assertThat(response.getBalance()).isEqualTo(BigDecimal.ZERO);
+        assertThat(response.getCurrentAllowance()).isEqualTo(BigDecimal.valueOf(100));
+        assertThat(response.getCurrentBalance()).isEqualTo(BigDecimal.ZERO);
         assertThat(response.getLockedUntil()).isNull();
         assertThat(response.getAwaitingPaymentAmount()).isEqualTo(BigDecimal.ZERO);
 
@@ -176,8 +176,8 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .jsonPath("$.balance").isEqualTo(40)
-                .jsonPath("$.allowance").isEqualTo(20)
+                .jsonPath("$.currentBalance").isEqualTo(40)
+                .jsonPath("$.currentAllowance").isEqualTo(20)
                 .jsonPath("$.awaitingPaymentAmount").isEqualTo(0)
         ;
     }
@@ -242,8 +242,8 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                 "name": "StarkNet Token",
                                 "logoUrl": null
                               },
-                              "balance": 100,
-                              "allowance": 100,
+                              "currentBalance": 100,
+                              "currentAllowance": 100,
                               "awaitingPaymentAmount": 0,
                               "lockedUntil": null,
                               "receipts": [
@@ -264,8 +264,8 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                 "name": "Bitcoin",
                                 "logoUrl": null
                               },
-                              "balance": 0,
-                              "allowance": 200,
+                              "currentBalance": 0,
+                              "currentAllowance": 200,
                               "awaitingPaymentAmount": 0,
                               "lockedUntil": null,
                               "receipts": []
@@ -310,8 +310,8 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .jsonPath("$.balance").isEqualTo(0)
-                .jsonPath("$.allowance").isEqualTo(100)
+                .jsonPath("$.currentBalance").isEqualTo(0)
+                .jsonPath("$.currentAllowance").isEqualTo(100)
                 .jsonPath("$.receipts.size()").isEqualTo(0)
         ;
     }
@@ -465,8 +465,8 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .jsonPath("$.accounts[0].balance").isEqualTo(100)
-                .jsonPath("$.accounts[0].allowance").isEqualTo(0)
+                .jsonPath("$.accounts[0].currentBalance").isEqualTo(100)
+                .jsonPath("$.accounts[0].currentAllowance").isEqualTo(0)
                 .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(30)
         ;
 

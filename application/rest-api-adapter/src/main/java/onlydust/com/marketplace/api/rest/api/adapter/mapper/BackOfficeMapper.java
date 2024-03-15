@@ -39,8 +39,11 @@ public interface BackOfficeMapper {
                 .sponsorId(account.sponsorId().value())
                 .currency(toShortCurrency(account.currency()))
                 .lockedUntil(account.lockedUntil().map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
-                .balance(account.balance().getValue())
-                .allowance(accountStatement.allowance().getValue())
+                .initialBalance(null) // TODO Antho
+                .currentBalance(account.balance().getValue())
+                .initialAllowance(null) // TODO Antho
+                .currentAllowance(accountStatement.allowance().getValue())
+                .debt(null) // TODO Antho
                 .awaitingPaymentAmount(accountStatement.awaitingPaymentAmount().getValue())
                 .receipts(account.getTransactions().stream()
                         .map(transaction -> mapTransactionToReceipt(account, transaction)).toList());
@@ -65,7 +68,6 @@ public interface BackOfficeMapper {
                 transaction.getThirdPartyAccountNumber());
     }
 
-
     static OldSponsorPage mapSponsorPageToContract(final Page<SponsorView> sponsorPage, int pageIndex) {
         return new OldSponsorPage()
                 .sponsors(sponsorPage.getContent().stream().map(sponsor -> new OldSponsorPageItemResponse()
@@ -86,8 +88,18 @@ public interface BackOfficeMapper {
                 .id(sponsor.id())
                 .name(sponsor.name())
                 .url(sponsor.url())
+                .logoUrl(sponsor.logoUrl());
+    }
+
+    static SponsorDetailsResponse mapSponsorToDetailsResponse(final SponsorView sponsor) {
+        return new SponsorDetailsResponse()
+                .id(sponsor.id())
+                .name(sponsor.name())
+                .url(sponsor.url())
                 .logoUrl(sponsor.logoUrl())
-                .projectIds(sponsor.projectIdsWhereSponsorIsActive().stream().toList());
+                .projects(List.of()) // TODO Antho
+                .availableBudgets(List.of()) // TODO Antho
+                ;
     }
 
     static EcosystemPage mapEcosystemPageToContract(final Page<EcosystemView> ecosystemViewPage, int pageIndex) {
@@ -482,6 +494,7 @@ public interface BackOfficeMapper {
                 .decimals(currency.decimals())
                 .description(currency.description().orElse(null))
                 .tokens(currency.erc20().stream().map(BackOfficeMapper::mapToken).toList())
+                .supportedOnNetworks(null) // TODO Antho
                 ;
     }
 

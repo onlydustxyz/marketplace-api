@@ -43,10 +43,9 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           "name": "AS Nancy Lorraine",
                           "url": null,
                           "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png",
-                          "projectIds": [
-                            "98873240-31df-431a-81dc-7d6fe01143a0",
-                            "a0c91aee-9770-4000-a893-953ddcbd62a7"
-                          ]
+                          "refundableBalances": [],
+                          "availableBudgets": [],
+                          "projects": []
                         }
                         """);
     }
@@ -296,8 +295,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         {
                           "name": "Foobar",
                           "url": "https://www.foobar.com",
-                          "logoUrl": "https://www.foobar.com/logo.png",
-                          "projectIds": []
+                          "logoUrl": "https://www.foobar.com/logo.png"
                         }
                         """)
                 .jsonPath("$.id").isNotEmpty();
@@ -328,11 +326,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
                           "name": "Foobaaaar",
                           "url": "https://www.foobaaaar.com",
-                          "logoUrl": "https://www.foobaaaar.com/logo.png",
-                          "projectIds": [
-                            "98873240-31df-431a-81dc-7d6fe01143a0",
-                            "a0c91aee-9770-4000-a893-953ddcbd62a7"
-                          ]
+                          "logoUrl": "https://www.foobaaaar.com/logo.png"
                         }
                         """);
     }
@@ -349,7 +343,8 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         {
                           "name": "Virgin sponsor",
                           "url": "https://www.foobar.com",
-                          "logoUrl": "https://www.foobar.com/logo.png"
+                          "logoUrl": "https://www.foobar.com/logo.png",
+                          "projects": []
                         }
                         """)
                 .exchange()
@@ -386,7 +381,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .json("""
                         {
                           "name": "Virgin sponsor",
-                          "projectIds": []
+                          "projects": []
                         }
                         """);
 
@@ -416,60 +411,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .json("""
                         {
                           "name": "Virgin sponsor",
-                          "projectIds": [
-                            "%s"
-                          ]
-                        }
-                        """.formatted(BRETZEL));
-
-        client.get()
-                .uri(getApiURI(OLD_GET_SPONSORS, Map.of(
-                        "pageIndex", "0",
-                        "pageSize", "5",
-                        "sponsorIds", sponsor.getId().toString())))
-                .header("Api-Key", apiKey())
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json("""
-                        {
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 1,
-                          "hasMore": false,
-                          "nextPageIndex": 0,
-                          "sponsors": [
-                            {
-                              "id": "%s",
-                              "name": "Virgin sponsor",
-                              "url": "https://www.foobar.com",
-                              "logoUrl": "https://www.foobar.com/logo.png",
-                              "projectIds": [
-                                "7d04163c-4187-4313-8066-61504d34fc56"
-                              ]
-                            }
-                          ]
-                        }
-                        """.formatted(sponsor.getId()));
-
-        // And when
-        projectSponsorRepository.save(new ProjectSponsorEntity(BRETZEL.value(), sponsorAccount.getSponsorId(),
-                Date.from(ZonedDateTime.now().minusMonths(6).minusDays(1).toInstant())));
-
-
-        client.get()
-                .uri(getApiURI(GET_SPONSOR.formatted(sponsorAccount.getSponsorId())))
-                .header("Api-Key", apiKey())
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json("""
-                        {
-                          "name": "Virgin sponsor",
-                          "projectIds": []
+                          "projects": []
                         }
                         """);
 
@@ -495,8 +437,55 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "id": "%s",
                               "name": "Virgin sponsor",
                               "url": "https://www.foobar.com",
-                              "logoUrl": "https://www.foobar.com/logo.png",
-                              "projectIds": []
+                              "logoUrl": "https://www.foobar.com/logo.png"
+                            }
+                          ]
+                        }
+                        """.formatted(sponsor.getId()));
+
+        // And when
+        projectSponsorRepository.save(new ProjectSponsorEntity(BRETZEL.value(), sponsorAccount.getSponsorId(),
+                Date.from(ZonedDateTime.now().minusMonths(6).minusDays(1).toInstant())));
+
+
+        client.get()
+                .uri(getApiURI(GET_SPONSOR.formatted(sponsorAccount.getSponsorId())))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "name": "Virgin sponsor",
+                          "projects": []
+                        }
+                        """);
+
+        client.get()
+                .uri(getApiURI(OLD_GET_SPONSORS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "sponsorIds", sponsor.getId().toString())))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 1,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "sponsors": [
+                            {
+                              "id": "%s",
+                              "name": "Virgin sponsor",
+                              "url": "https://www.foobar.com",
+                              "logoUrl": "https://www.foobar.com/logo.png"
                             }
                           ]
                         }

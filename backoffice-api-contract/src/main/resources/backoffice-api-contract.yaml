@@ -970,7 +970,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SponsorResponse'
+                $ref: '#/components/schemas/SponsorDetailsResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -1637,8 +1637,13 @@ components:
           items:
             $ref: '#/components/schemas/SponsorPageItemResponse'
 
-    SponsorPageItemResponse:
+    SponsorResponse:
       type: object
+      required:
+        - id
+        - name
+        - url
+        - logoUrl
       properties:
         id:
           type: string
@@ -1649,24 +1654,42 @@ components:
           type: string
         logoUrl:
           type: string
-        projects:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectLinkResponse'
 
-    SponsorResponse:
+    SponsorPageItemResponse:
       allOf:
-        - $ref: '#/components/schemas/OldSponsorPageItemResponse'
+        - $ref: '#/components/schemas/SponsorResponse'
         - type: object
+          required:
+            - projects
           properties:
-            refundableBalances:
+            projects:
               type: array
               items:
-                $ref: '#/components/schemas/TransactionData'
+                $ref: '#/components/schemas/ProjectLinkResponse'
+
+    SponsorDetailsResponse:
+      allOf:
+        - $ref: '#/components/schemas/SponsorResponse'
+        - type: object
+          required:
+            - availableBudgets
+            - projects
+          properties:
             availableBudgets:
               type: array
               items:
-                $ref: '#/components/schemas/AllocationData'
+                $ref: '#/components/schemas/AccountBalance'
+            projects:
+              type: array
+              items:
+                allOf:
+                  - $ref: '#/components/schemas/ProjectLinkResponse'
+                  - type: object
+                    properties:
+                      remainingBudgets:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/MoneyResponse'
 
     EcosystemPage:
       type: object
@@ -1797,38 +1820,58 @@ components:
           type: string
           format: date-time
 
-    AccountResponse:
+    AccountBalance:
       type: object
       required:
-        - id
-        - sponsorId
         - currency
-        - balance
-        - allowance
-        - receipts
+        - initialBalance
+        - currentBalance
+        - initialAllowance
+        - currentAllowance
+        - debt
+        - awaitingPaymentAmount
       properties:
-        id:
-          $ref: '#/components/schemas/SponsorAccountId'
-        sponsorId:
-          $ref: '#/components/schemas/SponsorId'
         currency:
           $ref: '#/components/schemas/ShortCurrencyResponse'
-        balance:
+        initialBalance:
           type: number
-          description: This is equal to the sum of receipts amounts (including credits and debits)
-        allowance:
+          description: This is equal to the sum of receipts amounts (including credits and debits) received from the sponsor
+        currentBalance:
           type: number
-          description: This is the amount of funds available for internal transactions between the sponsor and projects (and eventually contributors)
+          description: This is equal to the sum of receipts amounts (including credits and debits) received from the sponsor minus what has been paid to contributors
+        initialAllowance:
+          type: number
+          description: This is the initial amount of funds available for internal transactions between the sponsor and projects (and eventually contributors)
+        currentAllowance:
+          type: number
+          description: This is the remaining amount of funds available for internal transactions between the sponsor and projects (and eventually contributors)
+        debt:
+          type: number
+          description: This is difference between the initial balance and initial allowance
         awaitingPaymentAmount:
           type: number
           description: This is the sum of reward amounts which have not been paid yet (in the real world)
-        lockedUntil:
-          type: string
-          format: date-time
-        receipts:
-          type: array
-          items:
-            $ref: '#/components/schemas/TransactionReceipt'
+
+    AccountResponse:
+      allOf:
+        - $ref: '#/components/schemas/AccountBalance'
+        - type: object
+          required:
+            - id
+            - sponsorId
+            - receipts
+          properties:
+            id:
+              $ref: '#/components/schemas/SponsorAccountId'
+            sponsorId:
+              $ref: '#/components/schemas/SponsorId'
+            lockedUntil:
+              type: string
+              format: date-time
+            receipts:
+              type: array
+              items:
+                $ref: '#/components/schemas/TransactionReceipt'
 
     AccountListResponse:
       type: object
@@ -2705,6 +2748,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Token'
+            supportedOn:
+              type: array
+              items:
+                $ref: '#/components/schemas/TransactionNetwork'
             decimals:
               type: integer
             description:
@@ -2733,30 +2780,6 @@ components:
           description: The direct URL to the uploaded image
       example:
         url: https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4137005338789730434.png
-
-    TransactionData:
-      type: object
-      description: Contains the necessary information to perform a transaction.
-      required:
-        - amount
-        - currency
-      properties:
-        amount:
-          type: number
-        currency:
-          $ref: '#/components/schemas/TransactionalCurrencyResponse'
-
-    AllocationData:
-      type: object
-      description: Available budget that can be allocated
-      required:
-        - amount
-        - currency
-      properties:
-        amount:
-          type: number
-        currency:
-          $ref: '#/components/schemas/ShortCurrencyResponse'
 
     ShortCurrencyResponse:
       type: object
