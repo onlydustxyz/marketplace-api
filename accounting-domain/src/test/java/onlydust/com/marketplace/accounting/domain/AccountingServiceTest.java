@@ -45,7 +45,7 @@ public class AccountingServiceTest {
     }
 
     private Transaction fakeTransaction(Network network, Amount amount) {
-        return new Transaction(Transaction.Type.SPEND, fakePaymentReference(network), amount);
+        return new Transaction(Transaction.Type.DEPOSIT, fakePaymentReference(network), amount);
     }
 
     private void assertOnRewardCreated(RewardId rewardId, boolean isFunded, ZonedDateTime unlockDate, Set<Network> networks) {
@@ -127,7 +127,7 @@ public class AccountingServiceTest {
             final var amountToMint = PositiveAmount.of(10L);
 
             // When
-            final var sponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), amountToMint, null);
+            final var sponsorAccount = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, currency.id(), null, amountToMint);
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(sponsorAccount.account().id()), amountToMint));
@@ -151,7 +151,7 @@ public class AccountingServiceTest {
             final var transaction = fakeTransaction(Network.ETHEREUM, amount);
 
             // When
-            final var sponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(amount), null, transaction);
+            final var sponsorAccount = accountingService.createSponsorAccountWithInitialBalance(sponsorId, currency.id(), null, transaction);
             verify(accountingObserver).onSponsorAccountBalanceChanged(sponsorAccount);
 
             // Then
@@ -187,7 +187,7 @@ public class AccountingServiceTest {
             final var lockedUntil = ZonedDateTime.now().plusDays(1);
 
             // When
-            final var sponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), amount, lockedUntil, transaction);
+            final var sponsorAccount = accountingService.createSponsorAccountWithInitialBalance(sponsorId, currency.id(), lockedUntil, transaction);
             verify(accountingObserver).onSponsorAccountBalanceChanged(sponsorAccount);
 
             // Then
@@ -228,7 +228,7 @@ public class AccountingServiceTest {
             final var transaction = fakeTransaction(Network.STARKNET, amount);
 
             // When
-            assertThatThrownBy(() -> accountingService.createSponsorAccount(sponsorId, currency.id(), amount, null, transaction))
+            assertThatThrownBy(() -> accountingService.createSponsorAccountWithInitialBalance(sponsorId, currency.id(), null, transaction))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Currency USDC is not supported on network STARKNET");
@@ -249,7 +249,7 @@ public class AccountingServiceTest {
         @BeforeEach
         void setup() {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
-            sponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(100L), null).account();
+            sponsorAccount = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, currency.id(), null, PositiveAmount.of(100L)).account();
         }
 
         /*
@@ -569,7 +569,7 @@ public class AccountingServiceTest {
         @BeforeEach
         void setup() {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
-            sponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(300L), unlockDate)
+            sponsorAccount = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, currency.id(), unlockDate, PositiveAmount.of(300L))
                     .account();
         }
 
@@ -740,10 +740,12 @@ public class AccountingServiceTest {
             currency.erc20().add(ERC20Tokens.OP_USDC);
 
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
-            unlockedSponsorSponsorAccount1 = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(100L), null).account();
-            unlockedSponsorSponsorAccount2 = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(100L), null).account();
-            lockedSponsorSponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(100L),
-                    unlockDate).account();
+            unlockedSponsorSponsorAccount1 = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, currency.id(), null,
+                    PositiveAmount.of(100L)).account();
+            unlockedSponsorSponsorAccount2 = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, currency.id(), null,
+                    PositiveAmount.of(100L)).account();
+            lockedSponsorSponsorAccount = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, currency.id(), unlockDate,
+                    PositiveAmount.of(100L)).account();
         }
 
         /*
@@ -961,11 +963,13 @@ public class AccountingServiceTest {
 
             final var lockDate = ZonedDateTime.now().plusDays(1);
 
-            unlockedSponsorAccountUsdc1 = accountingService.createSponsorAccount(sponsorId, usdc.id(), PositiveAmount.of(200L), null).account();
-            unlockedSponsorAccountUsdc2 = accountingService.createSponsorAccount(sponsorId, usdc.id(), PositiveAmount.of(100L), null).account();
-            unlockedSponsorAccountOp = accountingService.createSponsorAccount(sponsorId, op.id(), PositiveAmount.of(100L), null).account();
-            lockedSponsorAccountUsdc = accountingService.createSponsorAccount(sponsorId, usdc.id(), PositiveAmount.of(100L),
-                    lockDate).account();
+            unlockedSponsorAccountUsdc1 =
+                    accountingService.createSponsorAccountWithInitialAllowance(sponsorId, usdc.id(), null, PositiveAmount.of(200L)).account();
+            unlockedSponsorAccountUsdc2 =
+                    accountingService.createSponsorAccountWithInitialAllowance(sponsorId, usdc.id(), null, PositiveAmount.of(100L)).account();
+            unlockedSponsorAccountOp = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, op.id(), null, PositiveAmount.of(100L)).account();
+            lockedSponsorAccountUsdc =
+                    accountingService.createSponsorAccountWithInitialAllowance(sponsorId, usdc.id(), lockDate, PositiveAmount.of(100L)).account();
 
             accountingService.allocate(unlockedSponsorAccountUsdc1.id(), projectId, PositiveAmount.of(200L), usdc.id());
             accountingService.allocate(unlockedSponsorAccountUsdc2.id(), projectId, PositiveAmount.of(100L), usdc.id());

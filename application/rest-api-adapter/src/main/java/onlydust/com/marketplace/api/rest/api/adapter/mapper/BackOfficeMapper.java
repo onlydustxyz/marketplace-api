@@ -62,7 +62,7 @@ public interface BackOfficeMapper {
                 .currentBalance(account.balance().getValue())
                 .initialAllowance(accountStatement.initialAllowance().getValue())
                 .currentAllowance(accountStatement.allowance().getValue())
-                .debt(accountStatement.initialAllowance().subtract(account.initialBalance()).getValue())
+                .debt(accountStatement.debt().getValue())
                 .awaitingPaymentAmount(accountStatement.awaitingPaymentAmount().getValue());
     }
 

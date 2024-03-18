@@ -34,4 +34,8 @@ public class SponsorAccountStatement {
     public AccountBookFacade accountBookFacade() {
         return accountBookFacade;
     }
+
+    public Amount debt() {
+        return initialAllowance().subtract(account().initialBalance());
+    }
 }

@@ -10,15 +10,15 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface AccountingFacadePort {
-    SponsorAccountStatement createSponsorAccount(final @NonNull SponsorId sponsorId, final @NonNull Currency.Id currencyId,
-                                                 final @NonNull PositiveAmount amountToMint,
-                                                 final ZonedDateTime lockedUntil);
+    SponsorAccountStatement createSponsorAccountWithInitialAllowance(final @NonNull SponsorId sponsorId, final @NonNull Currency.Id currencyId,
+                                                                     final ZonedDateTime lockedUntil, final @NonNull PositiveAmount allowance);
 
-    SponsorAccountStatement createSponsorAccount(final @NonNull SponsorId sponsorId, final @NonNull Currency.Id currencyId,
-                                                 final @NonNull PositiveAmount amountToMint,
-                                                 final ZonedDateTime lockedUntil, final @NonNull SponsorAccount.Transaction transaction);
+    SponsorAccountStatement createSponsorAccountWithInitialBalance(final @NonNull SponsorId sponsorId, final @NonNull Currency.Id currencyId,
+                                                                   final ZonedDateTime lockedUntil, final @NonNull SponsorAccount.Transaction transaction);
 
     SponsorAccountStatement fund(final @NonNull SponsorAccount.Id sponsorAccountId, final @NonNull SponsorAccount.Transaction transaction);
+
+    SponsorAccountStatement increaseAllowance(SponsorAccount.Id sponsorAccountId, Amount amount);
 
     void createReward(ProjectId from, RewardId to, PositiveAmount amount, Currency.Id currencyId);
 
@@ -31,8 +31,6 @@ public interface AccountingFacadePort {
     boolean isPayable(RewardId rewardId, Currency.Id currencyId);
 
     SponsorAccountStatement delete(SponsorAccount.Id sponsorAccountId, SponsorAccount.Transaction.Id receiptId);
-
-    SponsorAccountStatement increaseAllowance(SponsorAccount.Id sponsorAccountId, Amount amount);
 
     void allocate(SponsorAccount.Id from, ProjectId to, PositiveAmount amount, Currency.Id currencyId);
 

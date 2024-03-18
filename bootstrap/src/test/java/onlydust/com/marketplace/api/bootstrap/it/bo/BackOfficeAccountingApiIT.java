@@ -279,7 +279,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .bodyValue("""
                         {
                             "currencyId": "%s",
-                            "allowance": 100,
                              "receipt": {
                                 "reference": "0x01",
                                 "amount": 100,
@@ -375,7 +374,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .bodyValue("""
                         {
                             "currencyId": "%s",
-                            "allowance": 100,
                             "receipt": {
                                 "amount": 100,
                                 "network": "ETHEREUM",
@@ -419,7 +417,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .bodyValue("""
                         {
                             "currencyId": "%s",
-                            "allowance": 100,
                             "lockedUntil": "2024-01-31T00:00:00Z",
                             "receipt": {
                                 "amount": 100,
@@ -488,7 +485,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .bodyValue("""
                         {
                             "currencyId": "%s",
-                            "allowance": 100,
                             "receipt": {
                                 "reference": "0x01",
                                 "amount": 100,
@@ -728,7 +724,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .bodyValue("""
                         {
                             "currencyId": "%s",
-                            "allowance": 100,
                             "receipt": {
                                 "reference": "0x01",
                                 "amount": 100,
