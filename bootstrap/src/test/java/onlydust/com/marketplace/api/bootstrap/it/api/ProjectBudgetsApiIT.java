@@ -119,7 +119,7 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
                           "remainingDollarsEquivalent": 364.00,
                           "budgets": [
                             {
-                              "currency": "ETH",
+                              "currency": {"id":"71bdfcf4-74ee-486b-8cfe-5d841dd93d5c","code":"ETH","name":"Ether","logoUrl":null,"decimals":18},
                               "initialAmount": 100,
                               "remaining": 100,
                               "remainingDollarsEquivalent": 110.0,
@@ -127,7 +127,7 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
                               "dollarsConversionRate": 1.1
                             },
                             {
-                              "currency": "USDC",
+                              "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":null,"decimals":6},
                               "initialAmount": 200,
                               "remaining": 200,
                               "remainingDollarsEquivalent": 254.00,

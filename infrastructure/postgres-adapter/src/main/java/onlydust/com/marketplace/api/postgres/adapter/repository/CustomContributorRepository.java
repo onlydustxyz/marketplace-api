@@ -60,27 +60,8 @@ public class CustomContributorRepository {
                    to_rewards_stats.issue_count issues_to_reward,
                    to_rewards_stats.code_review_count code_reviews_to_reward,
                    
-                   (select jsonb_agg(jsonb_build_object(
-                                   'total_amount', user_rewards.total_amount,
-                                   'total_dollars_equivalent', user_rewards.total_dollars_equivalent,
-                                   'currency_id', user_rewards.currency_id,
-                                   'currency_code', user_rewards.currency_code,
-                                   'currency_name', user_rewards.currency_name,
-                                   'currency_decimals', user_rewards.currency_decimals,
-                                   'currency_logo_url', user_rewards.currency_logo_url
-                                ))
-                    from (select sum(r.amount)  as total_amount,
-                                 coalesce(sum(rsd.amount_usd_equivalent), 0)  as total_dollars_equivalent,
-                                 c.id as currency_id,
-                                 c.code as currency_code,
-                                 c.name as currency_name,
-                                 c.decimals as currency_decimals,
-                                 c.logo_url as currency_logo_url
-                          from rewards r
-                          join accounting.reward_status_data rsd on rsd.reward_id = r.id
-                          join currencies c on c.id = r.currency_id
-                          where r.recipient_id = ga.id
-                          group by c.id) as user_rewards)    totals_earned,
+                   coalesce(totals_earned.total_dollars_equivalent, 0)      earned,
+                   totals_earned.totals_earned_per_currency                 totals_earned,
                           
                    hc.contributor_github_user_id is not null is_hidden
             from projects_contributors pc
@@ -106,6 +87,30 @@ public class CustomContributorRepository {
                                   and ri.id is null
                                   and ic.project_id is null
                                 group by c.contributor_id) to_rewards_stats on to_rewards_stats.contributor_id = ga.id
+                     left join (select user_rewards.recipient_id,
+                                sum(user_rewards.total_dollars_equivalent) as total_dollars_equivalent,
+                                jsonb_agg(jsonb_build_object(
+                                   'total_amount', user_rewards.total_amount,
+                                   'total_dollars_equivalent', user_rewards.total_dollars_equivalent,
+                                   'currency_id', user_rewards.currency_id,
+                                   'currency_code', user_rewards.currency_code,
+                                   'currency_name', user_rewards.currency_name,
+                                   'currency_decimals', user_rewards.currency_decimals,
+                                   'currency_logo_url', user_rewards.currency_logo_url
+                                )) as totals_earned_per_currency
+                    from (select r.recipient_id,
+                                 sum(r.amount)  as total_amount,
+                                 coalesce(sum(rsd.amount_usd_equivalent), 0)  as total_dollars_equivalent,
+                                 c.id as currency_id,
+                                 c.code as currency_code,
+                                 c.name as currency_name,
+                                 c.decimals as currency_decimals,
+                                 c.logo_url as currency_logo_url
+                          from rewards r
+                          join accounting.reward_status_data rsd on rsd.reward_id = r.id
+                          join currencies c on c.id = r.currency_id
+                          group by r.recipient_id, c.id) as user_rewards
+                    group by user_rewards.recipient_id)    totals_earned on totals_earned.recipient_id = ga.id
                     
             where pc.project_id = :projectId
               and ga.login ilike '%' || :login || '%'

@@ -5,6 +5,8 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileEnti
 import onlydust.com.marketplace.project.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.project.domain.view.TotalsEarned;
 
+import java.util.List;
+
 import static java.util.Objects.isNull;
 
 public interface ProjectContributorsMapper {
@@ -40,8 +42,9 @@ public interface ProjectContributorsMapper {
     }
 
     private static TotalsEarned mapAmountsEntityToDomain(ProjectContributorViewEntity contributorViewEntity) {
-        return isNull(contributorViewEntity.getTotalEarnedPerCurrencies()) ? null :
-                new TotalsEarned(contributorViewEntity.getTotalEarnedPerCurrencies().stream().map(UserProfileEntity.TotalEarnedPerCurrency::toDomain).toList());
+        return new TotalsEarned(isNull(contributorViewEntity.getTotalEarnedPerCurrencies())
+                ? List.of()
+                : contributorViewEntity.getTotalEarnedPerCurrencies().stream().map(UserProfileEntity.TotalEarnedPerCurrency::toDomain).toList());
     }
 
 }

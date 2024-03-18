@@ -204,8 +204,10 @@ public class CustomUserRepository {
                 .website(row.getWebsite())
                 .technologies(getTechnologies(row))
                 .profileStats(UserProfileView.ProfileStats.builder()
-                        .totalsEarned(isNull(row.getTotalEarnedPerCurrencies()) ? null :
-                                new TotalsEarned(row.getTotalEarnedPerCurrencies().stream().map(UserProfileEntity.TotalEarnedPerCurrency::toDomain).toList()))
+                        .totalsEarned(new TotalsEarned(isNull(row.getTotalEarnedPerCurrencies())
+                                ? List.of()
+                                : row.getTotalEarnedPerCurrencies().stream().map(UserProfileEntity.TotalEarnedPerCurrency::toDomain).toList())
+                        )
                         .leadedProjectCount(row.getNumberOfLeadingProject())
                         .contributedProjectCount(row.getNumberOfOwnContributorOnProject())
                         .contributionCount(row.getContributionsCount())

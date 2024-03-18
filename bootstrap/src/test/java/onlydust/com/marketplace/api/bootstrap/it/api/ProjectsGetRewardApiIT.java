@@ -57,7 +57,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "id": "85f8358c-5339-42ac-a577-16d7760d1e28",
-                          "currency": "USDC",
+                          "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":null,"decimals":6},
                           "amount": 1000,
                           "dollarsEquivalent": 1010.00,
                           "status": "PENDING_CONTRIBUTOR",

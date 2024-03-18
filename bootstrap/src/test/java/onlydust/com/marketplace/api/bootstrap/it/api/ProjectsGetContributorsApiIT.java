@@ -21,81 +21,178 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
 
     private static final String GET_PROJECT_CONTRIBUTORS_PAGE_0 = """
             {
-               "totalPageNumber": 5,
-               "totalItemNumber": 18,
-               "hasMore": true,
-               "nextPageIndex": 1,
-               "contributors": [
-                 {
-                   "githubUserId": 43467246,
-                   "login": "AnthonyBuisset",
-                   "htmlUrl": null,
-                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                   "isRegistered": true,
-                   "contributionCount": 885,
-                   "rewardCount": 0,
-                   "earned": {
-                     "totalAmount": 0,
-                     "details": null
-                   },
-                   "contributionToRewardCount": null,
-                   "pullRequestToReward": null,
-                   "issueToReward": null,
-                   "codeReviewToReward": null
-                 },
-                 {
-                   "githubUserId": 595505,
-                   "login": "ofux",
-                   "htmlUrl": null,
-                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
-                   "isRegistered": true,
-                   "contributionCount": 570,
-                   "rewardCount": 0,
-                   "earned": {
-                     "totalAmount": 0,
-                     "details": null
-                   },
-                   "contributionToRewardCount": null,
-                   "pullRequestToReward": null,
-                   "issueToReward": null,
-                   "codeReviewToReward": null
-                 },
-                 {
-                   "githubUserId": 4435377,
-                   "login": "Bernardstanislas",
-                   "htmlUrl": null,
-                   "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4",
-                   "isRegistered": true,
-                   "contributionCount": 375,
-                   "rewardCount": 0,
-                   "earned": {
-                     "totalAmount": 0,
-                     "details": null
-                   },
-                   "contributionToRewardCount": null,
-                   "pullRequestToReward": null,
-                   "issueToReward": null,
-                   "codeReviewToReward": null
-                 },
-                 {
-                   "githubUserId": 21149076,
-                   "login": "oscarwroche",
-                   "htmlUrl": null,
-                   "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
-                   "isRegistered": true,
-                   "contributionCount": 213,
-                   "rewardCount": 0,
-                   "earned": {
-                     "totalAmount": 0,
-                     "details": null
-                   },
-                   "contributionToRewardCount": null,
-                   "pullRequestToReward": null,
-                   "issueToReward": null,
-                   "codeReviewToReward": null
-                 }
-               ]
-             }
+              "totalPageNumber": 5,
+              "totalItemNumber": 18,
+              "hasMore": true,
+              "nextPageIndex": 1,
+              "hasHiddenContributors": false,
+              "contributors": [
+                {
+                  "githubUserId": 43467246,
+                  "login": "AnthonyBuisset",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                  "isRegistered": true,
+                  "contributionCount": 885,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 2692632.50,
+                    "details": [
+                      {
+                        "totalAmount": 1500,
+                        "totalDollarsEquivalent": 2672970.00,
+                        "currency": {
+                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                          "code": "ETH",
+                          "name": "Ether",
+                          "logoUrl": null,
+                          "decimals": 18
+                        }
+                      },
+                      {
+                        "totalAmount": 3250,
+                        "totalDollarsEquivalent": 3250,
+                        "currency": {
+                          "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                          "code": "USD",
+                          "name": "US Dollar",
+                          "logoUrl": null,
+                          "decimals": 2
+                        }
+                      },
+                      {
+                        "totalAmount": 2000,
+                        "totalDollarsEquivalent": 0,
+                        "currency": {
+                          "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                          "code": "STRK",
+                          "name": "StarkNet Token",
+                          "logoUrl": null,
+                          "decimals": 18
+                        }
+                      },
+                      {
+                        "totalAmount": 16250,
+                        "totalDollarsEquivalent": 16412.50,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 595505,
+                  "login": "ofux",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
+                  "isRegistered": true,
+                  "contributionCount": 570,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 20855.02,
+                    "details": [
+                      {
+                        "totalAmount": 16502,
+                        "totalDollarsEquivalent": 16667.02,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      },
+                      {
+                        "totalAmount": 4188,
+                        "totalDollarsEquivalent": 4188,
+                        "currency": {
+                          "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                          "code": "USD",
+                          "name": "US Dollar",
+                          "logoUrl": null,
+                          "decimals": 2
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 4435377,
+                  "login": "Bernardstanislas",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4",
+                  "isRegistered": true,
+                  "contributionCount": 375,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 11552.38,
+                    "details": [
+                      {
+                        "totalAmount": 11438,
+                        "totalDollarsEquivalent": 11552.38,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 21149076,
+                  "login": "oscarwroche",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
+                  "isRegistered": true,
+                  "contributionCount": 213,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 24242.02,
+                    "details": [
+                      {
+                        "totalAmount": 24002,
+                        "totalDollarsEquivalent": 24242.02,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                }
+              ]
+            }
             """;
     private static final String GET_PROJECT_CONTRIBUTORS_PAGE_1 = """
             {
@@ -103,6 +200,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
               "totalItemNumber": 18,
               "hasMore": true,
               "nextPageIndex": 2,
+              "hasHiddenContributors": false,
               "contributors": [
                 {
                   "githubUserId": 16590657,
@@ -113,19 +211,26 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionCount": 147,
                   "rewardCount": 6,
                   "earned": {
-                    "totalAmount": 6060,
+                    "totalAmount": 6060.00,
                     "details": [
                       {
                         "totalAmount": 6000,
-                        "totalDollarsEquivalent": 6060,
-                        "currency": "USDC"
+                        "totalDollarsEquivalent": 6060.00,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
                       }
                     ]
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
                   "issueToReward": null,
-                  "codeReviewToReward": null
+                  "codeReviewToReward": null,
+                  "hidden": false
                 },
                 {
                   "githubUserId": 34384633,
@@ -136,13 +241,26 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionCount": 146,
                   "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 0,
-                    "details": null
+                    "totalAmount": 1010.00,
+                    "details": [
+                      {
+                        "totalAmount": 1000,
+                        "totalDollarsEquivalent": 1010.00,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
                   "issueToReward": null,
-                  "codeReviewToReward": null
+                  "codeReviewToReward": null,
+                  "hidden": false
                 },
                 {
                   "githubUserId": 5160414,
@@ -159,7 +277,8 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
                   "issueToReward": null,
-                  "codeReviewToReward": null
+                  "codeReviewToReward": null,
+                  "hidden": false
                 },
                 {
                   "githubUserId": 31901905,
@@ -176,733 +295,1057 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
                   "issueToReward": null,
-                  "codeReviewToReward": null
+                  "codeReviewToReward": null,
+                  "hidden": false
                 }
               ]
             }
             """;
     private static final String GET_PROJECT_CONTRIBUTORS_PROJECT_LEAD = """
             {
-                       "totalPageNumber": 1,
-                       "totalItemNumber": 18,
-                       "hasMore": false,
-                       "nextPageIndex": 0,
-                       "contributors": [
-                         {
-                           "githubUserId": 102823832,
-                           "login": "SamuelKer",
-                           "htmlUrl": null,
-                           "avatarUrl": "https://avatars.githubusercontent.com/u/102823832?v=4",
-                           "isRegistered": false,
-                           "contributionCount": 1,
-                           "rewardCount": 0,
-                           "earned": {
-                             "totalAmount": 0,
-                             "details": null
-                           },
-                           "contributionToRewardCount": 1,
-                           "pullRequestToReward": 1,
-                           "issueToReward": 0,
-                           "codeReviewToReward": 0
-                         },
-                         {
-                           "githubUserId": 129528947,
-                           "login": "VeryDustyBot",
-                           "htmlUrl": null,
-                           "avatarUrl": "https://avatars.githubusercontent.com/u/129528947?v=4",
-                           "isRegistered": false,
-                           "contributionCount": 1,
-                           "rewardCount": 0,
-                           "earned": {
-                             "totalAmount": 0,
-                             "details": null
-                           },
-                           "contributionToRewardCount": 1,
-                           "pullRequestToReward": 0,
-                           "issueToReward": 0,
-                           "codeReviewToReward": 1
-                         },
-                         {
-                           "githubUserId": 698957,
-                           "login": "ltoussaint",
-                           "htmlUrl": null,
-                           "avatarUrl": "https://avatars.githubusercontent.com/u/698957?v=4",
-                           "isRegistered": false,
-                           "contributionCount": 2,
-                           "rewardCount": 0,
-                           "earned": {
-                             "totalAmount": 0,
-                             "details": null
-                           },
-                           "contributionToRewardCount": 2,
-                           "pullRequestToReward": 0,
-                           "issueToReward": 0,
-                           "codeReviewToReward": 2
-                         },
-                         {
-                           "githubUserId": 112474158,
-                           "login": "onlydust-contributor",
-                           "htmlUrl": null,
-                           "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
-                           "isRegistered": true,
-                           "contributionCount": 2,
-                           "rewardCount": 0,
-                           "earned": {
-                             "totalAmount": 0,
-                             "details": null
-                           },
-                           "contributionToRewardCount": 2,
-                           "pullRequestToReward": 1,
-                           "issueToReward": 0,
-                           "codeReviewToReward": 1
-                         },
-                         {
-                           "githubUserId": 98529704,
-                           "login": "tekkac",
-                           "htmlUrl": null,
-                           "avatarUrl": "https://avatars.githubusercontent.com/u/98529704?v=4",
-                           "isRegistered": false,
-                           "contributionCount": 20,
-                           "rewardCount": 0,
-                           "earned": {
-                             "totalAmount": 0,
-                             "details": null
-                           },
-                           "contributionToRewardCount": 20,
-                           "pullRequestToReward": 7,
-                           "issueToReward": 1,
-                           "codeReviewToReward": 12
-                         },
-                         {
-                           "githubUserId": 45264458,
-                           "login": "abdelhamidbakhta",
-                           "htmlUrl": null,
-                           "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
-                           "isRegistered": false,
-                           "contributionCount": 21,
-                           "rewardCount": 0,
-                           "earned": {
-                             "totalAmount": 0,
-                             "details": null
-                           },
-                           "contributionToRewardCount": 21,
-                           "pullRequestToReward": 8,
-                           "issueToReward": 0,
-                           "codeReviewToReward": 13
-                         },
-                         {
-                           "githubUserId": 10167015,
-                           "login": "lechinoix",
-                           "htmlUrl": null,
-                           "avatarUrl": "https://avatars.githubusercontent.com/u/10167015?v=4",
-                           "isRegistered": false,
-                           "contributionCount": 36,
-                           "rewardCount": 0,
-                           "earned": {
-                             "totalAmount": 0,
-                             "details": null
-                           },
-                           "contributionToRewardCount": 36,
-                           "pullRequestToReward": 25,
-                           "issueToReward": 0,
-                           "codeReviewToReward": 11
-                         },
-                         {
-                           "githubUserId": 10922658,
-                           "login": "alexbensimon",
-                           "htmlUrl": null,
-                           "avatarUrl": "https://avatars.githubusercontent.com/u/10922658?v=4",
-                           "isRegistered": true,
-                           "contributionCount": 46,
-                           "rewardCount": 0,
-                           "earned": {
-                             "totalAmount": 0,
-                             "details": null
-                           },
-                           "contributionToRewardCount": 46,
-                           "pullRequestToReward": 34,
-                           "issueToReward": 0,
-                           "codeReviewToReward": 12
-                         },
-                         {
-                           "githubUserId": 143011364,
-                           "login": "pixelfact",
-                           "htmlUrl": null,
-                           "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
-                           "isRegistered": false,
-                           "contributionCount": 102,
-                           "rewardCount": 0,
-                           "earned": {
-                             "totalAmount": 0,
-                             "details": null
-                           },
-                           "contributionToRewardCount": 102,
-                           "pullRequestToReward": 55,
-                           "issueToReward": 0,
-                           "codeReviewToReward": 47
-                         },
-                         {
-                           "githubUserId": 17259618,
-                           "login": "alexbeno",
-                           "htmlUrl": null,
-                           "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
-                           "isRegistered": false,
-                           "contributionCount": 104,
-                           "rewardCount": 0,
-                           "earned": {
-                             "totalAmount": 0,
-                             "details": null
-                           },
-                           "contributionToRewardCount": 104,
-                           "pullRequestToReward": 78,
-                           "issueToReward": 0,
-                           "codeReviewToReward": 26
-                         },
-                         {
-                           "githubUserId": 31901905,
-                           "login": "kaelsky",
-                           "htmlUrl": null,
-                           "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
-                           "isRegistered": true,
-                           "contributionCount": 127,
-                           "rewardCount": 0,
-                           "earned": {
-                             "totalAmount": 0,
-                             "details": null
-                           },
-                           "contributionToRewardCount": 127,
-                           "pullRequestToReward": 88,
-                           "issueToReward": 0,
-                           "codeReviewToReward": 39
-                         },
-                         {
-                           "githubUserId": 5160414,
-                           "login": "haydencleary",
-                           "htmlUrl": null,
-                           "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
-                           "isRegistered": true,
-                           "contributionCount": 140,
-                           "rewardCount": 0,
-                           "earned": {
-                             "totalAmount": 0,
-                             "details": null
-                           },
-                           "contributionToRewardCount": 140,
-                           "pullRequestToReward": 57,
-                           "issueToReward": 1,
-                           "codeReviewToReward": 82
-                         },
-                         {
-                           "githubUserId": 34384633,
-                           "login": "tdelabro",
-                           "htmlUrl": null,
-                           "avatarUrl": "https://avatars.githubusercontent.com/u/34384633?v=4",
-                           "isRegistered": false,
-                           "contributionCount": 146,
-                           "rewardCount": 0,
-                           "earned": {
-                             "totalAmount": 0,
-                             "details": null
-                           },
-                           "contributionToRewardCount": 146,
-                           "pullRequestToReward": 107,
-                           "issueToReward": 0,
-                           "codeReviewToReward": 39
-                         },
-                         {
-                           "githubUserId": 16590657,
-                           "login": "PierreOucif",
-                           "htmlUrl": null,
-                           "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                           "isRegistered": true,
-                           "contributionCount": 147,
-                           "rewardCount": 6,
-                           "earned": {
-                             "totalAmount": 6060,
-                             "details": [
-                               {
-                                 "totalAmount": 6000,
-                                 "totalDollarsEquivalent": 6060,
-                                 "currency": "USDC"
-                               }
-                             ]
-                           },
-                           "contributionToRewardCount": 122,
-                           "pullRequestToReward": 5,
-                           "issueToReward": 0,
-                           "codeReviewToReward": 117
-                         },
-                         {
-                           "githubUserId": 21149076,
-                           "login": "oscarwroche",
-                           "htmlUrl": null,
-                           "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
-                           "isRegistered": true,
-                           "contributionCount": 213,
-                           "rewardCount": 0,
-                           "earned": {
-                             "totalAmount": 0,
-                             "details": null
-                           },
-                           "contributionToRewardCount": 153,
-                           "pullRequestToReward": 57,
-                           "issueToReward": 0,
-                           "codeReviewToReward": 96
-                         },
-                         {
-                           "githubUserId": 4435377,
-                           "login": "Bernardstanislas",
-                           "htmlUrl": null,
-                           "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4",
-                           "isRegistered": true,
-                           "contributionCount": 375,
-                           "rewardCount": 0,
-                           "earned": {
-                             "totalAmount": 0,
-                             "details": null
-                           },
-                           "contributionToRewardCount": 374,
-                           "pullRequestToReward": 115,
-                           "issueToReward": 0,
-                           "codeReviewToReward": 259
-                         },
-                         {
-                           "githubUserId": 595505,
-                           "login": "ofux",
-                           "htmlUrl": null,
-                           "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
-                           "isRegistered": true,
-                           "contributionCount": 570,
-                           "rewardCount": 0,
-                           "earned": {
-                             "totalAmount": 0,
-                             "details": null
-                           },
-                           "contributionToRewardCount": 569,
-                           "pullRequestToReward": 247,
-                           "issueToReward": 2,
-                           "codeReviewToReward": 320
-                         },
-                         {
-                           "githubUserId": 43467246,
-                           "login": "AnthonyBuisset",
-                           "htmlUrl": null,
-                           "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                           "isRegistered": true,
-                           "contributionCount": 885,
-                           "rewardCount": 0,
-                           "earned": {
-                             "totalAmount": 0,
-                             "details": null
-                           },
-                           "contributionToRewardCount": 797,
-                           "pullRequestToReward": 416,
-                           "issueToReward": 11,
-                           "codeReviewToReward": 370
-                         }
-                       ]
-                     }
+              "totalPageNumber": 1,
+              "totalItemNumber": 18,
+              "hasMore": false,
+              "nextPageIndex": 0,
+              "hasHiddenContributors": false,
+              "contributors": [
+                {
+                  "githubUserId": 102823832,
+                  "login": "SamuelKer",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/102823832?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 1,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": 1,
+                  "pullRequestToReward": 1,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 0,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 129528947,
+                  "login": "VeryDustyBot",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/129528947?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 1,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": 1,
+                  "pullRequestToReward": 0,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 1,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 698957,
+                  "login": "ltoussaint",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/698957?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 2,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": 2,
+                  "pullRequestToReward": 0,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 2,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 112474158,
+                  "login": "onlydust-contributor",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
+                  "isRegistered": true,
+                  "contributionCount": 2,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": 2,
+                  "pullRequestToReward": 1,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 1,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 98529704,
+                  "login": "tekkac",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/98529704?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 20,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": 20,
+                  "pullRequestToReward": 7,
+                  "issueToReward": 1,
+                  "codeReviewToReward": 12,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 45264458,
+                  "login": "abdelhamidbakhta",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 21,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 3977.38,
+                    "details": [
+                      {
+                        "totalAmount": 3938,
+                        "totalDollarsEquivalent": 3977.38,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": 21,
+                  "pullRequestToReward": 8,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 13,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 10167015,
+                  "login": "lechinoix",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/10167015?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 36,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 505.00,
+                    "details": [
+                      {
+                        "totalAmount": 500,
+                        "totalDollarsEquivalent": 505.00,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": 36,
+                  "pullRequestToReward": 25,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 11,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 10922658,
+                  "login": "alexbensimon",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/10922658?v=4",
+                  "isRegistered": true,
+                  "contributionCount": 46,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": 46,
+                  "pullRequestToReward": 34,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 12,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 143011364,
+                  "login": "pixelfact",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 102,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": 102,
+                  "pullRequestToReward": 55,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 47,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 17259618,
+                  "login": "alexbeno",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 104,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": 104,
+                  "pullRequestToReward": 78,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 26,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 31901905,
+                  "login": "kaelsky",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
+                  "isRegistered": true,
+                  "contributionCount": 127,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": 127,
+                  "pullRequestToReward": 88,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 39,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 5160414,
+                  "login": "haydencleary",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
+                  "isRegistered": true,
+                  "contributionCount": 140,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": 140,
+                  "pullRequestToReward": 57,
+                  "issueToReward": 1,
+                  "codeReviewToReward": 82,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 34384633,
+                  "login": "tdelabro",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/34384633?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 146,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 1010.00,
+                    "details": [
+                      {
+                        "totalAmount": 1000,
+                        "totalDollarsEquivalent": 1010.00,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": 146,
+                  "pullRequestToReward": 107,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 39,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 16590657,
+                  "login": "PierreOucif",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                  "isRegistered": true,
+                  "contributionCount": 147,
+                  "rewardCount": 6,
+                  "earned": {
+                    "totalAmount": 6060.00,
+                    "details": [
+                      {
+                        "totalAmount": 6000,
+                        "totalDollarsEquivalent": 6060.00,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": 122,
+                  "pullRequestToReward": 5,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 117,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 21149076,
+                  "login": "oscarwroche",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
+                  "isRegistered": true,
+                  "contributionCount": 213,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 24242.02,
+                    "details": [
+                      {
+                        "totalAmount": 24002,
+                        "totalDollarsEquivalent": 24242.02,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": 153,
+                  "pullRequestToReward": 57,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 96,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 4435377,
+                  "login": "Bernardstanislas",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4",
+                  "isRegistered": true,
+                  "contributionCount": 375,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 11552.38,
+                    "details": [
+                      {
+                        "totalAmount": 11438,
+                        "totalDollarsEquivalent": 11552.38,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": 374,
+                  "pullRequestToReward": 115,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 259,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 595505,
+                  "login": "ofux",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
+                  "isRegistered": true,
+                  "contributionCount": 570,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 20855.02,
+                    "details": [
+                      {
+                        "totalAmount": 16502,
+                        "totalDollarsEquivalent": 16667.02,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      },
+                      {
+                        "totalAmount": 4188,
+                        "totalDollarsEquivalent": 4188,
+                        "currency": {
+                          "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                          "code": "USD",
+                          "name": "US Dollar",
+                          "logoUrl": null,
+                          "decimals": 2
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": 569,
+                  "pullRequestToReward": 247,
+                  "issueToReward": 2,
+                  "codeReviewToReward": 320,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 43467246,
+                  "login": "AnthonyBuisset",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                  "isRegistered": true,
+                  "contributionCount": 885,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 2692632.50,
+                    "details": [
+                      {
+                        "totalAmount": 1500,
+                        "totalDollarsEquivalent": 2672970.00,
+                        "currency": {
+                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                          "code": "ETH",
+                          "name": "Ether",
+                          "logoUrl": null,
+                          "decimals": 18
+                        }
+                      },
+                      {
+                        "totalAmount": 3250,
+                        "totalDollarsEquivalent": 3250,
+                        "currency": {
+                          "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                          "code": "USD",
+                          "name": "US Dollar",
+                          "logoUrl": null,
+                          "decimals": 2
+                        }
+                      },
+                      {
+                        "totalAmount": 2000,
+                        "totalDollarsEquivalent": 0,
+                        "currency": {
+                          "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                          "code": "STRK",
+                          "name": "StarkNet Token",
+                          "logoUrl": null,
+                          "decimals": 18
+                        }
+                      },
+                      {
+                        "totalAmount": 16250,
+                        "totalDollarsEquivalent": 16412.50,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": 797,
+                  "pullRequestToReward": 416,
+                  "issueToReward": 11,
+                  "codeReviewToReward": 370,
+                  "hidden": false
+                }
+              ]
+            }
             """;
 
     private static final String GET_PROJECT_CONTRIBUTORS_PROJECT_LEAD_LOGIN_LE = """
-                 {
-                   "totalPageNumber": 1,
-                   "totalItemNumber": 4,
-                   "hasMore": false,
-                   "nextPageIndex": 0,
-                   "contributors": [
-                     {
-                       "githubUserId": 10167015,
-                       "login": "lechinoix",
-                       "htmlUrl": null,
-                       "avatarUrl": "https://avatars.githubusercontent.com/u/10167015?v=4",
-                       "isRegistered": false,
-                       "contributionCount": 36,
-                       "rewardCount": 0,
-                       "earned": {
-                         "totalAmount": 0,
-                         "details": null
-                       },
-                       "contributionToRewardCount": 36,
-                       "pullRequestToReward": 25,
-                       "issueToReward": 0,
-                       "codeReviewToReward": 11
-                     },
-                     {
-                       "githubUserId": 10922658,
-                       "login": "alexbensimon",
-                       "htmlUrl": null,
-                       "avatarUrl": "https://avatars.githubusercontent.com/u/10922658?v=4",
-                       "isRegistered": true,
-                       "contributionCount": 46,
-                       "rewardCount": 0,
-                       "earned": {
-                         "totalAmount": 0,
-                         "details": null
-                       },
-                       "contributionToRewardCount": 46,
-                       "pullRequestToReward": 34,
-                       "issueToReward": 0,
-                       "codeReviewToReward": 12
-                     },
-                     {
-                       "githubUserId": 17259618,
-                       "login": "alexbeno",
-                       "htmlUrl": null,
-                       "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
-                       "isRegistered": false,
-                       "contributionCount": 104,
-                       "rewardCount": 0,
-                       "earned": {
-                         "totalAmount": 0,
-                         "details": null
-                       },
-                       "contributionToRewardCount": 104,
-                       "pullRequestToReward": 78,
-                       "issueToReward": 0,
-                       "codeReviewToReward": 26
-                     },
-                     {
-                       "githubUserId": 5160414,
-                       "login": "haydencleary",
-                       "htmlUrl": null,
-                       "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
-                       "isRegistered": true,
-                       "contributionCount": 140,
-                       "rewardCount": 0,
-                       "earned": {
-                         "totalAmount": 0,
-                         "details": null
-                       },
-                       "contributionToRewardCount": 140,
-                       "pullRequestToReward": 57,
-                       "issueToReward": 1,
-                       "codeReviewToReward": 82
-                     }
-                   ]
-                 }
+            {
+              "totalPageNumber": 1,
+              "totalItemNumber": 4,
+              "hasMore": false,
+              "nextPageIndex": 0,
+              "hasHiddenContributors": false,
+              "contributors": [
+                {
+                  "githubUserId": 10167015,
+                  "login": "lechinoix",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/10167015?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 36,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 505.00,
+                    "details": [
+                      {
+                        "totalAmount": 500,
+                        "totalDollarsEquivalent": 505.00,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": 36,
+                  "pullRequestToReward": 25,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 11,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 10922658,
+                  "login": "alexbensimon",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/10922658?v=4",
+                  "isRegistered": true,
+                  "contributionCount": 46,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": 46,
+                  "pullRequestToReward": 34,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 12,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 17259618,
+                  "login": "alexbeno",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 104,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": 104,
+                  "pullRequestToReward": 78,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 26,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 5160414,
+                  "login": "haydencleary",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
+                  "isRegistered": true,
+                  "contributionCount": 140,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": 140,
+                  "pullRequestToReward": 57,
+                  "issueToReward": 1,
+                  "codeReviewToReward": 82,
+                  "hidden": false
+                }
+              ]
+            }
             """;
     private static final String GET_PROJECT_CONTRIBUTORS_ANONYMOUS = """
             {
-                  "totalPageNumber": 1,
-                  "totalItemNumber": 18,
-                  "hasMore": false,
-                  "nextPageIndex": 0,
-                  "contributors": [
-                    {
-                      "githubUserId": 102823832,
-                      "login": "SamuelKer",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/102823832?v=4",
-                      "isRegistered": false,
-                      "contributionCount": 1,
-                      "rewardCount": 0,
-                      "earned": {
-                        "totalAmount": 0,
-                        "details": null
+              "totalPageNumber": 1,
+              "totalItemNumber": 18,
+              "hasMore": false,
+              "nextPageIndex": 0,
+              "hasHiddenContributors": false,
+              "contributors": [
+                {
+                  "githubUserId": 102823832,
+                  "login": "SamuelKer",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/102823832?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 1,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 129528947,
+                  "login": "VeryDustyBot",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/129528947?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 1,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 698957,
+                  "login": "ltoussaint",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/698957?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 2,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 112474158,
+                  "login": "onlydust-contributor",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
+                  "isRegistered": true,
+                  "contributionCount": 2,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 98529704,
+                  "login": "tekkac",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/98529704?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 20,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 45264458,
+                  "login": "abdelhamidbakhta",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 21,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 3977.38,
+                    "details": [
+                      {
+                        "totalAmount": 3938,
+                        "totalDollarsEquivalent": 3977.38,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 10167015,
+                  "login": "lechinoix",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/10167015?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 36,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 505.00,
+                    "details": [
+                      {
+                        "totalAmount": 500,
+                        "totalDollarsEquivalent": 505.00,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 10922658,
+                  "login": "alexbensimon",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/10922658?v=4",
+                  "isRegistered": true,
+                  "contributionCount": 46,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 143011364,
+                  "login": "pixelfact",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 102,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 17259618,
+                  "login": "alexbeno",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 104,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 31901905,
+                  "login": "kaelsky",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
+                  "isRegistered": true,
+                  "contributionCount": 127,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 5160414,
+                  "login": "haydencleary",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
+                  "isRegistered": true,
+                  "contributionCount": 140,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 34384633,
+                  "login": "tdelabro",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/34384633?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 146,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 1010.00,
+                    "details": [
+                      {
+                        "totalAmount": 1000,
+                        "totalDollarsEquivalent": 1010.00,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 16590657,
+                  "login": "PierreOucif",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                  "isRegistered": true,
+                  "contributionCount": 147,
+                  "rewardCount": 6,
+                  "earned": {
+                    "totalAmount": 6060.00,
+                    "details": [
+                      {
+                        "totalAmount": 6000,
+                        "totalDollarsEquivalent": 6060.00,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 21149076,
+                  "login": "oscarwroche",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
+                  "isRegistered": true,
+                  "contributionCount": 213,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 24242.02,
+                    "details": [
+                      {
+                        "totalAmount": 24002,
+                        "totalDollarsEquivalent": 24242.02,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 4435377,
+                  "login": "Bernardstanislas",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4",
+                  "isRegistered": true,
+                  "contributionCount": 375,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 11552.38,
+                    "details": [
+                      {
+                        "totalAmount": 11438,
+                        "totalDollarsEquivalent": 11552.38,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 595505,
+                  "login": "ofux",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
+                  "isRegistered": true,
+                  "contributionCount": 570,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 20855.02,
+                    "details": [
+                      {
+                        "totalAmount": 16502,
+                        "totalDollarsEquivalent": 16667.02,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
                       },
-                      "contributionToRewardCount": null,
-                      "pullRequestToReward": null,
-                      "issueToReward": null,
-                      "codeReviewToReward": null
-                    },
-                    {
-                      "githubUserId": 129528947,
-                      "login": "VeryDustyBot",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/129528947?v=4",
-                      "isRegistered": false,
-                      "contributionCount": 1,
-                      "rewardCount": 0,
-                      "earned": {
-                        "totalAmount": 0,
-                        "details": null
+                      {
+                        "totalAmount": 4188,
+                        "totalDollarsEquivalent": 4188,
+                        "currency": {
+                          "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                          "code": "USD",
+                          "name": "US Dollar",
+                          "logoUrl": null,
+                          "decimals": 2
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 43467246,
+                  "login": "AnthonyBuisset",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                  "isRegistered": true,
+                  "contributionCount": 885,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 2692632.50,
+                    "details": [
+                      {
+                        "totalAmount": 1500,
+                        "totalDollarsEquivalent": 2672970.00,
+                        "currency": {
+                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                          "code": "ETH",
+                          "name": "Ether",
+                          "logoUrl": null,
+                          "decimals": 18
+                        }
                       },
-                      "contributionToRewardCount": null,
-                      "pullRequestToReward": null,
-                      "issueToReward": null,
-                      "codeReviewToReward": null
-                    },
-                    {
-                      "githubUserId": 698957,
-                      "login": "ltoussaint",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/698957?v=4",
-                      "isRegistered": false,
-                      "contributionCount": 2,
-                      "rewardCount": 0,
-                      "earned": {
-                        "totalAmount": 0,
-                        "details": null
+                      {
+                        "totalAmount": 3250,
+                        "totalDollarsEquivalent": 3250,
+                        "currency": {
+                          "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                          "code": "USD",
+                          "name": "US Dollar",
+                          "logoUrl": null,
+                          "decimals": 2
+                        }
                       },
-                      "contributionToRewardCount": null,
-                      "pullRequestToReward": null,
-                      "issueToReward": null,
-                      "codeReviewToReward": null
-                    },
-                    {
-                      "githubUserId": 112474158,
-                      "login": "onlydust-contributor",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
-                      "isRegistered": true,
-                      "contributionCount": 2,
-                      "rewardCount": 0,
-                      "earned": {
-                        "totalAmount": 0,
-                        "details": null
+                      {
+                        "totalAmount": 2000,
+                        "totalDollarsEquivalent": 0,
+                        "currency": {
+                          "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                          "code": "STRK",
+                          "name": "StarkNet Token",
+                          "logoUrl": null,
+                          "decimals": 18
+                        }
                       },
-                      "contributionToRewardCount": null,
-                      "pullRequestToReward": null,
-                      "issueToReward": null,
-                      "codeReviewToReward": null
-                    },
-                    {
-                      "githubUserId": 98529704,
-                      "login": "tekkac",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/98529704?v=4",
-                      "isRegistered": false,
-                      "contributionCount": 20,
-                      "rewardCount": 0,
-                      "earned": {
-                        "totalAmount": 0,
-                        "details": null
-                      },
-                      "contributionToRewardCount": null,
-                      "pullRequestToReward": null,
-                      "issueToReward": null,
-                      "codeReviewToReward": null
-                    },
-                    {
-                      "githubUserId": 45264458,
-                      "login": "abdelhamidbakhta",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
-                      "isRegistered": false,
-                      "contributionCount": 21,
-                      "rewardCount": 0,
-                      "earned": {
-                        "totalAmount": 0,
-                        "details": null
-                      },
-                      "contributionToRewardCount": null,
-                      "pullRequestToReward": null,
-                      "issueToReward": null,
-                      "codeReviewToReward": null
-                    },
-                    {
-                      "githubUserId": 10167015,
-                      "login": "lechinoix",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/10167015?v=4",
-                      "isRegistered": false,
-                      "contributionCount": 36,
-                      "rewardCount": 0,
-                      "earned": {
-                        "totalAmount": 0,
-                        "details": null
-                      },
-                      "contributionToRewardCount": null,
-                      "pullRequestToReward": null,
-                      "issueToReward": null,
-                      "codeReviewToReward": null
-                    },
-                    {
-                      "githubUserId": 10922658,
-                      "login": "alexbensimon",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/10922658?v=4",
-                      "isRegistered": true,
-                      "contributionCount": 46,
-                      "rewardCount": 0,
-                      "earned": {
-                        "totalAmount": 0,
-                        "details": null
-                      },
-                      "contributionToRewardCount": null,
-                      "pullRequestToReward": null,
-                      "issueToReward": null,
-                      "codeReviewToReward": null
-                    },
-                    {
-                      "githubUserId": 143011364,
-                      "login": "pixelfact",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
-                      "isRegistered": false,
-                      "contributionCount": 102,
-                      "rewardCount": 0,
-                      "earned": {
-                        "totalAmount": 0,
-                        "details": null
-                      },
-                      "contributionToRewardCount": null,
-                      "pullRequestToReward": null,
-                      "issueToReward": null,
-                      "codeReviewToReward": null
-                    },
-                    {
-                      "githubUserId": 17259618,
-                      "login": "alexbeno",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
-                      "isRegistered": false,
-                      "contributionCount": 104,
-                      "rewardCount": 0,
-                      "earned": {
-                        "totalAmount": 0,
-                        "details": null
-                      },
-                      "contributionToRewardCount": null,
-                      "pullRequestToReward": null,
-                      "issueToReward": null,
-                      "codeReviewToReward": null
-                    },
-                    {
-                      "githubUserId": 31901905,
-                      "login": "kaelsky",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
-                      "isRegistered": true,
-                      "contributionCount": 127,
-                      "rewardCount": 0,
-                      "earned": {
-                        "totalAmount": 0,
-                        "details": null
-                      },
-                      "contributionToRewardCount": null,
-                      "pullRequestToReward": null,
-                      "issueToReward": null,
-                      "codeReviewToReward": null
-                    },
-                    {
-                      "githubUserId": 5160414,
-                      "login": "haydencleary",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
-                      "isRegistered": true,
-                      "contributionCount": 140,
-                      "rewardCount": 0,
-                      "earned": {
-                        "totalAmount": 0,
-                        "details": null
-                      },
-                      "contributionToRewardCount": null,
-                      "pullRequestToReward": null,
-                      "issueToReward": null,
-                      "codeReviewToReward": null
-                    },
-                    {
-                      "githubUserId": 34384633,
-                      "login": "tdelabro",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/34384633?v=4",
-                      "isRegistered": false,
-                      "contributionCount": 146,
-                      "rewardCount": 0,
-                      "earned": {
-                        "totalAmount": 0,
-                        "details": null
-                      },
-                      "contributionToRewardCount": null,
-                      "pullRequestToReward": null,
-                      "issueToReward": null,
-                      "codeReviewToReward": null
-                    },
-                    {
-                      "githubUserId": 16590657,
-                      "login": "PierreOucif",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                      "isRegistered": true,
-                      "contributionCount": 147,
-                      "rewardCount": 6,
-                      "earned": {
-                        "totalAmount": 6060,
-                        "details": [
-                          {
-                            "totalAmount": 6000,
-                            "totalDollarsEquivalent": 6060,
-                            "currency": "USDC"
-                          }
-                        ]
-                      },
-                      "contributionToRewardCount": null,
-                      "pullRequestToReward": null,
-                      "issueToReward": null,
-                      "codeReviewToReward": null
-                    },
-                    {
-                      "githubUserId": 21149076,
-                      "login": "oscarwroche",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
-                      "isRegistered": true,
-                      "contributionCount": 213,
-                      "rewardCount": 0,
-                      "earned": {
-                        "totalAmount": 0,
-                        "details": null
-                      },
-                      "contributionToRewardCount": null,
-                      "pullRequestToReward": null,
-                      "issueToReward": null,
-                      "codeReviewToReward": null
-                    },
-                    {
-                      "githubUserId": 4435377,
-                      "login": "Bernardstanislas",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4",
-                      "isRegistered": true,
-                      "contributionCount": 375,
-                      "rewardCount": 0,
-                      "earned": {
-                        "totalAmount": 0,
-                        "details": null
-                      },
-                      "contributionToRewardCount": null,
-                      "pullRequestToReward": null,
-                      "issueToReward": null,
-                      "codeReviewToReward": null
-                    },
-                    {
-                      "githubUserId": 595505,
-                      "login": "ofux",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
-                      "isRegistered": true,
-                      "contributionCount": 570,
-                      "rewardCount": 0,
-                      "earned": {
-                        "totalAmount": 0,
-                        "details": null
-                      },
-                      "contributionToRewardCount": null,
-                      "pullRequestToReward": null,
-                      "issueToReward": null,
-                      "codeReviewToReward": null
-                    },
-                    {
-                      "githubUserId": 43467246,
-                      "login": "AnthonyBuisset",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                      "isRegistered": true,
-                      "contributionCount": 885,
-                      "rewardCount": 0,
-                      "earned": {
-                        "totalAmount": 0,
-                        "details": null
-                      },
-                      "contributionToRewardCount": null,
-                      "pullRequestToReward": null,
-                      "issueToReward": null,
-                      "codeReviewToReward": null
-                    }
-                  ]
+                      {
+                        "totalAmount": 16250,
+                        "totalDollarsEquivalent": 16412.50,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
                 }
+              ]
+            }
             """;
 
     private static final String GET_PROJECT_CONTRIBUTORS_ANONYMOUS_LOGIN_LE = """
@@ -921,9 +1364,21 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionCount": 36,
                   "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 0,
-                    "details": null
-                  },
+                      "totalAmount": 505.00,
+                      "details": [
+                        {
+                          "totalAmount": 500,
+                          "totalDollarsEquivalent": 505.00,
+                          "currency": {
+                            "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                            "code": "USDC",
+                            "name": "USD Coin",
+                            "logoUrl": null,
+                            "decimals": 6
+                          }
+                        }
+                      ]
+                    },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
                   "issueToReward": null,
@@ -989,7 +1444,71 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
               "totalItemNumber": 18,
               "hasMore": true,
               "nextPageIndex": 1,
+              "hasHiddenContributors": false,
               "contributors": [
+                {
+                  "githubUserId": 43467246,
+                  "login": "AnthonyBuisset",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                  "isRegistered": true,
+                  "contributionCount": 885,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 2692632.50,
+                    "details": [
+                      {
+                        "totalAmount": 1500,
+                        "totalDollarsEquivalent": 2672970.00,
+                        "currency": {
+                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                          "code": "ETH",
+                          "name": "Ether",
+                          "logoUrl": null,
+                          "decimals": 18
+                        }
+                      },
+                      {
+                        "totalAmount": 3250,
+                        "totalDollarsEquivalent": 3250,
+                        "currency": {
+                          "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                          "code": "USD",
+                          "name": "US Dollar",
+                          "logoUrl": null,
+                          "decimals": 2
+                        }
+                      },
+                      {
+                        "totalAmount": 2000,
+                        "totalDollarsEquivalent": 0,
+                        "currency": {
+                          "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                          "code": "STRK",
+                          "name": "StarkNet Token",
+                          "logoUrl": null,
+                          "decimals": 18
+                        }
+                      },
+                      {
+                        "totalAmount": 16250,
+                        "totalDollarsEquivalent": 16412.50,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": 797,
+                  "pullRequestToReward": 416,
+                  "issueToReward": 11,
+                  "codeReviewToReward": 370,
+                  "hidden": false
+                },
                 {
                   "githubUserId": 16590657,
                   "login": "PierreOucif",
@@ -1003,52 +1522,66 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                     "details": [
                       {
                         "totalAmount": 450,
-                        "totalDollarsEquivalent": 643.50,
-                        "currency": "OP"
+                        "totalDollarsEquivalent": 643.5,
+                        "currency": {
+                          "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
+                          "code": "OP",
+                          "name": "Optimism",
+                          "logoUrl": null,
+                          "decimals": 18
+                        }
                       },
                       {
-                        "totalAmount": 500000,
-                        "totalDollarsEquivalent": 0,
-                        "currency": "STRK"
+                        "totalAmount": 2000,
+                        "totalDollarsEquivalent": 1120,
+                        "currency": {
+                          "id": "48388edb-fda2-4a32-b228-28152a147500",
+                          "code": "APT",
+                          "name": "Aptos Coin",
+                          "logoUrl": null,
+                          "decimals": 8
+                        }
                       },
                       {
                         "totalAmount": 20.5,
                         "totalDollarsEquivalent": 31426.5,
-                        "currency": "ETH"
+                        "currency": {
+                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                          "code": "ETH",
+                          "name": "Ether",
+                          "logoUrl": null,
+                          "decimals": 18
+                        }
+                      },
+                      {
+                        "totalAmount": 500000,
+                        "totalDollarsEquivalent": 0,
+                        "currency": {
+                          "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                          "code": "STRK",
+                          "name": "StarkNet Token",
+                          "logoUrl": null,
+                          "decimals": 18
+                        }
                       },
                       {
                         "totalAmount": 2000,
-                        "totalDollarsEquivalent": 1120.00,
-                        "currency": "APT"
-                      },
-                      {
-                        "totalAmount": 2000,
-                        "totalDollarsEquivalent": 2020.0,
-                        "currency": "USDC"
+                        "totalDollarsEquivalent": 2020.00,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
                       }
                     ]
                   },
                   "contributionToRewardCount": 120,
                   "pullRequestToReward": 4,
                   "issueToReward": 0,
-                  "codeReviewToReward": 116
-                },
-                {
-                  "githubUserId": 43467246,
-                  "login": "AnthonyBuisset",
-                  "htmlUrl": null,
-                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                  "isRegistered": true,
-                  "contributionCount": 885,
-                  "rewardCount": 0,
-                  "earned": {
-                    "totalAmount": 0,
-                    "details": null
-                  },
-                  "contributionToRewardCount": 797,
-                  "pullRequestToReward": 416,
-                  "issueToReward": 11,
-                  "codeReviewToReward": 370
+                  "codeReviewToReward": 116,
+                  "hidden": false
                 }
               ]
             }
@@ -1060,30 +1593,8 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
               "totalItemNumber": 18,
               "hasMore": true,
               "nextPageIndex": 1,
+              "hasHiddenContributors": false,
               "contributors": [
-                {
-                  "githubUserId": 16590657,
-                  "login": "PierreOucif",
-                  "htmlUrl": null,
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                  "isRegistered": true,
-                  "contributionCount": 147,
-                  "rewardCount": 6,
-                  "earned": {
-                    "totalAmount": 6060,
-                    "details": [
-                      {
-                        "totalAmount": 6000,
-                        "totalDollarsEquivalent": 6060,
-                        "currency": "USDC"
-                      }
-                    ]
-                  },
-                  "contributionToRewardCount": 120,
-                  "pullRequestToReward": 4,
-                  "issueToReward": 0,
-                  "codeReviewToReward": 116
-                },
                 {
                   "githubUserId": 43467246,
                   "login": "AnthonyBuisset",
@@ -1093,13 +1604,89 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionCount": 885,
                   "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 0,
-                    "details": null
+                    "totalAmount": 2692632.50,
+                    "details": [
+                      {
+                        "totalAmount": 1500,
+                        "totalDollarsEquivalent": 2672970.00,
+                        "currency": {
+                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                          "code": "ETH",
+                          "name": "Ether",
+                          "logoUrl": null,
+                          "decimals": 18
+                        }
+                      },
+                      {
+                        "totalAmount": 3250,
+                        "totalDollarsEquivalent": 3250,
+                        "currency": {
+                          "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                          "code": "USD",
+                          "name": "US Dollar",
+                          "logoUrl": null,
+                          "decimals": 2
+                        }
+                      },
+                      {
+                        "totalAmount": 2000,
+                        "totalDollarsEquivalent": 0,
+                        "currency": {
+                          "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                          "code": "STRK",
+                          "name": "StarkNet Token",
+                          "logoUrl": null,
+                          "decimals": 18
+                        }
+                      },
+                      {
+                        "totalAmount": 16250,
+                        "totalDollarsEquivalent": 16412.50,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
                   },
                   "contributionToRewardCount": 797,
                   "pullRequestToReward": 416,
                   "issueToReward": 11,
-                  "codeReviewToReward": 370
+                  "codeReviewToReward": 370,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 21149076,
+                  "login": "oscarwroche",
+                  "htmlUrl": null,
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
+                  "isRegistered": true,
+                  "contributionCount": 213,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 24242.02,
+                    "details": [
+                      {
+                        "totalAmount": 24002,
+                        "totalDollarsEquivalent": 24242.02,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": null,
+                          "decimals": 6
+                        }
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": 153,
+                  "pullRequestToReward": 57,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 96,
+                  "hidden": false
                 }
               ]
             }
