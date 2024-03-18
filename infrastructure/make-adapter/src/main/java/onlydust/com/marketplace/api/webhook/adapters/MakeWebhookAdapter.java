@@ -43,7 +43,7 @@ public class MakeWebhookAdapter implements WebhookPort, MailNotificationPort {
         } else if (event instanceof UserSignedUp userSignedUp) {
             makeWebhookHttpClient.post(UserSignedUpEventDTO.of(userSignedUp, config.getEnvironment()));
         } else if (event instanceof BillingProfileVerificationUpdated billingProfileVerificationUpdated) {
-            makeWebhookHttpClient.post(UserBillingProfileVerificationStatusUpdatedEventDTO.of(billingProfileVerificationUpdated, config.getEnvironment()));
+            makeWebhookHttpClient.post(BillingProfileVerificationStatusUpdatedEventDTO.of(billingProfileVerificationUpdated, config.getEnvironment()));
         } else if (event instanceof InvoiceUploaded invoiceUploaded) {
             makeWebhookHttpClient.post(InvoiceUploadedEventDTO.of(invoiceUploaded, config.getEnvironment()));
         } else if (event instanceof InvoiceRejected invoiceRejected) {
