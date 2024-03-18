@@ -200,6 +200,12 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
         final BillingProfileUserRightsView billingProfileUserRightsView = billingProfileStoragePort.getUserRightsOnBillingProfile(billingProfileId, userId)
                 .orElseThrow(() -> internalServerError("User %s rights on billing profile %s were not found".formatted(userId, billingProfileId)));
+        if (billingProfileUserRightsView.role() == BillingProfile.User.Role.MEMBER) {
+            return billingProfileView.toBuilder()
+                    .me(billingProfileUserRightsView)
+                    .payoutInfo(null)
+                    .build();
+        }
         return billingProfileView.toBuilder()
                 .me(billingProfileUserRightsView)
                 .build();
@@ -234,9 +240,14 @@ public class BillingProfileService implements BillingProfileFacadePort {
     @Override
     @Transactional
     public void inviteCoworker(BillingProfile.Id billingProfileId, UserId invitedBy, GithubUserId invitedGithubUserId, BillingProfile.User.Role role) {
-        if (!billingProfileStoragePort.isAdmin(billingProfileId, invitedBy))
+        final var billingProfile = billingProfileStoragePort.findById(billingProfileId)
+                .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
+        if (!billingProfileStoragePort.isAdmin(billingProfileId, invitedBy)) {
             throw unauthorized("User %s must be admin to invite coworker to billing profile %s".formatted(invitedBy, billingProfileId));
-
+        }
+        if (billingProfile.getType() == BillingProfile.Type.INDIVIDUAL) {
+            throw unauthorized("Cannot invite coworker on individual billing profile %s".formatted(billingProfile.getId()));
+        }
         indexerPort.indexUser(invitedGithubUserId.value());
         billingProfileStoragePort.saveCoworkerInvitation(billingProfileId, invitedBy, invitedGithubUserId, role, ZonedDateTime.now());
     }
