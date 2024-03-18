@@ -33,6 +33,8 @@ public class RewardEntity {
     @OneToMany(mappedBy = "rewardId", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @NonNull List<RewardItemEntity> rewardItems;
 
+    @Column(name = "invoice_id", insertable = false, updatable = false)
+    UUID invoiceId;
     @ManyToOne
     InvoiceEntity invoice;
 
@@ -42,6 +44,7 @@ public class RewardEntity {
             schema = "accounting",
             joinColumns = @JoinColumn(name = "reward_id"),
             inverseJoinColumns = @JoinColumn(name = "receipt_id"))
+    @Builder.Default
     Set<ReceiptEntity> receipts = new HashSet<>();
 
     public static RewardEntity of(Reward reward, Currency currency) {
@@ -66,6 +69,7 @@ public class RewardEntity {
                 amount,
                 currency.toOldDomain(),
                 requestedAt,
-                rewardItems.stream().map(RewardItemEntity::toRewardItem).toList());
+                rewardItems.stream().map(RewardItemEntity::toRewardItem).toList(),
+                invoiceId != null);
     }
 }

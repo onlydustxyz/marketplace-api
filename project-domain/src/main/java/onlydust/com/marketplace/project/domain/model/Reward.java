@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.model;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
+import lombok.Value;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
@@ -10,15 +11,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-public record Reward(
-        @NonNull UUID id,
-        @NonNull UUID projectId,
-        @NonNull UUID requestorId,
-        @NonNull Long recipientId,
-        @NonNull BigDecimal amount,
-        @NonNull Currency currency,
-        @NonNull Date requestedAt,
-        @NonNull List<Item> rewardItems) {
+@Value
+@Accessors(fluent = true)
+public class Reward {
+    @NonNull UUID id;
+    @NonNull UUID projectId;
+    @NonNull UUID requestorId;
+    @NonNull Long recipientId;
+    @NonNull BigDecimal amount;
+    @NonNull Currency currency;
+    @NonNull Date requestedAt;
+    @NonNull List<Item> rewardItems;
+    boolean inInvoice;
 
     @Builder
     @Data
