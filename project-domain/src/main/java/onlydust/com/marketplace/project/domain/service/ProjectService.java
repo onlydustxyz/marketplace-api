@@ -10,7 +10,6 @@ import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
-import onlydust.com.marketplace.project.domain.port.input.ProjectRewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.view.*;
 import org.apache.commons.lang3.tuple.Pair;
@@ -27,7 +26,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @AllArgsConstructor
-public class ProjectService implements ProjectFacadePort, ProjectRewardFacadePort {
+public class ProjectService implements ProjectFacadePort {
 
     private static final Pattern ISSUE_URL_REGEX = Pattern.compile(
             "https://github\\.com/([^/]+)/([^/]+)/issues/([0-9]+)/?");
@@ -229,42 +228,6 @@ public class ProjectService implements ProjectFacadePort, ProjectRewardFacadePor
                     pageSize);
         } else {
             return projectStoragePort.findContributors(projectId, login, sortBy, sortDirection, pageIndex, pageSize);
-        }
-    }
-
-    @Override
-    public ProjectRewardsPageView getRewards(UUID projectId, UUID projectLeadId,
-                                             ProjectRewardView.Filters filters,
-                                             Integer pageIndex, Integer pageSize,
-                                             Reward.SortBy sortBy, SortDirection sortDirection) {
-        if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            return projectRewardStoragePort.findRewards(projectId, filters, sortBy, sortDirection, pageIndex, pageSize);
-        } else {
-            throw OnlyDustException.forbidden("Only project leads can read rewards on their projects");
-        }
-    }
-
-    @Override
-    public ProjectBudgetsView getBudgets(UUID projectId, UUID projectLeadId) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
-    public RewardDetailsView getRewardByIdForProjectLead(UUID projectId, UUID rewardId, UUID projectLeadId) {
-        if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            return projectRewardStoragePort.getProjectReward(rewardId);
-        } else {
-            throw OnlyDustException.forbidden("Only project leads can read reward on their projects");
-        }
-    }
-
-    @Override
-    public Page<RewardItemView> getRewardItemsPageByIdForProjectLead(UUID projectId, UUID rewardId,
-                                                                     UUID projectLeadId, int pageIndex, int pageSize) {
-        if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            return projectRewardStoragePort.getProjectRewardItems(rewardId, pageIndex, pageSize);
-        } else {
-            throw OnlyDustException.forbidden("Only project leads can read reward items on their projects");
         }
     }
 

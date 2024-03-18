@@ -126,7 +126,6 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
                     .orElseThrow(() -> notFound("RewardStatus not found for reward %s".formatted(reward.id())));
             rewardStatusStorage.save(rewardStatus.invoiceReceivedAt(null));
         });
-        //TODO send notification to make
     }
 
     @Override

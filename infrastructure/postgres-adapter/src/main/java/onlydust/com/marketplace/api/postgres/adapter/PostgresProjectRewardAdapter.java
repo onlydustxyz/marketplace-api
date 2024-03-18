@@ -132,9 +132,4 @@ public class PostgresProjectRewardAdapter implements ProjectRewardStoragePort {
                 .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
                 .build();
     }
-
-    @Override
-    public void updateUsdAmount(UUID rewardId) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
 }

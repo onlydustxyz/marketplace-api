@@ -10,7 +10,10 @@ import onlydust.com.marketplace.project.domain.mocks.DeterministicDateProvider;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.*;
-import onlydust.com.marketplace.project.domain.view.*;
+import onlydust.com.marketplace.project.domain.view.ContributionView;
+import onlydust.com.marketplace.project.domain.view.ProjectContributorsLinkView;
+import onlydust.com.marketplace.project.domain.view.ProjectDetailsView;
+import onlydust.com.marketplace.project.domain.view.RewardableItemView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -311,130 +314,6 @@ public class ProjectServiceTest {
                 pageIndex, pageSize);
     }
 
-
-    @Test
-    void should_check_project_lead_permissions_when_getting_project_rewards_given_a_valid_project_lead() {
-        final UUID projectId = UUID.randomUUID();
-        final Reward.SortBy sortBy = Reward.SortBy.CONTRIBUTION;
-        final UUID projectLeadId = UUID.randomUUID();
-        final int pageIndex = 1;
-        final int pageSize = 1;
-        final SortDirection sortDirection = SortDirection.desc;
-        final ProjectRewardView.Filters filters = ProjectRewardView.Filters.builder().build();
-
-        // When
-        when(projectStoragePort.getProjectLeadIds(projectId))
-                .thenReturn(List.of(UUID.randomUUID(), projectLeadId));
-        projectService.getRewards(projectId, projectLeadId, filters, pageIndex, pageSize, sortBy, sortDirection);
-
-        // Then
-        verify(projectRewardStoragePort, times(1)).findRewards(projectId, filters, sortBy, sortDirection, pageIndex,
-                pageSize);
-    }
-
-    @Test
-    void should_throw_forbidden_exception_when_getting_project_rewards_given_an_invalid_project_lead() {
-        final UUID projectId = UUID.randomUUID();
-        final UUID projectLeadId = UUID.randomUUID();
-        final Reward.SortBy sortBy = Reward.SortBy.CONTRIBUTION;
-        final int pageIndex = 1;
-        final int pageSize = 1;
-        final SortDirection sortDirection = SortDirection.asc;
-        final ProjectRewardView.Filters filters = ProjectRewardView.Filters.builder().build();
-
-        // When
-        when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
-        OnlyDustException onlyDustException = null;
-        try {
-            projectService.getRewards(projectId, projectLeadId, filters, pageIndex, pageSize, sortBy, sortDirection);
-        } catch (OnlyDustException e) {
-            onlyDustException = e;
-        }
-
-        // Then
-        verify(projectRewardStoragePort, times(0)).findRewards(projectId, filters, sortBy, sortDirection, pageIndex,
-                pageSize);
-        assertNotNull(onlyDustException);
-        assertEquals(403, onlyDustException.getStatus());
-        assertEquals("Only project leads can read rewards on their projects", onlyDustException.getMessage());
-    }
-
-
-    @Test
-    void should_check_project_lead_permissions_when_getting_project_reward_by_id_given_a_valid_project_lead() {
-        final UUID projectId = UUID.randomUUID();
-        final UUID projectLeadId = UUID.randomUUID();
-        final UUID rewardId = UUID.randomUUID();
-
-        // When
-        when(projectStoragePort.getProjectLeadIds(projectId))
-                .thenReturn(List.of(UUID.randomUUID(), projectLeadId));
-        projectService.getRewardByIdForProjectLead(projectId, rewardId, projectLeadId);
-
-        // Then
-        verify(projectRewardStoragePort, times(1)).getProjectReward(rewardId);
-    }
-
-    @Test
-    void should_throw_forbidden_exception_when_getting_project_reward_by_id_given_an_invalid_project_lead() {
-        final UUID projectId = UUID.randomUUID();
-        final UUID rewardId = UUID.randomUUID();
-        final UUID projectLeadId = UUID.randomUUID();
-
-        // When
-        when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
-        OnlyDustException onlyDustException = null;
-        try {
-            projectService.getRewardByIdForProjectLead(projectId, rewardId, projectLeadId);
-        } catch (OnlyDustException e) {
-            onlyDustException = e;
-        }
-
-        // Then
-        verify(projectRewardStoragePort, times(0)).findBudgets(projectId);
-        assertNotNull(onlyDustException);
-        assertEquals(403, onlyDustException.getStatus());
-        assertEquals("Only project leads can read reward on their projects", onlyDustException.getMessage());
-    }
-
-    @Test
-    void should_check_project_lead_permissions_when_getting_project_reward_items_by_id_given_a_valid_project_lead() {
-        final UUID projectId = UUID.randomUUID();
-        final UUID projectLeadId = UUID.randomUUID();
-        final UUID rewardId = UUID.randomUUID();
-
-        // When
-        when(projectStoragePort.getProjectLeadIds(projectId))
-                .thenReturn(List.of(UUID.randomUUID(), projectLeadId));
-        projectService.getRewardItemsPageByIdForProjectLead(projectId, rewardId, projectLeadId, 0, 50);
-
-        // Then
-        verify(projectRewardStoragePort, times(1)).getProjectRewardItems(rewardId, 0, 50);
-    }
-
-    @Test
-    void should_throw_forbidden_exception_when_getting_project_reward_items_by_id_given_an_invalid_project_lead() {
-        final UUID projectId = UUID.randomUUID();
-        final UUID rewardId = UUID.randomUUID();
-        final UUID projectLeadId = UUID.randomUUID();
-
-        // When
-        when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
-
-        OnlyDustException onlyDustException = null;
-        try {
-            projectService.getRewardItemsPageByIdForProjectLead(projectId, rewardId, projectLeadId, 0, 50);
-        } catch (OnlyDustException e) {
-            onlyDustException = e;
-        }
-
-        // Then
-        verify(projectRewardStoragePort, times(0)).findBudgets(projectId);
-        assertNotNull(onlyDustException);
-        assertEquals(403, onlyDustException.getStatus());
-        assertEquals("Only project leads can read reward items on their projects", onlyDustException.getMessage());
-    }
-
     @Test
     void should_check_project_lead_permissions_when_getting_project_rewardable_items_by_id_given_a_valid_project_lead() {
         final UUID projectId = UUID.randomUUID();
@@ -473,7 +352,6 @@ public class ProjectServiceTest {
         assertEquals(403, onlyDustException.getStatus());
         assertEquals("Only project leads can read rewardable items on their projects", onlyDustException.getMessage());
     }
-
 
     @Test
     void should_check_project_lead_permissions_when_getting_completed_rewardable_items_given_a_valid_project_lead() {

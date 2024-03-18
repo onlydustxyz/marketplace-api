@@ -18,6 +18,4 @@ public interface ProjectRewardStoragePort {
     RewardDetailsView getProjectReward(UUID rewardId);
 
     Page<RewardItemView> getProjectRewardItems(UUID rewardId, int pageIndex, int pageSize);
-
-    void updateUsdAmount(UUID rewardId);
 }
