@@ -77,11 +77,11 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
         final var STRK = currencyRepository.findByCode("STRK").orElseThrow();
 
         rewardRepository.save(new RewardEntity(UUID.randomUUID(), projectEntities.get(0).getId(), userId.value(), authenticatedUser.user().getGithubUserId(),
-                STRK, BigDecimal.ONE, new Date(), List.of(), null, null));
+                STRK, BigDecimal.ONE, new Date(), List.of(), null, null, null));
         rewardRepository.save(new RewardEntity(UUID.randomUUID(), projectEntities.get(1).getId(), userId.value(), authenticatedUser.user().getGithubUserId(),
-                STRK, BigDecimal.ONE, new Date(), List.of(), null, null));
+                STRK, BigDecimal.ONE, new Date(), List.of(), null, null, null));
         rewardRepository.save(new RewardEntity(UUID.randomUUID(), projectEntities.get(2).getId(), userId.value(), authenticatedUser.user().getGithubUserId(),
-                STRK, BigDecimal.ONE, new Date(), List.of(), null, null));
+                STRK, BigDecimal.ONE, new Date(), List.of(), null, null, null));
 
         // When
         client.get()

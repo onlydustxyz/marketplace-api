@@ -91,7 +91,7 @@ public class AccountingHelper {
         if (invoiceReceivedAt != null) {
             final var invoiceEntity = fakeInvoice(UUID.randomUUID(), List.of(rewardEntity.id()));
             invoiceRepository.save(invoiceEntity);
-            rewardEntity.invoice(invoiceEntity);
+            rewardEntity.invoiceId(invoiceEntity.id());
             // TODO check if still needed and correctly updated when invoice is uploaded
             rewardStatus.invoiceReceivedAt(new SimpleDateFormat("yyyy-MM-dd").parse(invoiceReceivedAt));
         }
