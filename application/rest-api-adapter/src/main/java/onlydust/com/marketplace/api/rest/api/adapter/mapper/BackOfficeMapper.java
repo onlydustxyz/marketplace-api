@@ -292,6 +292,7 @@ public interface BackOfficeMapper {
                         .tcAcceptedAt(user.getTcAcceptedAt())
                         .onboardingCompletedAt(user.getOnboardingCompletedAt())
                         .usEntity(user.getUsEntity())
+                        .verificationStatus(VerificationStatus.valueOf(user.getVerificationStatus()))
                 ).toList())
                 .totalPageNumber(userPage.getTotalPageNumber())
                 .totalItemNumber(userPage.getTotalItemNumber())

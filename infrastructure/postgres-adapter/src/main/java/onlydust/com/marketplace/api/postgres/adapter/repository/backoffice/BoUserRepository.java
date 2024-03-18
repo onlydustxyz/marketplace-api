@@ -24,75 +24,67 @@ public interface BoUserRepository extends JpaRepository<BoUserEntity, UUID> {
                                            FROM user_profile_info
                                            ORDER BY value DESC) user_languages_stats
                                      group by user_id)
-             SELECT u.id                                                                                         AS id,
-                    u.created_at                                                                                 AS created_at,
-                    GREATEST(ubpt.updated_at, ibp.updated_at, cbp.updated_at, upi.tech_updated_at, u.created_at) AS updated_at,
-                    u.last_seen_at                                                                               AS last_seen_at,
-                    coalesce(ubpt.billing_profile_type = 'COMPANY',false)                                        AS is_company,
-                    coalesce(case
-                                        when ubpt.billing_profile_type = 'COMPANY' then cbp.verification_status
-                                        when ubpt.billing_profile_type = 'INDIVIDUAL' then ibp.verification_status
-                                        end,
-                                    'NOT_STARTED')                                                               AS verification_status,
-                    cbp.name                                                                                     AS company_name,
-                    cbp.registration_number                                                                      AS company_num,
-                    coalesce(ibp.first_name, upi.first_name)                                                     AS firstname,
-                    coalesce(ibp.last_name, upi.last_name)                                                       AS lastname,
-                    (case
-                         when ubpt.billing_profile_type = 'COMPANY' then cbp.address
-                         when ubpt.billing_profile_type = 'INDIVIDUAL' then ibp.address end)                     AS address,
-                    (case
-                         when ubpt.billing_profile_type = 'COMPANY' then cbp.country
-                         when ubpt.billing_profile_type = 'INDIVIDUAL' then ibp.country end)                     AS country,
-                    (case
-                         when ubpt.billing_profile_type = 'COMPANY' then cbp.us_entity
-                         when ubpt.billing_profile_type = 'INDIVIDUAL' then ibp.us_citizen end)                  AS us_entity,
-                    (case
-                         when ubpt.billing_profile_type = 'COMPANY' then cbp.country
-                         when ubpt.billing_profile_type = 'INDIVIDUAL' then ibp.country end)                     AS country,
-                    ba.bic                                                                                       AS bic,
-                    ba.iban                                                                                      AS iban,
-                    eth_name.address                                                                             AS ens,
-                    eth_address.address                                                                          AS eth_address,
-                    aptos_address.address                                                                        AS aptos_address,
-                    optimism_wallet.address                                                                      AS optimism_address,
-                    starknet_address.address                                                                     AS starknet_address,
-                    u.github_user_id                                                                             AS github_user_id,
-                    COALESCE(gu.login, u.github_login)                                                           AS github_login,
-                    COALESCE(gu.html_url, 'https://github.com/' || u.github_login)                               AS github_html_url,
-                    COALESCE(gu.avatar_url, u.github_avatar_url)                                                 AS github_avatar_url,
-                    COALESCE(telegram.contact, gu.telegram)                                                      AS telegram,
-                    COALESCE(twitter.contact, gu.twitter)                                                        AS twitter,
-                    discord.contact                                                                              AS discord,
-                    COALESCE(linkedin.contact, gu.linkedin)                                                      AS linkedin,
-                    u.email                                                                                      AS email,
-                    whatsapp.contact                                                                             AS whatsapp,
-                    COALESCE(upi.bio, gu.bio)                                                                    AS bio,
-                    COALESCE(upi.location, gu.location)                                                          AS location,
-                    COALESCE(upi.website, gu.website)                                                            AS website,
-                    upi.looking_for_a_job                                                                        AS looking_for_a_job,
-                    upi.weekly_allocated_time                                                                    AS weekly_allocated_time,
-                    COALESCE(ul.languages, rl.languages)                                                         AS languages,
-                    o.terms_and_conditions_acceptance_date                                                       AS tc_accepted_at,
-                    o.profile_wizard_display_date                                                                AS onboarding_completed_at
+             SELECT u.id                                                                                                      AS id,
+                    u.created_at                                                                                              AS created_at,
+                    GREATEST(bp.tech_updated_at, kyc.tech_updated_at, kyb.tech_updated_at, upi.tech_updated_at, u.created_at) AS updated_at,
+                    u.last_seen_at                                                                                            AS last_seen_at,
+                    coalesce(bp.type != 'INDIVIDUAL', false)                                                                  AS is_company,
+                    coalesce(bp.verification_status, 'NOT_STARTED')                                                           AS verification_status,
+                    kyb.name                                                                                                  AS company_name,
+                    kyb.registration_number                                                                                   AS company_num,
+                    kyc.first_name                                                                                            AS firstname,
+                    kyc.last_name                                                                                             AS lastname,
+                    coalesce(kyc.address, kyb.address)                                                                        AS address,
+                    coalesce(kyc.country, kyb.country)                                                                        AS country,
+                    coalesce(kyc.us_citizen, kyb.us_entity)                                                                   AS us_entity,
+                    ba.bic                                                                                                    AS bic,
+                    ba.number                                                                                                 AS iban,
+                    eth_name.address                                                                                          AS ens,
+                    eth_address.address                                                                                       AS eth_address,
+                    aptos_address.address                                                                                     AS aptos_address,
+                    optimism_wallet.address                                                                                   AS optimism_address,
+                    starknet_address.address                                                                                  AS starknet_address,
+                    u.github_user_id                                                                                          AS github_user_id,
+                    COALESCE(gu.login, u.github_login)                                                                        AS github_login,
+                    COALESCE(gu.html_url, 'https://github.com/' || u.github_login)                                            AS github_html_url,
+                    COALESCE(gu.avatar_url, u.github_avatar_url)                                                              AS github_avatar_url,
+                    COALESCE(telegram.contact, gu.telegram)                                                                   AS telegram,
+                    COALESCE(twitter.contact, gu.twitter)                                                                     AS twitter,
+                    discord.contact                                                                                           AS discord,
+                    COALESCE(linkedin.contact, gu.linkedin)                                                                   AS linkedin,
+                    u.email                                                                                                   AS email,
+                    whatsapp.contact                                                                                          AS whatsapp,
+                    COALESCE(upi.bio, gu.bio)                                                                                 AS bio,
+                    COALESCE(upi.location, gu.location)                                                                       AS location,
+                    COALESCE(upi.website, gu.website)                                                                         AS website,
+                    upi.looking_for_a_job                                                                                     AS looking_for_a_job,
+                    upi.weekly_allocated_time                                                                                 AS weekly_allocated_time,
+                    COALESCE(ul.languages, rl.languages)                                                                      AS languages,
+                    o.terms_and_conditions_acceptance_date                                                                    AS tc_accepted_at,
+                    o.profile_wizard_display_date                                                                             AS onboarding_completed_at
              FROM iam.users u
                       LEFT JOIN indexer_exp.github_accounts gu ON gu.id = u.github_user_id
                       LEFT JOIN user_profile_info upi on upi.id = u.id
-                      LEFT JOIN user_billing_profile_types ubpt on u.id = ubpt.user_id
-                      LEFT JOIN individual_billing_profiles ibp on u.id = ibp.user_id
-                      LEFT JOIN company_billing_profiles cbp on u.id = cbp.user_id
-                      LEFT JOIN bank_accounts ba ON u.id = ba.user_id
-                      LEFT JOIN wallets eth_name
-                                ON eth_name.user_id = u.id AND eth_name.network = 'ethereum' AND eth_name.type = 'name'
-                      LEFT JOIN wallets eth_address
-                                ON eth_address.user_id = u.id AND eth_address.network = 'ethereum' AND eth_address.type = 'address'
-                      LEFT JOIN wallets aptos_address ON aptos_address.user_id = u.id AND aptos_address.network = 'aptos' AND
+                      LEFT JOIN LATERAL (
+                        SELECT bp.* from accounting.billing_profiles bp
+                        JOIN accounting.billing_profiles_users bpu ON bpu.billing_profile_id = bp.id
+                        WHERE bpu.user_id = u.id
+                        LIMIT 1
+                      ) bp ON true
+                      LEFT JOIN accounting.kyc ON kyc.billing_profile_id = bp.id
+                      LEFT JOIN accounting.kyb ON kyb.billing_profile_id = bp.id
+                      LEFT JOIN accounting.bank_accounts ba ON bp.id = ba.billing_profile_id
+                      LEFT JOIN accounting.wallets eth_name
+                                ON eth_name.billing_profile_id = bp.id AND eth_name.network = 'ethereum' AND eth_name.type = 'name'
+                      LEFT JOIN accounting.wallets eth_address
+                                ON eth_address.billing_profile_id = bp.id AND eth_address.network = 'ethereum' AND eth_address.type = 'address'
+                      LEFT JOIN accounting.wallets aptos_address ON aptos_address.billing_profile_id = u.id AND aptos_address.network = 'aptos' AND
                                                          aptos_address.type = 'address'
-                      LEFT JOIN wallets optimism_wallet
-                                ON optimism_wallet.user_id = u.id AND optimism_wallet.network = 'optimism' AND
+                      LEFT JOIN accounting.wallets optimism_wallet
+                                ON optimism_wallet.billing_profile_id = bp.id AND optimism_wallet.network = 'optimism' AND
                                    optimism_wallet.type = 'address'
-                      LEFT JOIN wallets starknet_address
-                                ON starknet_address.user_id = u.id AND starknet_address.network = 'starknet' AND
+                      LEFT JOIN accounting.wallets starknet_address
+                                ON starknet_address.billing_profile_id = bp.id AND starknet_address.network = 'starknet' AND
                                    starknet_address.type = 'address'
                       LEFT JOIN contact_informations telegram ON telegram.user_id = u.id AND telegram.channel = 'telegram'
                       LEFT JOIN contact_informations twitter ON twitter.user_id = u.id AND twitter.channel = 'twitter'

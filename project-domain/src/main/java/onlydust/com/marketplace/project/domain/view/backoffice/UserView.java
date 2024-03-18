@@ -48,8 +48,7 @@ public class UserView {
     List<String> languages;
     String tcAcceptedAt;
     ZonedDateTime onboardingCompletedAt;
-    // TODO
-//    OldVerificationStatus oldVerificationStatus;
+    String verificationStatus;
     Boolean usEntity;
 
     @Value
