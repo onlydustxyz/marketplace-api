@@ -2,8 +2,8 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import onlydust.com.marketplace.api.bootstrap.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.contract.model.CurrencyContract;
 import onlydust.com.marketplace.api.contract.model.RewardItemRequest;
 import onlydust.com.marketplace.api.contract.model.RewardRequest;
 import onlydust.com.marketplace.api.contract.model.RewardType;
@@ -32,7 +32,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
     public void should_be_unauthorized() {
         final RewardRequest rewardRequest = new RewardRequest()
                 .amount(BigDecimal.ONE)
-                .currency(CurrencyContract.USD)
+                .currencyId(CurrencyHelper.USD.value())
                 .recipientId(1L);
         final UUID projectId = UUID.randomUUID();
 
@@ -55,7 +55,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
         final UUID projectId = projectRepository.findAll().get(0).getId();
         final RewardRequest rewardRequest = new RewardRequest()
                 .amount(BigDecimal.ONE)
-                .currency(CurrencyContract.USD)
+                .currencyId(CurrencyHelper.USD.value())
                 .items(List.of(
                         new RewardItemRequest().id("pr1")
                                 .type(RewardType.PULL_REQUEST)
@@ -85,7 +85,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final RewardRequest rewardRequest = new RewardRequest()
                 .amount(BigDecimal.valueOf(1))
-                .currency(CurrencyContract.STRK)
+                .currencyId(CurrencyHelper.STRK.value())
                 .recipientId(11111L)
                 .items(List.of(
                         new RewardItemRequest().id("pr2")
@@ -113,7 +113,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final RewardRequest rewardRequest = new RewardRequest()
                 .amount(BigDecimal.valueOf(12.95))
-                .currency(CurrencyContract.ETH)
+                .currencyId(CurrencyHelper.ETH.value())
                 .recipientId(pierre.user().getGithubUserId())
                 .items(List.of(
                         new RewardItemRequest().id("pr1")

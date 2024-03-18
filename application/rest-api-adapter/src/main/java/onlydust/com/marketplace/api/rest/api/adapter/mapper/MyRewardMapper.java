@@ -9,8 +9,8 @@ import onlydust.com.marketplace.project.domain.view.UserTotalRewardView;
 
 import java.util.List;
 
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapCurrency;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectRewardMapper.mapMoney;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.mapCurrency;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 
 public interface MyRewardMapper {

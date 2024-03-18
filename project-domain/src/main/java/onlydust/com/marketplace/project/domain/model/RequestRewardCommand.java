@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.model;
 
 import lombok.Builder;
 import lombok.Data;
+import onlydust.com.marketplace.project.domain.view.CurrencyView;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -9,10 +10,10 @@ import java.util.UUID;
 
 @Builder
 @Data
-public class OldRequestRewardCommand {
+public class RequestRewardCommand {
     Long recipientId;
     BigDecimal amount;
-    Currency currency;
+    CurrencyView.Id currencyId;
     List<Item> items;
     UUID projectId;
 

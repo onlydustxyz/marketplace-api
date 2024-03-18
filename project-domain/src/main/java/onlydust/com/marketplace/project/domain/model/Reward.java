@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.project.domain.view.CurrencyView;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -19,7 +20,7 @@ public class Reward {
     @NonNull UUID requestorId;
     @NonNull Long recipientId;
     @NonNull BigDecimal amount;
-    @NonNull Currency currency;
+    @NonNull CurrencyView.Id currencyId;
     @NonNull Date requestedAt;
     @NonNull List<Item> rewardItems;
     boolean inInvoice;

@@ -1,12 +1,11 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.project.domain.model.Currency;
-import onlydust.com.marketplace.project.domain.view.ProjectContributorsLinkView;
-import onlydust.com.marketplace.project.domain.view.TotalEarnedPerCurrency;
-import onlydust.com.marketplace.project.domain.view.TotalsEarned;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectContributorViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileEntity;
+import onlydust.com.marketplace.project.domain.view.ProjectContributorsLinkView;
+import onlydust.com.marketplace.project.domain.view.TotalsEarned;
 
-import static java.util.Objects.nonNull;
+import static java.util.Objects.isNull;
 
 public interface ProjectContributorsMapper {
 
@@ -41,52 +40,8 @@ public interface ProjectContributorsMapper {
     }
 
     private static TotalsEarned mapAmountsEntityToDomain(ProjectContributorViewEntity contributorViewEntity) {
-        final TotalsEarned totalsEarned = TotalsEarned.builder()
-                .totalDollarsEquivalent(contributorViewEntity.getEarned())
-                .build();
-        if (nonNull(contributorViewEntity.getOpAmount())) {
-            totalsEarned.addDetail(TotalEarnedPerCurrency.builder()
-                    .currency(Currency.OP)
-                    .totalAmount(contributorViewEntity.getOpAmount())
-                    .totalDollarsEquivalent(contributorViewEntity.getOpDollarsEquivalentAmount()).build());
-        }
-        if (nonNull(contributorViewEntity.getStarkAmount())) {
-            totalsEarned.addDetail(TotalEarnedPerCurrency.builder()
-                    .currency(Currency.STRK)
-                    .totalAmount(contributorViewEntity.getStarkAmount())
-                    .totalDollarsEquivalent(contributorViewEntity.getStarkDollarsEquivalentAmount()).build());
-        }
-        if (nonNull(contributorViewEntity.getEthAmount())) {
-            totalsEarned.addDetail(TotalEarnedPerCurrency.builder()
-                    .currency(Currency.ETH)
-                    .totalAmount(contributorViewEntity.getEthAmount())
-                    .totalDollarsEquivalent(contributorViewEntity.getEthDollarsEquivalentAmount()).build());
-        }
-        if (nonNull(contributorViewEntity.getAptAmount())) {
-            totalsEarned.addDetail(TotalEarnedPerCurrency.builder()
-                    .currency(Currency.APT)
-                    .totalAmount(contributorViewEntity.getAptAmount())
-                    .totalDollarsEquivalent(contributorViewEntity.getAptDollarsEquivalentAmount()).build());
-        }
-        if (nonNull(contributorViewEntity.getUsdcAmount())) {
-            totalsEarned.addDetail(TotalEarnedPerCurrency.builder()
-                    .currency(Currency.USDC)
-                    .totalAmount(contributorViewEntity.getUsdcAmount())
-                    .totalDollarsEquivalent(contributorViewEntity.getUsdcDollarsEquivalentAmount()).build());
-        }
-        if (nonNull(contributorViewEntity.getUsdAmount())) {
-            totalsEarned.addDetail(TotalEarnedPerCurrency.builder()
-                    .currency(Currency.USD)
-                    .totalAmount(contributorViewEntity.getUsdAmount())
-                    .totalDollarsEquivalent(contributorViewEntity.getUsdAmount()).build());
-        }
-        if (nonNull(contributorViewEntity.getLordsAmount())) {
-            totalsEarned.addDetail(TotalEarnedPerCurrency.builder()
-                    .currency(Currency.LORDS)
-                    .totalAmount(contributorViewEntity.getLordsAmount())
-                    .totalDollarsEquivalent(contributorViewEntity.getLordsDollarsEquivalentAmount()).build());
-        }
-        return totalsEarned;
+        return isNull(contributorViewEntity.getTotalEarnedPerCurrencies()) ? null :
+                new TotalsEarned(contributorViewEntity.getTotalEarnedPerCurrencies().stream().map(UserProfileEntity.TotalEarnedPerCurrency::toDomain).toList());
     }
 
 }

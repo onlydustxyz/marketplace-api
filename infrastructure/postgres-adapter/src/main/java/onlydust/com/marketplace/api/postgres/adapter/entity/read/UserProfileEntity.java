@@ -7,16 +7,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import onlydust.com.marketplace.project.domain.view.UserProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.AllocatedTimeEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactChanelEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
+import onlydust.com.marketplace.project.domain.view.CurrencyView;
+import onlydust.com.marketplace.project.domain.view.UserProfileView;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -90,7 +91,7 @@ public class UserProfileEntity {
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb", name = "totals_earned")
-    private TotalsEarned totalsEarned;
+    private List<TotalEarnedPerCurrency> totalEarnedPerCurrencies;
 
     @Data
     @NoArgsConstructor
@@ -121,23 +122,35 @@ public class UserProfileEntity {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class TotalsEarned {
-        @JsonProperty("total_dollars_equivalent")
-        BigDecimal totalDollarsEquivalent;
-        @JsonProperty("details")
-        List<TotalEarnedPerCurrency> details;
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
     public static class TotalEarnedPerCurrency {
         @JsonProperty("total_dollars_equivalent")
         BigDecimal totalDollarsEquivalent;
         @JsonProperty("total_amount")
         BigDecimal totalAmount;
-        @JsonProperty("currency")
-        CurrencyEnumEntity currency;
+        @JsonProperty("currency_id")
+        UUID currencyId;
+        @JsonProperty("currency_code")
+        String currencyCode;
+        @JsonProperty("currency_name")
+        String currencyName;
+        @JsonProperty("currency_decimals")
+        Integer currencyDecimals;
+        @JsonProperty("currency_logo_url")
+        String logoUrl;
+
+        public onlydust.com.marketplace.project.domain.view.TotalEarnedPerCurrency toDomain() {
+            return onlydust.com.marketplace.project.domain.view.TotalEarnedPerCurrency.builder()
+                    .totalDollarsEquivalent(totalDollarsEquivalent)
+                    .totalAmount(totalAmount)
+                    .currency(CurrencyView.builder()
+                            .id(CurrencyView.Id.of(currencyId))
+                            .name(currencyName)
+                            .code(currencyCode)
+                            .decimals(currencyDecimals)
+                            .logoUrl(logoUrl != null ? URI.create(logoUrl) : null)
+                            .build())
+                    .build();
+        }
     }
 
     @Data

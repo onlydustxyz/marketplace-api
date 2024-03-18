@@ -2,7 +2,7 @@ package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
-import onlydust.com.marketplace.project.domain.model.OldRequestRewardCommand;
+import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.AccountingServicePort;
@@ -27,7 +27,7 @@ public class RewardService implements RewardFacadePort {
     @Override
     @Transactional
     public UUID createReward(UUID projectLeadId,
-                             OldRequestRewardCommand command) {
+                             RequestRewardCommand command) {
         if (!permissionService.isUserProjectLead(command.getProjectId(), projectLeadId))
             throw forbidden("User must be project lead to request a reward");
 
@@ -37,14 +37,13 @@ public class RewardService implements RewardFacadePort {
         indexerPort.indexUser(command.getRecipientId());
 
         final var rewardId = UUID.randomUUID();
-        // TODO: Refactor command to match new types
         final var reward = new Reward(
                 rewardId,
                 command.getProjectId(),
                 projectLeadId,
                 command.getRecipientId(),
                 command.getAmount(),
-                command.getCurrency(),
+                command.getCurrencyId(),
                 new Date(),
                 command.getItems().stream().map(item -> Reward.Item.builder()
                         .id(item.getId())
@@ -60,8 +59,7 @@ public class RewardService implements RewardFacadePort {
         );
         rewardStoragePort.save(reward);
 
-        // TODO: Use currencyId as input in REST API
-        accountingServicePort.createReward(command.getProjectId(), rewardId, command.getAmount(), command.getCurrency().toString().toUpperCase());
+        accountingServicePort.createReward(command.getProjectId(), rewardId, command.getAmount(), command.getCurrencyId());
         return rewardId;
     }
 
@@ -77,9 +75,8 @@ public class RewardService implements RewardFacadePort {
         if (reward.inInvoice())
             throw forbidden("Reward %s cannot be cancelled because it is included in an invoice".formatted(rewardId));
 
-        // TODO: Use currencyId as input in REST API
         rewardStoragePort.delete(rewardId);
-        accountingServicePort.cancelReward(rewardId, reward.currency().toString().toUpperCase());
+        accountingServicePort.cancelReward(rewardId, reward.currencyId());
     }
 
     @Override

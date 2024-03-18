@@ -46,9 +46,8 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
 
     @Override
     public void save(Reward reward) {
-        // TODO remove
-        final var currency = currencyStorage.findByCode(Currency.Code.of(reward.currency().name().toUpperCase()))
-                .orElseThrow(() -> OnlyDustException.internalServerError("Currency %s not found".formatted(reward.currency().name())));
+        final var currency = currencyStorage.get(Currency.Id.of(reward.currencyId().value()))
+                .orElseThrow(() -> OnlyDustException.internalServerError("Currency %s not found".formatted(reward.currencyId())));
         rewardRepository.save(RewardEntity.of(reward, currency));
     }
 

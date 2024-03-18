@@ -131,9 +131,8 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public AccountingServiceAdapter accountingServicePort(final AccountingFacadePort accountingFacadePort,
-                                                          final CurrencyFacadePort currencyFacadePort) {
-        return new AccountingServiceAdapter(accountingFacadePort, currencyFacadePort);
+    public AccountingServiceAdapter accountingServicePort(final AccountingFacadePort accountingFacadePort) {
+        return new AccountingServiceAdapter(accountingFacadePort);
     }
 
 

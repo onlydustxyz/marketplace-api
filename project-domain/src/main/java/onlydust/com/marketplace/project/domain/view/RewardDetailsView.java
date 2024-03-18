@@ -3,7 +3,6 @@ package onlydust.com.marketplace.project.domain.view;
 import lombok.Builder;
 import lombok.Data;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
-import onlydust.com.marketplace.project.domain.model.Currency;
 import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.model.Project;
 
@@ -15,10 +14,11 @@ import java.util.UUID;
 @Builder
 public class RewardDetailsView {
     UUID id;
-    Currency currency;
+    CurrencyView currency;
     BigDecimal amount;
     BigDecimal dollarsEquivalent;
     RewardStatus status;
+    Date unlockDate;
     GithubUserIdentity from;
     GithubUserIdentity to;
     Date createdAt;
@@ -26,8 +26,4 @@ public class RewardDetailsView {
     ReceiptView receipt;
     Project project;
     UUID invoiceId;
-
-    public Date getUnlockDate() {
-        return currency.unlockDate();
-    }
 }

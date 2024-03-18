@@ -3,6 +3,7 @@ package onlydust.com.marketplace.accounting.domain.service;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserverPort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PayoutPreferenceStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.PayoutPreferenceView;
@@ -23,7 +24,9 @@ public class PayoutPreferenceServiceTest {
 
     private final PayoutPreferenceStoragePort payoutPreferenceStoragePort = mock(PayoutPreferenceStoragePort.class);
     private final BillingProfileStoragePort billingProfileStoragePort = mock(BillingProfileStoragePort.class);
-    private final PayoutPreferenceService payoutPreferenceService = new PayoutPreferenceService(payoutPreferenceStoragePort, billingProfileStoragePort);
+    private final AccountingObserverPort accountingObserverPort = mock(AccountingObserverPort.class);
+    private final PayoutPreferenceService payoutPreferenceService = new PayoutPreferenceService(payoutPreferenceStoragePort, billingProfileStoragePort,
+            accountingObserverPort);
 
     @BeforeEach
     void setUp() {
@@ -50,6 +53,7 @@ public class PayoutPreferenceServiceTest {
         assertTrue(exception instanceof OnlyDustException);
         assertEquals(403, ((OnlyDustException) exception).getStatus());
         assertEquals("User %s is not member of billing profile %s".formatted(userId.value(), billingProfileId.value()), exception.getMessage());
+        verify(accountingObserverPort, never()).onPayoutPreferenceChanged(any());
     }
 
     @Test
@@ -74,6 +78,7 @@ public class PayoutPreferenceServiceTest {
         assertEquals(403, ((OnlyDustException) exception).getStatus());
         assertEquals("Cannot set payout preference for user %s on project %s because user has not received any rewards on it"
                 .formatted(userId.value(), projectId.value()), exception.getMessage());
+        verify(accountingObserverPort, never()).onPayoutPreferenceChanged(any());
     }
 
     @Test
@@ -99,6 +104,7 @@ public class PayoutPreferenceServiceTest {
         assertEquals(403, ((OnlyDustException) exception).getStatus());
         assertEquals("Cannot set payout preference for user %s on project %s because billing profile %s is disabled"
                 .formatted(userId.value(), projectId.value(), billingProfileId.value()), exception.getMessage());
+        verify(accountingObserverPort, never()).onPayoutPreferenceChanged(any());
     }
 
     @Test
@@ -115,6 +121,7 @@ public class PayoutPreferenceServiceTest {
 
         // Then
         verify(payoutPreferenceStoragePort).save(projectId, billingProfileId, userId);
+        verify(accountingObserverPort).onPayoutPreferenceChanged(billingProfileId);
     }
 
     @Test

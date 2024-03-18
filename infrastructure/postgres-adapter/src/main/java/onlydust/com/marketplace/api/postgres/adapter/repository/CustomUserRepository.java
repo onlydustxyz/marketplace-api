@@ -9,7 +9,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsFor
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileEntity;
 import onlydust.com.marketplace.project.domain.model.Contact;
 import onlydust.com.marketplace.project.domain.model.UserAllocatedTimeToContribute;
-import onlydust.com.marketplace.project.domain.view.TotalEarnedPerCurrency;
 import onlydust.com.marketplace.project.domain.view.TotalsEarned;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
 
@@ -78,22 +77,27 @@ public class CustomUserRepository {
                     from projects_contributors pc
                     where pc.github_user_id = gu.id)       contributor_on_project,
                         
-                   (select jsonb_build_object(
-                                   'total_dollars_equivalent', sum(prs.total_dollars_equivalent),
-                                   'details',
-                                   jsonb_agg(jsonb_build_object(
-                                           'total_amount', prs.total_amount,
-                                           'total_dollars_equivalent', prs.total_dollars_equivalent,
-                                           'currency', prs.currency
-                                             )))
+                   (select jsonb_agg(jsonb_build_object(
+                                   'total_amount', user_rewards.total_amount,
+                                   'total_dollars_equivalent', user_rewards.total_dollars_equivalent,
+                                   'currency_id', user_rewards.currency_id,
+                                   'currency_code', user_rewards.currency_code,
+                                   'currency_name', user_rewards.currency_name,
+                                   'currency_decimals', user_rewards.currency_decimals,
+                                   'currency_logo_url', user_rewards.currency_logo_url
+                                ))
                     from (select sum(r.amount)  as total_amount,
                                  coalesce(sum(rsd.amount_usd_equivalent), 0)  as total_dollars_equivalent,
-                                 LOWER(c.code)  as currency
+                                 c.id as currency_id,
+                                 c.code as currency_code,
+                                 c.name as currency_name,
+                                 c.decimals as currency_decimals,
+                                 c.logo_url as currency_logo_url
                           from rewards r
                           join accounting.reward_status_data rsd on rsd.reward_id = r.id
                           join currencies c on c.id = r.currency_id
                           where r.recipient_id = gu.id
-                          group by c.code) as prs)    totals_earned,
+                          group by c.id) as user_rewards)    totals_earned,
                         
                    (select sum(rc.completed_contribution_count)
                     from indexer_exp.repos_contributors rc
@@ -200,19 +204,8 @@ public class CustomUserRepository {
                 .website(row.getWebsite())
                 .technologies(getTechnologies(row))
                 .profileStats(UserProfileView.ProfileStats.builder()
-                        .totalsEarned(isNull(row.getTotalsEarned()) ? null :
-                                TotalsEarned.builder()
-                                        .totalDollarsEquivalent(row.getTotalsEarned().getTotalDollarsEquivalent())
-                                        .details(isNull(row.getTotalsEarned().getDetails()) ? List.of() :
-                                                row.getTotalsEarned().getDetails().stream().map(detail ->
-                                                        TotalEarnedPerCurrency.builder()
-                                                                .currency(isNull(detail.getCurrency()) ? null :
-                                                                        detail.getCurrency().toDomain())
-                                                                .totalAmount(detail.getTotalAmount())
-                                                                .totalDollarsEquivalent(detail.getTotalDollarsEquivalent())
-                                                                .build()
-                                                ).collect(Collectors.toList()))
-                                        .build())
+                        .totalsEarned(isNull(row.getTotalEarnedPerCurrencies()) ? null :
+                                new TotalsEarned(row.getTotalEarnedPerCurrencies().stream().map(UserProfileEntity.TotalEarnedPerCurrency::toDomain).toList()))
                         .leadedProjectCount(row.getNumberOfLeadingProject())
                         .contributedProjectCount(row.getNumberOfOwnContributorOnProject())
                         .contributionCount(row.getContributionsCount())

@@ -1,43 +1,40 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
-import onlydust.com.marketplace.project.domain.model.OldRequestRewardCommand;
+import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.project.domain.model.Reward;
-import onlydust.com.marketplace.project.domain.view.ContributionRewardView;
-import onlydust.com.marketplace.project.domain.view.ReceiptView;
-import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
-import onlydust.com.marketplace.project.domain.view.RewardItemView;
+import onlydust.com.marketplace.project.domain.view.*;
 
 import java.util.Objects;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapCurrency;
 
 public interface RewardMapper {
 
-    static OldRequestRewardCommand rewardRequestToDomain(final RewardRequest rewardRequest, final UUID projectId) {
-        return OldRequestRewardCommand.builder()
+    static RequestRewardCommand rewardRequestToDomain(final RewardRequest rewardRequest, final UUID projectId) {
+        return RequestRewardCommand.builder()
                 .amount(rewardRequest.getAmount())
                 .projectId(projectId)
-                .currency(mapCurrency(rewardRequest.getCurrency()))
+                .currencyId(CurrencyView.Id.of(rewardRequest.getCurrencyId()))
                 .recipientId(rewardRequest.getRecipientId())
                 .items(rewardRequest.getItems().stream().map(RewardMapper::rewardItemRequestToDomain).toList())
                 .build();
     }
 
-    private static OldRequestRewardCommand.Item rewardItemRequestToDomain(final RewardItemRequest rewardItemRequest) {
-        return OldRequestRewardCommand.Item.builder()
+    private static RequestRewardCommand.Item rewardItemRequestToDomain(final RewardItemRequest rewardItemRequest) {
+        return RequestRewardCommand.Item.builder()
                 .id(rewardItemRequest.getId())
                 .number(rewardItemRequest.getNumber())
                 .repoId(rewardItemRequest.getRepoId())
                 .type(switch (rewardItemRequest.getType()) {
-                    case ISSUE -> OldRequestRewardCommand.Item.Type.issue;
-                    case PULL_REQUEST -> OldRequestRewardCommand.Item.Type.pullRequest;
-                    case CODE_REVIEW -> OldRequestRewardCommand.Item.Type.codeReview;
+                    case ISSUE -> RequestRewardCommand.Item.Type.issue;
+                    case PULL_REQUEST -> RequestRewardCommand.Item.Type.pullRequest;
+                    case CODE_REVIEW -> RequestRewardCommand.Item.Type.codeReview;
                 })
                 .build();
     }
@@ -193,6 +190,24 @@ public interface RewardMapper {
             case "CONTRIBUTION" -> Reward.SortBy.CONTRIBUTION;
             default -> Reward.SortBy.REQUESTED_AT;
         };
+    }
+
+    static ShortCurrencyResponse mapCurrency(CurrencyView currency) {
+        return new ShortCurrencyResponse()
+                .id(currency.id().value())
+                .code(currency.code())
+                .name(currency.name())
+                .decimals(currency.decimals())
+                .logoUrl(currency.logoUrl());
+    }
+
+    static ShortCurrencyResponse mapCurrency(Currency currency) {
+        return new ShortCurrencyResponse()
+                .id(currency.id().value())
+                .code(currency.code().toString())
+                .name(currency.name())
+                .decimals(currency.decimals())
+                .logoUrl(currency.logoUri().orElse(null));
     }
 
 }

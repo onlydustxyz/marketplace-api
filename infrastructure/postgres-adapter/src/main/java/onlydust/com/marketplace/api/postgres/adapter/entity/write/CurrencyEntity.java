@@ -5,6 +5,7 @@ import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.project.domain.view.CurrencyView;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
@@ -66,9 +67,16 @@ public class CurrencyEntity {
                 .build();
     }
 
-    public onlydust.com.marketplace.project.domain.model.Currency toOldDomain() {
-        return onlydust.com.marketplace.project.domain.model.Currency.valueOf(code);
+    public CurrencyView toView() {
+        return CurrencyView.builder()
+                .id(CurrencyView.Id.of(id))
+                .name(name)
+                .code(code)
+                .logoUrl(logoUrl == null ? null : URI.create(logoUrl))
+                .decimals(decimals)
+                .build();
     }
+
 
     public enum Type {
         FIAT, CRYPTO;

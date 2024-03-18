@@ -1,20 +1,19 @@
 package onlydust.com.marketplace.project.domain.view;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
-@Data
-@Builder
+@Value
 public class TotalsEarned {
     BigDecimal totalDollarsEquivalent;
-    @Builder.Default
-    List<TotalEarnedPerCurrency> details = new ArrayList<>();
+    List<TotalEarnedPerCurrency> details;
 
-    public void addDetail(final TotalEarnedPerCurrency totalEarnedPerCurrency){
-        this.details.add(totalEarnedPerCurrency);
+    public TotalsEarned(List<TotalEarnedPerCurrency> totalEarnedPerCurrencies) {
+        this.details = totalEarnedPerCurrencies;
+        totalDollarsEquivalent = totalEarnedPerCurrencies.stream()
+                .map(TotalEarnedPerCurrency::getTotalDollarsEquivalent)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

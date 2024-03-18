@@ -9,7 +9,7 @@ import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.project.domain.view.ProjectRewardsPageView;
 
 import static java.util.Objects.nonNull;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapCurrency;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.mapCurrency;
 
 public interface ProjectRewardMapper {
 

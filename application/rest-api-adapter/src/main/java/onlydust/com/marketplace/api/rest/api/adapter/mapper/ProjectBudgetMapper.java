@@ -1,11 +1,11 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.BudgetResponse;
-import onlydust.com.marketplace.api.contract.model.CurrencyContract;
 import onlydust.com.marketplace.api.contract.model.ProjectBudgetsResponse;
-import onlydust.com.marketplace.project.domain.model.Currency;
 import onlydust.com.marketplace.project.domain.view.BudgetView;
 import onlydust.com.marketplace.project.domain.view.ProjectBudgetsView;
+
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.mapCurrency;
 
 public interface ProjectBudgetMapper {
 
@@ -23,29 +23,5 @@ public interface ProjectBudgetMapper {
                     .currency(mapCurrency(budget.getCurrency())));
         }
         return projectBudgetsResponse;
-    }
-
-    static CurrencyContract mapCurrency(Currency currency) {
-        return switch (currency) {
-            case ETH -> CurrencyContract.ETH;
-            case APT -> CurrencyContract.APT;
-            case OP -> CurrencyContract.OP;
-            case USD -> CurrencyContract.USD;
-            case STRK -> CurrencyContract.STRK;
-            case LORDS -> CurrencyContract.LORDS;
-            case USDC -> CurrencyContract.USDC;
-        };
-    }
-
-    static Currency mapCurrency(CurrencyContract currency) {
-        return switch (currency) {
-            case ETH -> Currency.ETH;
-            case APT -> Currency.APT;
-            case OP -> Currency.OP;
-            case USD -> Currency.USD;
-            case STRK -> Currency.STRK;
-            case LORDS -> Currency.LORDS;
-            case USDC -> Currency.USDC;
-        };
     }
 }
