@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
@@ -64,6 +65,25 @@ public interface BackOfficeMapper {
                 .currentAllowance(accountStatement.allowance().getValue())
                 .debt(accountStatement.debt().getValue())
                 .awaitingPaymentAmount(accountStatement.awaitingPaymentAmount().getValue());
+    }
+
+    static SponsorBudgetResponse mapSponsorBudgetResponse(final SponsorAccountStatement accountStatement) {
+        final var balance = mapAccountBalance(accountStatement);
+        final var account = accountStatement.account();
+        return new SponsorBudgetResponse()
+                .currency(balance.getCurrency())
+                .initialBalance(balance.getInitialBalance())
+                .currentBalance(balance.getCurrentBalance())
+                .initialAllowance(balance.getInitialAllowance())
+                .currentAllowance(balance.getCurrentAllowance())
+                .debt(balance.getDebt())
+                .awaitingPaymentAmount(balance.getAwaitingPaymentAmount())
+                .lockedAmounts(Stream.of(new SponsorBudgetResponseAllOfLockedAmounts()
+                                .amount(accountStatement.allowance().getValue())
+                                .lockedUntil(account.lockedUntil().map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
+                        ).filter(l -> l.getLockedUntil() != null)
+                        .toList())
+                ;
     }
 
     static TransactionReceipt mapTransactionToReceipt(final SponsorAccount sponsorAccount, final SponsorAccount.Transaction transaction) {
@@ -141,29 +161,30 @@ public interface BackOfficeMapper {
     }
 
     static SponsorDetailsResponse mapSponsorToDetailsResponse(final SponsorView sponsor, List<SponsorAccountStatement> accountStatements) {
-        final var emptyBalance = new AccountBalance()
+        final var emptyBudget = new SponsorBudgetResponse()
                 .initialBalance(BigDecimal.ZERO)
                 .currentBalance(BigDecimal.ZERO)
                 .initialAllowance(BigDecimal.ZERO)
                 .currentAllowance(BigDecimal.ZERO)
                 .debt(BigDecimal.ZERO)
-                .awaitingPaymentAmount(BigDecimal.ZERO);
+                .awaitingPaymentAmount(BigDecimal.ZERO)
+                .lockedAmounts(List.of());
 
         return new SponsorDetailsResponse()
                 .id(sponsor.id())
                 .name(sponsor.name())
                 .url(sponsor.url())
                 .logoUrl(sponsor.logoUrl())
-                .projects(sponsor.projectsWhereSponsorIsActive().stream().map(BackOfficeMapper::mapToProjectLink).toList())
+                .projects(sponsor.projectsWhereSponsorIsActive().stream().map(p -> mapToProjectWithBudget(p, accountStatements)).toList())
                 .availableBudgets(accountStatements.stream()
-                        .map(BackOfficeMapper::mapAccountBalance)
-                        .collect(groupingBy(AccountBalance::getCurrency, reducing(emptyBalance, BackOfficeMapper::merge)))
+                        .map(BackOfficeMapper::mapSponsorBudgetResponse)
+                        .collect(groupingBy(SponsorBudgetResponse::getCurrency, reducing(emptyBudget, BackOfficeMapper::merge)))
                         .values().stream().toList())
                 ;
     }
 
-    static AccountBalance merge(AccountBalance balance1, AccountBalance balance2) {
-        return new AccountBalance()
+    static SponsorBudgetResponse merge(SponsorBudgetResponse balance1, SponsorBudgetResponse balance2) {
+        return new SponsorBudgetResponse()
                 .currency(balance2.getCurrency())
                 .initialBalance(balance1.getInitialBalance().add(balance2.getInitialBalance()))
                 .currentBalance(balance1.getCurrentBalance().add(balance2.getCurrentBalance()))
@@ -171,13 +192,20 @@ public interface BackOfficeMapper {
                 .currentAllowance(balance1.getCurrentAllowance().add(balance2.getCurrentAllowance()))
                 .debt(balance1.getDebt().add(balance2.getDebt()))
                 .awaitingPaymentAmount(balance1.getAwaitingPaymentAmount().add(balance2.getAwaitingPaymentAmount()))
+                .lockedAmounts(Stream.concat(balance1.getLockedAmounts().stream(), balance2.getLockedAmounts().stream()).toList())
                 ;
     }
 
-    static ProjectLinkResponse mapToProjectLink(final ProjectSponsorView projectSponsorView) {
-        return new ProjectLinkResponse()
+    static ProjectWithBudgetResponse mapToProjectWithBudget(final ProjectSponsorView projectSponsorView, List<SponsorAccountStatement> accountStatements) {
+        return new ProjectWithBudgetResponse()
                 .name(projectSponsorView.projectName())
                 .logoUrl(projectSponsorView.projectLogoUrl())
+                .remainingBudgets(accountStatements.stream().map(statement -> new MoneyResponse()
+                                .amount(statement.amountSentTo(ProjectId.of(projectSponsorView.projectId())).getValue())
+                                .currency(toShortCurrency(statement.account().currency()))
+                        )
+                        .filter(money -> money.getAmount().compareTo(BigDecimal.ZERO) > 0)
+                        .toList())
                 ;
     }
 

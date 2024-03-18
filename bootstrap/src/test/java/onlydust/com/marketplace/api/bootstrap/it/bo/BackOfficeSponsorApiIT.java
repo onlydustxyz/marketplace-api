@@ -56,7 +56,8 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "initialAllowance": 19823190,
                               "currentAllowance": 0,
                               "debt": 0,
-                              "awaitingPaymentAmount": 0
+                              "awaitingPaymentAmount": 0,
+                              "lockedAmounts": []
                             },
                             {
                               "currency": {
@@ -70,17 +71,39 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "initialAllowance": 4000,
                               "currentAllowance": 0,
                               "debt": 0,
-                              "awaitingPaymentAmount": 0
+                              "awaitingPaymentAmount": 0,
+                              "lockedAmounts": []
                             }
                           ],
                           "projects": [
                             {
                               "name": "Aiolia du Lion",
-                              "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c"
+                              "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c",
+                              "remainingBudgets": []
                             },
                             {
                               "name": "Aldébaran du Taureau",
-                              "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aldebaran_taureau.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=ab78704b124d2de9525a8af91ef7c4ed"
+                              "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aldebaran_taureau.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=ab78704b124d2de9525a8af91ef7c4ed",
+                              "remainingBudgets": [
+                                {
+                                  "amount": 4000,
+                                  "currency": {
+                                    "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                    "code": "USD",
+                                    "name": "US Dollar",
+                                    "logoUrl": null
+                                  }
+                                },
+                                {
+                                  "amount": 19823190,
+                                  "currency": {
+                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                    "code": "USDC",
+                                    "name": "USD Coin",
+                                    "logoUrl": null
+                                  }
+                                }
+                              ]
                             }
                           ]
                         }
@@ -462,13 +485,25 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "initialAllowance": 1000,
                               "currentAllowance": 600,
                               "debt": 1000,
-                              "awaitingPaymentAmount": 0
+                              "awaitingPaymentAmount": 0,
+                              "lockedAmounts": []
                             }
                           ],
                           "projects": [
                             {
                               "name": "Bretzel",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
+                              "remainingBudgets": [
+                                {
+                                  "amount": 400,
+                                  "currency": {
+                                    "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                    "code": "STRK",
+                                    "name": "StarkNet Token",
+                                    "logoUrl": null
+                                  }
+                                }
+                              ]
                             }
                           ]
                         }

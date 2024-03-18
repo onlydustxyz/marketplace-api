@@ -90,7 +90,7 @@ paths:
   /bo/v2/invoices:
     get:
       security:
-        - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeInvoicingManagement
       summary: Get invoice page
@@ -1709,18 +1709,11 @@ components:
             availableBudgets:
               type: array
               items:
-                $ref: '#/components/schemas/AccountBalance'
+                $ref: '#/components/schemas/SponsorBudgetResponse'
             projects:
               type: array
               items:
-                allOf:
-                  - $ref: '#/components/schemas/ProjectLinkResponse'
-                  - type: object
-                    properties:
-                      remainingBudgets:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/MoneyResponse'
+                $ref: '#/components/schemas/ProjectWithBudgetResponse'
 
     EcosystemPage:
       type: object
@@ -3044,6 +3037,39 @@ components:
           type: string
         logoUrl:
           type: string
+
+    ProjectWithBudgetResponse:
+      allOf:
+        - $ref: '#/components/schemas/ProjectLinkResponse'
+        - type: object
+          required:
+            - remainingBudgets
+          properties:
+            remainingBudgets:
+              type: array
+              items:
+                $ref: '#/components/schemas/MoneyResponse'
+
+    SponsorBudgetResponse:
+      allOf:
+        - $ref: '#/components/schemas/AccountBalance'
+        - type: object
+          required:
+            - lockedAmounts
+          properties:
+            lockedAmounts:
+              type: array
+              items:
+                type: object
+                required:
+                  - lockedUntil
+                  - amount
+                properties:
+                  lockedUntil:
+                    type: string
+                    format: date-time
+                  amount:
+                    type: number
 
     SponsorLinkResponse:
       type: object
