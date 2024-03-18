@@ -1,10 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.Network;
-import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
@@ -58,5 +55,9 @@ public class AccountBookFacade {
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .max(Instant::compareTo);
+    }
+
+    public PositiveAmount transferredAmount(SponsorAccount.Id sponsorAccountId, ProjectId projectId) {
+        return accountBook.state().transferredAmount(AccountBook.AccountId.of(sponsorAccountId), AccountBook.AccountId.of(projectId));
     }
 }

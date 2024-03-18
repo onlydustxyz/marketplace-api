@@ -38,4 +38,8 @@ public class SponsorAccountStatement {
     public Amount debt() {
         return initialAllowance().subtract(account().initialBalance());
     }
+
+    public PositiveAmount amountSentTo(ProjectId projectId) {
+        return accountBookFacade.transferredAmount(sponsorAccount.id(), projectId);
+    }
 }
