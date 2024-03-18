@@ -43,7 +43,7 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
-@Tags(@Tag(name = "BillingProfile"))
+@Tags(@Tag(name = "BillingProfiles"))
 @AllArgsConstructor
 public class BillingProfileRestApi implements BillingProfilesApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
@@ -155,7 +155,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         billingProfileFacadePort.updatePayoutInfo(BillingProfile.Id.of(billingProfileId), UserId.of(authenticatedUser.getId()),
                 PayoutInfoMapper.mapToDomain(billingProfilePayoutInfoRequest));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @Override
@@ -198,7 +198,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     public ResponseEntity<Void> deleteBillingProfile(UUID billingProfileId) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         billingProfileFacadePort.deleteBillingProfile(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @Override
@@ -206,6 +206,6 @@ public class BillingProfileRestApi implements BillingProfilesApi {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         billingProfileFacadePort.enableBillingProfile(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId),
                 billingProfileEnableRequest.getEnable());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

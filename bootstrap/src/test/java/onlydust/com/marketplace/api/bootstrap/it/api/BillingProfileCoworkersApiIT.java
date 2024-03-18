@@ -526,6 +526,19 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful();
 
+        // When
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(companyBillingProfile.id().value().toString())))
+                .header("Authorization", "Bearer " + userAuthHelper.authenticateOlivier().jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.me.canDelete").isEqualTo(false)
+                .jsonPath("$.me.canLeave").isEqualTo(true)
+                .jsonPath("$.me.invitation").isNotEmpty();
+
         // Then
         client.get()
                 .uri(getApiURI(BILLING_PROFILES_GET_COWORKERS.formatted(companyBillingProfile.id().value().toString()),

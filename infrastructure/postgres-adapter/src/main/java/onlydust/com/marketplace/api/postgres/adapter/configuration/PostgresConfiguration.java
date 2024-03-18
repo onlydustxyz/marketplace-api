@@ -4,6 +4,7 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileUserRightsView;
 import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndexerEventEntity;
@@ -320,11 +321,12 @@ public class PostgresConfiguration {
                                                                      final BillingProfileUserInvitationRepository billingProfileUserInvitationRepository,
                                                                      final PayoutPreferenceRepository payoutPreferenceRepository,
                                                                      final BankAccountRepository bankAccountRepository,
-                                                                     final ShortBillingProfileViewRepository shortBillingProfileViewRepository) {
+                                                                     final ShortBillingProfileViewRepository shortBillingProfileViewRepository,
+                                                                     final BillingProfileUserRightsViewRepository billingProfileUserRightsViewRepository) {
         return new PostgresBillingProfileAdapter(globalSettingsRepository,
                 billingProfileRepository, kybRepository, kycRepository, payoutInfoRepository, walletRepository, billingProfileUserRepository,
                 billingProfileUserViewRepository, childrenKycRepository, billingProfileUserInvitationRepository, payoutPreferenceRepository,
-                bankAccountRepository, shortBillingProfileViewRepository);
+                bankAccountRepository, shortBillingProfileViewRepository, billingProfileUserRightsViewRepository);
     }
 
     @Bean

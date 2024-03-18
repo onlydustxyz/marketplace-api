@@ -15,6 +15,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileUserRightsView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -195,7 +196,13 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (!billingProfileStoragePort.isUserMemberOf(billingProfileId, userId)) {
             throw unauthorized("User %s is not a member of billing profile %s".formatted(userId, billingProfileId));
         }
-        return billingProfileStoragePort.findById(billingProfileId).orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
+        final BillingProfileView billingProfileView = billingProfileStoragePort.findById(billingProfileId)
+                .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
+        final BillingProfileUserRightsView billingProfileUserRightsView = billingProfileStoragePort.getUserRightsOnBillingProfile(billingProfileId, userId)
+                .orElseThrow(() -> internalServerError("User %s rights on billing profile %s were not found".formatted(userId, billingProfileId)));
+        return billingProfileView.toBuilder()
+                .me(billingProfileUserRightsView)
+                .build();
     }
 
     @Override
@@ -241,7 +248,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .orElseThrow(() -> notFound("Invitation not found for billing profile %s and user %s"
                         .formatted(billingProfileId, invitedGithubUserId)));
         billingProfileStoragePort.saveCoworker(billingProfileId, invited.userId(), invited.role(), ZonedDateTime.now());
-        billingProfileStoragePort.deleteCoworkerInvitation(billingProfileId, invitedGithubUserId);
+        billingProfileStoragePort.acceptCoworkerInvitation(billingProfileId, invitedGithubUserId);
     }
 
     @Override
@@ -269,9 +276,8 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
         if (coworker.hasJoined()) {
             billingProfileStoragePort.deleteCoworker(billingProfileId, coworker.userId());
-        } else {
-            billingProfileStoragePort.deleteCoworkerInvitation(billingProfileId, coworker.githubUserId());
         }
+        billingProfileStoragePort.deleteCoworkerInvitation(billingProfileId, coworker.githubUserId());
     }
 
     @Override

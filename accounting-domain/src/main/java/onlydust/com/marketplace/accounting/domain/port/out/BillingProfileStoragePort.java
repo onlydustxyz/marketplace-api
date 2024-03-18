@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileUserRightsView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -84,4 +85,8 @@ public interface BillingProfileStoragePort {
     void enableBillingProfile(BillingProfile.Id billingProfileId, Boolean enabled);
 
     boolean isEnabled(BillingProfile.Id billingProfileId);
+
+    Optional<BillingProfileUserRightsView> getUserRightsOnBillingProfile(BillingProfile.Id billingProfileId, UserId userId);
+
+    void acceptCoworkerInvitation(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId);
 }

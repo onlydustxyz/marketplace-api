@@ -280,15 +280,30 @@ public interface BillingProfileMapper {
 
     }
 
-    static BillingProfileResponse billingProfileViewToResponse(BillingProfileView billingProfileView) {
+    static BillingProfileResponse billingProfileViewToResponse(BillingProfileView view) {
         final BillingProfileResponse billingProfileResponse = new BillingProfileResponse();
-        billingProfileResponse.setId(billingProfileView.getId().value());
-        billingProfileResponse.setName(billingProfileView.getName());
-        billingProfileResponse.setType(map(billingProfileView.getType()));
-        billingProfileResponse.setKyb(isNull(billingProfileView.getKyb()) ? null : kybToResponse(billingProfileView.getKyb()));
-        billingProfileResponse.setKyc(isNull(billingProfileView.getKyc()) ? null : kycToResponse(billingProfileView.getKyc()));
-        billingProfileResponse.setStatus(verificationStatusToResponse(billingProfileView.getVerificationStatus()));
-        billingProfileResponse.setEnabled(billingProfileView.getEnabled());
+        billingProfileResponse.setId(view.getId().value());
+        billingProfileResponse.setName(view.getName());
+        billingProfileResponse.setType(map(view.getType()));
+        billingProfileResponse.setKyb(isNull(view.getKyb()) ? null : kybToResponse(view.getKyb()));
+        billingProfileResponse.setKyc(isNull(view.getKyc()) ? null : kycToResponse(view.getKyc()));
+        billingProfileResponse.setStatus(verificationStatusToResponse(view.getVerificationStatus()));
+        billingProfileResponse.setEnabled(view.getEnabled());
+        billingProfileResponse.setMe(isNull(view.getMe()) ? null :
+                new BillingProfileResponseMe()
+                        .canLeave(view.getMe().canLeave())
+                        .canDelete(view.getMe().canDelete())
+                        .role(mapRole(view.getMe().role()))
+                        .invitation(isNull(view.getMe().invitation()) ? null :
+                                new BillingProfileCoworkerInvitation()
+                                        .invitedBy(new ContributorResponse()
+                                                .avatarUrl(view.getMe().invitation().githubAvatarUrl())
+                                                .login(view.getMe().invitation().githubLogin())
+                                                .githubUserId(view.getMe().invitation().githubUserId().value()))
+                                        .role(mapRole(view.getMe().invitation().role()))
+                                        .invitedAt(view.getMe().invitation().invitedAt())
+                        )
+        );
         return billingProfileResponse;
     }
 
@@ -313,13 +328,19 @@ public interface BillingProfileMapper {
                 .htmlUrl(billingProfileCoworkerView.githubHtmlUrl())
                 .isRegistered(billingProfileCoworkerView.userId() != null)
                 .id(billingProfileCoworkerView.userId() != null ? billingProfileCoworkerView.userId().value() : null)
-                .role(switch (billingProfileCoworkerView.role()) {
-                    case ADMIN -> BillingProfileCoworkerRole.ADMIN;
-                    case MEMBER -> BillingProfileCoworkerRole.MEMBER;
-                })
+                .role(mapRole(billingProfileCoworkerView.role()))
                 .removable(billingProfileCoworkerView.removable())
                 .invitedAt(billingProfileCoworkerView.invitedAt())
                 .joinedAt(billingProfileCoworkerView.joinedAt());
 
     }
+
+    private static @NotNull BillingProfileCoworkerRole mapRole(BillingProfile.User.Role role) {
+        return switch (role) {
+            case ADMIN -> BillingProfileCoworkerRole.ADMIN;
+            case MEMBER -> BillingProfileCoworkerRole.MEMBER;
+        };
+    }
+
+
 }

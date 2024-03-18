@@ -187,3 +187,6 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000112_fix_reward_usd_equivalent_data_view.sql
   - include:
       file: db/changelog/changelogs/00000113_create_usd_quote_at_function.sql
+  - include:
+      file: db/changelog/changelogs/00000114_add_accepted_column_to_bp_invitation.sql
+

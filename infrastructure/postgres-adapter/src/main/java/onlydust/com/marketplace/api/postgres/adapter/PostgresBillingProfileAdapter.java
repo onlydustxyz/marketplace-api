@@ -8,8 +8,10 @@ import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileUserRightsView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserRightsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortBillingProfileViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
@@ -41,6 +43,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     private final @NonNull PayoutPreferenceRepository payoutPreferenceRepository;
     private final @NonNull BankAccountRepository bankAccountRepository;
     private final @NonNull ShortBillingProfileViewRepository shortBillingProfileViewRepository;
+    private final @NonNull BillingProfileUserRightsViewRepository billingProfileUserRightsViewRepository;
 
 
     @Override
@@ -93,7 +96,6 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional
     public void save(CompanyBillingProfile billingProfile) {
-        // TODO : manage add/remove members -> waiting to start the feature on coworkers
         billingProfileRepository.save(BillingProfileEntity.fromDomain(billingProfile,
                 billingProfile.members().stream().map(BillingProfile.User::id).toList().get(0), now()));
         final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfile.id().value());
@@ -284,6 +286,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                 .githubUserId(invitedUser.value())
                 .invitedAt(Date.from(invitedAt.toInstant()))
                 .role(BillingProfileUserEntity.Role.fromDomain(role))
+                .accepted(false)
                 .build());
     }
 
@@ -293,6 +296,13 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     }
 
     @Override
+    @Transactional
+    public void acceptCoworkerInvitation(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId) {
+        billingProfileUserInvitationRepository.acceptInvitation(billingProfileId.value(), invitedGithubUserId.value());
+    }
+
+    @Override
+    @Transactional
     public void saveCoworker(BillingProfile.Id billingProfileId, UserId invitedUser, BillingProfile.User.Role role, ZonedDateTime acceptedAt) {
         billingProfileUserRepository.save(BillingProfileUserEntity.builder()
                 .billingProfileId(billingProfileId.value())
@@ -303,18 +313,21 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<BillingProfileCoworkerView> getInvitedCoworker(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId) {
         return billingProfileUserViewRepository.findInvitedUserByBillingProfileIdAndGithubId(billingProfileId.value(), invitedGithubUserId.value())
                 .map(BillingProfileUserViewEntity::toView);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<BillingProfileCoworkerView> getCoworker(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId) {
         return billingProfileUserViewRepository.findUserByBillingProfileIdAndGithubId(billingProfileId.value(), invitedGithubUserId.value())
                 .map(BillingProfileUserViewEntity::toView);
     }
 
     @Override
+    @Transactional
     public void deleteCoworker(BillingProfile.Id billingProfileId, UserId userId) {
         billingProfileUserRepository.deleteById(new BillingProfileUserEntity.PrimaryKey(userId.value(), billingProfileId.value()));
     }
@@ -356,5 +369,12 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Transactional(readOnly = true)
     public boolean isEnabled(BillingProfile.Id billingProfileId) {
         return billingProfileRepository.isBillingProfileEnabled(billingProfileId.value());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<BillingProfileUserRightsView> getUserRightsOnBillingProfile(BillingProfile.Id billingProfileId, UserId userId) {
+        return billingProfileUserRightsViewRepository.findForUserIdAndBillingProfileId(userId.value(), billingProfileId.value())
+                .map(BillingProfileUserRightsViewEntity::toDomain);
     }
 }
