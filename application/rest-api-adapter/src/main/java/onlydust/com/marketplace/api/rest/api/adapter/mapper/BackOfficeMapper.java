@@ -299,40 +299,6 @@ public interface BackOfficeMapper {
                 .nextPageIndex(nextPageIndex(pageIndex, userPage.getTotalPageNumber()));
     }
 
-    static PaymentPage mapPaymentPageToContract(final Page<PaymentView> paymentPage, int pageIndex) {
-        return new PaymentPage()
-                .payments(paymentPage.getContent().stream().map(payment -> new PaymentPageItemResponse()
-                        .id(payment.getId())
-                        .projectId(payment.getProjectId())
-                        .amount(payment.getAmount())
-                        .currency(switch (payment.getCurrency()) {
-                            case STRK -> CurrencyCode.STRK;
-                            case USD -> CurrencyCode.USD;
-                            case APT -> CurrencyCode.APT;
-                            case OP -> CurrencyCode.OP;
-                            case ETH -> CurrencyCode.ETH;
-                            case LORDS -> CurrencyCode.LORDS;
-                            case USDC -> CurrencyCode.USDC;
-                        })
-                        .recipientId(payment.getRecipientId())
-                        .requestorId(payment.getRequestorId())
-                        .isPayable(payment.recipientPayoutInfoValid())
-                        .payoutSettings(payment.recipientPayoutSettings())
-                        .items(payment.getItems())
-                        .requestedAt(payment.getRequestedAt())
-                        .processedAt(payment.getProcessedAt())
-                        .pullRequestsCount(payment.getPullRequestsCount())
-                        .issuesCount(payment.getIssuesCount())
-                        .dustyIssuesCount(payment.getDustyIssuesCount())
-                        .codeReviewsCount(payment.getCodeReviewsCount())
-                ).toList())
-                .totalPageNumber(paymentPage.getTotalPageNumber())
-                .totalItemNumber(paymentPage.getTotalItemNumber())
-                .hasMore(hasMore(pageIndex, paymentPage.getTotalPageNumber()))
-                .nextPageIndex(nextPageIndex(pageIndex, paymentPage.getTotalPageNumber()));
-    }
-
-
     static InvoicePage mapInvoicePageToContract(final Page<Invoice> page, final int pageIndex, final String baseUri, final String token) {
         return new InvoicePage()
                 .invoices(page.getContent().stream().map(i -> mapInvoice(i, baseUri, token)).toList())
@@ -589,7 +555,7 @@ public interface BackOfficeMapper {
         };
     }
 
-    static CurrencyResponse mapCurrencyResponse(onlydust.com.marketplace.accounting.domain.model.Currency currency) {
+    static CurrencyResponse mapCurrencyResponse(Currency currency) {
         return new CurrencyResponse()
                 .id(currency.id().value())
                 .type(mapCurrencyType(currency.type()))
@@ -603,7 +569,6 @@ public interface BackOfficeMapper {
                 ;
     }
 
-
     @NonNull
     private static Token mapToken(ERC20 token) {
         return new Token()
@@ -614,14 +579,14 @@ public interface BackOfficeMapper {
                 .decimals(token.getDecimals());
     }
 
-    static CurrencyStandard mapCurrencyStandard(final @NonNull onlydust.com.marketplace.accounting.domain.model.Currency.Standard s) {
+    static CurrencyStandard mapCurrencyStandard(final @NonNull Currency.Standard s) {
         return switch (s) {
             case ERC20 -> CurrencyStandard.ERC20;
             case ISO4217 -> CurrencyStandard.ISO4217;
         };
     }
 
-    static CurrencyType mapCurrencyType(final @NonNull onlydust.com.marketplace.accounting.domain.model.Currency.Type type) {
+    static CurrencyType mapCurrencyType(final @NonNull Currency.Type type) {
         return switch (type) {
             case FIAT -> CurrencyType.FIAT;
             case CRYPTO -> CurrencyType.CRYPTO;

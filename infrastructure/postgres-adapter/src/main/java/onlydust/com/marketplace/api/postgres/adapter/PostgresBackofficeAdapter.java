@@ -1,7 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoEcosystemEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoProjectEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoSponsorEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.EcosystemRepository;
@@ -29,7 +32,6 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     private final BoSponsorRepository boSponsorRepository;
     private final ProjectLeadInvitationRepository projectLeadInvitationRepository;
     private final BoUserRepository boUserRepository;
-    private final BoPaymentRepository boPaymentRepository;
     private final BoProjectRepository boProjectRepository;
     private final BoEcosystemRepository boEcosystemRepository;
     private final EcosystemRepository ecosystemRepository;
@@ -99,17 +101,6 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     }
 
     @Override
-    public Page<PaymentView> listPayments(int pageIndex, int pageSize, PaymentView.Filters filters) {
-        final var page = boPaymentRepository.findAll(filters.getProjects(), filters.getPayments(), PageRequest.of(pageIndex, pageSize,
-                Sort.by(Sort.Direction.DESC, "requested_at")));
-        return Page.<PaymentView>builder()
-                .content(page.getContent().stream().map(BoPaymentEntity::toView).toList())
-                .totalItemNumber((int) page.getTotalElements())
-                .totalPageNumber(page.getTotalPages())
-                .build();
-    }
-
-    @Override
     public Page<OldProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds) {
         final var page = boProjectRepository.findAll(isNull(projectIds) ? List.of() : projectIds,
                 PageRequest.of(pageIndex, pageSize));
@@ -123,7 +114,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     @Override
     public Page<ProjectView> searchProjects(int pageIndex, int pageSize, String search) {
         final var pageRequest = PageRequest.of(pageIndex, pageSize, Sort.by("name"));
-        
+
         final var page = search != null
                 ? projectRepository.findAllByNameContainingIgnoreCase(search, pageRequest)
                 : projectRepository.findAll(pageRequest);
