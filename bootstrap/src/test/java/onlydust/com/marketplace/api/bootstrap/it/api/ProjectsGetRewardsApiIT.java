@@ -37,7 +37,6 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
         accountingHelper.patchReward("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0", 30, "OP", 6000, "2023-08-14", null);
         accountingHelper.patchReward("5b96ca1e-4ad2-41c1-8819-520b885d9223", 5, "STRK", null, null, null);
 
-
         billingProfileStoragePort.savePayoutInfoForBillingProfile(PayoutInfo.builder()
                 .optimismAddress(Optimism.accountAddress("0x" + faker.random().hex(40)))
                 .build(), BillingProfile.Id.of("20282367-56b0-42d3-81d3-5e4b38f67e3e"));
@@ -137,7 +136,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of(
                         "pageIndex", "0",
                         "pageSize", "10000",
-                        "currencies", currencyRepository.findByCode("ETH").orElseThrow().id().toString()
+                        "currencies", currencyRepository.findByCode("USDC").orElseThrow().id().toString()
                 )))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()
@@ -145,17 +144,18 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.rewards[?(@.amount.currency != 'ETH')]").doesNotExist()
-                .jsonPath("$.remainingBudget.currency").isEqualTo("ETH")
-        // TODO restore
-//                .jsonPath("$.remainingBudget.amount").isEqualTo(28)
-//                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(42000)
-//                .jsonPath("$.spentAmount.amount").isEqualTo(10)
-//                .jsonPath("$.spentAmount.currency").isEqualTo("ETH")
-//                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(15000)
-//                .jsonPath("$.sentRewardsCount").isEqualTo(10)
-//                .jsonPath("$.rewardedContributionsCount").isEqualTo(4)
-//                .jsonPath("$.rewardedContributorsCount").isEqualTo(2)
+                .consumeWith(System.out::println)
+                .jsonPath("$.rewards[?(@.amount.currency != 'USDC')]").doesNotExist()
+                .jsonPath("$.rewards[?(@.amount.currency == 'USDC')]").exists()
+                .jsonPath("$.remainingBudget.currency").isEqualTo("USDC")
+                .jsonPath("$.remainingBudget.amount").isEqualTo(99250)
+                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(100242.5000)
+                .jsonPath("$.spentAmount.amount").isEqualTo(7000)
+                .jsonPath("$.spentAmount.currency").isEqualTo("USDC")
+                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(7070)
+                .jsonPath("$.sentRewardsCount").isEqualTo(7)
+                .jsonPath("$.rewardedContributionsCount").isEqualTo(4)
+                .jsonPath("$.rewardedContributorsCount").isEqualTo(2)
         ;
     }
 
@@ -179,16 +179,15 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.rewards[?(@.rewardedUserLogin != 'gregcha')]").doesNotExist()
-        // TODO restore
-//                .jsonPath("$.remainingBudget.amount").doesNotExist()
-//                .jsonPath("$.remainingBudget.currency").doesNotExist()
-//                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(142242)
-//                .jsonPath("$.spentAmount.amount").doesNotExist()
-//                .jsonPath("$.spentAmount.currency").doesNotExist()
-//                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(13500)
-//                .jsonPath("$.sentRewardsCount").isEqualTo(9)
-//                .jsonPath("$.rewardedContributionsCount").isEqualTo(3)
-//                .jsonPath("$.rewardedContributorsCount").isEqualTo(1)
+                .jsonPath("$.remainingBudget.amount").doesNotExist()
+                .jsonPath("$.remainingBudget.currency").doesNotExist()
+                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(5446182)
+                .jsonPath("$.spentAmount.amount").doesNotExist()
+                .jsonPath("$.spentAmount.currency").doesNotExist()
+                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(9060)
+                .jsonPath("$.sentRewardsCount").isEqualTo(9)
+                .jsonPath("$.rewardedContributionsCount").isEqualTo(3)
+                .jsonPath("$.rewardedContributorsCount").isEqualTo(1)
         ;
     }
 
@@ -220,14 +219,13 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[?(@.requestedAt > '2023-09-26')]").doesNotExist()
                 .jsonPath("$.remainingBudget.amount").doesNotExist()
                 .jsonPath("$.remainingBudget.currency").doesNotExist()
-        // TODO restore
-//                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(142242)
-//                .jsonPath("$.spentAmount.amount").doesNotExist()
-//                .jsonPath("$.spentAmount.currency").doesNotExist()
-//                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(3000)
-//                .jsonPath("$.sentRewardsCount").isEqualTo(2)
-//                .jsonPath("$.rewardedContributionsCount").isEqualTo(1)
-//                .jsonPath("$.rewardedContributorsCount").isEqualTo(1)
+                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(5446182)
+                .jsonPath("$.spentAmount.amount").doesNotExist()
+                .jsonPath("$.spentAmount.currency").doesNotExist()
+                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(2020)
+                .jsonPath("$.sentRewardsCount").isEqualTo(2)
+                .jsonPath("$.rewardedContributionsCount").isEqualTo(1)
+                .jsonPath("$.rewardedContributorsCount").isEqualTo(1)
         ;
     }
 
@@ -254,16 +252,15 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .isOk()
                 .expectBody()
                 .jsonPath("$.rewards").isEmpty()
-        // TODO restore
-//                .jsonPath("$.remainingBudget.amount").doesNotExist()
-//                .jsonPath("$.remainingBudget.currency").doesNotExist()
-//                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(0)
-//                .jsonPath("$.spentAmount.amount").doesNotExist()
-//                .jsonPath("$.spentAmount.currency").doesNotExist()
-//                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(0)
-//                .jsonPath("$.sentRewardsCount").isEqualTo(0)
-//                .jsonPath("$.rewardedContributionsCount").isEqualTo(0)
-//                .jsonPath("$.rewardedContributorsCount").isEqualTo(0)
+                .jsonPath("$.remainingBudget.amount").isEqualTo(3000)
+                .jsonPath("$.remainingBudget.currency").isEqualTo("ETH")
+                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(5345940)
+                .jsonPath("$.spentAmount.amount").isEqualTo(0)
+                .jsonPath("$.spentAmount.currency").isEqualTo("ETH")
+                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(0)
+                .jsonPath("$.sentRewardsCount").isEqualTo(0)
+                .jsonPath("$.rewardedContributionsCount").isEqualTo(0)
+                .jsonPath("$.rewardedContributorsCount").isEqualTo(0)
         ;
 
 
@@ -283,16 +280,15 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .isOk()
                 .expectBody()
                 .jsonPath("$.rewards").isEmpty()
-        // TODO restore
-//                .jsonPath("$.remainingBudget.amount").isEqualTo(0)
-//                .jsonPath("$.remainingBudget.currency").isEqualTo("USD")
-//                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(0)
-//                .jsonPath("$.spentAmount.amount").isEqualTo(0)
-//                .jsonPath("$.spentAmount.currency").isEqualTo("USD")
-//                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(0)
-//                .jsonPath("$.sentRewardsCount").isEqualTo(0)
-//                .jsonPath("$.rewardedContributionsCount").isEqualTo(0)
-//                .jsonPath("$.rewardedContributorsCount").isEqualTo(0)
+                .jsonPath("$.remainingBudget.amount").isEqualTo(0)
+                .jsonPath("$.remainingBudget.currency").isEqualTo("USD")
+                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(0)
+                .jsonPath("$.spentAmount.amount").isEqualTo(0)
+                .jsonPath("$.spentAmount.currency").isEqualTo("USD")
+                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(0)
+                .jsonPath("$.sentRewardsCount").isEqualTo(0)
+                .jsonPath("$.rewardedContributionsCount").isEqualTo(0)
+                .jsonPath("$.rewardedContributorsCount").isEqualTo(0)
         ;
 
 
@@ -312,16 +308,15 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .isOk()
                 .expectBody()
                 .jsonPath("$.rewards").isEmpty()
-        // TODO restore
-//                .jsonPath("$.remainingBudget.amount").isEqualTo(99250)
-//                .jsonPath("$.remainingBudget.currency").isEqualTo("USDC")
-//                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(100242)
-//                .jsonPath("$.spentAmount.amount").isEqualTo(0)
-//                .jsonPath("$.spentAmount.currency").isEqualTo("USDC")
-//                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(0)
-//                .jsonPath("$.sentRewardsCount").isEqualTo(0)
-//                .jsonPath("$.rewardedContributionsCount").isEqualTo(0)
-//                .jsonPath("$.rewardedContributorsCount").isEqualTo(0)
+                .jsonPath("$.remainingBudget.amount").isEqualTo(99250)
+                .jsonPath("$.remainingBudget.currency").isEqualTo("USDC")
+                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(100242)
+                .jsonPath("$.spentAmount.amount").isEqualTo(0)
+                .jsonPath("$.spentAmount.currency").isEqualTo("USDC")
+                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(0)
+                .jsonPath("$.sentRewardsCount").isEqualTo(0)
+                .jsonPath("$.rewardedContributionsCount").isEqualTo(0)
+                .jsonPath("$.rewardedContributorsCount").isEqualTo(0)
         ;
     }
 
@@ -345,9 +340,8 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.rewards[?(@.amount.currency == 'STRK' && @.amount.dollarsEquivalent == null)]").exists()
                 .jsonPath("$.rewards[?(@.amount.currency == 'STRK' && @.amount.dollarsEquivalent != null)]").doesNotExist()
-        // TODO restore
-//                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(191010)
-//                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(101010)
+                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(1010)
+                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(4040)
         ;
     }
 }
