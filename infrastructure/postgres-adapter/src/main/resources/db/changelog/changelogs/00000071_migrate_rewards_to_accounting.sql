@@ -118,7 +118,7 @@ from work_items wi;
 
 insert into accounting.reward_status_data(reward_id, sponsor_has_enough_fund, unlock_date, invoice_received_at, paid_at, networks, amount_usd_equivalent)
 select r.id,
-       true, -- todo
+       true,
        case when pr.currency = 'op' then to_date('2024-08-23', 'YYYY-MM-DD') end,
        i.created_at,
        max(p.processed_at),
