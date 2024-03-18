@@ -56,8 +56,10 @@ public class BackofficeConfiguration {
             final RewardFacadePort rewardFacadePort,
             final CurrencyFacadePort currencyFacadePort,
             final UserFacadePort userFacadePort,
-            final AccountingRewardPort accountingRewardPort) {
-        return new BackofficeAccountingManagementRestApi(accountingFacadePort, rewardFacadePort, currencyFacadePort, userFacadePort, accountingRewardPort);
+            final AccountingRewardPort accountingRewardPort,
+            final BatchPaymentPort batchPaymentPort) {
+        return new BackofficeAccountingManagementRestApi(accountingFacadePort, rewardFacadePort, currencyFacadePort, userFacadePort, accountingRewardPort,
+                batchPaymentPort);
     }
 
     @Bean
@@ -67,10 +69,15 @@ public class BackofficeConfiguration {
 
     @Bean
     public AccountingRewardPort accountingRewardPort(final AccountingRewardStoragePort accountingRewardStoragePort,
-                                                     final InvoiceStoragePort invoiceStoragePort,
-                                                     final AccountingFacadePort accountingFacadePort,
                                                      final MailNotificationPort mailNotificationPort) {
-        return new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, invoiceStoragePort, accountingFacadePort,
-                mailNotificationPort);
+        return new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, mailNotificationPort);
+    }
+
+    @Bean
+    public BatchPaymentPort batchPaymentPort(final AccountingRewardStoragePort accountingRewardStoragePort,
+                                             final InvoiceStoragePort invoiceStoragePort,
+                                             final AccountingFacadePort accountingFacadePort) {
+        return new onlydust.com.marketplace.accounting.domain.service.BatchPaymentService(accountingRewardStoragePort, invoiceStoragePort,
+                accountingFacadePort);
     }
 }
