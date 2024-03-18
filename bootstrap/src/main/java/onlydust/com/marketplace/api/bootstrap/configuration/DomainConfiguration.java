@@ -67,36 +67,10 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public ProjectRewardFacadePort projectRewardFacadePort(final ProjectObserverPort projectObserverPort,
-                                                           final ProjectStoragePort projectStoragePort,
-                                                           final PostgresProjectRewardAdapter postgresProjectRewardAdapter,
-                                                           final ImageStoragePort imageStoragePort,
-                                                           final UUIDGeneratorPort uuidGeneratorPort,
-                                                           final PermissionService permissionService,
-                                                           final IndexerPort indexerPort,
-                                                           final DateProvider dateProvider,
-                                                           final ContributionStoragePort contributionStoragePort,
-                                                           final DustyBotStoragePort dustyBotStoragePort,
-                                                           final GithubStoragePort githubStoragePort) {
-        return new ProjectService(projectObserverPort,
-                projectStoragePort,
-                postgresProjectRewardAdapter,
-                imageStoragePort,
-                uuidGeneratorPort,
-                permissionService,
-                indexerPort,
-                dateProvider,
-                contributionStoragePort,
-                dustyBotStoragePort,
-                githubStoragePort);
-    }
-
-    @Bean
-    public ProjectRewardFacadePort projectRewardFacadePortV2(
-            final ProjectRewardStoragePort projectRewardStoragePortV2,
-            final PermissionService permissionService
+    public ProjectRewardFacadePort projectRewardFacadePort(final ProjectRewardStoragePort projectRewardStoragePort,
+                                                           final PermissionService permissionService
     ) {
-        return new ProjectRewardService(projectRewardStoragePortV2, permissionService);
+        return new ProjectRewardService(projectRewardStoragePort, permissionService);
     }
 
     @Bean
