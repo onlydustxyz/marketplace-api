@@ -8,7 +8,10 @@ import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
-import onlydust.com.marketplace.project.domain.view.backoffice.*;
+import onlydust.com.marketplace.project.domain.view.backoffice.EcosystemView;
+import onlydust.com.marketplace.project.domain.view.backoffice.ProjectLeadInvitationView;
+import onlydust.com.marketplace.project.domain.view.backoffice.ProjectRepositoryView;
+import onlydust.com.marketplace.project.domain.view.backoffice.UserView;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,7 +28,6 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 @Tags(@Tag(name = "Backoffice"))
 @AllArgsConstructor
 public class BackofficeRestApi implements BackofficeApi {
-
     private final BackofficeFacadePort backofficeFacadePort;
     final static Integer MAX_PAGE_SIZE = Integer.MAX_VALUE;
 
@@ -89,22 +91,6 @@ public class BackofficeRestApi implements BackofficeApi {
                 .build();
         final var usersPage = backofficeFacadePort.listUsers(sanitizedPageIndex, sanitizePageSize(pageSize, MAX_PAGE_SIZE), filters);
         final var response = mapUserPageToContract(usersPage, sanitizedPageIndex);
-
-        return response.getTotalPageNumber() > 1 ?
-                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
-                ResponseEntity.ok(response);
-    }
-
-
-    @Override
-    public ResponseEntity<PaymentPage> getPaymentPage(Integer pageIndex, Integer pageSize, List<UUID> projectIds, List<UUID> paymentIds) {
-        final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
-        final var filters = PaymentView.Filters.builder()
-                .projects(Optional.ofNullable(projectIds).orElse(List.of()))
-                .payments(Optional.ofNullable(paymentIds).orElse(List.of()))
-                .build();
-        final var paymentsPage = backofficeFacadePort.listPayments(sanitizedPageIndex, sanitizePageSize(pageSize, MAX_PAGE_SIZE), filters);
-        final var response = mapPaymentPageToContract(paymentsPage, sanitizedPageIndex);
 
         return response.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :

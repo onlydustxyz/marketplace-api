@@ -41,11 +41,6 @@ public class BackofficeService implements BackofficeFacadePort {
     }
 
     @Override
-    public Page<PaymentView> listPayments(int pageIndex, int pageSize, PaymentView.Filters filters) {
-        return backofficeStoragePort.listPayments(pageIndex, pageSize, filters);
-    }
-
-    @Override
     public Page<OldProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds) {
         return backofficeStoragePort.listProjects(pageIndex, pageSize, projectIds);
     }
@@ -54,7 +49,6 @@ public class BackofficeService implements BackofficeFacadePort {
     public Page<ProjectView> searchProjects(int pageIndex, int pageSize, String search) {
         return backofficeStoragePort.searchProjects(pageIndex, pageSize, search);
     }
-
 
     @Override
     public Ecosystem createEcosystem(Ecosystem ecosystem) {

@@ -16,8 +16,6 @@ public interface BackofficeStoragePort {
 
     Page<UserView> listUsers(int pageIndex, int pageSize, UserView.Filters filters);
 
-    Page<PaymentView> listPayments(int pageIndex, int pageSize, PaymentView.Filters filters);
-
     Page<OldProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds);
 
     Page<ProjectView> searchProjects(int pageIndex, int pageSize, String search);
