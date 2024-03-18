@@ -185,4 +185,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000111_migrate_transaction_types.sql
   - include:
       file: db/changelog/changelogs/00000112_fix_reward_usd_equivalent_data_view.sql
-
+  - include:
+      file: db/changelog/changelogs/00000113_create_usd_quote_at_function.sql

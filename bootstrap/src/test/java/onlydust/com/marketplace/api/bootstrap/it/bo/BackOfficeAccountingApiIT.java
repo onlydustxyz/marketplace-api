@@ -34,6 +34,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
     static final Currency.Id BTC = Currency.Id.of("3f6e1c98-8659-493a-b941-943a803bd91f");
     static final Currency.Id STRK = Currency.Id.of("81b7e948-954f-4718-bad3-b70a0edd27e1");
+    static final Currency.Id USDC = Currency.Id.of("562bbf65-8a71-4d30-ad63-520c0d68ba27");
 
     @Autowired
     private SponsorAccountRepository sponsorAccountRepository;
@@ -493,7 +494,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                 "thirdPartyAccountNumber": "red-bull.eth"
                             }
                         }
-                        """.formatted(STRK))
+                        """.formatted(USDC))
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -531,7 +532,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                         {
                             "recipientId": "%d",
                             "amount": 30,
-                            "currency": "STRK",
+                            "currency": "USDC",
                             "items": [{
                                 "type": "PULL_REQUEST",
                                 "id": "1703880973",
@@ -572,11 +573,11 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectBody()
                 .jsonPath("$.payments.size()").isEqualTo(1)
                 .jsonPath("$.payments[0].amount").isEqualTo(30)
-                .jsonPath("$.payments[0].currency.code").isEqualTo("STRK")
-                .jsonPath("$.payments[0].currency.name").isEqualTo("StarkNet Token")
+                .jsonPath("$.payments[0].currency.code").isEqualTo("USDC")
+                .jsonPath("$.payments[0].currency.name").isEqualTo("USD Coin")
                 .jsonPath("$.payments[0].currency.type").isEqualTo("CRYPTO")
                 .jsonPath("$.payments[0].currency.blockchain").isEqualTo("ETHEREUM")
-                .jsonPath("$.payments[0].currency.address").isEqualTo("0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766")
+                .jsonPath("$.payments[0].currency.address").isEqualTo("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48")
                 .jsonPath("$.payments[0].recipientAccountNumber").doesNotExist()
                 .jsonPath("$.payments[0].rewardId").isEqualTo(rewardId.toString());
 
@@ -617,7 +618,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectBody()
                 .json("""
                         {
-                           "currency": "STRK",
+                           "currency": "USDC",
                            "amount": 30,
                            "dollarsEquivalent": null,
                            "status": "COMPLETE",
@@ -680,13 +681,13 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                               "amount": {
                                 "amount": 100,
                                 "currency": {
-                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                  "code": "STRK",
-                                  "name": "StarkNet Token",
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
                                   "logoUrl": null
                                 },
-                                "dollarsEquivalent": null,
-                                "conversionRate": null
+                                "dollarsEquivalent": 101.00,
+                                "conversionRate": 1.01
                               }
                             },
                             {
@@ -697,13 +698,13 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                               "amount": {
                                 "amount": 100,
                                 "currency": {
-                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                  "code": "STRK",
-                                  "name": "StarkNet Token",
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
                                   "logoUrl": null
                                 },
-                                "dollarsEquivalent": null,
-                                "conversionRate": null
+                                "dollarsEquivalent": 101.00,
+                                "conversionRate": 1.01
                               }
                             }
                           ]
