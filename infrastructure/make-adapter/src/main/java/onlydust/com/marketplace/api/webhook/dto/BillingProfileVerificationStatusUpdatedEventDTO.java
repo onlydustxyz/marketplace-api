@@ -13,7 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UserBillingProfileVerificationStatusUpdatedEventDTO {
+public class BillingProfileVerificationStatusUpdatedEventDTO {
 
     @JsonProperty("aggregate_name")
     String aggregateName = "User";
@@ -38,13 +38,12 @@ public class UserBillingProfileVerificationStatusUpdatedEventDTO {
         String verificationStatus;
     }
 
-    public static UserBillingProfileVerificationStatusUpdatedEventDTO of(BillingProfileVerificationUpdated billingProfileVerificationUpdated, String environment) {
-        // TODO : migrate to billing profile event
-        return UserBillingProfileVerificationStatusUpdatedEventDTO.builder()
+    public static BillingProfileVerificationStatusUpdatedEventDTO of(BillingProfileVerificationUpdated event, String environment) {
+        return BillingProfileVerificationStatusUpdatedEventDTO.builder()
                 .environment(environment)
                 .payload(Payload.builder()
-//                        .userId(billingProfileVerificationUpdated.getUserId())
-//                        .verificationStatus(billingProfileVerificationUpdated.getOldVerificationStatus().name())
+                        .userId(event.getUserId().value())
+                        .verificationStatus(event.getVerificationStatus().name())
                         .build())
                 .build();
     }
