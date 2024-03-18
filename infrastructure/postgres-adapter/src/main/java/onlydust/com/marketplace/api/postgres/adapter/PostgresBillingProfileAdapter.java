@@ -11,6 +11,7 @@ import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerVie
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortBillingProfileViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -39,6 +40,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     private final @NonNull BillingProfileUserInvitationRepository billingProfileUserInvitationRepository;
     private final @NonNull PayoutPreferenceRepository payoutPreferenceRepository;
     private final @NonNull BankAccountRepository bankAccountRepository;
+    private final @NonNull ShortBillingProfileViewRepository shortBillingProfileViewRepository;
 
 
     @Override
@@ -53,17 +55,17 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional(readOnly = true)
     public Optional<ShortBillingProfileView> findIndividualBillingProfileForUser(UserId ownerId) {
-        return billingProfileRepository.findIndividualProfilesForUserId(ownerId.value())
-                .stream().map(BillingProfileEntity::toView).findFirst();
+        return shortBillingProfileViewRepository.findIndividualProfilesForUserId(ownerId.value())
+                .stream().map(ShortBillingProfileViewEntity::toView).findFirst();
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ShortBillingProfileView> findAllBillingProfilesForUser(UserId userId) {
         final var invoiceMandateLatestVersionDate = globalSettingsRepository.get().getInvoiceMandateLatestVersionDate();
-        return billingProfileRepository.findBillingProfilesForUserId(userId.value())
+        return shortBillingProfileViewRepository.findBillingProfilesForUserId(userId.value())
                 .stream()
-                .map(BillingProfileEntity::toView)
+                .map(ShortBillingProfileViewEntity::toView)
                 .peek(bp -> bp.setInvoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate))
                 .toList();
     }
@@ -114,8 +116,8 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional(readOnly = true)
     public boolean isUserMemberOf(BillingProfile.Id billingProfileId, UserId userId) {
-        return billingProfileRepository.findBillingProfilesForUserId(userId.value()).stream()
-                .anyMatch(billingProfileEntity -> billingProfileEntity.getId().equals(billingProfileId.value()));
+        return shortBillingProfileViewRepository.findBillingProfilesForUserId(userId.value()).stream()
+                .anyMatch(shortBillingProfileViewEntity -> shortBillingProfileViewEntity.getId().equals(billingProfileId.value()));
     }
 
     @Override

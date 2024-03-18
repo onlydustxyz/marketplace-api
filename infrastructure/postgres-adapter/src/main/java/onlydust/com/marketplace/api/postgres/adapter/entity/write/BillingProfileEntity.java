@@ -4,7 +4,6 @@ import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -70,10 +69,6 @@ public class BillingProfileEntity {
     @EqualsAndHashCode.Exclude
     private Date updatedAt;
 
-    public ZonedDateTime getInvoiceMandateAcceptedAt() {
-        return isNull(invoiceMandateAcceptedAt) ? null : new Date(invoiceMandateAcceptedAt.getTime()).toInstant().atZone(ZoneOffset.UTC);
-    }
-
     public enum Type {
         INDIVIDUAL,
         COMPANY,
@@ -86,6 +81,10 @@ public class BillingProfileEntity {
                 case SELF_EMPLOYED -> BillingProfile.Type.SELF_EMPLOYED;
             };
         }
+    }
+
+    public ZonedDateTime getInvoiceMandateAcceptedAt() {
+        return isNull(invoiceMandateAcceptedAt) ? null : new Date(invoiceMandateAcceptedAt.getTime()).toInstant().atZone(ZoneOffset.UTC);
     }
 
     public static BillingProfileEntity fromDomain(final BillingProfile billingProfile, final UserId ownerId, final ZonedDateTime ownerJoinedAt) {
@@ -109,14 +108,4 @@ public class BillingProfileEntity {
                 .build();
     }
 
-
-    public ShortBillingProfileView toView() {
-        return ShortBillingProfileView.builder()
-                .id(BillingProfile.Id.of(this.id))
-                .name(this.name)
-                .type(this.type.toDomain())
-                .invoiceMandateAcceptedAt(this.getInvoiceMandateAcceptedAt())
-                .enabled(this.enabled)
-                .build();
-    }
 }

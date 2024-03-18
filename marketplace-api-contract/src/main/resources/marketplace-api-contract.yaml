@@ -4653,6 +4653,8 @@ components:
           type: boolean
         enabled:
           type: boolean
+        pendingInvitationResponse:
+          type: boolean
     ProjectLedShortResponse:
       type: object
       required:
@@ -5443,10 +5445,10 @@ components:
               $ref: '#/components/schemas/BillingProfileCoworkerRole'
             canDelete:
               type: boolean
-              description: True if the billing profile can be deleted by the caller (eg. no payment using it so far and the caller is admin)
+              description: True if the billing profile can be deleted by the caller (eg. no invoice linked to it so far and the caller is admin)
             canLeave:
               type: boolean
-              description: True if the caller can leave the billing profile (eg. no payment using it so far and caller is not the last admin)
+              description: True if the caller can leave the billing profile (eg. no invoice linked to it so far and caller is not the last admin)
         kyc:
           $ref: '#/components/schemas/KYCResponse'
         kyb:

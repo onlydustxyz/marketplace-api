@@ -270,6 +270,7 @@ public interface BillingProfileMapper {
                         .id(view.getId().value())
                         .enabled(view.getEnabled())
                         .invoiceMandateAccepted(view.isInvoiceMandateAccepted())
+                        .pendingInvitationResponse(view.getPendingInvitationResponse())
                         .type(switch (view.getType()) {
                             case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
                             case COMPANY -> BillingProfileType.COMPANY;
