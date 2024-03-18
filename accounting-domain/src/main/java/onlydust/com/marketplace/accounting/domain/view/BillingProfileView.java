@@ -1,12 +1,12 @@
 package onlydust.com.marketplace.accounting.domain.view;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 
 import java.time.ZonedDateTime;
 
+@Value
 @Builder(toBuilder = true)
 @Getter
 public class BillingProfileView {
@@ -15,7 +15,7 @@ public class BillingProfileView {
     String name;
     Kyc kyc;
     Kyb kyb;
-    BillingProfile.User me;
+    BillingProfileUserRightsView me;
     VerificationStatus verificationStatus;
     PayoutInfo payoutInfo;
     Boolean enabled;

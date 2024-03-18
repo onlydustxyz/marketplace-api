@@ -25,7 +25,7 @@ public interface ShortBillingProfileViewRepository extends JpaRepository<ShortBi
             union
             select bp2.*, true pending_invitation
             from iam.users u
-                     join accounting.billing_profiles_user_invitations bpui on bpui.github_user_id = u.github_user_id
+                     join accounting.billing_profiles_user_invitations bpui on bpui.github_user_id = u.github_user_id and bpui.accepted = false
                      join accounting.billing_profiles bp2 on bp2.id = bpui.billing_profile_id
             where u.id = :userId
             """, nativeQuery = true)

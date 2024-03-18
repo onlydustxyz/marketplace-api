@@ -35,6 +35,8 @@ public class BillingProfileUserInvitationEntity {
 
     Date invitedAt;
     UUID invitedBy;
+    @Builder.Default
+    Boolean accepted = false;
 
     @EqualsAndHashCode
     @AllArgsConstructor

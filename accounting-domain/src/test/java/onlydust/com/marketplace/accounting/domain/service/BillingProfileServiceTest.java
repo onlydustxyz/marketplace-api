@@ -13,6 +13,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileUserRightsView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
@@ -756,6 +757,30 @@ class BillingProfileServiceTest {
     }
 
     @Test
+    void should_throw_internal_error_given_a_billing_profile_for_a_user_without_rights_found() {
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIdMember = UserId.of(UUID.randomUUID());
+
+        // When
+        when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdMember)).thenReturn(true);
+        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().build()));
+        when(billingProfileStoragePort.getUserRightsOnBillingProfile(billingProfileId, userIdMember))
+                .thenReturn(Optional.empty());
+        Exception exception = null;
+        try {
+            billingProfileService.getBillingProfile(billingProfileId, userIdMember);
+        } catch (Exception e) {
+            exception = e;
+        }
+
+        // Then
+        assertTrue(exception instanceof OnlyDustException);
+        assertEquals(500, ((OnlyDustException) exception).getStatus());
+        assertEquals("User %s rights on billing profile %s were not found".formatted(userIdMember.value(), billingProfileId.value()),
+                exception.getMessage());
+    }
+
+    @Test
     void should_get_billing_profile_given_a_user_member_of_it() {
         // Given
         final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
@@ -765,11 +790,17 @@ class BillingProfileServiceTest {
         // When
         when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdMember)).thenReturn(true);
         when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
+        when(billingProfileStoragePort.getUserRightsOnBillingProfile(billingProfileId, userIdMember))
+                .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
+                        .hasBillingProfileSomeInvoices(false)
+                        .hasUserSomeRewardsIncludedInInvoicesOnBillingProfile(false)
+                        .role(BillingProfile.User.Role.ADMIN)
+                        .build()));
         final BillingProfileView billingProfile = billingProfileService.getBillingProfile(billingProfileId, userIdMember);
 
         // Then
         verify(billingProfileStoragePort).findById(billingProfileId);
-        assertEquals(billingProfileView, billingProfile);
+        assertNotNull(billingProfile.getMe());
     }
 
     @Test
@@ -1128,7 +1159,7 @@ class BillingProfileServiceTest {
 
         // Then
         verify(billingProfileStoragePort).saveCoworker(eq(billingProfileId), eq(invitedUserId), eq(BillingProfile.User.Role.MEMBER), any());
-        verify(billingProfileStoragePort).deleteCoworkerInvitation(eq(billingProfileId), eq(invitedGithubUserId));
+        verify(billingProfileStoragePort).acceptCoworkerInvitation(eq(billingProfileId), eq(invitedGithubUserId));
     }
 
     @Test
@@ -1237,6 +1268,7 @@ class BillingProfileServiceTest {
 
         // Then
         verify(billingProfileStoragePort).deleteCoworker(eq(billingProfileId), eq(userIAdmin));
+        verify(billingProfileStoragePort).deleteCoworkerInvitation(eq(billingProfileId), eq(removedGithubUserId));
     }
 
     @Test

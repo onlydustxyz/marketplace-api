@@ -76,19 +76,19 @@ public interface BillingProfileUserViewRepository extends JpaRepository<BillingP
                    " AND (coalesce(roles) IS NULL OR cast(bpu.role as text) IN (:roles)) " +
                    " UNION " +
                    SELECT_INVITED_COWORKER +
-                   " WHERE bpui.billing_profile_id = :billingProfileId " +
+                   " WHERE bpui.billing_profile_id = :billingProfileId and bpui.accepted = false" +
                    " AND (coalesce(roles) IS NULL OR cast(bpui.role as text) IN (:roles)) ", nativeQuery = true)
     Page<BillingProfileUserViewEntity> findByBillingProfileId(UUID billingProfileId, List<String> roles, Pageable pageable);
 
     @Query(value = SELECT_INVITED_COWORKER +
-                   " WHERE bpui.billing_profile_id = :billingProfileId AND bpui.github_user_id = :githubUserId ", nativeQuery = true)
+                   " WHERE bpui.billing_profile_id = :billingProfileId AND bpui.github_user_id = :githubUserId and bpui.accepted = false", nativeQuery = true)
     Optional<BillingProfileUserViewEntity> findInvitedUserByBillingProfileIdAndGithubId(UUID billingProfileId, Long githubUserId);
 
     @Query(value = SELECT_COWORKER +
                    " WHERE bpu.billing_profile_id = :billingProfileId AND u.github_user_id = :githubUserId " +
                    " UNION " +
                    SELECT_INVITED_COWORKER +
-                   " WHERE bpui.billing_profile_id = :billingProfileId AND bpui.github_user_id = :githubUserId ", nativeQuery = true)
+                   " WHERE bpui.billing_profile_id = :billingProfileId AND bpui.github_user_id = :githubUserId and bpui.accepted = false", nativeQuery = true)
     Optional<BillingProfileUserViewEntity> findUserByBillingProfileIdAndGithubId(UUID billingProfileId, Long githubUserId);
 
     @Query(value = SELECT_COWORKER +
