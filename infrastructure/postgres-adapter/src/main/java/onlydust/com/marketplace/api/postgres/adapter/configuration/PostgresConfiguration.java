@@ -320,11 +320,12 @@ public class PostgresConfiguration {
                                                                      final ChildrenKycRepository childrenKycRepository,
                                                                      final BillingProfileUserInvitationRepository billingProfileUserInvitationRepository,
                                                                      final PayoutPreferenceRepository payoutPreferenceRepository,
-                                                                     final BankAccountRepository bankAccountRepository) {
+                                                                     final BankAccountRepository bankAccountRepository,
+                                                                     final ShortBillingProfileViewRepository shortBillingProfileViewRepository) {
         return new PostgresBillingProfileAdapter(globalSettingsRepository,
                 billingProfileRepository, kybRepository, kycRepository, payoutInfoRepository, walletRepository, billingProfileUserRepository,
                 billingProfileUserViewRepository, childrenKycRepository, billingProfileUserInvitationRepository, payoutPreferenceRepository,
-                bankAccountRepository);
+                bankAccountRepository, shortBillingProfileViewRepository);
     }
 
     @Bean

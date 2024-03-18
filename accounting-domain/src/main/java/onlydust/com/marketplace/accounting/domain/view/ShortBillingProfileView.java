@@ -15,7 +15,7 @@ public class ShortBillingProfileView {
     BillingProfile.Type type;
     String name;
     Boolean enabled;
-
+    Boolean pendingInvitationResponse;
     @Getter(AccessLevel.NONE)
     ZonedDateTime invoiceMandateAcceptedAt;
     @Getter(AccessLevel.NONE)

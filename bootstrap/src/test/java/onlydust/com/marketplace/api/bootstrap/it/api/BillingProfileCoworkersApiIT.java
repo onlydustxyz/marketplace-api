@@ -500,6 +500,18 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 .isNotFound();
 
         // When
+        client.get()
+                .uri(getApiURI(ME_BILLING_PROFILES))
+                .header("Authorization", "Bearer " + userAuthHelper.authenticateOlivier().jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.billingProfiles[?(@.type == 'SELF_EMPLOYED')].pendingInvitationResponse").isEqualTo(false)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].pendingInvitationResponse").isEqualTo(true);
+
+        // When
         client.post()
                 .uri(getApiURI(ME_BILLING_PROFILES_POST_COWORKER_INVITATIONS.formatted(companyBillingProfile.id().value().toString())))
                 .header("Authorization", "Bearer " + userAuthHelper.authenticateOlivier().jwt())
