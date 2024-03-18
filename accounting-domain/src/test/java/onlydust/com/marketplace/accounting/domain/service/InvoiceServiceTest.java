@@ -105,21 +105,16 @@ class InvoiceServiceTest {
     void should_update_if_approved_status() {
         // Given
         when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
-        Invoice.Status status = Invoice.Status.APPROVED;
-        final String rejectionReason = null;
+        final var status = Invoice.Status.APPROVED;
 
         // When
-        invoiceService.update(invoice.id(), status, rejectionReason);
+        invoiceService.update(invoice.id(), status, null);
 
         // Then
         final var invoiceCaptor = ArgumentCaptor.forClass(Invoice.class);
         verify(invoiceStoragePort).update(invoiceCaptor.capture());
         final var updatedInvoice = invoiceCaptor.getValue();
         assertThat(updatedInvoice.status()).isEqualTo(status);
-
-        if (status == Invoice.Status.REJECTED) {
-            //TODO: verify(billingProfileObserver).onInvoiceRejected(invoice.id());
-        }
     }
 
     @Test

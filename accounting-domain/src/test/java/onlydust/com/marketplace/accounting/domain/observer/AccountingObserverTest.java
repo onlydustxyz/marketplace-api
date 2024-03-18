@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.observer;
 
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
@@ -430,7 +431,7 @@ public class AccountingObserverTest {
             when(invoiceStorage.get(invoice.id())).thenReturn(Optional.of(invoice));
         }
 
-        //TODO @Test
+        @Test
         public void should_update_reward_status_data() {
             // Given
             when(rewardStatusStorage.get(any())).then(invocation -> {
@@ -439,7 +440,21 @@ public class AccountingObserverTest {
             });
 
             // When
-            //TODO: accountingObserver.onInvoiceRejected(invoice.id());
+            accountingObserver.onInvoiceRejected(new InvoiceRejected(
+                    faker.internet().emailAddress(),
+                    3L,
+                    faker.internet().slug(),
+                    faker.name().firstName(),
+                    invoice.number().toString(),
+                    invoice.rewards().stream().map(r -> InvoiceRejected.ShortReward.builder()
+                            .id(r.id())
+                            .projectName(r.projectName())
+                            .currencyCode(currency.code().toString())
+                            .amount(r.amount().getValue())
+                            .dollarsEquivalent(r.amount().getValue())
+                            .build()).toList(),
+                    "Invalid invoice"
+            ));
 
             // Then
             final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
