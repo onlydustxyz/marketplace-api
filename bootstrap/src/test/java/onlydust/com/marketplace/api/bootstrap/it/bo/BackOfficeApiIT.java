@@ -688,7 +688,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "website": "OnlyDust.xyz",
                               "lookingForAJob": null,
                               "weeklyAllocatedTime": null,
-                              "verificationStatus": "NOT_STARTED",
                               "languages": [
                                 "CSS",
                                 "HTML",
@@ -699,7 +698,9 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "TypeScript"
                               ],
                               "tcAcceptedAt": null,
-                              "onboardingCompletedAt": null
+                              "onboardingCompletedAt": null,
+                              "verificationStatus": "NOT_STARTED",
+                              "usEntity": null
                             },
                             {
                               "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
@@ -723,7 +724,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "optimismAddress": null,
                               "starknetAddress": null,
                               "createdAt": "2022-12-12T09:51:58.48559Z",
-                              "updatedAt": "2024-02-07T17:13:50.195346Z",
+                              "updatedAt": "2024-02-28T17:32:57.617763Z",
                               "lastSeenAt": "2023-10-05T19:06:50.034Z",
                               "email": "abuisset@gmail.com",
                               "githubUserId": 43467246,
@@ -735,7 +736,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "website": "https://linktr.ee/abuisset",
                               "lookingForAJob": false,
                               "weeklyAllocatedTime": "none",
-                              "verificationStatus": "NOT_STARTED",
                               "languages": [
                                 "TypeScript",
                                 "Rust",
@@ -753,7 +753,9 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "HTML"
                               ],
                               "tcAcceptedAt": "2023-06-16 16:10:53.562624",
-                              "onboardingCompletedAt": "2023-06-28T13:43:28.30742Z"
+                              "onboardingCompletedAt": "2023-06-28T13:43:28.30742Z",
+                              "verificationStatus": "NOT_STARTED",
+                              "usEntity": null
                             }
                           ]
                         }

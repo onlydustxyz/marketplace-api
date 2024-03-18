@@ -63,6 +63,7 @@ public class BoUserEntity {
     String tcAcceptedAt;
     ZonedDateTime onboardingCompletedAt;
     Boolean usEntity;
+    String verificationStatus;
 
     public UserView toView() {
         return UserView.builder()
@@ -103,6 +104,7 @@ public class BoUserEntity {
                 .tcAcceptedAt(tcAcceptedAt)
                 .onboardingCompletedAt(onboardingCompletedAt)
                 .usEntity(usEntity)
+                .verificationStatus(verificationStatus)
                 .build();
     }
 }
