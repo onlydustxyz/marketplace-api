@@ -46,13 +46,19 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     public ResponseEntity<AccountResponse> createSponsorAccount(UUID sponsorUuid, CreateAccountRequest createAccountRequest) {
         final var sponsorId = SponsorId.of(sponsorUuid);
         final var currencyId = Currency.Id.of(createAccountRequest.getCurrencyId());
-        final var allowance = PositiveAmount.of(createAccountRequest.getAllowance());
         final var lockedUntil = createAccountRequest.getLockedUntil();
+        final var allowance = createAccountRequest.getAllowance() == null ? null : PositiveAmount.of(createAccountRequest.getAllowance());
         final var transaction = createAccountRequest.getReceipt() == null ? null : mapReceiptToTransaction(createAccountRequest.getReceipt());
 
+        if (allowance == null && transaction == null)
+            throw badRequest("Either allowance or transaction must be set");
+
+        if (allowance != null && transaction != null)
+            throw badRequest("Both allowance and transaction cannot be set at the same time");
+
         final var sponsorAccountStatement = transaction == null ?
-                accountingFacadePort.createSponsorAccount(sponsorId, currencyId, allowance, lockedUntil) :
-                accountingFacadePort.createSponsorAccount(sponsorId, currencyId, allowance, lockedUntil, transaction);
+                accountingFacadePort.createSponsorAccountWithInitialAllowance(sponsorId, currencyId, lockedUntil, allowance) :
+                accountingFacadePort.createSponsorAccountWithInitialBalance(sponsorId, currencyId, lockedUntil, transaction);
 
         return ResponseEntity.ok(mapAccountToResponse(sponsorAccountStatement));
     }

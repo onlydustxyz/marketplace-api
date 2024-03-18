@@ -101,4 +101,12 @@ public class Amount {
     public boolean isZero() {
         return value.compareTo(BigDecimal.ZERO) == 0;
     }
+
+    public static Amount min(Amount a, Amount b) {
+        return a.isStrictlyLowerThan(b) ? a : b;
+    }
+
+    public static Amount max(Amount a, Amount b) {
+        return a.isStrictlyGreaterThan(b) ? a : b;
+    }
 }

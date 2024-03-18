@@ -96,8 +96,10 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
                 .url("https://sponsor.com")
                 .build());
 
-        final var accountEth = accountingFacadePort.createSponsorAccount(sponsorId, Currency.Id.of(eth.id()), PositiveAmount.of(1000L), null);
-        final var accountUsdc = accountingFacadePort.createSponsorAccount(sponsorId, Currency.Id.of(usdc.id()), PositiveAmount.of(20000L), null);
+        final var accountEth = accountingFacadePort.createSponsorAccountWithInitialAllowance(sponsorId, Currency.Id.of(eth.id()), null,
+                PositiveAmount.of(1000L));
+        final var accountUsdc = accountingFacadePort.createSponsorAccountWithInitialAllowance(sponsorId, Currency.Id.of(usdc.id()), null,
+                PositiveAmount.of(20000L));
 
         accountingFacadePort.allocate(accountEth.account().id(), ProjectId.of(projectId), PositiveAmount.of(100L), Currency.Id.of(eth.id()));
         accountingFacadePort.allocate(accountUsdc.account().id(), ProjectId.of(projectId), PositiveAmount.of(200L), Currency.Id.of(usdc.id()));

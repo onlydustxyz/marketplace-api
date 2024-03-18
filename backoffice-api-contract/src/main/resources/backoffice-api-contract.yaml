@@ -1867,7 +1867,6 @@ components:
       type: object
       required:
         - currencyId
-        - allowance
       properties:
         currencyId:
           $ref: '#/components/schemas/CurrencyId'

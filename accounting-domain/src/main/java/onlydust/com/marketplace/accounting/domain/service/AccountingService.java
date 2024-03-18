@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.reducing;
+import static onlydust.com.marketplace.accounting.domain.model.Amount.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -32,22 +33,19 @@ public class AccountingService implements AccountingFacadePort {
 
     @Override
     @Transactional
-    public SponsorAccountStatement createSponsorAccount(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount allowance,
-                                                        ZonedDateTime lockedUntil) {
-        final var currency = getCurrency(currencyId);
-        final var sponsorAccount = new SponsorAccount(sponsorId, currency, lockedUntil);
-        sponsorAccountStorage.save(sponsorAccount);
-
+    public SponsorAccountStatement createSponsorAccountWithInitialAllowance(@NonNull SponsorId sponsorId, @NonNull Currency.Id currencyId,
+                                                                            ZonedDateTime lockedUntil, @NonNull PositiveAmount allowance) {
+        final var sponsorAccount = createSponsorAccount(sponsorId, currencyId, lockedUntil);
         increaseAllowance(sponsorAccount.id(), allowance);
-        return sponsorAccountStatement(sponsorAccount, getAccountBook(currency));
+        return sponsorAccountStatement(sponsorAccount, getAccountBook(currencyId));
     }
 
-    @Override
     @Transactional
-    public SponsorAccountStatement createSponsorAccount(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount allowance,
-                                                        ZonedDateTime lockedUntil, @NonNull SponsorAccount.Transaction transaction) {
-        final var sponsorAccount = createSponsorAccount(sponsorId, currencyId, allowance, lockedUntil);
-        return fund(sponsorAccount.account().id(), transaction);
+    public SponsorAccountStatement createSponsorAccountWithInitialBalance(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId,
+                                                                          ZonedDateTime lockedUntil,
+                                                                          @NonNull SponsorAccount.Transaction transaction) {
+        final var sponsorAccount = createSponsorAccount(sponsorId, currencyId, lockedUntil);
+        return fund(sponsorAccount.id(), transaction);
     }
 
     @Override
@@ -84,7 +82,12 @@ public class AccountingService implements AccountingFacadePort {
     public SponsorAccountStatement fund(@NonNull SponsorAccount.Id sponsorAccountId, @NonNull SponsorAccount.Transaction transaction) {
         final var sponsorAccount = mustGetSponsorAccount(sponsorAccountId);
         final var accountBook = getAccountBook(sponsorAccount.currency());
-        return registerSponsorAccountTransaction(accountBook, sponsorAccount, transaction);
+        final var accountStatement = registerSponsorAccountTransaction(accountBook, sponsorAccount, transaction);
+
+        final var allowanceToAdd = min(transaction.amount(), max(accountStatement.debt().negate(), ZERO));
+        if (allowanceToAdd.isStrictlyPositive()) increaseAllowance(sponsorAccountId, allowanceToAdd);
+
+        return accountStatement;
     }
 
     @Override
@@ -138,7 +141,6 @@ public class AccountingService implements AccountingFacadePort {
         return new PayableRewardAggregator(sponsorAccountStorage, currency).isPayable(rewardId);
     }
 
-
     @Override
     public Optional<SponsorAccountStatement> getSponsorAccountStatement(SponsorAccount.Id sponsorAccountId) {
         return sponsorAccountStorage.get(sponsorAccountId).map(sponsorAccount -> sponsorAccountStatement(sponsorAccount,
@@ -175,6 +177,13 @@ public class AccountingService implements AccountingFacadePort {
     @Override
     public List<PayableReward> getPayableRewards(Set<RewardId> rewardIds) {
         return currencyStorage.all().stream().flatMap(currency -> new PayableRewardAggregator(sponsorAccountStorage, currency).getPayableRewards(rewardIds)).toList();
+    }
+
+    private SponsorAccount createSponsorAccount(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, ZonedDateTime lockedUntil) {
+        final var currency = getCurrency(currencyId);
+        final var sponsorAccount = new SponsorAccount(sponsorId, currency, lockedUntil);
+        sponsorAccountStorage.save(sponsorAccount);
+        return sponsorAccount;
     }
 
     private <From, To> AccountBookAggregate transfer(From from, To to, PositiveAmount amount, Currency.Id currencyId) {
@@ -215,6 +224,10 @@ public class AccountingService implements AccountingFacadePort {
 
     private AccountBookAggregate getAccountBook(Currency currency) {
         return AccountBookAggregate.fromEvents(accountBookEventStorage.get(currency));
+    }
+
+    private AccountBookAggregate getAccountBook(Currency.Id currencyId) {
+        return getAccountBook(getCurrency(currencyId));
     }
 
     public SponsorAccountStatement delete(SponsorAccount.Id sponsorAccountId, SponsorAccount.Transaction.Id transactionId) {

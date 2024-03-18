@@ -130,7 +130,7 @@ public class NewAccountingMigration implements CommandLineRunner {
         final var transaction = new SponsorAccount.Transaction(SponsorAccount.Transaction.Type.DEPOSIT, currency.legacyNetwork(), UNKNOWN, total,
                 sponsor.getName(), UNKNOWN);
 
-        return accountingFacadePort.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(total), unlockDate, transaction);
+        return accountingFacadePort.createSponsorAccountWithInitialBalance(sponsorId, currency.id(), unlockDate, transaction);
     }
 
     private void allocateBudgetToProjects(SponsorAccount sponsorAccount, Currency currency, List<Budget> budgets) {
