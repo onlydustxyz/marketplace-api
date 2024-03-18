@@ -58,7 +58,8 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.name").isEqualTo("company")
                 .jsonPath("$.type").isEqualTo("COMPANY")
                 .jsonPath("$.status").isEqualTo("NOT_STARTED")
-                .jsonPath("$.id").isNotEmpty();
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.kyb.id").isNotEmpty();
 
         client.post()
                 .uri(getApiURI(BILLING_PROFILES_POST))
@@ -100,7 +101,8 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.name").isEqualTo("self_employed")
                 .jsonPath("$.type").isEqualTo("SELF_EMPLOYED")
                 .jsonPath("$.status").isEqualTo("NOT_STARTED")
-                .jsonPath("$.id").isNotEmpty();
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.kyb.id").isNotEmpty();
 
         client.post()
                 .uri(getApiURI(BILLING_PROFILES_POST))
@@ -120,7 +122,8 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.name").isEqualTo("self_employed")
                 .jsonPath("$.type").isEqualTo("SELF_EMPLOYED")
                 .jsonPath("$.status").isEqualTo("NOT_STARTED")
-                .jsonPath("$.id").isNotEmpty();
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.kyb.id").isNotEmpty();
 
 
         // When
@@ -142,7 +145,8 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.name").isEqualTo("individual")
                 .jsonPath("$.type").isEqualTo("INDIVIDUAL")
                 .jsonPath("$.status").isEqualTo("NOT_STARTED")
-                .jsonPath("$.id").isNotEmpty();
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.kyc.id").isNotEmpty();
 
         // When
         client.post()
@@ -211,8 +215,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.me.canDelete").isEqualTo(true)
                 .jsonPath("$.me.canLeave").isEqualTo(false)
                 .jsonPath("$.me.role").isEqualTo("ADMIN")
-                .jsonPath("$.me.invitation").isEmpty()
-                .jsonPath("$.kyc").isEmpty();
+                .jsonPath("$.me.invitation").isEmpty();
 
         // When
         client.get()
@@ -230,8 +233,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.me.canDelete").isEqualTo(true)
                 .jsonPath("$.me.canLeave").isEqualTo(false)
                 .jsonPath("$.me.role").isEqualTo("ADMIN")
-                .jsonPath("$.me.invitation").isEmpty()
-                .jsonPath("$.kyc").isEmpty();
+                .jsonPath("$.me.invitation").isEmpty();
 
         // When
         client.get()
@@ -249,8 +251,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.me.canDelete").isEqualTo(true)
                 .jsonPath("$.me.canLeave").isEqualTo(false)
                 .jsonPath("$.me.role").isEqualTo("ADMIN")
-                .jsonPath("$.me.invitation").isEmpty()
-                .jsonPath("$.kyb").isEmpty();
+                .jsonPath("$.me.invitation").isEmpty();
 
         // When
         client.get()
