@@ -8,6 +8,7 @@ import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
+import onlydust.com.marketplace.accounting.domain.port.in.BatchPaymentPort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
@@ -41,6 +42,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     private final CurrencyFacadePort currencyFacadePort;
     private final UserFacadePort userFacadePort;
     private final AccountingRewardPort accountingRewardPort;
+    private final BatchPaymentPort batchPaymentPort;
 
     @Override
     public ResponseEntity<AccountResponse> createSponsorAccount(UUID sponsorUuid, CreateAccountRequest createAccountRequest) {
@@ -207,26 +209,26 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     public ResponseEntity<SearchRewardsResponse> searchRewards(SearchRewardsRequest searchRewardsRequest) {
         final var invoiceIds = searchRewardsRequest.getInvoiceIds() != null ?
                 searchRewardsRequest.getInvoiceIds().stream().map(Invoice.Id::of).toList() : null;
-        final List<BackofficeRewardView> rewardViews = accountingRewardPort.searchForBatchPaymentByInvoiceIds(invoiceIds);
+        final List<BackofficeRewardView> rewardViews = accountingRewardPort.searchRewardsByInvoiceIds(invoiceIds);
         return ResponseEntity.ok(SearchRewardMapper.searchRewardToResponse(rewardViews));
     }
 
     @Override
     public ResponseEntity<BatchPaymentsResponse> createBatchPayments(PostBatchPaymentRequest postBatchPaymentRequest) {
         final var batchPayments =
-                accountingRewardPort.createBatchPaymentsForInvoices(postBatchPaymentRequest.getInvoiceIds().stream().map(Invoice.Id::of).toList());
+                batchPaymentPort.createBatchPaymentsForInvoices(postBatchPaymentRequest.getInvoiceIds().stream().map(Invoice.Id::of).toList());
         return ResponseEntity.ok(BatchPaymentMapper.domainToResponse(batchPayments));
     }
 
     @Override
     public ResponseEntity<Void> updateBatchPayment(UUID batchPaymentId, BatchPaymentRequest batchPaymentRequest) {
-        accountingRewardPort.markBatchPaymentAsPaid(BatchPayment.Id.of(batchPaymentId), batchPaymentRequest.getTransactionHash());
+        batchPaymentPort.markBatchPaymentAsPaid(BatchPayment.Id.of(batchPaymentId), batchPaymentRequest.getTransactionHash());
         return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<BatchPaymentDetailsResponse> getBatchPayment(UUID batchPaymentId) {
-        return ResponseEntity.ok(BatchPaymentMapper.domainToDetailedResponse(accountingRewardPort.findBatchPaymentById(BatchPayment.Id.of(batchPaymentId))));
+        return ResponseEntity.ok(BatchPaymentMapper.domainToDetailedResponse(batchPaymentPort.findBatchPaymentById(BatchPayment.Id.of(batchPaymentId))));
     }
 
     @Override
@@ -234,7 +236,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
         final int sanitizePageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
         final int sanitizedPageSize = PaginationHelper.sanitizePageSize(pageSize);
         final BatchPaymentPageResponse batchPaymentPageResponse = BatchPaymentMapper.pageToResponse(
-                accountingRewardPort.findBatchPayments(sanitizePageIndex, sanitizedPageSize, statuses == null ? null :
+                batchPaymentPort.findBatchPayments(sanitizePageIndex, sanitizedPageSize, statuses == null ? null :
                         statuses.stream().map(BatchPaymentMapper::map).collect(Collectors.toSet())),
                 pageIndex);
         return batchPaymentPageResponse.getTotalPageNumber() > 1 ?

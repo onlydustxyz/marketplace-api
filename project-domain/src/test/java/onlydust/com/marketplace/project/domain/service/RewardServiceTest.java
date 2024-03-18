@@ -193,5 +193,6 @@ public class RewardServiceTest {
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("User must be project lead to cancel a reward");
         }
+
     }
 }
