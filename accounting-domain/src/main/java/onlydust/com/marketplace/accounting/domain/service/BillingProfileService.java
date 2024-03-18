@@ -245,8 +245,8 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (!billingProfileStoragePort.isAdmin(billingProfileId, invitedBy)) {
             throw unauthorized("User %s must be admin to invite coworker to billing profile %s".formatted(invitedBy, billingProfileId));
         }
-        if (billingProfile.getType() == BillingProfile.Type.INDIVIDUAL) {
-            throw unauthorized("Cannot invite coworker on individual billing profile %s".formatted(billingProfile.getId()));
+        if (List.of(BillingProfile.Type.INDIVIDUAL, BillingProfile.Type.SELF_EMPLOYED).contains(billingProfile.getType())) {
+            throw unauthorized("Cannot invite coworker on individual or self employed billing profile %s".formatted(billingProfile.getId()));
         }
         indexerPort.indexUser(invitedGithubUserId.value());
         billingProfileStoragePort.saveCoworkerInvitation(billingProfileId, invitedBy, invitedGithubUserId, role, ZonedDateTime.now());

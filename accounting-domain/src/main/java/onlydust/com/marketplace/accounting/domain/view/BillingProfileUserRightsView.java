@@ -9,7 +9,7 @@ import java.time.ZonedDateTime;
 
 @Builder
 public record BillingProfileUserRightsView(BillingProfile.User.Role role, Boolean hasBillingProfileSomeInvoices,
-                                           Boolean hasUserSomeRewardsIncludedInInvoicesOnBillingProfile, InvitationView invitation) {
+                                           Boolean hasUserSomeRewardsIncludedInInvoicesOnBillingProfile, InvitationView invitation, Boolean hasMoreThanOneCoworkers) {
     @Builder
     public record InvitationView(@NonNull ZonedDateTime invitedAt, @NonNull BillingProfile.User.Role role, @NonNull GithubUserId githubUserId,
                                  @NonNull String githubLogin, @NonNull String githubAvatarUrl) {

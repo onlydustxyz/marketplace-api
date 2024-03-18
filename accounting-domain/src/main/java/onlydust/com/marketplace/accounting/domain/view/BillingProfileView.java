@@ -1,8 +1,10 @@
 package onlydust.com.marketplace.accounting.domain.view;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Value;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
-import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 
 import java.time.ZonedDateTime;
 
@@ -35,5 +37,9 @@ public class BillingProfileView {
         return invoiceMandateAcceptedAt != null &&
                invoiceMandateLatestVersionDate != null &&
                invoiceMandateAcceptedAt.isAfter(invoiceMandateLatestVersionDate);
+    }
+
+    public boolean isSwitchableToSelfEmployed() {
+        return this.type == BillingProfile.Type.COMPANY && !this.me.hasMoreThanOneCoworkers();
     }
 }

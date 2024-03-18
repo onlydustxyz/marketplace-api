@@ -41,6 +41,7 @@ public interface BillingProfileMapper {
             billingProfileResponse.setName(companyBillingProfile.name());
             billingProfileResponse.setIsSwitchableToSelfEmployed(companyBillingProfile.isSwitchableToSelfEmployed());
             billingProfileResponse.setStatus(verificationStatusToResponse(companyBillingProfile.status()));
+            billingProfileResponse.setIsSwitchableToSelfEmployed(true);
             return billingProfileResponse;
         } else if (billingProfile instanceof SelfEmployedBillingProfile selfEmployedBillingProfile) {
             billingProfileResponse.setType(BillingProfileType.SELF_EMPLOYED);
@@ -49,6 +50,7 @@ public interface BillingProfileMapper {
             billingProfileResponse.setName(selfEmployedBillingProfile.name());
             billingProfileResponse.setIsSwitchableToSelfEmployed(selfEmployedBillingProfile.isSwitchableToCompany());
             billingProfileResponse.setStatus(verificationStatusToResponse(selfEmployedBillingProfile.status()));
+            billingProfileResponse.setIsSwitchableToSelfEmployed(false);
             return billingProfileResponse;
         } else {
             throw OnlyDustException.internalServerError("Failed to cast billing profile to billing profile type");
@@ -304,6 +306,7 @@ public interface BillingProfileMapper {
                                         .invitedAt(view.getMe().invitation().invitedAt())
                         )
         );
+        billingProfileResponse.setIsSwitchableToSelfEmployed(view.isSwitchableToSelfEmployed());
         return billingProfileResponse;
     }
 
