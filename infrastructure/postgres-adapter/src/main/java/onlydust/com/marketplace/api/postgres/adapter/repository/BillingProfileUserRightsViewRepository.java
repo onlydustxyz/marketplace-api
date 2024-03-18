@@ -25,7 +25,9 @@ public interface BillingProfileUserRightsViewRepository extends JpaRepository<Bi
                    bpui.invited_at,
                    u_by.github_login               invited_by_github_login,
                    u_by.github_user_id             invited_by_github_user_id,
-                   u_by.github_avatar_url          invited_by_github_avatar_url
+                   u_by.github_avatar_url          invited_by_github_avatar_url,
+                   (select count(*) from accounting.billing_profiles_user_invitations bpui2 
+                                    where bpui2.billing_profile_id = :billingProfileId ) > 0 has_more_than_one_coworker
             from accounting.billing_profiles_users bpu
                      join iam.users u on bpu.user_id = u.id
                      left join accounting.billing_profiles_user_invitations bpui

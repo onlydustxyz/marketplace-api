@@ -79,6 +79,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.name").isEqualTo("company")
                 .jsonPath("$.type").isEqualTo("COMPANY")
                 .jsonPath("$.status").isEqualTo("NOT_STARTED")
+                .jsonPath("$.isSwitchableToSelfEmployed").isEqualTo(true)
                 .jsonPath("$.id").isNotEmpty();
 
 
@@ -102,6 +103,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.type").isEqualTo("SELF_EMPLOYED")
                 .jsonPath("$.status").isEqualTo("NOT_STARTED")
                 .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.isSwitchableToSelfEmployed").isEqualTo(false)
                 .jsonPath("$.kyb.id").isNotEmpty();
 
         client.post()
@@ -122,7 +124,8 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.name").isEqualTo("self_employed")
                 .jsonPath("$.type").isEqualTo("SELF_EMPLOYED")
                 .jsonPath("$.status").isEqualTo("NOT_STARTED")
-                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.status").isEqualTo("NOT_STARTED")
+                .jsonPath("$.isSwitchableToSelfEmployed").isEqualTo(false)
                 .jsonPath("$.kyb.id").isNotEmpty();
 
 
@@ -146,6 +149,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.type").isEqualTo("INDIVIDUAL")
                 .jsonPath("$.status").isEqualTo("NOT_STARTED")
                 .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.isSwitchableToSelfEmployed").isEqualTo(false)
                 .jsonPath("$.kyc.id").isNotEmpty();
 
         // When

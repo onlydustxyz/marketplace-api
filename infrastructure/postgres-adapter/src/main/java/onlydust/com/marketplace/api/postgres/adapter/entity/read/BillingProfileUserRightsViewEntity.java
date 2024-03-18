@@ -30,6 +30,7 @@ public class BillingProfileUserRightsViewEntity {
     Long invitedByGithubUserId;
     String invitedByGithubLogin;
     String invitedByGithubAvatarUrl;
+    Boolean hasMoreThanOneCoworker;
 
 
     public BillingProfileUserRightsView toDomain() {
@@ -44,6 +45,7 @@ public class BillingProfileUserRightsViewEntity {
                         .invitedAt(this.invitedAt)
                         .role(this.invitedRole.toDomain())
                         .build())
+                .hasMoreThanOneCoworkers(this.hasMoreThanOneCoworker)
                 .build();
     }
 }

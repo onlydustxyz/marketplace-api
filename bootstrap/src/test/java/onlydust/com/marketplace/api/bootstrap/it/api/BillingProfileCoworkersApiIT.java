@@ -535,6 +535,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.isSwitchableToSelfEmployed").isEqualTo(false)
                 .jsonPath("$.me.canDelete").isEqualTo(false)
                 .jsonPath("$.me.canLeave").isEqualTo(true)
                 .jsonPath("$.me.invitation").isNotEmpty();

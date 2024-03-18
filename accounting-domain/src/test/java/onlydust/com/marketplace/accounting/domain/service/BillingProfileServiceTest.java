@@ -1166,6 +1166,7 @@ class BillingProfileServiceTest {
         final GithubUserId githubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
         when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
         when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+                .type(BillingProfile.Type.COMPANY)
                 .build()
         ));
 
@@ -1213,13 +1214,38 @@ class BillingProfileServiceTest {
         assertThatThrownBy(() -> billingProfileService.inviteCoworker(billingProfileId, userIAdmin, githubUserId, BillingProfile.User.Role.ADMIN))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("Cannot invite coworker on individual billing profile %s".formatted(billingProfileId));
+                .hasMessage("Cannot invite coworker on individual or self employed billing profile %s".formatted(billingProfileId));
 
         // Then
         verify(indexerPort, never()).indexUser(any());
         verify(billingProfileStoragePort, never()).saveCoworkerInvitation(any(), any(), any(), any(), any());
 
     }
+
+     @Test
+    void should_prevent_to_invite_coworker_on_self_employed_billing_profile() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final GithubUserId githubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStoragePort.findById(billingProfileId))
+                .thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.SELF_EMPLOYED)
+                        .verificationStatus(VerificationStatus.NOT_STARTED).build()));
+
+        // When
+        assertThatThrownBy(() -> billingProfileService.inviteCoworker(billingProfileId, userIAdmin, githubUserId, BillingProfile.User.Role.ADMIN))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Cannot invite coworker on individual or self employed billing profile %s".formatted(billingProfileId));
+
+        // Then
+        verify(indexerPort, never()).indexUser(any());
+        verify(billingProfileStoragePort, never()).saveCoworkerInvitation(any(), any(), any(), any(), any());
+
+    }
+
+
 
     @Test
     void should_accept_invitation() {
