@@ -26,20 +26,6 @@ public class MeGetRewardCurrenciesIT extends AbstractMarketplaceApiIT {
                         {
                           "currencies": [
                             {
-                              "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                              "code": "ETH",
-                              "name": "Ether",
-                              "logoUrl": null,
-                              "decimals": 18
-                            },
-                            {
-                              "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                              "code": "STRK",
-                              "name": "StarkNet Token",
-                              "logoUrl": null,
-                              "decimals": 18
-                            },
-                            {
                               "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                               "code": "USD",
                               "name": "US Dollar",
