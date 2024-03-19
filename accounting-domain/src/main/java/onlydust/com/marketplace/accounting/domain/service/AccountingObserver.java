@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificat
 import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 
@@ -40,13 +41,13 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
         sponsorAccount.awaitingPayments().forEach((rewardId, amount) -> {
             final var rewardStatus = rewardStatusStorage.get(rewardId)
                     .orElseThrow(() -> notFound("RewardStatus not found for reward %s".formatted(rewardId)));
-            rewardStatusStorage.save(uptodateRewardStatus(sponsorAccount.accountBookFacade(), rewardStatus));
+            rewardStatusStorage.save(upToDateRewardStatus(sponsorAccount.accountBookFacade(), rewardStatus));
         });
     }
 
     @Override
     public void onRewardCreated(RewardId rewardId, AccountBookFacade accountBookFacade) {
-        rewardStatusStorage.save(uptodateRewardStatus(accountBookFacade, new RewardStatusData(rewardId)));
+        rewardStatusStorage.save(upToDateRewardStatus(accountBookFacade, new RewardStatusData(rewardId)));
         updateUsdEquivalent(rewardId);
     }
 
@@ -95,7 +96,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
                                 quote.price())));
     }
 
-    private RewardStatusData uptodateRewardStatus(AccountBookFacade accountBookFacade, RewardStatusData rewardStatusData) {
+    private RewardStatusData upToDateRewardStatus(AccountBookFacade accountBookFacade, RewardStatusData rewardStatusData) {
         return rewardStatusData
                 .sponsorHasEnoughFund(accountBookFacade.isFunded(rewardStatusData.rewardId()))
                 .unlockDate(accountBookFacade.unlockDateOf(rewardStatusData.rewardId()).map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
@@ -129,8 +130,18 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
     }
 
     @Override
-    public void onPayoutPreferenceChanged(BillingProfile.Id billingProfileId) {
+    public void onPayoutPreferenceChanged(BillingProfile.Id billingProfileId, @NonNull UserId userId, @NonNull ProjectId projectId) {
         refreshRewardsUsdEquivalentOf(billingProfileId);
+        rewardStatusStorage.updateBillingProfileForRecipientUserIdAndProjectId(billingProfileId, userId, projectId);
+    }
+
+    @Override
+    public void onBillingProfileEnabled(BillingProfile.Id billingProfileId, Boolean enabled) {
+        if (enabled) {
+            rewardStatusStorage.enableBillingProfile(billingProfileId);
+        } else {
+            rewardStatusStorage.disabledBillingProfile(billingProfileId);
+        }
     }
 
     private void refreshRewardsUsdEquivalentOf(BillingProfile.Id billingProfileId) {

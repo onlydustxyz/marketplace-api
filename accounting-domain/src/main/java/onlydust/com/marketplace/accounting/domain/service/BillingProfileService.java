@@ -10,10 +10,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
-import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileUserRightsView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
@@ -41,6 +38,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     private final @NonNull PdfStoragePort pdfStoragePort;
     private final @NonNull BillingProfileObserver billingProfileObserver;
     private final @NonNull IndexerPort indexerPort;
+    private final @NonNull AccountingObserverPort accountingObserverPort;
 
 
     @Override
@@ -309,6 +307,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
             throw unauthorized("User %s must be admin to enable billing profile %s".formatted(userId.value(), billingProfileId.value()));
         billingProfileStoragePort.enableBillingProfile(billingProfileId, enabled);
+        accountingObserverPort.onBillingProfileEnabled(billingProfileId, enabled);
     }
 
     @Override
