@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapCurrency;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.mapCurrency;
 
 public interface UserMapper {
 

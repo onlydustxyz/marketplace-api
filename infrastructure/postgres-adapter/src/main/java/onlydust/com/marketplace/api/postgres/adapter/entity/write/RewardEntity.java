@@ -67,7 +67,7 @@ public class RewardEntity {
                 requestorId,
                 recipientId,
                 amount,
-                currency.toOldDomain(),
+                currency.toView().id(),
                 requestedAt,
                 rewardItems.stream().map(RewardItemEntity::toRewardItem).toList(),
                 invoiceId != null);

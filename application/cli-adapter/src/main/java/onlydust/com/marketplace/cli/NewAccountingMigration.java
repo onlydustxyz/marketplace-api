@@ -16,11 +16,14 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileRe
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.EventRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.util.StopWatch;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -151,7 +154,23 @@ public class NewAccountingMigration implements CommandLineRunner {
         if (budget.currency.code().toString().equals(Currency.Code.OP_STR) && UNLOCKED_OP_PROJECTS.contains(budget.projectId))
             return Optional.empty();
 
-        return Optional.ofNullable(onlydust.com.marketplace.project.domain.model.Currency.valueOf(budget.currency.code().toString().toUpperCase()).unlockDate()).map(d -> d.toInstant().atZone(ZoneOffset.UTC));
+        return Optional.ofNullable(OldCurrency.valueOf(budget.currency.code().toString().toUpperCase()).unlockDate()).map(d -> d.toInstant().atZone(ZoneOffset.UTC));
+    }
+
+    private enum OldCurrency {
+        USD, ETH, OP, APT, STRK, LORDS, USDC;
+
+        public Date unlockDate() {
+            return this == OldCurrency.OP ? parseDate("2024-08-23") : null;
+        }
+
+        private static Date parseDate(String date) {
+            try {
+                return new SimpleDateFormat("yyyy-MM-dd").parse(date);
+            } catch (ParseException e) {
+                throw OnlyDustException.badRequest("Invalid date format", e);
+            }
+        }
     }
 
     private void readOldEvents() {

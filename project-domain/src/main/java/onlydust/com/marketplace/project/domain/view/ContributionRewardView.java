@@ -3,7 +3,6 @@ package onlydust.com.marketplace.project.domain.view;
 import lombok.Builder;
 import lombok.Value;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
-import onlydust.com.marketplace.project.domain.model.Currency;
 import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
 
 import java.math.BigDecimal;
@@ -14,7 +13,7 @@ import java.util.UUID;
 @Builder
 public class ContributionRewardView {
     UUID id;
-    Currency currency;
+    CurrencyView currency;
     BigDecimal amount;
     BigDecimal dollarsEquivalent;
     RewardStatus status;

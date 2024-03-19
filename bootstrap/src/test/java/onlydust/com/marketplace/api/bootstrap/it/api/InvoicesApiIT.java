@@ -172,10 +172,10 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                               "projectName": "kaaper",
                               "amount": {
                                 "amount": 1000,
-                                "currency": "ETH",
+                                "currency": {"id":"71bdfcf4-74ee-486b-8cfe-5d841dd93d5c","code":"ETH","name":"Ether","logoUrl":null,"decimals":18},
                                 "target": {
                                   "amount": 1781980.00,
-                                  "currency": "USD",
+                                  "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2},
                                   "conversionRate": 1781.98
                                 }
                               }
@@ -183,16 +183,16 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                           ],
                           "totalBeforeTax": {
                             "amount": 1781980.00,
-                            "currency": "USD"
+                            "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2}
                           },
                           "taxRate": 0.2,
                           "totalTax": {
                             "amount": 356396.000,
-                            "currency": "USD"
+                            "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2}
                           },
                           "totalAfterTax": {
                             "amount": 2138376.000,
-                            "currency": "USD"
+                            "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2}
                           },
                           "usdToEurConversionRate": 0.92
                         }
@@ -329,10 +329,10 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                               "projectName": "kaaper",
                               "amount": {
                                 "amount": 1000,
-                                "currency": "USDC",
+                                "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":null,"decimals":6},
                                 "target": {
                                   "amount": 1010.00,
-                                  "currency": "USD",
+                                  "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2},
                                   "conversionRate": 1.01
                                 }
                               }
@@ -343,10 +343,10 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                               "projectName": "kaaper",
                               "amount": {
                                 "amount": 1000,
-                                "currency": "USDC",
+                                "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":null,"decimals":6},
                                 "target": {
                                   "amount": 1010.00,
-                                  "currency": "USD",
+                                  "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2},
                                   "conversionRate": 1.01
                                 }
                               }
@@ -354,16 +354,16 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                           ],
                           "totalBeforeTax": {
                             "amount": 2020.00,
-                            "currency": "USD"
+                            "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2}
                           },
                           "taxRate": 0.2,
                           "totalTax": {
                             "amount": 404.000,
-                            "currency": "USD"
+                            "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2}
                           },
                           "totalAfterTax": {
                             "amount": 2424.000,
-                            "currency": "USD"
+                            "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2}
                           },
                           "usdToEurConversionRate": 0.92
                         }
@@ -605,7 +605,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                                "number": "OD-MY-COMPANY-002",
                                "totalAfterTax": {
                                  "amount": 2424.000,
-                                 "currency": "USD"
+                                 "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2}
                                },
                                "status": "PROCESSING"
                              },
@@ -613,7 +613,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                                "number": "OD-MY-COMPANY-001",
                                "totalAfterTax": {
                                  "amount": 2138376.000,
-                                 "currency": "USD"
+                                 "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2}
                                },
                                "status": "PROCESSING"
                              }

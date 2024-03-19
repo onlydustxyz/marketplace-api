@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
@@ -23,6 +22,7 @@ import java.util.stream.Collectors;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsLast;
 import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.mapCurrency;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
@@ -210,11 +210,7 @@ public interface BillingProfileMapper {
     static NewMoney map(Money money) {
         return new NewMoney()
                 .amount(money.getValue())
-                .currency(map(money.getCurrency()));
-    }
-
-    static CurrencyContract map(Currency currency) {
-        return CurrencyContract.fromValue(currency.code().toString());
+                .currency(mapCurrency(money.getCurrency()));
     }
 
     static InvoiceStatus map(Invoice.Status status) {
@@ -229,10 +225,10 @@ public interface BillingProfileMapper {
     static ConvertibleMoney toConvertibleMoney(Money money, Money base) {
         return new ConvertibleMoney()
                 .amount(money.getValue())
-                .currency(map(money.getCurrency()))
+                .currency(mapCurrency(money.getCurrency()))
                 .target(new BaseMoney()
                         .amount(base.getValue())
-                        .currency(map(base.getCurrency()))
+                        .currency(mapCurrency(base.getCurrency()))
                         .conversionRate(base.getValue().divide(money.getValue(), 2, RoundingMode.HALF_EVEN))
                 );
     }

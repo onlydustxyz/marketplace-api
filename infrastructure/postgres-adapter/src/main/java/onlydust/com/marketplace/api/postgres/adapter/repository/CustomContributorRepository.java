@@ -59,24 +59,10 @@ public class CustomContributorRepository {
                    to_rewards_stats.pull_request_count prs_to_reward,
                    to_rewards_stats.issue_count issues_to_reward,
                    to_rewards_stats.code_review_count code_reviews_to_reward,
-                   amounts.usd                      as usd,
-                   amounts.usdc                     as usdc,
-                   coalesce(amounts.usdc_usd, 0)    as usdc_usd,
-                   amounts.eth                      as eth,
-                   coalesce(amounts.eth_usd, 0)     as eth_usd,
-                   amounts.stark                    as stark,
-                   coalesce(amounts.stark_usd, 0)   as stark_usd,
-                   amounts.apt                      as apt,
-                   coalesce(amounts.apt_usd, 0)     as apt_usd,
-                   amounts.op                       as op,
-                   coalesce(amounts.op_usd, 0)      as op_usd,
-                   amounts.lords                    as lords,
-                   coalesce(amounts.lords_usd, 0)   as lords_usd,
-                   coalesce(amounts.eth_usd, 0) + coalesce(amounts.stark_usd, 0) +
-                   coalesce(amounts.apt_usd, 0) + coalesce(amounts.op_usd, 0) +
-                   coalesce(amounts.lords_usd, 0) + coalesce(amounts.usdc_usd, 0) +
-                   coalesce(amounts.usd, 0)                   earned,
-                   amounts.lords_usd,
+                   
+                   coalesce(totals_earned.total_dollars_equivalent, 0)      earned,
+                   totals_earned.totals_earned_per_currency                 totals_earned,
+                          
                    hc.contributor_github_user_id is not null is_hidden
             from projects_contributors pc
                      join indexer_exp.github_accounts ga on ga.id = pc.github_user_id
@@ -101,25 +87,31 @@ public class CustomContributorRepository {
                                   and ri.id is null
                                   and ic.project_id is null
                                 group by c.contributor_id) to_rewards_stats on to_rewards_stats.contributor_id = ga.id
-                     left join (select sum(r.amount) filter (where c.code = 'USD')   usd,
-                                       sum(r.amount) filter (where c.code = 'USDC')   usdc,
-                                       sum(rsd.amount_usd_equivalent) filter (where c.code = 'USDC')   usdc_usd,
-                                       sum(r.amount) filter (where c.code = 'APT')   apt,
-                                       sum(rsd.amount_usd_equivalent) filter (where c.code = 'APT')   apt_usd,
-                                       sum(r.amount) filter (where c.code = 'STRK') stark,
-                                       sum(rsd.amount_usd_equivalent) filter (where c.code = 'STRK') stark_usd,
-                                       sum(r.amount) filter (where c.code = 'OP')    op,
-                                       sum(rsd.amount_usd_equivalent) filter (where c.code = 'OP')    op_usd,
-                                       sum(r.amount) filter (where c.code = 'ETH')   eth,
-                                       sum(rsd.amount_usd_equivalent) filter (where c.code = 'ETH')   eth_usd,
-                                       sum(r.amount) filter (where c.code = 'LORDS')   lords,
-                                       sum(rsd.amount_usd_equivalent) filter (where c.code = 'LORDS')   lords_usd,
-                                       r.recipient_id
-                                 from rewards r 
-                                 join accounting.reward_status_data rsd on r.id = rsd.reward_id
-                                 join currencies c on r.currency_id = c.id
-                                 where r.project_id = :projectId
-                                 group by r.recipient_id) amounts on amounts.recipient_id = ga.id
+                     left join (select user_rewards.recipient_id,
+                                sum(user_rewards.total_dollars_equivalent) as total_dollars_equivalent,
+                                jsonb_agg(jsonb_build_object(
+                                   'total_amount', user_rewards.total_amount,
+                                   'total_dollars_equivalent', user_rewards.total_dollars_equivalent,
+                                   'currency_id', user_rewards.currency_id,
+                                   'currency_code', user_rewards.currency_code,
+                                   'currency_name', user_rewards.currency_name,
+                                   'currency_decimals', user_rewards.currency_decimals,
+                                   'currency_logo_url', user_rewards.currency_logo_url
+                                )) as totals_earned_per_currency
+                    from (select r.recipient_id,
+                                 sum(r.amount)  as total_amount,
+                                 coalesce(sum(rsd.amount_usd_equivalent), 0)  as total_dollars_equivalent,
+                                 c.id as currency_id,
+                                 c.code as currency_code,
+                                 c.name as currency_name,
+                                 c.decimals as currency_decimals,
+                                 c.logo_url as currency_logo_url
+                          from rewards r
+                          join accounting.reward_status_data rsd on rsd.reward_id = r.id
+                          join currencies c on c.id = r.currency_id
+                          group by r.recipient_id, c.id) as user_rewards
+                    group by user_rewards.recipient_id)    totals_earned on totals_earned.recipient_id = ga.id
+                    
             where pc.project_id = :projectId
               and ga.login ilike '%' || :login || '%'
               and (hc.contributor_github_user_id is null or :showHidden)

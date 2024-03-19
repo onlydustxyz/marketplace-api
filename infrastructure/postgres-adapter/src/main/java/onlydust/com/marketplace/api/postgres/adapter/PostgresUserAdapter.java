@@ -14,7 +14,6 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
-import onlydust.com.marketplace.project.domain.model.Currency;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.view.*;
@@ -246,14 +245,14 @@ public class PostgresUserAdapter implements UserStoragePort {
                         .build())
                 .rewardedAmount(rewardsStats.size() == 1 ?
                         new Money(rewardsStats.get(0).getProcessedAmount(),
-                                Currency.valueOf(rewardsStats.get(0).getCurrency().code()),
+                                rewardsStats.get(0).getCurrency().toView(),
                                 rewardsStats.get(0).getProcessedUsdAmount()) :
                         new Money(null, null,
                                 rewardsStats.stream().map(RewardStatsEntity::getProcessedUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,
                                         BigDecimal::add)))
                 .pendingAmount(rewardsStats.size() == 1 ?
                         new Money(rewardsStats.get(0).getPendingAmount(),
-                                Currency.valueOf(rewardsStats.get(0).getCurrency().code()),
+                                rewardsStats.get(0).getCurrency().toView(),
                                 rewardsStats.get(0).getPendingUsdAmount()) :
                         new Money(null, null,
                                 rewardsStats.stream().map(RewardStatsEntity::getPendingUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,
@@ -324,9 +323,9 @@ public class PostgresUserAdapter implements UserStoragePort {
     }
 
     @Override
-    public List<Currency> listRewardCurrencies(Long githubUserId) {
+    public List<CurrencyView> listRewardCurrencies(Long githubUserId) {
         return currencyRepository.listRewardCurrenciesByRecipient(githubUserId).stream()
-                .map(CurrencyEntity::toOldDomain)
+                .map(CurrencyEntity::toView)
                 .toList();
     }
 

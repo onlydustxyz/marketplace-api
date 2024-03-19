@@ -15,8 +15,8 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Map;
 
+import static onlydust.com.marketplace.api.bootstrap.helper.CurrencyHelper.STRK;
 import static onlydust.com.marketplace.api.bootstrap.it.bo.BackOfficeAccountingApiIT.BRETZEL;
-import static onlydust.com.marketplace.api.bootstrap.it.bo.BackOfficeAccountingApiIT.STRK;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)

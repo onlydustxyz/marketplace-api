@@ -17,5 +17,5 @@ public interface RewardStatusStorage {
 
     List<RewardStatusData> notPaid();
 
-    List<RewardStatusData> notPaid(BillingProfile.Id userId);
+    List<RewardStatusData> notPaid(BillingProfile.Id billingProfileId);
 }

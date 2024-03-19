@@ -10,7 +10,6 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
-import onlydust.com.marketplace.project.domain.model.Currency;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.output.ProjectRewardStoragePort;
 import onlydust.com.marketplace.project.domain.view.*;
@@ -63,14 +62,14 @@ public class PostgresProjectRewardAdapter implements ProjectRewardStoragePort {
                         .build())
                 .remainingBudget(budgetStats.size() == 1 ?
                         new Money(budgetStats.get(0).getRemainingAmount(),
-                                budgetStats.get(0).getCurrency().toOldDomain(),
+                                budgetStats.get(0).getCurrency().toView(),
                                 budgetStats.get(0).getRemainingUsdAmount()) :
                         new Money(null, null,
                                 budgetStats.stream().map(BudgetStatsEntity::getRemainingUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,
                                         BigDecimal::add)))
                 .spentAmount(budgetStats.size() == 1 ?
                         new Money(budgetStats.get(0).getSpentAmount(),
-                                budgetStats.get(0).getCurrency().toOldDomain(),
+                                budgetStats.get(0).getCurrency().toView(),
                                 budgetStats.get(0).getSpentUsdAmount()) :
                         new Money(null, null,
                                 budgetStats.stream().map(BudgetStatsEntity::getSpentUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,
@@ -97,7 +96,7 @@ public class PostgresProjectRewardAdapter implements ProjectRewardStoragePort {
             ).map(HistoricalQuoteEntity::toDomain);
 
             return BudgetView.builder()
-                    .currency(Currency.valueOf(currency.code()))
+                    .currency(currency.toView())
                     .dollarsConversionRate(quote.map(Quote::price).orElse(null))
                     .remaining(projectAllowanceEntity.getCurrentAllowance())
                     .initialAmount(projectAllowanceEntity.getInitialAllowance())

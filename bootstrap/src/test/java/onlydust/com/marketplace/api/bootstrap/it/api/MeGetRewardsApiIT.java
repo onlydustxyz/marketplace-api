@@ -5,6 +5,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInf
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
@@ -14,6 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
+import javax.persistence.EntityManagerFactory;
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -25,6 +29,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     CurrencyRepository currencyRepository;
     @Autowired
     BillingProfileStoragePort billingProfileStoragePort;
+    @Autowired
+    EntityManagerFactory entityManagerFactory;
 
     UserAuthHelper.AuthenticatedUser pierre;
 
@@ -49,6 +55,9 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_list_my_rewards() {
+        // Given
+        setUnlockDateToSomeReward();
+
         // When
         client.get()
                 .uri(getApiURI(String.format(ME_GET_REWARDS), Map.of(
@@ -74,7 +83,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": null,
                               "amount": {
                                 "total": 500,
-                                "currency": "APT",
+                                "currency": {"id":"48388edb-fda2-4a32-b228-28152a147500","code":"APT","name":"Aptos Coin","logoUrl":null,"decimals":8},
                                 "dollarsEquivalent": 100000
                               },
                               "numberOfRewardedContributions": 25,
@@ -90,7 +99,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": null,
                               "amount": {
                                 "total": 50,
-                                "currency": "ETH",
+                                "currency": {"id":"71bdfcf4-74ee-486b-8cfe-5d841dd93d5c","code":"ETH","name":"Ether","logoUrl":null,"decimals":18},
                                 "dollarsEquivalent": 75000
                               },
                               "numberOfRewardedContributions": 1,
@@ -105,7 +114,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": null,
                               "amount": {
                                 "total": 10,
-                                "currency": "ETH",
+                                "currency": {"id":"71bdfcf4-74ee-486b-8cfe-5d841dd93d5c","code":"ETH","name":"Ether","logoUrl":null,"decimals":18},
                                 "dollarsEquivalent": 15000
                               },
                               "numberOfRewardedContributions": 25,
@@ -121,7 +130,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": null,
                               "amount": {
                                 "total": 1000,
-                                "currency": "USDC",
+                                "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":null,"decimals":6},
                                 "dollarsEquivalent": 1010.00
                               },
                               "numberOfRewardedContributions": 25,
@@ -137,7 +146,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": "2024-08-23T00:00:00Z",
                               "amount": {
                                 "total": 30,
-                                "currency": "OP",
+                                "currency": {"id":"00ca98a5-0197-4b76-a208-4bfc55ea8256","code":"OP","name":"Optimism","logoUrl":null,"decimals":18},
                                 "dollarsEquivalent": null
                               },
                               "numberOfRewardedContributions": 25,
@@ -153,7 +162,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": null,
                               "amount": {
                                 "total": 9511147,
-                                "currency": "STRK",
+                                "currency": {"id":"81b7e948-954f-4718-bad3-b70a0edd27e1","code":"STRK","name":"StarkNet Token","logoUrl":null,"decimals":18},
                                 "dollarsEquivalent": null
                               },
                               "numberOfRewardedContributions": 25,
@@ -183,6 +192,17 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         """);
     }
 
+    private void setUnlockDateToSomeReward() {
+        final var em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+        final var rewardStatusData = em.find(RewardStatusDataEntity.class, UUID.fromString("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"))
+                .unlockDate(Date.from(ZonedDateTime.parse("2024-08-23T00:00:00Z").toInstant()));
+        em.merge(rewardStatusData);
+        em.flush();
+        em.getTransaction().commit();
+        em.close();
+    }
+
     @Test
     void should_get_my_rewards_with_pending_invoice() {
         // When
@@ -205,7 +225,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": null,
                               "amount": {
                                 "total": 500,
-                                "currency": "APT",
+                                "currency": {"id":"48388edb-fda2-4a32-b228-28152a147500","code":"APT","name":"Aptos Coin","logoUrl":null,"decimals":8},
                                 "dollarsEquivalent": 100000
                               },
                               "numberOfRewardedContributions": 25,
@@ -221,7 +241,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": null,
                               "amount": {
                                 "total": 1000,
-                                "currency": "USDC",
+                                "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":null,"decimals":6},
                                 "dollarsEquivalent": 1010.00
                               },
                               "numberOfRewardedContributions": 25,
@@ -257,10 +277,10 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[?(@.requestedAt < '2023-09-20')]").doesNotExist()
                 .jsonPath("$.rewards[?(@.requestedAt > '2023-09-21')]").doesNotExist()
                 .jsonPath("$.rewardedAmount.amount").isEqualTo(50)
-                .jsonPath("$.rewardedAmount.currency").isEqualTo("ETH")
+                .jsonPath("$.rewardedAmount.currency.code").isEqualTo("ETH")
                 .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(75000)
                 .jsonPath("$.pendingAmount.amount").isEqualTo(0)
-                .jsonPath("$.pendingAmount.currency").isEqualTo("ETH")
+                .jsonPath("$.pendingAmount.currency.code").isEqualTo("ETH")
                 .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(0)
                 .jsonPath("$.receivedRewardsCount").isEqualTo(1)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(1)
@@ -283,13 +303,13 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.rewards[?(@.amount.currency == 'ETH')]").exists()
-                .jsonPath("$.rewards[?(@.amount.currency != 'ETH')]").doesNotExist()
+                .jsonPath("$.rewards[?(@.amount.currency.code == 'ETH')]").exists()
+                .jsonPath("$.rewards[?(@.amount.currency.code != 'ETH')]").doesNotExist()
                 .jsonPath("$.rewardedAmount.amount").isEqualTo(60)
-                .jsonPath("$.rewardedAmount.currency").isEqualTo("ETH")
+                .jsonPath("$.rewardedAmount.currency.code").isEqualTo("ETH")
                 .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(90000.00)
                 .jsonPath("$.pendingAmount.amount").isEqualTo(0)
-                .jsonPath("$.pendingAmount.currency").isEqualTo("ETH")
+                .jsonPath("$.pendingAmount.currency.code").isEqualTo("ETH")
                 .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(0.00)
                 .jsonPath("$.receivedRewardsCount").isEqualTo(2)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(26)
@@ -345,8 +365,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.rewards[?(@.amount.currency == 'STRK' && @.amount.dollarsEquivalent == null)]").exists()
-                .jsonPath("$.rewards[?(@.amount.currency == 'STRK' && @.amount.dollarsEquivalent != null)]").doesNotExist()
+                .jsonPath("$.rewards[?(@.amount.currency.code == 'STRK' && @.amount.dollarsEquivalent == null)]").exists()
+                .jsonPath("$.rewards[?(@.amount.currency.code == 'STRK' && @.amount.dollarsEquivalent != null)]").doesNotExist()
                 .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(191010)
                 .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(101010)
         ;

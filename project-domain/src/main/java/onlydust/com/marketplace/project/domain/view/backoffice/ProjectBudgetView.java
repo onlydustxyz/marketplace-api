@@ -2,7 +2,7 @@ package onlydust.com.marketplace.project.domain.view.backoffice;
 
 import lombok.Builder;
 import lombok.Data;
-import onlydust.com.marketplace.project.domain.model.Currency;
+import onlydust.com.marketplace.project.domain.view.CurrencyView;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -18,5 +18,5 @@ public class ProjectBudgetView {
     BigDecimal initialAmountDollarsEquivalent;
     BigDecimal remainingAmountDollarsEquivalent;
     BigDecimal spentAmountDollarsEquivalent;
-    Currency currency;
+    CurrencyView currency;
 }

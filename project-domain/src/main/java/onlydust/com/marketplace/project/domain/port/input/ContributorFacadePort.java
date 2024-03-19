@@ -3,10 +3,10 @@ package onlydust.com.marketplace.project.domain.port.input;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.model.Contributor;
-import onlydust.com.marketplace.project.domain.model.Currency;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
+import onlydust.com.marketplace.project.domain.view.CurrencyView;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
@@ -31,5 +31,5 @@ public interface ContributorFacadePort {
 
     List<Project> rewardingProjects(Long githubUserId);
 
-    List<Currency> getRewardCurrencies(Long githubUserId);
+    List<CurrencyView> getRewardCurrencies(Long githubUserId);
 }

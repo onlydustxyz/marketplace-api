@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.port.out;
 
-import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;

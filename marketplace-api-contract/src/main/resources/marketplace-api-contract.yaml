@@ -2847,7 +2847,7 @@ components:
         currencies:
           type: array
           items:
-            $ref: '#/components/schemas/CurrencyContract'
+            $ref: '#/components/schemas/ShortCurrencyResponse'
 
 
     # VALUE OBJECTS ==================================================================
@@ -2942,7 +2942,7 @@ components:
           description: Amount of money
           example: 100
         currency:
-          $ref: '#/components/schemas/CurrencyContract'
+          $ref: '#/components/schemas/ShortCurrencyResponse'
         usdEquivalent:
           type: number
           description: USD equivalent of the amount
@@ -4086,7 +4086,7 @@ components:
         total:
           type: number
         currency:
-          $ref: '#/components/schemas/CurrencyContract'
+          $ref: '#/components/schemas/ShortCurrencyResponse'
         dollarsEquivalent:
           type: number
     RewardRequest:
@@ -4104,8 +4104,8 @@ components:
         amount:
           type: number
           description: Currency amount
-        currency:
-          $ref: '#/components/schemas/CurrencyContract'
+        currencyId:
+          $ref: '#/components/schemas/CurrencyId'
         items:
           type: array
           minItems: 1
@@ -4347,17 +4347,28 @@ components:
         - APPROVED
         - CHANGES_REQUESTED
 
-    CurrencyContract:
-      type: string
-      description: Currency
-      enum:
-        - USD
-        - ETH
-        - APT
-        - STRK
-        - OP
-        - LORDS
-        - USDC
+    ShortCurrencyResponse:
+      type: object
+      description: Minimal information about a currency
+      required:
+        - id
+        - code
+        - name
+        - decimals
+      properties:
+        id:
+          $ref: '#/components/schemas/CurrencyId'
+        code:
+          type: string
+          example: USDC
+        name:
+          type: string
+          example: USD Coin
+        logoUrl:
+          type: string
+          format: uri
+        decimals:
+          type: integer
 
     ContributionPageResponse:
       type: object
@@ -4905,7 +4916,7 @@ components:
         - remaining
       properties:
         currency:
-          $ref: '#/components/schemas/CurrencyContract'
+          $ref: '#/components/schemas/ShortCurrencyResponse'
         initialAmount:
           type: number
         remaining:
@@ -4938,7 +4949,7 @@ components:
         totalDollarsEquivalent:
           type: number
         currency:
-          $ref: '#/components/schemas/CurrencyContract'
+          $ref: '#/components/schemas/ShortCurrencyResponse'
 
     RewardResponse:
       type: object
@@ -4955,7 +4966,7 @@ components:
           type: string
           format: uuid
         currency:
-          $ref: '#/components/schemas/CurrencyContract'
+          $ref: '#/components/schemas/ShortCurrencyResponse'
         amount:
           type: number
         dollarsEquivalent:
@@ -5752,7 +5763,7 @@ components:
         amount:
           type: number
         currency:
-          $ref: '#/components/schemas/CurrencyContract'
+          $ref: '#/components/schemas/ShortCurrencyResponse'
 
     BaseMoney:
       allOf:

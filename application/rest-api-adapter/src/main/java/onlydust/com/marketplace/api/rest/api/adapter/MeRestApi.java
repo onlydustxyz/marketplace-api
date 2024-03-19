@@ -251,7 +251,7 @@ public class MeRestApi implements MeApi {
     public ResponseEntity<CurrencyListResponse> getMyRewardCurrencies() {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var currencies = contributorFacadePort.getRewardCurrencies(authenticatedUser.getGithubUserId());
-        return ResponseEntity.ok(new CurrencyListResponse().currencies(currencies.stream().map(ProjectBudgetMapper::mapCurrency).toList()));
+        return ResponseEntity.ok(new CurrencyListResponse().currencies(currencies.stream().map(RewardMapper::mapCurrency).toList()));
     }
 
     @Override

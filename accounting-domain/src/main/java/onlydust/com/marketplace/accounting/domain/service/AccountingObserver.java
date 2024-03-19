@@ -103,11 +103,6 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
                 .usdAmount(usdAmountOf(rewardStatusData.rewardId()).orElse(null));
     }
 
-    public void refreshRewardsUsdEquivalents() {
-        rewardStatusStorage.notPaid().forEach(rewardStatus ->
-                rewardStatusStorage.save(rewardStatus.usdAmount(usdAmountOf(rewardStatus.rewardId()).orElse(null)))
-        );
-    }
 
     @Override
     public void onInvoiceUploaded(BillingProfile.Id billingProfileId, Invoice.Id invoiceId, boolean isExternal) {
@@ -131,5 +126,22 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
     @Override
     public void onBillingProfileUpdated(BillingProfileVerificationUpdated billingProfileVerificationUpdated) {
         // TODO ?
+    }
+
+    @Override
+    public void onPayoutPreferenceChanged(BillingProfile.Id billingProfileId) {
+        refreshRewardsUsdEquivalentOf(billingProfileId);
+    }
+
+    private void refreshRewardsUsdEquivalentOf(BillingProfile.Id billingProfileId) {
+        rewardStatusStorage.notPaid(billingProfileId).forEach(rewardStatus ->
+                rewardStatusStorage.save(rewardStatus.usdAmount(usdAmountOf(rewardStatus.rewardId()).orElse(null)))
+        );
+    }
+
+    public void refreshRewardsUsdEquivalents() {
+        rewardStatusStorage.notPaid().forEach(rewardStatus ->
+                rewardStatusStorage.save(rewardStatus.usdAmount(usdAmountOf(rewardStatus.rewardId()).orElse(null)))
+        );
     }
 }

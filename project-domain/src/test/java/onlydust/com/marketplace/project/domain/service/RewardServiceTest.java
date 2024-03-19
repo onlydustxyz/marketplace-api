@@ -3,11 +3,11 @@ package onlydust.com.marketplace.project.domain.service;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
-import onlydust.com.marketplace.project.domain.model.Currency;
-import onlydust.com.marketplace.project.domain.model.OldRequestRewardCommand;
+import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.output.AccountingServicePort;
 import onlydust.com.marketplace.project.domain.port.output.RewardStoragePort;
+import onlydust.com.marketplace.project.domain.view.CurrencyView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -38,6 +38,7 @@ public class RewardServiceTest {
     final UUID projectId = UUID.randomUUID();
     final Faker faker = new Faker();
     final Long recipientId = faker.number().randomNumber(5, true);
+    final CurrencyView.Id usdcId = CurrencyView.Id.random();
 
     @BeforeEach
     void setup() {
@@ -50,11 +51,11 @@ public class RewardServiceTest {
         void should_create_reward() {
             // Given
             when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
-            final var command = OldRequestRewardCommand.builder()
+            final var command = RequestRewardCommand.builder()
                     .projectId(projectId)
                     .recipientId(recipientId)
                     .amount(BigDecimal.TEN)
-                    .currency(Currency.USDC)
+                    .currencyId(usdcId)
                     .items(List.of())
                     .build();
 
@@ -74,21 +75,21 @@ public class RewardServiceTest {
             assertThat(capturedReward.requestorId()).isEqualTo(projectLeadId);
             assertThat(capturedReward.recipientId()).isEqualTo(recipientId);
             assertThat(capturedReward.amount()).isEqualTo(BigDecimal.TEN);
-            assertThat(capturedReward.currency()).isEqualTo(Currency.USDC);
+            assertThat(capturedReward.currencyId()).isEqualTo(usdcId);
             assertThat(capturedReward.rewardItems()).isEmpty();
 
-            verify(accountingServicePort).createReward(projectId, rewardId, BigDecimal.TEN, "USDC");
+            verify(accountingServicePort).createReward(projectId, rewardId, BigDecimal.TEN, usdcId);
         }
 
         @Test
         void should_prevent_non_project_lead_to_create_reward() {
             // Given
             when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
-            final var command = OldRequestRewardCommand.builder()
+            final var command = RequestRewardCommand.builder()
                     .projectId(projectId)
                     .recipientId(recipientId)
                     .amount(BigDecimal.TEN)
-                    .currency(Currency.USDC)
+                    .currencyId(usdcId)
                     .build();
 
             // When
@@ -102,11 +103,11 @@ public class RewardServiceTest {
         void should_prevent_creating_reward_with_negative_amount() {
             // Given
             when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
-            final var command = OldRequestRewardCommand.builder()
+            final var command = RequestRewardCommand.builder()
                     .projectId(projectId)
                     .recipientId(recipientId)
                     .amount(BigDecimal.TEN.negate())
-                    .currency(Currency.USDC)
+                    .currencyId(usdcId)
                     .build();
 
             // When
@@ -120,11 +121,11 @@ public class RewardServiceTest {
         void should_prevent_creating_reward_with_zero_amount() {
             // Given
             when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
-            final var command = OldRequestRewardCommand.builder()
+            final var command = RequestRewardCommand.builder()
                     .projectId(projectId)
                     .recipientId(recipientId)
                     .amount(BigDecimal.ZERO)
-                    .currency(Currency.USDC)
+                    .currencyId(usdcId)
                     .build();
 
             // When
@@ -159,7 +160,7 @@ public class RewardServiceTest {
                 projectLeadId,
                 recipientId,
                 BigDecimal.TEN,
-                Currency.USDC,
+                usdcId,
                 new Date(),
                 List.of(),
                 false
@@ -180,7 +181,7 @@ public class RewardServiceTest {
 
             // Then
             verify(rewardStoragePort).delete(rewardId);
-            verify(accountingServicePort).cancelReward(rewardId, "USDC");
+            verify(accountingServicePort).cancelReward(rewardId, usdcId);
         }
 
         @Test
@@ -205,7 +206,7 @@ public class RewardServiceTest {
                     projectLeadId,
                     recipientId,
                     BigDecimal.TEN,
-                    Currency.USDC,
+                    usdcId,
                     new Date(),
                     List.of(),
                     true

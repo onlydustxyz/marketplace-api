@@ -1,14 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardStatsEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface RewardStatsRepository extends JpaRepository<RewardStatsEntity, CurrencyEnumEntity> {
+public interface RewardStatsRepository extends JpaRepository<RewardStatsEntity, UUID> {
     @Query(value = """
             WITH reward_item_ids AS (SELECT ri.reward_id, JSONB_AGG(DISTINCT ri.id) as ids
                                      FROM reward_items ri

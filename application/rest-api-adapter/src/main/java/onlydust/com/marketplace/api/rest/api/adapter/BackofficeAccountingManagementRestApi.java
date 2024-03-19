@@ -152,10 +152,6 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
         final var reward = rewardFacadePort.getReward(rewardId)
                 .orElseThrow(() -> notFound("Reward %s not found".formatted(rewardId)));
 
-        final var currency =
-                currencyFacadePort.listCurrencies().stream().filter(c -> c.code().toString().equals(reward.currency().toString().toUpperCase())).findFirst()
-                        .orElseThrow(() -> notFound("Currency %s not found".formatted(reward.currency().toString().toUpperCase())));
-
         final var recipient = userFacadePort.getProfileById(reward.recipientId());
 
         final var paymentReference = new SponsorAccount.PaymentReference(mapTransactionNetwork(payRewardRequest.getNetwork()),
@@ -163,7 +159,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                 recipient.getLogin(),
                 payRewardRequest.getRecipientAccount());
 
-        accountingFacadePort.pay(RewardId.of(rewardId), currency.id(), paymentReference);
+        accountingFacadePort.pay(RewardId.of(rewardId), Currency.Id.of(reward.currencyId().value()), paymentReference);
 
         return ResponseEntity.noContent().build();
     }

@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import onlydust.com.backoffice.api.contract.model.AccountResponse;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.api.contract.model.CreateRewardResponse;
@@ -19,6 +18,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static onlydust.com.marketplace.api.bootstrap.helper.CurrencyHelper.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -32,9 +32,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     static final ProjectId BRETZEL = ProjectId.of("7d04163c-4187-4313-8066-61504d34fc56");
     static final ProjectId KAAPER = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
 
-    static final Currency.Id BTC = Currency.Id.of("3f6e1c98-8659-493a-b941-943a803bd91f");
-    static final Currency.Id STRK = Currency.Id.of("81b7e948-954f-4718-bad3-b70a0edd27e1");
-    static final Currency.Id USDC = Currency.Id.of("562bbf65-8a71-4d30-ad63-520c0d68ba27");
 
     @Autowired
     private SponsorAccountRepository sponsorAccountRepository;
@@ -532,7 +529,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                         {
                             "recipientId": "%d",
                             "amount": 30,
-                            "currency": "USDC",
+                            "currencyId": "%s",
                             "items": [{
                                 "type": "PULL_REQUEST",
                                 "id": "1703880973",
@@ -540,7 +537,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                 "repoId": 698096830
                             }]
                         }
-                        """.formatted(ofux.user().getGithubUserId()))
+                        """.formatted(ofux.user().getGithubUserId(), USDC))
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -618,7 +615,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectBody()
                 .json("""
                         {
-                           "currency": "USDC",
+                           "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":null,"decimals":6},
                            "amount": 30,
                            "dollarsEquivalent": null,
                            "status": "COMPLETE",
@@ -771,7 +768,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                         {
                             "recipientId": "%d",
                             "amount": 30,
-                            "currency": "STRK",
+                            "currencyId": "%s",
                             "items": [{
                                 "type": "PULL_REQUEST",
                                 "id": "1703880973",
@@ -779,7 +776,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                 "repoId": 698096830
                             }]
                         }
-                        """.formatted(ofux.user().getGithubUserId()))
+                        """.formatted(ofux.user().getGithubUserId(), STRK))
                 .exchange()
                 .expectStatus()
                 .isOk()

@@ -1,20 +1,25 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.math.BigDecimal;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity
+@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class ProjectContributorViewEntity {
     @Id
     @Column(name = "id")
@@ -40,31 +45,7 @@ public class ProjectContributorViewEntity {
     Integer codeReviewsToReward;
     @Column(name = "issues_to_reward")
     Integer issuesToReward;
-    @Column(name = "usd")
-    BigDecimal usdAmount;
-    @Column(name = "usdc")
-    BigDecimal usdcAmount;
-    @Column(name = "usdc_usd")
-    BigDecimal usdcDollarsEquivalentAmount;
-    @Column(name = "eth")
-    BigDecimal ethAmount;
-    @Column(name = "eth_usd")
-    BigDecimal ethDollarsEquivalentAmount;
-    @Column(name = "op")
-    BigDecimal opAmount;
-    @Column(name = "op_usd")
-    BigDecimal opDollarsEquivalentAmount;
-    @Column(name = "apt")
-    BigDecimal aptAmount;
-    @Column(name = "apt_usd")
-    BigDecimal aptDollarsEquivalentAmount;
-    @Column(name = "stark")
-    BigDecimal starkAmount;
-    @Column(name = "stark_usd")
-    BigDecimal starkDollarsEquivalentAmount;
-    @Column(name = "lords")
-    BigDecimal lordsAmount;
-    @Column(name = "lords_usd")
-    BigDecimal lordsDollarsEquivalentAmount;
-
+    @Type(type = "jsonb")
+    @Column(columnDefinition = "jsonb", name = "totals_earned")
+    private List<UserProfileEntity.TotalEarnedPerCurrency> totalEarnedPerCurrencies;
 }

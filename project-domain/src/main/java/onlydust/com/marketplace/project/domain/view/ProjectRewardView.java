@@ -3,7 +3,6 @@ package onlydust.com.marketplace.project.domain.view;
 import lombok.Builder;
 import lombok.Data;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
-import onlydust.com.marketplace.project.domain.model.Currency;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -20,17 +19,14 @@ public class ProjectRewardView {
     String rewardedUserLogin;
     String rewardedUserAvatar;
     RewardStatus status;
+    Date unlockDate;
     Amount amount;
-
-    public Date getUnlockDate() {
-        return amount.currency.unlockDate();
-    }
 
     @Data
     @Builder
     public static class Amount {
         BigDecimal total;
-        Currency currency;
+        CurrencyView currency;
         BigDecimal dollarsEquivalent;
     }
 

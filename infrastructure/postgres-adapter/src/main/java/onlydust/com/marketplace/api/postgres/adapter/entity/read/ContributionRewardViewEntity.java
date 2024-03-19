@@ -52,7 +52,7 @@ public class ContributionRewardViewEntity {
 
         return ContributionRewardView.builder()
                 .id(id)
-                .currency(currency.toOldDomain())
+                .currency(currency.toView())
                 .amount(amount)
                 .dollarsEquivalent(statusData.amountUsdEquivalent())
                 .status(status.toDomain())

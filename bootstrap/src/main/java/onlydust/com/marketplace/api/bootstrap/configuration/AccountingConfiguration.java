@@ -5,7 +5,6 @@ import onlydust.com.marketplace.accounting.domain.observers.NotificationOutbox;
 import onlydust.com.marketplace.accounting.domain.port.in.*;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.*;
-import onlydust.com.marketplace.api.infrastructure.accounting.AccountingObserverAdapter;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
 import onlydust.com.marketplace.kernel.port.output.*;
 import org.springframework.context.annotation.Bean;
@@ -21,14 +20,6 @@ public class AccountingConfiguration {
                                                      final @NonNull ProjectAccountingObserver projectAccountingObserver
     ) {
         return new AccountingService(accountBookEventStorage, sponsorAccountStorage, currencyStorage, accountingObserver, projectAccountingObserver);
-    }
-
-    @Bean
-    public AccountingObserverAdapter accountingObserverAdapter(
-            final @NonNull RewardStatusStorage rewardStatusStorage,
-            final @NonNull RewardStatusFacadePort rewardStatusFacadePort
-    ) {
-        return new AccountingObserverAdapter(rewardStatusStorage, rewardStatusFacadePort);
     }
 
     @Bean
@@ -72,8 +63,9 @@ public class AccountingConfiguration {
 
     @Bean
     public PayoutPreferenceFacadePort payoutPreferenceFacadePort(final PayoutPreferenceStoragePort payoutPreferenceStoragePort,
-                                                                 final BillingProfileStoragePort billingProfileStoragePort) {
-        return new PayoutPreferenceService(payoutPreferenceStoragePort, billingProfileStoragePort);
+                                                                 final BillingProfileStoragePort billingProfileStoragePort,
+                                                                 final AccountingObserverPort accountingObserverPort) {
+        return new PayoutPreferenceService(payoutPreferenceStoragePort, billingProfileStoragePort, accountingObserverPort);
     }
 
 
