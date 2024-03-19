@@ -4650,6 +4650,7 @@ components:
         - type
         - invoiceMandateAccepted
         - enabled
+        - role
       properties:
         id:
           type: string
@@ -4666,6 +4667,8 @@ components:
           type: boolean
         pendingInvitationResponse:
           type: boolean
+        role:
+          $ref: '#/components/schemas/BillingProfileCoworkerRole'
     ProjectLedShortResponse:
       type: object
       required:
