@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
-import onlydust.com.marketplace.api.bootstrap.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
@@ -137,7 +136,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of(
                         "pageIndex", "0",
                         "pageSize", "10000",
-                        "currencies", currencyRepository.findByCode("USDC").orElseThrow().id().toString()
+                        "currencies", currencyRepository.findByCode("ETH").orElseThrow().id().toString()
                 )))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()
@@ -277,10 +276,10 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.rewards").isEmpty()
                 .jsonPath("$.remainingBudget.amount").isEqualTo(3000)
-                .jsonPath("$.remainingBudget.currency").isEqualTo("ETH")
+                .jsonPath("$.remainingBudget.currency.code").isEqualTo("ETH")
                 .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(5345940)
                 .jsonPath("$.spentAmount.amount").isEqualTo(0)
-                .jsonPath("$.spentAmount.currency").isEqualTo("ETH")
+                .jsonPath("$.spentAmount.currency.code").isEqualTo("ETH")
                 .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(0)
                 .jsonPath("$.sentRewardsCount").isEqualTo(0)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(0)
@@ -305,10 +304,10 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.rewards").isEmpty()
                 .jsonPath("$.remainingBudget.amount").isEqualTo(0)
-                .jsonPath("$.remainingBudget.currency").isEqualTo("USD")
+                .jsonPath("$.remainingBudget.currency.code").isEqualTo("USD")
                 .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(0)
                 .jsonPath("$.spentAmount.amount").isEqualTo(0)
-                .jsonPath("$.spentAmount.currency").isEqualTo("USD")
+                .jsonPath("$.spentAmount.currency.code").isEqualTo("USD")
                 .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(0)
                 .jsonPath("$.sentRewardsCount").isEqualTo(0)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(0)
@@ -333,10 +332,10 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.rewards").isEmpty()
                 .jsonPath("$.remainingBudget.amount").isEqualTo(99250)
-                .jsonPath("$.remainingBudget.currency").isEqualTo("USDC")
+                .jsonPath("$.remainingBudget.currency.code").isEqualTo("USDC")
                 .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(100242)
                 .jsonPath("$.spentAmount.amount").isEqualTo(0)
-                .jsonPath("$.spentAmount.currency").isEqualTo("USDC")
+                .jsonPath("$.spentAmount.currency.code").isEqualTo("USDC")
                 .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(0)
                 .jsonPath("$.sentRewardsCount").isEqualTo(0)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(0)
