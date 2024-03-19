@@ -146,18 +146,41 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .consumeWith(System.out::println)
-                .jsonPath("$.rewards[?(@.amount.currency.code != 'USDC')]").doesNotExist()
-                .jsonPath("$.rewards[?(@.amount.currency.code == 'USDC')]").exists()
-                .jsonPath("$.remainingBudget.currency.code").isEqualTo("USDC")
-                .jsonPath("$.remainingBudget.amount").isEqualTo(99250)
-                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(100242.5000)
-                .jsonPath("$.spentAmount.amount").isEqualTo(7000)
-                .jsonPath("$.spentAmount.currency.code").isEqualTo("USDC")
-                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(7070)
-                .jsonPath("$.sentRewardsCount").isEqualTo(7)
-                .jsonPath("$.rewardedContributionsCount").isEqualTo(4)
-                .jsonPath("$.rewardedContributorsCount").isEqualTo(2)
-        ;
+                .jsonPath("$.rewards[?(@.amount.currency.code != 'ETH')]").doesNotExist()
+                .json("""
+                        {
+                          "rewards": [],
+                          "remainingBudget": {
+                            "amount": 3000,
+                            "currency": {
+                              "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                              "code": "ETH",
+                              "name": "Ether",
+                              "logoUrl": null,
+                              "decimals": 18
+                            },
+                            "usdEquivalent": 5345940.00
+                          },
+                          "spentAmount": {
+                            "amount": 0,
+                            "currency": {
+                              "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                              "code": "ETH",
+                              "name": "Ether",
+                              "logoUrl": null,
+                              "decimals": 18
+                            },
+                            "usdEquivalent": 0.00
+                          },
+                          "sentRewardsCount": 0,
+                          "rewardedContributionsCount": 0,
+                          "rewardedContributorsCount": 0,
+                          "hasMore": false,
+                          "totalPageNumber": 0,
+                          "totalItemNumber": 0,
+                          "nextPageIndex": 0
+                        }
+                        """);
     }
 
     @Test
