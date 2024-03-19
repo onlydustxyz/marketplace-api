@@ -1222,7 +1222,7 @@ class BillingProfileServiceTest {
 
     }
 
-     @Test
+    @Test
     void should_prevent_to_invite_coworker_on_self_employed_billing_profile() {
         // Given
         final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
@@ -1244,7 +1244,6 @@ class BillingProfileServiceTest {
         verify(billingProfileStoragePort, never()).saveCoworkerInvitation(any(), any(), any(), any(), any());
 
     }
-
 
 
     @Test
@@ -1574,5 +1573,102 @@ class BillingProfileServiceTest {
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Cannot update mandateAcceptanceDate on a disabled billing profile %s".formatted(billingProfileId));
+    }
+
+
+    @Nested
+    class UpdateBillingProfileType {
+
+        @Test
+        void should_prevent_given_a_user_not_admin() {
+            // Given
+            final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
+            final UserId userIdNotAdmin = UserId.random();
+            final BillingProfile.Type type = BillingProfile.Type.COMPANY;
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.updateBillingProfileType(billingProfileId, userIdNotAdmin, type))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("User %s must be admin to modify billing profile %s type to %s".formatted(userIdNotAdmin.value(), billingProfileId.value(),
+                            type));
+        }
+
+        @Test
+        void should_prevent_given_type_equals_to_individual() {
+            // Given
+            final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
+            final UserId userIdAdmin = UserId.random();
+            final BillingProfile.Type type = BillingProfile.Type.INDIVIDUAL;
+            when(billingProfileStoragePort.isAdmin(billingProfileId, userIdAdmin)).thenReturn(true);
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.updateBillingProfileType(billingProfileId, userIdAdmin, type))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("User %s cannot update billing profile %s to type INDIVIDUAL".formatted(userIdAdmin, billingProfileId));
+        }
+
+        @Test
+        void given_a_self_employed_billing_profile_to_update_to_company() {
+            // Given
+            final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
+            final UserId userIdAdmin = UserId.random();
+            final BillingProfile.Type type = BillingProfile.Type.COMPANY;
+            when(billingProfileStoragePort.isAdmin(billingProfileId, userIdAdmin)).thenReturn(true);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+                    .type(BillingProfile.Type.SELF_EMPLOYED).build()));
+            when(billingProfileStoragePort.getUserRightsOnBillingProfile(billingProfileId, userIdAdmin))
+                    .thenReturn(Optional.of(BillingProfileUserRightsView.builder().build()));
+
+            // When
+            billingProfileService.updateBillingProfileType(billingProfileId, userIdAdmin, type);
+
+            // Then
+            verify(billingProfileStoragePort).updateBillingProfileType(billingProfileId, type);
+        }
+
+        @Test
+        void given_a_company_billing_profile_to_update_to_self_employed() {
+            // Given
+            final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
+            final UserId userIdAdmin = UserId.random();
+            final BillingProfile.Type type = BillingProfile.Type.SELF_EMPLOYED;
+            when(billingProfileStoragePort.isAdmin(billingProfileId, userIdAdmin)).thenReturn(true);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+                    .type(BillingProfile.Type.COMPANY).build()));
+            when(billingProfileStoragePort.getUserRightsOnBillingProfile(billingProfileId, userIdAdmin))
+                    .thenReturn(Optional.of(BillingProfileUserRightsView.builder().hasMoreThanOneCoworkers(false).build()));
+
+            // When
+            billingProfileService.updateBillingProfileType(billingProfileId, userIdAdmin, type);
+
+            // Then
+            verify(billingProfileStoragePort).updateBillingProfileType(billingProfileId, type);
+        }
+
+        @Test
+        void prevent_given_a_company_billing_profile_to_update_to_self_employed_with_some_coworkers() {
+            // Given
+            final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
+            final UserId userIdAdmin = UserId.random();
+            final BillingProfile.Type type = BillingProfile.Type.SELF_EMPLOYED;
+            when(billingProfileStoragePort.isAdmin(billingProfileId, userIdAdmin)).thenReturn(true);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+                    .type(BillingProfile.Type.COMPANY).build()));
+            when(billingProfileStoragePort.getUserRightsOnBillingProfile(billingProfileId, userIdAdmin))
+                    .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
+                            .hasMoreThanOneCoworkers(true).build()));
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.updateBillingProfileType(billingProfileId, userIdAdmin, type))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("User %s cannot update billing profile %s of type %s to type %s".formatted(
+                            userIdAdmin, billingProfileId, BillingProfile.Type.COMPANY, type));
+
+        }
+
+
     }
 }

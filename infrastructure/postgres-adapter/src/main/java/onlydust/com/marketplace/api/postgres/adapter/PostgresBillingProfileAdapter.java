@@ -377,4 +377,10 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
         return billingProfileUserRightsViewRepository.findForUserIdAndBillingProfileId(userId.value(), billingProfileId.value())
                 .map(BillingProfileUserRightsViewEntity::toDomain);
     }
+
+    @Override
+    @Transactional
+    public void updateBillingProfileType(BillingProfile.Id billingProfileId, BillingProfile.Type type) {
+        billingProfileRepository.updateBillingProfileType(billingProfileId.value(), type.name());
+    }
 }

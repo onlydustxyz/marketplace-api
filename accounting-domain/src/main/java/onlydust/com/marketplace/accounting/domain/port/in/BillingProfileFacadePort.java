@@ -66,4 +66,6 @@ public interface BillingProfileFacadePort {
     void deleteBillingProfile(UserId userId, BillingProfile.Id billingProfileId);
 
     void enableBillingProfile(UserId userId, BillingProfile.Id billingProfileId, Boolean enable);
+
+    void updateBillingProfileType(BillingProfile.Id billingProfileId, UserId userId, BillingProfile.Type type);
 }

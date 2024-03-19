@@ -189,7 +189,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
     BillingProfileService billingProfileService;
 
     @Test
-    void should_get_and_delete_billing_profile_by_id() {
+    void should_get_update_delete_billing_profile_by_id() {
         // Given
         final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
                 faker.number().randomNumber() + faker.number().randomNumber(), faker.name().name(),
@@ -202,6 +202,71 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 faker.rickAndMorty().character(), null);
         final IndividualBillingProfile individualBillingProfile = billingProfileService.createIndividualBillingProfile(userId,
                 faker.rickAndMorty().character(), null);
+
+        // When
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(companyBillingProfile.id().value().toString())))
+                .header("Authorization", "Bearer " + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.name").isEqualTo(companyBillingProfile.name())
+                .jsonPath("$.id").isEqualTo(companyBillingProfile.id().value().toString())
+                .jsonPath("$.type").isEqualTo(companyBillingProfile.type().name())
+                .jsonPath("$.status").isEqualTo(companyBillingProfile.status().name())
+                .jsonPath("$.me.canDelete").isEqualTo(true)
+                .jsonPath("$.me.canLeave").isEqualTo(false)
+                .jsonPath("$.me.role").isEqualTo("ADMIN")
+                .jsonPath("$.me.invitation").isEmpty();
+
+        // When
+        client.put()
+                .uri(BILLING_PROFILES_TYPE_BY_ID.formatted(companyBillingProfile.id().value().toString()))
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                        "type": "SELF_EMPLOYED"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        // When
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(companyBillingProfile.id().value().toString())))
+                .header("Authorization", "Bearer " + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.name").isEqualTo(companyBillingProfile.name())
+                .jsonPath("$.id").isEqualTo(companyBillingProfile.id().value().toString())
+                .jsonPath("$.type").isEqualTo("SELF_EMPLOYED")
+                .jsonPath("$.status").isEqualTo(companyBillingProfile.status().name())
+                .jsonPath("$.me.canDelete").isEqualTo(true)
+                .jsonPath("$.me.canLeave").isEqualTo(false)
+                .jsonPath("$.me.role").isEqualTo("ADMIN")
+                .jsonPath("$.me.invitation").isEmpty();
+
+        client.put()
+                .uri(BILLING_PROFILES_TYPE_BY_ID.formatted(companyBillingProfile.id().value().toString()))
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                        "type": "COMPANY"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
 
         // When
         client.get()
@@ -256,6 +321,20 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.me.canLeave").isEqualTo(false)
                 .jsonPath("$.me.role").isEqualTo("ADMIN")
                 .jsonPath("$.me.invitation").isEmpty();
+
+        client.put()
+                .uri(BILLING_PROFILES_TYPE_BY_ID.formatted(individualBillingProfile.id().value().toString()))
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                        "type": "COMPANY"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is5xxServerError();
 
         // When
         client.get()
