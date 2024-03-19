@@ -12,6 +12,8 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
+
 @Entity
 @TypeDef(name = "billing_profile_role", typeClass = PostgreSQLEnumType.class)
 public class BillingProfileUserRightsViewEntity {
@@ -37,7 +39,7 @@ public class BillingProfileUserRightsViewEntity {
         return BillingProfileUserRightsView.builder()
                 .hasBillingProfileSomeInvoices(this.hasBillingProfileSomeInvoices)
                 .hasUserSomeRewardsIncludedInInvoicesOnBillingProfile(this.hasUserSomeLinkedInvoices)
-                .role(this.userRole.toDomain())
+                .role(isNull(this.userRole) ? null : this.userRole.toDomain())
                 .invitation(Objects.isNull(this.invitedByGithubUserId) ? null : BillingProfileUserRightsView.InvitationView.builder()
                         .githubUserId(GithubUserId.of(this.invitedByGithubUserId))
                         .githubAvatarUrl(this.invitedByGithubAvatarUrl)

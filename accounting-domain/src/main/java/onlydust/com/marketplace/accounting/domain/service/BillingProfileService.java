@@ -202,7 +202,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     private BillingProfileView getBillingProfileViewWithUserRights(BillingProfile.Id billingProfileId, UserId userId) {
         final BillingProfileView billingProfileView = billingProfileStoragePort.findById(billingProfileId)
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
-        final BillingProfileUserRightsView billingProfileUserRightsView = billingProfileStoragePort.getUserRightsOnBillingProfile(billingProfileId, userId)
+        final BillingProfileUserRightsView billingProfileUserRightsView = billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userId)
                 .orElseThrow(() -> internalServerError("User %s rights on billing profile %s were not found".formatted(userId, billingProfileId)));
         if (billingProfileUserRightsView.role() == BillingProfile.User.Role.MEMBER) {
             return billingProfileView.toBuilder()

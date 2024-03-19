@@ -765,7 +765,7 @@ class BillingProfileServiceTest {
         // When
         when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdMember)).thenReturn(true);
         when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().build()));
-        when(billingProfileStoragePort.getUserRightsOnBillingProfile(billingProfileId, userIdMember))
+        when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdMember))
                 .thenReturn(Optional.empty());
         Exception exception = null;
         try {
@@ -804,7 +804,7 @@ class BillingProfileServiceTest {
         // When
         when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdMember)).thenReturn(true);
         when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
-        when(billingProfileStoragePort.getUserRightsOnBillingProfile(billingProfileId, userIdMember))
+        when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdMember))
                 .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
                         .hasBillingProfileSomeInvoices(false)
                         .hasUserSomeRewardsIncludedInInvoicesOnBillingProfile(false)
@@ -843,7 +843,7 @@ class BillingProfileServiceTest {
         // When
         when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdMember)).thenReturn(true);
         when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
-        when(billingProfileStoragePort.getUserRightsOnBillingProfile(billingProfileId, userIdMember))
+        when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdMember))
                 .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
                         .hasBillingProfileSomeInvoices(false)
                         .hasUserSomeRewardsIncludedInInvoicesOnBillingProfile(false)
@@ -1618,7 +1618,7 @@ class BillingProfileServiceTest {
             when(billingProfileStoragePort.isAdmin(billingProfileId, userIdAdmin)).thenReturn(true);
             when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .type(BillingProfile.Type.SELF_EMPLOYED).build()));
-            when(billingProfileStoragePort.getUserRightsOnBillingProfile(billingProfileId, userIdAdmin))
+            when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdAdmin))
                     .thenReturn(Optional.of(BillingProfileUserRightsView.builder().build()));
 
             // When
@@ -1637,7 +1637,7 @@ class BillingProfileServiceTest {
             when(billingProfileStoragePort.isAdmin(billingProfileId, userIdAdmin)).thenReturn(true);
             when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .type(BillingProfile.Type.COMPANY).build()));
-            when(billingProfileStoragePort.getUserRightsOnBillingProfile(billingProfileId, userIdAdmin))
+            when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdAdmin))
                     .thenReturn(Optional.of(BillingProfileUserRightsView.builder().hasMoreThanOneCoworkers(false).build()));
 
             // When
@@ -1656,7 +1656,7 @@ class BillingProfileServiceTest {
             when(billingProfileStoragePort.isAdmin(billingProfileId, userIdAdmin)).thenReturn(true);
             when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .type(BillingProfile.Type.COMPANY).build()));
-            when(billingProfileStoragePort.getUserRightsOnBillingProfile(billingProfileId, userIdAdmin))
+            when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdAdmin))
                     .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
                             .hasMoreThanOneCoworkers(true).build()));
 
