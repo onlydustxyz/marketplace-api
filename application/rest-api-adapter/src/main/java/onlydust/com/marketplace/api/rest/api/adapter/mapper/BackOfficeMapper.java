@@ -179,7 +179,9 @@ public interface BackOfficeMapper {
                 .availableBudgets(accountStatements.stream()
                         .map(BackOfficeMapper::mapSponsorBudgetResponse)
                         .collect(groupingBy(SponsorBudgetResponse::getCurrency, reducing(emptyBudget, BackOfficeMapper::merge)))
-                        .values().stream().toList())
+                        .values().stream()
+                        .sorted(comparing(b -> b.getCurrency().getCode()))
+                        .toList())
                 ;
     }
 

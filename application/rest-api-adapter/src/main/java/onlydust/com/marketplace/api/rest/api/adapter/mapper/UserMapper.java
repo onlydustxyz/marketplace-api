@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.mapCurrency;
@@ -171,7 +172,8 @@ public interface UserMapper {
     static RewardTotalAmountsResponse totalsEarnedToResponse(TotalsEarned totalsEarned) {
         final RewardTotalAmountsResponse response = new RewardTotalAmountsResponse();
         response.setTotalAmount(totalsEarned.getTotalDollarsEquivalent());
-        for (TotalEarnedPerCurrency totalEarnedPerCurrency : totalsEarned.getDetails()) {
+        for (TotalEarnedPerCurrency totalEarnedPerCurrency :
+                totalsEarned.getDetails().stream().sorted(comparing(TotalEarnedPerCurrency::getTotalAmount)).toList()) {
             final MyRewardAmountResponse myRewardAmountResponse = new MyRewardAmountResponse();
             myRewardAmountResponse.setTotalAmount(totalEarnedPerCurrency.getTotalAmount());
             myRewardAmountResponse.totalDollarsEquivalent(totalEarnedPerCurrency.getTotalDollarsEquivalent());

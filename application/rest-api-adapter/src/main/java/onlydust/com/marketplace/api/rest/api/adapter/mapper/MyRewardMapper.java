@@ -1,11 +1,12 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.contract.model.MyRewardPageItemResponse;
+import onlydust.com.marketplace.api.contract.model.MyRewardsListResponse;
+import onlydust.com.marketplace.api.contract.model.MyRewardsPageResponse;
+import onlydust.com.marketplace.api.contract.model.RewardAmountResponse;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
-import onlydust.com.marketplace.project.domain.view.UserRewardTotalAmountsView;
 import onlydust.com.marketplace.project.domain.view.UserRewardView;
 import onlydust.com.marketplace.project.domain.view.UserRewardsPageView;
-import onlydust.com.marketplace.project.domain.view.UserTotalRewardView;
 
 import java.util.List;
 
@@ -51,17 +52,6 @@ public interface MyRewardMapper {
                 .currency(mapCurrency(view.getAmount().getCurrency()))
                 .dollarsEquivalent(view.getAmount().getDollarsEquivalent())
                 .total(view.getAmount().getTotal());
-    }
-
-    static RewardTotalAmountsResponse mapUserRewardTotalAmountsToResponse(final UserRewardTotalAmountsView view) {
-        final RewardTotalAmountsResponse myRewardTotalAmountsResponse = new RewardTotalAmountsResponse();
-        myRewardTotalAmountsResponse.setTotalAmount(view.getTotalAmount());
-        for (UserTotalRewardView userTotalReward : view.getUserTotalRewards()) {
-            myRewardTotalAmountsResponse.addDetailsItem(new MyRewardAmountResponse().totalAmount(userTotalReward.getTotalAmount())
-                    .totalDollarsEquivalent(userTotalReward.getTotalDollarsEquivalent())
-                    .currency(mapCurrency(userTotalReward.getCurrency())));
-        }
-        return myRewardTotalAmountsResponse;
     }
 
     static MyRewardsListResponse listToResponse(final List<UserRewardView> views) {
