@@ -334,8 +334,8 @@ public interface BillingProfileMapper {
 
     }
 
-    private static @NotNull BillingProfileCoworkerRole mapRole(BillingProfile.User.Role role) {
-        return switch (role) {
+    private static BillingProfileCoworkerRole mapRole(BillingProfile.User.Role role) {
+        return isNull(role) ? null : switch (role) {
             case ADMIN -> BillingProfileCoworkerRole.ADMIN;
             case MEMBER -> BillingProfileCoworkerRole.MEMBER;
         };
