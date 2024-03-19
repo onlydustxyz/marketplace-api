@@ -196,6 +196,10 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (!billingProfileStoragePort.isUserMemberOf(billingProfileId, userId)) {
             throw unauthorized("User %s is not a member of billing profile %s".formatted(userId, billingProfileId));
         }
+        return getBillingProfileViewWithUserRights(billingProfileId, userId);
+    }
+
+    private BillingProfileView getBillingProfileViewWithUserRights(BillingProfile.Id billingProfileId, UserId userId) {
         final BillingProfileView billingProfileView = billingProfileStoragePort.findById(billingProfileId)
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
         final BillingProfileUserRightsView billingProfileUserRightsView = billingProfileStoragePort.getUserRightsOnBillingProfile(billingProfileId, userId)
@@ -305,5 +309,24 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
             throw unauthorized("User %s must be admin to enable billing profile %s".formatted(userId.value(), billingProfileId.value()));
         billingProfileStoragePort.enableBillingProfile(billingProfileId, enabled);
+    }
+
+    @Override
+    public void updateBillingProfileType(BillingProfile.Id billingProfileId, UserId userId, BillingProfile.Type type) {
+        if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
+            throw unauthorized("User %s must be admin to modify billing profile %s type to %s".formatted(userId.value(), billingProfileId.value(), type));
+        if (type == BillingProfile.Type.INDIVIDUAL) {
+            throw unauthorized("User %s cannot update billing profile %s to type INDIVIDUAL".formatted(userId, billingProfileId));
+        }
+        final BillingProfileView billingProfileViewWithUserRights = getBillingProfileViewWithUserRights(billingProfileId, userId);
+        if (type == BillingProfile.Type.COMPANY && billingProfileViewWithUserRights.getType() == BillingProfile.Type.SELF_EMPLOYED) {
+            billingProfileStoragePort.updateBillingProfileType(billingProfileId, type);
+        } else if (type == BillingProfile.Type.SELF_EMPLOYED && billingProfileViewWithUserRights.isSwitchableToSelfEmployed()) {
+            billingProfileStoragePort.updateBillingProfileType(billingProfileId, type);
+        } else {
+            throw internalServerError("User %s cannot update billing profile %s of type %s to type %s".formatted(
+                    userId, billingProfileId, billingProfileViewWithUserRights.getType(), type
+            ));
+        }
     }
 }

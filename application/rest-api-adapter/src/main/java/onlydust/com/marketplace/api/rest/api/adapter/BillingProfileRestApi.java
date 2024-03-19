@@ -103,7 +103,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
                 BillingProfile.Id.of(billingProfileId),
                 Invoice.Id.of(invoiceId));
 
-        return ResponseEntity.ok()
+        return ok()
                 .header("Content-Disposition", "attachment; filename=" + invoice.fileName())
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(new InputStreamResource(invoice.data()));
@@ -132,7 +132,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
             case INDIVIDUAL -> billingProfileFacadePort.createIndividualBillingProfile(UserId.of(authenticatedUser.getId()), billingProfileRequest.getName(),
                     projectIds);
         });
-        return ResponseEntity.ok(billingProfileResponse);
+        return ok(billingProfileResponse);
     }
 
     @Override
@@ -140,14 +140,14 @@ public class BillingProfileRestApi implements BillingProfilesApi {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final BillingProfileView billingProfileView = billingProfileFacadePort.getBillingProfile(BillingProfile.Id.of(billingProfileId),
                 UserId.of(authenticatedUser.getId()));
-        return ResponseEntity.ok(BillingProfileMapper.billingProfileViewToResponse(billingProfileView));
+        return ok(BillingProfileMapper.billingProfileViewToResponse(billingProfileView));
     }
 
     @Override
     public ResponseEntity<BillingProfilePayoutInfoResponse> getPayoutInfo(UUID billingProfileId) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         PayoutInfo payoutInfo = billingProfileFacadePort.getPayoutInfo(BillingProfile.Id.of(billingProfileId), UserId.of(authenticatedUser.getId()));
-        return ResponseEntity.ok(PayoutInfoMapper.mapToResponse(payoutInfo));
+        return ok(PayoutInfoMapper.mapToResponse(payoutInfo));
     }
 
     @Override
@@ -166,7 +166,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
 
         final Page<BillingProfileCoworkerView> coworkers = billingProfileFacadePort.getCoworkers(BillingProfile.Id.of(billingProfileId),
                 UserId.of(authenticatedUser.getId()), sanitizedPageIndex, sanitizedPageSize);
-        return ResponseEntity.ok(BillingProfileMapper.coworkersPageToResponse(coworkers, pageIndex));
+        return ok(BillingProfileMapper.coworkersPageToResponse(coworkers, pageIndex));
     }
 
     @Override
@@ -206,6 +206,19 @@ public class BillingProfileRestApi implements BillingProfilesApi {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         billingProfileFacadePort.enableBillingProfile(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId),
                 billingProfileEnableRequest.getEnable());
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> updateBillingProfileType(UUID billingProfileId, BillingProfileTypeRequest billingProfileTypeRequest) {
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        billingProfileFacadePort.updateBillingProfileType(BillingProfile.Id.of(billingProfileId), UserId.of(authenticatedUser.getId()),
+                switch (billingProfileTypeRequest.getType()) {
+                    case INDIVIDUAL -> BillingProfile.Type.INDIVIDUAL;
+                    case COMPANY -> BillingProfile.Type.COMPANY;
+                    case SELF_EMPLOYED -> BillingProfile.Type.SELF_EMPLOYED
+                    ;
+                });
         return ResponseEntity.noContent().build();
     }
 }

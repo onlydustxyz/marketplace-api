@@ -46,4 +46,12 @@ public interface BillingProfileRepository extends JpaRepository<BillingProfileEn
             join accounting.billing_profiles_users bpu on bp.id = bpu.billing_profile_id and bpu.user_id = :userId
             """, nativeQuery = true)
     List<BillingProfileEntity> findBillingProfilesForUserId(@Param("userId") UUID userId);
+
+    @Modifying
+    @Query(nativeQuery = true, value = """
+                update accounting.billing_profiles
+                set type = cast(:type as accounting.billing_profile_type)
+                where id = :billingProfileId
+            """)
+    void updateBillingProfileType(UUID billingProfileId, String type);
 }
