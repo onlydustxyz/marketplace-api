@@ -5,6 +5,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInf
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
@@ -14,6 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
+import javax.persistence.EntityManagerFactory;
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -25,6 +29,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     CurrencyRepository currencyRepository;
     @Autowired
     BillingProfileStoragePort billingProfileStoragePort;
+    @Autowired
+    EntityManagerFactory entityManagerFactory;
 
     UserAuthHelper.AuthenticatedUser pierre;
 
@@ -49,6 +55,9 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_list_my_rewards() {
+        // Given
+        setUnlockDateToSomeReward();
+
         // When
         client.get()
                 .uri(getApiURI(String.format(ME_GET_REWARDS), Map.of(
@@ -181,6 +190,17 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                           "rewardingProjectsCount": 1
                         }
                         """);
+    }
+
+    private void setUnlockDateToSomeReward() {
+        final var em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+        final var rewardStatusData = em.find(RewardStatusDataEntity.class, UUID.fromString("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"))
+                .unlockDate(Date.from(ZonedDateTime.parse("2024-08-23T00:00:00Z").toInstant()));
+        em.merge(rewardStatusData);
+        em.flush();
+        em.getTransaction().commit();
+        em.close();
     }
 
     @Test

@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.vladmihalcea.hibernate.type.array.EnumArrayType;
 import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Amount;
@@ -20,7 +19,6 @@ import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.chrono.ChronoZonedDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
@@ -36,7 +34,6 @@ import static java.util.Objects.isNull;
 @Builder(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
 @Accessors(fluent = true, chain = true)
-@TypeDef(name = "currency", typeClass = PostgreSQLEnumType.class)
 @TypeDef(
         name = "accounting.network[]",
         typeClass = EnumArrayType.class,
@@ -66,9 +63,9 @@ public class RewardStatusDataEntity {
         return RewardStatusDataEntity.builder()
                 .rewardId(rewardStatusData.rewardId().value())
                 .sponsorHasEnoughFund(rewardStatusData.sponsorHasEnoughFund())
-                .unlockDate(rewardStatusData.unlockDate().map(ChronoZonedDateTime::toInstant).map(Date::from).orElse(null))
-                .invoiceReceivedAt(rewardStatusData.invoiceReceivedAt().map(ChronoZonedDateTime::toInstant).map(Date::from).orElse(null))
-                .paidAt(rewardStatusData.paidAt().map(ChronoZonedDateTime::toInstant).map(Date::from).orElse(null))
+                .unlockDate(rewardStatusData.unlockDate().map(ZonedDateTime::toInstant).map(Date::from).orElse(null))
+                .invoiceReceivedAt(rewardStatusData.invoiceReceivedAt().map(ZonedDateTime::toInstant).map(Date::from).orElse(null))
+                .paidAt(rewardStatusData.paidAt().map(ZonedDateTime::toInstant).map(Date::from).orElse(null))
                 .networks(rewardStatusData.networks().stream().map(NetworkEnumEntity::of).toArray(NetworkEnumEntity[]::new))
                 .amountUsdEquivalent(rewardStatusData.usdAmount().map(ConvertedAmount::convertedAmount).map(Amount::getValue).orElse(null))
                 .usdConversionRate(rewardStatusData.usdAmount().map(ConvertedAmount::conversionRate).orElse(null))
