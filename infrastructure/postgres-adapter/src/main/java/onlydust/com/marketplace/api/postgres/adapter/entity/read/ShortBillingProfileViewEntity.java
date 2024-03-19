@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileUserEntity;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.Entity;
@@ -23,6 +25,7 @@ import static java.util.Objects.isNull;
 @Data
 @TypeDef(name = "billing_profile_type", typeClass = PostgreSQLEnumType.class)
 @TypeDef(name = "verification_status", typeClass = PostgreSQLEnumType.class)
+@TypeDef(name = "billing_profile_role", typeClass = PostgreSQLEnumType.class)
 public class ShortBillingProfileViewEntity {
 
     @Id
@@ -35,6 +38,9 @@ public class ShortBillingProfileViewEntity {
     Date invoiceMandateAcceptedAt;
     Boolean enabled;
     Boolean pendingInvitation;
+    @Type(type = "billing_profile_type")
+    @Enumerated(EnumType.STRING)
+    BillingProfileUserEntity.Role role;
 
     public ZonedDateTime getInvoiceMandateAcceptedAt() {
         return isNull(invoiceMandateAcceptedAt) ? null : new Date(invoiceMandateAcceptedAt.getTime()).toInstant().atZone(ZoneOffset.UTC);
@@ -48,6 +54,7 @@ public class ShortBillingProfileViewEntity {
                 .pendingInvitationResponse(this.pendingInvitation)
                 .invoiceMandateAcceptedAt(this.getInvoiceMandateAcceptedAt())
                 .enabled(this.enabled)
+                .role(this.role.toDomain())
                 .build();
     }
 }

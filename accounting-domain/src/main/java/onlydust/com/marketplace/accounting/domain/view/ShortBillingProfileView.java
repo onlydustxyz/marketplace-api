@@ -21,6 +21,7 @@ public class ShortBillingProfileView {
     @Getter(AccessLevel.NONE)
     @Setter
     ZonedDateTime invoiceMandateLatestVersionDate;
+    BillingProfile.User.Role role;
 
     public boolean isInvoiceMandateAccepted() {
         if (type == BillingProfile.Type.INDIVIDUAL) return true;
