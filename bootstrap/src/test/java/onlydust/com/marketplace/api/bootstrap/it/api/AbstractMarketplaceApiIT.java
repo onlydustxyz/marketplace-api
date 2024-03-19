@@ -161,7 +161,7 @@ public class AbstractMarketplaceApiIT {
     @LocalServerPort
     int port;
     @Autowired
-    WebTestClient client;
+    protected WebTestClient client;
     @Autowired
     UserRepository userRepository;
     @Autowired
