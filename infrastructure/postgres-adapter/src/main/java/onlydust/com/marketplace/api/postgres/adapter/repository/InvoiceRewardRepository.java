@@ -10,14 +10,15 @@ import java.util.UUID;
 public interface InvoiceRewardRepository extends JpaRepository<InvoiceRewardEntity, UUID> {
     @Query(value = """
             SELECT
-                r.id                      as id,
-                p.name                    as project_name,
-                r.requested_at            as requested_at,
-                r.amount                  as amount,
-                r.currency_id             as currency_id,
-                usd.id                    as target_currency_id,
-                rsd.amount_usd_equivalent as target_amount,
-                r.invoice_id              as invoice_id
+                r.id                          as id,
+                p.name                        as project_name,
+                r.requested_at                as requested_at,
+                r.amount                      as amount,
+                r.currency_id                 as currency_id,
+                usd.id                        as target_currency_id,
+                rsd.amount_usd_equivalent     as target_amount,
+                r.invoice_id                  as invoice_id,
+                CAST(array[] AS accounting.network[]) as networks
             FROM
                 rewards r
                 JOIN accounting.reward_status_data rsd on rsd.reward_id = r.id

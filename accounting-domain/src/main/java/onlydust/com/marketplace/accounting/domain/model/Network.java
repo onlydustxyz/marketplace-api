@@ -2,6 +2,8 @@ package onlydust.com.marketplace.accounting.domain.model;
 
 import onlydust.com.marketplace.kernel.model.blockchain.*;
 
+import java.util.Optional;
+
 public enum Network {
     ETHEREUM(Currency.Type.CRYPTO, Blockchain.ETHEREUM),
     OPTIMISM(Currency.Type.CRYPTO, Blockchain.OPTIMISM),
@@ -22,8 +24,8 @@ public enum Network {
         return type;
     }
 
-    public Blockchain blockchain() {
-        return blockchain;
+    public Optional<Blockchain> blockchain() {
+        return Optional.ofNullable(blockchain);
     }
 
     public static Network fromBlockchain(Blockchain blockchain) {

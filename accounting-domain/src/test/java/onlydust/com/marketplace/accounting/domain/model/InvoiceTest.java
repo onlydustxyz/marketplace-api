@@ -66,9 +66,9 @@ class InvoiceTest {
             invoice = Invoice.of(individualBillingProfile, 1, UserId.random())
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of()),
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of())
                     ));
         }
 
@@ -131,9 +131,9 @@ class InvoiceTest {
             invoice = Invoice.of(companyBillingProfile, 1, UserId.random())
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of()),
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of())
                     ));
         }
 
@@ -201,9 +201,9 @@ class InvoiceTest {
             invoice = Invoice.of(companyBillingProfile, 1, UserId.random())
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of()),
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of())
                     ));
         }
 
@@ -272,9 +272,9 @@ class InvoiceTest {
             invoice = Invoice.of(companyBillingProfile, 1, UserId.random())
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of()),
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of())
                     ));
         }
 
@@ -343,9 +343,9 @@ class InvoiceTest {
             invoice = Invoice.of(companyBillingProfile, 1, UserId.random())
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of()),
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of())
                     ));
         }
 

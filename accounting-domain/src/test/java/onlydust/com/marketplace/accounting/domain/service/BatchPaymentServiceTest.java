@@ -96,20 +96,20 @@ public class BatchPaymentServiceTest {
                 Invoice.of(billingProfile1, 1, UserId.random())
                         .rewards(List.of(
                                 new Invoice.Reward(rewardIds.get(0), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                        Money.of(0L, ETH), Money.of(0L, USD), null),
+                                        Money.of(0L, ETH), Money.of(0L, USD), null, List.of()),
                                 new Invoice.Reward(rewardIds.get(2), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                        Money.of(0L, ETH), Money.of(0L, USD), null),
+                                        Money.of(0L, ETH), Money.of(0L, USD), null, List.of()),
                                 new Invoice.Reward(rewardIds.get(4), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                        Money.of(0L, ETH), Money.of(0L, USD), null)
+                                        Money.of(0L, ETH), Money.of(0L, USD), null, List.of())
                         )),
                 Invoice.of(billingProfile2, 1, UserId.random())
                         .rewards(List.of(
                                 new Invoice.Reward(rewardIds.get(1), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                        Money.of(0L, ETH), Money.of(0L, USD), null),
+                                        Money.of(0L, ETH), Money.of(0L, USD), null, List.of()),
                                 new Invoice.Reward(rewardIds.get(3), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                        Money.of(0L, ETH), Money.of(0L, USD), null),
+                                        Money.of(0L, ETH), Money.of(0L, USD), null, List.of()),
                                 new Invoice.Reward(rewardIds.get(5), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                        Money.of(0L, ETH), Money.of(0L, USD), null)
+                                        Money.of(0L, ETH), Money.of(0L, USD), null, List.of())
                         ))
         );
         payableRewards = List.of(

@@ -1,17 +1,24 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.vladmihalcea.hibernate.type.array.EnumArrayType;
+import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.UUID;
 
 @Entity
@@ -21,6 +28,17 @@ import java.util.UUID;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @Accessors(fluent = true)
 @Getter
+@TypeDef(
+        name = "accounting.network[]",
+        typeClass = EnumArrayType.class,
+        defaultForType = NetworkEnumEntity[].class,
+        parameters = {
+                @Parameter(
+                        name = AbstractArrayType.SQL_ARRAY_TYPE,
+                        value = "accounting.network"
+                )
+        }
+)
 public class InvoiceRewardEntity {
     @Id
     @Getter
@@ -33,6 +51,9 @@ public class InvoiceRewardEntity {
     @ManyToOne
     @NonNull CurrencyEntity targetCurrency;
     BigDecimal targetAmount;
+    @Type(type = "accounting.network[]")
+    @Column(columnDefinition = "accounting.network[]")
+    NetworkEnumEntity[] networks;
     UUID invoiceId;
 
     public Invoice.Reward forInvoice() {
@@ -42,7 +63,8 @@ public class InvoiceRewardEntity {
                 projectName,
                 Money.of(amount, currency.toDomain()),
                 Money.of(targetAmount, targetCurrency.toDomain()),
-                invoiceId == null ? null : Invoice.Id.of(invoiceId)
+                invoiceId == null ? null : Invoice.Id.of(invoiceId),
+                Arrays.stream(networks).map(NetworkEnumEntity::toNetwork).toList()
         );
     }
 
@@ -56,6 +78,7 @@ public class InvoiceRewardEntity {
                 .targetCurrency(CurrencyEntity.of(reward.target().getCurrency()))
                 .targetAmount(reward.target().getValue())
                 .invoiceId(reward.invoiceId() == null ? null : reward.invoiceId().value())
+                .networks(reward.networks().stream().map(NetworkEnumEntity::of).toArray(NetworkEnumEntity[]::new))
                 .build();
     }
 }

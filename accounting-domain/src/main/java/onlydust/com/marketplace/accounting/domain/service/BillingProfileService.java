@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
@@ -39,6 +40,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     private final @NonNull BillingProfileObserver billingProfileObserver;
     private final @NonNull IndexerPort indexerPort;
     private final @NonNull AccountingObserverPort accountingObserverPort;
+    private final @NonNull AccountingFacadePort accountingFacadePort;
 
 
     @Override
@@ -77,7 +79,10 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (!billingProfileStoragePort.isEnabled(billingProfileId))
             throw unauthorized("Cannot generate invoice on a disabled billing profile");
 
-        final var rewards = invoiceStoragePort.findRewards(rewardIds);
+        final var rewards = invoiceStoragePort.findRewards(rewardIds)
+                .stream().map(r -> r.withNetworks(accountingFacadePort.networksOf(r.amount().getCurrency().id(), r.id())))
+                .toList();
+
         if (rewards.stream().map(Invoice.Reward::invoiceId).filter(Objects::nonNull)
                 .anyMatch(i -> invoiceStoragePort.get(i).orElseThrow().status().isActive())) {
             throw badRequest("Some rewards are already invoiced");
