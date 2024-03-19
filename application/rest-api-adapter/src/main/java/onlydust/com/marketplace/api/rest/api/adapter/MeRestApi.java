@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MyRewardMapper.mapMyRewardsToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.getSortBy;
@@ -251,7 +252,10 @@ public class MeRestApi implements MeApi {
     public ResponseEntity<CurrencyListResponse> getMyRewardCurrencies() {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var currencies = contributorFacadePort.getRewardCurrencies(authenticatedUser.getGithubUserId());
-        return ResponseEntity.ok(new CurrencyListResponse().currencies(currencies.stream().map(RewardMapper::mapCurrency).toList()));
+        return ResponseEntity.ok(new CurrencyListResponse().currencies(currencies.stream()
+                .map(RewardMapper::mapCurrency)
+                .sorted(comparing(ShortCurrencyResponse::getCode))
+                .toList()));
     }
 
     @Override

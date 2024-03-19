@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import static java.util.Comparator.comparing;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapBlockchain;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapCurrencyResponse;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
@@ -112,6 +113,9 @@ public class BackofficeCurrencyManagementRestApi implements BackofficeCurrencyMa
     public ResponseEntity<CurrencyListResponse> listCurrencies() {
         final var currencies = currencyFacadePort.listCurrencies();
 
-        return ResponseEntity.ok(new CurrencyListResponse().currencies(currencies.stream().map(BackOfficeMapper::mapCurrencyResponse).toList()));
+        return ResponseEntity.ok(new CurrencyListResponse().currencies(currencies.stream()
+                .map(BackOfficeMapper::mapCurrencyResponse)
+                .sorted(comparing(CurrencyResponse::getCode))
+                .toList()));
     }
 }
