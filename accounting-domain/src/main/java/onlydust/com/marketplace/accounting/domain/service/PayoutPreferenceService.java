@@ -46,6 +46,6 @@ public class PayoutPreferenceService implements PayoutPreferenceFacadePort {
             throw forbidden("Cannot set payout preference for user %s on project %s because billing profile %s is disabled"
                     .formatted(userId, projectId, billingProfileId));
         payoutPreferenceStoragePort.save(projectId, billingProfileId, userId);
-        accountingObserverPort.onPayoutPreferenceChanged(billingProfileId);
+        accountingObserverPort.onPayoutPreferenceChanged(billingProfileId, userId, projectId);
     }
 }

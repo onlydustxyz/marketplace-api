@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
 
     @Test
@@ -76,12 +79,15 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
 
         final var STRK = currencyRepository.findByCode("STRK").orElseThrow();
 
-        rewardRepository.save(new RewardEntity(UUID.randomUUID(), projectEntities.get(0).getId(), userId.value(), authenticatedUser.user().getGithubUserId(),
-                STRK, BigDecimal.ONE, new Date(), List.of(), null, null, null));
-        rewardRepository.save(new RewardEntity(UUID.randomUUID(), projectEntities.get(1).getId(), userId.value(), authenticatedUser.user().getGithubUserId(),
-                STRK, BigDecimal.ONE, new Date(), List.of(), null, null, null));
-        rewardRepository.save(new RewardEntity(UUID.randomUUID(), projectEntities.get(2).getId(), userId.value(), authenticatedUser.user().getGithubUserId(),
-                STRK, BigDecimal.ONE, new Date(), List.of(), null, null, null));
+        final RewardEntity r1 = rewardRepository.save(new RewardEntity(UUID.randomUUID(), projectEntities.get(0).getId(), userId.value(),
+                authenticatedUser.user().getGithubUserId(),
+                STRK, BigDecimal.ONE, new Date(), List.of(), null, null, null, null));
+        final RewardEntity r2 = rewardRepository.save(new RewardEntity(UUID.randomUUID(), projectEntities.get(1).getId(), userId.value(),
+                authenticatedUser.user().getGithubUserId(),
+                STRK, BigDecimal.ONE, new Date(), List.of(), null, null, null, null));
+        final RewardEntity r3 = rewardRepository.save(new RewardEntity(UUID.randomUUID(), projectEntities.get(2).getId(), userId.value(),
+                authenticatedUser.user().getGithubUserId(),
+                STRK, BigDecimal.ONE, new Date(), List.of(), null, null, null, null));
 
         // When
         client.get()
@@ -128,6 +134,8 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful();
 
+        assertEquals(companyBillingProfile.id().value(), rewardRepository.findById(r1.id()).orElseThrow().billingProfileId());
+
         // When
         client.get()
                 .uri(getApiURI(ME_GET_PAYOUT_PREFERENCES))
@@ -173,6 +181,8 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful();
+
+        assertEquals(selfEmployedBillingProfile.id().value(), rewardRepository.findById(r2.id()).orElseThrow().billingProfileId());
 
         // When
         client.get()
@@ -222,6 +232,8 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful();
 
+        assertEquals(individualBillingProfile.id().value(), rewardRepository.findById(r3.id()).orElseThrow().billingProfileId());
+
         // When
         client.get()
                 .uri(getApiURI(ME_GET_PAYOUT_PREFERENCES))
@@ -270,6 +282,8 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful();
+
+        assertNull(rewardRepository.findById(r1.id()).orElseThrow().billingProfileId());
 
         // When
         client.get()
@@ -334,6 +348,39 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful();
+
+        // When
+        client.put()
+                .uri(getApiURI(BILLING_PROFILES_ENABLE_BY_ID.formatted(companyBillingProfile.id().value())))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "enable": true
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // When
+        client.put()
+                .uri(getApiURI(ME_PUT_PAYOUT_PREFERENCES))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "billingProfileId": "%s",
+                          "projectId": "%s"
+                        }
+                        """.formatted(companyBillingProfile.id().value(), projectEntities.get(0).getId()))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        assertEquals(companyBillingProfile.id().value(), rewardRepository.findById(r1.id()).orElseThrow().billingProfileId());
     }
 
 

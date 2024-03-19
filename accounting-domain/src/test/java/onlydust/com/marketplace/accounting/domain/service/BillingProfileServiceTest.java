@@ -7,10 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
-import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileUserRightsView;
@@ -52,8 +49,9 @@ class BillingProfileServiceTest {
     final PdfStoragePort pdfStoragePort = mock(PdfStoragePort.class);
     final BillingProfileObserver billingProfileObserver = mock(BillingProfileObserver.class);
     final IndexerPort indexerPort = mock(IndexerPort.class);
+    final AccountingObserverPort accountingObserverPort = mock(AccountingObserver.class);
     final BillingProfileService billingProfileService = new BillingProfileService(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort,
-            billingProfileObserver, indexerPort);
+            billingProfileObserver, indexerPort, accountingObserverPort);
     final UserId userId = UserId.random();
     final Currency ETH = Currencies.ETH;
     final Currency USD = Currencies.USD;
@@ -1548,6 +1546,7 @@ class BillingProfileServiceTest {
 
         // Then
         verify(billingProfileStoragePort).enableBillingProfile(billingProfileId, true);
+        verify(accountingObserverPort).onBillingProfileEnabled(billingProfileId, true);
     }
 
     @Test

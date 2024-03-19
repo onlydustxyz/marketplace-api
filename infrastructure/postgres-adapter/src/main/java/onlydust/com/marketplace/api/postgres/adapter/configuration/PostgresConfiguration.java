@@ -4,7 +4,6 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileUserRightsView;
 import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndexerEventEntity;
@@ -290,8 +289,9 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresRewardStatusAdapter postgresRewardStatusAdapter(final RewardStatusRepository rewardStatusRepository) {
-        return new PostgresRewardStatusAdapter(rewardStatusRepository);
+    public PostgresRewardStatusAdapter postgresRewardStatusAdapter(final RewardStatusRepository rewardStatusRepository,
+                                                                   final RewardRepository rewardRepository) {
+        return new PostgresRewardStatusAdapter(rewardStatusRepository, rewardRepository);
     }
 
     @Bean
