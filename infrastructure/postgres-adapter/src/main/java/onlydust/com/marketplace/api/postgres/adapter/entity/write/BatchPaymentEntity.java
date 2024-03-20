@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import lombok.*;
-import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
+import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.PayableReward;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
@@ -60,44 +60,44 @@ public class BatchPaymentEntity {
     @EqualsAndHashCode.Exclude
     private Date updatedAt;
 
-    public static BatchPaymentEntity fromDomain(final BatchPayment batchPayment) {
+    public static BatchPaymentEntity fromDomain(final Payment payment) {
         return BatchPaymentEntity.builder()
-                .id(batchPayment.id().value())
-                .csv(batchPayment.csv())
-                .transactionHash(batchPayment.transactionHash())
-                .network(NetworkEnumEntity.of(batchPayment.network()))
-                .status(switch (batchPayment.status()) {
+                .id(payment.id().value())
+                .csv(payment.csv())
+                .transactionHash(payment.transactionHash())
+                .network(NetworkEnumEntity.of(payment.network()))
+                .status(switch (payment.status()) {
                     case PAID -> Status.PAID;
                     case TO_PAY -> Status.TO_PAY;
                 })
-                .invoices(batchPayment.invoices().stream().map(InvoiceEntity::fromDomain).toList())
-                .rewards(batchPayment.rewards().stream().map(r -> BatchPaymentRewardEntity.from(batchPayment.id(), r)).toList())
+                .invoices(payment.invoices().stream().map(InvoiceEntity::fromDomain).toList())
+                .rewards(payment.rewards().stream().map(r -> BatchPaymentRewardEntity.from(payment.id(), r)).toList())
                 .build();
     }
 
     public enum Status {
         TO_PAY, PAID;
 
-        public static Status of(BatchPayment.Status status) {
+        public static Status of(Payment.Status status) {
             return switch (status) {
                 case TO_PAY -> TO_PAY;
                 case PAID -> PAID;
             };
         }
 
-        public BatchPayment.Status toDomain() {
+        public Payment.Status toDomain() {
             return switch (this) {
-                case TO_PAY -> BatchPayment.Status.TO_PAY;
-                case PAID -> BatchPayment.Status.PAID;
+                case TO_PAY -> Payment.Status.TO_PAY;
+                case PAID -> Payment.Status.PAID;
             };
         }
     }
 
-    public BatchPayment toDomain() {
-        return BatchPayment.builder()
+    public Payment toDomain() {
+        return Payment.builder()
                 .network(this.network.toNetwork())
                 .csv(this.csv)
-                .id(BatchPayment.Id.of(this.id))
+                .id(Payment.Id.of(this.id))
                 .transactionHash(this.transactionHash)
                 .rewards(this.rewards.stream().map(r ->
                         new PayableReward(

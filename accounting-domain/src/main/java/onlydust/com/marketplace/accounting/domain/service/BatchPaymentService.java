@@ -38,32 +38,32 @@ public class BatchPaymentService implements BatchPaymentPort {
 
     @Override
     @Transactional
-    public void markBatchPaymentAsPaid(BatchPayment.Id batchPaymentId, String transactionReference) {
+    public void markBatchPaymentAsPaid(Payment.Id batchPaymentId, String transactionReference) {
         final var batchPayment = accountingRewardStoragePort.findBatchPayment(batchPaymentId)
                 .orElseThrow(() -> notFound("Batch payment %s not found".formatted(batchPaymentId.value())));
 
-        if (batchPayment.status() != BatchPayment.Status.TO_PAY) {
+        if (batchPayment.status() != Payment.Status.TO_PAY) {
             throw badRequest("Batch payment %s is already paid".formatted(batchPaymentId.value()));
         }
 
         batchPayment.network().validateTransactionReference(transactionReference);
 
-        final BatchPayment updatedBatchPayment = batchPayment.toBuilder()
-                .status(BatchPayment.Status.PAID)
+        final Payment updatedPayment = batchPayment.toBuilder()
+                .status(Payment.Status.PAID)
                 .transactionHash(transactionReference)
                 .build();
 
-        accountingFacadePort.confirm(updatedBatchPayment);
-        accountingRewardStoragePort.saveBatchPayment(updatedBatchPayment);
+        accountingFacadePort.confirm(updatedPayment);
+        accountingRewardStoragePort.saveBatchPayment(updatedPayment);
     }
 
     @Override
-    public Page<BatchPaymentDetailsView> findBatchPayments(int pageIndex, int pageSize, Set<BatchPayment.Status> statuses) {
+    public Page<BatchPaymentDetailsView> findBatchPayments(int pageIndex, int pageSize, Set<Payment.Status> statuses) {
         return accountingRewardStoragePort.findBatchPaymentDetails(pageIndex, pageSize, statuses);
     }
 
     @Override
-    public BatchPaymentDetailsView findBatchPaymentById(BatchPayment.Id batchPaymentId) {
+    public BatchPaymentDetailsView findBatchPaymentById(Payment.Id batchPaymentId) {
         return accountingRewardStoragePort.findBatchPaymentDetailsById(batchPaymentId)
                 .orElseThrow(() -> notFound("Batch payment details %s not found".formatted(batchPaymentId.value())));
     }
@@ -88,10 +88,10 @@ public class BatchPaymentService implements BatchPaymentPort {
 
         accountingRewardStoragePort.saveAll(payments);
 
-        return payments.stream().map(batchPayment -> {
-            final var rewards = accountingRewardStoragePort.findRewardsById(batchPayment.rewards().stream().map(PayableReward::id).collect(Collectors.toSet()));
+        return payments.stream().map(payment -> {
+            final var rewards = accountingRewardStoragePort.findRewardsById(payment.rewards().stream().map(PayableReward::id).collect(Collectors.toSet()));
             return BatchPaymentDetailsView.builder()
-                    .batchPayment(batchPayment)
+                    .payment(payment)
                     .rewardViews(rewards)
                     .build();
         }).toList();

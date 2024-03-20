@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.backoffice.api.contract.model.*;
-import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
+import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
@@ -32,12 +32,12 @@ public interface BatchPaymentMapper {
     static BatchPaymentResponse domainToResponse(final BatchPaymentDetailsView bp) {
         final var totalsPerCurrency = bp.totalsPerCurrency().stream().map(SearchRewardMapper::totalMoneyViewToResponse).toList();
         return new BatchPaymentResponse()
-                .id(bp.batchPayment().id().value())
-                .createdAt(DateMapper.toZoneDateTime(bp.batchPayment().createdAt()))
-                .status(map(bp.batchPayment().status()))
-                .csv(bp.batchPayment().csv())
+                .id(bp.payment().id().value())
+                .createdAt(DateMapper.toZoneDateTime(bp.payment().createdAt()))
+                .status(map(bp.payment().status()))
+                .csv(bp.payment().csv())
                 .rewardCount((long) bp.rewardViews().size())
-                .network(mapNetwork(bp.batchPayment().network()))
+                .network(mapNetwork(bp.payment().network()))
                 .totalUsdEquivalent(totalsPerCurrency.stream()
                         .map(TotalMoneyWithUsdEquivalentResponse::getDollarsEquivalent)
                         .reduce(BigDecimal.ZERO, BigDecimal::add))
@@ -47,28 +47,28 @@ public interface BatchPaymentMapper {
     static BatchPaymentDetailsResponse domainToDetailedResponse(final BatchPaymentDetailsView bp) {
         final var totalsPerCurrency = bp.totalsPerCurrency().stream().map(SearchRewardMapper::totalMoneyViewToResponse).toList();
         return new BatchPaymentDetailsResponse()
-                .id(bp.batchPayment().id().value())
-                .createdAt(DateMapper.toZoneDateTime(bp.batchPayment().createdAt()))
-                .status(map(bp.batchPayment().status()))
-                .csv(bp.batchPayment().csv())
+                .id(bp.payment().id().value())
+                .createdAt(DateMapper.toZoneDateTime(bp.payment().createdAt()))
+                .status(map(bp.payment().status()))
+                .csv(bp.payment().csv())
                 .rewardCount((long) bp.rewardViews().size())
-                .network(mapNetwork(bp.batchPayment().network()))
+                .network(mapNetwork(bp.payment().network()))
                 .totalUsdEquivalent(totalsPerCurrency.stream()
                         .map(TotalMoneyWithUsdEquivalentResponse::getDollarsEquivalent)
                         .reduce(BigDecimal.ZERO, BigDecimal::add))
                 .totalsPerCurrency(totalsPerCurrency)
-                .transactionHash(bp.batchPayment().transactionHash())
+                .transactionHash(bp.payment().transactionHash())
                 .rewards(bp.rewardViews().stream().map(SearchRewardMapper::mapToItem).toList());
     }
 
-    static BatchPayment.Status map(final BatchPaymentStatus status) {
+    static Payment.Status map(final BatchPaymentStatus status) {
         return switch (status) {
-            case TO_PAY -> BatchPayment.Status.TO_PAY;
-            case PAID -> BatchPayment.Status.PAID;
+            case TO_PAY -> Payment.Status.TO_PAY;
+            case PAID -> Payment.Status.PAID;
         };
     }
 
-    static BatchPaymentStatus map(final BatchPayment.Status status) {
+    static BatchPaymentStatus map(final Payment.Status status) {
         return switch (status) {
             case TO_PAY -> BatchPaymentStatus.TO_PAY;
             case PAID -> BatchPaymentStatus.PAID;

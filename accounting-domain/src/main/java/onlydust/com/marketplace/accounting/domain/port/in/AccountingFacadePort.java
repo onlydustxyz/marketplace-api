@@ -22,15 +22,15 @@ public interface AccountingFacadePort {
 
     void createReward(ProjectId from, RewardId to, PositiveAmount amount, Currency.Id currencyId);
 
-    void pay(final @NonNull RewardId rewardId, final @NonNull BatchPayment.Reference paymentReference);
+    void pay(final @NonNull RewardId rewardId, final @NonNull Payment.Reference paymentReference);
 
-    List<BatchPayment> pay(final Set<RewardId> rewardIds);
+    List<Payment> pay(final Set<RewardId> rewardIds);
 
     void cancel(final @NonNull RewardId rewardId, @NonNull Currency.Id currencyId);
 
-    void cancel(@NonNull BatchPayment.Id paymentId, @NonNull Currency.Id currencyId);
+    void cancel(@NonNull Payment.Id paymentId, @NonNull Currency.Id currencyId);
 
-    void confirm(BatchPayment payment);
+    void confirm(Payment payment);
 
     boolean isPayable(RewardId rewardId, Currency.Id currencyId);
 

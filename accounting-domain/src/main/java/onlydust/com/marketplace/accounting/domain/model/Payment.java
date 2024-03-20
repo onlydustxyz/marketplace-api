@@ -12,7 +12,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.intern
 @Builder(toBuilder = true)
 @Accessors(chain = true, fluent = true)
 @Data
-public class BatchPayment {
+public class Payment {
     @NonNull
     Id id;
     @NonNull
@@ -32,8 +32,8 @@ public class BatchPayment {
     @Builder.Default
     final @NonNull Map<RewardId, Reference> references = new HashMap<>();
 
-    public static BatchPayment of(@NonNull Network network, @NonNull List<PayableReward> rewards, @NonNull String csv) {
-        return BatchPayment.builder()
+    public static Payment of(@NonNull Network network, @NonNull List<PayableReward> rewards, @NonNull String csv) {
+        return Payment.builder()
                 .id(Id.random())
                 .network(network)
                 .rewards(rewards)
@@ -68,12 +68,12 @@ public class BatchPayment {
     @EqualsAndHashCode(callSuper = true)
     @SuperBuilder
     public static class Id extends UuidWrapper {
-        public static BatchPayment.Id of(@NonNull final UUID uuid) {
-            return BatchPayment.Id.builder().uuid(uuid).build();
+        public static Payment.Id of(@NonNull final UUID uuid) {
+            return Payment.Id.builder().uuid(uuid).build();
         }
 
-        public static BatchPayment.Id of(@NonNull final String uuid) {
-            return BatchPayment.Id.of(UUID.fromString(uuid));
+        public static Payment.Id of(@NonNull final String uuid) {
+            return Payment.Id.of(UUID.fromString(uuid));
         }
     }
 

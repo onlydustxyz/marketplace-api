@@ -101,7 +101,7 @@ public class AccountingService implements AccountingFacadePort {
 
     @Override
     @Transactional
-    public void pay(final @NonNull RewardId rewardId, final @NonNull BatchPayment.Reference paymentReference) {
+    public void pay(final @NonNull RewardId rewardId, final @NonNull Payment.Reference paymentReference) {
         final var network = paymentReference.network();
         final var payableRewards = getPayableRewardsOn(network, Set.of(rewardId));
 
@@ -114,7 +114,7 @@ public class AccountingService implements AccountingFacadePort {
 
     @Override
     @Transactional
-    public List<BatchPayment> pay(final Set<RewardId> rewardIds) {
+    public List<Payment> pay(final Set<RewardId> rewardIds) {
         return getPayableRewards(rewardIds).stream()
                 .collect(groupingBy(r -> r.currency().network()))
                 .entrySet().stream()
@@ -123,8 +123,8 @@ public class AccountingService implements AccountingFacadePort {
                 .toList();
     }
 
-    private BatchPayment pay(final @NonNull Network network, final List<PayableReward> rewards) {
-        final var payment = BatchPayment.of(network, rewards, ""); // TODO make csv optional
+    private Payment pay(final @NonNull Network network, final List<PayableReward> rewards) {
+        final var payment = Payment.of(network, rewards, ""); // TODO make csv optional
 
         payment.rewards().stream().collect(groupingBy(PayableReward::currency))
                 .forEach((currency, currencyRewards) -> pay(payment.id(), currency, currencyRewards));
@@ -132,7 +132,7 @@ public class AccountingService implements AccountingFacadePort {
         return payment;
     }
 
-    private void pay(final @NonNull BatchPayment.Id paymentId, final @NonNull PayableCurrency payableCurrency, final List<PayableReward> rewards) {
+    private void pay(final @NonNull Payment.Id paymentId, final @NonNull PayableCurrency payableCurrency, final List<PayableReward> rewards) {
         final var currency = getCurrency(payableCurrency.id());
         final var accountBook = getAccountBook(currency);
 
@@ -155,7 +155,7 @@ public class AccountingService implements AccountingFacadePort {
 
     @Override
     @Transactional
-    public void cancel(@NonNull BatchPayment.Id paymentId, @NonNull Currency.Id currencyId) {
+    public void cancel(@NonNull Payment.Id paymentId, @NonNull Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
 
@@ -165,13 +165,13 @@ public class AccountingService implements AccountingFacadePort {
 
     @Override
     @Transactional
-    public void confirm(final @NonNull BatchPayment payment) {
+    public void confirm(final @NonNull Payment payment) {
         payment.rewards().stream()
                 .collect(groupingBy(PayableReward::currency))
                 .forEach((currency, rewards) -> confirm(payment, currency.id(), rewards));
     }
 
-    private void confirm(BatchPayment payment, Currency.Id currencyId, List<PayableReward> rewards) {
+    private void confirm(Payment payment, Currency.Id currencyId, List<PayableReward> rewards) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
 
@@ -181,7 +181,7 @@ public class AccountingService implements AccountingFacadePort {
         rewards.forEach(r -> confirm(accountBook, r, payment.referenceFor(r.id())));
     }
 
-    private void confirm(AccountBookAggregate accountBook, PayableReward reward, BatchPayment.Reference paymentReference) {
+    private void confirm(AccountBookAggregate accountBook, PayableReward reward, Payment.Reference paymentReference) {
         accountBook.state().transferredAmountPerOrigin(AccountId.of(reward.id()))
                 .entrySet()
                 .stream().map(e -> Map.entry(

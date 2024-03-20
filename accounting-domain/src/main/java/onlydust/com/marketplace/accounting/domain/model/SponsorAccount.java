@@ -121,14 +121,14 @@ public class SponsorAccount {
 
     @Accessors(fluent = true)
     @Getter
-    public static class Transaction extends BatchPayment.Reference {
+    public static class Transaction extends Payment.Reference {
         private final @NonNull Amount amount;
         private final @NonNull Id id;
         final @NonNull Type type;
 
         public Transaction(
                 final @NonNull Type type,
-                final @NonNull BatchPayment.Reference paymentReference,
+                final @NonNull Payment.Reference paymentReference,
                 final @NonNull Amount amount
         ) {
             this(type, paymentReference.network(), paymentReference.reference(), amount, paymentReference.thirdPartyName(),

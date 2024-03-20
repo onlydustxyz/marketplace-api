@@ -154,7 +154,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
         final var recipient = userFacadePort.getProfileById(reward.recipientId());
 
-        final var paymentReference = new BatchPayment.Reference(mapTransactionNetwork(payRewardRequest.getNetwork()),
+        final var paymentReference = new Payment.Reference(mapTransactionNetwork(payRewardRequest.getNetwork()),
                 payRewardRequest.getReference(),
                 recipient.getLogin(),
                 payRewardRequest.getRecipientAccount());
@@ -224,13 +224,13 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
     @Override
     public ResponseEntity<Void> updateBatchPayment(UUID batchPaymentId, BatchPaymentRequest batchPaymentRequest) {
-        batchPaymentPort.markBatchPaymentAsPaid(BatchPayment.Id.of(batchPaymentId), batchPaymentRequest.getTransactionHash());
+        batchPaymentPort.markBatchPaymentAsPaid(Payment.Id.of(batchPaymentId), batchPaymentRequest.getTransactionHash());
         return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<BatchPaymentDetailsResponse> getBatchPayment(UUID batchPaymentId) {
-        return ResponseEntity.ok(BatchPaymentMapper.domainToDetailedResponse(batchPaymentPort.findBatchPaymentById(BatchPayment.Id.of(batchPaymentId))));
+        return ResponseEntity.ok(BatchPaymentMapper.domainToDetailedResponse(batchPaymentPort.findBatchPaymentById(Payment.Id.of(batchPaymentId))));
     }
 
     @Override

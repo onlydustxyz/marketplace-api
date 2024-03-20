@@ -2,9 +2,9 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
@@ -93,21 +93,21 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<BatchPayment> findBatchPayment(BatchPayment.Id batchPaymentId) {
+    public Optional<Payment> findBatchPayment(Payment.Id batchPaymentId) {
         return batchPaymentRepository.findById(batchPaymentId.value()).map(BatchPaymentEntity::toDomain);
     }
 
     @Override
     @Transactional
-    public void saveBatchPayment(BatchPayment batchPayment) {
-        batchPaymentRepository.save(BatchPaymentEntity.fromDomain(batchPayment));
+    public void saveBatchPayment(Payment payment) {
+        batchPaymentRepository.save(BatchPaymentEntity.fromDomain(payment));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<BatchPaymentDetailsView> findBatchPaymentDetails(int pageIndex, int pageSize, Set<BatchPayment.Status> statuses) {
+    public Page<BatchPaymentDetailsView> findBatchPaymentDetails(int pageIndex, int pageSize, Set<Payment.Status> statuses) {
         if (statuses == null || statuses.isEmpty()) {
-            statuses = EnumSet.allOf(BatchPayment.Status.class);
+            statuses = EnumSet.allOf(Payment.Status.class);
         }
         final var page = batchPaymentRepository.findAllByStatusIsIn(statuses.stream().map(BatchPaymentEntity.Status::of).collect(Collectors.toSet()),
                 PageRequest.of(pageIndex, pageSize, Sort.by("createdAt").descending()));
@@ -120,13 +120,13 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<BatchPaymentDetailsView> findBatchPaymentDetailsById(BatchPayment.Id batchPaymentId) {
+    public Optional<BatchPaymentDetailsView> findBatchPaymentDetailsById(Payment.Id batchPaymentId) {
         return batchPaymentRepository.findById(batchPaymentId.value()).map(this::getBatchPaymentDetailsView);
     }
 
     private BatchPaymentDetailsView getBatchPaymentDetailsView(BatchPaymentEntity batchPayment) {
         return BatchPaymentDetailsView.builder()
-                .batchPayment(batchPayment.toDomain())
+                .payment(batchPayment.toDomain())
                 .rewardViews(
                         rewardDetailsViewRepository.findAllByRewardIds(batchPayment.getRewards().stream().map(BatchPaymentRewardEntity::rewardId).toList()).stream()
                                 .map(BackofficeRewardViewEntity::toDomain)
@@ -175,7 +175,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
 
     @Override
     @Transactional
-    public void saveAll(List<BatchPayment> batchPayments) {
-        batchPaymentRepository.saveAll(batchPayments.stream().map(BatchPaymentEntity::fromDomain).toList());
+    public void saveAll(List<Payment> payments) {
+        batchPaymentRepository.saveAll(payments.stream().map(BatchPaymentEntity::fromDomain).toList());
     }
 }

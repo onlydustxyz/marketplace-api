@@ -44,7 +44,7 @@ public interface AccountBook {
             return new AccountId(Type.REWARD, id.value());
         }
 
-        public static AccountId of(BatchPayment.Id id) {
+        public static AccountId of(Payment.Id id) {
             return new AccountId(Type.PAYMENT, id.value());
         }
 
@@ -55,7 +55,7 @@ public interface AccountBook {
                 return of(projectId);
             } else if (id instanceof RewardId rewardId) {
                 return of(rewardId);
-            } else if (id instanceof BatchPayment.Id paymentId) {
+            } else if (id instanceof Payment.Id paymentId) {
                 return of(paymentId);
             } else {
                 throw new IllegalArgumentException("Unsupported id type: " + id.getClass());
@@ -84,11 +84,11 @@ public interface AccountBook {
         }
 
 
-        public BatchPayment.Id paymentId() {
+        public Payment.Id paymentId() {
             if (!isPayment())
                 throw new IllegalArgumentException("Only payments can be converted to payment id");
 
-            return BatchPayment.Id.of(id);
+            return Payment.Id.of(id);
         }
 
         public boolean isReward() {
