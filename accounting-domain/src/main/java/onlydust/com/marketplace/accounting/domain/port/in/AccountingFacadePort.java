@@ -6,6 +6,7 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -30,7 +31,7 @@ public interface AccountingFacadePort {
 
     void cancel(@NonNull BatchPayment.Id paymentId, @NonNull Currency.Id currencyId);
 
-    void confirm(BatchPayment payment, SponsorAccount.PaymentReference paymentReference);
+    void confirm(BatchPayment payment, Map<RewardId, SponsorAccount.PaymentReference> paymentReferences);
 
     boolean isPayable(RewardId rewardId, Currency.Id currencyId);
 
@@ -49,8 +50,6 @@ public interface AccountingFacadePort {
     SponsorAccountStatement updateSponsorAccount(final @NonNull SponsorAccount.Id sponsorAccountId, ZonedDateTime lockedUntil);
 
     List<PayableReward> getPayableRewards();
-
-    List<PayableReward> getPayableRewards(Set<RewardId> rewardIds);
 
     Page<HistoricalTransaction> transactionHistory(SponsorId sponsorId, Integer pageIndex, Integer pageSize);
 

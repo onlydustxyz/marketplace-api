@@ -34,7 +34,7 @@ public class AccountBookFacade {
 
 
     public boolean isFunded(RewardId rewardId) {
-        return accountBook.state().transferredAmountPerOrigin(AccountBook.AccountId.of(rewardId)).entrySet().stream()
+        return accountBook.state().balancePerOrigin(AccountBook.AccountId.of(rewardId)).entrySet().stream()
                 .allMatch(entry -> {
                     final var sponsorAccount = sponsorAccountStorage.get(entry.getKey().sponsorAccountId()).orElseThrow();
                     return sponsorAccount.balance().isGreaterThanOrEqual(entry.getValue());
@@ -42,7 +42,7 @@ public class AccountBookFacade {
     }
 
     public Set<Network> networksOf(RewardId rewardId) {
-        return accountBook.state().transferredAmountPerOrigin(AccountBook.AccountId.of(rewardId)).keySet().stream()
+        return accountBook.state().balancePerOrigin(AccountBook.AccountId.of(rewardId)).keySet().stream()
                 .map(accountId -> sponsorAccountStorage.get(accountId.sponsorAccountId()).orElseThrow().network())
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -50,7 +50,7 @@ public class AccountBookFacade {
     }
 
     public Optional<Instant> unlockDateOf(RewardId rewardId) {
-        return accountBook.state().transferredAmountPerOrigin(AccountBook.AccountId.of(rewardId)).keySet().stream()
+        return accountBook.state().balancePerOrigin(AccountBook.AccountId.of(rewardId)).keySet().stream()
                 .map(accountId -> sponsorAccountStorage.get(accountId.sponsorAccountId()).orElseThrow().lockedUntil())
                 .filter(Optional::isPresent)
                 .map(Optional::get)

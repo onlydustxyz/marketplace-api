@@ -662,7 +662,7 @@ public class AccountBookTest {
         );
 
         // When
-        final var amounts = accountBook.state().transferredAmountPerOrigin(account3);
+        final var amounts = accountBook.state().balancePerOrigin(account3);
 
         // Then
         assertThat(amounts).containsOnly(

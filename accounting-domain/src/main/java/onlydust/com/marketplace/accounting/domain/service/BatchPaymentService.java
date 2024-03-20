@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -54,14 +53,14 @@ public class BatchPaymentService implements BatchPaymentPort {
                 .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
         final Map<RewardId, Wallet> wallets = walletsPerRewardForNetwork(rewardInvoices, batchPayment.network());
 
-        batchPayment.rewards().forEach(reward -> {
-            final var paymentReference = new SponsorAccount.PaymentReference(batchPayment.network(),
-                    transactionReference,
-                    rewardInvoices.get(reward.id()).billingProfileSnapshot().subject(),
-                    wallets.get(reward.id()).address());
+        final var paymentReferences = batchPayment.rewards().stream().map(reward -> Map.entry(reward.id(),
+                        new SponsorAccount.PaymentReference(batchPayment.network(),
+                        transactionReference,
+                        rewardInvoices.get(reward.id()).billingProfileSnapshot().subject(),
+                        wallets.get(reward.id()).address())))
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-            accountingFacadePort.pay(reward.id(), paymentReference);
-        });
+        accountingFacadePort.confirm(batchPayment, paymentReferences);
 
         final BatchPayment updatedBatchPayment = batchPayment.toBuilder()
                 .status(BatchPayment.Status.PAID)
@@ -89,30 +88,19 @@ public class BatchPaymentService implements BatchPaymentPort {
                 .flatMap(invoice -> invoice.rewards().stream().map(reward -> Map.entry(reward.id(), invoice)))
                 .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        final var payableRewardsByNetwork = accountingFacadePort.getPayableRewards(rewardInvoices.keySet()).stream()
-                .collect(groupingBy(r -> r.currency().network()));
+        final var payments = accountingFacadePort.pay(rewardInvoices.keySet());
 
-        final var batchPayments = payableRewardsByNetwork
-                .entrySet()
-                .stream()
-                .map(e -> {
-                    final var network = e.getKey();
-                    final var rewards = e.getValue();
-                    rewards.sort(Comparator.comparing(r -> r.id().value()));
-                    final Map<RewardId, Wallet> wallets = walletsPerRewardForNetwork(rewardInvoices, network);
+        payments.forEach(payment -> {
+            final Map<RewardId, Wallet> wallets = walletsPerRewardForNetwork(rewardInvoices, payment.network());
+            final var rewards = payment.rewards().stream().sorted(Comparator.comparing(r -> r.id().value())).toList();
+            payment
+                    .invoices(invoices)
+                    .csv(BatchPaymentExporter.csv(rewards, wallets));
+        });
 
-                    return BatchPayment.builder()
-                            .id(BatchPayment.Id.random())
-                            .network(network)
-                            .csv(BatchPaymentExporter.csv(rewards, wallets))
-                            .invoices(invoices)
-                            .rewards(rewards)
-                            .build();
-                })
-                .toList();
+        accountingRewardStoragePort.saveAll(payments);
 
-        accountingRewardStoragePort.saveAll(batchPayments);
-        return batchPayments.stream().map(batchPayment -> {
+        return payments.stream().map(batchPayment -> {
             final var rewards = accountingRewardStoragePort.findRewardsById(batchPayment.rewards().stream().map(PayableReward::id).collect(Collectors.toSet()));
             return BatchPaymentDetailsView.builder()
                     .batchPayment(batchPayment)
