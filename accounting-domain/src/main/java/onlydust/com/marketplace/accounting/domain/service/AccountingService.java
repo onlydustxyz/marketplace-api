@@ -109,7 +109,8 @@ public class AccountingService implements AccountingFacadePort {
         if (payableRewards.isEmpty()) throw badRequest("Reward %s is not payable on %s".formatted(rewardId, network));
 
         final var payment = pay(network, payableRewards);
-        confirm(payment, Map.of(rewardId, paymentReference));
+        payment.referenceFor(rewardId, paymentReference);
+        confirm(payment);
     }
 
     @Override
@@ -165,21 +166,20 @@ public class AccountingService implements AccountingFacadePort {
 
     @Override
     @Transactional
-    public void confirm(final @NonNull BatchPayment payment, final @NonNull Map<RewardId, PaymentReference> paymentReferences) {
-        // TODO move paymentReferences as method in payment ?
+    public void confirm(final @NonNull BatchPayment payment) {
         payment.rewards().stream()
                 .collect(groupingBy(PayableReward::currency))
-                .forEach((currency, rewards) -> confirm(payment.id(), currency.id(), rewards, paymentReferences));
+                .forEach((currency, rewards) -> confirm(payment, currency.id(), rewards));
     }
 
-    private void confirm(BatchPayment.Id paymentId, Currency.Id currencyId, List<PayableReward> rewards, Map<RewardId, PaymentReference> paymentReferences) {
+    private void confirm(BatchPayment payment, Currency.Id currencyId, List<PayableReward> rewards) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
 
-        accountBook.burn(AccountId.of(paymentId), rewards.stream().map(PayableReward::amount).reduce(PositiveAmount::add).orElse(PositiveAmount.ZERO));
+        accountBook.burn(AccountId.of(payment.id()), rewards.stream().map(PayableReward::amount).reduce(PositiveAmount::add).orElse(PositiveAmount.ZERO));
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
 
-        rewards.forEach(r -> confirm(accountBook, r, paymentReferences.get(r.id())));
+        rewards.forEach(r -> confirm(accountBook, r, payment.referenceFor(r.id())));
     }
 
     private void confirm(AccountBookAggregate accountBook, PayableReward reward, PaymentReference paymentReference) {

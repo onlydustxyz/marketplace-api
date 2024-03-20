@@ -23,7 +23,6 @@ import org.mockito.ArgumentCaptor;
 
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -1221,20 +1220,6 @@ public class AccountingServiceTest {
         }
 
         @Test
-        void should_prevent_confirming_payment_on_incorrect_network() {
-            // Given
-            accountingService.fund(unlockedSponsorAccountUsdc1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(300L)));
-            final var payments = accountingService.pay(Set.of(rewardId1, rewardId2));
-
-            // When
-            assertThatThrownBy(() -> accountingService.confirm(payments.get(0), Map.of(rewardId1, fakePaymentReference(Network.OPTIMISM), rewardId2,
-                    fakePaymentReference(Network.OPTIMISM))))
-                    // Then
-                    .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("Payment network ETHEREUM does not match payment reference network OPTIMISM");
-        }
-
-        @Test
         void should_return_partially_paid_payable_rewards() {
             // Given
             accountingService.fund(unlockedSponsorAccountUsdc1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(50L)));
@@ -1356,9 +1341,9 @@ public class AccountingServiceTest {
         // When
         final var ethPaymentReference1 = fakePaymentReference(Network.ETHEREUM);
         final var ethPaymentReference2 = fakePaymentReference(Network.ETHEREUM);
-        accountingService.confirm(payment1, Map.of(
-                rewardId1, ethPaymentReference1,
-                rewardId2, ethPaymentReference2));
+        payment1.referenceFor(rewardId1, ethPaymentReference1);
+        payment1.referenceFor(rewardId2, ethPaymentReference2);
+        accountingService.confirm(payment1);
 
         // Then
         verify(accountingObserver).onPaymentReceived(rewardId1, ethPaymentReference1);
@@ -1373,7 +1358,8 @@ public class AccountingServiceTest {
         // When
         reset(accountingObserver);
         final var starknetPaymentReference = fakePaymentReference(Network.STARKNET);
-        accountingService.confirm(payment2, Map.of(rewardId2, starknetPaymentReference));
+        payment2.referenceFor(rewardId2, starknetPaymentReference);
+        accountingService.confirm(payment2);
 
         // Then
         verify(accountingObserver, never()).onPaymentReceived(eq(rewardId1), any());

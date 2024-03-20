@@ -48,24 +48,12 @@ public class BatchPaymentService implements BatchPaymentPort {
 
         batchPayment.network().validateTransactionReference(transactionReference);
 
-        final Map<RewardId, Invoice> rewardInvoices = batchPayment.invoices().stream()
-                .flatMap(invoice -> invoice.rewards().stream().map(reward -> Map.entry(reward.id(), invoice)))
-                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
-        final Map<RewardId, Wallet> wallets = walletsPerRewardForNetwork(rewardInvoices, batchPayment.network());
-
-        final var paymentReferences = batchPayment.rewards().stream().map(reward -> Map.entry(reward.id(),
-                        new SponsorAccount.PaymentReference(batchPayment.network(),
-                        transactionReference,
-                        rewardInvoices.get(reward.id()).billingProfileSnapshot().subject(),
-                        wallets.get(reward.id()).address())))
-                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        accountingFacadePort.confirm(batchPayment, paymentReferences);
-
         final BatchPayment updatedBatchPayment = batchPayment.toBuilder()
                 .status(BatchPayment.Status.PAID)
                 .transactionHash(transactionReference)
                 .build();
+
+        accountingFacadePort.confirm(updatedBatchPayment);
         accountingRewardStoragePort.saveBatchPayment(updatedBatchPayment);
     }
 

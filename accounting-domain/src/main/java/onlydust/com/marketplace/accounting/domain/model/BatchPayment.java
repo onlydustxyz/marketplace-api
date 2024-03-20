@@ -5,9 +5,9 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @Builder(toBuilder = true)
 @Accessors(chain = true, fluent = true)
@@ -29,6 +29,9 @@ public class BatchPayment {
     List<PayableReward> rewards;
     Date createdAt;
 
+    @Builder.Default
+    final @NonNull Map<RewardId, SponsorAccount.PaymentReference> references = new HashMap<>();
+
     public static BatchPayment of(@NonNull Network network, @NonNull List<PayableReward> rewards, @NonNull String csv) {
         return BatchPayment.builder()
                 .id(Id.random())
@@ -39,6 +42,27 @@ public class BatchPayment {
                 .csv(csv)
                 .build();
     }
+
+    public SponsorAccount.PaymentReference referenceFor(@NonNull RewardId rewardId) {
+        return references.computeIfAbsent(rewardId, this::computeReference);
+    }
+
+    private SponsorAccount.PaymentReference computeReference(RewardId rewardId) {
+        final var invoice = invoices.stream()
+                .filter(i -> i.rewards().stream().anyMatch(reward -> reward.id().equals(rewardId)))
+                .findFirst()
+                .orElseThrow(() -> internalServerError("Reward %s not found in batch payment %s".formatted(rewardId, id)));
+
+        final var wallet = invoice.billingProfileSnapshot().wallet(network)
+                .orElseThrow(() -> internalServerError("Wallet not found for invoice %s on network %s".formatted(invoice.id(), network)));
+
+        return new SponsorAccount.PaymentReference(network, transactionHash, invoice.billingProfileSnapshot().subject(), wallet.address());
+    }
+
+    public void referenceFor(@NonNull RewardId rewardId, SponsorAccount.PaymentReference reference) {
+        references.put(rewardId, reference);
+    }
+
 
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)

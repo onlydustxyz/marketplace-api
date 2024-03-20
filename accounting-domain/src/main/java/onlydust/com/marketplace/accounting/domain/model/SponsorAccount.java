@@ -124,6 +124,7 @@ public class SponsorAccount {
     @Getter
     @EqualsAndHashCode
     @ToString
+    // TODO move inside BatchPayment
     public static class PaymentReference {
         private final @NonNull Network network;
         private final @NonNull String reference;
