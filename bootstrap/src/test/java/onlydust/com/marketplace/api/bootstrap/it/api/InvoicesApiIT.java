@@ -95,6 +95,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .address("My address")
                 .registrationNumber("123456")
                 .subjectToEuropeVAT(true)
+                .usEntity(false)
                 .status(VerificationStatus.VERIFIED)
                 .build());
 

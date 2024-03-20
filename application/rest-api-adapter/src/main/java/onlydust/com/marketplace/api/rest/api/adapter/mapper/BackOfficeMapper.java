@@ -378,6 +378,8 @@ public interface BackOfficeMapper {
                         })
                         .name(invoice.billingProfileSnapshot().subject())
                         .admins(null) //TODO: add admins when implementing the new version for pennylane
+                        .kyc(invoice.billingProfileSnapshot().kyc().map(BackOfficeMapper::mapKyc).orElse(null))
+                        .kyb(invoice.billingProfileSnapshot().kyb().map(BackOfficeMapper::mapKyb).orElse(null))
                 )
                 .rewardCount(invoice.rewards().size())
                 .totalUsdEquivalent(invoice.totalAfterTax().getValue())
@@ -387,6 +389,28 @@ public interface BackOfficeMapper {
                                 .currency(toShortCurrency(reward.amount().getCurrency()))
                                 .dollarsEquivalent(reward.target().getValue())
                 ).toList());
+    }
+
+    static KybResponse mapKyb(Invoice.BillingProfileSnapshot.KybSnapshot kybSnapshot) {
+        return new KybResponse()
+                .name(kybSnapshot.name())
+                .registrationNumber(kybSnapshot.registrationNumber())
+                .address(kybSnapshot.address())
+                .country(kybSnapshot.countryName())
+                .countryCode(kybSnapshot.countryCode())
+                .usEntity(kybSnapshot.usEntity())
+                .subjectToEuropeVAT(kybSnapshot.subjectToEuVAT())
+                .euVATNumber(kybSnapshot.euVATNumber());
+    }
+
+    static KycResponse mapKyc(Invoice.BillingProfileSnapshot.KycSnapshot kycSnapshot) {
+        return new KycResponse()
+                .firstName(kycSnapshot.firstName())
+                .lastName(kycSnapshot.lastName())
+                .address(kycSnapshot.address())
+                .country(kycSnapshot.countryName())
+                .countryCode(kycSnapshot.countryCode())
+                .usCitizen(kycSnapshot.usCitizen());
     }
 
     @SneakyThrows
@@ -413,6 +437,8 @@ public interface BackOfficeMapper {
                                         .email(admin.email())
                                 ).toList()
                         )
+                        .kyc(invoice.billingProfileSnapshot().kyc().map(BackOfficeMapper::mapKyc).orElse(null))
+                        .kyb(invoice.billingProfileSnapshot().kyb().map(BackOfficeMapper::mapKyb).orElse(null))
                 )
                 .totalEquivalent(new MoneyResponse()
                         .amount(invoice.totalAfterTax().getValue())

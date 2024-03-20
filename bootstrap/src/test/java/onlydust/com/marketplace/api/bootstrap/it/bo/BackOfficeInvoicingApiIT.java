@@ -253,6 +253,19 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 "name": "Apple Inc.",
                                 "type": "COMPANY",
                                 "verificationStatus": null,
+                                "kyb": {
+                                  "name": "Apple Inc.",
+                                  "registrationNumber": "123456789",
+                                  "registrationDate": null,
+                                  "address": "1 Infinite Loop, Cupertino, CA 95014, United States",
+                                  "country": "France",
+                                  "countryCode": "FRA",
+                                  "usEntity": false,
+                                  "subjectToEuropeVAT": true,
+                                  "euVATNumber": "FR12345678901",
+                                  "sumsubUrl": null
+                                },
+                                "kyc": null,
                                 "admins": null
                               },
                               "rewardCount": 3,
@@ -299,6 +312,19 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 "name": "Apple Inc.",
                                 "type": "COMPANY",
                                 "verificationStatus": null,
+                                "kyb": {
+                                  "name": "Apple Inc.",
+                                  "registrationNumber": "123456789",
+                                  "registrationDate": null,
+                                  "address": "1 Infinite Loop, Cupertino, CA 95014, United States",
+                                  "country": "France",
+                                  "countryCode": "FRA",
+                                  "usEntity": false,
+                                  "subjectToEuropeVAT": true,
+                                  "euVATNumber": "FR12345678901",
+                                  "sumsubUrl": null
+                                },
+                                "kyc": null,
                                 "admins": null
                               },
                               "rewardCount": 2,
@@ -334,6 +360,19 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 "name": "Apple Inc.",
                                 "type": "COMPANY",
                                 "verificationStatus": null,
+                                "kyb": {
+                                  "name": "Apple Inc.",
+                                  "registrationNumber": "123456789",
+                                  "registrationDate": null,
+                                  "address": "1 Infinite Loop, Cupertino, CA 95014, United States",
+                                  "country": "France",
+                                  "countryCode": "FRA",
+                                  "usEntity": false,
+                                  "subjectToEuropeVAT": true,
+                                  "euVATNumber": "FR12345678901",
+                                  "sumsubUrl": null
+                                },
+                                "kyc": null,
                                 "admins": null
                               },
                               "rewardCount": 1,
@@ -377,6 +416,19 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                             "name": "Apple Inc.",
                             "type": "COMPANY",
                             "verificationStatus": null,
+                            "kyb": {
+                              "name": "Apple Inc.",
+                              "registrationNumber": "123456789",
+                              "registrationDate": null,
+                              "address": "1 Infinite Loop, Cupertino, CA 95014, United States",
+                              "country": "France",
+                              "countryCode": "FRA",
+                              "usEntity": false,
+                              "subjectToEuropeVAT": true,
+                              "euVATNumber": "FR12345678901",
+                              "sumsubUrl": null
+                            },
+                            "kyc": null,
                             "admins": [
                               {
                                 "login": null,

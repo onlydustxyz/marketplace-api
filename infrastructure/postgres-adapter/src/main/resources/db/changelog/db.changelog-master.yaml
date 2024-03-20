@@ -193,3 +193,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000115_add_billing_profile_id_to_rewards.sql
   - include:
       file: db/changelog/changelogs/00000116_migrate_invoice_networks.sql
+  - include:
+      file: db/changelog/changelogs/00000117_add_us_entity_in_invoice_data.sql
