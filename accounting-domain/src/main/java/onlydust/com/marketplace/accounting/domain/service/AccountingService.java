@@ -162,28 +162,24 @@ public class AccountingService implements AccountingFacadePort {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
 
-        final var amountPerSponsorAccountOnNetwork = accountBook.state().transferredAmountPerOrigin(AccountId.of(paymentId))
-                .entrySet().stream().collect(toMap(e -> mustGetSponsorAccount(e.getKey().sponsorAccountId()), Map.Entry::getValue))
-                .entrySet().stream().filter(e -> e.getKey().network().filter(paymentReference.network()::equals).isPresent())
-                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+        accountBook.state().transferredAmountPerOrigin(AccountId.of(paymentId))
+                .entrySet().stream()
+                .map(e -> Map.entry(
+                        mustGetSponsorAccount(e.getKey().sponsorAccountId()),
+                        new SponsorAccount.Transaction(SPEND, paymentReference, e.getValue().negate())
+                ))
+                .filter(e -> e.getKey().network().filter(paymentReference.network()::equals).isPresent())
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue))
+                .forEach((sponsorAccount, transaction) -> registerSponsorAccountTransaction(accountBook, sponsorAccount, transaction));
 
-        accountBook.burn(AccountId.of(paymentId), accountBook.state().balanceOf(AccountId.of(paymentId)));
+        accountBook.burn(AccountId.of(paymentId), rewards.stream().map(PayableReward::amount).reduce(PositiveAmount::add).orElse(PositiveAmount.ZERO));
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
 
-        amountPerSponsorAccountOnNetwork.forEach((sponsorAccount, amount) ->
-                registerSponsorAccountTransaction(accountBook, sponsorAccount, new SponsorAccount.Transaction(SPEND, paymentReference, amount.negate())));
-
-        final var sponsorAccountIds = amountPerSponsorAccountOnNetwork.keySet().stream().map(SponsorAccount::id).map(AccountId::of).collect(toSet());
-        accountBook.state().transactionsTo(AccountId.of(paymentId))
-                .stream().filter(transaction -> transaction.from().isReward())
-                .map(transaction -> transaction.from().rewardId())
-                .distinct()
-                .filter(rewardId -> accountBook.state().hasParent(AccountId.of(rewardId), sponsorAccountIds))
-                .forEach(rewardId -> {
-                    accountingObserver.onPaymentReceived(rewardId, paymentReference);
-                    if (isPaid(accountBook.state(), rewardId))
-                        accountingObserver.onRewardPaid(rewardId);
-                });
+        rewards.forEach(reward -> {
+            accountingObserver.onPaymentReceived(reward.id(), paymentReference);
+            if (isPaid(accountBook.state(), reward.id()))
+                accountingObserver.onRewardPaid(reward.id());
+        });
     }
 
     private static boolean isPaid(AccountBookState accountBookState, RewardId rewardId) {
