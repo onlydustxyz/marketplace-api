@@ -127,7 +127,7 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
                               "dollarsConversionRate": 1.1
                             },
                             {
-                              "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":null,"decimals":6},
+                              "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
                               "initialAmount": 200,
                               "remaining": 200,
                               "remainingDollarsEquivalent": 254.00,
