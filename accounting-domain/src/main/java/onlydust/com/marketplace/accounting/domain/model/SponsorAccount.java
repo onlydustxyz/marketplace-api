@@ -59,7 +59,7 @@ public class SponsorAccount {
     }
 
     public Amount unlockedBalance() {
-        return locked() ? PositiveAmount.ZERO : balance();
+        return locked() ? Amount.ZERO : balance();
     }
 
     public Amount balance() {
