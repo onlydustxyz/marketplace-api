@@ -377,7 +377,6 @@ public interface BackOfficeMapper {
                             case SELF_EMPLOYED -> BillingProfileType.SELF_EMPLOYED;
                         })
                         .name(invoice.billingProfileSnapshot().subject())
-                        .admins(null) //TODO: add admins when implementing the new version for pennylane
                         .kyc(invoice.billingProfileSnapshot().kyc().map(BackOfficeMapper::mapKyc).orElse(null))
                         .kyb(invoice.billingProfileSnapshot().kyb().map(BackOfficeMapper::mapKyb).orElse(null))
                 )
