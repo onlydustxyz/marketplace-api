@@ -96,7 +96,7 @@ public class NewAccountingMigration implements CommandLineRunner {
             LOGGER.info("Paying reward %s".formatted(reward.id));
             final var reference = new SponsorAccount.PaymentReference(reward.network, reward.reference, contributorName(reward.recipientId),
                     reward.accountNumber);
-            accountingFacadePort.pay(reward.id, reward.currency.id(), reference);
+            accountingFacadePort.pay(reward.id, reference);
         }
     }
 

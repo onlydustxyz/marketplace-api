@@ -251,19 +251,15 @@ public class BatchPaymentServiceTest {
         // Then
         verify(accountingRewardStoragePort).saveBatchPayment(updatedBatchPayment);
         verify(accountingService).pay(payableRewards.get(0).id(),
-                payableRewards.get(0).currency().id(),
                 new SponsorAccount.PaymentReference(Network.ETHEREUM, transactionHash, invoices.get(0).billingProfileSnapshot().subject(), "vitalik.eth"));
 
         verify(accountingService).pay(payableRewards.get(2).id(),
-                payableRewards.get(2).currency().id(),
                 new SponsorAccount.PaymentReference(Network.ETHEREUM, transactionHash, invoices.get(0).billingProfileSnapshot().subject(), "vitalik.eth"));
 
         verify(accountingService).pay(payableRewards.get(4).id(),
-                payableRewards.get(4).currency().id(),
                 new SponsorAccount.PaymentReference(Network.ETHEREUM, transactionHash, invoices.get(0).billingProfileSnapshot().subject(), "vitalik.eth"));
 
         verify(accountingService).pay(payableRewards.get(5).id(),
-                payableRewards.get(5).currency().id(),
                 new SponsorAccount.PaymentReference(Network.ETHEREUM, transactionHash, invoices.get(1).billingProfileSnapshot().subject(), "foo.eth"));
     }
 }

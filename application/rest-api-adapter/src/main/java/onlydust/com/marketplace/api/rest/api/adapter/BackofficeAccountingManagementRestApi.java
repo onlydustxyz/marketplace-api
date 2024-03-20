@@ -159,7 +159,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                 recipient.getLogin(),
                 payRewardRequest.getRecipientAccount());
 
-        accountingFacadePort.pay(RewardId.of(rewardId), Currency.Id.of(reward.currencyId().value()), paymentReference);
+        accountingFacadePort.pay(RewardId.of(rewardId), paymentReference);
 
         return ResponseEntity.noContent().build();
     }

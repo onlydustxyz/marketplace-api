@@ -101,8 +101,11 @@ public class AccountingService implements AccountingFacadePort {
 
     @Override
     @Transactional
-    public void pay(final @NonNull RewardId rewardId, final @NonNull Currency.Id currencyId, final @NonNull SponsorAccount.PaymentReference paymentReference) {
-        final var payment = pay(Set.of(rewardId), currencyId, paymentReference.network());
+    public void pay(final @NonNull RewardId rewardId, final @NonNull SponsorAccount.PaymentReference paymentReference) {
+        final var network = paymentReference.network();
+        final var payableRewards = getPayableRewardsOn(network, Set.of(rewardId));
+
+        final var payment = pay(network, payableRewards);
 
         if (payment.rewards().isEmpty())
             throw badRequest("Reward %s is not payable".formatted(rewardId));
@@ -112,16 +115,30 @@ public class AccountingService implements AccountingFacadePort {
 
     @Override
     @Transactional
-    public BatchPayment pay(final Set<RewardId> rewardIds, final @NonNull Currency.Id currencyId, final @NonNull Network network) {
-        final var currency = getCurrency(currencyId);
-        final var accountBook = getAccountBook(currency);
-        final var payment = BatchPayment.of(network, getPayableRewardsOn(network, rewardIds), ""); // TODO make csv optional
+    public List<BatchPayment> pay(final Set<RewardId> rewardIds) {
+        return getPayableRewards(rewardIds).stream()
+                .collect(groupingBy(r -> r.currency().network()))
+                .entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .map(entry -> pay(entry.getKey(), entry.getValue()))
+                .toList();
+    }
 
-        payment.rewards().forEach(reward -> accountBook.transfer(AccountId.of(reward.id()), AccountId.of(payment.id()), reward.amount()));
+    private BatchPayment pay(final @NonNull Network network, final List<PayableReward> rewards) {
+        final var payment = BatchPayment.of(network, rewards, ""); // TODO make csv optional
 
-        accountBookEventStorage.save(currency, accountBook.pendingEvents());
+        payment.rewards().stream().collect(groupingBy(PayableReward::currency))
+                .forEach((currency, currencyRewards) -> pay(payment.id(), currency, currencyRewards));
 
         return payment;
+    }
+
+    private void pay(final @NonNull BatchPayment.Id paymentId, final @NonNull PayableCurrency payableCurrency, final List<PayableReward> rewards) {
+        final var currency = getCurrency(payableCurrency.id());
+        final var accountBook = getAccountBook(currency);
+
+        rewards.forEach(reward -> accountBook.transfer(AccountId.of(reward.id()), AccountId.of(paymentId), reward.amount()));
+        accountBookEventStorage.save(currency, accountBook.pendingEvents());
     }
 
     @Override

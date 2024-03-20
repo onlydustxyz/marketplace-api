@@ -341,7 +341,7 @@ public class AccountingServiceTest {
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
             final var transaction = fakeTransaction(network, PositiveAmount.of(10L));
-            assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), transaction))
+            assertThatThrownBy(() -> accountingService.pay(rewardId1, transaction))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Reward %s is not payable".formatted(rewardId1));
@@ -415,7 +415,7 @@ public class AccountingServiceTest {
 
             final var transaction = new Transaction(Transaction.Type.DEPOSIT, Network.ETHEREUM, "0x123456", PositiveAmount.of(1000L), "StarkNet Foundation",
                     "starknet.eth");
-            accountingService.pay(rewardId2, currency.id(), transaction);
+            accountingService.pay(rewardId2, transaction);
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
@@ -451,7 +451,7 @@ public class AccountingServiceTest {
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
             assertThat(accountingService.isPayable(rewardId2, currency.id())).isTrue();
 
-            accountingService.pay(rewardId1, currency.id(), fakeTransaction(network, PositiveAmount.of(50L)));
+            accountingService.pay(rewardId1, fakeTransaction(network, PositiveAmount.of(50L)));
 
             {
                 final var account = accountingService.getSponsorAccountStatement(sponsorAccount.id()).orElseThrow();
@@ -461,7 +461,7 @@ public class AccountingServiceTest {
             }
 
             assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
-            assertThatThrownBy(() -> accountingService.pay(rewardId2, currency.id(), fakeTransaction(network, PositiveAmount.of(50L))))
+            assertThatThrownBy(() -> accountingService.pay(rewardId2, fakeTransaction(network, PositiveAmount.of(50L))))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Reward %s is not payable".formatted(rewardId2));
@@ -513,20 +513,21 @@ public class AccountingServiceTest {
             when(currencyStorage.all()).thenReturn(Set.of(currency));
 
             // When
-            final var payment = accountingService.pay(Set.of(rewardId1), currency.id(), network);
+            final var payments = accountingService.pay(Set.of(rewardId1));
 
             // Then
+            assertThat(payments).hasSize(1);
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
             assertThat(accountingService.getPayableRewards()).isEmpty();
             assertThatThrownBy(() -> accountingService.cancel(rewardId1, currency.id()))
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Cannot entirely refund");
-            assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), fakePaymentReference(network)))
+            assertThatThrownBy(() -> accountingService.pay(rewardId1, fakePaymentReference(network)))
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Reward %s is not payable".formatted(rewardId1));
 
             // When
-            accountingService.cancel(payment.id(), currency.id());
+            accountingService.cancel(payments.get(0).id(), currency.id());
 
             // Then
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
@@ -622,7 +623,7 @@ public class AccountingServiceTest {
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
             final var transaction = fakeTransaction(network, PositiveAmount.of(10L));
-            assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), transaction))
+            assertThatThrownBy(() -> accountingService.pay(rewardId1, transaction))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Reward %s is not payable".formatted(rewardId1));
@@ -676,7 +677,7 @@ public class AccountingServiceTest {
             assertOnRewardCreated(rewardId1, true, unlockDate, Set.of(network));
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
-            assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), fakeTransaction(network, amount)))
+            assertThatThrownBy(() -> accountingService.pay(rewardId1, fakeTransaction(network, amount)))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Reward %s is not payable".formatted(rewardId1));
@@ -747,7 +748,7 @@ public class AccountingServiceTest {
             assertThat(account.awaitingPaymentAmount()).isEqualTo(PositiveAmount.of(100L));
 
             assertThat(accountingService.isPayable(rewardId, currency.id())).isFalse();
-            assertThatThrownBy(() -> accountingService.pay(rewardId, currency.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L))))
+            assertThatThrownBy(() -> accountingService.pay(rewardId, fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L))))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Reward %s is not payable".formatted(rewardId));
@@ -779,7 +780,7 @@ public class AccountingServiceTest {
                 final var account = accountingService.getSponsorAccountStatement(unlockedSponsorSponsorAccount1.id()).orElseThrow();
                 assertThat(account.awaitingPaymentAmount()).isEqualTo(PositiveAmount.of(100L));
             }
-            accountingService.pay(rewardId, currency.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(1000L)));
+            accountingService.pay(rewardId, fakeTransaction(Network.ETHEREUM, PositiveAmount.of(1000L)));
             {
                 final var account = accountingService.getSponsorAccountStatement(unlockedSponsorSponsorAccount1.id()).orElseThrow();
                 assertThat(account.awaitingPaymentAmount()).isEqualTo(PositiveAmount.ZERO);
@@ -787,7 +788,7 @@ public class AccountingServiceTest {
 
             // Then
             assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
-            assertThatThrownBy(() -> accountingService.pay(rewardId2, currency.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(1000L))))
+            assertThatThrownBy(() -> accountingService.pay(rewardId2, fakeTransaction(Network.ETHEREUM, PositiveAmount.of(1000L))))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Reward %s is not payable".formatted(rewardId2));
@@ -811,7 +812,7 @@ public class AccountingServiceTest {
 
             // When
             assertThat(accountingService.isPayable(rewardId, currency.id())).isFalse();
-            assertThatThrownBy(() -> accountingService.pay(rewardId, currency.id(), fakePaymentReference(Network.ETHEREUM)))
+            assertThatThrownBy(() -> accountingService.pay(rewardId, fakePaymentReference(Network.ETHEREUM)))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Reward %s is not payable".formatted(rewardId));
@@ -841,8 +842,8 @@ public class AccountingServiceTest {
             // When
             assertThat(accountingService.isPayable(rewardId, currency.id())).isTrue();
 
-            accountingService.pay(rewardId, currency.id(), fakePaymentReference(Network.ETHEREUM));
-            accountingService.pay(rewardId, currency.id(), fakePaymentReference(Network.OPTIMISM));
+            accountingService.pay(rewardId, fakePaymentReference(Network.ETHEREUM));
+            accountingService.pay(rewardId, fakePaymentReference(Network.OPTIMISM));
 
             // Then
             assertThat(sponsorAccountStorage.get(unlockedSponsorSponsorAccount1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
@@ -875,7 +876,7 @@ public class AccountingServiceTest {
 
             reset(accountingObserver);
             final var reference = fakePaymentReference(Network.ETHEREUM);
-            accountingService.pay(rewardId, currency.id(), reference);
+            accountingService.pay(rewardId, reference);
             verify(accountingObserver, times(2)).onSponsorAccountBalanceChanged(any());
             verify(accountingObserver).onPaymentReceived(rewardId, reference);
             verify(accountingObserver).onRewardPaid(rewardId);
@@ -1224,10 +1225,10 @@ public class AccountingServiceTest {
         void should_prevent_confirming_payment_on_incorrect_network() {
             // Given
             accountingService.fund(unlockedSponsorAccountUsdc1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(300L)));
-            final var payment = accountingService.pay(Set.of(rewardId1, rewardId2), usdc.id(), Network.ETHEREUM);
+            final var payments = accountingService.pay(Set.of(rewardId1, rewardId2));
 
             // When
-            assertThatThrownBy(() -> accountingService.confirm(payment, fakePaymentReference(Network.OPTIMISM)))
+            assertThatThrownBy(() -> accountingService.confirm(payments.get(0), fakePaymentReference(Network.OPTIMISM)))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Payment network ETHEREUM does not match payment reference network OPTIMISM");
@@ -1250,7 +1251,7 @@ public class AccountingServiceTest {
 
             reset(accountingObserver);
             final var reference = fakePaymentReference(Network.ETHEREUM);
-            accountingService.pay(rewardId3, usdc.id(), reference);
+            accountingService.pay(rewardId3, reference);
             verify(accountingObserver).onSponsorAccountBalanceChanged(any());
             verify(accountingObserver).onPaymentReceived(rewardId3, reference);
             verify(accountingObserver, never()).onRewardPaid(rewardId3);
@@ -1336,14 +1337,19 @@ public class AccountingServiceTest {
         accountingService.fund(sponsor2Account1, fakeTransaction(Network.ETHEREUM, PositiveAmount.of(2_500L)));
 
         // Then
+        assertAccount(sponsor1Account1, 1_000L, 10_000L, 10_000L);
+        assertAccount(sponsor2Account1, 0L, 5_500L, 5_500L);
+        assertAccount(sponsor2Account2, 15_000L, 50_000L, 50_000L);
         assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
         assertThat(accountingService.isPayable(rewardId2, currency.id())).isTrue();
 
         // When
-        final var payment1 = accountingService.pay(Set.of(rewardId1, rewardId2), currency.id(), Network.ETHEREUM);
-        final var payment2 = accountingService.pay(Set.of(rewardId1, rewardId2), currency.id(), Network.STARKNET);
+        final var payments = accountingService.pay(Set.of(rewardId1, rewardId2));
 
         // Then
+        assertThat(payments).hasSize(2);
+        final var payment1 = payments.stream().filter(p -> p.network().equals(Network.ETHEREUM)).findFirst().orElseThrow();
+        final var payment2 = payments.stream().filter(p -> p.network().equals(Network.STARKNET)).findFirst().orElseThrow();
         assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
         assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
 

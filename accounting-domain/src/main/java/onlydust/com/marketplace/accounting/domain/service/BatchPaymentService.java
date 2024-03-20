@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toMap;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -33,7 +34,7 @@ public class BatchPaymentService implements BatchPaymentPort {
         return rewardInvoices.entrySet().stream()
                 .map(e -> Map.entry(e.getKey(), e.getValue().billingProfileSnapshot().wallet(network)))
                 .filter(e -> e.getValue().isPresent())
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().get()));
+                .collect(toMap(Map.Entry::getKey, e -> e.getValue().get()));
     }
 
     @Override
@@ -50,7 +51,7 @@ public class BatchPaymentService implements BatchPaymentPort {
 
         final Map<RewardId, Invoice> rewardInvoices = batchPayment.invoices().stream()
                 .flatMap(invoice -> invoice.rewards().stream().map(reward -> Map.entry(reward.id(), invoice)))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
         final Map<RewardId, Wallet> wallets = walletsPerRewardForNetwork(rewardInvoices, batchPayment.network());
 
         batchPayment.rewards().forEach(reward -> {
@@ -59,7 +60,7 @@ public class BatchPaymentService implements BatchPaymentPort {
                     rewardInvoices.get(reward.id()).billingProfileSnapshot().subject(),
                     wallets.get(reward.id()).address());
 
-            accountingFacadePort.pay(reward.id(), reward.currency().id(), paymentReference);
+            accountingFacadePort.pay(reward.id(), paymentReference);
         });
 
         final BatchPayment updatedBatchPayment = batchPayment.toBuilder()
@@ -84,11 +85,11 @@ public class BatchPaymentService implements BatchPaymentPort {
     public List<BatchPaymentDetailsView> createBatchPaymentsForInvoices(List<Invoice.Id> invoiceIds) {
 
         final var invoices = invoiceStoragePort.getAll(invoiceIds);
-        final Map<RewardId, Invoice> rewardInvoices = invoices.stream()
+        final var rewardInvoices = invoices.stream()
                 .flatMap(invoice -> invoice.rewards().stream().map(reward -> Map.entry(reward.id(), invoice)))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        final Map<Network, List<PayableReward>> payableRewardsByNetwork = accountingFacadePort.getPayableRewards(rewardInvoices.keySet()).stream()
+        final var payableRewardsByNetwork = accountingFacadePort.getPayableRewards(rewardInvoices.keySet()).stream()
                 .collect(groupingBy(r -> r.currency().network()));
 
         final var batchPayments = payableRewardsByNetwork
