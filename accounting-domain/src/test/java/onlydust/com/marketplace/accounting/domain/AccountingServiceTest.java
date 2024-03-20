@@ -1221,6 +1221,19 @@ public class AccountingServiceTest {
         }
 
         @Test
+        void should_prevent_confirming_payment_on_incorrect_network() {
+            // Given
+            accountingService.fund(unlockedSponsorAccountUsdc1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(300L)));
+            final var payment = accountingService.pay(Set.of(rewardId1, rewardId2), usdc.id(), Network.ETHEREUM);
+
+            // When
+            assertThatThrownBy(() -> accountingService.confirm(payment, fakePaymentReference(Network.OPTIMISM)))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Payment network ETHEREUM does not match payment reference network OPTIMISM");
+        }
+
+        @Test
         void should_return_partially_paid_payable_rewards() {
             // Given
             accountingService.fund(unlockedSponsorAccountUsdc1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(50L)));
@@ -1336,7 +1349,7 @@ public class AccountingServiceTest {
 
         // When
         final var ethPaymentReference = fakePaymentReference(Network.ETHEREUM);
-        accountingService.confirm(payment1.id(), currency.id(), ethPaymentReference);
+        accountingService.confirm(payment1, ethPaymentReference);
 
         // Then
         verify(accountingObserver).onPaymentReceived(rewardId1, ethPaymentReference);
@@ -1351,7 +1364,7 @@ public class AccountingServiceTest {
         // When
         reset(accountingObserver);
         final var starknetPaymentReference = fakePaymentReference(Network.STARKNET);
-        accountingService.confirm(payment2.id(), currency.id(), starknetPaymentReference);
+        accountingService.confirm(payment2, starknetPaymentReference);
 
         // Then
         verify(accountingObserver, never()).onPaymentReceived(eq(rewardId1), any());

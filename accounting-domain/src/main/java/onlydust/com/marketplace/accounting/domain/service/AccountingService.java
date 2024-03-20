@@ -107,7 +107,7 @@ public class AccountingService implements AccountingFacadePort {
         if (payment.rewards().isEmpty())
             throw badRequest("Reward %s is not payable".formatted(rewardId));
 
-        confirm(payment.id(), currencyId, paymentReference);
+        confirm(payment, paymentReference);
     }
 
     @Override
@@ -149,7 +149,16 @@ public class AccountingService implements AccountingFacadePort {
 
     @Override
     @Transactional
-    public void confirm(BatchPayment.Id paymentId, Currency.Id currencyId, SponsorAccount.PaymentReference paymentReference) {
+    public void confirm(BatchPayment payment, SponsorAccount.PaymentReference paymentReference) {
+        if (!payment.network().equals(paymentReference.network()))
+            throw badRequest("Payment network %s does not match payment reference network %s".formatted(payment.network(), paymentReference.network()));
+
+        payment.rewards().stream()
+                .collect(groupingBy(PayableReward::currency))
+                .forEach((currency, rewards) -> confirm(payment.id(), currency.id(), rewards, paymentReference));
+    }
+
+    private void confirm(BatchPayment.Id paymentId, Currency.Id currencyId, List<PayableReward> rewards, SponsorAccount.PaymentReference paymentReference) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
 
