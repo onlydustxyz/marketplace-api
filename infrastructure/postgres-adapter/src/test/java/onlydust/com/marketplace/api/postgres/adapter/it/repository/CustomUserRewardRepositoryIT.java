@@ -266,7 +266,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
             );
             assertThat(viewEntities.stream().map(UserRewardViewEntity::getStatus).toList()).containsExactly(
                     "MISSING_PAYOUT_INFO",
-                    "MISSING_PAYOUT_INFO",
+                    "PENDING_INVOICE",
                     "MISSING_PAYOUT_INFO",
                     "MISSING_PAYOUT_INFO",
                     "MISSING_PAYOUT_INFO",
@@ -461,7 +461,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
             );
             assertThat(viewEntities.stream().map(UserRewardViewEntity::getStatus).toList()).containsExactly(
                     "MISSING_PAYOUT_INFO",
-                    "PENDING_INVOICE",
+                    "MISSING_PAYOUT_INFO",
                     "MISSING_PAYOUT_INFO",
                     "PENDING_INVOICE",
                     "MISSING_PAYOUT_INFO",
@@ -505,7 +505,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
             );
             assertThat(viewEntities.stream().map(UserRewardViewEntity::getStatus).toList()).containsExactly(
                     "COMPLETE",
-                    "PROCESSING",
+                    "MISSING_PAYOUT_INFO",
                     "MISSING_PAYOUT_INFO",
                     "COMPLETE",
                     "MISSING_PAYOUT_INFO",

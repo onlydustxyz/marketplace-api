@@ -31,9 +31,9 @@ public enum Network {
         return switch (currencyCode) {
             case Currency.Code.USD_STR, Currency.Code.EUR_STR -> Network.SEPA;
             case Currency.Code.APT_STR -> Network.APTOS;
-            case Currency.Code.ETH_STR, Currency.Code.LORDS_STR, Currency.Code.USDC_STR -> Network.ETHEREUM;
+            case Currency.Code.LORDS_STR, Currency.Code.USDC_STR -> Network.ETHEREUM;
             case Currency.Code.OP_STR -> Network.OPTIMISM;
-            case Currency.Code.STRK_STR -> Network.STARKNET;
+            case Currency.Code.STRK_STR, Currency.Code.ETH_STR -> Network.STARKNET;
 
             default -> throw new IllegalArgumentException("Currency %s not supported".formatted(currencyCode));
         };

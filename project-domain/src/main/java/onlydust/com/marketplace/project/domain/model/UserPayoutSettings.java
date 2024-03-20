@@ -27,10 +27,10 @@ public class UserPayoutSettings {
     public boolean hasValidPayoutSettings() {
         return nonNull(this) && pendingPaymentsCurrencies.stream().allMatch(currency -> switch (currency) {
             case USD -> nonNull(this.sepaAccount) && this.sepaAccount.valid();
-            case ETH, LORDS, USDC -> nonNull(this.ethWallet);
+            case LORDS, USDC -> nonNull(this.ethWallet);
             case APT -> nonNull(this.aptosAddress);
             case OP -> nonNull(this.optimismAddress);
-            case STRK -> nonNull(this.starknetAddress);
+            case ETH, STRK -> nonNull(this.starknetAddress);
         });
     }
 
@@ -43,12 +43,12 @@ public class UserPayoutSettings {
     }
 
     public boolean isMissingStarknetWallet() {
-        return pendingPaymentsCurrencies.contains(Currency.STRK) && isNull(this.starknetAddress);
+        return (pendingPaymentsCurrencies.contains(Currency.STRK)
+               || pendingPaymentsCurrencies.contains(Currency.ETH) ) && isNull(this.starknetAddress);
     }
 
     public boolean isMissingEthereumWallet() {
-        return (pendingPaymentsCurrencies.contains(Currency.ETH)
-                || pendingPaymentsCurrencies.contains(Currency.LORDS)
+        return (pendingPaymentsCurrencies.contains(Currency.LORDS)
                 || pendingPaymentsCurrencies.contains(Currency.USDC))
                && isNull(this.ethWallet);
     }

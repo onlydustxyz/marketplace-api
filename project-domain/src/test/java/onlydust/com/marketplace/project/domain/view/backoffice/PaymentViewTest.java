@@ -51,7 +51,7 @@ class PaymentViewTest {
 
         assertTrue(PaymentView.builder()
                 .currency(Currency.ETH)
-                .recipientEthWallet("vitalik.eth")
+                .recipientStarkWallet("vitalik.eth")
                 .build()
                 .recipientPayoutInfoValid());
 
@@ -96,7 +96,7 @@ class PaymentViewTest {
 
         assertThat(PaymentView.builder()
                 .currency(Currency.ETH)
-                .recipientEthWallet("wallet")
+                .recipientStarkWallet("wallet")
                 .build()
                 .recipientPayoutSettings()).isEqualTo("wallet");
 

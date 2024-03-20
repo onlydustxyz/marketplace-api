@@ -54,10 +54,10 @@ public class PaymentView {
 
         return switch (currency) {
             case USD -> Optional.ofNullable(recipientSepaAccount).map(SepaAccount::valid).orElse(false);
-            case ETH, LORDS, USDC -> nonNull(recipientEthWallet);
+            case LORDS, USDC -> nonNull(recipientEthWallet);
             case OP -> nonNull(recipientOptimismWallet);
             case APT -> nonNull(recipientAptosWallet);
-            case STRK -> nonNull(recipientStarkWallet);
+            case STRK, ETH -> nonNull(recipientStarkWallet);
         };
     }
 
@@ -65,10 +65,10 @@ public class PaymentView {
         return switch (currency) {
             case USD -> recipientSepaAccount == null ? "" :
                     "%s / %s".formatted(recipientSepaAccount.getAccountNumber().asString(), recipientSepaAccount.getBic());
-            case ETH, LORDS, USDC -> recipientEthWallet;
+            case LORDS, USDC -> recipientEthWallet;
             case OP -> recipientOptimismWallet;
             case APT -> recipientAptosWallet;
-            case STRK -> recipientStarkWallet;
+            case STRK, ETH -> recipientStarkWallet;
         };
     }
 }

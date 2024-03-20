@@ -116,9 +116,9 @@ public interface RewardViewRepository extends JpaRepository<RewardDetailsViewEnt
                            when u.id is null then 'PENDING_SIGNUP'
                            when not coalesce(bpc.billing_profile_verified, false) then 'PENDING_VERIFICATION'
                            when (case
-                                     when pr.currency in ('eth', 'lords', 'usdc')
+                                     when pr.currency in ('lords', 'usdc')
                                          then not pc.wallets @> array [cast('ethereum' as network)]
-                                     when pr.currency = 'strk' then not pc.wallets @> array [cast('starknet' as network)]
+                                     when pr.currency in ('strk', 'eth') then not pc.wallets @> array [cast('starknet' as network)]
                                      when pr.currency = 'op' then not pc.wallets @> array [cast('optimism' as network)]
                                      when pr.currency = 'apt' then not pc.wallets @> array [cast('aptos' as network)]
                                      when pr.currency = 'usd' then not pc.has_bank_account
