@@ -102,25 +102,9 @@ public class AccountingService implements AccountingFacadePort {
     @Override
     @Transactional
     public void pay(final @NonNull RewardId rewardId, final @NonNull Currency.Id currencyId, final @NonNull SponsorAccount.PaymentReference paymentReference) {
-        final var currency = getCurrency(currencyId);
-        final var accountBook = getAccountBook(currency);
-
-        accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).forEach((sponsorAccountId, amount) -> {
-            final var sponsorAccount = sponsorAccountStorage.get(sponsorAccountId.sponsorAccountId()).orElseThrow();
-            final var sponsorAccountNetwork =
-                    sponsorAccount.network().orElseThrow(() -> internalServerError("Sponsor account %s is not funded".formatted(sponsorAccountId.sponsorAccountId())));
-
-            if (paymentReference.network().equals(sponsorAccountNetwork)) {
-                accountBook.burn(AccountId.of(rewardId), amount);
-                registerSponsorAccountTransaction(accountBook, sponsorAccount,
-                        new SponsorAccount.Transaction(SPEND, paymentReference, amount.negate()));
-            }
-        });
-
-        accountBookEventStorage.save(currency, accountBook.pendingEvents());
-        accountingObserver.onPaymentReceived(rewardId, paymentReference);
-        if (accountBook.state().balanceOf(AccountId.of(rewardId)).isZero())
-            accountingObserver.onRewardPaid(rewardId);
+        final var paymentId = BatchPayment.Id.random();
+        pay(List.of(rewardId), paymentId, currencyId);
+        confirm(paymentId, currencyId, paymentReference);
     }
 
     @Override
@@ -131,6 +115,10 @@ public class AccountingService implements AccountingFacadePort {
         final var paymentAccountId = AccountId.of(paymentId);
 
         rewardIds.stream().map(AccountId::of)
+                .peek(rewardAccountId -> {
+                    if (!isPayable(rewardAccountId.rewardId(), currencyId))
+                        throw internalServerError("Reward %s is not payable".formatted(rewardAccountId.rewardId()));
+                })
                 .forEach(rewardAccountId -> accountBook.transfer(rewardAccountId, paymentAccountId, accountBook.state().balanceOf(rewardAccountId)));
 
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
@@ -147,6 +135,16 @@ public class AccountingService implements AccountingFacadePort {
         accountingObserver.onRewardCancelled(rewardId);
         refundedAccounts.stream().filter(AccountId::isProject).map(AccountId::projectId).forEach(refundedProjectId -> onAllowanceUpdated(refundedProjectId,
                 currencyId, accountBook.state()));
+    }
+
+    @Override
+    @Transactional
+    public void cancel(@NonNull BatchPayment.Id paymentId, @NonNull Currency.Id currencyId) {
+        final var currency = getCurrency(currencyId);
+        final var accountBook = getAccountBook(currency);
+
+        accountBook.refund(AccountId.of(paymentId));
+        accountBookEventStorage.save(currency, accountBook.pendingEvents());
     }
 
     @Override

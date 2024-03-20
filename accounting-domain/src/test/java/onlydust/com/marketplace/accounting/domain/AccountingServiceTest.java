@@ -501,6 +501,37 @@ public class AccountingServiceTest {
                     new FullRefundEvent(AccountId.of(rewardId1))
             );
         }
+
+        @Test
+        void should_prevent_a_reward_from_being_payable_if_already_paid() {
+            // Given
+            final var paymentId = BatchPayment.Id.random();
+
+            accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(100L)));
+            accountingService.allocate(sponsorAccount.id(), projectId1, PositiveAmount.of(100L), currency.id());
+            accountingService.createReward(projectId1, rewardId1, PositiveAmount.of(40L), currency.id());
+            when(currencyStorage.all()).thenReturn(Set.of(currency));
+
+            // When
+            accountingService.pay(List.of(rewardId1), paymentId, currency.id());
+
+            // Then
+            assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
+            assertThat(accountingService.getPayableRewards()).isEmpty();
+            assertThatThrownBy(() -> accountingService.cancel(rewardId1, currency.id()))
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Cannot entirely refund");
+            assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), fakePaymentReference(network)))
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Reward %s is not payable".formatted(rewardId1));
+
+            // When
+            accountingService.cancel(paymentId, currency.id());
+
+            // Then
+            assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
+            assertThat(accountingService.getPayableRewards()).hasSize(1);
+        }
     }
 
     @Nested
