@@ -75,6 +75,32 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                   "visibility": "PUBLIC"
                 },
                 {
+                  "id": "27ca7e18-9e71-468f-8825-c64fe6b79d66",
+                  "name": "B Conseil",
+                  "isLead": false,
+                  "leadSince": null,
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png",
+                  "contributorCount": 3,
+                  "totalGranted": 0.00,
+                  "userContributionCount": 7,
+                  "userLastContributedAt": "2023-08-30T09:20:48Z",
+                  "slug": "b-conseil",
+                  "visibility": "PRIVATE"
+                },
+                {
+                  "id": "57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8",
+                  "name": "Pizzeria Yoshi !",
+                  "isLead": false,
+                  "leadSince": null,
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png",
+                  "contributorCount": 886,
+                  "totalGranted": 20137.50,
+                  "userContributionCount": 7,
+                  "userLastContributedAt": "2023-08-30T09:20:48Z",
+                  "slug": "pizzeria-yoshi-",
+                  "visibility": "PUBLIC"
+                },
+                {
                   "id": "00490be6-2c03-4720-993b-aea3e07edd81",
                   "name": "Zama",
                   "isLead": false,
@@ -85,6 +111,45 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                   "userContributionCount": 25,
                   "userLastContributedAt": "2022-06-01T10:34:49Z",
                   "slug": "zama",
+                  "visibility": "PUBLIC"
+                },
+                {
+                  "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                  "name": "kaaper",
+                  "isLead": true,
+                  "leadSince": "2022-12-23T11:11:51.388471Z",
+                  "logoUrl": null,
+                  "contributorCount": 21,
+                  "totalGranted": 24240.00,
+                  "userContributionCount": 903,
+                  "userLastContributedAt": "2023-10-12T08:57:23Z",
+                  "slug": "kaaper",
+                  "visibility": "PUBLIC"
+                },
+                {
+                  "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                  "name": "QA new contributions",
+                  "isLead": false,
+                  "leadSince": null,
+                  "logoUrl": null,
+                  "contributorCount": 18,
+                  "totalGranted": 6060.00,
+                  "userContributionCount": 885,
+                  "userLastContributedAt": "2023-10-12T08:57:23Z",
+                  "slug": "qa-new-contributions",
+                  "visibility": "PUBLIC"
+                },
+                {
+                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                  "name": "Mooooooonlight",
+                  "isLead": false,
+                  "leadSince": null,
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg",
+                  "contributorCount": 20,
+                  "totalGranted": 4545.00,
+                  "userContributionCount": 888,
+                  "userLastContributedAt": "2023-10-12T08:57:23Z",
+                  "slug": "mooooooonlight",
                   "visibility": "PUBLIC"
                 },
                 {
@@ -101,32 +166,6 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                   "visibility": "PUBLIC"
                 },
                 {
-                  "id": "27ca7e18-9e71-468f-8825-c64fe6b79d66",
-                  "name": "B Conseil",
-                  "isLead": false,
-                  "leadSince": null,
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png",
-                  "contributorCount": 3,
-                  "totalGranted": 0.00,
-                  "userContributionCount": 7,
-                  "userLastContributedAt": "2023-08-30T09:20:48Z",
-                  "slug": "b-conseil",
-                  "visibility": "PRIVATE"
-                },
-                {
-                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                  "name": "Mooooooonlight",
-                  "isLead": false,
-                  "leadSince": null,
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg",
-                  "contributorCount": 20,
-                  "totalGranted": 4545.00,
-                  "userContributionCount": 888,
-                  "userLastContributedAt": "2023-10-12T08:57:23Z",
-                  "slug": "mooooooonlight",
-                  "visibility": "PUBLIC"
-                },
-                                {
                   "id": "dc60d963-4b5f-4a96-928c-8440b4657138",
                   "name": "Zero title 4",
                   "isLead": false,
@@ -137,45 +176,6 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                   "userContributionCount": 3,
                   "userLastContributedAt": "2023-07-10T15:41:24Z",
                   "slug": "zero-title-4",
-                  "visibility": "PUBLIC"
-                },
-                {
-                  "id": "f39b827f-df73-498c-8853-99bc3f562723",
-                  "name": "QA new contributions",
-                  "isLead": false,
-                  "leadSince": null,
-                  "logoUrl": null,
-                  "contributorCount": 18,
-                  "totalGranted": 6060.0,
-                  "userContributionCount": 885,
-                  "userLastContributedAt": "2023-10-12T08:57:23Z",
-                  "slug": "qa-new-contributions",
-                  "visibility": "PUBLIC"
-                },
-                {
-                  "id": "57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8",
-                  "name": "Pizzeria Yoshi !",
-                  "isLead": false,
-                  "leadSince": null,
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png",
-                  "contributorCount": 886,
-                  "totalGranted": 20137.5,
-                  "userContributionCount": 7,
-                  "userLastContributedAt": "2023-08-30T09:20:48Z",
-                  "slug": "pizzeria-yoshi-",
-                  "visibility": "PUBLIC"
-                },
-                                {
-                  "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
-                  "name": "kaaper",
-                  "isLead": true,
-                  "leadSince": "2022-12-23T11:11:51.388471Z",
-                  "logoUrl": null,
-                  "contributorCount": 21,
-                  "totalGranted": 24240.00,
-                  "userContributionCount": 903,
-                  "userLastContributedAt": "2023-10-12T08:57:23Z",
-                  "slug": "kaaper",
                   "visibility": "PUBLIC"
                 }
               ],
@@ -191,18 +191,8 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                       "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2}
                     },
                     {
-                      "totalAmount": 1500,
-                      "totalDollarsEquivalent": 2672970.00,
-                      "currency": {"id":"71bdfcf4-74ee-486b-8cfe-5d841dd93d5c","code":"ETH","name":"Ether","logoUrl":null,"decimals":18}
-                    },
-                    {
-                      "totalAmount": 2000,
-                      "totalDollarsEquivalent": 0,
-                      "currency": {"id":"81b7e948-954f-4718-bad3-b70a0edd27e1","code":"STRK","name":"StarkNet Token","logoUrl":null,"decimals":18}
-                    },
-                    {
-                      "totalAmount": 16250,
-                      "totalDollarsEquivalent": 16412.50,
+                      "totalAmount": 19750,
+                      "totalDollarsEquivalent": 2689382.50,
                       "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":null,"decimals":6}
                     }
                   ]
@@ -841,10 +831,12 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                   }
                 ]
               },
+              "firstName": "Anthony",
+              "lastName": "BUISSET",
               "allocatedTimeToContribute": "NONE",
               "isLookingForAJob": false
             }
-             """;
+            """;
 
     private static final String GET_ANTHONY_PUBLIC_PROFILE_JSON_RESPONSE = """
             {
@@ -877,11 +869,6 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
               "cover": "BLUE",
               "contacts": [
                 {
-                  "channel": "TWITTER",
-                  "contact": "https://twitter.com/abuisset",
-                  "visibility": "public"
-                },
-                {
                   "channel": "TELEGRAM",
                   "contact": "https://t.me/abuisset",
                   "visibility": "public"
@@ -889,6 +876,11 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                 {
                   "channel": "DISCORD",
                   "contact": "antho",
+                  "visibility": "public"
+                },
+                {
+                  "channel": "TWITTER",
+                  "contact": "https://twitter.com/abuisset",
                   "visibility": "public"
                 }
               ],
@@ -907,6 +899,19 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                   "visibility": "PUBLIC"
                 },
                 {
+                  "id": "57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8",
+                  "name": "Pizzeria Yoshi !",
+                  "isLead": false,
+                  "leadSince": null,
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png",
+                  "contributorCount": 886,
+                  "totalGranted": 20137.50,
+                  "userContributionCount": 7,
+                  "userLastContributedAt": "2023-08-30T09:20:48Z",
+                  "slug": "pizzeria-yoshi-",
+                  "visibility": "PUBLIC"
+                },
+                {
                   "id": "00490be6-2c03-4720-993b-aea3e07edd81",
                   "name": "Zama",
                   "isLead": false,
@@ -920,16 +925,29 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                   "visibility": "PUBLIC"
                 },
                 {
-                  "id": "a852e8fd-de3c-4a14-813e-4b592af40d54",
-                  "name": "OnlyDust Marketplace",
+                  "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                  "name": "kaaper",
                   "isLead": true,
-                  "leadSince": "2023-07-09T07:30:12.544103Z",
+                  "leadSince": "2022-12-23T11:11:51.388471Z",
                   "logoUrl": null,
-                  "contributorCount": 10,
-                  "totalGranted": 1010.00,
-                  "userContributionCount": null,
-                  "userLastContributedAt": null,
-                  "slug": "onlydust-marketplace",
+                  "contributorCount": 21,
+                  "totalGranted": 24240.00,
+                  "userContributionCount": 903,
+                  "userLastContributedAt": "2023-10-12T08:57:23Z",
+                  "slug": "kaaper",
+                  "visibility": "PUBLIC"
+                },
+                {
+                  "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                  "name": "QA new contributions",
+                  "isLead": false,
+                  "leadSince": null,
+                  "logoUrl": null,
+                  "contributorCount": 18,
+                  "totalGranted": 6060.00,
+                  "userContributionCount": 885,
+                  "userLastContributedAt": "2023-10-12T08:57:23Z",
+                  "slug": "qa-new-contributions",
                   "visibility": "PUBLIC"
                 },
                 {
@@ -946,6 +964,19 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                   "visibility": "PUBLIC"
                 },
                 {
+                  "id": "a852e8fd-de3c-4a14-813e-4b592af40d54",
+                  "name": "OnlyDust Marketplace",
+                  "isLead": true,
+                  "leadSince": "2023-07-09T07:30:12.544103Z",
+                  "logoUrl": null,
+                  "contributorCount": 10,
+                  "totalGranted": 1010.00,
+                  "userContributionCount": null,
+                  "userLastContributedAt": null,
+                  "slug": "onlydust-marketplace",
+                  "visibility": "PUBLIC"
+                },
+                {
                   "id": "dc60d963-4b5f-4a96-928c-8440b4657138",
                   "name": "Zero title 4",
                   "isLead": false,
@@ -956,45 +987,6 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                   "userContributionCount": 3,
                   "userLastContributedAt": "2023-07-10T15:41:24Z",
                   "slug": "zero-title-4",
-                  "visibility": "PUBLIC"
-                },
-                {
-                  "id": "f39b827f-df73-498c-8853-99bc3f562723",
-                  "name": "QA new contributions",
-                  "isLead": false,
-                  "leadSince": null,
-                  "logoUrl": null,
-                  "contributorCount": 18,
-                  "totalGranted": 6060.0,
-                  "userContributionCount": 885,
-                  "userLastContributedAt": "2023-10-12T08:57:23Z",
-                  "slug": "qa-new-contributions",
-                  "visibility": "PUBLIC"
-                },
-                                {
-                  "id": "57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8",
-                  "name": "Pizzeria Yoshi !",
-                  "isLead": false,
-                  "leadSince": null,
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png",
-                  "contributorCount": 886,
-                  "totalGranted": 20137.5,
-                  "userContributionCount": 7,
-                  "userLastContributedAt": "2023-08-30T09:20:48Z",
-                  "slug": "pizzeria-yoshi-",
-                  "visibility": "PUBLIC"
-                },
-                {
-                  "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
-                  "name": "kaaper",
-                  "isLead": true,
-                  "leadSince": "2022-12-23T11:11:51.388471Z",
-                  "logoUrl": null,
-                  "contributorCount": 21,
-                  "totalGranted": 24240.00,
-                  "userContributionCount": 903,
-                  "userLastContributedAt": "2023-10-12T08:57:23Z",
-                  "slug": "kaaper",
                   "visibility": "PUBLIC"
                 }
               ],
@@ -1010,18 +1002,8 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                       "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2}
                     },
                     {
-                      "totalAmount": 1500,
-                      "totalDollarsEquivalent": 2672970.00,
-                      "currency": {"id":"71bdfcf4-74ee-486b-8cfe-5d841dd93d5c","code":"ETH","name":"Ether","logoUrl":null,"decimals":18}
-                    },
-                    {
-                      "totalAmount": 2000,
-                      "totalDollarsEquivalent": 0,
-                      "currency": {"id":"81b7e948-954f-4718-bad3-b70a0edd27e1","code":"STRK","name":"StarkNet Token","logoUrl":null,"decimals":18}
-                    },
-                    {
-                      "totalAmount": 16250,
-                      "totalDollarsEquivalent": 16412.50,
+                      "totalAmount": 19750,
+                      "totalDollarsEquivalent": 2689382.50,
                       "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":null,"decimals":6}
                     }
                   ]
@@ -1659,7 +1641,9 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                     "pullRequestCount": 6
                   }
                 ]
-              }
+              },
+              "firstName": "Anthony",
+              "lastName": "BUISSET"
             }
             """;
 

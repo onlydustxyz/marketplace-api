@@ -314,4 +314,14 @@ public class AccountingService implements AccountingFacadePort {
     public Page<HistoricalTransaction> transactionHistory(SponsorId sponsorId, Integer pageIndex, Integer pageSize) {
         return sponsorAccountStorage.transactionsOf(sponsorId, pageIndex, pageSize);
     }
+
+    @Override
+    public List<Network> networksOf(Currency.Id currencyId, RewardId rewardId) {
+        final var accountBook = getAccountBook(currencyId);
+        return accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).keySet().stream()
+                .map(accountId -> mustGetSponsorAccount(accountId.sponsorAccountId()).network())
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+    }
 }

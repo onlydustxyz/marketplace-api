@@ -124,14 +124,14 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
 
         // Given
         newCompanyInvoiceToReview(List.of(
-                RewardId.of("061e2c7e-bda4-49a8-9914-2e76926f70c2")));
+                RewardId.of("6587511b-3791-47c6-8430-8f793606c63a")));
         newCompanyInvoiceToReview(List.of(
-                RewardId.of("ee28315c-7a84-4052-9308-c2236eeafda1"),
-                RewardId.of("d067b24d-115a-45e9-92de-94dd1d01b184")));
+                RewardId.of("79209029-c488-4284-aa3f-bce8870d3a66"),
+                RewardId.of("303f26b1-63f0-41f1-ab11-e70b54ef4a2a")));
         newCompanyInvoiceToReview(List.of(
-                RewardId.of("d506a05d-3739-452f-928d-45ea81d33079"),
-                RewardId.of("5083ac1f-4325-4d47-9760-cbc9ab82f25c"),
-                RewardId.of("e6ee79ae-b3f0-4f4e-b7e3-9e643bc27236")));
+                RewardId.of("0b275f04-bdb1-4d4f-8cd1-76fe135ccbdf"),
+                RewardId.of("335e45a5-7f59-4519-8a12-1addc530214c"),
+                RewardId.of("e9ebbe59-fb74-4a6c-9a51-6d9050412977")));
     }
 
     private void newCompanyInvoiceToReview(List<RewardId> rewardIds) throws IOException {
@@ -170,7 +170,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                             {
                               "status": "PROCESSING",
                               "internalStatus": "TO_REVIEW",
-                              "amount": 5718.000,
+                              "amount": 3636.000,
                               "currency": {
                                 "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                 "code": "USD",
@@ -178,15 +178,15 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 "logoUrl": null
                               },
                               "rewardIds": [
-                                "e6ee79ae-b3f0-4f4e-b7e3-9e643bc27236",
-                                "5083ac1f-4325-4d47-9760-cbc9ab82f25c",
-                                "d506a05d-3739-452f-928d-45ea81d33079"
+                                "e9ebbe59-fb74-4a6c-9a51-6d9050412977",
+                                "335e45a5-7f59-4519-8a12-1addc530214c",
+                                "0b275f04-bdb1-4d4f-8cd1-76fe135ccbdf"
                               ]
                             },
                             {
                               "status": "PROCESSING",
                               "internalStatus": "TO_REVIEW",
-                              "amount": 3333.000,
+                              "amount": 2424.000,
                               "currency": {
                                 "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                 "code": "USD",
@@ -194,8 +194,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 "logoUrl": null
                               },
                               "rewardIds": [
-                                "d067b24d-115a-45e9-92de-94dd1d01b184",
-                                "ee28315c-7a84-4052-9308-c2236eeafda1"
+                                "303f26b1-63f0-41f1-ab11-e70b54ef4a2a",
+                                "79209029-c488-4284-aa3f-bce8870d3a66"
                               ]
                             },
                             {
@@ -209,7 +209,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 "logoUrl": null
                               },
                               "rewardIds": [
-                                "061e2c7e-bda4-49a8-9914-2e76926f70c2"
+                                "6587511b-3791-47c6-8430-8f793606c63a"
                               ]
                             }
                           ]
@@ -253,7 +253,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 "admins": null
                               },
                               "rewardCount": 3,
-                              "totalUsdEquivalent": 5718.000,
+                              "totalUsdEquivalent": 3636.000,
                               "totalsPerCurrency": [
                                 {
                                   "amount": 1000,
@@ -266,24 +266,24 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                   "dollarsEquivalent": 1010.00
                                 },
                                 {
-                                  "amount": 500,
+                                  "amount": 1000,
                                   "currency": {
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
                                     "name": "USD Coin",
                                     "logoUrl": null
                                   },
-                                  "dollarsEquivalent": 505.00
+                                  "dollarsEquivalent": 1010.00
                                 },
                                 {
-                                  "amount": 3250,
+                                  "amount": 1000,
                                   "currency": {
-                                    "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                                    "code": "USD",
-                                    "name": "US Dollar",
+                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                    "code": "USDC",
+                                    "name": "USD Coin",
                                     "logoUrl": null
                                   },
-                                  "dollarsEquivalent": 3250
+                                  "dollarsEquivalent": 1010.00
                                 }
                               ]
                             },
@@ -296,7 +296,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 "admins": null
                               },
                               "rewardCount": 2,
-                              "totalUsdEquivalent": 3333.000,
+                              "totalUsdEquivalent": 2424.000,
                               "totalsPerCurrency": [
                                 {
                                   "amount": 1000,
@@ -309,14 +309,14 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                   "dollarsEquivalent": 1010.00
                                 },
                                 {
-                                  "amount": 1750,
+                                  "amount": 1000,
                                   "currency": {
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
                                     "name": "USD Coin",
                                     "logoUrl": null
                                   },
-                                  "dollarsEquivalent": 1767.50
+                                  "dollarsEquivalent": 1010.00
                                 }
                               ]
                             },
@@ -406,15 +406,99 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               ],
                               "rewards": [
                                 {
-                                  "id": "061e2c7e-bda4-49a8-9914-2e76926f70c2",
-                                  "requestedAt": "2023-05-15T12:15:54.25529Z",
-                                  "processedAt": "2023-07-27T10:27:14.522Z",
+                                  "id": "6587511b-3791-47c6-8430-8f793606c63a",
+                                  "requestedAt": "2023-09-20T08:01:47.616674Z",
+                                  "processedAt": null,
                                   "githubUrls": [
-                                    "https://github.com/od-mocks/cool-repo-A/pull/397"
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1026",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1037",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1038",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1039",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1040",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1041",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1042",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1043",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1044",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1045",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1048",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1049",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1052",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1053",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1054",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1056",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1059",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1063",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1064",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1065",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1067",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1068",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1070",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1071",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1073",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1075",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1076",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1077",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1079",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1080",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1081",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1082",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1084",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1085",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1087",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1088",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1090",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1091",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1100",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1103",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1104",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1105",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1107",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1108",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1112",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1113",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1114",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1115",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1117",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1118",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1121",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1122",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1124",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1129",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1131",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1132",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1133",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1137",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1143",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1148",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1150",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1151",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1152",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1160",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1161",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1162",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1163",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1164",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1165",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1167",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1168",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1169",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1172",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1174",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1175",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1204",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1212",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1217",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1235",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1237",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1239",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1240",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1241",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1247",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/62"
                                   ],
                                   "project": {
-                                    "name": "Pizzeria Yoshi !",
-                                    "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png"
+                                    "name": "kaaper",
+                                    "logoUrl": null
                                   },
                                   "sponsors": [
                                     {
@@ -432,10 +516,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                     },
                                     "dollarsEquivalent": 1010.00,
                                     "conversionRate": 1.0100000000000000
-                                  },
-                                  "transactionReferences": [
-                                    "0x0"
-                                  ]
+                                  }
                                 }
                               ]
                             }
@@ -533,12 +614,12 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         .withRequestBody(matchingJsonPath("$.recipientName", equalTo("Olivier")))
                         .withRequestBody(matchingJsonPath("$.rewardCount", equalTo(String.valueOf(invoice.rewards().size()))))
                         .withRequestBody(matchingJsonPath("$.invoiceName", equalTo(invoice.number().value())))
-                        .withRequestBody(matchingJsonPath("$.totalUsdAmount", equalTo("2777.5")))
+                        .withRequestBody(matchingJsonPath("$.totalUsdAmount", equalTo("2020.0")))
                         .withRequestBody(
                                 matchingJsonPath("$.rejectionReason", equalTo(rejectionReason))
                         )
-                        .withRequestBody(matchingJsonPath("$.rewardNames", containing("#D067B - oscar's awesome project - USDC - 1000")))
-                        .withRequestBody(matchingJsonPath("$.rewardNames", containing("#EE283 - Aldébaran du Taureau - USDC - 1750")))
+                        .withRequestBody(matchingJsonPath("$.rewardNames", containing("#303F2 - kaaper - USDC - 1000")))
+                        .withRequestBody(matchingJsonPath("$.rewardNames", containing("#79209 - kaaper - USDC - 1000")))
         );
 
         client

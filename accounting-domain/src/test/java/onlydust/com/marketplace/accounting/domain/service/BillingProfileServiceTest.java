@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
@@ -50,8 +51,9 @@ class BillingProfileServiceTest {
     final BillingProfileObserver billingProfileObserver = mock(BillingProfileObserver.class);
     final IndexerPort indexerPort = mock(IndexerPort.class);
     final AccountingObserverPort accountingObserverPort = mock(AccountingObserver.class);
+    final AccountingFacadePort accountingFacadePort = mock(AccountingFacadePort.class);
     final BillingProfileService billingProfileService = new BillingProfileService(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort,
-            billingProfileObserver, indexerPort, accountingObserverPort);
+            billingProfileObserver, indexerPort, accountingObserverPort, accountingFacadePort);
     final UserId userId = UserId.random();
     final Currency ETH = Currencies.ETH;
     final Currency USD = Currencies.USD;
@@ -77,7 +79,7 @@ class BillingProfileServiceTest {
                 .build();
         invoice = Invoice.of(companyBillingProfile, 1, userId)
                 .rewards(rewards);
-        reset(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort, billingProfileObserver);
+        reset(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort, billingProfileObserver, accountingFacadePort);
     }
 
     @Nested
@@ -481,7 +483,8 @@ class BillingProfileServiceTest {
                 faker.lordOfTheRings().character(),
                 Money.of(faker.number().randomNumber(1, true), ETH),
                 Money.of(faker.number().randomNumber(4, true), USD),
-                invoiceId
+                invoiceId,
+                List.of()
         );
     }
 

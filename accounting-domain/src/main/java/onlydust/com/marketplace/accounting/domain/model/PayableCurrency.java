@@ -23,7 +23,7 @@ public class PayableCurrency {
     @Getter
     private final @NonNull Currency.Type type;
     private final Currency.Standard standard;
-    private final Blockchain blockchain;
+    private final @NonNull Network network;
     private final Hash address;
 
     public Optional<Currency.Standard> standard() {
@@ -35,11 +35,11 @@ public class PayableCurrency {
     }
 
     public Optional<Blockchain> blockchain() {
-        return Optional.ofNullable(blockchain);
+        return network.blockchain();
     }
 
     public Network network() {
-        return Network.fromBlockchain(blockchain);
+        return network;
     }
 
     public Optional<Hash> address() {

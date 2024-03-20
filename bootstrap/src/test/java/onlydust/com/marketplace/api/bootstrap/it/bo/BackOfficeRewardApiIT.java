@@ -746,9 +746,9 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "money": {
                                 "amount": 1000,
                                 "currency": {
-                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                  "code": "STRK",
-                                  "name": "StarkNet Token",
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
                                   "logoUrl": null
                                 },
                                 "dollarsEquivalent": null,

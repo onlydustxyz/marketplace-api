@@ -161,7 +161,7 @@ class InvoiceServiceTest {
         invoice.rewards(List.of(
                 new Invoice.Reward(RewardId.random(), ZonedDateTime.now(), faker.rickAndMorty().character(),
                         Money.of(BigDecimal.TEN, Currency.crypto("dustyCrypto", Currency.Code.of("DSTC"), 10)),
-                        Money.of(BigDecimal.TEN, Currency.crypto("dustyCrypto", Currency.Code.of("DSTC"), 10)), invoice.id())));
+                        Money.of(BigDecimal.TEN, Currency.crypto("dustyCrypto", Currency.Code.of("DSTC"), 10)), invoice.id(), List.of())));
         when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
         Invoice.Status status = Invoice.Status.REJECTED;
         final String rejectionReason = faker.rickAndMorty().character();
