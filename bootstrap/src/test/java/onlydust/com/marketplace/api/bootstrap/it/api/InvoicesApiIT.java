@@ -7,13 +7,17 @@ import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.BillingProfileInvoicesPageResponse;
 import onlydust.com.marketplace.api.contract.model.MyBillingProfilesResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.OldVerificationStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OldWalletEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.WalletTypeEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.OldWalletRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.*;
@@ -54,6 +58,8 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     InvoiceRepository invoiceRepository;
     @Autowired
     EntityManagerFactory entityManagerFactory;
+    @Autowired
+    OldWalletRepository walletRepository;
 
     UserAuthHelper.AuthenticatedUser antho;
     UserAuthHelper.AuthenticatedUser olivier;
@@ -99,6 +105,9 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
         individualBillingProfileRepository.save(individualBillingProfile);
 
         individualBillingProfileId = individualBillingProfile.getId();
+        walletRepository.save(new OldWalletEntity(antho.user().getId(), NetworkEnumEntity.starknet,
+                "0x023d363c43084e942793080cd35cda4f8d361638a5f1a57616cf8e6ed5842650", WalletTypeEnumEntity.address
+        ));
     }
 
 
@@ -114,7 +123,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.rewards.size()").isEqualTo(11)
+                .jsonPath("$.rewards.size()").isEqualTo(12)
                 .jsonPath("$.rewards[?(@.id == '966cd55c-7de8-45c4-8bba-b388c38ca15d')]").exists()
                 .jsonPath("$.rewards[?(@.id == '79209029-c488-4284-aa3f-bce8870d3a66')]").exists()
                 .jsonPath("$.rewards[?(@.id == 'd22f75ab-d9f5-4dc6-9a85-60dcd7452028')]").exists()
@@ -159,8 +168,8 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                             "bankAccount": null,
                             "wallets": [
                               {
-                                "address": "abuisset.eth",
-                                "network": "ETHEREUM"
+                                "address": "0x023d363c43084e942793080cd35cda4f8d361638a5f1a57616cf8e6ed5842650",
+                                "network": "STARKNET"
                               }
                             ]
                           },
@@ -207,7 +216,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.rewards.size()").isEqualTo(11)
+                .jsonPath("$.rewards.size()").isEqualTo(12)
                 .jsonPath("$.rewards[?(@.id == '966cd55c-7de8-45c4-8bba-b388c38ca15d')]").exists();
 
         // When
@@ -245,7 +254,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.rewards.size()").isEqualTo(10)
+                .jsonPath("$.rewards.size()").isEqualTo(11)
                 .jsonPath("$.rewards[?(@.id == '966cd55c-7de8-45c4-8bba-b388c38ca15d')]").doesNotExist()
         ;
 
@@ -378,7 +387,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.rewards.size()").isEqualTo(10)
+                .jsonPath("$.rewards.size()").isEqualTo(11)
                 .jsonPath("$.rewards[?(@.id == '79209029-c488-4284-aa3f-bce8870d3a66')]").exists()
                 .jsonPath("$.rewards[?(@.id == 'd22f75ab-d9f5-4dc6-9a85-60dcd7452028')]").exists()
         ;
@@ -433,7 +442,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.rewards.size()").isEqualTo(8)
+                .jsonPath("$.rewards.size()").isEqualTo(9)
                 .jsonPath("$.rewards[?(@.id == '79209029-c488-4284-aa3f-bce8870d3a66')]").doesNotExist()
                 .jsonPath("$.rewards[?(@.id == 'd22f75ab-d9f5-4dc6-9a85-60dcd7452028')]").doesNotExist()
         ;
@@ -848,8 +857,6 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     @Test
     @Order(103)
     void should_order_invoices_by_status() {
-        final var invoice = invoiceRepository.findAll().stream().filter(i -> i.billingProfileId().equals(billingProfileId)).findFirst().orElseThrow();
-        invoiceRepository.save(invoice.status(InvoiceEntity.Status.PAID));
 
         {
             // When

@@ -70,9 +70,9 @@ public class CustomUserRewardRepository {
                            when r.id is not null then 'COMPLETE'
                            when not coalesce(bpc.billing_profile_verified, false) then 'PENDING_VERIFICATION'
                            when (case
-                                     when pr.currency in ('eth', 'lords', 'usdc')
+                                     when pr.currency in ('lords', 'usdc')
                                          then not payout_checks.wallets @> array [cast('ethereum' as network)]
-                                     when pr.currency = 'strk' then not payout_checks.wallets @> array [cast('starknet' as network)]
+                                     when pr.currency in ('strk', 'eth') then not payout_checks.wallets @> array [cast('starknet' as network)]
                                      when pr.currency = 'op' then not payout_checks.wallets @> array [cast('optimism' as network)]
                                      when pr.currency = 'apt' then not payout_checks.wallets @> array [cast('aptos' as network)]
                                      when pr.currency = 'usd' then not payout_checks.has_bank_account
@@ -149,9 +149,9 @@ public class CustomUserRewardRepository {
                            when r.id is not null then 'COMPLETE'
                            when not coalesce(bpc.billing_profile_verified, false) then 'PENDING_VERIFICATION'
                            when (case
-                                             when pr.currency in ('eth', 'lords', 'usdc')
+                                             when pr.currency in ('lords', 'usdc')
                                                  then not payout_checks.wallets @> array [cast('ethereum' as network)]
-                                             when pr.currency = 'strk' then not payout_checks.wallets @> array [cast('starknet' as network)]
+                                             when pr.currency in ('strk', 'eth') then not payout_checks.wallets @> array [cast('starknet' as network)]
                                              when pr.currency = 'op' then not payout_checks.wallets @> array [cast('optimism' as network)]
                                              when pr.currency = 'apt' then not payout_checks.wallets @> array [cast('aptos' as network)]
                                              when pr.currency = 'usd' then not payout_checks.has_bank_account

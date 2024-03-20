@@ -18,6 +18,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepos
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
+import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -71,11 +72,10 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
             }
             """;
     private static final String GET_USER_REWARDS_WITH_MULTI_CURRENCIES_RESPONSE_JSON = """
-                       
+           
             {
              "rewards": [
                {
-                 "requestedAt": "2023-09-19T07:38:22.018458Z",
                  "processedAt": null,
                  "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                  "status": "MISSING_PAYOUT_INFO",
@@ -91,10 +91,9 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                  "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
                },
                {
-                 "requestedAt": "2023-09-20T08:46:52.77875Z",
                  "processedAt": null,
                  "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                 "status": "PENDING_INVOICE",
+                 "status": "MISSING_PAYOUT_INFO",
                  "unlockDate": null,
                  "amount": {
                    "total": 50,
@@ -107,7 +106,6 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                  "id": "e1498a17-5090-4071-a88a-6f0b0c337c3a"
                },
                {
-                 "requestedAt": "2023-09-19T07:40:26.971981Z",
                  "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                  "status": "COMPLETE",
                  "unlockDate": null,
@@ -122,7 +120,6 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                  "id": "40fda3c6-2a3f-4cdd-ba12-0499dd232d53"
                },
                {
-                 "requestedAt": "2023-09-19T07:38:52.590518Z",
                  "processedAt": null,
                  "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                  "status": "PENDING_INVOICE",
@@ -138,7 +135,6 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                  "id": "85f8358c-5339-42ac-a577-16d7760d1e28"
                },
                {
-                 "requestedAt": "2023-09-19T07:39:54.45638Z",
                  "processedAt": null,
                  "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                  "status": "MISSING_PAYOUT_INFO",
@@ -154,7 +150,6 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                  "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"
                },
                {
-                 "requestedAt": "2023-09-19T07:39:23.730967Z",
                  "processedAt": null,
                  "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                  "status": "MISSING_PAYOUT_INFO",
@@ -187,9 +182,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
              "receivedRewardsCount": 6,
              "rewardedContributionsCount": 26,
              "rewardingProjectsCount": 1
-
                       }
-                       
             """;
     private static final String ME_GET_REWARDS_RESPONSE_JSON = """
             {
@@ -442,6 +435,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
         postgresUserAdapter.savePayoutSettingsForUserId(pierre.user().getId(),
                 UserPayoutSettings.builder()
                         .ethWallet(Ethereum.wallet("vitalik.eth"))
+                        .starknetAddress(StarkNet.accountAddress("0x0193b4ac4c80b6f61e0bcfb83a77592c177a77e6b99ec4ccb7237a88e5c963f2"))
                         .aptosAddress(Aptos.accountAddress("0x" + faker.random().hex(40)))
                         .build());
 
@@ -478,6 +472,22 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "rewardedOnProjectName": "QA new contributions",
                               "rewardedOnProjectLogoUrl": null,
                               "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
+                            },
+                            {
+                              "requestedAt": "2023-09-19T07:39:23.730967Z",
+                              "processedAt": null,
+                              "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                              "status": "PENDING_INVOICE",
+                              "unlockDate": null,
+                              "amount": {
+                                "total": 9511147,
+                                "currency": "STRK",
+                                "dollarsEquivalent": null
+                              },
+                              "numberOfRewardedContributions": 25,
+                              "rewardedOnProjectName": "QA new contributions",
+                              "rewardedOnProjectLogoUrl": null,
+                              "id": "5b96ca1e-4ad2-41c1-8819-520b885d9223"
                             },
                             {
                               "requestedAt": "2023-09-20T08:46:52.77875Z",
@@ -533,7 +543,23 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "rewardedOnProjectName": "QA new contributions",
                               "rewardedOnProjectLogoUrl": null,
                               "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
-                            }]
+                            },
+                             {
+                               "processedAt": null,
+                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                               "status": "PENDING_INVOICE",
+                               "unlockDate": null,
+                               "amount": {
+                                 "total": 9511147,
+                                 "currency": "STRK",
+                                 "dollarsEquivalent": null
+                               },
+                               "numberOfRewardedContributions": 25,
+                               "rewardedOnProjectName": "QA new contributions",
+                               "rewardedOnProjectLogoUrl": null,
+                               "id": "5b96ca1e-4ad2-41c1-8819-520b885d9223"
+                             }
+                            ]
                             }
                          """);
     }
