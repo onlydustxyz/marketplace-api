@@ -261,7 +261,8 @@ public interface BackOfficeMapper {
                 .id(currency.id().value())
                 .code(currency.code().toString())
                 .name(currency.name())
-                .logoUrl(currency.logoUri().orElse(null));
+                .logoUrl(currency.logoUri().orElse(null))
+                .decimals(currency.decimals());
     }
 
     static ProjectLeadInvitationPage mapProjectLeadInvitationPageToContract(final Page<ProjectLeadInvitationView> projectLeadInvitationViewPage,

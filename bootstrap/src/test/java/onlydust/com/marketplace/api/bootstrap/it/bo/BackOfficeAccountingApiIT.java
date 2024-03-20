@@ -218,7 +218,8 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                   "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
                                   "code": "STRK",
                                   "name": "StarkNet Token",
-                                  "logoUrl": null
+                                  "logoUrl": null,
+                                  "decimals": 18
                                 },
                                 "dollarsEquivalent": null,
                                 "conversionRate": null
@@ -238,7 +239,8 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                   "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
                                   "code": "STRK",
                                   "name": "StarkNet Token",
-                                  "logoUrl": null
+                                  "logoUrl": null,
+                                  "decimals": 18
                                 },
                                 "dollarsEquivalent": null,
                                 "conversionRate": null
@@ -255,7 +257,8 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                   "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
                                   "code": "STRK",
                                   "name": "StarkNet Token",
-                                  "logoUrl": null
+                                  "logoUrl": null,
+                                  "decimals": 18
                                 },
                                 "dollarsEquivalent": null,
                                 "conversionRate": null
@@ -324,7 +327,8 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                 "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
                                 "code": "STRK",
                                 "name": "StarkNet Token",
-                                "logoUrl": null
+                                "logoUrl": null,
+                                "decimals": 18
                               },
                               "initialBalance": 100,
                               "currentBalance": 100,
@@ -349,7 +353,8 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                 "id": "3f6e1c98-8659-493a-b941-943a803bd91f",
                                 "code": "BTC",
                                 "name": "Bitcoin",
-                                "logoUrl": null
+                                "logoUrl": null,
+                                "decimals": 8
                               },
                               "currentBalance": 0,
                               "currentAllowance": 200,
@@ -681,7 +686,8 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
                                   "name": "USD Coin",
-                                  "logoUrl": null
+                                  "logoUrl": null,
+                                  "decimals": 6
                                 },
                                 "dollarsEquivalent": 101.00,
                                 "conversionRate": 1.01
@@ -698,7 +704,8 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
                                   "name": "USD Coin",
-                                  "logoUrl": null
+                                  "logoUrl": null,
+                                  "decimals": 6
                                 },
                                 "dollarsEquivalent": 101.00,
                                 "conversionRate": 1.01
