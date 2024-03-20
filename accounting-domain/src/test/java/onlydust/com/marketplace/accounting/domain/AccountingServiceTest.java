@@ -1240,6 +1240,7 @@ public class AccountingServiceTest {
         final var projectId2 = ProjectId.random();
         final var rewardId1 = RewardId.random();
         final var rewardId2 = RewardId.random();
+        final var payment1 = BatchPayment.Id.random();
         final var currency = Currencies.ETH.withERC20(ERC20Tokens.STARKNET_ETH);
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
@@ -1285,13 +1286,49 @@ public class AccountingServiceTest {
         assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
         assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
 
-        // When
-        accountingService.pay(rewardId1, currency.id(), fakePaymentReference(Network.ETHEREUM));
+        // When (special actions to make reward2 payable)
+        accountingService.updateSponsorAccount(sponsor2Account2, null);
+        accountingService.fund(sponsor2Account1, fakeTransaction(Network.ETHEREUM, PositiveAmount.of(2_500L)));
 
         // Then
+        assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
+        assertThat(accountingService.isPayable(rewardId2, currency.id())).isTrue();
+
+        // When
+        accountingService.pay(List.of(rewardId1, rewardId2), payment1, currency.id());
+
+        // Then
+        assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
+        assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
+
+        // When
+        final var ethPaymentReference = fakePaymentReference(Network.ETHEREUM);
+        accountingService.confirm(payment1, currency.id(), ethPaymentReference);
+
+        // Then
+        verify(accountingObserver).onPaymentReceived(rewardId1, ethPaymentReference);
+        verify(accountingObserver).onPaymentReceived(rewardId2, ethPaymentReference);
+        verify(accountingObserver).onRewardPaid(rewardId1);
+        verify(accountingObserver, never()).onRewardPaid(rewardId2);
+
         assertAccount(sponsor1Account1, 1_000L, 9_000L, 9_000L);
         assertAccount(sponsor2Account1, 0L, 500L, 500L);
-        assertAccount(sponsor2Account2, 15_000L, 50_000L, 0L);
+        assertAccount(sponsor2Account2, 15_000L, 50_000L, 50_000L);
+
+        // When
+        reset(accountingObserver);
+        final var starknetPaymentReference = fakePaymentReference(Network.STARKNET);
+        accountingService.confirm(payment1, currency.id(), starknetPaymentReference);
+
+        // Then
+        verify(accountingObserver, never()).onPaymentReceived(eq(rewardId1), any());
+        verify(accountingObserver).onPaymentReceived(rewardId2, starknetPaymentReference);
+        verify(accountingObserver, never()).onRewardPaid(rewardId1);
+        verify(accountingObserver).onRewardPaid(rewardId2);
+
+        assertAccount(sponsor1Account1, 1_000L, 9_000L, 9_000L);
+        assertAccount(sponsor2Account1, 0L, 500L, 500L);
+        assertAccount(sponsor2Account2, 15_000L, 48_500L, 48_500L);
 
         assertThat(accountBookEventStorage.events.get(currency)).containsExactlyInAnyOrder(
                 new MintEvent(AccountId.of(sponsor1Account1), PositiveAmount.of(10_000L)),
@@ -1307,8 +1344,10 @@ public class AccountingServiceTest {
                 new TransferEvent(AccountId.of(sponsor2Account2), AccountId.of(projectId2), PositiveAmount.of(5_000L)),
                 new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId1), PositiveAmount.of(3_500L)),
                 new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(4_000L)),
-                new BurnEvent(AccountId.of(rewardId1), PositiveAmount.of(1_000L)),
-                new BurnEvent(AccountId.of(rewardId1), PositiveAmount.of(2_500L))
+                new TransferEvent(AccountId.of(rewardId1), AccountId.of(payment1), PositiveAmount.of(3_500L)),
+                new TransferEvent(AccountId.of(rewardId2), AccountId.of(payment1), PositiveAmount.of(4_000L)),
+                new BurnEvent(AccountId.of(payment1), PositiveAmount.of(6_000L)),
+                new BurnEvent(AccountId.of(payment1), PositiveAmount.of(1_500L))
         );
     }
 

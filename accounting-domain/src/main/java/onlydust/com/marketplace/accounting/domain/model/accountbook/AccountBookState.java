@@ -106,6 +106,10 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
                 .map(v -> incomingEdgeOf(v).amount).reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
+    public boolean hasParent(@NonNull AccountId to, @NonNull Collection<AccountId> from) {
+        return accountVertices(to).stream().anyMatch(v -> from.stream().anyMatch(f -> hasParent(v, f)));
+    }
+
     public @NonNull List<Transaction> transactionsFrom(@NonNull AccountId from) {
         final var startVertices = accountVertices(from);
         final Map<FromTo, PositiveAmount> aggregatedAmounts = new HashMap<>();

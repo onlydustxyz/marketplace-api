@@ -543,6 +543,12 @@ public class AccountBookTest {
         assertThat(transferredAmountFromAccount2ToAccount1).isEqualTo(PositiveAmount.ZERO);
         assertThat(transferredAmountFromAccount3ToAccount1).isEqualTo(PositiveAmount.ZERO);
 
+        assertThat(accountBook.state().hasParent(account1, List.of(account2, account3))).isFalse();
+        assertThat(accountBook.state().hasParent(account2, List.of(account1, account3))).isTrue();
+        assertThat(accountBook.state().hasParent(account2, List.of(account3))).isFalse();
+        assertThat(accountBook.state().hasParent(account3, List.of(account1, account2))).isTrue();
+        assertThat(accountBook.state().hasParent(account3, List.of(account2))).isTrue();
+
         assertThat(accountBook.pendingEvents()).isEmpty();
     }
 

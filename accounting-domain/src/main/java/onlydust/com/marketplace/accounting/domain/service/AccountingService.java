@@ -13,13 +13,14 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import javax.transaction.Transactional;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.reducing;
+import static java.util.stream.Collectors.*;
 import static onlydust.com.marketplace.accounting.domain.model.Amount.*;
+import static onlydust.com.marketplace.accounting.domain.model.SponsorAccount.Transaction.Type.SPEND;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -112,7 +113,7 @@ public class AccountingService implements AccountingFacadePort {
             if (paymentReference.network().equals(sponsorAccountNetwork)) {
                 accountBook.burn(AccountId.of(rewardId), amount);
                 registerSponsorAccountTransaction(accountBook, sponsorAccount,
-                        new SponsorAccount.Transaction(SponsorAccount.Transaction.Type.SPEND, paymentReference, amount.negate()));
+                        new SponsorAccount.Transaction(SPEND, paymentReference, amount.negate()));
             }
         });
 
@@ -120,6 +121,19 @@ public class AccountingService implements AccountingFacadePort {
         accountingObserver.onPaymentReceived(rewardId, paymentReference);
         if (accountBook.state().balanceOf(AccountId.of(rewardId)).isZero())
             accountingObserver.onRewardPaid(rewardId);
+    }
+
+    @Override
+    @Transactional
+    public void pay(final @NonNull List<RewardId> rewardIds, final BatchPayment.Id paymentId, final @NonNull Currency.Id currencyId) {
+        final var currency = getCurrency(currencyId);
+        final var accountBook = getAccountBook(currency);
+        final var paymentAccountId = AccountId.of(paymentId);
+
+        rewardIds.stream().map(AccountId::of)
+                .forEach(rewardAccountId -> accountBook.transfer(rewardAccountId, paymentAccountId, accountBook.state().balanceOf(rewardAccountId)));
+
+        accountBookEventStorage.save(currency, accountBook.pendingEvents());
     }
 
     @Override
@@ -133,6 +147,41 @@ public class AccountingService implements AccountingFacadePort {
         accountingObserver.onRewardCancelled(rewardId);
         refundedAccounts.stream().filter(AccountId::isProject).map(AccountId::projectId).forEach(refundedProjectId -> onAllowanceUpdated(refundedProjectId,
                 currencyId, accountBook.state()));
+    }
+
+    @Override
+    @Transactional
+    public void confirm(BatchPayment.Id paymentId, Currency.Id currencyId, SponsorAccount.PaymentReference paymentReference) {
+        final var currency = getCurrency(currencyId);
+        final var accountBook = getAccountBook(currency);
+
+        final var amountPerSponsorAccountOnNetwork = accountBook.state().transferredAmountPerOrigin(AccountId.of(paymentId))
+                .entrySet().stream().collect(toMap(e -> mustGetSponsorAccount(e.getKey().sponsorAccountId()), Map.Entry::getValue))
+                .entrySet().stream().filter(e -> e.getKey().network().filter(paymentReference.network()::equals).isPresent())
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        final var totalAmountOnNetwork = amountPerSponsorAccountOnNetwork.values().stream().reduce(PositiveAmount.ZERO, PositiveAmount::add);
+        accountBook.burn(AccountId.of(paymentId), totalAmountOnNetwork);
+        accountBookEventStorage.save(currency, accountBook.pendingEvents());
+
+        amountPerSponsorAccountOnNetwork.forEach((sponsorAccount, amount) ->
+                registerSponsorAccountTransaction(accountBook, sponsorAccount, new SponsorAccount.Transaction(SPEND, paymentReference, amount.negate())));
+
+        final var sponsorAccountIds = amountPerSponsorAccountOnNetwork.keySet().stream().map(SponsorAccount::id).map(AccountId::of).collect(toSet());
+        accountBook.state().transactionsTo(AccountId.of(paymentId))
+                .stream().filter(transaction -> transaction.from().isReward())
+                .map(transaction -> transaction.from().rewardId())
+                .distinct()
+                .filter(rewardId -> accountBook.state().hasParent(AccountId.of(rewardId), sponsorAccountIds))
+                .forEach(rewardId -> {
+                    accountingObserver.onPaymentReceived(rewardId, paymentReference);
+                    if (isPaid(accountBook.state(), rewardId))
+                        accountingObserver.onRewardPaid(rewardId);
+                });
+    }
+
+    private static boolean isPaid(AccountBookState accountBookState, RewardId rewardId) {
+        return accountBookState.unspentChildren(AccountId.of(rewardId)).keySet().stream().filter(AccountId::isPayment).findFirst().isEmpty();
     }
 
     @Override
@@ -284,7 +333,7 @@ public class AccountingService implements AccountingFacadePort {
             final var sponsorAccount = sponsorAccount(sponsorAccountId);
 
             final var sponsorAccountNetwork = sponsorAccount.network().orElseThrow();
-            sponsorAccount.add(new SponsorAccount.Transaction(SponsorAccount.Transaction.Type.SPEND, sponsorAccountNetwork, rewardId.toString(),
+            sponsorAccount.add(new SponsorAccount.Transaction(SPEND, sponsorAccountNetwork, rewardId.toString(),
                     amount.negate(), "", ""));
         }
 
@@ -302,6 +351,7 @@ public class AccountingService implements AccountingFacadePort {
         }
 
         private boolean isPayable(RewardId rewardId) {
+            if (accountBook.state().balanceOf(AccountId.of(rewardId)).isZero()) return false;
             return accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).entrySet().stream().allMatch(entry -> {
                 final var sponsorAccount = sponsorAccountProvider.get(entry.getKey().sponsorAccountId())
                         .orElseThrow(() -> notFound(("Sponsor account %s not found").formatted(entry.getKey().sponsorAccountId())));

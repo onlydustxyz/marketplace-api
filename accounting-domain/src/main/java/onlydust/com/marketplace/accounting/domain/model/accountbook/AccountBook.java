@@ -2,10 +2,7 @@ package onlydust.com.marketplace.accounting.domain.model.accountbook;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.*;
-import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
-import onlydust.com.marketplace.accounting.domain.model.ProjectId;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
+import onlydust.com.marketplace.accounting.domain.model.*;
 
 import java.util.Collection;
 import java.util.Set;
@@ -30,7 +27,7 @@ public interface AccountBook {
     class AccountId {
         public static final AccountId ROOT = new AccountId(null, null);
 
-        enum Type {SPONSOR_ACCOUNT, REWARD, PROJECT}
+        enum Type {SPONSOR_ACCOUNT, REWARD, PROJECT, PAYMENT}
 
         private Type type;
         private UUID id;
@@ -47,6 +44,10 @@ public interface AccountBook {
             return new AccountId(Type.REWARD, id.value());
         }
 
+        public static AccountId of(BatchPayment.Id id) {
+            return new AccountId(Type.PAYMENT, id.value());
+        }
+
         public static <T> AccountId of(T id) {
             if (id instanceof SponsorAccount.Id sponsorAccountId) {
                 return of(sponsorAccountId);
@@ -54,6 +55,8 @@ public interface AccountBook {
                 return of(projectId);
             } else if (id instanceof RewardId rewardId) {
                 return of(rewardId);
+            } else if (id instanceof BatchPayment.Id paymentId) {
+                return of(paymentId);
             } else {
                 throw new IllegalArgumentException("Unsupported id type: " + id.getClass());
             }
@@ -80,6 +83,14 @@ public interface AccountBook {
             return RewardId.of(id);
         }
 
+
+        public BatchPayment.Id paymentId() {
+            if (!isPayment())
+                throw new IllegalArgumentException("Only payments can be converted to payment id");
+
+            return BatchPayment.Id.of(id);
+        }
+
         public boolean isReward() {
             return type == Type.REWARD;
         }
@@ -91,6 +102,11 @@ public interface AccountBook {
         public boolean isSponsorAccount() {
             return type == Type.SPONSOR_ACCOUNT;
         }
+
+        public boolean isPayment() {
+            return type == Type.PAYMENT;
+        }
+
     }
 
     record Transaction(AccountId from, AccountId to, @NonNull PositiveAmount amount) {

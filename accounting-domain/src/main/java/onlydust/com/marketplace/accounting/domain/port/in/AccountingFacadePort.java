@@ -26,7 +26,11 @@ public interface AccountingFacadePort {
              final @NonNull Currency.Id currencyId,
              final @NonNull SponsorAccount.PaymentReference paymentReference);
 
+    void pay(final @NonNull List<RewardId> rewardIds, final BatchPayment.Id paymentId, final @NonNull Currency.Id currencyId);
+
     void cancel(final @NonNull RewardId rewardId, @NonNull Currency.Id currencyId);
+
+    void confirm(BatchPayment.Id paymentId, Currency.Id currencyId, SponsorAccount.PaymentReference paymentReference);
 
     boolean isPayable(RewardId rewardId, Currency.Id currencyId);
 
