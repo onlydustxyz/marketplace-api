@@ -26,7 +26,7 @@ public interface AccountingFacadePort {
              final @NonNull Currency.Id currencyId,
              final @NonNull SponsorAccount.PaymentReference paymentReference);
 
-    void pay(final @NonNull List<RewardId> rewardIds, final BatchPayment.Id paymentId, final @NonNull Currency.Id currencyId);
+    BatchPayment pay(final Set<RewardId> rewardIds, final @NonNull Currency.Id currencyId, final @NonNull Network network);
 
     void cancel(final @NonNull RewardId rewardId, @NonNull Currency.Id currencyId);
 

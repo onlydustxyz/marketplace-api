@@ -29,6 +29,17 @@ public class BatchPayment {
     List<PayableReward> rewards;
     Date createdAt;
 
+    public static BatchPayment of(@NonNull Network network, @NonNull List<PayableReward> rewards, @NonNull String csv) {
+        return BatchPayment.builder()
+                .id(Id.random())
+                .network(network)
+                .rewards(rewards)
+                .invoices(List.of())
+                .createdAt(new Date())
+                .csv(csv)
+                .build();
+    }
+
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)
     @SuperBuilder

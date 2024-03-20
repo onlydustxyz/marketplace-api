@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.*;
 import static onlydust.com.marketplace.accounting.domain.model.Amount.*;
 import static onlydust.com.marketplace.accounting.domain.model.SponsorAccount.Transaction.Type.SPEND;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
@@ -102,26 +102,26 @@ public class AccountingService implements AccountingFacadePort {
     @Override
     @Transactional
     public void pay(final @NonNull RewardId rewardId, final @NonNull Currency.Id currencyId, final @NonNull SponsorAccount.PaymentReference paymentReference) {
-        final var paymentId = BatchPayment.Id.random();
-        pay(List.of(rewardId), paymentId, currencyId);
-        confirm(paymentId, currencyId, paymentReference);
+        final var payment = pay(Set.of(rewardId), currencyId, paymentReference.network());
+
+        if (payment.rewards().isEmpty())
+            throw badRequest("Reward %s is not payable".formatted(rewardId));
+
+        confirm(payment.id(), currencyId, paymentReference);
     }
 
     @Override
     @Transactional
-    public void pay(final @NonNull List<RewardId> rewardIds, final BatchPayment.Id paymentId, final @NonNull Currency.Id currencyId) {
+    public BatchPayment pay(final Set<RewardId> rewardIds, final @NonNull Currency.Id currencyId, final @NonNull Network network) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
-        final var paymentAccountId = AccountId.of(paymentId);
+        final var payment = BatchPayment.of(network, getPayableRewardsOn(network, rewardIds), ""); // TODO make csv optional
 
-        rewardIds.stream().map(AccountId::of)
-                .peek(rewardAccountId -> {
-                    if (!isPayable(rewardAccountId.rewardId(), currencyId))
-                        throw internalServerError("Reward %s is not payable".formatted(rewardAccountId.rewardId()));
-                })
-                .forEach(rewardAccountId -> accountBook.transfer(rewardAccountId, paymentAccountId, accountBook.state().balanceOf(rewardAccountId)));
+        payment.rewards().forEach(reward -> accountBook.transfer(AccountId.of(reward.id()), AccountId.of(payment.id()), reward.amount()));
 
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
+
+        return payment;
     }
 
     @Override
@@ -158,8 +158,7 @@ public class AccountingService implements AccountingFacadePort {
                 .entrySet().stream().filter(e -> e.getKey().network().filter(paymentReference.network()::equals).isPresent())
                 .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        final var totalAmountOnNetwork = amountPerSponsorAccountOnNetwork.values().stream().reduce(PositiveAmount.ZERO, PositiveAmount::add);
-        accountBook.burn(AccountId.of(paymentId), totalAmountOnNetwork);
+        accountBook.burn(AccountId.of(paymentId), accountBook.state().balanceOf(AccountId.of(paymentId)));
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
 
         amountPerSponsorAccountOnNetwork.forEach((sponsorAccount, amount) ->
@@ -179,7 +178,8 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     private static boolean isPaid(AccountBookState accountBookState, RewardId rewardId) {
-        return accountBookState.unspentChildren(AccountId.of(rewardId)).keySet().stream().filter(AccountId::isPayment).findFirst().isEmpty();
+        final var rewardAccountId = AccountId.of(rewardId);
+        return accountBookState.balanceOf(rewardAccountId).isZero() && accountBookState.unspentChildren(rewardAccountId).keySet().stream().filter(AccountId::isPayment).findFirst().isEmpty();
     }
 
     @Override
@@ -224,6 +224,10 @@ public class AccountingService implements AccountingFacadePort {
     @Override
     public List<PayableReward> getPayableRewards(Set<RewardId> rewardIds) {
         return currencyStorage.all().stream().flatMap(currency -> new PayableRewardAggregator(sponsorAccountStorage, currency).getPayableRewards(rewardIds)).toList();
+    }
+
+    private List<PayableReward> getPayableRewardsOn(@NonNull Network network, @NonNull Set<RewardId> rewardIds) {
+        return getPayableRewards(rewardIds).stream().filter(payableReward -> network.equals(payableReward.currency().network())).toList();
     }
 
     private SponsorAccount createSponsorAccount(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, ZonedDateTime lockedUntil) {
@@ -350,6 +354,7 @@ public class AccountingService implements AccountingFacadePort {
 
         private boolean isPayable(RewardId rewardId) {
             if (accountBook.state().balanceOf(AccountId.of(rewardId)).isZero()) return false;
+
             return accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).entrySet().stream().allMatch(entry -> {
                 final var sponsorAccount = sponsorAccountProvider.get(entry.getKey().sponsorAccountId())
                         .orElseThrow(() -> notFound(("Sponsor account %s not found").formatted(entry.getKey().sponsorAccountId())));

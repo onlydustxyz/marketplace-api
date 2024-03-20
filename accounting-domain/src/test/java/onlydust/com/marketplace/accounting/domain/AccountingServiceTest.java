@@ -192,11 +192,11 @@ public class AccountingServiceTest {
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(sponsorAccount.account().id()), amount));
-            assertThat(sponsorAccount.account().unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
+            assertThat(sponsorAccount.account().unlockedBalance()).isEqualTo(Amount.ZERO);
             assertThat(sponsorAccount.account().lockedUntil()).contains(lockedUntil.toInstant());
 
             final var savedAccount = sponsorAccountStorage.get(sponsorAccount.account().id()).orElseThrow();
-            assertThat(savedAccount.unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
+            assertThat(savedAccount.unlockedBalance()).isEqualTo(Amount.ZERO);
             assertThat(savedAccount.lockedUntil()).isEqualTo(sponsorAccount.account().lockedUntil());
         }
 
@@ -249,6 +249,7 @@ public class AccountingServiceTest {
         @BeforeEach
         void setup() {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
+            when(currencyStorage.all()).thenReturn(Set.of(currency));
             sponsorAccount = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, currency.id(), null, PositiveAmount.of(100L)).account();
         }
 
@@ -343,7 +344,7 @@ public class AccountingServiceTest {
             assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), transaction))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("Sponsor account %s is not funded".formatted(sponsorAccount.id()));
+                    .hasMessage("Reward %s is not payable".formatted(rewardId1));
         }
 
         /*
@@ -462,7 +463,8 @@ public class AccountingServiceTest {
             assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
             assertThatThrownBy(() -> accountingService.pay(rewardId2, currency.id(), fakeTransaction(network, PositiveAmount.of(50L))))
                     // Then
-                    .isInstanceOf(OnlyDustException.class).hasMessageContaining("Not enough fund");
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Reward %s is not payable".formatted(rewardId2));
         }
 
         /*
@@ -505,15 +507,13 @@ public class AccountingServiceTest {
         @Test
         void should_prevent_a_reward_from_being_payable_if_already_paid() {
             // Given
-            final var paymentId = BatchPayment.Id.random();
-
             accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(100L)));
             accountingService.allocate(sponsorAccount.id(), projectId1, PositiveAmount.of(100L), currency.id());
             accountingService.createReward(projectId1, rewardId1, PositiveAmount.of(40L), currency.id());
             when(currencyStorage.all()).thenReturn(Set.of(currency));
 
             // When
-            accountingService.pay(List.of(rewardId1), paymentId, currency.id());
+            final var payment = accountingService.pay(Set.of(rewardId1), currency.id(), network);
 
             // Then
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
@@ -526,7 +526,7 @@ public class AccountingServiceTest {
                     .hasMessageContaining("Reward %s is not payable".formatted(rewardId1));
 
             // When
-            accountingService.cancel(paymentId, currency.id());
+            accountingService.cancel(payment.id(), currency.id());
 
             // Then
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
@@ -625,7 +625,7 @@ public class AccountingServiceTest {
             assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), transaction))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessageContaining("is not funded");
+                    .hasMessage("Reward %s is not payable".formatted(rewardId1));
         }
 
         /*
@@ -652,7 +652,7 @@ public class AccountingServiceTest {
                     new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(100L))
             );
 
-            assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
+            assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
         }
 
         /*
@@ -679,7 +679,7 @@ public class AccountingServiceTest {
             assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), fakeTransaction(network, amount)))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessageContaining("Cannot spend from locked account");
+                    .hasMessage("Reward %s is not payable".formatted(rewardId1));
         }
 
         /*
@@ -720,6 +720,7 @@ public class AccountingServiceTest {
             currency.erc20().add(ERC20Tokens.OP_USDC);
 
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
+            when(currencyStorage.all()).thenReturn(Set.of(currency));
             unlockedSponsorSponsorAccount1 = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, currency.id(), null,
                     PositiveAmount.of(100L)).account();
             unlockedSponsorSponsorAccount2 = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, currency.id(), null,
@@ -749,7 +750,7 @@ public class AccountingServiceTest {
             assertThatThrownBy(() -> accountingService.pay(rewardId, currency.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L))))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessageContaining("is not funded");
+                    .hasMessage("Reward %s is not payable".formatted(rewardId));
         }
 
         /*
@@ -789,7 +790,7 @@ public class AccountingServiceTest {
             assertThatThrownBy(() -> accountingService.pay(rewardId2, currency.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(1000L))))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessageContaining("is not funded");
+                    .hasMessage("Reward %s is not payable".formatted(rewardId2));
         }
 
         /*
@@ -810,10 +811,10 @@ public class AccountingServiceTest {
 
             // When
             assertThat(accountingService.isPayable(rewardId, currency.id())).isFalse();
-            assertThatThrownBy(() -> accountingService.pay(rewardId, currency.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L))))
+            assertThatThrownBy(() -> accountingService.pay(rewardId, currency.id(), fakePaymentReference(Network.ETHEREUM)))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessageContaining("Cannot spend from locked account");
+                    .hasMessage("Reward %s is not payable".formatted(rewardId));
         }
 
         /*
@@ -1271,10 +1272,10 @@ public class AccountingServiceTest {
         final var projectId2 = ProjectId.random();
         final var rewardId1 = RewardId.random();
         final var rewardId2 = RewardId.random();
-        final var payment1 = BatchPayment.Id.random();
         final var currency = Currencies.ETH.withERC20(ERC20Tokens.STARKNET_ETH);
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
+        when(currencyStorage.all()).thenReturn(Set.of(currency));
 
         // When
         final var sponsor1Account1 = accountingService.createSponsorAccountWithInitialAllowance(sponsor1, currency.id(), null,
@@ -1326,7 +1327,8 @@ public class AccountingServiceTest {
         assertThat(accountingService.isPayable(rewardId2, currency.id())).isTrue();
 
         // When
-        accountingService.pay(List.of(rewardId1, rewardId2), payment1, currency.id());
+        final var payment1 = accountingService.pay(Set.of(rewardId1, rewardId2), currency.id(), Network.ETHEREUM);
+        final var payment2 = accountingService.pay(Set.of(rewardId1, rewardId2), currency.id(), Network.STARKNET);
 
         // Then
         assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
@@ -1334,7 +1336,7 @@ public class AccountingServiceTest {
 
         // When
         final var ethPaymentReference = fakePaymentReference(Network.ETHEREUM);
-        accountingService.confirm(payment1, currency.id(), ethPaymentReference);
+        accountingService.confirm(payment1.id(), currency.id(), ethPaymentReference);
 
         // Then
         verify(accountingObserver).onPaymentReceived(rewardId1, ethPaymentReference);
@@ -1349,7 +1351,7 @@ public class AccountingServiceTest {
         // When
         reset(accountingObserver);
         final var starknetPaymentReference = fakePaymentReference(Network.STARKNET);
-        accountingService.confirm(payment1, currency.id(), starknetPaymentReference);
+        accountingService.confirm(payment2.id(), currency.id(), starknetPaymentReference);
 
         // Then
         verify(accountingObserver, never()).onPaymentReceived(eq(rewardId1), any());
@@ -1375,10 +1377,11 @@ public class AccountingServiceTest {
                 new TransferEvent(AccountId.of(sponsor2Account2), AccountId.of(projectId2), PositiveAmount.of(5_000L)),
                 new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId1), PositiveAmount.of(3_500L)),
                 new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(4_000L)),
-                new TransferEvent(AccountId.of(rewardId1), AccountId.of(payment1), PositiveAmount.of(3_500L)),
-                new TransferEvent(AccountId.of(rewardId2), AccountId.of(payment1), PositiveAmount.of(4_000L)),
-                new BurnEvent(AccountId.of(payment1), PositiveAmount.of(6_000L)),
-                new BurnEvent(AccountId.of(payment1), PositiveAmount.of(1_500L))
+                new TransferEvent(AccountId.of(rewardId1), AccountId.of(payment1.id()), PositiveAmount.of(3_500L)),
+                new TransferEvent(AccountId.of(rewardId2), AccountId.of(payment1.id()), PositiveAmount.of(2_500L)),
+                new TransferEvent(AccountId.of(rewardId2), AccountId.of(payment2.id()), PositiveAmount.of(1_500L)),
+                new BurnEvent(AccountId.of(payment1.id()), PositiveAmount.of(6_000L)),
+                new BurnEvent(AccountId.of(payment2.id()), PositiveAmount.of(1_500L))
         );
     }
 
