@@ -117,6 +117,7 @@ public class MeRestApi implements MeApi {
         final var filters = UserRewardView.Filters.builder()
                 .currencies(Optional.ofNullable(currencies).orElse(List.of()))
                 .projectIds(Optional.ofNullable(projects).orElse(List.of()))
+                .adminCompanyBillingProfilesIds(authenticatedUser.getCompanyAdminBillingProfile().stream().map(BillingProfileLinkView::id).toList())
                 .from(isNull(fromDate) ? null : DateMapper.parse(fromDate))
                 .to(isNull(toDate) ? null : DateMapper.parse(toDate))
                 .build();

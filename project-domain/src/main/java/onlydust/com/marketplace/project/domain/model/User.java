@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.project.domain.model;
 
 import lombok.*;
+import onlydust.com.marketplace.project.domain.view.BillingProfileLinkView;
 import onlydust.com.marketplace.project.domain.view.ProjectLedView;
 
 import java.util.ArrayList;
@@ -20,15 +21,13 @@ public class User {
     String githubLogin;
     String githubEmail;
     @Builder.Default
-    Boolean hasValidPayoutInfos = true;
-    @Builder.Default
     List<ProjectLedView> projectsLed = new ArrayList<>();
     @Builder.Default
     List<ProjectLedView> pendingProjectsLed = new ArrayList<>();
     @Builder.Default
     List<UUID> projectsAppliedTo = new ArrayList<>();
     @Builder.Default
-    Boolean hasValidBillingProfile = true;
+    List<BillingProfileLinkView> billingProfiles = new ArrayList<>();
 
     @Getter(AccessLevel.NONE)
     boolean hasAcceptedLatestTermsAndConditions;
@@ -48,5 +47,11 @@ public class User {
 
     public boolean hasRole(UserRole role) {
         return roles.contains(role);
+    }
+
+    public List<BillingProfileLinkView> getCompanyAdminBillingProfile() {
+        return this.billingProfiles.stream()
+                .filter(bp -> bp.type() == BillingProfileLinkView.Type.COMPANY && bp.role() == BillingProfileLinkView.Role.ADMIN)
+                .toList();
     }
 }

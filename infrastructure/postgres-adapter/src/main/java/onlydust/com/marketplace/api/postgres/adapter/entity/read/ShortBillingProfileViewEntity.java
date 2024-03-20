@@ -38,7 +38,7 @@ public class ShortBillingProfileViewEntity {
     Date invoiceMandateAcceptedAt;
     Boolean enabled;
     Boolean pendingInvitation;
-    @Type(type = "billing_profile_type")
+    @Type(type = "billing_profile_role")
     @Enumerated(EnumType.STRING)
     BillingProfileUserEntity.Role role;
 

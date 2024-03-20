@@ -54,8 +54,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(false)
-                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false)
-                .jsonPath("$.hasValidPayoutInfos").isEqualTo(true);
+                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false);
 
         // When
         client.patch()
@@ -79,8 +78,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(true)
-                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false)
-                .jsonPath("$.hasValidPayoutInfos").isEqualTo(true);
+                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false);
 
         // When
         client.patch()
@@ -104,8 +102,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(true)
-                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(true)
-                .jsonPath("$.hasValidPayoutInfos").isEqualTo(true);
+                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(true);
     }
 
     @SneakyThrows

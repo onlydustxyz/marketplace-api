@@ -36,6 +36,7 @@ public class UserRewardView {
     public static class Filters {
         List<UUID> currencies;
         List<UUID> projectIds;
+        List<UUID> adminCompanyBillingProfilesIds;
         Date from;
         Date to;
     }

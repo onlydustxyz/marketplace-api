@@ -81,7 +81,7 @@ public class UserServiceTest {
         // Then
         verify(userStoragePort, times(1)).updateUserLastSeenAt(user.getId(), dateProvider.now());
         assertEquals(user, userByGithubIdentity);
-        assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
+        assertEquals(0, userByGithubIdentity.getBillingProfiles().size());
     }
 
     @Test
@@ -112,7 +112,7 @@ public class UserServiceTest {
         // Then
         verify(userStoragePort, times(1)).updateUserLastSeenAt(user.getId(), dateProvider.now());
         assertEquals(user, userByGithubIdentity);
-        assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
+        assertEquals(0, userByGithubIdentity.getBillingProfiles().size());
     }
 
     @Test
@@ -142,8 +142,9 @@ public class UserServiceTest {
         // Then
         verify(userStoragePort, times(1)).updateUserLastSeenAt(user.getId(), dateProvider.now());
         assertEquals(user, userByGithubIdentity);
-        assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
-        assertEquals(true, userByGithubIdentity.getHasValidBillingProfile());
+        // TODO : validation with list of BPs
+//        assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
+//        assertEquals(true, userByGithubIdentity.getHasValidBillingProfile());
     }
 
     //    @Test - TODO: restore ?
@@ -173,8 +174,9 @@ public class UserServiceTest {
         // Then
         verify(userStoragePort, times(1)).updateUserLastSeenAt(user.getId(), dateProvider.now());
         assertEquals(user, userByGithubIdentity);
-        assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
-        assertEquals(false, userByGithubIdentity.getHasValidBillingProfile());
+        // TODO : validation with list of BPs
+//        assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
+//        assertEquals(false, userByGithubIdentity.getHasValidBillingProfile());
     }
 
 
@@ -193,7 +195,7 @@ public class UserServiceTest {
         // Then
         verify(userStoragePort, never()).updateUserLastSeenAt(any(), any());
         assertEquals(user, userByGithubIdentity);
-        assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
+        assertEquals(0, userByGithubIdentity.getBillingProfiles().size());
     }
 
     @Test
