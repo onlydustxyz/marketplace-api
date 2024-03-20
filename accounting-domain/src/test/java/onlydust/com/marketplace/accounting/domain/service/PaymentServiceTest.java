@@ -142,7 +142,11 @@ public class PaymentServiceTest {
     void should_generate_batch_given_payable_rewards() {
         // Given
         when(invoiceStoragePort.getAll(invoiceIds)).thenReturn(invoices);
-        when(accountingService.getPayableRewards(rewardIdsSet)).thenReturn(payableRewards);
+        when(accountingService.pay(rewardIdsSet)).thenReturn(List.of(
+                Payment.of(Network.ETHEREUM, payableRewards.stream().filter(pr -> pr.currency().network().equals(Network.ETHEREUM)).toList()),
+                Payment.of(Network.OPTIMISM, payableRewards.stream().filter(pr -> pr.currency().network().equals(Network.OPTIMISM)).toList()),
+                Payment.of(Network.STARKNET, payableRewards.stream().filter(pr -> pr.currency().network().equals(Network.STARKNET)).toList())
+        ));
 
         // When
         final var batches = rewardService.createBatchPaymentsForInvoices(invoiceIds).stream().map(BatchPaymentDetailsView::payment).toList();
@@ -243,23 +247,12 @@ public class PaymentServiceTest {
                 .transactionHash(transactionHash)
                 .build();
 
-
         // When
         when(accountingRewardStoragePort.findBatchPayment(batchPaymentId)).thenReturn(Optional.of(payment));
         rewardService.markBatchPaymentAsPaid(batchPaymentId, transactionHash);
 
         // Then
         verify(accountingRewardStoragePort).saveBatchPayment(updatedPayment);
-        verify(accountingService).pay(payableRewards.get(0).id(),
-                new Payment.Reference(Network.ETHEREUM, transactionHash, invoices.get(0).billingProfileSnapshot().subject(), "vitalik.eth"));
-
-        verify(accountingService).pay(payableRewards.get(2).id(),
-                new Payment.Reference(Network.ETHEREUM, transactionHash, invoices.get(0).billingProfileSnapshot().subject(), "vitalik.eth"));
-
-        verify(accountingService).pay(payableRewards.get(4).id(),
-                new Payment.Reference(Network.ETHEREUM, transactionHash, invoices.get(0).billingProfileSnapshot().subject(), "vitalik.eth"));
-
-        verify(accountingService).pay(payableRewards.get(5).id(),
-                new Payment.Reference(Network.ETHEREUM, transactionHash, invoices.get(1).billingProfileSnapshot().subject(), "foo.eth"));
+        verify(accountingService).confirm(updatedPayment);
     }
 }
