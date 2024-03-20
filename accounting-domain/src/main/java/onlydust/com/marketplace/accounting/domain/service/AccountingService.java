@@ -124,7 +124,7 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     private Payment pay(final @NonNull Network network, final List<PayableReward> rewards) {
-        final var payment = Payment.of(network, rewards, ""); // TODO make csv optional
+        final var payment = Payment.of(network, rewards);
 
         payment.rewards().stream().collect(groupingBy(PayableReward::currency))
                 .forEach((currency, currencyRewards) -> pay(payment.id(), currency, currencyRewards));

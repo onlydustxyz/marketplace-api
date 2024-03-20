@@ -15,7 +15,6 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.intern
 public class Payment {
     @NonNull
     Id id;
-    @NonNull
     String csv;
     @NonNull
     Network network;
@@ -32,14 +31,13 @@ public class Payment {
     @Builder.Default
     final @NonNull Map<RewardId, Reference> references = new HashMap<>();
 
-    public static Payment of(@NonNull Network network, @NonNull List<PayableReward> rewards, @NonNull String csv) {
+    public static Payment of(@NonNull Network network, @NonNull List<PayableReward> rewards) {
         return Payment.builder()
                 .id(Id.random())
                 .network(network)
                 .rewards(rewards)
                 .invoices(List.of())
                 .createdAt(new Date())
-                .csv(csv)
                 .build();
     }
 
