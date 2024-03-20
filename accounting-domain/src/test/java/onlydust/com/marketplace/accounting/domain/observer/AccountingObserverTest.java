@@ -158,7 +158,7 @@ public class AccountingObserverTest {
                     .paidAt(null)
                     .withAdditionalNetworks(Set.of(Network.ETHEREUM, Network.OPTIMISM));
 
-            final var reference = new SponsorAccount.PaymentReference(Network.ETHEREUM, "0x1234", "ofux", "ofux.eth");
+            final var reference = new BatchPayment.Reference(Network.ETHEREUM, "0x1234", "ofux", "ofux.eth");
 
             final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
             final var billingProfileId = BillingProfile.Id.random();

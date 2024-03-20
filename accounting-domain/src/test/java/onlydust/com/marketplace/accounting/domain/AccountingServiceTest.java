@@ -2,7 +2,6 @@ package onlydust.com.marketplace.accounting.domain;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.*;
-import onlydust.com.marketplace.accounting.domain.model.SponsorAccount.PaymentReference;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount.Transaction;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.*;
@@ -40,8 +39,8 @@ public class AccountingServiceTest {
             projectAccountingObserver);
     final Faker faker = new Faker();
 
-    private PaymentReference fakePaymentReference(Network network) {
-        return new PaymentReference(network, faker.random().hex(), faker.rickAndMorty().character(), faker.internet().slug() + ".eth");
+    private BatchPayment.Reference fakePaymentReference(Network network) {
+        return new BatchPayment.Reference(network, faker.random().hex(), faker.rickAndMorty().character(), faker.internet().slug() + ".eth");
     }
 
     private Transaction fakeTransaction(Network network, Amount amount) {

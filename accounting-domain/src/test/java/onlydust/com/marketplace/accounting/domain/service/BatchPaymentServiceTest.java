@@ -251,15 +251,15 @@ public class BatchPaymentServiceTest {
         // Then
         verify(accountingRewardStoragePort).saveBatchPayment(updatedBatchPayment);
         verify(accountingService).pay(payableRewards.get(0).id(),
-                new SponsorAccount.PaymentReference(Network.ETHEREUM, transactionHash, invoices.get(0).billingProfileSnapshot().subject(), "vitalik.eth"));
+                new BatchPayment.Reference(Network.ETHEREUM, transactionHash, invoices.get(0).billingProfileSnapshot().subject(), "vitalik.eth"));
 
         verify(accountingService).pay(payableRewards.get(2).id(),
-                new SponsorAccount.PaymentReference(Network.ETHEREUM, transactionHash, invoices.get(0).billingProfileSnapshot().subject(), "vitalik.eth"));
+                new BatchPayment.Reference(Network.ETHEREUM, transactionHash, invoices.get(0).billingProfileSnapshot().subject(), "vitalik.eth"));
 
         verify(accountingService).pay(payableRewards.get(4).id(),
-                new SponsorAccount.PaymentReference(Network.ETHEREUM, transactionHash, invoices.get(0).billingProfileSnapshot().subject(), "vitalik.eth"));
+                new BatchPayment.Reference(Network.ETHEREUM, transactionHash, invoices.get(0).billingProfileSnapshot().subject(), "vitalik.eth"));
 
         verify(accountingService).pay(payableRewards.get(5).id(),
-                new SponsorAccount.PaymentReference(Network.ETHEREUM, transactionHash, invoices.get(1).billingProfileSnapshot().subject(), "foo.eth"));
+                new BatchPayment.Reference(Network.ETHEREUM, transactionHash, invoices.get(1).billingProfileSnapshot().subject(), "foo.eth"));
     }
 }

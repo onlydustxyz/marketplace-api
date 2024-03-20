@@ -20,7 +20,7 @@ public class Receipt {
     @NonNull String thirdPartyName;
     @NonNull String thirdPartyAccountNumber;
 
-    public static Receipt of(@NonNull final RewardId rewardId, @NonNull final SponsorAccount.PaymentReference reference) {
+    public static Receipt of(@NonNull final RewardId rewardId, @NonNull final BatchPayment.Reference reference) {
         return new Receipt(Id.random(),
                 rewardId,
                 ZonedDateTime.now(),

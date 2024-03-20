@@ -3,7 +3,6 @@ package onlydust.com.marketplace.accounting.domain.service;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
-import onlydust.com.marketplace.accounting.domain.model.SponsorAccount.PaymentReference;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookState;
@@ -102,7 +101,7 @@ public class AccountingService implements AccountingFacadePort {
 
     @Override
     @Transactional
-    public void pay(final @NonNull RewardId rewardId, final @NonNull PaymentReference paymentReference) {
+    public void pay(final @NonNull RewardId rewardId, final @NonNull BatchPayment.Reference paymentReference) {
         final var network = paymentReference.network();
         final var payableRewards = getPayableRewardsOn(network, Set.of(rewardId));
 
@@ -182,7 +181,7 @@ public class AccountingService implements AccountingFacadePort {
         rewards.forEach(r -> confirm(accountBook, r, payment.referenceFor(r.id())));
     }
 
-    private void confirm(AccountBookAggregate accountBook, PayableReward reward, PaymentReference paymentReference) {
+    private void confirm(AccountBookAggregate accountBook, PayableReward reward, BatchPayment.Reference paymentReference) {
         accountBook.state().transferredAmountPerOrigin(AccountId.of(reward.id()))
                 .entrySet()
                 .stream().map(e -> Map.entry(

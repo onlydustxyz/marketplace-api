@@ -154,7 +154,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
         final var recipient = userFacadePort.getProfileById(reward.recipientId());
 
-        final var paymentReference = new SponsorAccount.PaymentReference(mapTransactionNetwork(payRewardRequest.getNetwork()),
+        final var paymentReference = new BatchPayment.Reference(mapTransactionNetwork(payRewardRequest.getNetwork()),
                 payRewardRequest.getReference(),
                 recipient.getLogin(),
                 payRewardRequest.getRecipientAccount());

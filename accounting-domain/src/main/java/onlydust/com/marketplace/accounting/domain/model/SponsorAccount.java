@@ -119,29 +119,16 @@ public class SponsorAccount {
         }
     }
 
-    @AllArgsConstructor
     @Accessors(fluent = true)
     @Getter
-    @EqualsAndHashCode
-    @ToString
-    // TODO move inside BatchPayment
-    public static class PaymentReference {
-        private final @NonNull Network network;
-        private final @NonNull String reference;
-        private final @NonNull String thirdPartyName;
-        private final @NonNull String thirdPartyAccountNumber;
-    }
-
-    @Accessors(fluent = true)
-    @Getter
-    public static class Transaction extends PaymentReference {
+    public static class Transaction extends BatchPayment.Reference {
         private final @NonNull Amount amount;
         private final @NonNull Id id;
         final @NonNull Type type;
 
         public Transaction(
                 final @NonNull Type type,
-                final @NonNull PaymentReference paymentReference,
+                final @NonNull BatchPayment.Reference paymentReference,
                 final @NonNull Amount amount
         ) {
             this(type, paymentReference.network(), paymentReference.reference(), amount, paymentReference.thirdPartyName(),

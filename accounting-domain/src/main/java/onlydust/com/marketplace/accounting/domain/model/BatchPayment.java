@@ -30,7 +30,7 @@ public class BatchPayment {
     Date createdAt;
 
     @Builder.Default
-    final @NonNull Map<RewardId, SponsorAccount.PaymentReference> references = new HashMap<>();
+    final @NonNull Map<RewardId, Reference> references = new HashMap<>();
 
     public static BatchPayment of(@NonNull Network network, @NonNull List<PayableReward> rewards, @NonNull String csv) {
         return BatchPayment.builder()
@@ -43,11 +43,11 @@ public class BatchPayment {
                 .build();
     }
 
-    public SponsorAccount.PaymentReference referenceFor(@NonNull RewardId rewardId) {
+    public Reference referenceFor(@NonNull RewardId rewardId) {
         return references.computeIfAbsent(rewardId, this::computeReference);
     }
 
-    private SponsorAccount.PaymentReference computeReference(RewardId rewardId) {
+    private Reference computeReference(RewardId rewardId) {
         final var invoice = invoices.stream()
                 .filter(i -> i.rewards().stream().anyMatch(reward -> reward.id().equals(rewardId)))
                 .findFirst()
@@ -56,10 +56,10 @@ public class BatchPayment {
         final var wallet = invoice.billingProfileSnapshot().wallet(network)
                 .orElseThrow(() -> internalServerError("Wallet not found for invoice %s on network %s".formatted(invoice.id(), network)));
 
-        return new SponsorAccount.PaymentReference(network, transactionHash, invoice.billingProfileSnapshot().subject(), wallet.address());
+        return new Reference(network, transactionHash, invoice.billingProfileSnapshot().subject(), wallet.address());
     }
 
-    public void referenceFor(@NonNull RewardId rewardId, SponsorAccount.PaymentReference reference) {
+    public void referenceFor(@NonNull RewardId rewardId, Reference reference) {
         references.put(rewardId, reference);
     }
 
@@ -77,6 +77,17 @@ public class BatchPayment {
         }
     }
 
+    @AllArgsConstructor
+    @Accessors(fluent = true)
+    @Getter
+    @EqualsAndHashCode
+    @ToString
+    public static class Reference {
+        private final @NonNull Network network;
+        private final @NonNull String reference;
+        private final @NonNull String thirdPartyName;
+        private final @NonNull String thirdPartyAccountNumber;
+    }
 
     public enum Status {
         TO_PAY, PAID
