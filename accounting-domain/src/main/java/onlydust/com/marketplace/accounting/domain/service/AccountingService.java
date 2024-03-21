@@ -199,7 +199,7 @@ public class AccountingService implements AccountingFacadePort {
 
     private static boolean isPaid(AccountBookState accountBookState, RewardId rewardId) {
         final var rewardAccountId = AccountId.of(rewardId);
-        return accountBookState.balanceOf(rewardAccountId).isZero() && accountBookState.unspentChildren(rewardAccountId).keySet().stream().filter(AccountId::isPayment).findFirst().isEmpty();
+        return accountBookState.balanceOf(rewardAccountId).isZero() && accountBookState.unspentChildren(rewardAccountId).keySet().stream().noneMatch(AccountId::isPayment);
     }
 
     @Override
