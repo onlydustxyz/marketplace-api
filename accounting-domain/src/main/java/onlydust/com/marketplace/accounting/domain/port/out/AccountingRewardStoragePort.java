@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.accounting.domain.port.out;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
@@ -20,12 +20,13 @@ public interface AccountingRewardStoragePort {
 
     List<BackofficeRewardView> getInvoiceRewards(@NonNull Invoice.Id invoiceId);
 
-    Optional<BatchPayment> findBatchPayment(BatchPayment.Id batchPaymentId);
+    Optional<Payment> findPayment(Payment.Id batchPaymentId);
 
-    void saveBatchPayment(BatchPayment updatedBatchPayment);
-    Page<BatchPaymentDetailsView> findBatchPaymentDetails(int pageIndex, int pageSize, Set<BatchPayment.Status> statuses);
+    void savePayment(Payment updatedPayment);
 
-    Optional<BatchPaymentDetailsView> findBatchPaymentDetailsById(BatchPayment.Id batchPaymentId);
+    Page<BatchPaymentDetailsView> findPaymentDetails(int pageIndex, int pageSize, Set<Payment.Status> statuses);
+
+    Optional<BatchPaymentDetailsView> findPaymentDetailsById(Payment.Id batchPaymentId);
 
     List<BackofficeRewardView> findRewardsById(Set<RewardId> rewardIds);
 
@@ -38,6 +39,6 @@ public interface AccountingRewardStoragePort {
 
     void markRewardsAsPaymentNotified(List<RewardId> rewardId);
 
-    void saveAll(List<BatchPayment> batchPayments);
+    void saveAll(List<Payment> payments);
 
 }

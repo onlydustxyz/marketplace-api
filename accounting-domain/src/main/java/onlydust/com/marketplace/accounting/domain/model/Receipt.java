@@ -12,15 +12,22 @@ import java.util.UUID;
 @Value
 @Accessors(fluent = true)
 public class Receipt {
-    @NonNull Id id;
-    @NonNull RewardId rewardId;
-    @NonNull ZonedDateTime createdAt;
-    @NonNull Network network;
-    @NonNull String reference;
-    @NonNull String thirdPartyName;
-    @NonNull String thirdPartyAccountNumber;
+    @NonNull
+    Id id;
+    @NonNull
+    RewardId rewardId;
+    @NonNull
+    ZonedDateTime createdAt;
+    @NonNull
+    Network network;
+    @NonNull
+    String reference;
+    @NonNull
+    String thirdPartyName;
+    @NonNull
+    String thirdPartyAccountNumber;
 
-    public static Receipt of(@NonNull final RewardId rewardId, @NonNull final SponsorAccount.PaymentReference reference) {
+    public static Receipt of(@NonNull final RewardId rewardId, @NonNull final Payment.Reference reference) {
         return new Receipt(Id.random(),
                 rewardId,
                 ZonedDateTime.now(),

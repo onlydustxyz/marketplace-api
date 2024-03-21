@@ -36,13 +36,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-public class BatchPaymentServiceTest {
+public class PaymentServiceTest {
 
     private final Faker faker = new Faker();
     private final AccountingRewardStoragePort accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
     private final AccountingService accountingService = mock(AccountingService.class);
     private final InvoiceStoragePort invoiceStoragePort = mock(InvoiceStoragePort.class);
-    private final BatchPaymentService rewardService = new BatchPaymentService(accountingRewardStoragePort, invoiceStoragePort, accountingService);
+    private final PaymentService rewardService = new PaymentService(accountingRewardStoragePort, invoiceStoragePort, accountingService);
 
     List<Invoice.Id> invoiceIds;
     List<Invoice> invoices;
@@ -131,25 +131,29 @@ public class BatchPaymentServiceTest {
         when(accountingService.getPayableRewards(rewardIdsSet)).thenReturn(List.of());
 
         // When
-        final var batches = rewardService.createBatchPaymentsForInvoices(invoiceIds);
+        final var batches = rewardService.createPaymentsForInvoices(invoiceIds);
 
         // Then
         assertThat(batches).isEmpty();
-        verify(accountingRewardStoragePort, never()).saveBatchPayment(any());
+        verify(accountingRewardStoragePort, never()).savePayment(any());
     }
 
     @Test
     void should_generate_batch_given_payable_rewards() {
         // Given
         when(invoiceStoragePort.getAll(invoiceIds)).thenReturn(invoices);
-        when(accountingService.getPayableRewards(rewardIdsSet)).thenReturn(payableRewards);
+        when(accountingService.pay(rewardIdsSet)).thenReturn(List.of(
+                Payment.of(Network.ETHEREUM, payableRewards.stream().filter(pr -> pr.currency().network().equals(Network.ETHEREUM)).toList()),
+                Payment.of(Network.OPTIMISM, payableRewards.stream().filter(pr -> pr.currency().network().equals(Network.OPTIMISM)).toList()),
+                Payment.of(Network.STARKNET, payableRewards.stream().filter(pr -> pr.currency().network().equals(Network.STARKNET)).toList())
+        ));
 
         // When
-        final var batches = rewardService.createBatchPaymentsForInvoices(invoiceIds).stream().map(BatchPaymentDetailsView::batchPayment).toList();
+        final var batches = rewardService.createPaymentsForInvoices(invoiceIds).stream().map(BatchPaymentDetailsView::payment).toList();
 
         // Then
         assertThat(batches).hasSize(3);
-        assertThat(batches).extracting(BatchPayment::network).containsExactlyInAnyOrder(Network.ETHEREUM, Network.OPTIMISM, Network.STARKNET);
+        assertThat(batches).extracting(Payment::network).containsExactlyInAnyOrder(Network.ETHEREUM, Network.OPTIMISM, Network.STARKNET);
         {
             final var ethereumBatch = batches.stream().filter(batch -> batch.network().equals(Network.ETHEREUM)).findFirst().orElseThrow();
             assertThat(ethereumBatch.rewards()).containsExactlyInAnyOrder(payableRewards.get(0), payableRewards.get(2), payableRewards.get(4),
@@ -186,13 +190,13 @@ public class BatchPaymentServiceTest {
     @Test
     void should_raise_not_found_exception_given_not_existing_batch_payment() {
         // Given
-        final BatchPayment.Id batchPaymentId = BatchPayment.Id.random();
+        final Payment.Id batchPaymentId = Payment.Id.random();
 
         // When
-        when(accountingRewardStoragePort.findBatchPayment(batchPaymentId))
+        when(accountingRewardStoragePort.findPayment(batchPaymentId))
                 .thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> rewardService.markBatchPaymentAsPaid(batchPaymentId, faker.random().hex()))
+        assertThatThrownBy(() -> rewardService.markPaymentAsPaid(batchPaymentId, faker.random().hex()))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Batch payment %s not found".formatted(batchPaymentId.value()));
     }
@@ -201,21 +205,21 @@ public class BatchPaymentServiceTest {
     @Test
     void should_raise_wrong_transaction_hash_exception() {
         // Given
-        final BatchPayment.Id batchPaymentId = BatchPayment.Id.random();
+        final Payment.Id batchPaymentId = Payment.Id.random();
         final String transactionHash = faker.rickAndMorty().character();
 
         // When
-        when(accountingRewardStoragePort.findBatchPayment(batchPaymentId))
-                .thenReturn(Optional.of(BatchPayment.builder()
+        when(accountingRewardStoragePort.findPayment(batchPaymentId))
+                .thenReturn(Optional.of(Payment.builder()
                         .csv("")
-                        .id(BatchPayment.Id.random())
+                        .id(Payment.Id.random())
                         .network(Network.STARKNET)
                         .rewards(List.of())
                         .invoices(List.of())
                         .build()));
         Exception exception = null;
         try {
-            rewardService.markBatchPaymentAsPaid(batchPaymentId, transactionHash);
+            rewardService.markPaymentAsPaid(batchPaymentId, transactionHash);
         } catch (Exception e) {
             exception = e;
         }
@@ -229,41 +233,26 @@ public class BatchPaymentServiceTest {
     @Test
     void should_update_batch_payment_and_linked_rewards_with_transaction_hash() {
         // Given
-        final BatchPayment.Id batchPaymentId = BatchPayment.Id.random();
+        final Payment.Id batchPaymentId = Payment.Id.random();
         final String transactionHash = "0x" + faker.random().hex();
-        final BatchPayment batchPayment = BatchPayment.builder()
+        final Payment payment = Payment.builder()
                 .id(batchPaymentId)
                 .network(Network.ETHEREUM)
                 .csv(faker.gameOfThrones().character())
                 .rewards(payableRewards.stream().filter(pr -> pr.currency().network().equals(Network.ETHEREUM)).toList())
                 .invoices(invoices)
                 .build();
-        final BatchPayment updatedBatchPayment = batchPayment.toBuilder()
-                .status(BatchPayment.Status.PAID)
+        final Payment updatedPayment = payment.toBuilder()
+                .status(Payment.Status.PAID)
                 .transactionHash(transactionHash)
                 .build();
 
-
         // When
-        when(accountingRewardStoragePort.findBatchPayment(batchPaymentId)).thenReturn(Optional.of(batchPayment));
-        rewardService.markBatchPaymentAsPaid(batchPaymentId, transactionHash);
+        when(accountingRewardStoragePort.findPayment(batchPaymentId)).thenReturn(Optional.of(payment));
+        rewardService.markPaymentAsPaid(batchPaymentId, transactionHash);
 
         // Then
-        verify(accountingRewardStoragePort).saveBatchPayment(updatedBatchPayment);
-        verify(accountingService).pay(payableRewards.get(0).id(),
-                payableRewards.get(0).currency().id(),
-                new SponsorAccount.PaymentReference(Network.ETHEREUM, transactionHash, invoices.get(0).billingProfileSnapshot().subject(), "vitalik.eth"));
-
-        verify(accountingService).pay(payableRewards.get(2).id(),
-                payableRewards.get(2).currency().id(),
-                new SponsorAccount.PaymentReference(Network.ETHEREUM, transactionHash, invoices.get(0).billingProfileSnapshot().subject(), "vitalik.eth"));
-
-        verify(accountingService).pay(payableRewards.get(4).id(),
-                payableRewards.get(4).currency().id(),
-                new SponsorAccount.PaymentReference(Network.ETHEREUM, transactionHash, invoices.get(0).billingProfileSnapshot().subject(), "vitalik.eth"));
-
-        verify(accountingService).pay(payableRewards.get(5).id(),
-                payableRewards.get(5).currency().id(),
-                new SponsorAccount.PaymentReference(Network.ETHEREUM, transactionHash, invoices.get(1).billingProfileSnapshot().subject(), "foo.eth"));
+        verify(accountingRewardStoragePort).savePayment(updatedPayment);
+        verify(accountingService).confirm(updatedPayment);
     }
 }
