@@ -47,7 +47,7 @@ public class RewardsExporter {
             for (final var reward : rewards) {
                 csvPrinter.printRecord(
                         reward.project().name(),
-                        //TODO add kyc/kyb name (company name or person name)
+                        //TODO X add kyc/kyb name (company name or person name)
                         isNull(reward.billingProfileAdmin()) ? null : reward.billingProfileAdmin().admins().stream()
                                 .map(a -> new InvoiceCreator(a.login(), a.email(), a.firstName() + " " + a.lastName())).toList(),
                         reward.money().amount(),

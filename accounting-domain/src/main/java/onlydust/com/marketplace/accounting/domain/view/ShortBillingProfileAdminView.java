@@ -8,7 +8,8 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.Verificat
 import java.util.List;
 
 @Builder
-public record ShortBillingProfileAdminView(@NonNull List<Admin> admins,
+public record ShortBillingProfileAdminView(//TODO X: List<Admin> admins => Admin invoiceCreator
+                                           @NonNull List<Admin> admins,
                                            @NonNull BillingProfile.Id billingProfileId,
                                            @NonNull BillingProfile.Type billingProfileType,
                                            String billingProfileName,

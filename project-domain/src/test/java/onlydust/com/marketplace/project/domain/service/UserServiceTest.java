@@ -147,7 +147,7 @@ public class UserServiceTest {
 //        assertEquals(true, userByGithubIdentity.getHasValidBillingProfile());
     }
 
-    //    @Test - TODO: restore ?
+    //    @Test - TODO: restore during alerting dev
     void should_update_user_with_has_valid_billing_profile_given_pending_payments() {
         final GithubUserIdentity githubUserIdentity =
                 GithubUserIdentity.builder()
@@ -398,7 +398,7 @@ public class UserServiceTest {
                 RewardDetailsView.builder().id(rewardId)
                         .billingProfileId(companyAdminBillingProfileIds.get(0))
                         .to(GithubUserIdentity.builder()
-                        .githubUserId(recipientId).build()).build();
+                                .githubUserId(recipientId).build()).build();
 
         // When
         when(userStoragePort.findRewardById(rewardId))
@@ -461,7 +461,6 @@ public class UserServiceTest {
         assertEquals(403, onlyDustException.getStatus());
         assertEquals("Only recipient user or billing profile admin linked to this reward can read its details", onlyDustException.getMessage());
     }
-
 
 
     @Test

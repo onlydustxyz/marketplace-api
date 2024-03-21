@@ -126,7 +126,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
 
     @Override
     public void onBillingProfileUpdated(BillingProfileVerificationUpdated billingProfileVerificationUpdated) {
-        // TODO ?
+        // TODO X: call refreshRewardsUsdEquivalentOf
     }
 
     @Override

@@ -213,7 +213,7 @@ public class Invoice {
             }
         }
 
-        // TODO, store the vatRegulationState
+        // TODO X: store the vatRegulationState
         public record KybSnapshot(@NonNull String registrationNumber,
                                   @NonNull String name,
                                   @NonNull String address,

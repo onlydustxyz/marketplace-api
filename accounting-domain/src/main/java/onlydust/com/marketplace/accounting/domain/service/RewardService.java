@@ -10,7 +10,10 @@ import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
@@ -20,6 +23,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badReq
 @AllArgsConstructor
 public class RewardService implements AccountingRewardPort {
 
+    // TODO X: remove
     private static final List<onlydust.com.marketplace.accounting.domain.model.Currency.Code> CURRENCY_CODES_AVAILABLE_FOR_BATCH_PAYMENT = List.of(
             onlydust.com.marketplace.accounting.domain.model.Currency.Code.STRK,
             onlydust.com.marketplace.accounting.domain.model.Currency.Code.USDC,
@@ -40,7 +44,7 @@ public class RewardService implements AccountingRewardPort {
                                                  List<RewardStatus> statuses,
                                                  Date fromRequestedAt, Date toRequestedAt,
                                                  Date fromProcessedAt, Date toProcessedAt) {
-        final Set<RewardStatus> sanitizedStatuses= isNull(statuses) ? Set.of() : statuses.stream().collect(Collectors.toUnmodifiableSet());
+        final Set<RewardStatus> sanitizedStatuses = isNull(statuses) ? Set.of() : statuses.stream().collect(Collectors.toUnmodifiableSet());
         return accountingRewardStoragePort.findRewards(pageIndex, pageSize, sanitizedStatuses, fromRequestedAt, toRequestedAt, fromProcessedAt, toProcessedAt);
     }
 
@@ -49,7 +53,7 @@ public class RewardService implements AccountingRewardPort {
         return accountingRewardStoragePort.searchRewards(List.of(Invoice.Status.APPROVED), invoiceIds)
                 .stream()
                 .filter(rewardView -> CURRENCY_CODES_AVAILABLE_FOR_BATCH_PAYMENT.contains(rewardView.money().currency().code()))
-                // TODO: the following filter won't work when reward has multiple receipts
+                // TODO X: use reward status instead of this filter (could be added to the SQL query)
                 .filter(rewardView -> isNull(rewardView.processedAt()) && rewardView.transactionReferences().isEmpty())
                 .toList();
     }

@@ -132,8 +132,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         final var contributorCount = customContributorRepository.getProjectContributorCount(projectView.getId(), null);
         final var leaders = projectLeadViewRepository.findProjectLeadersAndInvitedLeaders(projectView.getId());
         final var ecosystems = customProjectRepository.getProjectEcosystems(projectView.getId());
-        // TODO : migrate to multi-token
-        final Boolean hasRemainingBudget = customProjectRepository.hasRemainingBudget(projectView.getId());
+        final var hasRemainingBudget = customProjectRepository.hasRemainingBudget(projectView.getId());
         final var me = isNull(caller) ? null : new ProjectDetailsView.Me(
                 leaders.stream().anyMatch(l -> l.getGithubId().equals(caller.getGithubUserId()) && l.getHasAcceptedInvitation()),
                 leaders.stream().anyMatch(l -> l.getGithubId().equals(caller.getGithubUserId()) && !l.getHasAcceptedInvitation()),

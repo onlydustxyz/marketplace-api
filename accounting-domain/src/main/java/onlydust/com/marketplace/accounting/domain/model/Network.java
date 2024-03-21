@@ -46,7 +46,6 @@ public enum Network {
             case STARKNET -> StarkNet.transactionHash(transactionReference);
             case APTOS -> Aptos.transactionHash(transactionReference);
             case SEPA -> {
-                //TODO validate IBAN &co
             }
         }
     }

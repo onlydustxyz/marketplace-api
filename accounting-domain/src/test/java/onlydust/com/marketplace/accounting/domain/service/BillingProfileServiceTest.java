@@ -617,8 +617,6 @@ class BillingProfileServiceTest {
             // Then
             assertThat(limit).isEqualTo(PositiveAmount.of(5000L));
             assertThat(amount).isEqualTo(PositiveAmount.ZERO);
-
-            //TODO: pay some rewards linked to the billing profile, and check the currentYearPaymentAmount is updated
         }
     }
 

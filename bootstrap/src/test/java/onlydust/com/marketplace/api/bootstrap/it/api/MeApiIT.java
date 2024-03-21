@@ -454,7 +454,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.email").isEqualTo(newEmail);
     }
 
-    //    @Test - TODO: restore ?
+    //    @Test - TODO: restore during alerting development
     void should_return_has_valid_billing_profile() {
         // Given
         final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
