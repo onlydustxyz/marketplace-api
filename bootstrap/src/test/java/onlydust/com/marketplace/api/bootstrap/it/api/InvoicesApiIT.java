@@ -95,6 +95,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .address("My address")
                 .registrationNumber("123456")
                 .subjectToEuropeVAT(true)
+                .usEntity(false)
                 .status(VerificationStatus.VERIFIED)
                 .build());
 
@@ -172,7 +173,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                               "projectName": "kaaper",
                               "amount": {
                                 "amount": 1000,
-                                "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":null,"decimals":6},
+                                "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
                                 "target": {
                                   "amount": 1781980.00,
                                   "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2},
@@ -329,7 +330,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                               "projectName": "kaaper",
                               "amount": {
                                 "amount": 1000,
-                                "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":null,"decimals":6},
+                                "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
                                 "target": {
                                   "amount": 1010.00,
                                   "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2},
@@ -343,7 +344,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                               "projectName": "kaaper",
                               "amount": {
                                 "amount": 1000,
-                                "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":null,"decimals":6},
+                                "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
                                 "target": {
                                   "amount": 1010.00,
                                   "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2},

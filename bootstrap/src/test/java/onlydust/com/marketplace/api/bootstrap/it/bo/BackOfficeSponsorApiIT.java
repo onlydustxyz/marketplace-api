@@ -49,7 +49,8 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                 "code": "USDC",
                                 "name": "USD Coin",
-                                "logoUrl": null
+                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                "decimals": 6
                               },
                               "initialBalance": 19823190,
                               "currentBalance": 19822690,
@@ -64,7 +65,8 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                 "code": "USD",
                                 "name": "US Dollar",
-                                "logoUrl": null
+                                "logoUrl": null,
+                                "decimals": 2
                               },
                               "initialBalance": 4000,
                               "currentBalance": 0,
@@ -91,7 +93,8 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                     "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                     "code": "USD",
                                     "name": "US Dollar",
-                                    "logoUrl": null
+                                    "logoUrl": null,
+                                    "decimals": 2
                                   }
                                 },
                                 {
@@ -100,7 +103,8 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
                                     "name": "USD Coin",
-                                    "logoUrl": null
+                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                    "decimals": 6
                                   }
                                 }
                               ]
@@ -478,7 +482,8 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
                                 "code": "STRK",
                                 "name": "StarkNet Token",
-                                "logoUrl": null
+                                "logoUrl": null,
+                                "decimals": 18
                               },
                               "initialBalance": 0,
                               "currentBalance": 0,
@@ -500,7 +505,8 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                     "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
                                     "code": "STRK",
                                     "name": "StarkNet Token",
-                                    "logoUrl": null
+                                    "logoUrl": null,
+                                    "decimals": 18
                                   }
                                 }
                               ]

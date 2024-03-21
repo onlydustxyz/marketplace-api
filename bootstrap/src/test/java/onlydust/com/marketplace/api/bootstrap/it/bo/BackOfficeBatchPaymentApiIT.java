@@ -205,7 +205,8 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                     "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                     "code": "USD",
                                     "name": "US Dollar",
-                                    "logoUrl": null
+                                    "logoUrl": null,
+                                    "decimals": 2
                                   },
                                   "dollarsEquivalent": 1000
                                 }
@@ -222,7 +223,8 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
                                     "name": "USD Coin",
-                                    "logoUrl": null
+                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                    "decimals": 6
                                   },
                                   "dollarsEquivalent": 3030.00
                                 }
@@ -270,7 +272,8 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                 "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                 "code": "USDC",
                                 "name": "USD Coin",
-                                "logoUrl": null
+                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                "decimals": 6
                               },
                               "dollarsEquivalent": 3030.00
                             }
@@ -305,7 +308,8 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
                                   "name": "USD Coin",
-                                  "logoUrl": null
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 },
                                 "dollarsEquivalent": 2020.00,
                                 "conversionRate": 1.0100000000000000
@@ -425,7 +429,8 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
                                   "name": "USD Coin",
-                                  "logoUrl": null
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 },
                                 "dollarsEquivalent": 1010.00,
                                 "conversionRate": 1.0100000000000000
@@ -472,7 +477,8 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                     "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                     "code": "USD",
                                     "name": "US Dollar",
-                                    "logoUrl": null
+                                    "logoUrl": null,
+                                    "decimals": 2
                                   },
                                   "dollarsEquivalent": 1000
                                 }
@@ -490,7 +496,8 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
                                     "name": "USD Coin",
-                                    "logoUrl": null
+                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                    "decimals": 6
                                   },
                                   "dollarsEquivalent": 3030.00
                                 }
@@ -582,7 +589,8 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
                                     "name": "USD Coin",
-                                    "logoUrl": null
+                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                    "decimals": 6
                                   },
                                   "dollarsEquivalent": 3030.00
                                 }

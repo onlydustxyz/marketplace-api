@@ -175,7 +175,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                 "code": "USD",
                                 "name": "US Dollar",
-                                "logoUrl": null
+                                "logoUrl": null,
+                                "decimals": 2
                               },
                               "rewardIds": [
                                 "e9ebbe59-fb74-4a6c-9a51-6d9050412977",
@@ -191,7 +192,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                 "code": "USD",
                                 "name": "US Dollar",
-                                "logoUrl": null
+                                "logoUrl": null,
+                                "decimals": 2
                               },
                               "rewardIds": [
                                 "303f26b1-63f0-41f1-ab11-e70b54ef4a2a",
@@ -206,7 +208,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                 "code": "USD",
                                 "name": "US Dollar",
-                                "logoUrl": null
+                                "logoUrl": null,
+                                "decimals": 2
                               },
                               "rewardIds": [
                                 "6587511b-3791-47c6-8430-8f793606c63a"
@@ -250,6 +253,19 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 "name": "Apple Inc.",
                                 "type": "COMPANY",
                                 "verificationStatus": null,
+                                "kyb": {
+                                  "name": "Apple Inc.",
+                                  "registrationNumber": "123456789",
+                                  "registrationDate": null,
+                                  "address": "1 Infinite Loop, Cupertino, CA 95014, United States",
+                                  "country": "France",
+                                  "countryCode": "FRA",
+                                  "usEntity": false,
+                                  "subjectToEuropeVAT": true,
+                                  "euVATNumber": "FR12345678901",
+                                  "sumsubUrl": null
+                                },
+                                "kyc": null,
                                 "admins": null
                               },
                               "rewardCount": 3,
@@ -261,7 +277,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
                                     "name": "USD Coin",
-                                    "logoUrl": null
+                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                    "decimals": 6
                                   },
                                   "dollarsEquivalent": 1010.00
                                 },
@@ -271,7 +288,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
                                     "name": "USD Coin",
-                                    "logoUrl": null
+                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                    "decimals": 6
                                   },
                                   "dollarsEquivalent": 1010.00
                                 },
@@ -281,7 +299,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
                                     "name": "USD Coin",
-                                    "logoUrl": null
+                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                    "decimals": 6
                                   },
                                   "dollarsEquivalent": 1010.00
                                 }
@@ -293,6 +312,19 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 "name": "Apple Inc.",
                                 "type": "COMPANY",
                                 "verificationStatus": null,
+                                "kyb": {
+                                  "name": "Apple Inc.",
+                                  "registrationNumber": "123456789",
+                                  "registrationDate": null,
+                                  "address": "1 Infinite Loop, Cupertino, CA 95014, United States",
+                                  "country": "France",
+                                  "countryCode": "FRA",
+                                  "usEntity": false,
+                                  "subjectToEuropeVAT": true,
+                                  "euVATNumber": "FR12345678901",
+                                  "sumsubUrl": null
+                                },
+                                "kyc": null,
                                 "admins": null
                               },
                               "rewardCount": 2,
@@ -304,7 +336,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
                                     "name": "USD Coin",
-                                    "logoUrl": null
+                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                    "decimals": 6
                                   },
                                   "dollarsEquivalent": 1010.00
                                 },
@@ -314,7 +347,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
                                     "name": "USD Coin",
-                                    "logoUrl": null
+                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                    "decimals": 6
                                   },
                                   "dollarsEquivalent": 1010.00
                                 }
@@ -326,6 +360,19 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 "name": "Apple Inc.",
                                 "type": "COMPANY",
                                 "verificationStatus": null,
+                                "kyb": {
+                                  "name": "Apple Inc.",
+                                  "registrationNumber": "123456789",
+                                  "registrationDate": null,
+                                  "address": "1 Infinite Loop, Cupertino, CA 95014, United States",
+                                  "country": "France",
+                                  "countryCode": "FRA",
+                                  "usEntity": false,
+                                  "subjectToEuropeVAT": true,
+                                  "euVATNumber": "FR12345678901",
+                                  "sumsubUrl": null
+                                },
+                                "kyc": null,
                                 "admins": null
                               },
                               "rewardCount": 1,
@@ -337,7 +384,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
                                     "name": "USD Coin",
-                                    "logoUrl": null
+                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                    "decimals": 6
                                   },
                                   "dollarsEquivalent": 1010.00
                                 }
@@ -368,6 +416,19 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                             "name": "Apple Inc.",
                             "type": "COMPANY",
                             "verificationStatus": null,
+                            "kyb": {
+                              "name": "Apple Inc.",
+                              "registrationNumber": "123456789",
+                              "registrationDate": null,
+                              "address": "1 Infinite Loop, Cupertino, CA 95014, United States",
+                              "country": "France",
+                              "countryCode": "FRA",
+                              "usEntity": false,
+                              "subjectToEuropeVAT": true,
+                              "euVATNumber": "FR12345678901",
+                              "sumsubUrl": null
+                            },
+                            "kyc": null,
                             "admins": [
                               {
                                 "login": null,
@@ -384,7 +445,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                               "code": "USD",
                               "name": "US Dollar",
-                              "logoUrl": null
+                              "logoUrl": null,
+                              "decimals": 2
                             }
                           },
                           "rewardsPerNetwork": [
@@ -399,7 +461,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
                                     "name": "USD Coin",
-                                    "logoUrl": null
+                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                    "decimals": 6
                                   },
                                   "dollarsEquivalent": 1010.00
                                 }
@@ -512,7 +575,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                       "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                       "code": "USDC",
                                       "name": "USD Coin",
-                                      "logoUrl": null
+                                      "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                      "decimals": 6
                                     },
                                     "dollarsEquivalent": 1010.00,
                                     "conversionRate": 1.0100000000000000
