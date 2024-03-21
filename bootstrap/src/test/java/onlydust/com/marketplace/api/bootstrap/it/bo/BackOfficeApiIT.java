@@ -486,8 +486,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         """);
     }
 
-    //    @Test
-    // TODO restore ?
+    @Test
     void should_get_users() {
         // When
         client.get()
