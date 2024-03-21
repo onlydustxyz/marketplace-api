@@ -21,3 +21,5 @@ services:
 
 # To load the data dump, run the following command:
 # > docker exec -it marketplace_db_with_IT_dump "/scripts/restore_db.sh"
+# To dump the DB, run the following command:
+# > docker exec -it marketplace_db_with_IT_dump "/scripts/dump_db.sh"

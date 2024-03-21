@@ -45,6 +45,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     private final CurrencyStorage currencyStorage;
 
     @Override
+    @Transactional
     public void save(Reward reward) {
         final var currency = currencyStorage.get(Currency.Id.of(reward.currencyId().value()))
                 .orElseThrow(() -> OnlyDustException.internalServerError("Currency %s not found".formatted(reward.currencyId())));
@@ -52,11 +53,13 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     }
 
     @Override
+    @Transactional
     public void delete(UUID rewardId) {
         rewardRepository.deleteById(rewardId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Reward> get(UUID rewardId) {
         return rewardRepository.findById(rewardId).map(RewardEntity::toReward);
     }

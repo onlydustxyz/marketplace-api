@@ -42,7 +42,7 @@ public interface MyRewardMapper {
                 .rewardedOnProjectLogoUrl(view.getRewardedOnProjectLogoUrl())
                 .rewardedOnProjectName(view.getRewardedOnProjectName())
                 .amount(mapRewardAmountToResponse(view))
-                .status(RewardMapper.map(view.getStatus().getRewardStatusForUser(view.getId(), view.getStatus(),
+                .status(RewardMapper.map(view.getStatus().getRewardStatusForUser(view.getId(),
                         view.getRecipientId(), view.getBillingProfileId(), githubUserId,
                         billingProfiles.stream().map(BillingProfileLinkView::toUserBillingProfile).toList())))
                 .requestedAt(DateMapper.toZoneDateTime(view.getRequestedAt()))

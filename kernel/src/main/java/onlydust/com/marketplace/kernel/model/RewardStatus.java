@@ -76,25 +76,25 @@ public enum RewardStatus {
         };
     }
 
-    public RewardStatus getRewardStatusForUser(final UUID rewardId, final RewardStatus status, final Long rewardRecipientId, final UUID rewardBillingProfileId,
+    public RewardStatus getRewardStatusForUser(final UUID rewardId, final Long rewardRecipientId, final UUID rewardBillingProfileId,
                                                final Long userGithubUserId, final List<UserBillingProfile> billingProfiles) {
         if (isNull(rewardBillingProfileId) && rewardRecipientId.equals(userGithubUserId)) {
-            return status.asRecipient();
+            return this.asRecipient();
         }
         if (billingProfiles.stream()
                 .filter(bp -> bp.role() == UserBillingProfile.Role.ADMIN)
                 .map(UserBillingProfile::id)
                 .toList().contains(rewardBillingProfileId)) {
-            return status.asBillingProfileAdmin();
+            return this.asBillingProfileAdmin();
         }
         if (billingProfiles.stream()
                 .filter(bp -> bp.role() == UserBillingProfile.Role.MEMBER)
                 .map(UserBillingProfile::id)
                 .toList().contains(rewardBillingProfileId)) {
-            return status.asBillingProfileMember();
+            return this.asBillingProfileMember();
         }
         throw internalServerError("Cannot map reward %s to correct reward status %s because no condition was matched".formatted(rewardId,
-                status));
+                this));
     }
 
     @Builder
