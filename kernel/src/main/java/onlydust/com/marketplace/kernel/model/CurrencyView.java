@@ -1,9 +1,8 @@
-package onlydust.com.marketplace.project.domain.view;
+package onlydust.com.marketplace.kernel.model;
 
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
-import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.net.URI;
 import java.util.UUID;

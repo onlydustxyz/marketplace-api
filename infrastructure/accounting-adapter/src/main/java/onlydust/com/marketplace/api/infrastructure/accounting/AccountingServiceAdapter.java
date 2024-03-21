@@ -6,8 +6,8 @@ import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
+import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.project.domain.port.output.AccountingServicePort;
-import onlydust.com.marketplace.project.domain.view.CurrencyView;
 
 import java.math.BigDecimal;
 import java.util.UUID;

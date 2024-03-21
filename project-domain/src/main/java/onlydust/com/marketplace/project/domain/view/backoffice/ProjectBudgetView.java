@@ -2,7 +2,7 @@ package onlydust.com.marketplace.project.domain.view.backoffice;
 
 import lombok.Builder;
 import lombok.Data;
-import onlydust.com.marketplace.project.domain.view.CurrencyView;
+import onlydust.com.marketplace.kernel.model.CurrencyView;
 
 import java.math.BigDecimal;
 import java.util.UUID;

@@ -5,7 +5,7 @@ import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.project.domain.view.CurrencyView;
+import onlydust.com.marketplace.kernel.model.CurrencyView;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;

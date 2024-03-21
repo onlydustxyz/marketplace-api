@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.model.Contributor;
@@ -9,7 +10,6 @@ import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
-import onlydust.com.marketplace.project.domain.view.CurrencyView;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashSet;
