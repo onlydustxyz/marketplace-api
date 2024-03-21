@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.in.BatchPaymentPort;
+import onlydust.com.marketplace.accounting.domain.port.in.PaymentPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
@@ -23,7 +23,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badReq
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
-public class BatchPaymentService implements BatchPaymentPort {
+public class PaymentService implements PaymentPort {
     private final AccountingRewardStoragePort accountingRewardStoragePort;
     private final InvoiceStoragePort invoiceStoragePort;
     private final AccountingFacadePort accountingFacadePort;
@@ -38,38 +38,38 @@ public class BatchPaymentService implements BatchPaymentPort {
 
     @Override
     @Transactional
-    public void markBatchPaymentAsPaid(Payment.Id batchPaymentId, String transactionReference) {
-        final var batchPayment = accountingRewardStoragePort.findBatchPayment(batchPaymentId)
-                .orElseThrow(() -> notFound("Batch payment %s not found".formatted(batchPaymentId.value())));
+    public void markPaymentAsPaid(Payment.Id paymentId, String transactionReference) {
+        final var payment = accountingRewardStoragePort.findPayment(paymentId)
+                .orElseThrow(() -> notFound("Batch payment %s not found".formatted(paymentId.value())));
 
-        if (batchPayment.status() != Payment.Status.TO_PAY) {
-            throw badRequest("Batch payment %s is already paid".formatted(batchPaymentId.value()));
+        if (payment.status() != Payment.Status.TO_PAY) {
+            throw badRequest("Batch payment %s is already paid".formatted(paymentId.value()));
         }
 
-        batchPayment.network().validateTransactionReference(transactionReference);
+        payment.network().validateTransactionReference(transactionReference);
 
-        final Payment updatedPayment = batchPayment.toBuilder()
+        final Payment updatedPayment = payment.toBuilder()
                 .status(Payment.Status.PAID)
                 .transactionHash(transactionReference)
                 .build();
 
         accountingFacadePort.confirm(updatedPayment);
-        accountingRewardStoragePort.saveBatchPayment(updatedPayment);
+        accountingRewardStoragePort.savePayment(updatedPayment);
     }
 
     @Override
-    public Page<BatchPaymentDetailsView> findBatchPayments(int pageIndex, int pageSize, Set<Payment.Status> statuses) {
-        return accountingRewardStoragePort.findBatchPaymentDetails(pageIndex, pageSize, statuses);
+    public Page<BatchPaymentDetailsView> findPayments(int pageIndex, int pageSize, Set<Payment.Status> statuses) {
+        return accountingRewardStoragePort.findPaymentDetails(pageIndex, pageSize, statuses);
     }
 
     @Override
-    public BatchPaymentDetailsView findBatchPaymentById(Payment.Id batchPaymentId) {
-        return accountingRewardStoragePort.findBatchPaymentDetailsById(batchPaymentId)
-                .orElseThrow(() -> notFound("Batch payment details %s not found".formatted(batchPaymentId.value())));
+    public BatchPaymentDetailsView findPaymentById(Payment.Id paymentId) {
+        return accountingRewardStoragePort.findPaymentDetailsById(paymentId)
+                .orElseThrow(() -> notFound("Batch payment details %s not found".formatted(paymentId.value())));
     }
 
     @Override
-    public List<BatchPaymentDetailsView> createBatchPaymentsForInvoices(List<Invoice.Id> invoiceIds) {
+    public List<BatchPaymentDetailsView> createPaymentsForInvoices(List<Invoice.Id> invoiceIds) {
 
         final var invoices = invoiceStoragePort.getAll(invoiceIds);
         final var rewardInvoices = invoices.stream()

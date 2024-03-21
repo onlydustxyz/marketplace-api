@@ -8,8 +8,8 @@ import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
-import onlydust.com.marketplace.accounting.domain.port.in.BatchPaymentPort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.PaymentPort;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BatchPaymentMapper;
@@ -42,7 +42,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     private final CurrencyFacadePort currencyFacadePort;
     private final UserFacadePort userFacadePort;
     private final AccountingRewardPort accountingRewardPort;
-    private final BatchPaymentPort batchPaymentPort;
+    private final PaymentPort paymentPort;
 
     @Override
     public ResponseEntity<AccountResponse> createSponsorAccount(UUID sponsorUuid, CreateAccountRequest createAccountRequest) {
@@ -218,19 +218,19 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     @Override
     public ResponseEntity<BatchPaymentsResponse> createBatchPayments(PostBatchPaymentRequest postBatchPaymentRequest) {
         final var batchPayments =
-                batchPaymentPort.createBatchPaymentsForInvoices(postBatchPaymentRequest.getInvoiceIds().stream().map(Invoice.Id::of).toList());
+                paymentPort.createPaymentsForInvoices(postBatchPaymentRequest.getInvoiceIds().stream().map(Invoice.Id::of).toList());
         return ResponseEntity.ok(BatchPaymentMapper.domainToResponse(batchPayments));
     }
 
     @Override
     public ResponseEntity<Void> updateBatchPayment(UUID batchPaymentId, BatchPaymentRequest batchPaymentRequest) {
-        batchPaymentPort.markBatchPaymentAsPaid(Payment.Id.of(batchPaymentId), batchPaymentRequest.getTransactionHash());
+        paymentPort.markPaymentAsPaid(Payment.Id.of(batchPaymentId), batchPaymentRequest.getTransactionHash());
         return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<BatchPaymentDetailsResponse> getBatchPayment(UUID batchPaymentId) {
-        return ResponseEntity.ok(BatchPaymentMapper.domainToDetailedResponse(batchPaymentPort.findBatchPaymentById(Payment.Id.of(batchPaymentId))));
+        return ResponseEntity.ok(BatchPaymentMapper.domainToDetailedResponse(paymentPort.findPaymentById(Payment.Id.of(batchPaymentId))));
     }
 
     @Override
@@ -238,7 +238,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
         final int sanitizePageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
         final int sanitizedPageSize = PaginationHelper.sanitizePageSize(pageSize);
         final BatchPaymentPageResponse batchPaymentPageResponse = BatchPaymentMapper.pageToResponse(
-                batchPaymentPort.findBatchPayments(sanitizePageIndex, sanitizedPageSize, statuses == null ? null :
+                paymentPort.findPayments(sanitizePageIndex, sanitizedPageSize, statuses == null ? null :
                         statuses.stream().map(BatchPaymentMapper::map).collect(Collectors.toSet())),
                 pageIndex);
         return batchPaymentPageResponse.getTotalPageNumber() > 1 ?

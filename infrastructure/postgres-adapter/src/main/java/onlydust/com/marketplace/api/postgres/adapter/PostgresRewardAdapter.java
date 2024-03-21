@@ -93,19 +93,19 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Payment> findBatchPayment(Payment.Id batchPaymentId) {
+    public Optional<Payment> findPayment(Payment.Id batchPaymentId) {
         return batchPaymentRepository.findById(batchPaymentId.value()).map(BatchPaymentEntity::toDomain);
     }
 
     @Override
     @Transactional
-    public void saveBatchPayment(Payment payment) {
+    public void savePayment(Payment payment) {
         batchPaymentRepository.save(BatchPaymentEntity.fromDomain(payment));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<BatchPaymentDetailsView> findBatchPaymentDetails(int pageIndex, int pageSize, Set<Payment.Status> statuses) {
+    public Page<BatchPaymentDetailsView> findPaymentDetails(int pageIndex, int pageSize, Set<Payment.Status> statuses) {
         if (statuses == null || statuses.isEmpty()) {
             statuses = EnumSet.allOf(Payment.Status.class);
         }
@@ -120,7 +120,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<BatchPaymentDetailsView> findBatchPaymentDetailsById(Payment.Id batchPaymentId) {
+    public Optional<BatchPaymentDetailsView> findPaymentDetailsById(Payment.Id batchPaymentId) {
         return batchPaymentRepository.findById(batchPaymentId.value()).map(this::getBatchPaymentDetailsView);
     }
 

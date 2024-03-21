@@ -4,6 +4,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.*;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
+import onlydust.com.marketplace.accounting.domain.service.PaymentService;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
@@ -57,9 +58,9 @@ public class BackofficeConfiguration {
             final CurrencyFacadePort currencyFacadePort,
             final UserFacadePort userFacadePort,
             final AccountingRewardPort accountingRewardPort,
-            final BatchPaymentPort batchPaymentPort) {
+            final PaymentPort paymentPort) {
         return new BackofficeAccountingManagementRestApi(accountingFacadePort, rewardFacadePort, currencyFacadePort, userFacadePort, accountingRewardPort,
-                batchPaymentPort);
+                paymentPort);
     }
 
     @Bean
@@ -74,10 +75,10 @@ public class BackofficeConfiguration {
     }
 
     @Bean
-    public BatchPaymentPort batchPaymentPort(final AccountingRewardStoragePort accountingRewardStoragePort,
-                                             final InvoiceStoragePort invoiceStoragePort,
-                                             final AccountingFacadePort accountingFacadePort) {
-        return new onlydust.com.marketplace.accounting.domain.service.BatchPaymentService(accountingRewardStoragePort, invoiceStoragePort,
+    public PaymentPort batchPaymentPort(final AccountingRewardStoragePort accountingRewardStoragePort,
+                                        final InvoiceStoragePort invoiceStoragePort,
+                                        final AccountingFacadePort accountingFacadePort) {
+        return new PaymentService(accountingRewardStoragePort, invoiceStoragePort,
                 accountingFacadePort);
     }
 }

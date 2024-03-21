@@ -42,7 +42,7 @@ public class PaymentServiceTest {
     private final AccountingRewardStoragePort accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
     private final AccountingService accountingService = mock(AccountingService.class);
     private final InvoiceStoragePort invoiceStoragePort = mock(InvoiceStoragePort.class);
-    private final BatchPaymentService rewardService = new BatchPaymentService(accountingRewardStoragePort, invoiceStoragePort, accountingService);
+    private final PaymentService rewardService = new PaymentService(accountingRewardStoragePort, invoiceStoragePort, accountingService);
 
     List<Invoice.Id> invoiceIds;
     List<Invoice> invoices;
@@ -131,11 +131,11 @@ public class PaymentServiceTest {
         when(accountingService.getPayableRewards(rewardIdsSet)).thenReturn(List.of());
 
         // When
-        final var batches = rewardService.createBatchPaymentsForInvoices(invoiceIds);
+        final var batches = rewardService.createPaymentsForInvoices(invoiceIds);
 
         // Then
         assertThat(batches).isEmpty();
-        verify(accountingRewardStoragePort, never()).saveBatchPayment(any());
+        verify(accountingRewardStoragePort, never()).savePayment(any());
     }
 
     @Test
@@ -149,7 +149,7 @@ public class PaymentServiceTest {
         ));
 
         // When
-        final var batches = rewardService.createBatchPaymentsForInvoices(invoiceIds).stream().map(BatchPaymentDetailsView::payment).toList();
+        final var batches = rewardService.createPaymentsForInvoices(invoiceIds).stream().map(BatchPaymentDetailsView::payment).toList();
 
         // Then
         assertThat(batches).hasSize(3);
@@ -193,10 +193,10 @@ public class PaymentServiceTest {
         final Payment.Id batchPaymentId = Payment.Id.random();
 
         // When
-        when(accountingRewardStoragePort.findBatchPayment(batchPaymentId))
+        when(accountingRewardStoragePort.findPayment(batchPaymentId))
                 .thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> rewardService.markBatchPaymentAsPaid(batchPaymentId, faker.random().hex()))
+        assertThatThrownBy(() -> rewardService.markPaymentAsPaid(batchPaymentId, faker.random().hex()))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Batch payment %s not found".formatted(batchPaymentId.value()));
     }
@@ -209,7 +209,7 @@ public class PaymentServiceTest {
         final String transactionHash = faker.rickAndMorty().character();
 
         // When
-        when(accountingRewardStoragePort.findBatchPayment(batchPaymentId))
+        when(accountingRewardStoragePort.findPayment(batchPaymentId))
                 .thenReturn(Optional.of(Payment.builder()
                         .csv("")
                         .id(Payment.Id.random())
@@ -219,7 +219,7 @@ public class PaymentServiceTest {
                         .build()));
         Exception exception = null;
         try {
-            rewardService.markBatchPaymentAsPaid(batchPaymentId, transactionHash);
+            rewardService.markPaymentAsPaid(batchPaymentId, transactionHash);
         } catch (Exception e) {
             exception = e;
         }
@@ -248,11 +248,11 @@ public class PaymentServiceTest {
                 .build();
 
         // When
-        when(accountingRewardStoragePort.findBatchPayment(batchPaymentId)).thenReturn(Optional.of(payment));
-        rewardService.markBatchPaymentAsPaid(batchPaymentId, transactionHash);
+        when(accountingRewardStoragePort.findPayment(batchPaymentId)).thenReturn(Optional.of(payment));
+        rewardService.markPaymentAsPaid(batchPaymentId, transactionHash);
 
         // Then
-        verify(accountingRewardStoragePort).saveBatchPayment(updatedPayment);
+        verify(accountingRewardStoragePort).savePayment(updatedPayment);
         verify(accountingService).confirm(updatedPayment);
     }
 }
