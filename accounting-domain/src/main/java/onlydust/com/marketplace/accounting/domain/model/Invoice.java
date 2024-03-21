@@ -193,7 +193,7 @@ public class Invoice {
         public Optional<Wallet> wallet(Network network) {
             return switch (network) {
                 case ETHEREUM, OPTIMISM, STARKNET, APTOS -> wallets.stream().filter(w -> w.network() == network).findFirst();
-                case SEPA, SWIFT -> Optional.ofNullable(bankAccount).map(b -> new Wallet(network, b.accountNumber()));
+                case SEPA -> Optional.ofNullable(bankAccount).map(b -> new Wallet(network, b.accountNumber()));
             };
         }
 

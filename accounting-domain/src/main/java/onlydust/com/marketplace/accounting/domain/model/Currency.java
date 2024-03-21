@@ -106,7 +106,7 @@ public class Currency implements Cloneable {
 
     public List<Network> supportedNetworks() {
         return switch (type) {
-            case FIAT -> List.of(Network.SEPA, Network.SWIFT);
+            case FIAT -> List.of(Network.SEPA);
             case CRYPTO -> Stream.concat(
                             erc20.stream().map(ERC20::getBlockchain).map(Network::fromBlockchain),
                             Stream.ofNullable(nativeNetwork()))
