@@ -197,3 +197,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000117_add_us_entity_in_invoice_data.sql
   - include:
       file: db/changelog/changelogs/00000118_remove_swift_network.sql
+  - include:
+      file: db/changelog/changelogs/00000119_migrate_billing_profile_id_to_rewards.sql
