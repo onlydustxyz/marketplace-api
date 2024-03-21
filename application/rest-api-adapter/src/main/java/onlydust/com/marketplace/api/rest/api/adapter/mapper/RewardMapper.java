@@ -9,7 +9,7 @@ import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.view.*;
 
-import java.util.Objects;
+import java.util.List;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -39,7 +39,7 @@ public interface RewardMapper {
                 .build();
     }
 
-    static RewardDetailsResponse rewardDetailsToResponse(RewardDetailsView rewardDetailsView, boolean forUser) {
+    static RewardDetailsResponse projectRewardDetailsToResponse(RewardDetailsView rewardDetailsView) {
         final var response = new RewardDetailsResponse()
                 .from(new ContributorResponse()
                         .githubUserId(rewardDetailsView.getFrom().getGithubUserId())
@@ -61,20 +61,46 @@ public interface RewardMapper {
                 .id(rewardDetailsView.getId())
                 .receipt(receiptToResponse(rewardDetailsView.getReceipt()))
                 .project(ProjectMapper.mapShortProjectResponse(rewardDetailsView.getProject()));
-
-        if (forUser) {
-            response.status(map(rewardDetailsView.getStatus().asUser()));
-        } else {
-            response.status(map(rewardDetailsView.getStatus().asProjectLead()));
-        }
-
+        response.status(map(rewardDetailsView.getStatus().asProjectLead()));
         return response;
     }
 
-    static RewardStatusContract map(RewardStatus.AsUser status) {
+    static RewardDetailsResponse myRewardDetailsToResponse(RewardDetailsView rewardDetailsView, Long githubUserId,
+                                                           List<BillingProfileLinkView> billingProfiles) {
+        final var response = new RewardDetailsResponse()
+                .from(new ContributorResponse()
+                        .githubUserId(rewardDetailsView.getFrom().getGithubUserId())
+                        .avatarUrl(rewardDetailsView.getFrom().getGithubAvatarUrl())
+                        .login(rewardDetailsView.getFrom().getGithubLogin())
+                )
+                .to(
+                        new ContributorResponse()
+                                .githubUserId(rewardDetailsView.getTo().getGithubUserId())
+                                .avatarUrl(rewardDetailsView.getTo().getGithubAvatarUrl())
+                                .login(rewardDetailsView.getTo().getGithubLogin())
+                )
+                .createdAt(DateMapper.toZoneDateTime(rewardDetailsView.getCreatedAt()))
+                .processedAt(DateMapper.toZoneDateTime(rewardDetailsView.getProcessedAt()))
+                .amount(rewardDetailsView.getAmount())
+                .currency(mapCurrency(rewardDetailsView.getCurrency()))
+                .unlockDate(DateMapper.toZoneDateTime(rewardDetailsView.getUnlockDate()))
+                .dollarsEquivalent(rewardDetailsView.getDollarsEquivalent())
+                .id(rewardDetailsView.getId())
+                .receipt(receiptToResponse(rewardDetailsView.getReceipt()))
+                .project(ProjectMapper.mapShortProjectResponse(rewardDetailsView.getProject()));
+        response.status(map(rewardDetailsView.getStatus().getRewardStatusForUser(rewardDetailsView.getId(), rewardDetailsView.getStatus(),
+                rewardDetailsView.getTo().getGithubUserId(), rewardDetailsView.getBillingProfileId(), githubUserId,
+                billingProfiles.stream().map(BillingProfileLinkView::toUserBillingProfile).toList())));
+        return response;
+    }
+
+
+    static RewardStatusContract map(RewardStatus status) {
         return switch (status) {
             case PENDING_SIGNUP -> RewardStatusContract.PENDING_SIGNUP;
+            case PENDING_CONTRIBUTOR -> RewardStatusContract.PENDING_CONTRIBUTOR;
             case PENDING_BILLING_PROFILE -> RewardStatusContract.PENDING_BILLING_PROFILE;
+            case PENDING_COMPANY -> RewardStatusContract.PENDING_COMPANY;
             case PENDING_VERIFICATION -> RewardStatusContract.PENDING_VERIFICATION;
             case PAYMENT_BLOCKED -> RewardStatusContract.PAYMENT_BLOCKED;
             case PAYOUT_INFO_MISSING -> RewardStatusContract.PAYOUT_INFO_MISSING;
@@ -85,16 +111,8 @@ public interface RewardMapper {
         };
     }
 
-    static RewardStatusContract map(RewardStatus.AsProjectLead status) {
-        return switch (status) {
-            case PENDING_SIGNUP -> RewardStatusContract.PENDING_SIGNUP;
-            case PENDING_CONTRIBUTOR -> RewardStatusContract.PENDING_CONTRIBUTOR;
-            case PROCESSING -> RewardStatusContract.PROCESSING;
-            case COMPLETE -> RewardStatusContract.COMPLETE;
-        };
-    }
-
-    static RewardResponse rewardToResponse(ContributionRewardView rewardView, boolean forUser) {
+    static RewardResponse rewardToResponse(ContributionRewardView rewardView, Long githubUserId,
+                                           List<BillingProfileLinkView> billingProfiles) {
         final var response = new RewardResponse()
                 .from(new ContributorResponse()
                         .githubUserId(rewardView.getFrom().getGithubUserId())
@@ -113,14 +131,9 @@ public interface RewardMapper {
                 .currency(mapCurrency(rewardView.getCurrency()))
                 .dollarsEquivalent(rewardView.getDollarsEquivalent())
                 .id(rewardView.getId());
-
-
-        if (forUser) {
-            response.status(map(rewardView.getStatus().asUser()));
-        } else {
-            response.status(map(rewardView.getStatus().asProjectLead()));
-        }
-
+        response.status(map(rewardView.getStatus().getRewardStatusForUser(rewardView.getId(), rewardView.getStatus(),
+                rewardView.getTo().getGithubUserId(), rewardView.getBillingProfileId(), githubUserId,
+                billingProfiles.stream().map(BillingProfileLinkView::toUserBillingProfile).toList())));
         return response;
     }
 
@@ -183,7 +196,7 @@ public interface RewardMapper {
     }
 
     static Reward.SortBy getSortBy(String sort) {
-        sort = Objects.isNull(sort) ? "" : sort;
+        sort = isNull(sort) ? "" : sort;
         return switch (sort) {
             case "STATUS" -> Reward.SortBy.STATUS;
             case "AMOUNT" -> Reward.SortBy.AMOUNT;

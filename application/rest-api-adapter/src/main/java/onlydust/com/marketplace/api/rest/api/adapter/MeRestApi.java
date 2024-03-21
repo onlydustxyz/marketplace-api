@@ -117,6 +117,7 @@ public class MeRestApi implements MeApi {
         final var filters = UserRewardView.Filters.builder()
                 .currencies(Optional.ofNullable(currencies).orElse(List.of()))
                 .projectIds(Optional.ofNullable(projects).orElse(List.of()))
+                .administratedBillingProfilesIds(authenticatedUser.getAdministratedBillingProfile().stream().map(BillingProfileLinkView::id).toList())
                 .from(isNull(fromDate) ? null : DateMapper.parse(fromDate))
                 .to(isNull(toDate) ? null : DateMapper.parse(toDate))
                 .build();
@@ -124,7 +125,8 @@ public class MeRestApi implements MeApi {
         final var page = userFacadePort.getRewardsForUserId(authenticatedUser.getGithubUserId(), filters, sanitizedPageIndex,
                 sanitizedPageSize, sortBy, SortDirectionMapper.requestToDomain(direction));
 
-        final var myRewardsPageResponse = mapMyRewardsToResponse(sanitizedPageIndex, page);
+        final var myRewardsPageResponse = mapMyRewardsToResponse(sanitizedPageIndex, page, authenticatedUser.getGithubUserId(),
+                authenticatedUser.getBillingProfiles());
 
         return myRewardsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(myRewardsPageResponse) :
@@ -221,9 +223,10 @@ public class MeRestApi implements MeApi {
     @Override
     public ResponseEntity<RewardDetailsResponse> getMyReward(UUID rewardId) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final RewardDetailsView rewardDetailsView = userFacadePort.getRewardByIdForRecipientId(rewardId,
-                authenticatedUser.getGithubUserId());
-        return ResponseEntity.ok(RewardMapper.rewardDetailsToResponse(rewardDetailsView, true));
+        final RewardDetailsView rewardDetailsView = userFacadePort.getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId,
+                authenticatedUser.getGithubUserId(), authenticatedUser.getAdministratedBillingProfile().stream().map(BillingProfileLinkView::id).toList());
+        return ResponseEntity.ok(RewardMapper.myRewardDetailsToResponse(rewardDetailsView, authenticatedUser.getGithubUserId(),
+                authenticatedUser.getBillingProfiles()));
     }
 
     @Override
@@ -232,20 +235,13 @@ public class MeRestApi implements MeApi {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final Page<RewardItemView> page = userFacadePort.getRewardItemsPageByIdForRecipientId(rewardId,
-                authenticatedUser.getGithubUserId(), sanitizedPageIndex, sanitizedPageSize);
+        final Page<RewardItemView> page = userFacadePort.getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId,
+                authenticatedUser.getGithubUserId(), sanitizedPageIndex, sanitizedPageSize,
+                authenticatedUser.getAdministratedBillingProfile().stream().map(BillingProfileLinkView::id).toList());
         final RewardItemsPageResponse rewardItemsPageResponse = RewardMapper.pageToResponse(sanitizedPageIndex, page);
         return rewardItemsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardItemsPageResponse) :
                 ResponseEntity.ok(rewardItemsPageResponse);
-    }
-
-    @Override
-    public ResponseEntity<MyRewardsListResponse> getMyRewardsPendingInvoice() {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final List<UserRewardView> rewardViews =
-                userFacadePort.getPendingInvoiceRewardsForRecipientId(authenticatedUser.getGithubUserId());
-        return ResponseEntity.ok(MyRewardMapper.listToResponse(rewardViews));
     }
 
     @Override

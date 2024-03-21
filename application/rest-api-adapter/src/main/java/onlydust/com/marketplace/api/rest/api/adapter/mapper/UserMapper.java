@@ -223,7 +223,6 @@ public interface UserMapper {
         getMeResponse.setLogin(authenticatedUser.getGithubLogin());
         getMeResponse.setHasSeenOnboardingWizard(authenticatedUser.hasSeenOnboardingWizard());
         getMeResponse.setHasAcceptedLatestTermsAndConditions(authenticatedUser.hasAcceptedLatestTermsAndConditions());
-        getMeResponse.setHasValidPayoutInfos(authenticatedUser.getHasValidPayoutInfos());
         getMeResponse.setProjectsLed(authenticatedUser.getProjectsLed()
                 .stream().map(projectLedView -> new ProjectLedShortResponse()
                         .id(projectLedView.getId())
@@ -244,11 +243,32 @@ public interface UserMapper {
                 .toList());
         getMeResponse.setProjectsAppliedTo(authenticatedUser.getProjectsAppliedTo());
         getMeResponse.setIsAdmin(authenticatedUser.hasRole(UserRole.ADMIN));
-        getMeResponse.setCreatedAt(DateMapper.toZoneDateTime(authenticatedUser.getCreatedAt()));
+        getMeResponse.setCreatedAt(toZoneDateTime(authenticatedUser.getCreatedAt()));
         getMeResponse.setEmail(authenticatedUser.getGithubEmail());
         getMeResponse.setFirstName(authenticatedUser.getFirstName());
         getMeResponse.setLastName(authenticatedUser.getLastName());
-        getMeResponse.setHasValidBillingProfile(authenticatedUser.getHasValidBillingProfile());
+        getMeResponse.setBillingProfiles(authenticatedUser.getBillingProfiles().stream().map(bp -> new BillingProfileLinkResponse()
+                .id(bp.id())
+                .role(switch (bp.role()) {
+                    case ADMIN -> BillingProfileCoworkerRole.ADMIN;
+                    case MEMBER -> BillingProfileCoworkerRole.MEMBER;
+                })
+                .hasValidPayoutMethods(bp.hasValidPayoutMethods())
+                .hasValidVerificationValid(bp.hasValidVerificationStatus())
+                .verificationStatus(switch (bp.verificationStatus()) {
+                    case VERIFIED -> VerificationStatus.VERIFIED;
+                    case UNDER_REVIEW -> VerificationStatus.UNDER_REVIEW;
+                    case STARTED -> VerificationStatus.STARTED;
+                    case NOT_STARTED -> VerificationStatus.NOT_STARTED;
+                    case REJECTED -> VerificationStatus.REJECTED;
+                    case CLOSED -> VerificationStatus.CLOSED;
+                })
+                .type(switch (bp.type()) {
+                    case SELF_EMPLOYED -> BillingProfileType.SELF_EMPLOYED;
+                    case COMPANY -> BillingProfileType.COMPANY;
+                    case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
+                })).toList()
+        );
         return getMeResponse;
     }
 

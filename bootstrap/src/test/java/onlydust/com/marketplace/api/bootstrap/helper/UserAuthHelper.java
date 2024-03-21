@@ -24,6 +24,11 @@ public class UserAuthHelper {
     @NonNull
     public AuthenticatedUser newFakeUser(UUID userId, long githubUserId, String login, String avatarUrl,
                                          boolean isAdmin) {
+        return authenticateUser(signUpUser(userId, githubUserId, login, avatarUrl, isAdmin));
+    }
+
+    public UserEntity signUpUser(UUID userId, long githubUserId, String login, String avatarUrl,
+                                 boolean isAdmin) {
         final UserEntity user = UserEntity.builder()
                 .id(userId)
                 .githubUserId(githubUserId)
@@ -37,8 +42,7 @@ public class UserAuthHelper {
         userRepository.save(user);
 
         mockAuth0UserInfo(user);
-
-        return authenticateUser(user);
+        return user;
     }
 
     public void mockAuth0UserInfo(UserEntity user) {

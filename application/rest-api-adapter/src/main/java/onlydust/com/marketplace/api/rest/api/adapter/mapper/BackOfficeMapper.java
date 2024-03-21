@@ -707,23 +707,25 @@ public interface BackOfficeMapper {
     }
 
     static RewardStatus map(RewardStatusContract rewardStatus) {
-        return new RewardStatus(switch (rewardStatus) {
-            case PENDING_SIGNUP -> RewardStatus.AsUser.PENDING_SIGNUP;
-            case PENDING_BILLING_PROFILE -> RewardStatus.AsUser.PENDING_BILLING_PROFILE;
-            case PENDING_VERIFICATION -> RewardStatus.AsUser.PENDING_VERIFICATION;
-            case PAYMENT_BLOCKED -> RewardStatus.AsUser.PAYMENT_BLOCKED;
-            case PAYOUT_INFO_MISSING -> RewardStatus.AsUser.PAYOUT_INFO_MISSING;
-            case LOCKED -> RewardStatus.AsUser.LOCKED;
-            case PENDING_REQUEST -> RewardStatus.AsUser.PENDING_REQUEST;
-            case PROCESSING -> RewardStatus.AsUser.PROCESSING;
-            case COMPLETE -> RewardStatus.AsUser.COMPLETE;
-        });
+        return switch (rewardStatus) {
+            case PENDING_SIGNUP -> RewardStatus.PENDING_SIGNUP;
+            case PENDING_BILLING_PROFILE -> RewardStatus.PENDING_BILLING_PROFILE;
+            case PENDING_VERIFICATION -> RewardStatus.PENDING_VERIFICATION;
+            case PAYMENT_BLOCKED -> RewardStatus.PAYMENT_BLOCKED;
+            case PAYOUT_INFO_MISSING -> RewardStatus.PAYOUT_INFO_MISSING;
+            case LOCKED -> RewardStatus.LOCKED;
+            case PENDING_REQUEST -> RewardStatus.PENDING_REQUEST;
+            case PROCESSING -> RewardStatus.PROCESSING;
+            case COMPLETE -> RewardStatus.COMPLETE;
+        };
     }
 
-    static RewardStatusContract map(RewardStatus.AsUser rewardStatus) {
-        return switch (rewardStatus) {
+    static RewardStatusContract map(RewardStatus rewardStatus) {
+        return switch (rewardStatus.asBackofficeUser()) {
             case PENDING_SIGNUP -> RewardStatusContract.PENDING_SIGNUP;
+            case PENDING_CONTRIBUTOR -> null;
             case PENDING_BILLING_PROFILE -> RewardStatusContract.PENDING_BILLING_PROFILE;
+            case PENDING_COMPANY -> null;
             case PENDING_VERIFICATION -> RewardStatusContract.PENDING_VERIFICATION;
             case PAYMENT_BLOCKED -> RewardStatusContract.PAYMENT_BLOCKED;
             case PAYOUT_INFO_MISSING -> RewardStatusContract.PAYOUT_INFO_MISSING;

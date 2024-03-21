@@ -24,6 +24,7 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                    r.amount                     AS amount,
                    r.currency_id                AS currency_id,
                    r.invoice_id                 AS invoice_id,
+                   r.billing_profile_id         AS billing_profile_id,
                    count(*)                     AS contribution_count,
                    github_recipient.id          AS recipient_id,
                    github_recipient.login       AS recipient_login,
@@ -40,7 +41,17 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                  JOIN indexer_exp.github_accounts github_requestor ON github_requestor.id = requestor.github_user_id
             WHERE (coalesce(:rewardIds) IS NULL OR r.id IN (:rewardIds))
               AND (coalesce(:statuses) IS NULL OR CAST(rs.status AS TEXT) IN (:statuses))
-              AND (coalesce(:contributorIds) IS NULL OR r.recipient_id IN (:contributorIds))
+              AND (
+                    (:administratedBillingProfilesIds IS NULL AND (coalesce(:contributorIds) IS NULL OR r.recipient_id IN (:contributorIds)))
+                    OR
+                    (:administratedBillingProfilesIds IS NOT NULL AND
+                        (
+                            (r.billing_profile_id IN (:administratedBillingProfilesIds) AND r.recipient_id NOT IN (:contributorIds))
+                            OR
+                            r.recipient_id IN (:contributorIds)
+                        )
+                    )
+                  )
               AND (coalesce(:currencyIds) IS NULL OR r.currency_id IN (:currencyIds))
               AND (coalesce(:projectIds) IS NULL OR r.project_id IN (:projectIds))
               and (:fromDate IS NULL OR r.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD'))
@@ -51,6 +62,7 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                 r.project_id, 
                 r.amount, 
                 r.currency_id, 
+                r.billing_profile_id,
                 rsd.amount_usd_equivalent,
                 github_recipient.id,
                 github_recipient.login,
@@ -64,6 +76,7 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                                 List<UUID> currencyIds,
                                 List<UUID> projectIds,
                                 List<String> statuses,
+                                List<UUID> administratedBillingProfilesIds,
                                 String fromDate,
                                 String toDate,
                                 Pageable pageable);
@@ -85,6 +98,7 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                 List.of(),
                 List.of(),
                 List.of(),
+                List.of(),
                 null,
                 null,
                 Pageable.unpaged())
@@ -98,6 +112,7 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                 List.of(),
                 List.of(),
                 List.of(RewardStatusEntity.Status.PENDING_REQUEST.name()),
+                List.of(),
                 null,
                 null,
                 Pageable.unpaged())
@@ -113,19 +128,21 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                 currencies,
                 List.of(projectId),
                 List.of(),
+                List.of(),
                 fromDate,
                 toDate,
                 pageRequest);
     }
 
-    default Page<RewardViewEntity> findUserRewards(Long githubUserId, List<UUID> currencies, List<UUID> projectIds, String fromDate, String toDate,
-                                                   PageRequest pageRequest) {
+    default Page<RewardViewEntity> findUserRewards(Long githubUserId, List<UUID> currencies, List<UUID> projectIds, List<UUID> getAdministratedBillingProfilesIds,
+                                                   String fromDate, String toDate, PageRequest pageRequest) {
         return find(
                 List.of(),
                 List.of(githubUserId),
                 currencies,
                 projectIds,
                 List.of(),
+                getAdministratedBillingProfilesIds,
                 fromDate,
                 toDate,
                 pageRequest);

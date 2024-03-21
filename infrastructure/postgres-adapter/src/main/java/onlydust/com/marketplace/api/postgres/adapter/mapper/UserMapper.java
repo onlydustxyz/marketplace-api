@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.view.BillingProfileLinkView;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.ProjectLeaderLinkView;
 import onlydust.com.marketplace.project.domain.view.ProjectLedView;
@@ -51,7 +52,8 @@ public interface UserMapper {
 
     static User mapUserToDomain(UserViewEntity user, Date termsAndConditionsLatestVersionDate,
                                 List<ProjectLedIdViewEntity> projectLedIdViewEntities,
-                                List<ApplicationEntity> applications) {
+                                List<ApplicationEntity> applications,
+                                List<BillingProfileLinkView> billingProfiles) {
         return User.builder()
                 .id(user.getId())
                 .githubUserId(user.getGithubUserId())
@@ -87,6 +89,7 @@ public interface UserMapper {
                                 .build()).toList())
                 .projectsAppliedTo(applications.stream().map(ApplicationEntity::getProjectId).toList())
                 .createdAt(user.getCreatedAt())
+                .billingProfiles(billingProfiles)
                 .build();
     }
 

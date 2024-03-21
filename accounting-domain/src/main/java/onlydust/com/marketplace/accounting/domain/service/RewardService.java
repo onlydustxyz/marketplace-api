@@ -40,12 +40,7 @@ public class RewardService implements AccountingRewardPort {
                                                  List<RewardStatus> statuses,
                                                  Date fromRequestedAt, Date toRequestedAt,
                                                  Date fromProcessedAt, Date toProcessedAt) {
-        Set<RewardStatus> sanitizedStatuses;
-        if (statuses == null || statuses.isEmpty()) {
-            sanitizedStatuses = EnumSet.allOf(RewardStatus.AsUser.class).stream().map(RewardStatus::new).collect(Collectors.toUnmodifiableSet());
-        } else {
-            sanitizedStatuses = statuses.stream().collect(Collectors.toUnmodifiableSet());
-        }
+        final Set<RewardStatus> sanitizedStatuses= isNull(statuses) ? Set.of() : statuses.stream().collect(Collectors.toUnmodifiableSet());
         return accountingRewardStoragePort.findRewards(pageIndex, pageSize, sanitizedStatuses, fromRequestedAt, toRequestedAt, fromProcessedAt, toProcessedAt);
     }
 

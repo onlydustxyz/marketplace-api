@@ -31,6 +31,7 @@ public interface RewardMapper {
                 .authorLogin(rewardItemViewEntity.getAuthorLogin())
                 .status(githubStatusToDomain(rewardItemViewEntity.getStatus()))
                 .githubBody(rewardItemViewEntity.getGithubBody())
+                .billingProfileId(rewardItemViewEntity.getBillingProfileId())
                 .build();
     }
 

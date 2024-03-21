@@ -300,28 +300,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/me/rewards/pending-invoice:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Me
-      summary: Get caller's rewards pending invoice
-      operationId: getMyRewardsPendingInvoice
-      description: |
-        Get the page of all rewards pending invoice where the recipient is the caller
-      responses:
-        "200":
-          description: 'Page of rewards'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MyRewardsListResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
   /api/v1/me/contributions:
     get:
       security:
@@ -4107,6 +4085,7 @@ components:
         - PENDING_SIGNUP
         - PENDING_CONTRIBUTOR
         - PENDING_BILLING_PROFILE
+        - PENDING_COMPANY
         - PENDING_VERIFICATION
         - PAYMENT_BLOCKED
         - PAYOUT_INFO_MISSING
@@ -4617,12 +4596,6 @@ components:
             hasAcceptedLatestTermsAndConditions:
               type: boolean
               description: True if the user has accepted the latest version of terms and conditions
-            hasValidPayoutInfos:
-              type: boolean
-              description: False if the user has invalid payout information
-            hasValidBillingProfile:
-              type: boolean
-              description: False if at least one billing profiles is not valid
             projectsLed:
               type: array
               items:
@@ -4645,8 +4618,10 @@ components:
               type: string
               format: email
               description: User email
-            billingProfileType:
-              $ref: '#/components/schemas/BillingProfileType'
+            billingProfiles:
+              type: array
+              items:
+                $ref: '#/components/schemas/BillingProfileLinkResponse'
             firstName:
               type: string
             lastName:
@@ -4694,6 +4669,8 @@ components:
         - name
         - type
         - invoiceMandateAccepted
+        - hasValidPayoutMethods
+        - hasValidVerificationValid
         - enabled
         - role
       properties:
@@ -4714,6 +4691,37 @@ components:
           type: boolean
         role:
           $ref: '#/components/schemas/BillingProfileCoworkerRole'
+        hasValidPayoutMethods:
+          description: Always true when no pending rewards
+          type: boolean
+        hasValidVerificationValid:
+          description: Always true when no pending rewards
+          type: boolean
+    BillingProfileLinkResponse:
+      type: object
+      required:
+        - id
+        - type
+        - hasValidPayoutMethods
+        - hasValidVerificationValid
+        - verificationStatus
+        - role
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/BillingProfileType'
+        role:
+          $ref: '#/components/schemas/BillingProfileCoworkerRole'
+        verificationStatus:
+          $ref: '#/components/schemas/VerificationStatus'
+        hasValidPayoutMethods:
+          description: Always true when no pending rewards
+          type: boolean
+        hasValidVerificationValid:
+          description: Always true when no pending rewards
+          type: boolean
     ProjectLedShortResponse:
       type: object
       required:

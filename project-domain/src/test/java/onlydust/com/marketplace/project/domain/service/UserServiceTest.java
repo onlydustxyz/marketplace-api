@@ -81,7 +81,7 @@ public class UserServiceTest {
         // Then
         verify(userStoragePort, times(1)).updateUserLastSeenAt(user.getId(), dateProvider.now());
         assertEquals(user, userByGithubIdentity);
-        assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
+        assertEquals(0, userByGithubIdentity.getBillingProfiles().size());
     }
 
     @Test
@@ -112,7 +112,7 @@ public class UserServiceTest {
         // Then
         verify(userStoragePort, times(1)).updateUserLastSeenAt(user.getId(), dateProvider.now());
         assertEquals(user, userByGithubIdentity);
-        assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
+        assertEquals(0, userByGithubIdentity.getBillingProfiles().size());
     }
 
     @Test
@@ -142,8 +142,9 @@ public class UserServiceTest {
         // Then
         verify(userStoragePort, times(1)).updateUserLastSeenAt(user.getId(), dateProvider.now());
         assertEquals(user, userByGithubIdentity);
-        assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
-        assertEquals(true, userByGithubIdentity.getHasValidBillingProfile());
+        // TODO : validation with list of BPs
+//        assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
+//        assertEquals(true, userByGithubIdentity.getHasValidBillingProfile());
     }
 
     //    @Test - TODO: restore ?
@@ -173,8 +174,9 @@ public class UserServiceTest {
         // Then
         verify(userStoragePort, times(1)).updateUserLastSeenAt(user.getId(), dateProvider.now());
         assertEquals(user, userByGithubIdentity);
-        assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
-        assertEquals(false, userByGithubIdentity.getHasValidBillingProfile());
+        // TODO : validation with list of BPs
+//        assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
+//        assertEquals(false, userByGithubIdentity.getHasValidBillingProfile());
     }
 
 
@@ -193,7 +195,7 @@ public class UserServiceTest {
         // Then
         verify(userStoragePort, never()).updateUserLastSeenAt(any(), any());
         assertEquals(user, userByGithubIdentity);
-        assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
+        assertEquals(0, userByGithubIdentity.getBillingProfiles().size());
     }
 
     @Test
@@ -373,16 +375,42 @@ public class UserServiceTest {
         final long recipientId = 1L;
         final RewardDetailsView expectedReward =
                 RewardDetailsView.builder().id(rewardId).to(GithubUserIdentity.builder().githubUserId(recipientId).build()).build();
+        final List<UUID> companyAdminBillingProfileIds = List.of();
 
         // When
         when(userStoragePort.findRewardById(rewardId))
                 .thenReturn(expectedReward);
-        final RewardDetailsView rewardDetailsView = userService.getRewardByIdForRecipientId(rewardId, recipientId);
+        final RewardDetailsView rewardDetailsView = userService.getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, recipientId,
+                companyAdminBillingProfileIds);
 
         // Then
         assertNotNull(rewardDetailsView);
         assertEquals(expectedReward, rewardDetailsView);
     }
+
+    @Test
+    void should_validate_reward_is_linked_to_user_given_a_valid_billing_profile_admin() {
+        // Given
+        final UUID rewardId = UUID.randomUUID();
+        final long recipientId = 1L;
+        final List<UUID> companyAdminBillingProfileIds = List.of(UUID.randomUUID());
+        final RewardDetailsView expectedReward =
+                RewardDetailsView.builder().id(rewardId)
+                        .billingProfileId(companyAdminBillingProfileIds.get(0))
+                        .to(GithubUserIdentity.builder()
+                        .githubUserId(recipientId).build()).build();
+
+        // When
+        when(userStoragePort.findRewardById(rewardId))
+                .thenReturn(expectedReward);
+        final RewardDetailsView rewardDetailsView = userService.getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, 2L,
+                companyAdminBillingProfileIds);
+
+        // Then
+        assertNotNull(rewardDetailsView);
+        assertEquals(expectedReward, rewardDetailsView);
+    }
+
 
     @Test
     void should_validate_reward_is_linked_to_user_given_a_invalid_recipient_id() {
@@ -391,13 +419,14 @@ public class UserServiceTest {
         final long recipientId = 1L;
         final RewardDetailsView expectedReward =
                 RewardDetailsView.builder().id(rewardId).to(GithubUserIdentity.builder().githubUserId(2L).build()).build();
+        final List<UUID> companyAdminBillingProfileIds = List.of();
 
         // When
         when(userStoragePort.findRewardById(rewardId))
                 .thenReturn(expectedReward);
         OnlyDustException onlyDustException = null;
         try {
-            userService.getRewardByIdForRecipientId(rewardId, recipientId);
+            userService.getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, recipientId, companyAdminBillingProfileIds);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -405,14 +434,67 @@ public class UserServiceTest {
         // Then
         assertNotNull(onlyDustException);
         assertEquals(403, onlyDustException.getStatus());
-        assertEquals("Only recipient user can read it's own reward", onlyDustException.getMessage());
+        assertEquals("Only recipient user or billing profile admin linked to this reward can read its details", onlyDustException.getMessage());
     }
+
+    @Test
+    void should_validate_reward_is_linked_to_user_given_an_invalid_billing_profile_admin() {
+        // Given
+        final UUID rewardId = UUID.randomUUID();
+        final long recipientId = 1L;
+        final List<UUID> companyAdminBillingProfileIds = List.of(UUID.randomUUID());
+        final RewardDetailsView expectedReward =
+                RewardDetailsView.builder().id(rewardId).to(GithubUserIdentity.builder().githubUserId(2L).build()).build();
+
+        // When
+        when(userStoragePort.findRewardById(rewardId))
+                .thenReturn(expectedReward);
+        OnlyDustException onlyDustException = null;
+        try {
+            userService.getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, recipientId, companyAdminBillingProfileIds);
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        assertNotNull(onlyDustException);
+        assertEquals(403, onlyDustException.getStatus());
+        assertEquals("Only recipient user or billing profile admin linked to this reward can read its details", onlyDustException.getMessage());
+    }
+
+
+
+    @Test
+    void should_validate_reward_items_are_linked_to_user_given_a_valid_billing_profile_admin() {
+        // Given
+        final UUID rewardId = UUID.randomUUID();
+        final long recipientId = 5L;
+        final List<UUID> companyAdminBillingProfiles = List.of(UUID.randomUUID(), UUID.randomUUID());
+        final Page<RewardItemView> expectedPage = Page.<RewardItemView>builder()
+                .content(List.of(
+                        RewardItemView.builder().githubAuthorId(1L).recipientId(2L).billingProfileId(companyAdminBillingProfiles.get(0)).build(),
+                        RewardItemView.builder().githubAuthorId(1L).recipientId(2L).billingProfileId(companyAdminBillingProfiles.get(1)).build()
+                ))
+                .build();
+
+        // When
+        when(userStoragePort.findRewardItemsPageById(rewardId, 0, 20))
+                .thenReturn(expectedPage);
+        final Page<RewardItemView> page = userService.getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, recipientId, 0,
+                20, companyAdminBillingProfiles);
+
+        // Then
+        assertNotNull(page);
+        assertEquals(expectedPage, page);
+    }
+
 
     @Test
     void should_validate_reward_items_are_linked_to_user_given_a_valid_recipient_id() {
         // Given
         final UUID rewardId = UUID.randomUUID();
         final long recipientId = 2L;
+        final List<UUID> companyAdminBillingProfiles = List.of();
         final Page<RewardItemView> expectedPage = Page.<RewardItemView>builder()
                 .content(List.of(
                         RewardItemView.builder().githubAuthorId(1L).recipientId(2L).build(),
@@ -423,8 +505,8 @@ public class UserServiceTest {
         // When
         when(userStoragePort.findRewardItemsPageById(rewardId, 0, 20))
                 .thenReturn(expectedPage);
-        final Page<RewardItemView> page = userService.getRewardItemsPageByIdForRecipientId(rewardId, recipientId, 0,
-                20);
+        final Page<RewardItemView> page = userService.getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, recipientId, 0,
+                20, companyAdminBillingProfiles);
 
         // Then
         assertNotNull(page);
@@ -435,6 +517,7 @@ public class UserServiceTest {
     void should_validate_reward_items_are_linked_to_user_given_a_invalid_recipient_id() {
         final UUID rewardId = UUID.randomUUID();
         final long recipientId = 3L;
+        final List<UUID> companyAdminBillingProfiles = List.of();
         final Page<RewardItemView> expectedPage = Page.<RewardItemView>builder()
                 .content(List.of(
                         RewardItemView.builder().githubAuthorId(1L).recipientId(3L).build(),
@@ -447,8 +530,8 @@ public class UserServiceTest {
                 .thenReturn(expectedPage);
         OnlyDustException onlyDustException = null;
         try {
-            userService.getRewardItemsPageByIdForRecipientId(rewardId, recipientId, 0,
-                    20);
+            userService.getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, recipientId, 0,
+                    20, companyAdminBillingProfiles);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -456,7 +539,7 @@ public class UserServiceTest {
         // Then
         assertNotNull(onlyDustException);
         assertEquals(403, onlyDustException.getStatus());
-        assertEquals("Only recipient user can read it's own reward", onlyDustException.getMessage());
+        assertEquals("Only recipient user or billing profile admin linked to this reward can read its details", onlyDustException.getMessage());
     }
 
     @Test

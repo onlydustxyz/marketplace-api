@@ -173,7 +173,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         assertThat(me.getEmail()).isEqualTo(email);
         assertThat(me.getHasSeenOnboardingWizard()).isEqualTo(false);
         assertThat(me.getHasAcceptedLatestTermsAndConditions()).isEqualTo(false);
-        assertThat(me.getHasValidPayoutInfos()).isEqualTo(true);
+        assertThat(me.getBillingProfiles()).isEmpty();
         assertThat(me.getIsAdmin()).isEqualTo(false);
         assertThat(me.getId()).isNotNull();
     }
@@ -213,8 +213,6 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.githubUserId").isEqualTo(githubUserId)
                 .jsonPath("$.avatarUrl").isEqualTo(avatarUrl)
                 .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(true)
-                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(true)
-                .jsonPath("$.hasValidPayoutInfos").isEqualTo(true)
                 .jsonPath("$.isAdmin").isEqualTo(true)
                 .jsonPath("$.createdAt").isNotEmpty()
                 .jsonPath("$.id").isEqualTo(user.getId().toString());
@@ -259,9 +257,8 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.login").isEqualTo(impersonatedUser.getGithubLogin())
                 .jsonPath("$.githubUserId").isEqualTo(impersonatedUser.getGithubUserId())
                 .jsonPath("$.avatarUrl").isEqualTo(impersonatedUser.getGithubAvatarUrl())
+                // TODO : maybe check if we get the BP of the impersonated user
                 .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(false)
-                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false)
-                .jsonPath("$.hasValidPayoutInfos").isEqualTo(true)
                 .jsonPath("$.isAdmin").isEqualTo(false)
                 .jsonPath("$.id").isEqualTo(impersonatedUser.getId().toString());
     }

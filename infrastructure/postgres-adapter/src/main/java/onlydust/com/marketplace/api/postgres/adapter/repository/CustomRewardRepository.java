@@ -84,7 +84,8 @@ public class CustomRewardRepository {
                              from indexer_exp.github_pull_request_commit_counts gprcc
                              where gprcc.pull_request_id = pull_request.id and gprcc.author_id = r.recipient_id) user_commits_count,
                             issue.comments_count,
-                            r.recipient_id
+                            r.recipient_id,
+                            r.billing_profile_id
             from rewards r
                      join reward_items ri on ri.reward_id = r.id
                      left join get_issue issue on issue.id = (case when ri.id ~ '^[0-9]+$' then cast(ri.id as bigint) else -1 end)

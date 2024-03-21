@@ -35,6 +35,7 @@ public class RewardViewEntity {
     Integer contributionCount;
     Long recipientId;
     UUID invoiceId;
+    UUID billingProfileId;
     String recipientLogin;
     String recipientAvatarUrl;
     Long requestorId;
@@ -77,6 +78,7 @@ public class RewardViewEntity {
                         .build())
                 .project(project.toDomain())
                 .receipt(receipts.stream().findFirst().map(ReceiptEntity::toDomain).orElse(null))
+                .billingProfileId(this.billingProfileId)
                 .build();
     }
 
@@ -96,6 +98,10 @@ public class RewardViewEntity {
                         .dollarsEquivalent(statusData.amountUsdEquivalent())
                         .build())
                 .numberOfRewardedContributions(contributionCount)
+                .recipientAvatarUrl(recipientAvatarUrl)
+                .recipientId(recipientId)
+                .recipientLogin(recipientLogin)
+                .billingProfileId(billingProfileId)
                 .build();
     }
 
@@ -105,8 +111,8 @@ public class RewardViewEntity {
                 .numberOfRewardedContributions(contributionCount)
                 .requestedAt(requestedAt)
                 .processedAt(statusData.paidAt())
-                .rewardedUserLogin(requestorLogin)
-                .rewardedUserAvatar(requestorAvatarUrl)
+                .rewardedUserLogin(recipientLogin)
+                .rewardedUserAvatar(recipientAvatarUrl)
                 .status(status.toDomain())
                 .unlockDate(statusData.unlockDate())
                 .amount(ProjectRewardView.Amount.builder()

@@ -21,4 +21,5 @@ public class ContributionRewardView {
     GithubUserIdentity to;
     Date createdAt;
     Date processedAt;
+    UUID billingProfileId;
 }

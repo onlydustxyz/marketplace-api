@@ -51,6 +51,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final RewardStatsRepository rewardStatsRepository;
     private final RewardViewRepository rewardViewRepository;
     private final CurrencyRepository currencyRepository;
+    private final BillingProfileLinkViewRepository billingProfileLinkViewRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -61,8 +62,9 @@ public class PostgresUserAdapter implements UserStoragePort {
                     .sorted(Comparator.comparing(ProjectLedIdViewEntity::getProjectSlug))
                     .toList();
             final var applications = applicationRepository.findAllByApplicantId(u.getId());
+            final var billingProfiles = billingProfileLinkViewRepository.findByUserId(u.getId()).stream().map(BillingProfileLinkViewEntity::toDomain).toList();
             return mapUserToDomain(u, globalSettingsRepository.get().getTermsAndConditionsLatestVersionDate(),
-                    projectLedIdsByUserId, applications);
+                    projectLedIdsByUserId, applications, billingProfiles);
         });
     }
 
@@ -75,8 +77,9 @@ public class PostgresUserAdapter implements UserStoragePort {
                     .sorted(Comparator.comparing(ProjectLedIdViewEntity::getProjectSlug))
                     .toList();
             final var applications = applicationRepository.findAllByApplicantId(u.getId());
+            final var billingProfiles = billingProfileLinkViewRepository.findByUserId(u.getId()).stream().map(BillingProfileLinkViewEntity::toDomain).toList();
             return mapUserToDomain(u, globalSettingsRepository.get().getTermsAndConditionsLatestVersionDate(),
-                    projectLedIdsByUserId, applications);
+                    projectLedIdsByUserId, applications, billingProfiles);
         });
     }
 
@@ -232,10 +235,11 @@ public class PostgresUserAdapter implements UserStoragePort {
         final var pageRequest = PageRequest.of(pageIndex, pageSize,
                 RewardViewRepository.sortBy(sort, sortDirection == SortDirection.asc ? Direction.ASC : Direction.DESC));
 
-        final var page = rewardViewRepository.findUserRewards(githubUserId, filters.getCurrencies(), filters.getProjectIds(), fromDate, toDate, pageRequest);
+        final var page = rewardViewRepository.findUserRewards(githubUserId, filters.getCurrencies(), filters.getProjectIds(),
+                filters.getAdministratedBillingProfilesIds(), fromDate, toDate, pageRequest);
 
         final var rewardsStats = rewardStatsRepository.findByUser(githubUserId, filters.getCurrencies(), filters.getProjectIds(),
-                fromDate, toDate);
+                filters.getAdministratedBillingProfilesIds(), fromDate, toDate);
 
         return UserRewardsPageView.builder()
                 .rewards(Page.<UserRewardView>builder()

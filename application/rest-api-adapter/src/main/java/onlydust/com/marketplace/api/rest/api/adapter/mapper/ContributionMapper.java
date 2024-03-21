@@ -7,9 +7,9 @@ import onlydust.com.marketplace.project.domain.model.ContributionStatus;
 import onlydust.com.marketplace.project.domain.model.ContributionType;
 import onlydust.com.marketplace.project.domain.view.*;
 
+import java.util.List;
 import java.util.Optional;
 
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.rewardToResponse;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 
 public interface ContributionMapper {
@@ -120,7 +120,8 @@ public interface ContributionMapper {
         };
     }
 
-    static ContributionDetailsResponse mapContributionDetails(ContributionDetailsView contribution, boolean forUser) {
+    static ContributionDetailsResponse mapContributionDetails(ContributionDetailsView contribution, Long githubUserId,
+                                                              List<BillingProfileLinkView> billingProfiles) {
         return new ContributionDetailsResponse()
                 .id(contribution.getId())
                 .contributor(ContributorMapper.of(contribution.getContributor()))
@@ -141,7 +142,8 @@ public interface ContributionMapper {
                 .commitsCount(contribution.getGithubCommitsCount())
                 .userCommitsCount(contribution.getGithubUserCommitsCount())
                 .links(contribution.getLinks().stream().map(ContributionMapper::mapContributionLink).toList())
-                .rewards(contribution.getRewards().stream().map(r -> rewardToResponse(r, forUser)).toList());
+                .rewards(contribution.getRewards().stream().map((ContributionRewardView rewardView) -> RewardMapper.rewardToResponse(rewardView, githubUserId
+                        , billingProfiles)).toList());
     }
 
     static ProjectChurnedContributorsPageItemResponseAllOfLastContribution mapChurnedContribution(ChurnedContributorView.Contribution lastContribution) {

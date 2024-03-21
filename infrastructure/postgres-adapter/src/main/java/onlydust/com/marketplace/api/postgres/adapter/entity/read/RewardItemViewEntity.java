@@ -7,6 +7,7 @@ import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -57,6 +58,7 @@ public class RewardItemViewEntity {
     Long recipientId;
     @Column(name = "github_body")
     String githubBody;
+    UUID billingProfileId;
 
     public enum ContributionType {
         ISSUE, PULL_REQUEST, CODE_REVIEW

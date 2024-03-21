@@ -40,10 +40,10 @@ public interface UserFacadePort {
                                             int pageIndex, int sanitizedPageSize,
                                             Reward.SortBy sortBy, SortDirection sortDirection);
 
-    RewardDetailsView getRewardByIdForRecipientId(UUID rewardId, Long recipientId);
+    RewardDetailsView getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(UUID rewardId, Long recipientId, List<UUID> companyAdminBillingProfileIds);
 
-    Page<RewardItemView> getRewardItemsPageByIdForRecipientId(UUID rewardId, Long recipientId, int pageIndex,
-                                                              int pageSize);
+    Page<RewardItemView> getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(UUID rewardId, Long recipientId, int pageIndex,
+                                                                                               int pageSize, List<UUID> companyAdminBillingProfileIds);
 
     List<UserRewardView> getPendingInvoiceRewardsForRecipientId(Long githubUserId);
 

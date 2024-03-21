@@ -38,6 +38,8 @@ public class ContributionRewardViewEntity {
     String recipientAvatarUrl;
     Long recipientId;
 
+    UUID billingProfileId;
+
     public ContributionRewardView toView() {
         final var requestor = GithubUserIdentity.builder()
                 .githubLogin(requestorLogin)
@@ -60,6 +62,7 @@ public class ContributionRewardViewEntity {
                 .to(recipient)
                 .createdAt(requestedAt)
                 .processedAt(statusData.paidAt())
+                .billingProfileId(billingProfileId)
                 .build();
     }
 }

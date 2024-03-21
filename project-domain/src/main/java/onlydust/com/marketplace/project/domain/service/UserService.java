@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
+
 @AllArgsConstructor
 @Slf4j
 public class UserService implements UserFacadePort {
@@ -155,20 +157,23 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
-    public RewardDetailsView getRewardByIdForRecipientId(UUID rewardId, Long recipientId) {
+    public RewardDetailsView getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(UUID rewardId, Long recipientId,
+                                                                                          List<UUID> companyAdminBillingProfileIds) {
         final RewardDetailsView reward = userStoragePort.findRewardById(rewardId);
-        if (!reward.getTo().getGithubUserId().equals(recipientId)) {
-            throw OnlyDustException.forbidden("Only recipient user can read it's own reward");
+        if (!reward.getTo().getGithubUserId().equals(recipientId) &&
+            (isNull(reward.getBillingProfileId()) || !companyAdminBillingProfileIds.contains(reward.getBillingProfileId()))) {
+            throw OnlyDustException.forbidden("Only recipient user or billing profile admin linked to this reward can read its details");
         }
         return reward;
     }
 
-    @Override
-    public Page<RewardItemView> getRewardItemsPageByIdForRecipientId(UUID rewardId, Long recipientId, int pageIndex,
-                                                                     int pageSize) {
+    public Page<RewardItemView> getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(UUID rewardId, Long recipientId, int pageIndex,
+                                                                                                      int pageSize, List<UUID> companyAdminBillingProfileIds) {
         final Page<RewardItemView> page = userStoragePort.findRewardItemsPageById(rewardId, pageIndex, pageSize);
-        if (page.getContent().stream().anyMatch(rewardItemView -> !rewardItemView.getRecipientId().equals(recipientId))) {
-            throw OnlyDustException.forbidden("Only recipient user can read it's own reward");
+        if (page.getContent().stream().anyMatch(rewardItemView -> !rewardItemView.getRecipientId().equals(recipientId)) &&
+            page.getContent().stream().anyMatch(rewardItemView -> isNull(rewardItemView.getBillingProfileId())
+                                                                  || !companyAdminBillingProfileIds.contains(rewardItemView.getBillingProfileId()))) {
+            throw OnlyDustException.forbidden("Only recipient user or billing profile admin linked to this reward can read its details");
         }
         return page;
     }
