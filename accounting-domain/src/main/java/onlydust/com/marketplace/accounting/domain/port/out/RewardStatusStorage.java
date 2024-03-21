@@ -26,4 +26,6 @@ public interface RewardStatusStorage {
     void enableBillingProfile(BillingProfile.Id billingProfileId);
 
     void disabledBillingProfile(BillingProfile.Id billingProfileId);
+
+    void updateBillingProfileFromRecipientPayoutPreferences(RewardId rewardId);
 }

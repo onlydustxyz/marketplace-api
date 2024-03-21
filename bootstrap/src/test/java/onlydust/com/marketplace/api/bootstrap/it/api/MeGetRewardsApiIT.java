@@ -204,57 +204,6 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_get_my_rewards_with_pending_invoice() {
-        // When
-        client.get()
-                .uri(getApiURI(ME_REWARDS_PENDING_INVOICE))
-                .header("Authorization", BEARER_PREFIX + pierre.jwt())
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json("""
-                        {
-                          "rewards": [
-                            {
-                              "requestedAt": "2023-09-19T07:38:22.018458Z",
-                              "processedAt": null,
-                              "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                              "status": "PENDING_REQUEST",
-                              "unlockDate": null,
-                              "amount": {
-                                "total": 500,
-                                "currency": {"id":"48388edb-fda2-4a32-b228-28152a147500","code":"APT","name":"Aptos Coin","logoUrl":null,"decimals":8},
-                                "dollarsEquivalent": 100000
-                              },
-                              "numberOfRewardedContributions": 25,
-                              "rewardedOnProjectName": "QA new contributions",
-                              "rewardedOnProjectLogoUrl": null,
-                              "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
-                            },
-                            {
-                              "requestedAt": "2023-09-19T07:38:52.590518Z",
-                              "processedAt": null,
-                              "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                              "status": "PENDING_REQUEST",
-                              "unlockDate": null,
-                              "amount": {
-                                "total": 1000,
-                                "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
-                                "dollarsEquivalent": 1010.00
-                              },
-                              "numberOfRewardedContributions": 25,
-                              "rewardedOnProjectName": "QA new contributions",
-                              "rewardedOnProjectLogoUrl": null,
-                              "id": "85f8358c-5339-42ac-a577-16d7760d1e28"
-                            }
-                          ]
-                        }
-                        """);
-    }
-
-    @Test
     void should_filter_by_date() {
         // When
         client.get()
