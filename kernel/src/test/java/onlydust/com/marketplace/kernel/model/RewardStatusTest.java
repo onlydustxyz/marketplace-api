@@ -2,9 +2,11 @@ package onlydust.com.marketplace.kernel.model;
 
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 import static onlydust.com.marketplace.kernel.model.RewardStatus.*;
@@ -90,5 +92,88 @@ class RewardStatusTest {
 
     }
 
+
+    @Nested
+    class ShouldGetRewardStatusForUser {
+
+
+        @Test
+        void given_a_recipient() {
+            // Given
+            final UUID rewardId = UUID.randomUUID();
+            final long rewardRecipientId = 1L;
+            final UUID rewardBillingProfileId = null;
+            final long userGithubUserId = 1L;
+            final List<UserBillingProfile> billingProfiles = List.of();
+
+            // When
+            final RewardStatus rewardStatusForUser = PENDING_BILLING_PROFILE.getRewardStatusForUser(rewardId, rewardRecipientId, rewardBillingProfileId,
+                    userGithubUserId, billingProfiles);
+
+            // Then
+            assertEquals(PENDING_BILLING_PROFILE, rewardStatusForUser);
+        }
+
+        @Test
+        void given_a_billing_profile_member() {
+            // Given
+            final UUID rewardId = UUID.randomUUID();
+            final long rewardRecipientId = 1L;
+            final UUID rewardBillingProfileId = UUID.randomUUID();
+            final long userGithubUserId = 1L;
+            final List<UserBillingProfile> billingProfiles = List.of(UserBillingProfile.builder()
+                    .role(UserBillingProfile.Role.MEMBER)
+                    .id(rewardBillingProfileId)
+                    .build());
+
+            // When
+            final RewardStatus rewardStatusForUser = PAYOUT_INFO_MISSING.getRewardStatusForUser(rewardId, rewardRecipientId, rewardBillingProfileId,
+                    userGithubUserId, billingProfiles);
+
+            // Then
+            assertEquals(PENDING_COMPANY, rewardStatusForUser);
+        }
+
+        @Test
+        void given_a_billing_profile_admin() {
+            // Given
+            final UUID rewardId = UUID.randomUUID();
+            final long rewardRecipientId = 1L;
+            final UUID rewardBillingProfileId = UUID.randomUUID();
+            final long userGithubUserId = 2L;
+            final List<UserBillingProfile> billingProfiles = List.of(UserBillingProfile.builder()
+                    .role(UserBillingProfile.Role.ADMIN)
+                    .id(rewardBillingProfileId)
+                    .build());
+
+            // When
+            final RewardStatus rewardStatusForUser = PAYOUT_INFO_MISSING.getRewardStatusForUser(rewardId, rewardRecipientId, rewardBillingProfileId,
+                    userGithubUserId, billingProfiles);
+
+            // Then
+            assertEquals(PAYOUT_INFO_MISSING, rewardStatusForUser);
+        }
+
+        @Test
+        void given_an_invalid_user() {
+            // Given
+            final UUID rewardId = UUID.randomUUID();
+            final long rewardRecipientId = 1L;
+            final UUID rewardBillingProfileId = UUID.randomUUID();
+            final long userGithubUserId = 2L;
+            final List<UserBillingProfile> billingProfiles = List.of(UserBillingProfile.builder()
+                    .role(UserBillingProfile.Role.ADMIN)
+                    .id(UUID.randomUUID())
+                    .build());
+
+            // When
+            Assertions.assertThatThrownBy(() -> PAYOUT_INFO_MISSING.getRewardStatusForUser(rewardId, rewardRecipientId, rewardBillingProfileId,
+                            userGithubUserId, billingProfiles))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Cannot map reward %s to correct reward status %s because no condition was matched".formatted(rewardId,
+                            PAYOUT_INFO_MISSING.name()));
+        }
+    }
 
 }

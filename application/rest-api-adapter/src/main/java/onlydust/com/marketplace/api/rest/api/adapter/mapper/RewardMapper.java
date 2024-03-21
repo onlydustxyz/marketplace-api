@@ -88,7 +88,7 @@ public interface RewardMapper {
                 .id(rewardDetailsView.getId())
                 .receipt(receiptToResponse(rewardDetailsView.getReceipt()))
                 .project(ProjectMapper.mapShortProjectResponse(rewardDetailsView.getProject()));
-        response.status(map(rewardDetailsView.getStatus().getRewardStatusForUser(rewardDetailsView.getId(), rewardDetailsView.getStatus(),
+        response.status(map(rewardDetailsView.getStatus().getRewardStatusForUser(rewardDetailsView.getId(),
                 rewardDetailsView.getTo().getGithubUserId(), rewardDetailsView.getBillingProfileId(), githubUserId,
                 billingProfiles.stream().map(BillingProfileLinkView::toUserBillingProfile).toList())));
         return response;
@@ -131,7 +131,7 @@ public interface RewardMapper {
                 .currency(mapCurrency(rewardView.getCurrency()))
                 .dollarsEquivalent(rewardView.getDollarsEquivalent())
                 .id(rewardView.getId());
-        response.status(map(rewardView.getStatus().getRewardStatusForUser(rewardView.getId(), rewardView.getStatus(),
+        response.status(map(rewardView.getStatus().getRewardStatusForUser(rewardView.getId(),
                 rewardView.getTo().getGithubUserId(), rewardView.getBillingProfileId(), githubUserId,
                 billingProfiles.stream().map(BillingProfileLinkView::toUserBillingProfile).toList())));
         return response;
