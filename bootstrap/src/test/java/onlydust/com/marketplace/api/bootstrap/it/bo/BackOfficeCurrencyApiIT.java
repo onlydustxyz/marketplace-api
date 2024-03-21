@@ -322,7 +322,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                               "tokens": [],
                               "decimals": 3,
                               "description": "Euro is the official currency of the European Union",
-                              "supportedOn": ["SEPA", "SWIFT"]
+                              "supportedOn": ["SEPA"]
                             },
                             {
                               "code": "USDC",

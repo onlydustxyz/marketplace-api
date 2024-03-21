@@ -52,7 +52,7 @@ class CurrencyTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = Network.class, names = {"SEPA", "SWIFT"})
+    @EnumSource(value = Network.class, names = {"SEPA"})
     void should_return_payable_currency_for_fiat(Network network) {
         // Given
         final var euro = Currency.fiat("Euro", Currency.Code.of("EUR"), 2);
@@ -71,7 +71,7 @@ class CurrencyTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = Network.class, names = {"SEPA", "SWIFT"}, mode = EnumSource.Mode.EXCLUDE)
+    @EnumSource(value = Network.class, names = {"SEPA"}, mode = EnumSource.Mode.EXCLUDE)
     void should_throw_when_network_is_not_supported_for_fiat(Network network) {
         // Given
         final var euro = Currency.fiat("Euro", Currency.Code.of("EUR"), 2);
@@ -158,7 +158,7 @@ class CurrencyTest {
         final var networks = euro.supportedNetworks();
 
         // Then
-        assertThat(networks).containsExactlyInAnyOrder(Network.SEPA, Network.SWIFT);
+        assertThat(networks).containsExactlyInAnyOrder(Network.SEPA);
     }
 
     @Test

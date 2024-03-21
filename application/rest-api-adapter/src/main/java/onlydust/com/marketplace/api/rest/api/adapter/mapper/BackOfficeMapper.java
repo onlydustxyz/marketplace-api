@@ -673,7 +673,6 @@ public interface BackOfficeMapper {
             case STARKNET -> Network.STARKNET;
             case APTOS -> Network.APTOS;
             case SEPA -> Network.SEPA;
-            case SWIFT -> Network.SWIFT;
         };
     }
 
@@ -684,7 +683,6 @@ public interface BackOfficeMapper {
             case STARKNET -> TransactionNetwork.STARKNET;
             case APTOS -> TransactionNetwork.APTOS;
             case SEPA -> TransactionNetwork.SEPA;
-            case SWIFT -> TransactionNetwork.SWIFT;
         };
     }
 

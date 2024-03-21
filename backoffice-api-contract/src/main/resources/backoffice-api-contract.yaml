@@ -2026,7 +2026,6 @@ components:
     TransactionNetwork:
       type: string
       enum:
-        - SWIFT
         - SEPA
         - ETHEREUM
         - OPTIMISM
