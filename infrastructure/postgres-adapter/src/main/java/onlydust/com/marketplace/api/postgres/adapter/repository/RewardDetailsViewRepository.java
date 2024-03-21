@@ -102,7 +102,7 @@ public interface RewardDetailsViewRepository extends JpaRepository<BackofficeRew
                         
                      
                        
-            where cast(rs.status as text) in (:statuses)
+            where (coalesce(:statuses) is null or cast(rs.status as text) in (:statuses))
                 and (coalesce(:fromRequestedAt) is null or r.requested_at >= cast(cast(:fromRequestedAt as text) as timestamp))
                 and (coalesce(:toRequestedAt)   is null or r.requested_at <= cast(cast(:toRequestedAt   as text) as timestamp))
                 and (coalesce(:fromProcessedAt) is null or rsd.paid_at  >= cast(cast(:fromProcessedAt as text) as timestamp))

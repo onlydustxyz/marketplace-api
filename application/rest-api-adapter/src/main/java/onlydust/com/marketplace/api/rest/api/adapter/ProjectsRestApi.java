@@ -213,7 +213,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final RewardDetailsView rewardDetailsView = projectRewardFacadePort.getRewardByIdForProjectLead(projectId, rewardId,
                 authenticatedUser.getId());
-        return ResponseEntity.ok(RewardMapper.rewardDetailsToResponse(rewardDetailsView, false));
+        return ResponseEntity.ok(RewardMapper.projectRewardDetailsToResponse(rewardDetailsView));
     }
 
     @Override
@@ -286,7 +286,7 @@ public class ProjectsRestApi implements ProjectsApi {
                 authenticatedUser);
 
         return ResponseEntity.ok(ContributionMapper.mapContributionDetails(contribution,
-                contribution.getContributor().getGithubUserId().equals(authenticatedUser.getGithubUserId())));
+                authenticatedUser.getGithubUserId(), authenticatedUser.getAdministratedBillingProfile()));
     }
 
     @Override

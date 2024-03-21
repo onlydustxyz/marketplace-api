@@ -72,7 +72,7 @@ public interface SearchRewardMapper {
         response.setNextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()));
         page.getContent().forEach(rewardDetailsView -> response.addRewardsItem(new RewardPageItemResponse()
                 .id(rewardDetailsView.id().value())
-                .status(map(rewardDetailsView.status().asUser()))
+                .status(map(rewardDetailsView.status().asBackofficeUser()))
                 .requestedAt(rewardDetailsView.requestedAt())
                 .processedAt(rewardDetailsView.processedAt())
                 .githubUrls(rewardDetailsView.githubUrls())

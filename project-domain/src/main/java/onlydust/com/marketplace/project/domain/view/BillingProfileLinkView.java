@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.view;
 
 import lombok.Builder;
 import lombok.NonNull;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 
 import java.util.UUID;
 
@@ -20,5 +21,15 @@ public record BillingProfileLinkView(@NonNull UUID id, @NonNull Type type, @NonN
 
     public enum VerificationStatus {
         VERIFIED, UNDER_REVIEW, STARTED, NOT_STARTED, REJECTED, CLOSED;
+    }
+
+    public RewardStatus.UserBillingProfile toUserBillingProfile(){
+        return RewardStatus.UserBillingProfile.builder()
+                .id(this.id)
+                .role(switch (this.role){
+                    case ADMIN -> RewardStatus.UserBillingProfile.Role.ADMIN;
+                    case MEMBER -> RewardStatus.UserBillingProfile.Role.MEMBER;
+                })
+                .build();
     }
 }

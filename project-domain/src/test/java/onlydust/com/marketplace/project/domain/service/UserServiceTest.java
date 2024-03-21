@@ -380,7 +380,7 @@ public class UserServiceTest {
         // When
         when(userStoragePort.findRewardById(rewardId))
                 .thenReturn(expectedReward);
-        final RewardDetailsView rewardDetailsView = userService.getRewardByIdForRecipientIdAndCompanyAdminBillingProfileIds(rewardId, recipientId,
+        final RewardDetailsView rewardDetailsView = userService.getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, recipientId,
                 companyAdminBillingProfileIds);
 
         // Then
@@ -403,7 +403,7 @@ public class UserServiceTest {
         // When
         when(userStoragePort.findRewardById(rewardId))
                 .thenReturn(expectedReward);
-        final RewardDetailsView rewardDetailsView = userService.getRewardByIdForRecipientIdAndCompanyAdminBillingProfileIds(rewardId, 2L,
+        final RewardDetailsView rewardDetailsView = userService.getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, 2L,
                 companyAdminBillingProfileIds);
 
         // Then
@@ -426,7 +426,7 @@ public class UserServiceTest {
                 .thenReturn(expectedReward);
         OnlyDustException onlyDustException = null;
         try {
-            userService.getRewardByIdForRecipientIdAndCompanyAdminBillingProfileIds(rewardId, recipientId, companyAdminBillingProfileIds);
+            userService.getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, recipientId, companyAdminBillingProfileIds);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -451,7 +451,7 @@ public class UserServiceTest {
                 .thenReturn(expectedReward);
         OnlyDustException onlyDustException = null;
         try {
-            userService.getRewardByIdForRecipientIdAndCompanyAdminBillingProfileIds(rewardId, recipientId, companyAdminBillingProfileIds);
+            userService.getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, recipientId, companyAdminBillingProfileIds);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -480,7 +480,7 @@ public class UserServiceTest {
         // When
         when(userStoragePort.findRewardItemsPageById(rewardId, 0, 20))
                 .thenReturn(expectedPage);
-        final Page<RewardItemView> page = userService.getRewardItemsPageByIdForRecipientIdAndCompanyAdminBillingProfileIds(rewardId, recipientId, 0,
+        final Page<RewardItemView> page = userService.getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, recipientId, 0,
                 20, companyAdminBillingProfiles);
 
         // Then
@@ -505,7 +505,7 @@ public class UserServiceTest {
         // When
         when(userStoragePort.findRewardItemsPageById(rewardId, 0, 20))
                 .thenReturn(expectedPage);
-        final Page<RewardItemView> page = userService.getRewardItemsPageByIdForRecipientIdAndCompanyAdminBillingProfileIds(rewardId, recipientId, 0,
+        final Page<RewardItemView> page = userService.getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, recipientId, 0,
                 20, companyAdminBillingProfiles);
 
         // Then
@@ -530,7 +530,7 @@ public class UserServiceTest {
                 .thenReturn(expectedPage);
         OnlyDustException onlyDustException = null;
         try {
-            userService.getRewardItemsPageByIdForRecipientIdAndCompanyAdminBillingProfileIds(rewardId, recipientId, 0,
+            userService.getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, recipientId, 0,
                     20, companyAdminBillingProfiles);
         } catch (OnlyDustException e) {
             onlyDustException = e;

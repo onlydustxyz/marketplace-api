@@ -50,11 +50,11 @@ public class UserTest {
                 .build();
 
         // When
-        final List<BillingProfileLinkView> companyAdminBillingProfile = user.getCompanyAdminBillingProfile();
+        final List<BillingProfileLinkView> administratedBillingProfile = user.getAdministratedBillingProfile();
 
         // Then
-        Assertions.assertEquals(1, companyAdminBillingProfile.size());
-        Assertions.assertEquals(BillingProfileLinkView.Role.ADMIN, companyAdminBillingProfile.get(0).role());
-        Assertions.assertEquals(BillingProfileLinkView.Type.COMPANY, companyAdminBillingProfile.get(0).type());
+        Assertions.assertEquals(1, administratedBillingProfile.size());
+        Assertions.assertEquals(BillingProfileLinkView.Role.ADMIN, administratedBillingProfile.get(0).role());
+        Assertions.assertEquals(BillingProfileLinkView.Type.COMPANY, administratedBillingProfile.get(0).type());
     }
 }

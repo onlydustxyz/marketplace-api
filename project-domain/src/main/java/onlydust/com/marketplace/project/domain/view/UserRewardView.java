@@ -22,6 +22,10 @@ public class UserRewardView {
     RewardStatus status;
     Date unlockDate;
     Amount amount;
+    Long recipientId;
+    String recipientLogin;
+    String recipientAvatarUrl;
+    UUID billingProfileId;
 
     @Data
     @Builder
@@ -36,7 +40,7 @@ public class UserRewardView {
     public static class Filters {
         List<UUID> currencies;
         List<UUID> projectIds;
-        List<UUID> adminCompanyBillingProfilesIds;
+        List<UUID> administratedBillingProfilesIds;
         Date from;
         Date to;
     }

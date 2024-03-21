@@ -98,6 +98,10 @@ public class RewardViewEntity {
                         .dollarsEquivalent(statusData.amountUsdEquivalent())
                         .build())
                 .numberOfRewardedContributions(contributionCount)
+                .recipientAvatarUrl(recipientAvatarUrl)
+                .recipientId(recipientId)
+                .recipientLogin(recipientLogin)
+                .billingProfileId(billingProfileId)
                 .build();
     }
 

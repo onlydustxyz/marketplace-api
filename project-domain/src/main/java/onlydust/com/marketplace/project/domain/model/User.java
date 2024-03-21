@@ -49,9 +49,9 @@ public class User {
         return roles.contains(role);
     }
 
-    public List<BillingProfileLinkView> getCompanyAdminBillingProfile() {
+    public List<BillingProfileLinkView> getAdministratedBillingProfile() {
         return this.billingProfiles.stream()
-                .filter(bp -> bp.type() == BillingProfileLinkView.Type.COMPANY && bp.role() == BillingProfileLinkView.Role.ADMIN)
+                .filter(bp -> bp.role() == BillingProfileLinkView.Role.ADMIN)
                 .toList();
     }
 }

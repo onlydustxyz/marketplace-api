@@ -42,11 +42,11 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
             WHERE (coalesce(:rewardIds) IS NULL OR r.id IN (:rewardIds))
               AND (coalesce(:statuses) IS NULL OR CAST(rs.status AS TEXT) IN (:statuses))
               AND (
-                    (:companyBillingProfileAdminIds IS NULL AND (coalesce(:contributorIds) IS NULL OR r.recipient_id IN (:contributorIds)))
+                    (:administratedBillingProfilesIds IS NULL AND (coalesce(:contributorIds) IS NULL OR r.recipient_id IN (:contributorIds)))
                     OR
-                    (:companyBillingProfileAdminIds IS NOT NULL AND
+                    (:administratedBillingProfilesIds IS NOT NULL AND
                         (
-                            (r.billing_profile_id IN (:companyBillingProfileAdminIds) AND r.recipient_id NOT IN (:contributorIds))
+                            (r.billing_profile_id IN (:administratedBillingProfilesIds) AND r.recipient_id NOT IN (:contributorIds))
                             OR
                             r.recipient_id IN (:contributorIds)
                         )
@@ -76,7 +76,7 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                                 List<UUID> currencyIds,
                                 List<UUID> projectIds,
                                 List<String> statuses,
-                                List<UUID> companyBillingProfileAdminIds,
+                                List<UUID> administratedBillingProfilesIds,
                                 String fromDate,
                                 String toDate,
                                 Pageable pageable);
@@ -134,7 +134,7 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                 pageRequest);
     }
 
-    default Page<RewardViewEntity> findUserRewards(Long githubUserId, List<UUID> currencies, List<UUID> projectIds, List<UUID> adminCompanyBillingProfilesIds,
+    default Page<RewardViewEntity> findUserRewards(Long githubUserId, List<UUID> currencies, List<UUID> projectIds, List<UUID> getAdministratedBillingProfilesIds,
                                                    String fromDate, String toDate, PageRequest pageRequest) {
         return find(
                 List.of(),
@@ -142,7 +142,7 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                 currencies,
                 projectIds,
                 List.of(),
-                adminCompanyBillingProfilesIds,
+                getAdministratedBillingProfilesIds,
                 fromDate,
                 toDate,
                 pageRequest);

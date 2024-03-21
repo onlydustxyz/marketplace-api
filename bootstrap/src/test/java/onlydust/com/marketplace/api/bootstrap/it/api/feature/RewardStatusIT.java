@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.bootstrap.it.api.feature;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.Builder;
+import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
@@ -925,10 +926,9 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 MyRewardDatum.builder()
                         .githubUserId(companyBPMember1GithubId)
                         .rewardData(List.of(
-                                // TODO PENDING_COMPANY
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId1)
-                                        .status("PENDING_BILLING_PROFILE")
+                                        .status("PENDING_COMPANY")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
                                         .build(),
@@ -1063,10 +1063,9 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 MyRewardDatum.builder()
                         .githubUserId(companyBPMember1GithubId)
                         .rewardData(List.of(
-                                // TODO PENDING_COMPANY
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId1)
-                                        .status("PENDING_BILLING_PROFILE")
+                                        .status("PENDING_COMPANY")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
                                         .build(),
@@ -1145,11 +1144,11 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     }
 
     @Builder
-    private record MyRewardDatum(Long githubUserId, List<RewardDatum> rewardData) {
+    private record MyRewardDatum(@NonNull Long githubUserId, @NonNull List<RewardDatum> rewardData) {
     }
 
     @Builder
-    private record RewardDatum(UUID rewardId, String status, Long rewardedAmount, Long pendingAmount) {
+    private record RewardDatum(@NonNull UUID rewardId, @NonNull String status, @NonNull Long rewardedAmount, @NonNull Long pendingAmount) {
     }
 
     private void assertGetProjectRewardsStatusOnProject(final UUID projectId, final Map<UUID, String> rewardStatusMapToId) {

@@ -157,8 +157,8 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
-    public RewardDetailsView getRewardByIdForRecipientIdAndCompanyAdminBillingProfileIds(UUID rewardId, Long recipientId,
-                                                                                         List<UUID> companyAdminBillingProfileIds) {
+    public RewardDetailsView getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(UUID rewardId, Long recipientId,
+                                                                                          List<UUID> companyAdminBillingProfileIds) {
         final RewardDetailsView reward = userStoragePort.findRewardById(rewardId);
         if (!reward.getTo().getGithubUserId().equals(recipientId) &&
             (isNull(reward.getBillingProfileId()) || !companyAdminBillingProfileIds.contains(reward.getBillingProfileId()))) {
@@ -167,8 +167,8 @@ public class UserService implements UserFacadePort {
         return reward;
     }
 
-    public Page<RewardItemView> getRewardItemsPageByIdForRecipientIdAndCompanyAdminBillingProfileIds(UUID rewardId, Long recipientId, int pageIndex,
-                                                                                                     int pageSize, List<UUID> companyAdminBillingProfileIds) {
+    public Page<RewardItemView> getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(UUID rewardId, Long recipientId, int pageIndex,
+                                                                                                      int pageSize, List<UUID> companyAdminBillingProfileIds) {
         final Page<RewardItemView> page = userStoragePort.findRewardItemsPageById(rewardId, pageIndex, pageSize);
         if (page.getContent().stream().anyMatch(rewardItemView -> !rewardItemView.getRecipientId().equals(recipientId)) &&
             page.getContent().stream().anyMatch(rewardItemView -> isNull(rewardItemView.getBillingProfileId())

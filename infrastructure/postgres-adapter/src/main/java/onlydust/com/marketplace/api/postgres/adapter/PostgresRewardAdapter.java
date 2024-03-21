@@ -148,7 +148,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
                                                   Date fromRequestedAt, Date toRequestedAt,
                                                   Date fromProcessedAt, Date toProcessedAt) {
         final var page = rewardDetailsViewRepository.findAllByStatusesAndDates(
-                statuses.stream().map(RewardStatusEntity::from).map(RewardStatusEntity.Status::toString).toList(),
+                statuses.stream().map(rewardStatus -> RewardStatusEntity.from(rewardStatus.asBackofficeUser())).map(RewardStatusEntity.Status::toString).toList(),
                 fromRequestedAt, toRequestedAt,
                 fromProcessedAt, toProcessedAt,
                 PageRequest.of(pageIndex, pageSize, Sort.by("requested_at").descending())

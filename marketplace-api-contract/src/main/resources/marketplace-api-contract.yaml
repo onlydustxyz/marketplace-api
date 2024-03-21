@@ -300,28 +300,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/me/rewards/pending-invoice:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Me
-      summary: Get caller's rewards pending invoice
-      operationId: getMyRewardsPendingInvoice
-      description: |
-        Get the page of all rewards pending invoice where the recipient is the caller
-      responses:
-        "200":
-          description: 'Page of rewards'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MyRewardsListResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
   /api/v1/me/contributions:
     get:
       security:
@@ -4070,6 +4048,7 @@ components:
         - PENDING_SIGNUP
         - PENDING_CONTRIBUTOR
         - PENDING_BILLING_PROFILE
+        - PENDING_COMPANY
         - PENDING_VERIFICATION
         - PAYMENT_BLOCKED
         - PAYOUT_INFO_MISSING
