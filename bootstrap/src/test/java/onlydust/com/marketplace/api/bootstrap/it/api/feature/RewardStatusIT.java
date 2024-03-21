@@ -671,7 +671,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
-                                        .status("PENDING_VERIFICATION")
+                                        .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
                                         .build(),
@@ -776,10 +776,10 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .pendingAmount(30L)
                                         .build(),
                                 RewardDatum.builder()
-                                        .rewardId(companyBPAdmin1RewardId1)
+                                        .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
-                                        .rewardedAmount(100L)
-                                        .pendingAmount(100L)
+                                        .rewardedAmount(200L)
+                                        .pendingAmount(200L)
                                         .build()
                         ))
                         .build(),
@@ -843,7 +843,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         ));
 
 
-        updatePayoutPreferences(companyBPAdmin2GithubId, companyBillingProfile.id(), projectId1);
+        updatePayoutPreferences(companyBPMember1GithubId, companyBillingProfile.id(), projectId1);
 
         // When
         assertGetMyRewardsStatus(List.of(
@@ -852,7 +852,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                         .rewardData(List.of(
                                 RewardDatum.builder()
                                         .rewardId(individualBPAdminRewardId1)
-                                        .status("PENDING_BILLING_PROFILE")
+                                        .status("PENDING_VERIFICATION")
                                         .rewardedAmount(10L)
                                         .pendingAmount(10L)
                                         .build(),
@@ -880,10 +880,10 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .pendingAmount(20L)
                                         .build(),
                                 RewardDatum.builder()
-                                        .rewardId(companyBPAdmin1RewardId1)
+                                        .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
-                                        .rewardedAmount(100L)
-                                        .pendingAmount(100L)
+                                        .rewardedAmount(200L)
+                                        .pendingAmount(200L)
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
@@ -984,14 +984,13 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         );
 
         // When
-        // When
         assertGetMyRewardsStatus(List.of(
                 MyRewardDatum.builder()
                         .githubUserId(individualBPAdminGithubId)
                         .rewardData(List.of(
                                 RewardDatum.builder()
                                         .rewardId(individualBPAdminRewardId1)
-                                        .status("PENDING_BILLING_PROFILE")
+                                        .status("PENDING_VERIFICATION")
                                         .rewardedAmount(10L)
                                         .pendingAmount(10L)
                                         .build(),
@@ -1019,10 +1018,10 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .pendingAmount(20L)
                                         .build(),
                                 RewardDatum.builder()
-                                        .rewardId(companyBPAdmin1RewardId1)
+                                        .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
-                                        .rewardedAmount(100L)
-                                        .pendingAmount(100L)
+                                        .rewardedAmount(200L)
+                                        .pendingAmount(200L)
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
@@ -1133,7 +1132,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                         .expectStatus()
                         .is2xxSuccessful()
                         .expectBody()
-//                        .consumeWith(System.out::println)
+                        .consumeWith(System.out::println)
                         .jsonPath("$.status").isEqualTo(rewardDatum.status)
                         .jsonPath("$.amount").isEqualTo(rewardDatum.rewardedAmount);
             }

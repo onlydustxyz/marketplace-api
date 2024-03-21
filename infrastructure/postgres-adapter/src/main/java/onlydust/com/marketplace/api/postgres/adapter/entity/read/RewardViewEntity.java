@@ -35,6 +35,7 @@ public class RewardViewEntity {
     Integer contributionCount;
     Long recipientId;
     UUID invoiceId;
+    UUID billingProfileId;
     String recipientLogin;
     String recipientAvatarUrl;
     Long requestorId;
@@ -77,6 +78,7 @@ public class RewardViewEntity {
                         .build())
                 .project(project.toDomain())
                 .receipt(receipts.stream().findFirst().map(ReceiptEntity::toDomain).orElse(null))
+                .billingProfileId(this.billingProfileId)
                 .build();
     }
 

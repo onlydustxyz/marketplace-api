@@ -5,6 +5,7 @@ import lombok.Data;
 import onlydust.com.marketplace.project.domain.model.ContributionType;
 
 import java.util.Date;
+import java.util.UUID;
 
 
 @Builder
@@ -29,4 +30,5 @@ public class RewardItemView {
     String authorGithubUrl;
     Long recipientId;
     String githubBody;
+    UUID billingProfileId;
 }

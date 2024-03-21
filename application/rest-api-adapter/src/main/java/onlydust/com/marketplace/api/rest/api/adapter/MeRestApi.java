@@ -222,8 +222,8 @@ public class MeRestApi implements MeApi {
     @Override
     public ResponseEntity<RewardDetailsResponse> getMyReward(UUID rewardId) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final RewardDetailsView rewardDetailsView = userFacadePort.getRewardByIdForRecipientId(rewardId,
-                authenticatedUser.getGithubUserId());
+        final RewardDetailsView rewardDetailsView = userFacadePort.getRewardByIdForRecipientIdAndCompanyAdminBillingProfileIds(rewardId,
+                authenticatedUser.getGithubUserId(), authenticatedUser.getCompanyAdminBillingProfile().stream().map(BillingProfileLinkView::id).toList());
         return ResponseEntity.ok(RewardMapper.rewardDetailsToResponse(rewardDetailsView, true));
     }
 
@@ -233,8 +233,9 @@ public class MeRestApi implements MeApi {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final Page<RewardItemView> page = userFacadePort.getRewardItemsPageByIdForRecipientId(rewardId,
-                authenticatedUser.getGithubUserId(), sanitizedPageIndex, sanitizedPageSize);
+        final Page<RewardItemView> page = userFacadePort.getRewardItemsPageByIdForRecipientIdAndCompanyAdminBillingProfileIds(rewardId,
+                authenticatedUser.getGithubUserId(), sanitizedPageIndex, sanitizedPageSize,
+                authenticatedUser.getCompanyAdminBillingProfile().stream().map(BillingProfileLinkView::id).toList());
         final RewardItemsPageResponse rewardItemsPageResponse = RewardMapper.pageToResponse(sanitizedPageIndex, page);
         return rewardItemsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardItemsPageResponse) :

@@ -26,4 +26,5 @@ public class RewardDetailsView {
     ReceiptView receipt;
     Project project;
     UUID invoiceId;
+    UUID billingProfileId;
 }

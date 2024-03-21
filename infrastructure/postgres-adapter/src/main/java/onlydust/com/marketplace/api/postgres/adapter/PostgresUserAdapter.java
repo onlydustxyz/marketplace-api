@@ -239,7 +239,7 @@ public class PostgresUserAdapter implements UserStoragePort {
                 filters.getAdminCompanyBillingProfilesIds(), fromDate, toDate, pageRequest);
 
         final var rewardsStats = rewardStatsRepository.findByUser(githubUserId, filters.getCurrencies(), filters.getProjectIds(),
-                fromDate, toDate);
+                filters.getAdminCompanyBillingProfilesIds(), fromDate, toDate);
 
         return UserRewardsPageView.builder()
                 .rewards(Page.<UserRewardView>builder()
