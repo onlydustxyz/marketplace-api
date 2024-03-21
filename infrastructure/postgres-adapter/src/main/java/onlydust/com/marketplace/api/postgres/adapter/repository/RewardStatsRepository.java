@@ -25,11 +25,11 @@ public interface RewardStatsRepository extends JpaRepository<RewardStatsEntity, 
                      JOIN accounting.reward_statuses rs ON rs.reward_id = r.id
                      LEFT JOIN reward_item_ids wii ON wii.reward_id = r.id
             WHERE (
-                    (:administratedBillingProfilesIds IS NULL AND r.recipient_id = :contributorId)
+                    (coalesce(:administratedBillingProfileIds) IS NULL AND r.recipient_id = :contributorId)
                     OR
-                    (:administratedBillingProfilesIds IS NOT NULL AND
+                    (coalesce(:administratedBillingProfileIds) IS NOT NULL AND
                         (
-                            (r.billing_profile_id IN (:administratedBillingProfilesIds) AND r.recipient_id != :contributorId)
+                            (r.billing_profile_id IN (:administratedBillingProfileIds) AND r.recipient_id != :contributorId)
                             OR
                             r.recipient_id = :contributorId
                         )
@@ -41,6 +41,6 @@ public interface RewardStatsRepository extends JpaRepository<RewardStatsEntity, 
               AND (:toDate IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
             GROUP BY r.currency_id
             """, nativeQuery = true)
-    List<RewardStatsEntity> findByUser(Long contributorId, List<UUID> currencyIds, List<UUID> projectIds, List<UUID> administratedBillingProfilesIds,
+    List<RewardStatsEntity> findByUser(Long contributorId, List<UUID> currencyIds, List<UUID> projectIds, List<UUID> administratedBillingProfileIds,
                                        String fromDate, String toDate);
 }
