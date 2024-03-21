@@ -46,7 +46,6 @@ public class PayoutInfo {
             case STARKNET -> Optional.ofNullable(starknetAddress).map(a -> new Wallet(Network.STARKNET, a.toString()));
             case APTOS -> Optional.ofNullable(aptosAddress).map(a -> new Wallet(Network.APTOS, a.toString()));
             case SEPA -> Optional.ofNullable(bankAccount).map(ba -> new Wallet(Network.SEPA, ba.accountNumber()));
-            case SWIFT -> Optional.ofNullable(bankAccount).map(ba -> new Wallet(Network.SWIFT, ba.accountNumber()));
         };
     }
 }

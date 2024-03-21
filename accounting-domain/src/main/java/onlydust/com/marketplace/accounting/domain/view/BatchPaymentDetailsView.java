@@ -3,7 +3,7 @@ package onlydust.com.marketplace.accounting.domain.view;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
+import onlydust.com.marketplace.accounting.domain.model.Payment;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -14,8 +14,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.intern
 @Builder
 @Accessors(chain = true, fluent = true)
 public record BatchPaymentDetailsView(
-        @NonNull
-        BatchPayment batchPayment,
+        @NonNull Payment payment,
         @NonNull
         List<BackofficeRewardView> rewardViews
 ) {

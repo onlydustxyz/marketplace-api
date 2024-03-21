@@ -66,9 +66,9 @@ class InvoiceTest {
             invoice = Invoice.of(individualBillingProfile, 1, UserId.random())
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of()),
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of())
                     ));
         }
 
@@ -116,6 +116,7 @@ class InvoiceTest {
                     .address("1 rue de la paix")
                     .name("OnlyDust SAS")
                     .subjectToEuropeVAT(false)
+                    .usEntity(true)
                     .status(VerificationStatus.VERIFIED)
                     .build();
             payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
@@ -131,9 +132,9 @@ class InvoiceTest {
             invoice = Invoice.of(companyBillingProfile, 1, UserId.random())
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of()),
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of())
                     ));
         }
 
@@ -186,6 +187,7 @@ class InvoiceTest {
                     .address("1 rue de la paix")
                     .name("OnlyDust SAS")
                     .subjectToEuropeVAT(true)
+                    .usEntity(false)
                     .status(VerificationStatus.VERIFIED)
                     .build();
             payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
@@ -201,9 +203,9 @@ class InvoiceTest {
             invoice = Invoice.of(companyBillingProfile, 1, UserId.random())
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of()),
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of())
                     ));
         }
 
@@ -257,6 +259,7 @@ class InvoiceTest {
                     .address("1 rue de la paix")
                     .name("OnlyDust SAS")
                     .subjectToEuropeVAT(false)
+                    .usEntity(false)
                     .status(VerificationStatus.VERIFIED)
                     .build();
             payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
@@ -272,9 +275,9 @@ class InvoiceTest {
             invoice = Invoice.of(companyBillingProfile, 1, UserId.random())
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of()),
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of())
                     ));
         }
 
@@ -328,6 +331,7 @@ class InvoiceTest {
                     .address("1 rue de la paix")
                     .name("OnlyDust SAS")
                     .subjectToEuropeVAT(true)
+                    .usEntity(false)
                     .status(VerificationStatus.VERIFIED)
                     .build();
             payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
@@ -343,9 +347,9 @@ class InvoiceTest {
             invoice = Invoice.of(companyBillingProfile, 1, UserId.random())
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of()),
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
+                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of())
                     ));
         }
 

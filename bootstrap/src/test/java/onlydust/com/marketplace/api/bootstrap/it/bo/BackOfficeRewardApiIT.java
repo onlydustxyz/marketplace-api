@@ -267,7 +267,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                   "code": "USD",
                                   "name": "US Dollar",
-                                  "logoUrl": null
+                                  "logoUrl": null,
+                                  "decimals": 2
                                 },
                                 "dollarsEquivalent": 1000.00,
                                 "conversionRate": 1.00000000000000000000
@@ -326,7 +327,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                   "code": "USD",
                                   "name": "US Dollar",
-                                  "logoUrl": null
+                                  "logoUrl": null,
+                                  "decimals": 2
                                 },
                                 "dollarsEquivalent": 1000.00,
                                 "conversionRate": 1.00000000000000000000
@@ -370,7 +372,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                   "code": "USD",
                                   "name": "US Dollar",
-                                  "logoUrl": null
+                                  "logoUrl": null,
+                                  "decimals": 2
                                 },
                                 "dollarsEquivalent": 1000.00,
                                 "conversionRate": 1.00000000000000000000
@@ -429,7 +432,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
                                   "name": "USD Coin",
-                                  "logoUrl": null
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 },
                                 "dollarsEquivalent": 1010.0000,
                                 "conversionRate": 1.0100000000000000
@@ -477,7 +481,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
                                   "name": "USD Coin",
-                                  "logoUrl": null
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 },
                                 "dollarsEquivalent": 1010.0000,
                                 "conversionRate": 1.0100000000000000
@@ -565,7 +570,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                   "code": "USD",
                                   "name": "US Dollar",
-                                  "logoUrl": null
+                                  "logoUrl": null,
+                                  "decimals": 2
                                 },
                                 "dollarsEquivalent": 1000.00,
                                 "conversionRate": 1.00000000000000000000
@@ -624,7 +630,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                   "code": "USD",
                                   "name": "US Dollar",
-                                  "logoUrl": null
+                                  "logoUrl": null,
+                                  "decimals": 2
                                 },
                                 "dollarsEquivalent": 1000.00,
                                 "conversionRate": 1.00000000000000000000
@@ -668,7 +675,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                   "code": "USD",
                                   "name": "US Dollar",
-                                  "logoUrl": null
+                                  "logoUrl": null,
+                                  "decimals": 2
                                 },
                                 "dollarsEquivalent": 1000.00,
                                 "conversionRate": 1.00000000000000000000
@@ -708,7 +716,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
                                   "name": "USD Coin",
-                                  "logoUrl": null
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 },
                                 "dollarsEquivalent": 1010.00,
                                 "conversionRate": 1.0100000000000000
@@ -746,10 +755,11 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "money": {
                                 "amount": 1000,
                                 "currency": {
-                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                  "code": "STRK",
-                                  "name": "StarkNet Token",
-                                  "logoUrl": null
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 },
                                 "dollarsEquivalent": null,
                                 "conversionRate": null
@@ -831,7 +841,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
                                   "name": "USD Coin",
-                                  "logoUrl": null
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 },
                                 "dollarsEquivalent": 1010.00,
                                 "conversionRate": 1.0100000000000000
@@ -890,7 +901,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
                                   "name": "USD Coin",
-                                  "logoUrl": null
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 },
                                 "dollarsEquivalent": 2525.00,
                                 "conversionRate": 1.0100000000000000
@@ -949,7 +961,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
                                   "name": "USD Coin",
-                                  "logoUrl": null
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 },
                                 "dollarsEquivalent": 757.50,
                                 "conversionRate": 1.0100000000000000
@@ -1008,7 +1021,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
                                   "name": "USD Coin",
-                                  "logoUrl": null
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 },
                                 "dollarsEquivalent": 1010.00,
                                 "conversionRate": 1.0100000000000000
@@ -1067,7 +1081,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
                                   "name": "USD Coin",
-                                  "logoUrl": null
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 },
                                 "dollarsEquivalent": 505.00,
                                 "conversionRate": 1.0100000000000000

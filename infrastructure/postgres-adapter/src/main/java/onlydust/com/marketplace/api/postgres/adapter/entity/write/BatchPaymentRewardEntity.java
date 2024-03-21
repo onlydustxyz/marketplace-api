@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import lombok.*;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
+import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.PayableReward;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -45,7 +45,7 @@ public class BatchPaymentRewardEntity {
         UUID rewardId;
     }
 
-    public static BatchPaymentRewardEntity from(@NonNull BatchPayment.Id batchPaymentId, @NonNull PayableReward reward) {
+    public static BatchPaymentRewardEntity from(@NonNull Payment.Id batchPaymentId, @NonNull PayableReward reward) {
         return BatchPaymentRewardEntity.builder()
                 .batchPaymentId(batchPaymentId.value())
                 .rewardId(reward.id().value())

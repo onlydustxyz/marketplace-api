@@ -71,7 +71,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
     }
 
     @Override
-    public void onPaymentReceived(RewardId rewardId, SponsorAccount.PaymentReference reference) {
+    public void onPaymentReceived(RewardId rewardId, Payment.Reference reference) {
         receiptStorage.save(Receipt.of(rewardId, reference));
     }
 

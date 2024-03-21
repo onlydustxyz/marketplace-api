@@ -158,7 +158,7 @@ public class AccountingObserverTest {
                     .paidAt(null)
                     .withAdditionalNetworks(Set.of(Network.ETHEREUM, Network.OPTIMISM));
 
-            final var reference = new SponsorAccount.PaymentReference(Network.ETHEREUM, "0x1234", "ofux", "ofux.eth");
+            final var reference = new Payment.Reference(Network.ETHEREUM, "0x1234", "ofux", "ofux.eth");
 
             final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
             final var billingProfileId = BillingProfile.Id.random();
@@ -174,9 +174,9 @@ public class AccountingObserverTest {
             var invoice = Invoice.of(companyBillingProfile, 1, UserId.random());
             invoice = invoice.rewards(List.of(
                     new Invoice.Reward(rewardId, ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id()),
+                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id(), List.of()),
                     new Invoice.Reward(rewardId2, ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id())
+                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id(), List.of())
             ));
 
             // When
@@ -370,11 +370,11 @@ public class AccountingObserverTest {
 
             invoice.rewards(List.of(
                     new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id()),
+                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id(), List.of()),
                     new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id()),
+                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id(), List.of()),
                     new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id())
+                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id(), List.of())
             ));
 
             when(invoiceStorage.get(invoice.id())).thenReturn(Optional.of(invoice));
@@ -421,11 +421,11 @@ public class AccountingObserverTest {
 
             invoice.rewards(List.of(
                     new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id()),
+                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id(), List.of()),
                     new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id()),
+                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id(), List.of()),
                     new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id())
+                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id(), List.of())
             ));
 
             when(invoiceStorage.get(invoice.id())).thenReturn(Optional.of(invoice));

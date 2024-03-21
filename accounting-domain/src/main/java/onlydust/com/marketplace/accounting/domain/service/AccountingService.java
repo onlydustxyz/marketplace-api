@@ -13,14 +13,15 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import javax.transaction.Transactional;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.reducing;
+import static java.util.stream.Collectors.*;
 import static onlydust.com.marketplace.accounting.domain.model.Amount.*;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
+import static onlydust.com.marketplace.accounting.domain.model.SponsorAccount.Transaction.Type.SPEND;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
@@ -100,26 +101,43 @@ public class AccountingService implements AccountingFacadePort {
 
     @Override
     @Transactional
-    public void pay(final @NonNull RewardId rewardId, final @NonNull Currency.Id currencyId, final @NonNull SponsorAccount.PaymentReference paymentReference) {
-        final var currency = getCurrency(currencyId);
+    public void pay(final @NonNull RewardId rewardId, final @NonNull Payment.Reference paymentReference) {
+        final var network = paymentReference.network();
+        final var payableRewards = getPayableRewardsOn(network, Set.of(rewardId));
+
+        if (payableRewards.isEmpty()) throw badRequest("Reward %s is not payable on %s".formatted(rewardId, network));
+
+        final var payment = pay(network, payableRewards);
+        payment.referenceFor(rewardId, paymentReference);
+        confirm(payment);
+    }
+
+    @Override
+    @Transactional
+    public List<Payment> pay(final Set<RewardId> rewardIds) {
+        return getPayableRewards(rewardIds).stream()
+                .collect(groupingBy(r -> r.currency().network()))
+                .entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .map(entry -> pay(entry.getKey(), entry.getValue()))
+                .toList();
+    }
+
+    private Payment pay(final @NonNull Network network, final List<PayableReward> rewards) {
+        final var payment = Payment.of(network, rewards);
+
+        payment.rewards().stream().collect(groupingBy(PayableReward::currency))
+                .forEach((currency, currencyRewards) -> pay(payment.id(), currency, currencyRewards));
+
+        return payment;
+    }
+
+    private void pay(final @NonNull Payment.Id paymentId, final @NonNull PayableCurrency payableCurrency, final List<PayableReward> rewards) {
+        final var currency = getCurrency(payableCurrency.id());
         final var accountBook = getAccountBook(currency);
 
-        accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).forEach((sponsorAccountId, amount) -> {
-            final var sponsorAccount = sponsorAccountStorage.get(sponsorAccountId.sponsorAccountId()).orElseThrow();
-            final var sponsorAccountNetwork =
-                    sponsorAccount.network().orElseThrow(() -> internalServerError("Sponsor account %s is not funded".formatted(sponsorAccountId.sponsorAccountId())));
-
-            if (paymentReference.network().equals(sponsorAccountNetwork)) {
-                accountBook.burn(AccountId.of(rewardId), amount);
-                registerSponsorAccountTransaction(accountBook, sponsorAccount,
-                        new SponsorAccount.Transaction(SponsorAccount.Transaction.Type.SPEND, paymentReference, amount.negate()));
-            }
-        });
-
+        rewards.forEach(reward -> accountBook.transfer(AccountId.of(reward.id()), AccountId.of(paymentId), reward.amount()));
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
-        accountingObserver.onPaymentReceived(rewardId, paymentReference);
-        if (accountBook.state().balanceOf(AccountId.of(rewardId)).isZero())
-            accountingObserver.onRewardPaid(rewardId);
     }
 
     @Override
@@ -133,6 +151,55 @@ public class AccountingService implements AccountingFacadePort {
         accountingObserver.onRewardCancelled(rewardId);
         refundedAccounts.stream().filter(AccountId::isProject).map(AccountId::projectId).forEach(refundedProjectId -> onAllowanceUpdated(refundedProjectId,
                 currencyId, accountBook.state()));
+    }
+
+    @Override
+    @Transactional
+    public void cancel(@NonNull Payment.Id paymentId, @NonNull Currency.Id currencyId) {
+        final var currency = getCurrency(currencyId);
+        final var accountBook = getAccountBook(currency);
+
+        accountBook.refund(AccountId.of(paymentId));
+        accountBookEventStorage.save(currency, accountBook.pendingEvents());
+    }
+
+    @Override
+    @Transactional
+    public void confirm(final @NonNull Payment payment) {
+        payment.rewards().stream()
+                .collect(groupingBy(PayableReward::currency))
+                .forEach((currency, rewards) -> confirm(payment, currency.id(), rewards));
+    }
+
+    private void confirm(Payment payment, Currency.Id currencyId, List<PayableReward> rewards) {
+        final var currency = getCurrency(currencyId);
+        final var accountBook = getAccountBook(currency);
+
+        accountBook.burn(AccountId.of(payment.id()), rewards.stream().map(PayableReward::amount).reduce(PositiveAmount::add).orElse(PositiveAmount.ZERO));
+        accountBookEventStorage.save(currency, accountBook.pendingEvents());
+
+        rewards.forEach(r -> confirm(accountBook, r, payment.referenceFor(r.id())));
+    }
+
+    private void confirm(AccountBookAggregate accountBook, PayableReward reward, Payment.Reference paymentReference) {
+        accountBook.state().transferredAmountPerOrigin(AccountId.of(reward.id()))
+                .entrySet()
+                .stream().map(e -> Map.entry(
+                        mustGetSponsorAccount(e.getKey().sponsorAccountId()),
+                        new SponsorAccount.Transaction(SPEND, paymentReference, e.getValue().negate())
+                ))
+                .filter(e -> paymentReference.network().equals(e.getKey().network().orElse(null)))
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue))
+                .forEach((account, transaction) -> registerSponsorAccountTransaction(accountBook, account, transaction));
+
+        accountingObserver.onPaymentReceived(reward.id(), paymentReference);
+        if (isPaid(accountBook.state(), reward.id()))
+            accountingObserver.onRewardPaid(reward.id());
+    }
+
+    private static boolean isPaid(AccountBookState accountBookState, RewardId rewardId) {
+        final var rewardAccountId = AccountId.of(rewardId);
+        return accountBookState.balanceOf(rewardAccountId).isZero() && accountBookState.unspentChildren(rewardAccountId).keySet().stream().noneMatch(AccountId::isPayment);
     }
 
     @Override
@@ -174,9 +241,12 @@ public class AccountingService implements AccountingFacadePort {
         return currencyStorage.all().stream().flatMap(currency -> new PayableRewardAggregator(sponsorAccountStorage, currency).getPayableRewards()).toList();
     }
 
-    @Override
     public List<PayableReward> getPayableRewards(Set<RewardId> rewardIds) {
         return currencyStorage.all().stream().flatMap(currency -> new PayableRewardAggregator(sponsorAccountStorage, currency).getPayableRewards(rewardIds)).toList();
+    }
+
+    private List<PayableReward> getPayableRewardsOn(@NonNull Network network, @NonNull Set<RewardId> rewardIds) {
+        return getPayableRewards(rewardIds).stream().filter(payableReward -> network.equals(payableReward.currency().network())).toList();
     }
 
     private SponsorAccount createSponsorAccount(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, ZonedDateTime lockedUntil) {
@@ -273,7 +343,7 @@ public class AccountingService implements AccountingFacadePort {
         }
 
         private Stream<PayableReward> trySpend(AccountId rewardAccountId) {
-            return accountBook.state().transferredAmountPerOrigin(rewardAccountId).entrySet().stream()
+            return accountBook.state().balancePerOrigin(rewardAccountId).entrySet().stream()
                     .filter(e -> e.getValue().isStrictlyPositive())
                     .filter(e -> stillEnoughBalance(e.getKey().sponsorAccountId(), e.getValue()))
                     .peek(e -> spend(e.getKey().sponsorAccountId(), rewardAccountId.rewardId(), e.getValue()))
@@ -284,7 +354,7 @@ public class AccountingService implements AccountingFacadePort {
             final var sponsorAccount = sponsorAccount(sponsorAccountId);
 
             final var sponsorAccountNetwork = sponsorAccount.network().orElseThrow();
-            sponsorAccount.add(new SponsorAccount.Transaction(SponsorAccount.Transaction.Type.SPEND, sponsorAccountNetwork, rewardId.toString(),
+            sponsorAccount.add(new SponsorAccount.Transaction(SPEND, sponsorAccountNetwork, rewardId.toString(),
                     amount.negate(), "", ""));
         }
 
@@ -302,7 +372,9 @@ public class AccountingService implements AccountingFacadePort {
         }
 
         private boolean isPayable(RewardId rewardId) {
-            return accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).entrySet().stream().allMatch(entry -> {
+            if (accountBook.state().balanceOf(AccountId.of(rewardId)).isZero()) return false;
+
+            return accountBook.state().balancePerOrigin(AccountId.of(rewardId)).entrySet().stream().allMatch(entry -> {
                 final var sponsorAccount = sponsorAccountProvider.get(entry.getKey().sponsorAccountId())
                         .orElseThrow(() -> notFound(("Sponsor account %s not found").formatted(entry.getKey().sponsorAccountId())));
                 return sponsorAccount.unlockedBalance().isGreaterThanOrEqual(entry.getValue());
@@ -313,5 +385,15 @@ public class AccountingService implements AccountingFacadePort {
     @Override
     public Page<HistoricalTransaction> transactionHistory(SponsorId sponsorId, Integer pageIndex, Integer pageSize) {
         return sponsorAccountStorage.transactionsOf(sponsorId, pageIndex, pageSize);
+    }
+
+    @Override
+    public List<Network> networksOf(Currency.Id currencyId, RewardId rewardId) {
+        final var accountBook = getAccountBook(currencyId);
+        return accountBook.state().balancePerOrigin(AccountId.of(rewardId)).keySet().stream()
+                .map(accountId -> mustGetSponsorAccount(accountId.sponsorAccountId()).network())
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
     }
 }

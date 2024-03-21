@@ -22,11 +22,15 @@ public interface AccountingFacadePort {
 
     void createReward(ProjectId from, RewardId to, PositiveAmount amount, Currency.Id currencyId);
 
-    void pay(final @NonNull RewardId rewardId,
-             final @NonNull Currency.Id currencyId,
-             final @NonNull SponsorAccount.PaymentReference paymentReference);
+    void pay(final @NonNull RewardId rewardId, final @NonNull Payment.Reference paymentReference);
+
+    List<Payment> pay(final Set<RewardId> rewardIds);
 
     void cancel(final @NonNull RewardId rewardId, @NonNull Currency.Id currencyId);
+
+    void cancel(@NonNull Payment.Id paymentId, @NonNull Currency.Id currencyId);
+
+    void confirm(Payment payment);
 
     boolean isPayable(RewardId rewardId, Currency.Id currencyId);
 
@@ -46,7 +50,7 @@ public interface AccountingFacadePort {
 
     List<PayableReward> getPayableRewards();
 
-    List<PayableReward> getPayableRewards(Set<RewardId> rewardIds);
-
     Page<HistoricalTransaction> transactionHistory(SponsorId sponsorId, Integer pageIndex, Integer pageSize);
+
+    List<Network> networksOf(Currency.Id currencyId, RewardId rewardId);
 }

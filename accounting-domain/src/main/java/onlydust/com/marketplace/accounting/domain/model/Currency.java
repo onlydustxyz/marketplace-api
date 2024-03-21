@@ -106,7 +106,7 @@ public class Currency implements Cloneable {
 
     public List<Network> supportedNetworks() {
         return switch (type) {
-            case FIAT -> List.of(Network.SEPA, Network.SWIFT);
+            case FIAT -> List.of(Network.SEPA);
             case CRYPTO -> Stream.concat(
                             erc20.stream().map(ERC20::getBlockchain).map(Network::fromBlockchain),
                             Stream.ofNullable(nativeNetwork()))
@@ -131,15 +131,16 @@ public class Currency implements Cloneable {
             throw OnlyDustException.internalServerError("Currency %s is not supported on network %s".formatted(code, network));
 
         if (type == Type.FIAT)
-            return new PayableCurrency(id, code(), name(), logoUri().orElse(null), type(), Standard.ISO4217, null, null);
+            return new PayableCurrency(id, code(), name(), logoUri().orElse(null), type(), Standard.ISO4217, Network.SEPA, null);
 
         if (network.equals(nativeNetwork()))
-            return new PayableCurrency(id, code(), name(), logoUri().orElse(null), type(), null, nativeNetwork().blockchain(), null);
+            return new PayableCurrency(id, code(), name(), logoUri().orElse(null), type(), null, nativeNetwork(), null);
 
-        final var erc20 = erc20().stream().filter(e -> e.getBlockchain().equals(network.blockchain()))
+        final var erc20 = erc20().stream().filter(e -> e.getBlockchain().equals(network.blockchain().orElse(null)))
                 .findFirst().orElseThrow(() -> OnlyDustException.internalServerError("Currency %s is not supported on network %s".formatted(code, network)));
 
-        return new PayableCurrency(id, code(), name(), logoUri().orElse(null), type(), Standard.ERC20, erc20.getBlockchain(), erc20.getAddress());
+        return new PayableCurrency(id, code(), name(), logoUri().orElse(null), type(), Standard.ERC20, Network.fromBlockchain(erc20.getBlockchain()),
+                erc20.getAddress());
     }
 
     private Network nativeNetwork() {

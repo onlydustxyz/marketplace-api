@@ -95,8 +95,7 @@ public class Invoice {
     }
 
     private List<Network> networks() {
-        // TODO use SponsorAccount network
-        return rewards.stream().map(Reward::network).toList();
+        return rewards.stream().flatMap(r -> r.networks().stream()).distinct().toList();
     }
 
     public String externalFileName() {
@@ -193,16 +192,15 @@ public class Invoice {
 
         public Optional<Wallet> wallet(Network network) {
             return switch (network) {
-                case ETHEREUM,OPTIMISM,STARKNET,APTOS ->
-                     wallets.stream().filter(w -> w.network() == network).findFirst();
-                case SEPA,SWIFT ->
-                     Optional.ofNullable(bankAccount).map(b -> new Wallet(network, b.accountNumber()));
+                case ETHEREUM, OPTIMISM, STARKNET, APTOS -> wallets.stream().filter(w -> w.network() == network).findFirst();
+                case SEPA -> Optional.ofNullable(bankAccount).map(b -> new Wallet(network, b.accountNumber()));
             };
         }
 
-        public record KycSnapshot(@NonNull String firstName, String lastName, @NonNull String address, @NonNull String countryCode) {
+        public record KycSnapshot(@NonNull String firstName, String lastName, @NonNull String address, @NonNull String countryCode,
+                                  @NonNull Boolean usCitizen) {
             public static KycSnapshot of(Kyc kyc) {
-                return new KycSnapshot(kyc.getFirstName(), kyc.getLastName(), kyc.getAddress(), kyc.getCountry().iso3Code());
+                return new KycSnapshot(kyc.getFirstName(), kyc.getLastName(), kyc.getAddress(), kyc.getCountry().iso3Code(), kyc.getUsCitizen());
             }
 
             @Deprecated
@@ -220,6 +218,7 @@ public class Invoice {
                                   @NonNull String name,
                                   @NonNull String address,
                                   @NonNull String countryCode,
+                                  @NonNull Boolean usEntity,
                                   @NonNull Boolean subjectToEuVAT,
                                   @NonNull Boolean inEuropeanUnion,
                                   @NonNull Boolean isFrance,
@@ -231,6 +230,7 @@ public class Invoice {
                         kyb.getName(),
                         kyb.getAddress(),
                         kyb.getCountry().iso3Code(),
+                        kyb.getUsEntity(),
                         kyb.getSubjectToEuropeVAT(),
                         kyb.getCountry().inEuropeanUnion(),
                         kyb.getCountry().isFrance(),
@@ -256,12 +256,10 @@ public class Invoice {
         }
     }
 
-
     public record Reward(@NonNull RewardId id, @NonNull ZonedDateTime createdAt, @NonNull String projectName,
-                         @NonNull Money amount, @NonNull Money target, Invoice.Id invoiceId) {
-        @Deprecated
-        public Network network() {
-            return amount.currency.legacyNetwork();
+                         @NonNull Money amount, @NonNull Money target, Invoice.Id invoiceId, List<Network> networks) {
+        public Reward withNetworks(List<Network> networks) {
+            return new Reward(id, createdAt, projectName, amount, target, invoiceId, networks);
         }
     }
 

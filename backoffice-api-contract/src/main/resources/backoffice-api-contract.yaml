@@ -2026,7 +2026,6 @@ components:
     TransactionNetwork:
       type: string
       enum:
-        - SWIFT
         - SEPA
         - ETHEREUM
         - OPTIMISM
@@ -2353,6 +2352,70 @@ components:
           items:
             $ref: '#/components/schemas/InvoiceRewardsPerNetwork'
 
+    KycResponse:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        birthdate:
+          type: string
+          format: date-time
+        address:
+          type: string
+        country:
+          type: string
+          deprecated: true
+        countryCode:
+          type: string
+          format: iso-country-code
+        usCitizen:
+          type: boolean
+        idDocumentType:
+          type: string
+          enum:
+            - PASSPORT
+            - ID_CARD
+            - RESIDENCE_PERMIT
+            - DRIVER_LICENSE
+        idDocumentNumber:
+          type: string
+        validUntil:
+          type: string
+          format: date-time
+        idDocumentCountryCode:
+          type: string
+        sumsubUrl:
+          type: string
+
+    KybResponse:
+      type: object
+      properties:
+        name:
+          type: string
+        registrationNumber:
+          type: string
+        registrationDate:
+          type: string
+          format: date-time
+        address:
+          type: string
+        country:
+          deprecated: true
+          type: string
+        countryCode:
+          type: string
+          format: iso-country-code
+        usEntity:
+          type: boolean
+        subjectToEuropeVAT:
+          type: boolean
+        euVATNumber:
+          type: string
+        sumsubUrl:
+          type: string
+
     InvoiceRewardsPerNetwork:
       type: object
       required:
@@ -2502,6 +2565,10 @@ components:
           $ref: '#/components/schemas/BillingProfileType'
         verificationStatus:
           $ref: '#/components/schemas/VerificationStatus'
+        kyb:
+          $ref: '#/components/schemas/KybResponse'
+        kyc:
+          $ref: '#/components/schemas/KycResponse'
         admins:
           type: array
           items:
@@ -2756,6 +2823,11 @@ components:
     ShortCurrencyResponse:
       type: object
       description: Minimal information about a currency
+      required:
+        - id
+        - code
+        - name
+        - decimals
       properties:
         id:
           $ref: '#/components/schemas/CurrencyId'
@@ -2768,6 +2840,8 @@ components:
         logoUrl:
           type: string
           format: uri
+        decimals:
+          type: integer
 
     TransactionalCurrencyResponse:
       allOf:

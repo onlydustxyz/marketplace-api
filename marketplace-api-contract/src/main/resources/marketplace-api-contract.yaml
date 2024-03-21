@@ -2481,6 +2481,43 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/billing-profiles/{billingProfileId}/coworkers/{githubUserId}/role:
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BillingProfiles
+      summary: Update coworker role
+      operationId: updateCoworkerRole
+      description: |
+        Update coworker role. Caller must be an admin of the billing profile.
+      parameters:
+        - in: path
+          name: billingProfileId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BillingProfileId'
+        - in: path
+          name: githubUserId
+          required: true
+          schema:
+            $ref: '#/components/schemas/GithubUserId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCoworkerRoleRequest'
+      responses:
+        "204":
+          description: 'Coworker updated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
   /api/v1/billing-profiles/{billingProfileId}/invoice-preview:
     get:
@@ -4609,6 +4646,14 @@ components:
       properties:
         enable:
           type: boolean
+
+    UpdateCoworkerRoleRequest:
+      type: object
+      required:
+        - role
+      properties:
+        role:
+          $ref: '#/components/schemas/BillingProfileCoworkerRole'
 
     MyBillingProfilesResponse:
       type: object

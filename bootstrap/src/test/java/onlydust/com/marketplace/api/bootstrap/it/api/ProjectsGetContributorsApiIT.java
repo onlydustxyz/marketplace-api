@@ -39,17 +39,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                     "totalAmount": 2692632.50,
                     "details": [
                       {
-                        "totalAmount": 1500,
-                        "totalDollarsEquivalent": 2672970.00,
-                        "currency": {
-                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                          "code": "ETH",
-                          "name": "Ether",
-                          "logoUrl": null,
-                          "decimals": 18
-                        }
-                      },
-                      {
                         "totalAmount": 3250,
                         "totalDollarsEquivalent": 3250,
                         "currency": {
@@ -61,24 +50,13 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                         }
                       },
                       {
-                        "totalAmount": 2000,
-                        "totalDollarsEquivalent": 0,
-                        "currency": {
-                          "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                          "code": "STRK",
-                          "name": "StarkNet Token",
-                          "logoUrl": null,
-                          "decimals": 18
-                        }
-                      },
-                      {
-                        "totalAmount": 16250,
-                        "totalDollarsEquivalent": 16412.50,
+                        "totalAmount": 19750,
+                        "totalDollarsEquivalent": 2689382.50,
                         "currency": {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -102,17 +80,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                     "totalAmount": 20855.02,
                     "details": [
                       {
-                        "totalAmount": 16502,
-                        "totalDollarsEquivalent": 16667.02,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": null,
-                          "decimals": 6
-                        }
-                      },
-                      {
                         "totalAmount": 4188,
                         "totalDollarsEquivalent": 4188,
                         "currency": {
@@ -121,6 +88,17 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "name": "US Dollar",
                           "logoUrl": null,
                           "decimals": 2
+                        }
+                      },
+                      {
+                        "totalAmount": 16502,
+                        "totalDollarsEquivalent": 16667.02,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                          "decimals": 6
                         }
                       }
                     ]
@@ -149,7 +127,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -179,7 +157,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -220,7 +198,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -250,7 +228,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -417,7 +395,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -447,7 +425,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -567,7 +545,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -597,7 +575,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -627,7 +605,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -657,7 +635,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -681,17 +659,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                     "totalAmount": 20855.02,
                     "details": [
                       {
-                        "totalAmount": 16502,
-                        "totalDollarsEquivalent": 16667.02,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": null,
-                          "decimals": 6
-                        }
-                      },
-                      {
                         "totalAmount": 4188,
                         "totalDollarsEquivalent": 4188,
                         "currency": {
@@ -700,6 +667,17 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "name": "US Dollar",
                           "logoUrl": null,
                           "decimals": 2
+                        }
+                      },
+                      {
+                        "totalAmount": 16502,
+                        "totalDollarsEquivalent": 16667.02,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                          "decimals": 6
                         }
                       }
                     ]
@@ -722,17 +700,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                     "totalAmount": 2692632.50,
                     "details": [
                       {
-                        "totalAmount": 1500,
-                        "totalDollarsEquivalent": 2672970.00,
-                        "currency": {
-                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                          "code": "ETH",
-                          "name": "Ether",
-                          "logoUrl": null,
-                          "decimals": 18
-                        }
-                      },
-                      {
                         "totalAmount": 3250,
                         "totalDollarsEquivalent": 3250,
                         "currency": {
@@ -744,24 +711,13 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                         }
                       },
                       {
-                        "totalAmount": 2000,
-                        "totalDollarsEquivalent": 0,
-                        "currency": {
-                          "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                          "code": "STRK",
-                          "name": "StarkNet Token",
-                          "logoUrl": null,
-                          "decimals": 18
-                        }
-                      },
-                      {
-                        "totalAmount": 16250,
-                        "totalDollarsEquivalent": 16412.50,
+                        "totalAmount": 19750,
+                        "totalDollarsEquivalent": 2689382.50,
                         "currency": {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -803,7 +759,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -988,7 +944,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -1018,7 +974,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -1138,7 +1094,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -1168,7 +1124,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -1198,7 +1154,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -1228,7 +1184,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -1252,17 +1208,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                     "totalAmount": 20855.02,
                     "details": [
                       {
-                        "totalAmount": 16502,
-                        "totalDollarsEquivalent": 16667.02,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": null,
-                          "decimals": 6
-                        }
-                      },
-                      {
                         "totalAmount": 4188,
                         "totalDollarsEquivalent": 4188,
                         "currency": {
@@ -1271,6 +1216,17 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "name": "US Dollar",
                           "logoUrl": null,
                           "decimals": 2
+                        }
+                      },
+                      {
+                        "totalAmount": 16502,
+                        "totalDollarsEquivalent": 16667.02,
+                        "currency": {
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                          "decimals": 6
                         }
                       }
                     ]
@@ -1293,17 +1249,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                     "totalAmount": 2692632.50,
                     "details": [
                       {
-                        "totalAmount": 1500,
-                        "totalDollarsEquivalent": 2672970.00,
-                        "currency": {
-                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                          "code": "ETH",
-                          "name": "Ether",
-                          "logoUrl": null,
-                          "decimals": 18
-                        }
-                      },
-                      {
                         "totalAmount": 3250,
                         "totalDollarsEquivalent": 3250,
                         "currency": {
@@ -1315,24 +1260,13 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                         }
                       },
                       {
-                        "totalAmount": 2000,
-                        "totalDollarsEquivalent": 0,
-                        "currency": {
-                          "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                          "code": "STRK",
-                          "name": "StarkNet Token",
-                          "logoUrl": null,
-                          "decimals": 18
-                        }
-                      },
-                      {
-                        "totalAmount": 16250,
-                        "totalDollarsEquivalent": 16412.50,
+                        "totalAmount": 19750,
+                        "totalDollarsEquivalent": 2689382.50,
                         "currency": {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -1373,7 +1307,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                             "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                             "code": "USDC",
                             "name": "USD Coin",
-                            "logoUrl": null,
+                            "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                             "decimals": 6
                           }
                         }
@@ -1458,17 +1392,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                     "totalAmount": 2692632.50,
                     "details": [
                       {
-                        "totalAmount": 1500,
-                        "totalDollarsEquivalent": 2672970.00,
-                        "currency": {
-                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                          "code": "ETH",
-                          "name": "Ether",
-                          "logoUrl": null,
-                          "decimals": 18
-                        }
-                      },
-                      {
                         "totalAmount": 3250,
                         "totalDollarsEquivalent": 3250,
                         "currency": {
@@ -1480,24 +1403,13 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                         }
                       },
                       {
-                        "totalAmount": 2000,
-                        "totalDollarsEquivalent": 0,
-                        "currency": {
-                          "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                          "code": "STRK",
-                          "name": "StarkNet Token",
-                          "logoUrl": null,
-                          "decimals": 18
-                        }
-                      },
-                      {
-                        "totalAmount": 16250,
-                        "totalDollarsEquivalent": 16412.50,
+                        "totalAmount": 19750,
+                        "totalDollarsEquivalent": 2689382.50,
                         "currency": {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -1521,6 +1433,17 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                     "totalAmount": 35210.00,
                     "details": [
                       {
+                        "totalAmount": 20.5,
+                        "totalDollarsEquivalent": 31426.5,
+                        "currency": {
+                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                          "code": "ETH",
+                          "name": "Ether",
+                          "logoUrl": null,
+                          "decimals": 18
+                        }
+                      },
+                      {
                         "totalAmount": 450,
                         "totalDollarsEquivalent": 643.5,
                         "currency": {
@@ -1543,14 +1466,14 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                         }
                       },
                       {
-                        "totalAmount": 20.5,
-                        "totalDollarsEquivalent": 31426.5,
+                        "totalAmount": 2000,
+                        "totalDollarsEquivalent": 2020.00,
                         "currency": {
-                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                          "code": "ETH",
-                          "name": "Ether",
-                          "logoUrl": null,
-                          "decimals": 18
+                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                          "code": "USDC",
+                          "name": "USD Coin",
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                          "decimals": 6
                         }
                       },
                       {
@@ -1562,17 +1485,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "name": "StarkNet Token",
                           "logoUrl": null,
                           "decimals": 18
-                        }
-                      },
-                      {
-                        "totalAmount": 2000,
-                        "totalDollarsEquivalent": 2020.00,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": null,
-                          "decimals": 6
                         }
                       }
                     ]
@@ -1607,17 +1519,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                     "totalAmount": 2692632.50,
                     "details": [
                       {
-                        "totalAmount": 1500,
-                        "totalDollarsEquivalent": 2672970.00,
-                        "currency": {
-                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                          "code": "ETH",
-                          "name": "Ether",
-                          "logoUrl": null,
-                          "decimals": 18
-                        }
-                      },
-                      {
                         "totalAmount": 3250,
                         "totalDollarsEquivalent": 3250,
                         "currency": {
@@ -1629,24 +1530,13 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                         }
                       },
                       {
-                        "totalAmount": 2000,
-                        "totalDollarsEquivalent": 0,
-                        "currency": {
-                          "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                          "code": "STRK",
-                          "name": "StarkNet Token",
-                          "logoUrl": null,
-                          "decimals": 18
-                        }
-                      },
-                      {
-                        "totalAmount": 16250,
-                        "totalDollarsEquivalent": 16412.50,
+                        "totalAmount": 19750,
+                        "totalDollarsEquivalent": 2689382.50,
                         "currency": {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }
@@ -1676,7 +1566,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
-                          "logoUrl": null,
+                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         }
                       }

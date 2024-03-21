@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.accounting.domain.model.BatchPayment;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
@@ -62,8 +62,8 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
 
     static final List<Invoice.Id> anthonyInvoiceIds = new ArrayList<>();
     static final List<Invoice.Id> olivierInvoiceIds = new ArrayList<>();
-    static BatchPayment.Id sepaBatchPaymentId;
-    static BatchPayment.Id ethBatchPaymentId;
+    static Payment.Id sepaBatchPaymentId;
+    static Payment.Id ethBatchPaymentId;
 
     void setUp() throws IOException {
         // Given
@@ -205,7 +205,8 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                     "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                     "code": "USD",
                                     "name": "US Dollar",
-                                    "logoUrl": null
+                                    "logoUrl": null,
+                                    "decimals": 2
                                   },
                                   "dollarsEquivalent": 1000
                                 }
@@ -222,7 +223,8 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
                                     "name": "USD Coin",
-                                    "logoUrl": null
+                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                    "decimals": 6
                                   },
                                   "dollarsEquivalent": 3030.00
                                 }
@@ -238,8 +240,8 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                 erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,747e663f-4e68-4b42-965b-b5aebedcd4c4.eth,1000
                 erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,e461c019-ba23-4671-9b6c-3a5a18748af9.eth,2000
                 """);
-        ethBatchPaymentId = BatchPayment.Id.of(network1.getValue().equals("ETHEREUM") ? batchPaymentId1.getValue() : batchPaymentId2.getValue());
-        sepaBatchPaymentId = BatchPayment.Id.of(network1.getValue().equals("SEPA") ? batchPaymentId1.getValue() : batchPaymentId2.getValue());
+        ethBatchPaymentId = Payment.Id.of(network1.getValue().equals("ETHEREUM") ? batchPaymentId1.getValue() : batchPaymentId2.getValue());
+        sepaBatchPaymentId = Payment.Id.of(network1.getValue().equals("SEPA") ? batchPaymentId1.getValue() : batchPaymentId2.getValue());
     }
 
     @Test
@@ -270,7 +272,8 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                 "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                 "code": "USDC",
                                 "name": "USD Coin",
-                                "logoUrl": null
+                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                "decimals": 6
                               },
                               "dollarsEquivalent": 3030.00
                             }
@@ -305,7 +308,8 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
                                   "name": "USD Coin",
-                                  "logoUrl": null
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 },
                                 "dollarsEquivalent": 2020.00,
                                 "conversionRate": 1.0100000000000000
@@ -425,7 +429,8 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
                                   "name": "USD Coin",
-                                  "logoUrl": null
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 },
                                 "dollarsEquivalent": 1010.00,
                                 "conversionRate": 1.0100000000000000
@@ -472,7 +477,8 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                     "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                     "code": "USD",
                                     "name": "US Dollar",
-                                    "logoUrl": null
+                                    "logoUrl": null,
+                                    "decimals": 2
                                   },
                                   "dollarsEquivalent": 1000
                                 }
@@ -490,7 +496,8 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
                                     "name": "USD Coin",
-                                    "logoUrl": null
+                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                    "decimals": 6
                                   },
                                   "dollarsEquivalent": 3030.00
                                 }
@@ -582,7 +589,8 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
                                     "name": "USD Coin",
-                                    "logoUrl": null
+                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                    "decimals": 6
                                   },
                                   "dollarsEquivalent": 3030.00
                                 }

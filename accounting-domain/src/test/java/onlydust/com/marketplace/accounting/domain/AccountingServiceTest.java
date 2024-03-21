@@ -2,7 +2,6 @@ package onlydust.com.marketplace.accounting.domain;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.*;
-import onlydust.com.marketplace.accounting.domain.model.SponsorAccount.PaymentReference;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount.Transaction;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.*;
@@ -40,8 +39,8 @@ public class AccountingServiceTest {
             projectAccountingObserver);
     final Faker faker = new Faker();
 
-    private PaymentReference fakePaymentReference(Network network) {
-        return new PaymentReference(network, faker.random().hex(), faker.rickAndMorty().character(), faker.internet().slug() + ".eth");
+    private Payment.Reference fakePaymentReference(Network network) {
+        return new Payment.Reference(network, faker.random().hex(), faker.rickAndMorty().character(), faker.internet().slug() + ".eth");
     }
 
     private Transaction fakeTransaction(Network network, Amount amount) {
@@ -192,11 +191,11 @@ public class AccountingServiceTest {
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(sponsorAccount.account().id()), amount));
-            assertThat(sponsorAccount.account().unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
+            assertThat(sponsorAccount.account().unlockedBalance()).isEqualTo(Amount.ZERO);
             assertThat(sponsorAccount.account().lockedUntil()).contains(lockedUntil.toInstant());
 
             final var savedAccount = sponsorAccountStorage.get(sponsorAccount.account().id()).orElseThrow();
-            assertThat(savedAccount.unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
+            assertThat(savedAccount.unlockedBalance()).isEqualTo(Amount.ZERO);
             assertThat(savedAccount.lockedUntil()).isEqualTo(sponsorAccount.account().lockedUntil());
         }
 
@@ -249,6 +248,7 @@ public class AccountingServiceTest {
         @BeforeEach
         void setup() {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
+            when(currencyStorage.all()).thenReturn(Set.of(currency));
             sponsorAccount = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, currency.id(), null, PositiveAmount.of(100L)).account();
         }
 
@@ -340,10 +340,10 @@ public class AccountingServiceTest {
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
             final var transaction = fakeTransaction(network, PositiveAmount.of(10L));
-            assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), transaction))
+            assertThatThrownBy(() -> accountingService.pay(rewardId1, transaction))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("Sponsor account %s is not funded".formatted(sponsorAccount.id()));
+                    .hasMessage("Reward %s is not payable on ETHEREUM".formatted(rewardId1));
         }
 
         /*
@@ -394,57 +394,6 @@ public class AccountingServiceTest {
         }
 
         /*
-         * Given a sponsor, a project, 2 projects and 2 contributors
-         * When
-         *    - the sponsor funds project 1
-         *    - project 1 rewards the 2 contributors
-         *    - some project 1 unspent funds are re-allocated to project 2
-         *    - the project 1 refunds the remaining unspent funds to the sponsor
-         *    - the sponsor funds project 2 directly
-         *    - project 2 rewards contributor 2
-         *    - contributor 2 withdraws his money
-         * Then All is well :-)
-         */
-        @Test
-        void should_do_everything() {
-            // When
-            accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(300L)));
-            verify(accountingObserver).onSponsorAccountBalanceChanged(any());
-            accountingService.allocate(sponsorAccount.id(), projectId1, PositiveAmount.of(70L), currency.id());
-
-            accountingService.createReward(projectId1, rewardId1, PositiveAmount.of(10L), currency.id());
-            assertOnRewardCreated(rewardId1, true, null, Set.of(network));
-
-            accountingService.createReward(projectId1, rewardId2, PositiveAmount.of(20L), currency.id());
-            assertOnRewardCreated(rewardId2, true, null, Set.of(network));
-
-            accountingService.unallocate(projectId1, sponsorAccount.id(), PositiveAmount.of(20L), currency.id());
-
-            accountingService.allocate(sponsorAccount.id(), projectId2, PositiveAmount.of(35L), currency.id());
-
-            accountingService.createReward(projectId2, rewardId2, PositiveAmount.of(25L), currency.id());
-
-            assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
-            reset(accountingObserver);
-            final var reference = fakePaymentReference(network);
-            accountingService.pay(rewardId2, currency.id(), reference);
-            verify(accountingObserver).onSponsorAccountBalanceChanged(any());
-            verify(accountingObserver).onPaymentReceived(rewardId2, reference);
-            verify(accountingObserver).onRewardPaid(rewardId2);
-
-            // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(
-                    new TransferEvent(AccountId.of(sponsorAccount.id()), AccountId.of(projectId1), PositiveAmount.of(70L)),
-                    new TransferEvent(AccountId.of(projectId1), AccountId.of(rewardId1), PositiveAmount.of(10L)),
-                    new TransferEvent(AccountId.of(projectId1), AccountId.of(rewardId2), PositiveAmount.of(20L)),
-                    new RefundEvent(AccountId.of(projectId1), AccountId.of(sponsorAccount.id()), PositiveAmount.of(20L)),
-                    new TransferEvent(AccountId.of(sponsorAccount.id()), AccountId.of(projectId2), PositiveAmount.of(35L)),
-                    new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(25L)),
-                    new BurnEvent(AccountId.of(rewardId2), PositiveAmount.of(45L))
-            );
-        }
-
-        /*
          * Given a sponsor, a project and a contributor
          * When
          *    - the sponsor funds its account in multiple times
@@ -463,9 +412,7 @@ public class AccountingServiceTest {
             accountingService.createReward(projectId2, rewardId2, PositiveAmount.of(100L), currency.id());
             assertOnRewardCreated(rewardId2, true, null, Set.of(network));
 
-            final var transaction = new Transaction(Transaction.Type.DEPOSIT, Network.ETHEREUM, "0x123456", PositiveAmount.of(1000L), "StarkNet Foundation",
-                    "starknet.eth");
-            accountingService.pay(rewardId2, currency.id(), transaction);
+            accountingService.pay(rewardId2, fakePaymentReference(Network.ETHEREUM));
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
@@ -501,7 +448,7 @@ public class AccountingServiceTest {
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
             assertThat(accountingService.isPayable(rewardId2, currency.id())).isTrue();
 
-            accountingService.pay(rewardId1, currency.id(), fakeTransaction(network, PositiveAmount.of(50L)));
+            accountingService.pay(rewardId1, fakeTransaction(network, PositiveAmount.of(50L)));
 
             {
                 final var account = accountingService.getSponsorAccountStatement(sponsorAccount.id()).orElseThrow();
@@ -511,9 +458,10 @@ public class AccountingServiceTest {
             }
 
             assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
-            assertThatThrownBy(() -> accountingService.pay(rewardId2, currency.id(), fakeTransaction(network, PositiveAmount.of(50L))))
+            assertThatThrownBy(() -> accountingService.pay(rewardId2, fakeTransaction(network, PositiveAmount.of(50L))))
                     // Then
-                    .isInstanceOf(OnlyDustException.class).hasMessageContaining("Not enough fund");
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Reward %s is not payable on ETHEREUM".formatted(rewardId2));
         }
 
         /*
@@ -551,6 +499,36 @@ public class AccountingServiceTest {
                     new TransferEvent(AccountId.of(projectId1), AccountId.of(rewardId1), PositiveAmount.of(40L)),
                     new FullRefundEvent(AccountId.of(rewardId1))
             );
+        }
+
+        @Test
+        void should_prevent_a_reward_from_being_payable_if_already_paid() {
+            // Given
+            accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(100L)));
+            accountingService.allocate(sponsorAccount.id(), projectId1, PositiveAmount.of(100L), currency.id());
+            accountingService.createReward(projectId1, rewardId1, PositiveAmount.of(40L), currency.id());
+            when(currencyStorage.all()).thenReturn(Set.of(currency));
+
+            // When
+            final var payments = accountingService.pay(Set.of(rewardId1));
+
+            // Then
+            assertThat(payments).hasSize(1);
+            assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
+            assertThat(accountingService.getPayableRewards()).isEmpty();
+            assertThatThrownBy(() -> accountingService.cancel(rewardId1, currency.id()))
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Cannot entirely refund");
+            assertThatThrownBy(() -> accountingService.pay(rewardId1, fakePaymentReference(network)))
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Reward %s is not payable".formatted(rewardId1));
+
+            // When
+            accountingService.cancel(payments.get(0).id(), currency.id());
+
+            // Then
+            assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
+            assertThat(accountingService.getPayableRewards()).hasSize(1);
         }
     }
 
@@ -642,10 +620,10 @@ public class AccountingServiceTest {
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
             final var transaction = fakeTransaction(network, PositiveAmount.of(10L));
-            assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), transaction))
+            assertThatThrownBy(() -> accountingService.pay(rewardId1, transaction))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessageContaining("is not funded");
+                    .hasMessage("Reward %s is not payable on ETHEREUM".formatted(rewardId1));
         }
 
         /*
@@ -672,7 +650,7 @@ public class AccountingServiceTest {
                     new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(100L))
             );
 
-            assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
+            assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
         }
 
         /*
@@ -696,10 +674,10 @@ public class AccountingServiceTest {
             assertOnRewardCreated(rewardId1, true, unlockDate, Set.of(network));
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
-            assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), fakeTransaction(network, amount)))
+            assertThatThrownBy(() -> accountingService.pay(rewardId1, fakeTransaction(network, amount)))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessageContaining("Cannot spend from locked account");
+                    .hasMessage("Reward %s is not payable on ETHEREUM".formatted(rewardId1));
         }
 
         /*
@@ -740,6 +718,7 @@ public class AccountingServiceTest {
             currency.erc20().add(ERC20Tokens.OP_USDC);
 
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
+            when(currencyStorage.all()).thenReturn(Set.of(currency));
             unlockedSponsorSponsorAccount1 = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, currency.id(), null,
                     PositiveAmount.of(100L)).account();
             unlockedSponsorSponsorAccount2 = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, currency.id(), null,
@@ -766,12 +745,11 @@ public class AccountingServiceTest {
             assertThat(account.awaitingPaymentAmount()).isEqualTo(PositiveAmount.of(100L));
 
             assertThat(accountingService.isPayable(rewardId, currency.id())).isFalse();
-            assertThatThrownBy(() -> accountingService.pay(rewardId, currency.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L))))
+            assertThatThrownBy(() -> accountingService.pay(rewardId, fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L))))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessageContaining("is not funded");
+                    .hasMessage("Reward %s is not payable on ETHEREUM".formatted(rewardId));
         }
-
 
         /*
          * Given 2 sponsor accounts that rewarded 2 contributors via the same project
@@ -799,7 +777,7 @@ public class AccountingServiceTest {
                 final var account = accountingService.getSponsorAccountStatement(unlockedSponsorSponsorAccount1.id()).orElseThrow();
                 assertThat(account.awaitingPaymentAmount()).isEqualTo(PositiveAmount.of(100L));
             }
-            accountingService.pay(rewardId, currency.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(1000L)));
+            accountingService.pay(rewardId, fakeTransaction(Network.ETHEREUM, PositiveAmount.of(1000L)));
             {
                 final var account = accountingService.getSponsorAccountStatement(unlockedSponsorSponsorAccount1.id()).orElseThrow();
                 assertThat(account.awaitingPaymentAmount()).isEqualTo(PositiveAmount.ZERO);
@@ -807,10 +785,10 @@ public class AccountingServiceTest {
 
             // Then
             assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
-            assertThatThrownBy(() -> accountingService.pay(rewardId2, currency.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(1000L))))
+            assertThatThrownBy(() -> accountingService.pay(rewardId2, fakeTransaction(Network.ETHEREUM, PositiveAmount.of(1000L))))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessageContaining("is not funded");
+                    .hasMessage("Reward %s is not payable on ETHEREUM".formatted(rewardId2));
         }
 
         /*
@@ -831,10 +809,10 @@ public class AccountingServiceTest {
 
             // When
             assertThat(accountingService.isPayable(rewardId, currency.id())).isFalse();
-            assertThatThrownBy(() -> accountingService.pay(rewardId, currency.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L))))
+            assertThatThrownBy(() -> accountingService.pay(rewardId, fakePaymentReference(Network.ETHEREUM)))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessageContaining("Cannot spend from locked account");
+                    .hasMessage("Reward %s is not payable on ETHEREUM".formatted(rewardId));
         }
 
         /*
@@ -861,8 +839,8 @@ public class AccountingServiceTest {
             // When
             assertThat(accountingService.isPayable(rewardId, currency.id())).isTrue();
 
-            accountingService.pay(rewardId, currency.id(), fakePaymentReference(Network.ETHEREUM));
-            accountingService.pay(rewardId, currency.id(), fakePaymentReference(Network.OPTIMISM));
+            accountingService.pay(rewardId, fakePaymentReference(Network.ETHEREUM));
+            accountingService.pay(rewardId, fakePaymentReference(Network.OPTIMISM));
 
             // Then
             assertThat(sponsorAccountStorage.get(unlockedSponsorSponsorAccount1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
@@ -895,7 +873,7 @@ public class AccountingServiceTest {
 
             reset(accountingObserver);
             final var reference = fakePaymentReference(Network.ETHEREUM);
-            accountingService.pay(rewardId, currency.id(), reference);
+            accountingService.pay(rewardId, reference);
             verify(accountingObserver, times(2)).onSponsorAccountBalanceChanged(any());
             verify(accountingObserver).onPaymentReceived(rewardId, reference);
             verify(accountingObserver).onRewardPaid(rewardId);
@@ -1009,7 +987,7 @@ public class AccountingServiceTest {
          * Then We can list the payable rewards
          */
         @Test
-        void should_return_no_payable_reward_if_no_fund() {
+        void should_return_no_payable_reward_if_none_fund() {
             {
                 // When
                 final var payableRewards = accountingService.getPayableRewards();
@@ -1257,7 +1235,7 @@ public class AccountingServiceTest {
 
             reset(accountingObserver);
             final var reference = fakePaymentReference(Network.ETHEREUM);
-            accountingService.pay(rewardId3, usdc.id(), reference);
+            accountingService.pay(rewardId3, reference);
             verify(accountingObserver).onSponsorAccountBalanceChanged(any());
             verify(accountingObserver).onPaymentReceived(rewardId3, reference);
             verify(accountingObserver, never()).onRewardPaid(rewardId3);
@@ -1278,7 +1256,146 @@ public class AccountingServiceTest {
                 assertThat(payableRewards1).isEmpty();
             }
         }
+    }
 
+    /*
+     * diagram: https://app.diagrams.net/#G1r4LWMljxwrZyAPJkvC1_rxL8Zsj0v1WN
+     */
+    @Test
+    void complete_test_case() {
+        // Given
+        final var sponsor1 = SponsorId.random();
+        final var sponsor2 = SponsorId.random();
+        final var projectId1 = ProjectId.random();
+        final var projectId2 = ProjectId.random();
+        final var rewardId1 = RewardId.random();
+        final var rewardId2 = RewardId.random();
+        final var currency = Currencies.ETH.withERC20(ERC20Tokens.STARKNET_ETH);
 
+        when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
+        when(currencyStorage.all()).thenReturn(Set.of(currency));
+
+        // When
+        final var sponsor1Account1 = accountingService.createSponsorAccountWithInitialAllowance(sponsor1, currency.id(), null,
+                PositiveAmount.of(10_000L)).account().id();
+        accountingService.fund(sponsor1Account1, fakeTransaction(Network.ETHEREUM, PositiveAmount.of(5_000L)));
+        accountingService.fund(sponsor1Account1, fakeTransaction(Network.ETHEREUM, PositiveAmount.of(5_000L)));
+
+        final var sponsor2Account1 = accountingService.createSponsorAccountWithInitialBalance(sponsor1, currency.id(), null,
+                fakeTransaction(Network.ETHEREUM, PositiveAmount.of(3_000L))).account().id();
+        accountingService.increaseAllowance(sponsor2Account1, Amount.of(17_000L));
+
+        final var sponsor2Account2 = accountingService.createSponsorAccountWithInitialBalance(sponsor2, currency.id(), ZonedDateTime.now().plusMonths(1),
+                fakeTransaction(Network.STARKNET, PositiveAmount.of(50_000L))).account().id();
+        accountingService.increaseAllowance(sponsor2Account2, Amount.of(-30_000L));
+
+        // Then
+        assertAccount(sponsor1Account1, 10_000L, 10_000L, 10_000L);
+        assertAccount(sponsor2Account1, 20_000L, 3_000L, 3_000L);
+        assertAccount(sponsor2Account2, 20_000L, 50_000L, 0L);
+
+        // When
+        accountingService.allocate(sponsor1Account1, projectId1, PositiveAmount.of(8_000L), currency.id());
+        accountingService.allocate(sponsor2Account1, projectId1, PositiveAmount.of(15_000L), currency.id());
+
+        accountingService.allocate(sponsor1Account1, projectId2, PositiveAmount.of(1_000L), currency.id());
+        accountingService.allocate(sponsor2Account1, projectId2, PositiveAmount.of(2_000L), currency.id());
+        accountingService.allocate(sponsor2Account1, projectId2, PositiveAmount.of(3_000L), currency.id());
+        accountingService.allocate(sponsor2Account2, projectId2, PositiveAmount.of(5_000L), currency.id());
+
+        // Then
+        assertAccount(sponsor1Account1, 1_000L, 10_000L, 10_000L);
+        assertAccount(sponsor2Account1, 0L, 3_000L, 3_000L);
+        assertAccount(sponsor2Account2, 15_000L, 50_000L, 0L);
+
+        // When
+        accountingService.createReward(projectId2, rewardId1, PositiveAmount.of(3_500L), currency.id());
+        accountingService.createReward(projectId2, rewardId2, PositiveAmount.of(4_000L), currency.id());
+
+        // Then
+        assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
+        assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
+
+        // When (special actions to make reward2 payable)
+        accountingService.updateSponsorAccount(sponsor2Account2, null);
+        accountingService.fund(sponsor2Account1, fakeTransaction(Network.ETHEREUM, PositiveAmount.of(2_500L)));
+
+        // Then
+        assertAccount(sponsor1Account1, 1_000L, 10_000L, 10_000L);
+        assertAccount(sponsor2Account1, 0L, 5_500L, 5_500L);
+        assertAccount(sponsor2Account2, 15_000L, 50_000L, 50_000L);
+        assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
+        assertThat(accountingService.isPayable(rewardId2, currency.id())).isTrue();
+
+        // When
+        final var payments = accountingService.pay(Set.of(rewardId1, rewardId2));
+
+        // Then
+        assertThat(payments).hasSize(2);
+        final var payment1 = payments.stream().filter(p -> p.network().equals(Network.ETHEREUM)).findFirst().orElseThrow();
+        final var payment2 = payments.stream().filter(p -> p.network().equals(Network.STARKNET)).findFirst().orElseThrow();
+        assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
+        assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
+
+        // When
+        final var ethPaymentReference1 = fakePaymentReference(Network.ETHEREUM);
+        final var ethPaymentReference2 = fakePaymentReference(Network.ETHEREUM);
+        payment1.referenceFor(rewardId1, ethPaymentReference1);
+        payment1.referenceFor(rewardId2, ethPaymentReference2);
+        accountingService.confirm(payment1);
+
+        // Then
+        verify(accountingObserver).onPaymentReceived(rewardId1, ethPaymentReference1);
+        verify(accountingObserver).onPaymentReceived(rewardId2, ethPaymentReference2);
+        verify(accountingObserver).onRewardPaid(rewardId1);
+        verify(accountingObserver, never()).onRewardPaid(rewardId2);
+
+        assertAccount(sponsor1Account1, 1_000L, 9_000L, 9_000L);
+        assertAccount(sponsor2Account1, 0L, 500L, 500L);
+        assertAccount(sponsor2Account2, 15_000L, 50_000L, 50_000L);
+
+        // When
+        reset(accountingObserver);
+        final var starknetPaymentReference = fakePaymentReference(Network.STARKNET);
+        payment2.referenceFor(rewardId2, starknetPaymentReference);
+        accountingService.confirm(payment2);
+
+        // Then
+        verify(accountingObserver, never()).onPaymentReceived(eq(rewardId1), any());
+        verify(accountingObserver).onPaymentReceived(rewardId2, starknetPaymentReference);
+        verify(accountingObserver, never()).onRewardPaid(rewardId1);
+        verify(accountingObserver).onRewardPaid(rewardId2);
+
+        assertAccount(sponsor1Account1, 1_000L, 9_000L, 9_000L);
+        assertAccount(sponsor2Account1, 0L, 500L, 500L);
+        assertAccount(sponsor2Account2, 15_000L, 48_500L, 48_500L);
+
+        assertThat(accountBookEventStorage.events.get(currency)).containsExactlyInAnyOrder(
+                new MintEvent(AccountId.of(sponsor1Account1), PositiveAmount.of(10_000L)),
+                new MintEvent(AccountId.of(sponsor2Account1), PositiveAmount.of(3_000L)),
+                new MintEvent(AccountId.of(sponsor2Account1), PositiveAmount.of(17_000L)),
+                new MintEvent(AccountId.of(sponsor2Account2), PositiveAmount.of(50_000L)),
+                new RefundEvent(AccountId.of(sponsor2Account2), AccountId.ROOT, PositiveAmount.of(30_000L)),
+                new TransferEvent(AccountId.of(sponsor1Account1), AccountId.of(projectId1), PositiveAmount.of(8_000L)),
+                new TransferEvent(AccountId.of(sponsor2Account1), AccountId.of(projectId1), PositiveAmount.of(15_000L)),
+                new TransferEvent(AccountId.of(sponsor1Account1), AccountId.of(projectId2), PositiveAmount.of(1_000L)),
+                new TransferEvent(AccountId.of(sponsor2Account1), AccountId.of(projectId2), PositiveAmount.of(2_000L)),
+                new TransferEvent(AccountId.of(sponsor2Account1), AccountId.of(projectId2), PositiveAmount.of(3_000L)),
+                new TransferEvent(AccountId.of(sponsor2Account2), AccountId.of(projectId2), PositiveAmount.of(5_000L)),
+                new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId1), PositiveAmount.of(3_500L)),
+                new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(4_000L)),
+                new TransferEvent(AccountId.of(rewardId1), AccountId.of(payment1.id()), PositiveAmount.of(3_500L)),
+                new TransferEvent(AccountId.of(rewardId2), AccountId.of(payment1.id()), PositiveAmount.of(2_500L)),
+                new TransferEvent(AccountId.of(rewardId2), AccountId.of(payment2.id()), PositiveAmount.of(1_500L)),
+                new BurnEvent(AccountId.of(payment1.id()), PositiveAmount.of(6_000L)),
+                new BurnEvent(AccountId.of(payment2.id()), PositiveAmount.of(1_500L))
+        );
+    }
+
+    private void assertAccount(SponsorAccount.Id sponsorAccountId, Long expectedAllowance, Long expectedBalance, Long expectedUnlockedBalance) {
+        final var sponsorAccountStatement = accountingService.getSponsorAccountStatement(sponsorAccountId).orElseThrow();
+        assertThat(sponsorAccountStatement.allowance()).isEqualTo(PositiveAmount.of(expectedAllowance));
+        assertThat(sponsorAccountStatement.account().balance()).isEqualTo(Amount.of(expectedBalance));
+        assertThat(sponsorAccountStatement.account().unlockedBalance()).isEqualTo(Amount.of(expectedUnlockedBalance));
     }
 }

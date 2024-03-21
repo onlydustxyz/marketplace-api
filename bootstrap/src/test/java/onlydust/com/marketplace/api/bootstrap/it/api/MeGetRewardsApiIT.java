@@ -130,7 +130,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": null,
                               "amount": {
                                 "total": 1000,
-                                "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":null,"decimals":6},
+                                "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
                                 "dollarsEquivalent": 1010.00
                               },
                               "numberOfRewardedContributions": 25,
@@ -241,7 +241,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": null,
                               "amount": {
                                 "total": 1000,
-                                "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":null,"decimals":6},
+                                "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
                                 "dollarsEquivalent": 1010.00
                               },
                               "numberOfRewardedContributions": 25,
@@ -339,11 +339,11 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                           "'298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").exists()
                 .jsonPath("$.rewards[?(@.projectId nin ['5aabf0f1-7495-4bff-8de2-4396837ce6b4'," +
                           "'298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").doesNotExist()
-                .jsonPath("$.rewardedAmount.amount").doesNotExist()
-                .jsonPath("$.rewardedAmount.currency").doesNotExist()
+                .jsonPath("$.rewardedAmount.amount").isEqualTo(12500)
+                .jsonPath("$.rewardedAmount.currency.code").isEqualTo("USDC")
                 .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(2683070)
-                .jsonPath("$.pendingAmount.amount").doesNotExist()
-                .jsonPath("$.pendingAmount.currency").doesNotExist()
+                .jsonPath("$.pendingAmount.amount").isEqualTo(12000)
+                .jsonPath("$.pendingAmount.currency.code").isEqualTo("USDC")
                 .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(1792080.0)
                 .jsonPath("$.receivedRewardsCount").isEqualTo(13)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(88)
