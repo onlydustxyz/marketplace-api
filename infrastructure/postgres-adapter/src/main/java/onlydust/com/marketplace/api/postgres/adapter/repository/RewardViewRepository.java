@@ -1,10 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
 import onlydust.com.marketplace.project.domain.model.Reward;
+import org.intellij.lang.annotations.Language;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.JpaSort;
@@ -17,7 +16,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UUID> {
-    @Query(value = """
+
+    @Language("PostgreSQL")
+    String SELECT = """
             SELECT r.id                         AS id,
                    r.requested_at               AS requested_at,
                    r.project_id                 AS project_id,
@@ -39,27 +40,7 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                  JOIN indexer_exp.github_accounts github_recipient ON github_recipient.id = r.recipient_id
                  JOIN iam.users requestor ON requestor.id = r.requestor_id
                  JOIN indexer_exp.github_accounts github_requestor ON github_requestor.id = requestor.github_user_id
-            WHERE (coalesce(:rewardIds) IS NULL OR r.id IN (:rewardIds))
-              AND (coalesce(:statuses) IS NULL OR CAST(rs.status AS TEXT) IN (:statuses))
-              AND (
-                    (coalesce(:contributorIds) IS NULL OR r.recipient_id IN (:contributorIds))
-                    OR
-                    (coalesce(:administratedBillingProfileIds) IS NULL OR r.billing_profile_id IN (:administratedBillingProfileIds))
-                  )
-              AND (coalesce(:currencyIds) IS NULL OR r.currency_id IN (:currencyIds))
-              AND (coalesce(:projectIds) IS NULL OR r.project_id IN (:projectIds))
-              and (:fromDate IS NULL OR r.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD'))
-              AND (:toDate IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
-            """, nativeQuery = true)
-    Page<RewardViewEntity> find(List<UUID> rewardIds,
-                                List<Long> contributorIds,
-                                List<UUID> currencyIds,
-                                List<UUID> projectIds,
-                                List<String> statuses,
-                                List<UUID> administratedBillingProfileIds,
-                                String fromDate,
-                                String toDate,
-                                Pageable pageable);
+            """;
 
     static Sort sortBy(final Reward.SortBy sortBy, final Sort.Direction direction) {
         return switch (sortBy) {
@@ -70,48 +51,40 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
         };
     }
 
+    @Query(value = SELECT + """
+            WHERE r.id = :rewardId
+            """, nativeQuery = true)
+    Optional<RewardViewEntity> find(UUID rewardId);
 
-    default Optional<RewardViewEntity> find(UUID rewardId) {
-        return find(
-                List.of(rewardId),
-                List.of(),
-                List.of(),
-                List.of(),
-                List.of(),
-                List.of(),
-                null,
-                null,
-                Pageable.unpaged())
-                .stream().findFirst();
-    }
+    @Query(value = SELECT + """
+            WHERE r.project_id = :projectId
+              AND (coalesce(:contributorIds) IS NULL OR r.recipient_id IN (:contributorIds))
+              AND (coalesce(:currencyIds) IS NULL OR r.currency_id IN (:currencyIds))
+              AND (:fromDate IS NULL OR r.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD'))
+              AND (:toDate IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
+            """, nativeQuery = true)
+    Page<RewardViewEntity> findProjectRewards(UUID projectId, List<UUID> currencyIds, List<Long> contributorIds, String fromDate, String toDate,
+                                              Pageable pageable);
 
-    default Page<RewardViewEntity> findProjectRewards(UUID projectId, List<UUID> currencies, List<Long> contributors, String fromDate, String toDate,
-                                                      PageRequest pageRequest) {
-        return find(
-                List.of(),
-                contributors,
-                currencies,
-                List.of(projectId),
-                List.of(),
-                List.of(),
-                fromDate,
-                toDate,
-                pageRequest);
-    }
+    @Query(value = SELECT + """
+            WHERE (
+                r.recipient_id = :githubUserId
+                OR
+                (coalesce(:administratedBillingProfileIds) IS NOT NULL AND r.billing_profile_id IN (:administratedBillingProfileIds))
+              )
+              AND (coalesce(:currencyIds) IS NULL OR r.currency_id IN (:currencyIds))
+              AND (coalesce(:projectIds) IS NULL OR r.project_id IN (:projectIds))
+              AND (:fromDate IS NULL OR r.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD'))
+              AND (:toDate IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
+            """, nativeQuery = true)
+    Page<RewardViewEntity> findUserRewards(Long githubUserId, List<UUID> currencyIds, List<UUID> projectIds, List<UUID> administratedBillingProfileIds,
+                                           String fromDate, String toDate, Pageable pageable);
 
-    default Page<RewardViewEntity> findUserRewards(Long githubUserId, List<UUID> currencies, List<UUID> projectIds, List<UUID> administratedBillingProfileIds,
-                                                   String fromDate, String toDate, PageRequest pageRequest) {
-        return find(
-                List.of(),
-                List.of(githubUserId),
-                currencies,
-                projectIds,
-                List.of(),
-                administratedBillingProfileIds,
-                fromDate,
-                toDate,
-                pageRequest);
-    }
+    @Query(value = SELECT + """
+            WHERE r.billing_profile_id = :billingProfileId
+              AND rs.status = 'PENDING_REQUEST'
+            """, nativeQuery = true)
+    List<RewardViewEntity> findInvoiceableRewardsForBillingProfile(UUID billingProfileId);
 
     @Modifying
     @Query(nativeQuery = true, value = """
@@ -121,17 +94,4 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
             """)
     void markRewardAsPaymentNotified(List<UUID> rewardIds);
 
-    default List<RewardViewEntity> findInvoiceableRewardsForBillingProfile(UUID billingProfileId) {
-        return find(
-                List.of(),
-                List.of(),
-                List.of(),
-                List.of(),
-                List.of(RewardStatusEntity.Status.PENDING_REQUEST.name()),
-                List.of(billingProfileId),
-                null,
-                null,
-                Pageable.unpaged())
-                .getContent();
-    }
 }

@@ -68,7 +68,7 @@ public interface ShortBillingProfileViewRepository extends JpaRepository<ShortBi
                 bp2.verification_status,
                 bp2.enabled,
                 bpui.role,
-                false pending_invitation,
+                true pending_invitation,
                 count(r2.*) reward_count,
                 count(rs2.*) invoiceable_reward_count
             from iam.users u

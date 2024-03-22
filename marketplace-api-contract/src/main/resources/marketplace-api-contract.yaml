@@ -4668,8 +4668,6 @@ components:
         - id
         - name
         - type
-        - rewardCount
-        - invoiceableRewardCount
         - invoiceMandateAccepted
         - hasValidPayoutMethods
         - hasValidVerificationValid
