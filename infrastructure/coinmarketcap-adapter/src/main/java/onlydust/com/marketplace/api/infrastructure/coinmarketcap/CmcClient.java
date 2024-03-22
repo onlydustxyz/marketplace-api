@@ -8,6 +8,7 @@ import io.netty.handler.codec.http.HttpMethod;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
+@Slf4j
 public class CmcClient extends HttpClient {
     private final Properties properties;
     private final static Map<Currency.Id, Integer> INTERNAL_IDS = new HashMap<>();
@@ -57,9 +59,17 @@ public class CmcClient extends HttpClient {
     }
 
     public Optional<MetadataResponse> metadata(ERC20 erc20) {
-        final var typeRef = new TypeReference<Response<Map<Integer, MetadataResponse>>>() {
-        };
-        return get("/v2/cryptocurrency/info?aux=logo,description&address=%s".formatted(erc20.getAddress()), typeRef).flatMap(d -> d.values().stream().findFirst());
+        try {
+            final var typeRef = new TypeReference<Response<Map<Integer, MetadataResponse>>>() {
+            };
+            return get("/v2/cryptocurrency/info?aux=logo,description&address=%s".formatted(erc20.getAddress()), typeRef).flatMap(d -> d.values().stream().findFirst());
+        } catch (OnlyDustException e) {
+            if (e.getStatus() == 400) {
+                LOGGER.warn("Unable to fetch metadata for ERC20 token %s".formatted(erc20.getAddress()));
+                return Optional.empty();
+            }
+            throw e;
+        }
     }
 
     public Optional<MetadataResponse> metadata(Currency.Code code) {
@@ -68,7 +78,6 @@ public class CmcClient extends HttpClient {
         return get("/v2/cryptocurrency/info?aux=logo,description&symbol=%s".formatted(code), typeRef).flatMap(d -> d.values().stream().findFirst()
                 .flatMap(l -> l.stream().filter(m -> m.category.equals("coin")).findFirst()));
     }
-
 
     public Map<Integer, QuoteResponse> quotes(Set<Currency> from, Set<Currency> to) {
         final var fromIds = currencyToIdList(from);
@@ -92,8 +101,10 @@ public class CmcClient extends HttpClient {
     public synchronized Optional<Integer> internalId(Currency currency) {
         final var id = INTERNAL_IDS.computeIfAbsent(currency.id(), i -> switch (currency.type()) {
                     case CRYPTO -> currency.erc20()
-                            .stream().findFirst()
-                            .flatMap(this::metadata)
+                            .stream().map(this::metadata)
+                            .filter(Optional::isPresent)
+                            .map(Optional::get)
+                            .findFirst()
                             .or(() -> metadata(currency.code()))
                             .map(MetadataResponse::id)
                             .orElse(null);
