@@ -30,6 +30,7 @@ public interface MyRewardMapper {
                 .receivedRewardsCount(page.getReceivedRewardsCount())
                 .rewardedContributionsCount(page.getRewardedContributionsCount())
                 .rewardingProjectsCount(page.getRewardingProjectsCount())
+                .pendingRequestCount(page.getPendingRequestCount())
                 ;
     }
 
