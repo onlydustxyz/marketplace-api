@@ -3,6 +3,7 @@ package onlydust.com.marketplace.accounting.domain.model.accountbook;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.kernel.model.EventType;
 
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Slf4j
 public class AccountBookAggregate implements AccountBook {
     private final AccountBookState state = new AccountBookState();
     private final List<AccountBookEvent> pendingEvents = new ArrayList<>();
@@ -19,6 +21,17 @@ public class AccountBookAggregate implements AccountBook {
     public static AccountBookAggregate fromEvents(final @NonNull Collection<AccountBookEvent> events) {
         AccountBookAggregate aggregate = new AccountBookAggregate();
         events.forEach(aggregate.state::accept);
+        return aggregate;
+    }
+
+    @Deprecated
+    public static AccountBookAggregate fromEventsDebug(final @NonNull Collection<AccountBookEvent> events) {
+        AccountBookAggregate aggregate = new AccountBookAggregate();
+        try {
+            events.forEach(aggregate.state::accept);
+        } catch (Exception e) {
+            LOGGER.error("Error while event sourcing account book", e);
+        }
         return aggregate;
     }
 
