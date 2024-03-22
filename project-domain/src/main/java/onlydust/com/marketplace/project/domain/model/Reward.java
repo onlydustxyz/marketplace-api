@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.project.domain.view.CurrencyView;
+import onlydust.com.marketplace.kernel.model.CurrencyView;
 
 import java.math.BigDecimal;
 import java.util.Date;

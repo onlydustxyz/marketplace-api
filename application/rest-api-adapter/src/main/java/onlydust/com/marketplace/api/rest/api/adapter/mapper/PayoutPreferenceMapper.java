@@ -8,21 +8,29 @@ import onlydust.com.marketplace.api.contract.model.ShortBillingProfileResponse;
 import onlydust.com.marketplace.api.contract.model.ShortProjectResponse;
 
 import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BillingProfileMapper.mapRole;
 
 public interface PayoutPreferenceMapper {
 
     static PayoutPreferencesItemResponse mapToResponse(final PayoutPreferenceView view) {
         return new PayoutPreferencesItemResponse()
-                .billingProfile(isNull(view.shortBillingProfileView()) ? null : billingProfileToResponse(view.shortBillingProfileView()))
+                .billingProfile(isNull(view.shortBillingProfileView()) ? null : billingProfileToShortResponse(view.shortBillingProfileView()))
                 .project(projectToResponse(view.shortProjectView()));
     }
 
-    private static ShortBillingProfileResponse billingProfileToResponse(final ShortBillingProfileView shortBillingProfileView) {
+    static ShortBillingProfileResponse billingProfileToShortResponse(final ShortBillingProfileView view) {
         return new ShortBillingProfileResponse()
-                .id(shortBillingProfileView.getId().value())
-                .name(shortBillingProfileView.getName())
-                .type(BillingProfileMapper.map(shortBillingProfileView.getType()));
+                .id(view.getId().value())
+                .name(view.getName())
+                .enabled(view.getEnabled())
+                .invoiceMandateAccepted(view.isInvoiceMandateAccepted())
+                .pendingInvitationResponse(view.getPendingInvitationResponse())
+                .invoiceableRewardCount(view.getInvoiceableRewardCount())
+                .rewardCount(view.getRewardCount())
+                .role(isNull(view.getRole()) ? null : mapRole(view.getRole()))
+                .type(BillingProfileMapper.map(view.getType()));
     }
+
 
     private static ShortProjectResponse projectToResponse(final ShortProjectView view) {
         return new ShortProjectResponse()

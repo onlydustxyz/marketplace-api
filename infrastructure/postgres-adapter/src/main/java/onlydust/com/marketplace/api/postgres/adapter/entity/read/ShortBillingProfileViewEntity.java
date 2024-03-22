@@ -41,6 +41,8 @@ public class ShortBillingProfileViewEntity {
     @Type(type = "billing_profile_role")
     @Enumerated(EnumType.STRING)
     BillingProfileUserEntity.Role role;
+    Integer rewardCount;
+    Integer invoiceableRewardCount;
 
     public ZonedDateTime getInvoiceMandateAcceptedAt() {
         return isNull(invoiceMandateAcceptedAt) ? null : new Date(invoiceMandateAcceptedAt.getTime()).toInstant().atZone(ZoneOffset.UTC);
@@ -55,6 +57,8 @@ public class ShortBillingProfileViewEntity {
                 .invoiceMandateAcceptedAt(this.getInvoiceMandateAcceptedAt())
                 .enabled(this.enabled)
                 .role(this.role.toDomain())
+                .rewardCount(this.rewardCount)
+                .invoiceableRewardCount(this.invoiceableRewardCount)
                 .build();
     }
 }

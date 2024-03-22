@@ -105,7 +105,6 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_GET_CONTRIBUTED_PROJECTS = "/api/v1/me/contributed-projects";
     protected static final String ME_GET_CONTRIBUTED_REPOS = "/api/v1/me/contributed-repos";
     protected static final String ME_GET_REWARDING_PROJECTS = "/api/v1/me/rewarding-projects";
-    protected static final String ME_REWARDS_PENDING_INVOICE = "/api/v1/me/rewards/pending-invoice";
     protected static final String ME_REWARD = "/api/v1/me/rewards/%s";
     protected static final String ME_REWARD_ITEMS = "/api/v1/me/rewards/%s/reward-items";
     protected static final String ME_GET_REWARD_CURRENCIES = "/api/v1/me/reward-currencies";
@@ -126,6 +125,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String BILLING_PROFILES_PUT_PAYOUT_INFO = "/api/v1/billing-profiles/%s/payout-info";
     protected static final String BILLING_PROFILES_ENABLE_BY_ID = "/api/v1/billing-profiles/%s/enable";
     protected static final String BILLING_PROFILES_TYPE_BY_ID = "/api/v1/billing-profiles/%s/type";
+    protected static final String BILLING_PROFILES_INVOICEABLE_REWARDS = "/api/v1/billing-profiles/%s/invoiceable-rewards";
     protected static final String ME_GET_PAYOUT_PREFERENCES = "/api/v1/me/payout-preferences";
     protected static final String ME_PUT_PAYOUT_PREFERENCES = "/api/v1/me/payout-preferences";
     protected static final String BILLING_PROFILES_GET_COWORKERS = "/api/v1/billing-profiles/%s/coworkers";

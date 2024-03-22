@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
@@ -289,13 +290,6 @@ public class PostgresUserAdapter implements UserStoragePort {
                 .totalItemNumber(count)
                 .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
                 .build();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<UserRewardView> findPendingInvoiceRewardsForRecipientId(Long githubUserId) {
-        return rewardViewRepository.findPendingPaymentRequestForRecipient(githubUserId)
-                .stream().map(RewardViewEntity::toUserReward).toList();
     }
 
     @Override

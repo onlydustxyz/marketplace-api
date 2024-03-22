@@ -179,11 +179,6 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
-    public List<UserRewardView> getPendingInvoiceRewardsForRecipientId(Long githubUserId) {
-        return userStoragePort.findPendingInvoiceRewardsForRecipientId(githubUserId);
-    }
-
-    @Override
     public void claimProjectForAuthenticatedUser(UUID projectId, User user) {
         final ProjectDetailsView projectDetails = projectStoragePort.getById(projectId, user);
         if (!projectDetails.getLeaders().isEmpty() || !projectDetails.getInvitedLeaders().isEmpty()) {

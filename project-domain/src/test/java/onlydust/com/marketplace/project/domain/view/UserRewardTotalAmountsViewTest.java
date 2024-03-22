@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.project.domain.view;
 
+import onlydust.com.marketplace.kernel.model.CurrencyView;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

@@ -4,11 +4,13 @@ import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.contract.model.VerificationStatus;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
@@ -262,19 +264,12 @@ public interface BillingProfileMapper {
 
     static MyBillingProfilesResponse myBillingProfileToResponse(final List<ShortBillingProfileView> shortBillingProfileViews) {
         final MyBillingProfilesResponse myBillingProfilesResponse = new MyBillingProfilesResponse();
-        myBillingProfilesResponse.setBillingProfiles(isNull(shortBillingProfileViews) ? List.of() : shortBillingProfileViews.stream()
-                .map(view -> new ShortBillingProfileResponse()
-                        .name(view.getName())
-                        .id(view.getId().value())
-                        .enabled(view.getEnabled())
-                        .invoiceMandateAccepted(view.isInvoiceMandateAccepted())
-                        .pendingInvitationResponse(view.getPendingInvitationResponse())
-                        .role(isNull(view.getRole()) ? null : mapRole(view.getRole()))
-                        .type(switch (view.getType()) {
-                            case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
-                            case COMPANY -> BillingProfileType.COMPANY;
-                            case SELF_EMPLOYED -> BillingProfileType.SELF_EMPLOYED;
-                        })).collect(Collectors.toList()));
+        myBillingProfilesResponse.setBillingProfiles(isNull(shortBillingProfileViews) ?
+                List.of() :
+                shortBillingProfileViews.stream()
+                        .map(PayoutPreferenceMapper::billingProfileToShortResponse)
+                        .sorted(Comparator.comparing(ShortBillingProfileResponse::getName))
+                        .collect(Collectors.toList()));
         return myBillingProfilesResponse;
 
     }
@@ -335,7 +330,7 @@ public interface BillingProfileMapper {
 
     }
 
-    private static BillingProfileCoworkerRole mapRole(BillingProfile.User.Role role) {
+    static BillingProfileCoworkerRole mapRole(BillingProfile.User.Role role) {
         return isNull(role) ? null : switch (role) {
             case ADMIN -> BillingProfileCoworkerRole.ADMIN;
             case MEMBER -> BillingProfileCoworkerRole.MEMBER;
@@ -343,4 +338,26 @@ public interface BillingProfileMapper {
     }
 
 
+    static BillingProfileInvoiceableRewardsResponse mapToInvoiceableRewardsResponse(List<BillingProfileRewardView> invoiceableRewards) {
+        return new BillingProfileInvoiceableRewardsResponse()
+                .rewards(invoiceableRewards.stream().map(BillingProfileMapper::mapInvoiceableReward).toList());
+    }
+
+    static MyRewardPageItemResponse mapInvoiceableReward(BillingProfileRewardView view) {
+        return new MyRewardPageItemResponse()
+                .id(view.getId())
+                .projectId(view.getProjectId())
+                .numberOfRewardedContributions(view.getNumberOfRewardedContributions())
+                .rewardedOnProjectLogoUrl(view.getRewardedOnProjectLogoUrl())
+                .rewardedOnProjectName(view.getRewardedOnProjectName())
+                .amount(new RewardAmountResponse()
+                        .currency(mapCurrency(view.getAmount().getCurrency()))
+                        .dollarsEquivalent(view.getAmount().getDollarsEquivalent())
+                        .total(view.getAmount().getTotal()))
+                .status(RewardMapper.map(RewardStatus.PENDING_REQUEST))
+                .requestedAt(DateMapper.toZoneDateTime(view.getRequestedAt()))
+                .processedAt(DateMapper.toZoneDateTime(view.getProcessedAt()))
+                .unlockDate(DateMapper.toZoneDateTime(view.getUnlockDate()))
+                ;
+    }
 }

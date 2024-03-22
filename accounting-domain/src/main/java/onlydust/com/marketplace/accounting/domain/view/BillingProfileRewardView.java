@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.project.domain.view;
+package onlydust.com.marketplace.accounting.domain.view;
 
 import lombok.Builder;
 import lombok.Data;
@@ -7,12 +7,11 @@ import onlydust.com.marketplace.kernel.model.RewardStatus;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Data
 @Builder
-public class UserRewardView {
+public class BillingProfileRewardView {
     UUID id;
     UUID projectId;
     Integer numberOfRewardedContributions;
@@ -34,15 +33,5 @@ public class UserRewardView {
         BigDecimal total;
         CurrencyView currency;
         BigDecimal dollarsEquivalent;
-    }
-
-    @Data
-    @Builder
-    public static class Filters {
-        List<UUID> currencies;
-        List<UUID> projectIds;
-        List<UUID> administratedBillingProfilesIds;
-        Date from;
-        Date to;
     }
 }
