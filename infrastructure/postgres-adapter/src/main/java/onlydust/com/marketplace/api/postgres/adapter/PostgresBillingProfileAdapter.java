@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static java.time.ZonedDateTime.now;
 import static java.util.Objects.isNull;
@@ -33,6 +34,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     private final @NonNull KybRepository kybRepository;
     private final @NonNull KycRepository kycRepository;
     private final @NonNull PayoutInfoRepository payoutInfoRepository;
+    private final @NonNull PayoutInfoViewRepository payoutInfoViewRepository;
     private final @NonNull WalletRepository walletRepository;
     private final @NonNull BillingProfileUserRepository billingProfileUserRepository;
     private final @NonNull BillingProfileUserViewRepository billingProfileUserViewRepository;
@@ -65,8 +67,9 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Transactional(readOnly = true)
     public List<ShortBillingProfileView> findAllBillingProfilesForUser(UserId userId) {
         final var invoiceMandateLatestVersionDate = globalSettingsRepository.get().getInvoiceMandateLatestVersionDate();
-        return shortBillingProfileViewRepository.findBillingProfilesForUserId(userId.value())
-                .stream()
+        final var billingProfiles = shortBillingProfileViewRepository.findBillingProfilesForUserId(userId.value());
+        final var billingProfilesInvitedOn = shortBillingProfileViewRepository.findBillingProfilesForUserIdInvited(userId.value());
+        return Stream.concat(billingProfiles.stream(), billingProfilesInvitedOn.stream())
                 .map(ShortBillingProfileViewEntity::toView)
                 .peek(bp -> bp.setInvoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate))
                 .toList();
@@ -193,8 +196,8 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<PayoutInfo> findPayoutInfoByBillingProfile(BillingProfile.Id billingProfileId) {
-        return payoutInfoRepository.findById(billingProfileId.value()).map(PayoutInfoEntity::toDomain);
+    public Optional<PayoutInfoView> findPayoutInfoByBillingProfile(BillingProfile.Id billingProfileId) {
+        return payoutInfoViewRepository.findByBillingProfileId(billingProfileId.value()).map(PayoutInfoViewEntity::toDomain);
     }
 
     @Override

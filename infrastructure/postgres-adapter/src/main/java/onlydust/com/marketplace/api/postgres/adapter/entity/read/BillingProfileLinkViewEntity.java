@@ -30,6 +30,8 @@ public class BillingProfileLinkViewEntity {
     @Type(type = "verification_status")
     @Enumerated(EnumType.STRING)
     VerificationStatusEntity verificationStatus;
+    Boolean missingPayoutInfo;
+    Boolean missingVerification;
 
 
     public BillingProfileLinkView toDomain() {
@@ -52,8 +54,8 @@ public class BillingProfileLinkViewEntity {
                     case REJECTED -> BillingProfileLinkView.VerificationStatus.REJECTED;
                     case CLOSED -> BillingProfileLinkView.VerificationStatus.CLOSED;
                 })
-                .hasValidPayoutMethods(false)
-                .hasValidVerificationStatus(false)
+                .missingPayoutInfo(this.missingPayoutInfo)
+                .missingVerification(this.missingVerification)
                 .build();
     }
 }

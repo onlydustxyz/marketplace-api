@@ -217,10 +217,10 @@ public class BillingProfileService implements BillingProfileFacadePort {
     }
 
     @Override
-    public PayoutInfo getPayoutInfo(BillingProfile.Id billingProfileId, UserId userId) {
+    public PayoutInfoView getPayoutInfo(BillingProfile.Id billingProfileId, UserId userId) {
         if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
             throw unauthorized("User %s must be admin to read payout info of billing profile %s".formatted(userId, billingProfileId));
-        return billingProfileStoragePort.findPayoutInfoByBillingProfile(billingProfileId).orElseGet(() -> PayoutInfo.builder().build());
+        return billingProfileStoragePort.findPayoutInfoByBillingProfile(billingProfileId).orElseGet(() -> PayoutInfoView.builder().build());
     }
 
     @Override

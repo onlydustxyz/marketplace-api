@@ -27,6 +27,9 @@ public interface PayoutPreferenceMapper {
                 .pendingInvitationResponse(view.getPendingInvitationResponse())
                 .invoiceableRewardCount(view.getInvoiceableRewardCount())
                 .rewardCount(view.getRewardCount())
+                .missingPayoutInfo(view.getMissingPayoutInfo())
+                .missingVerification(view.getMissingVerification())
+                .verificationBlocked(view.isVerificationBlocked())
                 .role(isNull(view.getRole()) ? null : mapRole(view.getRole()))
                 .type(BillingProfileMapper.map(view.getType()));
     }

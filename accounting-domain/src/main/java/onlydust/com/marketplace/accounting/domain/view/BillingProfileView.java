@@ -26,6 +26,8 @@ public class BillingProfileView {
     ZonedDateTime invoiceMandateAcceptedAt;
     @Getter(AccessLevel.NONE)
     ZonedDateTime invoiceMandateLatestVersionDate;
+    Boolean missingPayoutInfo;
+    Boolean missingVerification;
 
     public boolean isVerified() {
         return verificationStatus == VerificationStatus.VERIFIED;
@@ -41,5 +43,9 @@ public class BillingProfileView {
 
     public boolean isSwitchableToSelfEmployed() {
         return this.type == BillingProfile.Type.COMPANY && !this.me.hasMoreThanOneCoworkers();
+    }
+
+    public boolean isVerificationBlocked() {
+        return verificationStatus == VerificationStatus.REJECTED || verificationStatus == VerificationStatus.CLOSED;
     }
 }

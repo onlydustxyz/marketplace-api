@@ -316,6 +316,7 @@ public class PostgresConfiguration {
                                                                      final KybRepository kybRepository,
                                                                      final BillingProfileRepository billingProfileRepository,
                                                                      final PayoutInfoRepository payoutInfoRepository,
+                                                                     final PayoutInfoViewRepository payoutInfoViewRepository,
                                                                      final WalletRepository walletRepository,
                                                                      final BillingProfileUserRepository billingProfileUserRepository,
                                                                      final BillingProfileUserViewRepository billingProfileUserViewRepository,
@@ -327,9 +328,10 @@ public class PostgresConfiguration {
                                                                      final BillingProfileUserRightsViewRepository billingProfileUserRightsViewRepository,
                                                                      final RewardViewRepository rewardViewRepository) {
         return new PostgresBillingProfileAdapter(globalSettingsRepository,
-                billingProfileRepository, kybRepository, kycRepository, payoutInfoRepository, walletRepository, billingProfileUserRepository,
-                billingProfileUserViewRepository, childrenKycRepository, billingProfileUserInvitationRepository, payoutPreferenceRepository,
-                bankAccountRepository, shortBillingProfileViewRepository, billingProfileUserRightsViewRepository, rewardViewRepository);
+                billingProfileRepository, kybRepository, kycRepository, payoutInfoRepository, payoutInfoViewRepository, walletRepository,
+                billingProfileUserRepository, billingProfileUserViewRepository, childrenKycRepository, billingProfileUserInvitationRepository,
+                payoutPreferenceRepository, bankAccountRepository, shortBillingProfileViewRepository, billingProfileUserRightsViewRepository,
+                rewardViewRepository);
     }
 
     @Bean

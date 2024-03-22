@@ -5,10 +5,7 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileRewardView;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
-import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
+import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 
@@ -45,7 +42,7 @@ public interface BillingProfileFacadePort {
 
     BillingProfileView getBillingProfile(BillingProfile.Id billingProfileId, UserId userId);
 
-    PayoutInfo getPayoutInfo(BillingProfile.Id billingProfileId, UserId userId);
+    PayoutInfoView getPayoutInfo(BillingProfile.Id billingProfileId, UserId userId);
 
     void updatePayoutInfo(BillingProfile.Id billingProfileId, UserId userId, PayoutInfo payoutInfo);
 

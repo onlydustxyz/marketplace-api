@@ -38,14 +38,4 @@ public class PayoutInfo {
         }
         return wallets;
     }
-
-    public Optional<Wallet> wallet(Network network) {
-        return switch (network) {
-            case ETHEREUM -> Optional.ofNullable(ethWallet).map(a -> new Wallet(Network.ETHEREUM, a.asString()));
-            case OPTIMISM -> Optional.ofNullable(optimismAddress).map(a -> new Wallet(Network.OPTIMISM, a.toString()));
-            case STARKNET -> Optional.ofNullable(starknetAddress).map(a -> new Wallet(Network.STARKNET, a.toString()));
-            case APTOS -> Optional.ofNullable(aptosAddress).map(a -> new Wallet(Network.APTOS, a.toString()));
-            case SEPA -> Optional.ofNullable(bankAccount).map(ba -> new Wallet(Network.SEPA, ba.accountNumber()));
-        };
-    }
 }

@@ -36,7 +36,7 @@ public interface BillingProfileStoragePort {
 
     Optional<BillingProfileView> findById(BillingProfile.Id billingProfileId);
 
-    Optional<PayoutInfo> findPayoutInfoByBillingProfile(BillingProfile.Id billingProfileId);
+    Optional<PayoutInfoView> findPayoutInfoByBillingProfile(BillingProfile.Id billingProfileId);
 
     void savePayoutInfoForBillingProfile(PayoutInfo payoutInfo, BillingProfile.Id billingProfileId);
 

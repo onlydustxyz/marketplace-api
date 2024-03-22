@@ -2,11 +2,11 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileUserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -27,22 +27,29 @@ import static java.util.Objects.isNull;
 @TypeDef(name = "verification_status", typeClass = PostgreSQLEnumType.class)
 @TypeDef(name = "billing_profile_role", typeClass = PostgreSQLEnumType.class)
 public class ShortBillingProfileViewEntity {
-
     @Id
-    @EqualsAndHashCode.Include
     UUID id;
-    String name;
-    @org.hibernate.annotations.Type(type = "billing_profile_type")
+
+    @Type(type = "billing_profile_type")
     @Enumerated(EnumType.STRING)
     BillingProfileEntity.Type type;
-    Date invoiceMandateAcceptedAt;
-    Boolean enabled;
-    Boolean pendingInvitation;
+
     @Type(type = "billing_profile_role")
     @Enumerated(EnumType.STRING)
     BillingProfileUserEntity.Role role;
+
+    @Type(type = "verification_status")
+    @Enumerated(EnumType.STRING)
+    VerificationStatusEntity verificationStatus;
+
+    String name;
+    Date invoiceMandateAcceptedAt;
+    Boolean enabled;
+    Boolean pendingInvitation;
     Integer rewardCount;
     Integer invoiceableRewardCount;
+    Boolean missingPayoutInfo;
+    Boolean missingVerification;
 
     public ZonedDateTime getInvoiceMandateAcceptedAt() {
         return isNull(invoiceMandateAcceptedAt) ? null : new Date(invoiceMandateAcceptedAt.getTime()).toInstant().atZone(ZoneOffset.UTC);
@@ -51,14 +58,17 @@ public class ShortBillingProfileViewEntity {
     public ShortBillingProfileView toView() {
         return ShortBillingProfileView.builder()
                 .id(BillingProfile.Id.of(this.id))
-                .name(this.name)
                 .type(this.type.toDomain())
+                .role(this.role.toDomain())
+                .verificationStatus(this.verificationStatus.toDomain())
+                .name(this.name)
+                .enabled(this.enabled)
                 .pendingInvitationResponse(this.pendingInvitation)
                 .invoiceMandateAcceptedAt(this.getInvoiceMandateAcceptedAt())
-                .enabled(this.enabled)
-                .role(this.role.toDomain())
                 .rewardCount(this.rewardCount)
                 .invoiceableRewardCount(this.invoiceableRewardCount)
+                .missingVerification(this.missingVerification)
+                .missingPayoutInfo(this.missingPayoutInfo)
                 .build();
     }
 }

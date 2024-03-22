@@ -13,6 +13,7 @@ import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileUserRightsView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
+import onlydust.com.marketplace.accounting.domain.view.PayoutInfoView;
 import onlydust.com.marketplace.accounting.domain.view.UserView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosAccountAddress;
@@ -972,13 +973,13 @@ class BillingProfileServiceTest {
         // Given
         final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
         final UserId userIAdmin = UserId.of(UUID.randomUUID());
-        final PayoutInfo expectedPayoutInfo = PayoutInfo.builder().build();
+        final PayoutInfoView expectedPayoutInfo = PayoutInfoView.builder().build();
 
         // When
         when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
         when(billingProfileStoragePort.findPayoutInfoByBillingProfile(billingProfileId))
                 .thenReturn(Optional.of(expectedPayoutInfo));
-        final PayoutInfo payoutInfo = billingProfileService.getPayoutInfo(billingProfileId, userIAdmin);
+        final PayoutInfoView payoutInfo = billingProfileService.getPayoutInfo(billingProfileId, userIAdmin);
 
         // Then
         assertEquals(expectedPayoutInfo, payoutInfo);
@@ -995,7 +996,7 @@ class BillingProfileServiceTest {
         when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
         when(billingProfileStoragePort.findPayoutInfoByBillingProfile(billingProfileId))
                 .thenReturn(Optional.empty());
-        final PayoutInfo payoutInfo = billingProfileService.getPayoutInfo(billingProfileId, userIAdmin);
+        final PayoutInfoView payoutInfo = billingProfileService.getPayoutInfo(billingProfileId, userIAdmin);
 
         // Then
         assertNotNull(payoutInfo);
