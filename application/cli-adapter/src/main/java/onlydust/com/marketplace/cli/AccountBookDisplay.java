@@ -31,18 +31,19 @@ public class AccountBookDisplay implements CommandLineRunner {
         final var options = cliArguments();
 
         parseArgs(args, options).ifPresent(cmd -> run(Currency.Code.of(cmd.getOptionValue("c")),
-                SponsorId.of(cmd.getOptionValue("s"))));
+                cmd.hasOption("s") ? SponsorId.of(cmd.getOptionValue("s")) : null));
     }
 
     private void run(Currency.Code currencyCode, SponsorId sponsorId) {
         final var currency = currencyStorage.findByCode(currencyCode)
                 .orElseThrow(() -> new IllegalArgumentException("Currency %s not found".formatted(currencyCode)));
-        final var sponsorAccount = sponsorAccountStorage.getSponsorAccounts(sponsorId).stream().filter(s -> s.currency().equals(currency)).findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Sponsor %s has no account for currency %s".formatted(sponsorId, currencyCode)));
+        final var sponsorAccount = sponsorId == null ? null :
+                sponsorAccountStorage.getSponsorAccounts(sponsorId).stream().filter(s -> s.currency().equals(currency)).findFirst()
+                        .orElseThrow(() -> new IllegalArgumentException("Sponsor %s has no account for currency %s".formatted(sponsorId, currencyCode)));
 
         final var events = accountBookEventStorage.get(currency);
         final var accountBook = AccountBookAggregate.fromEventsDebug(events);
-        accountBook.state().export(ToDot("account_book.dot", sponsorAccount.id()));
+        accountBook.state().export(ToDot("account_book.dot", sponsorAccount == null ? null : sponsorAccount.id()));
     }
 
     private static Optional<CommandLine> parseArgs(String[] args, Options options) {
@@ -81,7 +82,6 @@ public class AccountBookDisplay implements CommandLineRunner {
                 .longOpt("sponsor")
                 .desc("Sponsor ID")
                 .hasArg()
-                .required()
                 .build());
 
         options.addOption(Option.builder("h")

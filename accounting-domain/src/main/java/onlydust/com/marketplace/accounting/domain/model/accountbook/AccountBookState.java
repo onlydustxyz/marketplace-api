@@ -437,6 +437,6 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     }
 
     public static <T> Exporter ToDot(String filePath, T root) {
-        return new DotExporter(filePath, AccountId.of(root));
+        return new DotExporter(filePath, root == null ? ROOT : AccountId.of(root));
     }
 }
