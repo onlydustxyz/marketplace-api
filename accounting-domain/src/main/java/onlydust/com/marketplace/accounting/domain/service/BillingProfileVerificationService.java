@@ -129,6 +129,7 @@ public class BillingProfileVerificationService implements BillingProfileVerifica
         return childrenBillingProfileUpdated.toBuilder()
                 .verificationStatus(newVerificationStatus)
                 .userId(parentKyb.getOwnerId())
+                .verificationId(parentKyb.getId())
                 .build();
     }
 }

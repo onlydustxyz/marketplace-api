@@ -1,13 +1,13 @@
 package onlydust.com.marketplace.accounting.domain.observer;
 
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
@@ -24,10 +24,7 @@ import org.mockito.ArgumentCaptor;
 import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyb;
 import static onlydust.com.marketplace.accounting.domain.stubs.Currencies.ETH;
@@ -41,6 +38,7 @@ public class AccountingObserverTest {
     private InvoiceStoragePort invoiceStorage;
     private AccountBookFacade accountBookFacade;
     RewardUsdEquivalentStorage rewardUsdEquivalentStorage;
+    private BillingProfileStoragePort billingProfileStoragePort;
     QuoteStorage quoteStorage;
     CurrencyStorage currencyStorage;
     AccountingObserver accountingObserver;
@@ -62,8 +60,9 @@ public class AccountingObserverTest {
         currencyStorage = mock(CurrencyStorage.class);
         invoiceStorage = mock(InvoiceStoragePort.class);
         receiptStorage = mock(ReceiptStoragePort.class);
+        billingProfileStoragePort = mock(BillingProfileStoragePort.class);
         accountingObserver = new AccountingObserver(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage, invoiceStorage,
-                receiptStorage);
+                receiptStorage, billingProfileStoragePort);
         when(currencyStorage.findByCode(usd.code())).thenReturn(Optional.of(usd));
 
         when(rewardStatusStorage.get(any(RewardId.class))).then(invocation -> {
@@ -557,5 +556,114 @@ public class AccountingObserverTest {
             assertThat(rewardStatuses).hasSize(2);
             assertThat(rewardStatuses).allMatch(r -> r.usdAmount().isPresent());
         }
+    }
+
+    @Nested
+    class OnBillingProfileUpdated {
+
+        @Test
+        void should_refresh_usd_equivalent_given_a_kyc() {
+            // Given
+            final UUID kycId = UUID.randomUUID();
+            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kycId, VerificationType.KYC,
+                    VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(), null);
+            final Kyc kyc =
+                    Kyc.builder().id(kycId).billingProfileId(BillingProfile.Id.random()).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();
+
+            // When
+            when(billingProfileStoragePort.findKycById(kycId)).thenReturn(Optional.of(kyc));
+            accountingObserver.onBillingProfileUpdated(billingProfileVerificationUpdated);
+
+            // Then
+            verify(rewardStatusStorage).notPaid(kyc.getBillingProfileId());
+        }
+
+        @Test
+        void should_prevent_given_a_kyc_not_found() {
+            // Given
+            final UUID kycId = UUID.randomUUID();
+            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kycId, VerificationType.KYC,
+                    VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(), null);
+
+            // When
+            when(billingProfileStoragePort.findKycById(kycId)).thenReturn(Optional.empty());
+            assertThatThrownBy(() -> accountingObserver.onBillingProfileUpdated(billingProfileVerificationUpdated))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("KYC %s not found".formatted(kycId));
+            verifyNoInteractions(rewardStatusStorage);
+        }
+
+        @Test
+        void should_prevent_given_a_kyb_not_found() {
+            // Given
+            final UUID kybId = UUID.randomUUID();
+            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, VerificationType.KYB,
+                    VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(), null);
+
+            // When
+            when(billingProfileStoragePort.findKybById(kybId)).thenReturn(Optional.empty());
+            assertThatThrownBy(() -> accountingObserver.onBillingProfileUpdated(billingProfileVerificationUpdated))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("KYB %s not found".formatted(kybId));
+            verifyNoInteractions(rewardStatusStorage);
+        }
+
+
+        @Test
+        void should_refresh_usd_equivalent_given_a_kyb() {
+            // Given
+            final UUID kybId = UUID.randomUUID();
+            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, VerificationType.KYB,
+                    VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(), null);
+            final Kyb kyb =
+                    Kyb.builder().id(kybId).billingProfileId(BillingProfile.Id.random()).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();
+
+            // When
+            when(billingProfileStoragePort.findKybById(kybId)).thenReturn(Optional.of(kyb));
+            accountingObserver.onBillingProfileUpdated(billingProfileVerificationUpdated);
+
+            // Then
+            verify(rewardStatusStorage).notPaid(kyb.getBillingProfileId());
+        }
+
+         @Test
+        void should_refresh_usd_equivalent_given_a_kyc_children() {
+            // Given
+            final UUID kybId = UUID.randomUUID();
+            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, VerificationType.KYC,
+                    VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(), faker.gameOfThrones().character());
+            final Kyb kyb =
+                    Kyb.builder().id(kybId).billingProfileId(BillingProfile.Id.random()).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();
+
+            // When
+            when(billingProfileStoragePort.findKybByParentExternalId(billingProfileVerificationUpdated.getParentExternalApplicantId()))
+                    .thenReturn(Optional.of(kyb));
+            accountingObserver.onBillingProfileUpdated(billingProfileVerificationUpdated);
+
+            // Then
+            verify(rewardStatusStorage).notPaid(kyb.getBillingProfileId());
+        }
+
+        @Test
+        void should_prevent_given_a_children_kyc_not_found() {
+            // Given
+            final UUID kybId = UUID.randomUUID();
+            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, VerificationType.KYC,
+                    VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(), faker.chuckNorris().fact());
+
+            // When
+            when(billingProfileStoragePort.findKybByParentExternalId(billingProfileVerificationUpdated.getParentExternalApplicantId())).thenReturn(Optional.empty());
+            assertThatThrownBy(() -> accountingObserver.onBillingProfileUpdated(billingProfileVerificationUpdated))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("KYB not found for parentExternalApplicantId %s".formatted(billingProfileVerificationUpdated.getParentExternalApplicantId()));
+            verifyNoInteractions(rewardStatusStorage);
+        }
+
+
+
+
     }
 }

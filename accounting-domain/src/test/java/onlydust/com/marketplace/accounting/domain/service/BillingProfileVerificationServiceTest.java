@@ -309,6 +309,7 @@ public class BillingProfileVerificationServiceTest {
             final BillingProfileVerificationUpdated updatedEvent =
                     billingProfileVerificationUpdated.toBuilder()
                             .userId(initialKyb.getOwnerId())
+                            .verificationId(initialKyb.getId())
                             .verificationStatus(VerificationStatus.REJECTED).build();
 
             // When

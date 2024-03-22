@@ -26,6 +26,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
     private final CurrencyStorage currencyStorage;
     private final InvoiceStoragePort invoiceStorage;
     private final ReceiptStoragePort receiptStorage;
+    private final BillingProfileStoragePort billingProfileStoragePort;
 
     @Override
     public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
@@ -85,11 +86,16 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
     public Optional<ConvertedAmount> usdAmountOf(RewardId rewardId) {
         final var usd = currencyStorage.findByCode(Currency.Code.USD).orElseThrow(() -> internalServerError("Currency USD not found"));
 
-        return rewardUsdEquivalentStorage.get(rewardId).flatMap(rewardUsdEquivalent -> rewardUsdEquivalent.equivalenceSealingDate().flatMap(date -> quoteStorage.nearest(rewardUsdEquivalent.rewardCurrencyId(), usd.id(), date)).map(quote -> new ConvertedAmount(Amount.of(quote.convertToBaseCurrency(rewardUsdEquivalent.rewardAmount())), quote.price())));
+        return rewardUsdEquivalentStorage.get(rewardId).flatMap(rewardUsdEquivalent -> rewardUsdEquivalent.equivalenceSealingDate()
+                .flatMap(date -> quoteStorage.nearest(rewardUsdEquivalent.rewardCurrencyId(), usd.id(), date))
+                .map(quote -> new ConvertedAmount(Amount.of(quote.convertToBaseCurrency(rewardUsdEquivalent.rewardAmount())), quote.price())));
     }
 
     private RewardStatusData upToDateRewardStatus(AccountBookFacade accountBookFacade, RewardStatusData rewardStatusData) {
-        return rewardStatusData.sponsorHasEnoughFund(accountBookFacade.isFunded(rewardStatusData.rewardId())).unlockDate(accountBookFacade.unlockDateOf(rewardStatusData.rewardId()).map(d -> d.atZone(ZoneOffset.UTC)).orElse(null)).withAdditionalNetworks(accountBookFacade.networksOf(rewardStatusData.rewardId())).usdAmount(usdAmountOf(rewardStatusData.rewardId()).orElse(null));
+        return rewardStatusData.sponsorHasEnoughFund(accountBookFacade.isFunded(rewardStatusData.rewardId()))
+                .unlockDate(accountBookFacade.unlockDateOf(rewardStatusData.rewardId()).map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
+                .withAdditionalNetworks(accountBookFacade.networksOf(rewardStatusData.rewardId())).usdAmount(usdAmountOf(rewardStatusData.rewardId())
+                        .orElse(null));
     }
 
 
@@ -114,7 +120,21 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
 
     @Override
     public void onBillingProfileUpdated(BillingProfileVerificationUpdated billingProfileVerificationUpdated) {
-        // TODO X: call refreshRewardsUsdEquivalentOf
+        final BillingProfile.Id billingProfileId =
+                billingProfileVerificationUpdated.isAChildrenKYC() ?
+                billingProfileStoragePort.findKybByParentExternalId(billingProfileVerificationUpdated.getParentExternalApplicantId())
+                        .orElseThrow(() -> internalServerError("KYB not found for parentExternalApplicantId %s"
+                                .formatted(billingProfileVerificationUpdated.getParentExternalApplicantId()))).getBillingProfileId()
+                :
+                switch (billingProfileVerificationUpdated.getType()) {
+                    case KYB -> billingProfileStoragePort.findKybById(billingProfileVerificationUpdated.getVerificationId())
+                            .orElseThrow(() -> internalServerError("KYB %s not found"
+                                    .formatted(billingProfileVerificationUpdated.getVerificationId()))).getBillingProfileId();
+                    case KYC -> billingProfileStoragePort.findKycById(billingProfileVerificationUpdated.getVerificationId())
+                            .orElseThrow(() -> internalServerError("KYC %s not found"
+                                    .formatted(billingProfileVerificationUpdated.getVerificationId()))).getBillingProfileId();
+                };
+        refreshRewardsUsdEquivalentOf(billingProfileId);
     }
 
     @Override
@@ -133,7 +153,8 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
     }
 
     private void refreshRewardsUsdEquivalentOf(BillingProfile.Id billingProfileId) {
-        rewardStatusStorage.notPaid(billingProfileId).forEach(rewardStatus -> rewardStatusStorage.save(rewardStatus.usdAmount(usdAmountOf(rewardStatus.rewardId()).orElse(null))));
+        rewardStatusStorage.notPaid(billingProfileId).forEach(rewardStatus -> rewardStatusStorage.save(rewardStatus.usdAmount(usdAmountOf(rewardStatus.rewardId())
+                .orElse(null))));
     }
 
     public void refreshRewardsUsdEquivalents() {
