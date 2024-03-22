@@ -1,34 +1,103 @@
 package onlydust.com.marketplace.api.infrastructure.coinmarketcap.adapters;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.api.infrastructure.coinmarketcap.CmcClient;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
+import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Set;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CmcQuoteServiceAdapterTest {
     private static final Currency USD = Currency.fiat("US Dollar", Currency.Code.of("USD"), 2);
     private static final Currency ETH = Currency.crypto("Ether", Currency.Code.of("ETH"), 18);
 
-    private final CmcClient.Properties properties = new CmcClient.Properties(
-            "https://pro-api.coinmarketcap.com",
-            "<API_KEY>");
+    private CmcClient.Properties properties;
 
-    private final CmcClient client = new CmcClient(properties);
-    private final CmcQuoteServiceAdapter adapter = new CmcQuoteServiceAdapter(client);
+    private CmcQuoteServiceAdapter adapter;
 
-    private final static ERC20 USDC_ERC20 = new ERC20(Blockchain.ETHEREUM, Ethereum.contractAddress("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"), "USD Coin"
+    private final static ERC20 USDC_ERC20_ETH = new ERC20(Blockchain.ETHEREUM, Ethereum.contractAddress("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"), "USD " +
+                                                                                                                                                       "Coin"
             , "USDC", 6, BigInteger.TEN);
+
+    private final static ERC20 USDC_ERC20_STARKNET = new ERC20(Blockchain.STARKNET, StarkNet.contractAddress(
+            "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8"), "USD Coin", "USDC", 6, BigInteger.TEN);
     private final static ERC20 LORDS_ERC20 = new ERC20(Blockchain.ETHEREUM, Ethereum.contractAddress("0x686f2404e77Ab0d9070a46cdfb0B7feCDD2318b0"), "Lords",
             "LORDS", 18, BigInteger.TEN);
-    private final static Currency USDC = Currency.of(USDC_ERC20);
+    private final static Currency USDC = Currency.of(USDC_ERC20_ETH).withERC20(USDC_ERC20_STARKNET);
     private final static Currency LORDS = Currency.of(LORDS_ERC20);
+
+    private WireMockServer wireMockServer;
+
+    @BeforeEach
+    void setUp() {
+        wireMockServer = new WireMockServer(8089);
+        wireMockServer.start();
+
+        properties = new CmcClient.Properties(wireMockServer.baseUrl(), "CMC_API_KEY");
+        adapter = new CmcQuoteServiceAdapter(new CmcClient(properties));
+    }
+
+    @Test
+    void should_handle_bad_request() {
+        // Given
+        final var currency = Currency.of(USDC_ERC20_STARKNET).withERC20(USDC_ERC20_ETH);
+
+        wireMockServer.stubFor(get(urlEqualTo("/v2/cryptocurrency/info?aux=logo,description&address=%s".formatted(USDC_ERC20_STARKNET.getAddress())))
+                .willReturn(aResponse().withStatus(400).withBody("""
+                        {
+                          "status": { "error_code": 400 }
+                        }
+                        """)));
+
+        wireMockServer.stubFor(get(urlEqualTo("/v2/cryptocurrency/info?aux=logo,description&address=%s".formatted(USDC_ERC20_ETH.getAddress())))
+                .willReturn(aResponse().withStatus(200).withBody("""
+                        {
+                          "status": { "error_code": 0 },
+                          "data": {
+                            "3408": { "id": 3408, "name": "USDC", "symbol": "USDC" }
+                          }
+                        }
+                        """)));
+
+        wireMockServer.stubFor(get(urlEqualTo("/v1/fiat/map?limit=5000"))
+                .willReturn(aResponse().withStatus(200).withBody("""
+                        {
+                            "status": { "error_code": 0 },
+                            "data": [{ "id": 2781, "name": "US Dollar", "symbol": "USD" }]
+                        }
+                        """)));
+
+
+        wireMockServer.stubFor(get(urlEqualTo("/v2/cryptocurrency/quotes/latest?id=3408&convert_id=2781"))
+                .willReturn(aResponse().withStatus(200).withBody("""
+                        {
+                           "status": { "error_code": 0 },
+                           "data": {
+                             "3408": {
+                               "id": 3408,
+                               "quote": {
+                                 "2781": { "price": 1.0, "last_updated": "2024-02-07T15:04:00.000Z" }
+                               }
+                             }
+                           }
+                         }
+                        """)));
+
+        final var quotes = adapter.currentPrice(Set.of(currency), Set.of(USD));
+
+        assertThat(quotes).hasSize(1);
+        assertThat(quotes.get(0).price()).isEqualByComparingTo(BigDecimal.ONE);
+    }
 
     //    @Test
     void should_return_multiple_quotes_from_ids() {

@@ -4,6 +4,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.contract.model.MyRewardsPageResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
@@ -12,16 +13,21 @@ import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import javax.persistence.EntityManagerFactory;
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
@@ -190,6 +196,55 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                           "rewardingProjectsCount": 1
                         }
                         """);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "AMOUNT, DESC",
+            "AMOUNT, ASC",
+            "CONTRIBUTION, DESC",
+            "CONTRIBUTION, ASC",
+            "STATUS, DESC",
+            "STATUS, ASC",
+            "REQUESTED_AT, DESC",
+            "REQUESTED_AT, ASC"
+    })
+    void should_sort_by(String sort, String direction) {
+        // When
+        final var response = client.get()
+                .uri(getApiURI(String.format(ME_GET_REWARDS), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "20",
+                        "sort", sort,
+                        "direction", direction)
+                ))
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isEqualTo(HttpStatus.OK)
+                .expectBody(MyRewardsPageResponse.class)
+                .returnResult().getResponseBody();
+
+        final var rewards = response.getRewards();
+        final var first = direction.equals("ASC") ? rewards.get(0) : rewards.get(rewards.size() - 1);
+        final var last = direction.equals("ASC") ? rewards.get(rewards.size() - 1) : rewards.get(0);
+
+        switch (sort) {
+            case "AMOUNT":
+                assertThat(Optional.ofNullable(first.getAmount().getDollarsEquivalent()).orElse(BigDecimal.ZERO))
+                        .isLessThanOrEqualTo(Optional.ofNullable(last.getAmount().getDollarsEquivalent()).orElse(BigDecimal.ZERO));
+                break;
+            case "CONTRIBUTION":
+                assertThat(first.getNumberOfRewardedContributions()).isLessThanOrEqualTo(last.getNumberOfRewardedContributions());
+                break;
+            case "STATUS":
+                assertThat(first.getStatus()).isLessThanOrEqualTo(last.getStatus());
+                break;
+            case "REQUESTED_AT":
+                assertThat(first.getRequestedAt()).isBeforeOrEqualTo(last.getRequestedAt());
+                break;
+        }
     }
 
     private void setUnlockDateToSomeReward() {

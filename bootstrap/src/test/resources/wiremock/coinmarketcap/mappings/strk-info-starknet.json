@@ -9,7 +9,7 @@
         }
     },
     "response": {
-        "status": 200,
+        "status": 400,
         "bodyFileName": "body-not-found.json"
     }
 }
