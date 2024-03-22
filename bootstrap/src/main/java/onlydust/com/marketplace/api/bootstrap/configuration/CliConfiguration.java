@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
 import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.EventRepository;
@@ -30,7 +31,8 @@ public class CliConfiguration {
     }
 
     @Bean
-    public AccountBookDisplay accountBookDisplay(final CurrencyStorage currencyStorage, final AccountBookEventStorage accountBookEventStorage) {
-        return new AccountBookDisplay(currencyStorage, accountBookEventStorage);
+    public AccountBookDisplay accountBookDisplay(final CurrencyStorage currencyStorage, final SponsorAccountStorage sponsorAccountStorage,
+                                                 final AccountBookEventStorage accountBookEventStorage) {
+        return new AccountBookDisplay(currencyStorage, sponsorAccountStorage, accountBookEventStorage);
     }
 }
