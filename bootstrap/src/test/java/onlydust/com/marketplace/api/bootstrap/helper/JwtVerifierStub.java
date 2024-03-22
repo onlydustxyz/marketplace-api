@@ -53,7 +53,7 @@ public class JwtVerifierStub implements JWTVerifier {
     }
 
     public String tokenFor(String sub) {
-        return tokenFor(sub, 10_000L);
+        return tokenFor(sub, 100_000L);
     }
 
     public String tokenFor(Long githubUserId) {

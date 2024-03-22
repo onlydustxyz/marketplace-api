@@ -4,24 +4,30 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.Builder;
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.accounting.domain.model.*;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.QuoteStorage;
+import onlydust.com.marketplace.accounting.domain.service.AccountingObserver;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
+import onlydust.com.marketplace.api.bootstrap.helper.AccountingHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.bootstrap.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import onlydust.com.marketplace.project.domain.service.RewardService;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -34,7 +40,10 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import javax.persistence.EntityManagerFactory;
+import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -62,6 +71,15 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     RewardRepository rewardRepository;
     @Autowired
     BillingProfileService billingProfileService;
+    @Autowired
+    BillingProfileStoragePort billingProfileStoragePort;
+    @Autowired
+    QuoteStorage quoteStorage;
+    @Autowired
+    AccountingHelper accountingHelper;
+    @Autowired
+    AccountingObserver accountingObserver;
+
     private final Long individualBPAdminGithubId = 1L;
     private final Long companyBPAdmin1GithubId = 2L;
     private final Long companyBPAdmin2GithubId = 3L;
@@ -88,7 +106,18 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     private UUID projectId1;
     private UUID projectId2;
     private UUID sponsorId = UUID.fromString("eb04a5de-4802-4071-be7b-9007b563d48d");
+    private UUID individualBPId;
+    private UUID companyBPId;
+    private UUID selfEmployedBPId;
 
+    public void resetAuth0Mock() {
+        userRepository.findByGithubUserId(individualBPAdminGithubId).ifPresent(userAuthHelper::mockAuth0UserInfo);
+        userRepository.findByGithubUserId(companyBPAdmin1GithubId).ifPresent(userAuthHelper::mockAuth0UserInfo);
+        userRepository.findByGithubUserId(companyBPAdmin2GithubId).ifPresent(userAuthHelper::mockAuth0UserInfo);
+        userRepository.findByGithubUserId(companyBPMember1GithubId).ifPresent(userAuthHelper::mockAuth0UserInfo);
+        userRepository.findByGithubUserId(selfEmployedBPAdminGithubId).ifPresent(userAuthHelper::mockAuth0UserInfo);
+        userRepository.findByGithubUserId(16590657L).ifPresent(userAuthHelper::mockAuth0UserInfo);
+    }
 
     public void setupPendingSignup() {
         indexerApiWireMockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/events/on-repo-link-changed"))
@@ -168,12 +197,12 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
 
         final UUID strkId = currencyRepository.findByCode("STRK").orElseThrow().id();
-        final SponsorAccountStatement strk = accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
+        final SponsorAccountStatement strkSponsorAccount = accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
                 Currency.Id.of(strkId), null,
                 new SponsorAccount.Transaction(SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(), Amount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
-        accountingService.allocate(strk.account().id(), ProjectId.of(projectId1), PositiveAmount.of(100000L), Currency.Id.of(strkId));
-        accountingService.allocate(strk.account().id(), ProjectId.of(projectId2), PositiveAmount.of(100000L), Currency.Id.of(strkId));
+        accountingService.allocate(strkSponsorAccount.account().id(), ProjectId.of(projectId1), PositiveAmount.of(100000L), Currency.Id.of(strkId));
+        accountingService.allocate(strkSponsorAccount.account().id(), ProjectId.of(projectId2), PositiveAmount.of(100000L), Currency.Id.of(strkId));
 
         final var em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
@@ -193,6 +222,13 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         em.getTransaction().commit();
         em.close();
 
+        final CurrencyEntity usd = accountingHelper.usd();
+        final CurrencyEntity strk = accountingHelper.strk();
+
+        quoteStorage.save(List.of(
+                new Quote(Currency.Id.of(strk.id()), Currency.Id.of(usd.id()), BigDecimal.valueOf(2.5), Instant.now())
+        ));
+
         sendRewardToRecipient(individualBPAdminGithubId, 10L, projectId1);
         sendRewardToRecipient(individualBPAdminGithubId, 100L, projectId2);
         sendRewardToRecipient(companyBPAdmin1GithubId, 20L, projectId1);
@@ -203,6 +239,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         sendRewardToRecipient(companyBPMember1GithubId, 400L, projectId2);
         sendRewardToRecipient(selfEmployedBPAdminGithubId, 50L, projectId1);
         sendRewardToRecipient(selfEmployedBPAdminGithubId, 500L, projectId2);
+
         setUp();
     }
 
@@ -286,6 +323,15 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         userRepository.findByGithubUserId(companyBPAdmin2GithubId).ifPresent(userEntity -> companyBPAdmin2Id = userEntity.getId());
         userRepository.findByGithubUserId(companyBPMember1GithubId).ifPresent(userEntity -> companyBPMember1Id = userEntity.getId());
         userRepository.findByGithubUserId(selfEmployedBPAdminGithubId).ifPresent(userEntity -> selfEmployedBPAdminId = userEntity.getId());
+
+        individualBPId = isNull(individualBPAdminId) ? null :
+                billingProfileService.getBillingProfilesForUser(UserId.of(individualBPAdminId)).stream().map(s -> s.getId().value()).findFirst().orElse(null);
+        companyBPId = isNull(companyBPAdmin1Id) ? null :
+                billingProfileService.getBillingProfilesForUser(UserId.of(companyBPAdmin1Id)).stream().map(s -> s.getId().value()).findFirst().orElse(null);
+        selfEmployedBPId = isNull(selfEmployedBPAdminId) ? null :
+                billingProfileService.getBillingProfilesForUser(UserId.of(selfEmployedBPAdminId)).stream().map(s -> s.getId().value()).findFirst().orElse(null);
+        // To avoid flakiness due to wireMock stubs randomly disappearing after to many call
+//        resetAuth0Mock();
     }
 
     private void sendRewardToRecipient(Long recipientId, Long amount, UUID projectId) {
@@ -1255,18 +1301,802 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_not_display_transaction_details_given_a_billing_profile_member() {
+    @Order(40)
+    void should_display_reward_statuses_given_payout_info_missing() {
         // Given
+        setUp();
+        resetAuth0Mock();
+
+        // To avoid to stub all the Sumsub flow ...
+        final UUID kycId = billingProfileService.getBillingProfile(BillingProfile.Id.of(individualBPId), UserId.of(individualBPAdminId)).getKyc().getId();
+        billingProfileStoragePort.saveKyc(Kyc.builder()
+                .id(kycId)
+                .externalApplicantId(faker.rickAndMorty().character())
+                .address(faker.address().fullAddress())
+                .usCitizen(false)
+                .birthdate(new Date())
+                .country(Country.fromIso3("ARG"))
+                .idDocumentType(Kyc.IdDocumentTypeEnum.ID_CARD)
+                .firstName(faker.name().firstName())
+                .lastName(faker.name().lastName())
+                .ownerId(UserId.of(individualBPAdminId))
+                .billingProfileId(BillingProfile.Id.of(individualBPId))
+                .status(VerificationStatus.VERIFIED)
+                .build());
+        billingProfileStoragePort.updateBillingProfileStatus(BillingProfile.Id.of(individualBPId), VerificationStatus.VERIFIED);
+        accountingObserver.onBillingProfileUpdated(new BillingProfileVerificationUpdated(kycId, VerificationType.KYC, VerificationStatus.VERIFIED, null,
+                UserId.of(individualBPId), null, faker.rickAndMorty().character(), null));
+
+        assertGetProjectRewardsStatusOnProject(
+                projectId1,
+                Map.of(
+                        individualBPAdminRewardId1, "PENDING_CONTRIBUTOR",
+                        companyBPAdmin1RewardId1, "PENDING_CONTRIBUTOR",
+                        companyBPAdmin2RewardId1, "PENDING_CONTRIBUTOR",
+                        companyBPMember1RewardId1, "PENDING_CONTRIBUTOR",
+                        selfEmployedBPAdminRewardId11, "PENDING_CONTRIBUTOR",
+                        selfEmployedBPAdminRewardId12, "PENDING_CONTRIBUTOR"
+                )
+        );
+        assertGetProjectRewardsStatusOnProject(
+                projectId2,
+                Map.of(
+                        individualBPAdminRewardId2, "PENDING_CONTRIBUTOR",
+                        companyBPAdmin1RewardId2, "PENDING_CONTRIBUTOR",
+                        companyBPAdmin2RewardId2, "PENDING_CONTRIBUTOR",
+                        companyBPMember1RewardId2, "PENDING_CONTRIBUTOR",
+                        selfEmployedBPAdminRewardId2, "PENDING_CONTRIBUTOR"
+                )
+        );
+        assertGetMyRewardsStatus(List.of(
+                MyRewardDatum.builder()
+                        .githubUserId(individualBPAdminGithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(individualBPAdminRewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(10L)
+                                        .pendingAmount(10L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(individualBPAdminRewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(100L)
+                                        .pendingAmount(100L)
+                                        .build()
+                        ))
+                        .build(),
+                MyRewardDatum.builder()
+                        .githubUserId(companyBPAdmin1GithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(companyBPMember1RewardId1)
+                                        .status("PENDING_VERIFICATION")
+                                        .rewardedAmount(40L)
+                                        .pendingAmount(40L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin1RewardId1)
+                                        .status("PENDING_VERIFICATION")
+                                        .rewardedAmount(20L)
+                                        .pendingAmount(20L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin1RewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(200L)
+                                        .pendingAmount(200L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin2RewardId1)
+                                        .status("PENDING_VERIFICATION")
+                                        .rewardedAmount(30L)
+                                        .pendingAmount(30L)
+                                        .build()
+                        ))
+                        .build(),
+                MyRewardDatum.builder()
+                        .githubUserId(companyBPAdmin2GithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(companyBPMember1RewardId1)
+                                        .status("PENDING_VERIFICATION")
+                                        .rewardedAmount(40L)
+                                        .pendingAmount(40L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin2RewardId1)
+                                        .status("PENDING_VERIFICATION")
+                                        .rewardedAmount(30L)
+                                        .pendingAmount(30L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin2RewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(300L)
+                                        .pendingAmount(300L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin1RewardId1)
+                                        .status("PENDING_VERIFICATION")
+                                        .rewardedAmount(20L)
+                                        .pendingAmount(20L)
+                                        .build()
+                        ))
+                        .build(),
+                MyRewardDatum.builder()
+                        .githubUserId(companyBPMember1GithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(companyBPMember1RewardId1)
+                                        .status("PENDING_COMPANY")
+                                        .rewardedAmount(40L)
+                                        .pendingAmount(40L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPMember1RewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(400L)
+                                        .pendingAmount(400L)
+                                        .build()
+                        ))
+                        .build(),
+                MyRewardDatum.builder()
+                        .githubUserId(selfEmployedBPAdminGithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(selfEmployedBPAdminRewardId11)
+                                        .status("PENDING_VERIFICATION")
+                                        .rewardedAmount(50L)
+                                        .pendingAmount(50L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(selfEmployedBPAdminRewardId12)
+                                        .status("PENDING_VERIFICATION")
+                                        .rewardedAmount(55L)
+                                        .pendingAmount(55L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(selfEmployedBPAdminRewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(500L)
+                                        .pendingAmount(500L)
+                                        .build()
+                        ))
+                        .build()
+        ));
 
         // When
+        final UUID companyKybId = billingProfileService.getBillingProfile(BillingProfile.Id.of(companyBPId), UserId.of(companyBPAdmin1Id)).getKyb().getId();
+        billingProfileStoragePort.saveKyb(Kyb.builder()
+                .billingProfileId(BillingProfile.Id.of(companyBPId))
+                .status(VerificationStatus.VERIFIED)
+                .ownerId(UserId.of(companyBPAdmin1Id))
+                .country(Country.fromIso3("FRA"))
+                .address(faker.address().fullAddress())
+                .externalApplicantId(faker.rickAndMorty().character())
+                .registrationDate(new Date())
+                .id(companyKybId)
+                .subjectToEuropeVAT(false)
+                .usEntity(false)
+                .build());
+        billingProfileStoragePort.updateBillingProfileStatus(BillingProfile.Id.of(companyBPId), VerificationStatus.VERIFIED);
+        accountingObserver.onBillingProfileUpdated(new BillingProfileVerificationUpdated(companyKybId, VerificationType.KYB, VerificationStatus.VERIFIED, null,
+                UserId.of(companyBPAdmin1Id), null, faker.rickAndMorty().character(), null));
+        // Then
+        assertGetProjectRewardsStatusOnProject(
+                projectId1,
+                Map.of(
+                        individualBPAdminRewardId1, "PENDING_CONTRIBUTOR",
+                        companyBPAdmin1RewardId1, "PENDING_CONTRIBUTOR",
+                        companyBPAdmin2RewardId1, "PENDING_CONTRIBUTOR",
+                        companyBPMember1RewardId1, "PENDING_CONTRIBUTOR",
+                        selfEmployedBPAdminRewardId11, "PENDING_CONTRIBUTOR",
+                        selfEmployedBPAdminRewardId12, "PENDING_CONTRIBUTOR"
+                )
+        );
+        assertGetProjectRewardsStatusOnProject(
+                projectId2,
+                Map.of(
+                        individualBPAdminRewardId2, "PENDING_CONTRIBUTOR",
+                        companyBPAdmin1RewardId2, "PENDING_CONTRIBUTOR",
+                        companyBPAdmin2RewardId2, "PENDING_CONTRIBUTOR",
+                        companyBPMember1RewardId2, "PENDING_CONTRIBUTOR",
+                        selfEmployedBPAdminRewardId2, "PENDING_CONTRIBUTOR"
+                )
+        );
+        assertGetMyRewardsStatus(List.of(
+                MyRewardDatum.builder()
+                        .githubUserId(individualBPAdminGithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(individualBPAdminRewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(10L)
+                                        .pendingAmount(10L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(individualBPAdminRewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(100L)
+                                        .pendingAmount(100L)
+                                        .build()
+                        ))
+                        .build(),
+                MyRewardDatum.builder()
+                        .githubUserId(companyBPAdmin1GithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(companyBPMember1RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(40L)
+                                        .pendingAmount(40L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin1RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(20L)
+                                        .pendingAmount(20L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin1RewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(200L)
+                                        .pendingAmount(200L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin2RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(30L)
+                                        .pendingAmount(30L)
+                                        .build()
+                        ))
+                        .build(),
+                MyRewardDatum.builder()
+                        .githubUserId(companyBPAdmin2GithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(companyBPMember1RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(40L)
+                                        .pendingAmount(40L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin2RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(30L)
+                                        .pendingAmount(30L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin2RewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(300L)
+                                        .pendingAmount(300L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin1RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(20L)
+                                        .pendingAmount(20L)
+                                        .build()
+                        ))
+                        .build(),
+                MyRewardDatum.builder()
+                        .githubUserId(companyBPMember1GithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(companyBPMember1RewardId1)
+                                        .status("PENDING_COMPANY")
+                                        .rewardedAmount(40L)
+                                        .pendingAmount(40L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPMember1RewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(400L)
+                                        .pendingAmount(400L)
+                                        .build()
+                        ))
+                        .build(),
+                MyRewardDatum.builder()
+                        .githubUserId(selfEmployedBPAdminGithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(selfEmployedBPAdminRewardId11)
+                                        .status("PENDING_VERIFICATION")
+                                        .rewardedAmount(50L)
+                                        .pendingAmount(50L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(selfEmployedBPAdminRewardId12)
+                                        .status("PENDING_VERIFICATION")
+                                        .rewardedAmount(55L)
+                                        .pendingAmount(55L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(selfEmployedBPAdminRewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(500L)
+                                        .pendingAmount(500L)
+                                        .build()
+                        ))
+                        .build()
+        ));
+
+        // When
+        final UUID selfEmployedKybId =
+                billingProfileService.getBillingProfile(BillingProfile.Id.of(selfEmployedBPId), UserId.of(selfEmployedBPAdminId)).getKyb().getId();
+        billingProfileStoragePort.saveKyb(Kyb.builder()
+                .billingProfileId(BillingProfile.Id.of(selfEmployedBPId))
+                .status(VerificationStatus.VERIFIED)
+                .ownerId(UserId.of(selfEmployedBPAdminId))
+                .country(Country.fromIso3("FRA"))
+                .address(faker.address().fullAddress())
+                .externalApplicantId(faker.rickAndMorty().character())
+                .registrationDate(new Date())
+                .id(selfEmployedKybId)
+                .subjectToEuropeVAT(false)
+                .usEntity(false)
+                .build());
+        billingProfileStoragePort.updateBillingProfileStatus(BillingProfile.Id.of(selfEmployedBPId), VerificationStatus.VERIFIED);
+        accountingObserver.onBillingProfileUpdated(new BillingProfileVerificationUpdated(selfEmployedKybId, VerificationType.KYB, VerificationStatus.VERIFIED
+                , null,
+                UserId.of(selfEmployedBPId), null, faker.rickAndMorty().character(), null));
 
         // Then
+        assertGetProjectRewardsStatusOnProject(
+                projectId1,
+                Map.of(
+                        individualBPAdminRewardId1, "PENDING_CONTRIBUTOR",
+                        companyBPAdmin1RewardId1, "PENDING_CONTRIBUTOR",
+                        companyBPAdmin2RewardId1, "PENDING_CONTRIBUTOR",
+                        companyBPMember1RewardId1, "PENDING_CONTRIBUTOR",
+                        selfEmployedBPAdminRewardId11, "PENDING_CONTRIBUTOR",
+                        selfEmployedBPAdminRewardId12, "PENDING_CONTRIBUTOR"
+                )
+        );
+        assertGetProjectRewardsStatusOnProject(
+                projectId2,
+                Map.of(
+                        individualBPAdminRewardId2, "PENDING_CONTRIBUTOR",
+                        companyBPAdmin1RewardId2, "PENDING_CONTRIBUTOR",
+                        companyBPAdmin2RewardId2, "PENDING_CONTRIBUTOR",
+                        companyBPMember1RewardId2, "PENDING_CONTRIBUTOR",
+                        selfEmployedBPAdminRewardId2, "PENDING_CONTRIBUTOR"
+                )
+        );
+        assertGetMyRewardsStatus(List.of(
+                MyRewardDatum.builder()
+                        .githubUserId(individualBPAdminGithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(individualBPAdminRewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(10L)
+                                        .pendingAmount(10L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(individualBPAdminRewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(100L)
+                                        .pendingAmount(100L)
+                                        .build()
+                        ))
+                        .build(),
+                MyRewardDatum.builder()
+                        .githubUserId(companyBPAdmin1GithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(companyBPMember1RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(40L)
+                                        .pendingAmount(40L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin1RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(20L)
+                                        .pendingAmount(20L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin1RewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(200L)
+                                        .pendingAmount(200L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin2RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(30L)
+                                        .pendingAmount(30L)
+                                        .build()
+                        ))
+                        .build(),
+                MyRewardDatum.builder()
+                        .githubUserId(companyBPAdmin2GithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(companyBPMember1RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(40L)
+                                        .pendingAmount(40L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin2RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(30L)
+                                        .pendingAmount(30L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin2RewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(300L)
+                                        .pendingAmount(300L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin1RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(20L)
+                                        .pendingAmount(20L)
+                                        .build()
+                        ))
+                        .build(),
+                MyRewardDatum.builder()
+                        .githubUserId(companyBPMember1GithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(companyBPMember1RewardId1)
+                                        .status("PENDING_COMPANY")
+                                        .rewardedAmount(40L)
+                                        .pendingAmount(40L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPMember1RewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(400L)
+                                        .pendingAmount(400L)
+                                        .build()
+                        ))
+                        .build(),
+                MyRewardDatum.builder()
+                        .githubUserId(selfEmployedBPAdminGithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(selfEmployedBPAdminRewardId11)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(50L)
+                                        .pendingAmount(50L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(selfEmployedBPAdminRewardId12)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(55L)
+                                        .pendingAmount(55L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(selfEmployedBPAdminRewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(500L)
+                                        .pendingAmount(500L)
+                                        .build()
+                        ))
+                        .build()
+        ));
     }
+
+    @Test
+    void should_not_display_transaction_details_given_a_billing_profile_member() {
+
+    }
+
+
+    @Test
+    @Order(50)
+    void should_display_reward_statuses_given_pending_request() {
+        // Given
+        setUp();
+        billingProfileService.updatePayoutInfo(BillingProfile.Id.of(individualBPId), UserId.of(individualBPAdminId), PayoutInfo.builder()
+                .ethWallet(new WalletLocator(new Name("ilysse.eth")))
+                .build());
+
+        // When
+        assertGetProjectRewardsStatusOnProject(
+                projectId1,
+                Map.of(
+                        individualBPAdminRewardId1, "PENDING_CONTRIBUTOR",
+                        companyBPAdmin1RewardId1, "PENDING_CONTRIBUTOR",
+                        companyBPAdmin2RewardId1, "PENDING_CONTRIBUTOR",
+                        companyBPMember1RewardId1, "PENDING_CONTRIBUTOR",
+                        selfEmployedBPAdminRewardId11, "PENDING_CONTRIBUTOR",
+                        selfEmployedBPAdminRewardId12, "PENDING_CONTRIBUTOR"
+                )
+        );
+        assertGetProjectRewardsStatusOnProject(
+                projectId2,
+                Map.of(
+                        individualBPAdminRewardId2, "PENDING_CONTRIBUTOR",
+                        companyBPAdmin1RewardId2, "PENDING_CONTRIBUTOR",
+                        companyBPAdmin2RewardId2, "PENDING_CONTRIBUTOR",
+                        companyBPMember1RewardId2, "PENDING_CONTRIBUTOR",
+                        selfEmployedBPAdminRewardId2, "PENDING_CONTRIBUTOR"
+                )
+        );
+        assertGetMyRewardsStatus(List.of(
+                MyRewardDatum.builder()
+                        .githubUserId(individualBPAdminGithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(individualBPAdminRewardId1)
+                                        .status("PENDING_REQUEST")
+                                        .rewardedAmount(10L)
+                                        .pendingAmount(10L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(individualBPAdminRewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(100L)
+                                        .pendingAmount(100L)
+                                        .build()
+                        ))
+                        .build(),
+                MyRewardDatum.builder()
+                        .githubUserId(companyBPAdmin1GithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(companyBPMember1RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(40L)
+                                        .pendingAmount(40L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin1RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(20L)
+                                        .pendingAmount(20L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin1RewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(200L)
+                                        .pendingAmount(200L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin2RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(30L)
+                                        .pendingAmount(30L)
+                                        .build()
+                        ))
+                        .build(),
+                MyRewardDatum.builder()
+                        .githubUserId(companyBPAdmin2GithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(companyBPMember1RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(40L)
+                                        .pendingAmount(40L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin2RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(30L)
+                                        .pendingAmount(30L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin2RewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(300L)
+                                        .pendingAmount(300L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin1RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(20L)
+                                        .pendingAmount(20L)
+                                        .build()
+                        ))
+                        .build(),
+                MyRewardDatum.builder()
+                        .githubUserId(companyBPMember1GithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(companyBPMember1RewardId1)
+                                        .status("PENDING_COMPANY")
+                                        .rewardedAmount(40L)
+                                        .pendingAmount(40L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPMember1RewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(400L)
+                                        .pendingAmount(400L)
+                                        .build()
+                        ))
+                        .build(),
+                MyRewardDatum.builder()
+                        .githubUserId(selfEmployedBPAdminGithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(selfEmployedBPAdminRewardId11)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(50L)
+                                        .pendingAmount(50L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(selfEmployedBPAdminRewardId12)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(55L)
+                                        .pendingAmount(55L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(selfEmployedBPAdminRewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(500L)
+                                        .pendingAmount(500L)
+                                        .build()
+                        ))
+                        .build()
+        ));
+
+        // TODO : get invoiceable rewards
+    }
+
+    @Test
+    @Order(60)
+    void should_display_reward_statuses_given_processing() {
+        // Given
+        setUp();
+        final Invoice individualInvoice = billingProfileService.previewInvoice(UserId.of(individualBPAdminId), BillingProfile.Id.of(individualBPId),
+                List.of(RewardId.of(individualBPAdminRewardId1)));
+        billingProfileService.uploadGeneratedInvoice(UserId.of(individualBPAdminId), BillingProfile.Id.of(individualBPId), individualInvoice.id(),
+                new ByteArrayInputStream(faker.address().fullAddress().getBytes()));
+
+        // When
+        assertGetProjectRewardsStatusOnProject(
+                projectId1,
+                Map.of(
+                        individualBPAdminRewardId1, "PROCESSING",
+                        companyBPAdmin1RewardId1, "PENDING_CONTRIBUTOR",
+                        companyBPAdmin2RewardId1, "PENDING_CONTRIBUTOR",
+                        companyBPMember1RewardId1, "PENDING_CONTRIBUTOR",
+                        selfEmployedBPAdminRewardId11, "PENDING_CONTRIBUTOR",
+                        selfEmployedBPAdminRewardId12, "PENDING_CONTRIBUTOR"
+                )
+        );
+        assertGetProjectRewardsStatusOnProject(
+                projectId2,
+                Map.of(
+                        individualBPAdminRewardId2, "PENDING_CONTRIBUTOR",
+                        companyBPAdmin1RewardId2, "PENDING_CONTRIBUTOR",
+                        companyBPAdmin2RewardId2, "PENDING_CONTRIBUTOR",
+                        companyBPMember1RewardId2, "PENDING_CONTRIBUTOR",
+                        selfEmployedBPAdminRewardId2, "PENDING_CONTRIBUTOR"
+                )
+        );
+        assertGetMyRewardsStatus(List.of(
+                MyRewardDatum.builder()
+                        .githubUserId(individualBPAdminGithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(individualBPAdminRewardId1)
+                                        .status("PROCESSING")
+                                        .rewardedAmount(10L)
+                                        .pendingAmount(10L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(individualBPAdminRewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(100L)
+                                        .pendingAmount(100L)
+                                        .build()
+                        ))
+                        .build(),
+                MyRewardDatum.builder()
+                        .githubUserId(companyBPAdmin1GithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(companyBPMember1RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(40L)
+                                        .pendingAmount(40L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin1RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(20L)
+                                        .pendingAmount(20L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin1RewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(200L)
+                                        .pendingAmount(200L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin2RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(30L)
+                                        .pendingAmount(30L)
+                                        .build()
+                        ))
+                        .build(),
+                MyRewardDatum.builder()
+                        .githubUserId(companyBPAdmin2GithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(companyBPMember1RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(40L)
+                                        .pendingAmount(40L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin2RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(30L)
+                                        .pendingAmount(30L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin2RewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(300L)
+                                        .pendingAmount(300L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPAdmin1RewardId1)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(20L)
+                                        .pendingAmount(20L)
+                                        .build()
+                        ))
+                        .build(),
+                MyRewardDatum.builder()
+                        .githubUserId(companyBPMember1GithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(companyBPMember1RewardId1)
+                                        .status("PENDING_COMPANY")
+                                        .rewardedAmount(40L)
+                                        .pendingAmount(40L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(companyBPMember1RewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(400L)
+                                        .pendingAmount(400L)
+                                        .build()
+                        ))
+                        .build(),
+                MyRewardDatum.builder()
+                        .githubUserId(selfEmployedBPAdminGithubId)
+                        .rewardData(List.of(
+                                RewardDatum.builder()
+                                        .rewardId(selfEmployedBPAdminRewardId11)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(50L)
+                                        .pendingAmount(50L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(selfEmployedBPAdminRewardId12)
+                                        .status("PAYOUT_INFO_MISSING")
+                                        .rewardedAmount(55L)
+                                        .pendingAmount(55L)
+                                        .build(),
+                                RewardDatum.builder()
+                                        .rewardId(selfEmployedBPAdminRewardId2)
+                                        .status("PENDING_BILLING_PROFILE")
+                                        .rewardedAmount(500L)
+                                        .pendingAmount(500L)
+                                        .build()
+                        ))
+                        .build()
+        ));
+    }
+
 
     private void assertGetMyRewardsStatus(final List<MyRewardDatum> myRewardData) {
         for (MyRewardDatum myRewardDatum : myRewardData) {
             final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.authenticateUser(myRewardDatum.githubUserId);
-
 
             final WebTestClient.BodyContentSpec bodyContentSpec = client.get()
                     .uri(getApiURI(ME_GET_REWARDS, Map.of("pageIndex", "0", "pageSize", "10")))
@@ -1396,7 +2226,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 "decimals": 18
               },
               "amount": 10,
-              "dollarsEquivalent": null,
+              
               "unlockDate": null,
               "from": {
                 "githubUserId": 16590657,
@@ -1433,7 +2263,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 "decimals": 18
               },
               "amount": 100,
-              "dollarsEquivalent": null,
+              
               "unlockDate": null,
               "from": {
                 "githubUserId": 16590657,
@@ -1472,7 +2302,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "decimals": 18
                },
                "amount": 20,
-               "dollarsEquivalent": null,
+               
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -1510,7 +2340,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "decimals": 18
                },
                "amount": 200,
-               "dollarsEquivalent": null,
+               
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -1548,7 +2378,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "decimals": 18
                },
                "amount": 30,
-               "dollarsEquivalent": null,
+               
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -1586,7 +2416,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "decimals": 18
                },
                "amount": 300,
-               "dollarsEquivalent": null,
+               
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -1624,7 +2454,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "decimals": 18
                },
                "amount": 50,
-               "dollarsEquivalent": null,
+               
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -1662,7 +2492,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "decimals": 18
                },
                "amount": 55,
-               "dollarsEquivalent": null,
+               
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -1700,7 +2530,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "decimals": 18
                },
                "amount": 500,
-               "dollarsEquivalent": null,
+               
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -1739,7 +2569,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 "decimals": 18
               },
               "amount": 40,
-              "dollarsEquivalent": null,
+              
               "unlockDate": null,
               "from": {
                 "githubUserId": 16590657,
@@ -1777,7 +2607,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 "decimals": 18
               },
               "amount": 400,
-              "dollarsEquivalent": null,
+              
               "unlockDate": null,
               "from": {
                 "githubUserId": 16590657,

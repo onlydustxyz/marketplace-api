@@ -28,8 +28,10 @@ public class AccountingConfiguration {
                                                  final @NonNull QuoteStorage quoteStorage,
                                                  final @NonNull CurrencyStorage currencyStorage,
                                                  final @NonNull InvoiceStoragePort invoiceStorage,
-                                                 final @NonNull ReceiptStoragePort receiptStorage) {
-        return new AccountingObserver(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage, invoiceStorage, receiptStorage);
+                                                 final @NonNull ReceiptStoragePort receiptStorage,
+                                                 final @NonNull BillingProfileStoragePort billingProfileStoragePort) {
+        return new AccountingObserver(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage, invoiceStorage, receiptStorage,
+                billingProfileStoragePort);
     }
 
     @Bean
