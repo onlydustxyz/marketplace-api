@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain.model.accountbook;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.*;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.*;
 
 import java.util.Collection;
@@ -19,16 +20,17 @@ public interface AccountBook {
 
     Set<AccountId> refund(AccountId from);
 
-    @ToString
     @EqualsAndHashCode
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
+    @Accessors(fluent = true)
     class AccountId {
         public static final AccountId ROOT = new AccountId(null, null);
 
         enum Type {SPONSOR_ACCOUNT, REWARD, PROJECT, PAYMENT}
 
+        @Getter
         private Type type;
         private UUID id;
 
@@ -107,6 +109,9 @@ public interface AccountBook {
             return type == Type.PAYMENT;
         }
 
+        public String toString() {
+            return id == null ? "ROOT" : id.toString();
+        }
     }
 
     record Transaction(AccountId from, AccountId to, @NonNull PositiveAmount amount) {

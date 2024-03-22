@@ -56,6 +56,8 @@ public class NewAccountingMigration implements CommandLineRunner {
     @Override
     //    @Transactional
     public void run(String... args) {
+        if (args.length == 0 || !args[0].equals("accounting_migration")) return;
+
         final var stopWatch = new StopWatch("accounting-migration");
 
         try {

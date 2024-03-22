@@ -2,14 +2,20 @@ package onlydust.com.marketplace.accounting.domain.model.accountbook;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Amount;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.kernel.visitor.Visitable;
 import onlydust.com.marketplace.kernel.visitor.Visitor;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.SimpleDirectedGraph;
+import org.jgrapht.nio.Attribute;
+import org.jgrapht.nio.DefaultAttribute;
+import org.jgrapht.nio.dot.DOTExporter;
 import org.jgrapht.traverse.DepthFirstIterator;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -321,6 +327,10 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         return visitor.visit(this);
     }
 
+    public void export(Exporter exporter) {
+        exporter.export(this);
+    }
+
     private record VertexWithBalance(@NonNull Vertex vertex, @NonNull PositiveAmount balance) {
     }
 
@@ -356,5 +366,51 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     @AllArgsConstructor(staticName = "of")
     private static class Vertex {
         private final AccountId accountId;
+    }
+
+    public interface Exporter {
+        void export(AccountBookState state);
+    }
+
+    @AllArgsConstructor
+    public static class DotExporter implements Exporter {
+        private final String filePath;
+
+        @Override
+        @SneakyThrows
+        public void export(AccountBookState state) {
+            final var exporter = new DOTExporter<Vertex, Edge>();
+
+            exporter.setVertexAttributeProvider(this::attributes);
+            exporter.setEdgeAttributeProvider(this::attributes);
+
+            final var writer = new BufferedWriter(new FileWriter(filePath));
+            exporter.exportGraph(state.graph, writer);
+        }
+
+        private Map<String, Attribute> attributes(Vertex v) {
+            return Map.of(
+                    "label", DefaultAttribute.createAttribute(v.accountId.toString()),
+                    "bgcolor", colorOf(v)
+            );
+        }
+
+        Attribute colorOf(Vertex v) {
+            return DefaultAttribute.createAttribute(v.accountId.type() == null ? "black" :
+                    switch (v.accountId.type()) {
+                        case SPONSOR_ACCOUNT -> "red";
+                        case REWARD -> "green";
+                        case PROJECT -> "blue";
+                        case PAYMENT -> "orange";
+                    });
+        }
+
+        private Map<String, Attribute> attributes(Edge e) {
+            return Map.of("label", DefaultAttribute.createAttribute(e.amount.toString()));
+        }
+    }
+
+    public static Exporter ToDot(String filePath) {
+        return new DotExporter(filePath);
     }
 }

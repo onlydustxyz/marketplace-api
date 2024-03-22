@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountBookEnt
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountBookEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @AllArgsConstructor
@@ -25,6 +26,7 @@ public class PostgresAccountBookEventStorage implements AccountBookEventStorage 
     }
 
     @Override
+    @Transactional
     public void save(Currency currency, List<AccountBookEvent> pendingEvents) {
         final var accountBookEntity = accountBookRepository.findByCurrencyId(currency.id().value())
                 .orElse(AccountBookEntity.of(currency.id().value()));
