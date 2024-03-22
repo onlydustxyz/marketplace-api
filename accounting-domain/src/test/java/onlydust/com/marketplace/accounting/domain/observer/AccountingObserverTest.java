@@ -628,6 +628,42 @@ public class AccountingObserverTest {
             verify(rewardStatusStorage).notPaid(kyb.getBillingProfileId());
         }
 
+         @Test
+        void should_refresh_usd_equivalent_given_a_kyc_children() {
+            // Given
+            final UUID kybId = UUID.randomUUID();
+            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, VerificationType.KYC,
+                    VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(), faker.gameOfThrones().character());
+            final Kyb kyb =
+                    Kyb.builder().id(kybId).billingProfileId(BillingProfile.Id.random()).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();
+
+            // When
+            when(billingProfileStoragePort.findKybByParentExternalId(billingProfileVerificationUpdated.getParentExternalApplicantId()))
+                    .thenReturn(Optional.of(kyb));
+            accountingObserver.onBillingProfileUpdated(billingProfileVerificationUpdated);
+
+            // Then
+            verify(rewardStatusStorage).notPaid(kyb.getBillingProfileId());
+        }
+
+        @Test
+        void should_prevent_given_a_children_kyc_not_found() {
+            // Given
+            final UUID kybId = UUID.randomUUID();
+            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, VerificationType.KYC,
+                    VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(), faker.chuckNorris().fact());
+
+            // When
+            when(billingProfileStoragePort.findKybByParentExternalId(billingProfileVerificationUpdated.getParentExternalApplicantId())).thenReturn(Optional.empty());
+            assertThatThrownBy(() -> accountingObserver.onBillingProfileUpdated(billingProfileVerificationUpdated))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("KYB not found for parentExternalApplicantId %s".formatted(billingProfileVerificationUpdated.getParentExternalApplicantId()));
+            verifyNoInteractions(rewardStatusStorage);
+        }
+
+
+
 
     }
 }
