@@ -3979,6 +3979,9 @@ components:
         receivedRewardsCount:
           type: integer
           description: Number of rewards that have been received
+        pendingInvoiceCount:
+          type: integer
+          description: Number of rewards pending invoice
         rewardedContributionsCount:
           type: integer
           description: Number of contributions that have been rewarded
