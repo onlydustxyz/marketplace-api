@@ -4,11 +4,13 @@ import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.contract.model.VerificationStatus;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
@@ -343,4 +345,26 @@ public interface BillingProfileMapper {
     }
 
 
+    static BillingProfileInvoiceableRewardsResponse mapToInvoiceableRewardsResponse(List<BillingProfileRewardView> invoiceableRewards) {
+        return new BillingProfileInvoiceableRewardsResponse()
+                .rewards(invoiceableRewards.stream().map(BillingProfileMapper::mapInvoiceableReward).toList());
+    }
+
+    static MyRewardPageItemResponse mapInvoiceableReward(BillingProfileRewardView view) {
+        return new MyRewardPageItemResponse()
+                .id(view.getId())
+                .projectId(view.getProjectId())
+                .numberOfRewardedContributions(view.getNumberOfRewardedContributions())
+                .rewardedOnProjectLogoUrl(view.getRewardedOnProjectLogoUrl())
+                .rewardedOnProjectName(view.getRewardedOnProjectName())
+                .amount(new RewardAmountResponse()
+                        .currency(mapCurrency(view.getAmount().getCurrency()))
+                        .dollarsEquivalent(view.getAmount().getDollarsEquivalent())
+                        .total(view.getAmount().getTotal()))
+                .status(RewardMapper.map(RewardStatus.PENDING_REQUEST))
+                .requestedAt(DateMapper.toZoneDateTime(view.getRequestedAt()))
+                .processedAt(DateMapper.toZoneDateTime(view.getProcessedAt()))
+                .unlockDate(DateMapper.toZoneDateTime(view.getUnlockDate()))
+                ;
+    }
 }

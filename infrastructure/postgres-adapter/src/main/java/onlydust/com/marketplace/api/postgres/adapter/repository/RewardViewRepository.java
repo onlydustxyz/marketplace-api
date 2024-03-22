@@ -42,15 +42,9 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
             WHERE (coalesce(:rewardIds) IS NULL OR r.id IN (:rewardIds))
               AND (coalesce(:statuses) IS NULL OR CAST(rs.status AS TEXT) IN (:statuses))
               AND (
-                    (coalesce(:administratedBillingProfileIds) IS NULL AND (coalesce(:contributorIds) IS NULL OR r.recipient_id IN (:contributorIds)))
+                    (coalesce(:contributorIds) IS NULL OR r.recipient_id IN (:contributorIds))
                     OR
-                    (coalesce(:administratedBillingProfileIds) IS NOT NULL AND
-                        (
-                            (r.billing_profile_id IN (:administratedBillingProfileIds) AND r.recipient_id NOT IN (:contributorIds))
-                            OR
-                            r.recipient_id IN (:contributorIds)
-                        )
-                    )
+                    (coalesce(:administratedBillingProfileIds) IS NULL OR r.billing_profile_id IN (:administratedBillingProfileIds))
                   )
               AND (coalesce(:currencyIds) IS NULL OR r.currency_id IN (:currencyIds))
               AND (coalesce(:projectIds) IS NULL OR r.project_id IN (:projectIds))
@@ -91,21 +85,6 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                 .stream().findFirst();
     }
 
-    default List<RewardViewEntity> findPendingPaymentRequestForRecipient(Long githubUserId) {
-        return find(
-                List.of(),
-                List.of(githubUserId),
-                List.of(),
-                List.of(),
-                List.of(RewardStatusEntity.Status.PENDING_REQUEST.name()),
-                List.of(),
-                null,
-                null,
-                Pageable.unpaged())
-                .getContent();
-    }
-
-
     default Page<RewardViewEntity> findProjectRewards(UUID projectId, List<UUID> currencies, List<Long> contributors, String fromDate, String toDate,
                                                       PageRequest pageRequest) {
         return find(
@@ -141,4 +120,18 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
             where id in (:rewardIds)
             """)
     void markRewardAsPaymentNotified(List<UUID> rewardIds);
+
+    default List<RewardViewEntity> findInvoiceableRewardsForBillingProfile(UUID billingProfileId) {
+        return find(
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of(RewardStatusEntity.Status.PENDING_REQUEST.name()),
+                List.of(billingProfileId),
+                null,
+                null,
+                Pageable.unpaged())
+                .getContent();
+    }
 }

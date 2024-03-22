@@ -221,4 +221,12 @@ public class BillingProfileRestApi implements BillingProfilesApi {
                 });
         return ResponseEntity.noContent().build();
     }
+
+    @Override
+    public ResponseEntity<BillingProfileInvoiceableRewardsResponse> getInvoiceableRewards(UUID billingProfileId) {
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var invoiceableRewards = billingProfileFacadePort.getInvoiceableRewardsForBillingProfile(UserId.of(authenticatedUser.getId()),
+                BillingProfile.Id.of(billingProfileId));
+        return ok(BillingProfileMapper.mapToInvoiceableRewardsResponse(invoiceableRewards));
+    }
 }

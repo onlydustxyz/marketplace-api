@@ -45,8 +45,6 @@ public interface UserStoragePort {
 
     Page<RewardItemView> findRewardItemsPageById(UUID rewardId, int pageIndex, int pageSize);
 
-    List<UserRewardView> findPendingInvoiceRewardsForRecipientId(Long githubUserId);
-
     List<Contributor> searchContributorsByLogin(Set<Long> reposIds, String login, int maxContributorCountToReturn);
 
     void saveProjectLead(UUID userId, UUID projectId);

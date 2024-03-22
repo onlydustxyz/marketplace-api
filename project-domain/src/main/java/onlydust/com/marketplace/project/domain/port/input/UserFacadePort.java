@@ -45,8 +45,6 @@ public interface UserFacadePort {
     Page<RewardItemView> getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(UUID rewardId, Long recipientId, int pageIndex,
                                                                                                int pageSize, List<UUID> companyAdminBillingProfileIds);
 
-    List<UserRewardView> getPendingInvoiceRewardsForRecipientId(Long githubUserId);
-
     void claimProjectForAuthenticatedUser(UUID projectId, User user);
 
     URL saveAvatarImage(InputStream imageInputStream);

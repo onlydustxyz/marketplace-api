@@ -294,13 +294,6 @@ public class PostgresUserAdapter implements UserStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserRewardView> findPendingInvoiceRewardsForRecipientId(Long githubUserId) {
-        return rewardViewRepository.findPendingPaymentRequestForRecipient(githubUserId)
-                .stream().map(RewardViewEntity::toUserReward).toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public List<Contributor> searchContributorsByLogin(Set<Long> reposIds, String login,
                                                        int maxContributorCountToReturn) {
         List<ContributorViewEntity> contributors;

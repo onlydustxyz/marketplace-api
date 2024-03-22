@@ -1668,7 +1668,38 @@ class BillingProfileServiceTest {
                             userIdAdmin, billingProfileId, BillingProfile.Type.COMPANY, type));
 
         }
+    }
 
+    @Test
+    void should_not_return_invoiceable_rewards_given_a_user_not_admin() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
+        final UserId userId = UserId.random();
 
+        // When
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userId))
+                .thenReturn(false);
+
+        // Then
+        assertThatThrownBy(() -> billingProfileService.getInvoiceableRewardsForBillingProfile(userId, billingProfileId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("User %s must be admin to get invoiceable rewards of billing profile %s".formatted(userId.value(), billingProfileId.value()));
+        verify(billingProfileStoragePort, never()).findInvoiceableRewardsForBillingProfile(any());
+    }
+
+    @Test
+    void should_return_invoiceable_rewards() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
+        final UserId userId = UserId.random();
+
+        // When
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userId))
+                .thenReturn(true);
+        billingProfileService.getInvoiceableRewardsForBillingProfile(userId, billingProfileId);
+
+        // Then
+        verify(billingProfileStoragePort).findInvoiceableRewardsForBillingProfile(billingProfileId);
     }
 }

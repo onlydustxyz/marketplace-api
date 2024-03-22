@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -68,4 +69,6 @@ public interface BillingProfileFacadePort {
     void enableBillingProfile(UserId userId, BillingProfile.Id billingProfileId, Boolean enable);
 
     void updateBillingProfileType(BillingProfile.Id billingProfileId, UserId userId, BillingProfile.Type type);
+
+    List<BillingProfileRewardView> getInvoiceableRewardsForBillingProfile(UserId userId, BillingProfile.Id billingProfileId);
 }

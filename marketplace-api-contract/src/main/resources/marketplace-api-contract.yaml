@@ -2288,7 +2288,7 @@ paths:
       tags:
         - BillingProfiles
       summary: Get payable rewards linked to given billing profile
-      operationId: getPayableRewards
+      operationId: getInvoiceableRewards
       description: |
         Get payable rewards linked to given billing profile
       parameters:

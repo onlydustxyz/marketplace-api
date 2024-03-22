@@ -7,12 +7,10 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileUserRightsView;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
-import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
+import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserRightsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortBillingProfileViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
@@ -44,6 +42,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     private final @NonNull BankAccountRepository bankAccountRepository;
     private final @NonNull ShortBillingProfileViewRepository shortBillingProfileViewRepository;
     private final @NonNull BillingProfileUserRightsViewRepository billingProfileUserRightsViewRepository;
+    private final @NonNull RewardViewRepository rewardViewRepository;
 
 
     @Override
@@ -382,5 +381,11 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Transactional
     public void updateBillingProfileType(BillingProfile.Id billingProfileId, BillingProfile.Type type) {
         billingProfileRepository.updateBillingProfileType(billingProfileId.value(), type.name());
+    }
+
+    @Override
+    public List<BillingProfileRewardView> findInvoiceableRewardsForBillingProfile(BillingProfile.Id billingProfileId) {
+        return rewardViewRepository.findInvoiceableRewardsForBillingProfile(billingProfileId.value())
+                .stream().map(RewardViewEntity::toBillingProfileReward).toList();
     }
 }

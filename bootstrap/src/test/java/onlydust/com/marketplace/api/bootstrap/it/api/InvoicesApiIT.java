@@ -61,7 +61,6 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     PayoutPreferenceFacadePort payoutPreferenceFacadePort;
 
     UserAuthHelper.AuthenticatedUser antho;
-    UserAuthHelper.AuthenticatedUser olivier;
     UUID companyBillingProfileId;
 
     private static final ProjectId PROJECT_ID = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
@@ -69,8 +68,9 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     @BeforeEach
     void setUp() {
         antho = userAuthHelper.authenticateAnthony();
-        olivier = userAuthHelper.authenticateOlivier();
         companyBillingProfileId = initBillingProfile(antho).value();
+
+        payoutPreferenceFacadePort.setPayoutPreference(PROJECT_ID, BillingProfile.Id.of(companyBillingProfileId), UserId.of(antho.user().getId()));
     }
 
     private BillingProfile.Id initBillingProfile(UserAuthHelper.AuthenticatedUser owner) {
@@ -110,7 +110,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     void list_pending_invoices_before() {
         // When
         client.get()
-                .uri(getApiURI(ME_REWARDS_PENDING_INVOICE))
+                .uri(getApiURI(BILLING_PROFILES_INVOICEABLE_REWARDS.formatted(companyBillingProfileId)))
                 .header("Authorization", BEARER_PREFIX + antho.jwt())
                 .exchange()
                 // Then
@@ -174,27 +174,57 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                               "projectName": "kaaper",
                               "amount": {
                                 "amount": 1000,
-                                "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
                                 "target": {
-                                  "amount": 1781980.00,
-                                  "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2},
-                                  "conversionRate": 1781.98
+                                  "amount": 1010.00,
+                                  "currency": {
+                                    "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                    "code": "USD",
+                                    "name": "US Dollar",
+                                    "logoUrl": null,
+                                    "decimals": 2
+                                  },
+                                  "conversionRate": 1.01
                                 }
                               }
                             }
                           ],
                           "totalBeforeTax": {
-                            "amount": 1781980.00,
-                            "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2}
+                            "amount": 1010.00,
+                            "currency": {
+                              "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                              "code": "USD",
+                              "name": "US Dollar",
+                              "logoUrl": null,
+                              "decimals": 2
+                            }
                           },
                           "taxRate": 0.2,
                           "totalTax": {
-                            "amount": 356396.000,
-                            "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2}
+                            "amount": 202.000,
+                            "currency": {
+                              "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                              "code": "USD",
+                              "name": "US Dollar",
+                              "logoUrl": null,
+                              "decimals": 2
+                            }
                           },
                           "totalAfterTax": {
-                            "amount": 2138376.000,
-                            "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2}
+                            "amount": 1212.000,
+                            "currency": {
+                              "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                              "code": "USD",
+                              "name": "US Dollar",
+                              "logoUrl": null,
+                              "decimals": 2
+                            }
                           },
                           "usdToEurConversionRate": 0.92
                         }
@@ -203,7 +233,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_REWARDS_PENDING_INVOICE))
+                .uri(getApiURI(BILLING_PROFILES_INVOICEABLE_REWARDS.formatted(companyBillingProfileId)))
                 .header("Authorization", BEARER_PREFIX + antho.jwt())
                 .exchange()
                 // Then
@@ -241,7 +271,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_REWARDS_PENDING_INVOICE))
+                .uri(getApiURI(BILLING_PROFILES_INVOICEABLE_REWARDS.formatted(companyBillingProfileId)))
                 .header("Authorization", BEARER_PREFIX + antho.jwt())
                 .exchange()
                 // Then
@@ -374,7 +404,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_REWARDS_PENDING_INVOICE))
+                .uri(getApiURI(BILLING_PROFILES_INVOICEABLE_REWARDS.formatted(companyBillingProfileId)))
                 .header("Authorization", BEARER_PREFIX + antho.jwt())
                 .exchange()
                 // Then
@@ -429,7 +459,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_REWARDS_PENDING_INVOICE))
+                .uri(getApiURI(BILLING_PROFILES_INVOICEABLE_REWARDS.formatted(companyBillingProfileId)))
                 .header("Authorization", BEARER_PREFIX + antho.jwt())
                 .exchange()
                 // Then
@@ -614,7 +644,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                              {
                                "number": "OD-MY-COMPANY-001",
                                "totalAfterTax": {
-                                 "amount": 2138376.000,
+                                 "amount": 1212.000,
                                  "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2}
                                },
                                "status": "PROCESSING"
