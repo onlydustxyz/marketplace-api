@@ -25,21 +25,18 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class SponsorAccountTransactionsEntity {
     @Id
-    @NonNull UUID id;
     @EqualsAndHashCode.Include
+    @NonNull UUID id;
     @NonNull UUID accountId;
 
-    @EqualsAndHashCode.Include
     @Enumerated(javax.persistence.EnumType.STRING)
     @Type(type = "transaction_type")
     @NonNull TransactionType type;
 
-    @EqualsAndHashCode.Include
     @Enumerated(javax.persistence.EnumType.STRING)
     @Type(type = "network")
     @NonNull NetworkEnumEntity network;
 
-    @EqualsAndHashCode.Include
     @NonNull String reference;
     @NonNull BigDecimal amount;
     @NonNull String thirdPartyName;
