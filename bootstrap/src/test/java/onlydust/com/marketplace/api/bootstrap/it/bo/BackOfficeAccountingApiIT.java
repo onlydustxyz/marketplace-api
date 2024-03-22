@@ -147,7 +147,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                         {
                             "receipt": {
                                 "reference": "0x02",
-                                "amount": -60,
+                                "amount": -30,
                                 "network": "ETHEREUM",
                                 "thirdPartyName": "Coca Cola LTD",
                                 "thirdPartyAccountNumber": "coca.cola.eth"
@@ -160,11 +160,39 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .isOk()
                 .expectBody()
                 .jsonPath("$.reference").isEqualTo("0x02")
-                .jsonPath("$.amount").isEqualTo(-60)
+                .jsonPath("$.amount").isEqualTo(-30)
                 .jsonPath("$.network").isEqualTo("ETHEREUM")
                 .jsonPath("$.thirdPartyName").isEqualTo("Coca Cola LTD")
                 .jsonPath("$.thirdPartyAccountNumber").isEqualTo("coca.cola.eth")
         ;
+
+        client.post()
+                .uri(getApiURI(POST_SPONSOR_ACCOUNTS_RECEIPTS.formatted(accountId)))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "receipt": {
+                                "reference": "0x02",
+                                "amount": -30,
+                                "network": "ETHEREUM",
+                                "thirdPartyName": "Coca Cola LTD",
+                                "thirdPartyAccountNumber": "coca.cola.eth"
+                            }
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.reference").isEqualTo("0x02")
+                .jsonPath("$.amount").isEqualTo(-30)
+                .jsonPath("$.network").isEqualTo("ETHEREUM")
+                .jsonPath("$.thirdPartyName").isEqualTo("Coca Cola LTD")
+                .jsonPath("$.thirdPartyAccountNumber").isEqualTo("coca.cola.eth")
+        ;
+
 
         // When
         client.put()
@@ -203,7 +231,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .json("""
                         {
                           "totalPageNumber": 1,
-                          "totalItemNumber": 3,
+                          "totalItemNumber": 4,
                           "hasMore": false,
                           "nextPageIndex": 0,
                           "transactions": [
@@ -213,7 +241,25 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                               "lockedUntil": null,
                               "project": null,
                               "amount": {
-                                "amount": -60,
+                                "amount": -30,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "dollarsEquivalent": null,
+                                "conversionRate": null
+                              }
+                            },
+                            {
+                              "type": "DEPOSIT",
+                              "network": "ETHEREUM",
+                              "lockedUntil": null,
+                              "project": null,
+                              "amount": {
+                                "amount": -30,
                                 "currency": {
                                   "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
                                   "code": "STRK",
