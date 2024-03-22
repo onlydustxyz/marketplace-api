@@ -123,6 +123,41 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[?(@.id == 'd22f75ab-d9f5-4dc6-9a85-60dcd7452028')]").exists()
                 .jsonPath("$.rewards[?(@.id == 'dd7d445f-6915-4955-9bae-078173627b05')]").exists()
         ;
+
+        client.get()
+                .uri(ME_BILLING_PROFILES)
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "billingProfiles": [
+                            {
+                              "type": "INDIVIDUAL",
+                              "name": "Anthony BUISSET",
+                              "rewardCount": 9,
+                              "invoiceableRewardCount": 0,
+                              "invoiceMandateAccepted": true,
+                              "enabled": true,
+                              "pendingInvitationResponse": false,
+                              "role": "ADMIN"
+                            },
+                            {
+                              "type": "COMPANY",
+                              "name": "My billing profile",
+                              "rewardCount": 12,
+                              "invoiceableRewardCount": 12,
+                              "invoiceMandateAccepted": false,
+                              "enabled": true,
+                              "pendingInvitationResponse": false,
+                              "role": "ADMIN"
+                            }
+                          ]
+                        }
+                        """);
     }
 
     @SneakyThrows
@@ -243,6 +278,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards.size()").isEqualTo(12)
                 .jsonPath("$.rewards[?(@.id == '966cd55c-7de8-45c4-8bba-b388c38ca15d')]").exists();
 
+
         // When
         when(pdfStoragePort.upload(eq(invoiceId.getValue() + ".pdf"), any())).then(invocation -> {
             final var fileName = invocation.getArgument(0, String.class);
@@ -281,6 +317,41 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards.size()").isEqualTo(11)
                 .jsonPath("$.rewards[?(@.id == '966cd55c-7de8-45c4-8bba-b388c38ca15d')]").doesNotExist()
         ;
+
+        client.get()
+                .uri(ME_BILLING_PROFILES)
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "billingProfiles": [
+                            {
+                              "type": "INDIVIDUAL",
+                              "name": "Anthony BUISSET",
+                              "rewardCount": 9,
+                              "invoiceableRewardCount": 0,
+                              "invoiceMandateAccepted": true,
+                              "enabled": true,
+                              "pendingInvitationResponse": false,
+                              "role": "ADMIN"
+                            },
+                            {
+                              "type": "COMPANY",
+                              "name": "My billing profile",
+                              "rewardCount": 12,
+                              "invoiceableRewardCount": 11,
+                              "invoiceMandateAccepted": false,
+                              "enabled": true,
+                              "pendingInvitationResponse": false,
+                              "role": "ADMIN"
+                            }
+                          ]
+                        }
+                        """);
 
         notificationOutboxJob.run();
         webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
@@ -470,6 +541,41 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[?(@.id == '79209029-c488-4284-aa3f-bce8870d3a66')]").doesNotExist()
                 .jsonPath("$.rewards[?(@.id == 'd22f75ab-d9f5-4dc6-9a85-60dcd7452028')]").doesNotExist()
         ;
+
+        client.get()
+                .uri(ME_BILLING_PROFILES)
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "billingProfiles": [
+                            {
+                              "type": "INDIVIDUAL",
+                              "name": "Anthony BUISSET",
+                              "rewardCount": 9,
+                              "invoiceableRewardCount": 0,
+                              "invoiceMandateAccepted": true,
+                              "enabled": true,
+                              "pendingInvitationResponse": false,
+                              "role": "ADMIN"
+                            },
+                            {
+                              "type": "COMPANY",
+                              "name": "My billing profile",
+                              "rewardCount": 12,
+                              "invoiceableRewardCount": 9,
+                              "invoiceMandateAccepted": true,
+                              "enabled": true,
+                              "pendingInvitationResponse": false,
+                              "role": "ADMIN"
+                            }
+                          ]
+                        }
+                        """);
 
         notificationOutboxJob.run();
         webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))

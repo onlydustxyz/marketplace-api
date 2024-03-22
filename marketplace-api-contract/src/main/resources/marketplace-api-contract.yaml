@@ -4668,6 +4668,8 @@ components:
         - id
         - name
         - type
+        - rewardCount
+        - invoiceableRewardCount
         - invoiceMandateAccepted
         - hasValidPayoutMethods
         - hasValidVerificationValid
@@ -4682,6 +4684,8 @@ components:
         name:
           type: string
         rewardCount:
+          type: integer
+        invoiceableRewardCount:
           type: integer
         invoiceMandateAccepted:
           type: boolean

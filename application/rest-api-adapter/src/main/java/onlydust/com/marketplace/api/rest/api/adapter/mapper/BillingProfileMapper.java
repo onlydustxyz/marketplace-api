@@ -264,19 +264,12 @@ public interface BillingProfileMapper {
 
     static MyBillingProfilesResponse myBillingProfileToResponse(final List<ShortBillingProfileView> shortBillingProfileViews) {
         final MyBillingProfilesResponse myBillingProfilesResponse = new MyBillingProfilesResponse();
-        myBillingProfilesResponse.setBillingProfiles(isNull(shortBillingProfileViews) ? List.of() : shortBillingProfileViews.stream()
-                .map(view -> new ShortBillingProfileResponse()
-                        .name(view.getName())
-                        .id(view.getId().value())
-                        .enabled(view.getEnabled())
-                        .invoiceMandateAccepted(view.isInvoiceMandateAccepted())
-                        .pendingInvitationResponse(view.getPendingInvitationResponse())
-                        .role(isNull(view.getRole()) ? null : mapRole(view.getRole()))
-                        .type(switch (view.getType()) {
-                            case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
-                            case COMPANY -> BillingProfileType.COMPANY;
-                            case SELF_EMPLOYED -> BillingProfileType.SELF_EMPLOYED;
-                        })).collect(Collectors.toList()));
+        myBillingProfilesResponse.setBillingProfiles(isNull(shortBillingProfileViews) ?
+                List.of() :
+                shortBillingProfileViews.stream()
+                        .map(PayoutPreferenceMapper::billingProfileToShortResponse)
+                        .sorted(Comparator.comparing(ShortBillingProfileResponse::getName))
+                        .collect(Collectors.toList()));
         return myBillingProfilesResponse;
 
     }
@@ -337,7 +330,7 @@ public interface BillingProfileMapper {
 
     }
 
-    private static BillingProfileCoworkerRole mapRole(BillingProfile.User.Role role) {
+    static BillingProfileCoworkerRole mapRole(BillingProfile.User.Role role) {
         return isNull(role) ? null : switch (role) {
             case ADMIN -> BillingProfileCoworkerRole.ADMIN;
             case MEMBER -> BillingProfileCoworkerRole.MEMBER;

@@ -22,6 +22,8 @@ public class ShortBillingProfileView {
     @Setter
     ZonedDateTime invoiceMandateLatestVersionDate;
     BillingProfile.User.Role role;
+    Integer rewardCount;
+    Integer invoiceableRewardCount;
 
     public boolean isInvoiceMandateAccepted() {
         if (type == BillingProfile.Type.INDIVIDUAL) return true;
