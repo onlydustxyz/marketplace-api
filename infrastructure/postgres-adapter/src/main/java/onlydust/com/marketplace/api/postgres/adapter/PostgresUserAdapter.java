@@ -262,6 +262,8 @@ public class PostgresUserAdapter implements UserStoragePort {
                         new Money(null, null,
                                 rewardsStats.stream().map(RewardStatsEntity::getPendingUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,
                                         BigDecimal::add)))
+                .pendingRequestCount(rewardsStats.size() == 1 ? rewardsStats.get(0).getPendingRequestCount() :
+                        rewardsStats.stream().map(RewardStatsEntity::getPendingRequestCount).filter(Objects::nonNull).reduce(0, Integer::sum))
                 .receivedRewardsCount(rewardsStats.stream().map(RewardStatsEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .rewardedContributionsCount(rewardsStats.stream().map(RewardStatsEntity::getRewardItemIds).flatMap(Collection::stream).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .rewardingProjectsCount(rewardsStats.stream().map(RewardStatsEntity::getProjectIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())

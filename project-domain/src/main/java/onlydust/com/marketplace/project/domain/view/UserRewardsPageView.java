@@ -13,4 +13,5 @@ public class UserRewardsPageView {
     Integer receivedRewardsCount;
     Integer rewardedContributionsCount;
     Integer rewardingProjectsCount;
+    Integer pendingRequestCount;
 }

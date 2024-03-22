@@ -29,6 +29,7 @@ public class RewardStatsEntity {
     BigDecimal processedUsdAmount;
     BigDecimal pendingAmount;
     BigDecimal pendingUsdAmount;
+    Integer pendingRequestCount;
     @Type(type = "jsonb")
     Set<UUID> rewardIds;
     @Type(type = "jsonb")

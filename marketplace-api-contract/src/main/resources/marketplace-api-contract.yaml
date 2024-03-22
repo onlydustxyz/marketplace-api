@@ -3985,6 +3985,9 @@ components:
         rewardingProjectsCount:
           type: integer
           description: Number of projects the user has been rewarded for
+        pendingRequestCount:
+          type: integer
+          description: Number of rewards at pending request status
     MyRewardsListResponse:
       type: object
       required:
