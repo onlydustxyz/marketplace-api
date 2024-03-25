@@ -3118,9 +3118,6 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         backofficeAccountingManagementRestApi.payReward(selfEmployedBPAdminRewardId11,
                 new PayRewardRequest().network(TransactionNetwork.ETHEREUM).recipientAccount("0x5b8a9A23c729010FB1DBFcC0e8e5eCeB4CC81cD9").reference(
                         "0x9da1b9ded266895e097a18378789c3f09bb0a541d8c17c0d9c7a95bb3072ffa0"));
-        backofficeAccountingManagementRestApi.payReward(selfEmployedBPAdminRewardId12,
-                new PayRewardRequest().network(TransactionNetwork.ETHEREUM).recipientAccount("0x5b8a9A23c729010FB1DBFcC0e8e5eCeB4CC81cD9").reference(
-                        "0x9da1b9ded266895e097a18378789c3f09bb0a541d8c17c0d9c7a95bb3072ffa0"));
 
         // Then
         assertGetProjectRewardsStatusOnProject(
@@ -3131,7 +3128,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                         companyBPAdmin2RewardId1, "COMPLETE",
                         companyBPMember1RewardId1, "COMPLETE",
                         selfEmployedBPAdminRewardId11, "COMPLETE",
-                        selfEmployedBPAdminRewardId12, "COMPLETE"
+                        selfEmployedBPAdminRewardId12, "PENDING_CONTRIBUTOR"
                 )
         );
         assertGetProjectRewardsStatusOnProject(
@@ -3248,7 +3245,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId12)
-                                        .status("COMPLETE")
+                                        .status("PENDING_REQUEST")
                                         .rewardedAmount(55L)
                                         .pendingAmount(0L)
                                         .build(),
@@ -3256,7 +3253,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .rewardId(selfEmployedBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(500L)
-                                        .pendingAmount(500L)
+                                        .pendingAmount(555L)
                                         .build()
                         ))
                         .build()

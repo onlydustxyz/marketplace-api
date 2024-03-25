@@ -31,6 +31,7 @@ public class AccountingService implements AccountingFacadePort {
     private final CurrencyStorage currencyStorage;
     private final AccountingObserverPort accountingObserver;
     private final ProjectAccountingObserver projectAccountingObserver;
+    private final InvoiceStoragePort invoiceStoragePort;
 
     @Override
     @Transactional
@@ -103,7 +104,7 @@ public class AccountingService implements AccountingFacadePort {
     @Transactional
     public void pay(final @NonNull RewardId rewardId, final @NonNull Payment.Reference paymentReference) {
         final var network = paymentReference.network();
-        final var payableRewards = getPayableRewardsOn(network, Set.of(rewardId));
+        final var payableRewards = filterPayableRewards(network, Set.of(rewardId));
 
         if (payableRewards.isEmpty()) throw badRequest("Reward %s is not payable on %s".formatted(rewardId, network));
 
@@ -126,7 +127,8 @@ public class AccountingService implements AccountingFacadePort {
     private Payment pay(final @NonNull Network network, final List<PayableReward> rewards) {
         final var payment = Payment.of(network, rewards);
 
-        payment.rewards().stream().collect(groupingBy(PayableReward::currency))
+        payment.rewards().stream()
+                .collect(groupingBy(PayableReward::currency))
                 .forEach((currency, currencyRewards) -> pay(payment.id(), currency, currencyRewards));
 
         return payment;
@@ -237,10 +239,13 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     public List<PayableReward> getPayableRewards(Set<RewardId> rewardIds) {
-        return currencyStorage.all().stream().flatMap(currency -> new PayableRewardAggregator(sponsorAccountStorage, currency).getPayableRewards(rewardIds)).toList();
+        return currencyStorage.all().stream()
+                .flatMap(currency -> new PayableRewardAggregator(sponsorAccountStorage, currency).getPayableRewards(rewardIds))
+                .filter(r -> invoiceStoragePort.invoiceOf(r.id()).map(i -> i.status() == Invoice.Status.APPROVED).orElse(false))
+                .toList();
     }
 
-    private List<PayableReward> getPayableRewardsOn(@NonNull Network network, @NonNull Set<RewardId> rewardIds) {
+    private List<PayableReward> filterPayableRewards(@NonNull Network network, @NonNull Set<RewardId> rewardIds) {
         return getPayableRewards(rewardIds).stream().filter(payableReward -> network.equals(payableReward.currency().network())).toList();
     }
 
@@ -319,10 +324,6 @@ public class AccountingService implements AccountingFacadePort {
             this.sponsorAccountProvider = new CachedSponsorAccountProvider(sponsorAccountProvider);
             this.currency = currency;
             this.accountBook = getAccountBook(currency);
-        }
-
-        public Stream<PayableReward> getPayableRewards() {
-            return getPayableRewards(null);
         }
 
         public Stream<PayableReward> getPayableRewards(Set<RewardId> rewardIds) {

@@ -5,8 +5,14 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount.Transaction;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserverPort;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.ProjectAccountingObserver;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
@@ -14,16 +20,20 @@ import onlydust.com.marketplace.accounting.domain.stubs.AccountBookEventStorageS
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.stubs.ERC20Tokens;
 import onlydust.com.marketplace.accounting.domain.stubs.SponsorAccountStorageStub;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -35,9 +45,19 @@ public class AccountingServiceTest {
     final CurrencyStorage currencyStorage = mock(CurrencyStorage.class);
     final AccountingObserverPort accountingObserver = mock(AccountingObserverPort.class);
     final ProjectAccountingObserver projectAccountingObserver = mock(ProjectAccountingObserver.class);
+    final InvoiceStoragePort invoiceStoragePort = mock(InvoiceStoragePort.class);
     final AccountingService accountingService = new AccountingService(accountBookEventStorage, sponsorAccountStorage, currencyStorage, accountingObserver,
-            projectAccountingObserver);
+            projectAccountingObserver, invoiceStoragePort);
     final Faker faker = new Faker();
+    final Invoice invoice = Invoice.of(BillingProfileView.builder()
+                    .id(BillingProfile.Id.random())
+                    .type(BillingProfile.Type.INDIVIDUAL)
+                    .kyc(Kyc.builder().id(UUID.randomUUID()).ownerId(UserId.random()).status(VerificationStatus.VERIFIED).country(Country.fromIso3("FRA")).firstName(faker.name().firstName()).address(faker.address().fullAddress()).usCitizen(false).build())
+                    .payoutInfo(PayoutInfo.builder().build())
+                    .name("OnlyDust")
+                    .build(), 1, UserId.random())
+            .status(Invoice.Status.APPROVED)
+            .rewards(List.of());
 
     private Payment.Reference fakePaymentReference(Network network) {
         return new Payment.Reference(network, faker.random().hex(), faker.rickAndMorty().character(), faker.internet().slug() + ".eth");
@@ -60,6 +80,11 @@ public class AccountingServiceTest {
         }
         assertThat(accountBookFacade.networksOf(rewardId)).isEqualTo(networks);
         reset(accountingObserver);
+    }
+
+    @BeforeEach
+    void setup() {
+        when(invoiceStoragePort.invoiceOf(any())).thenReturn(Optional.of(invoice));
     }
 
     @Nested
@@ -1246,6 +1271,33 @@ public class AccountingServiceTest {
                 assertThat(payableRewards).containsExactly(new PayableReward(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L)));
                 assertThat(payableRewards1).isEmpty();
             }
+        }
+
+        @Test
+        void should_not_return_rewards_with_no_invoice() {
+            // Given
+            accountingService.fund(unlockedSponsorAccountUsdc1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(75L)));
+            when(invoiceStoragePort.invoiceOf(rewardId1)).thenReturn(Optional.empty());
+
+            // When
+            final var payableRewards = accountingService.getPayableRewards(Set.of(rewardId1));
+
+            // Then
+            assertThat(payableRewards).isEmpty();
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = Invoice.Status.class, names = {"DRAFT", "TO_REVIEW", "REJECTED", "PAID"})
+        void should_not_return_rewards_with_invoice_not_approved(Invoice.Status status) {
+            // Given
+            accountingService.fund(unlockedSponsorAccountUsdc1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(75L)));
+            when(invoiceStoragePort.invoiceOf(rewardId1)).thenReturn(Optional.of(invoice.status(status)));
+
+            // When
+            final var payableRewards = accountingService.getPayableRewards(Set.of(rewardId1));
+
+            // Then
+            assertThat(payableRewards).isEmpty();
         }
     }
 

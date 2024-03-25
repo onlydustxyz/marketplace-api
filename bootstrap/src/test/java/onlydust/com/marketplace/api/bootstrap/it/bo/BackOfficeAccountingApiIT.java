@@ -632,7 +632,27 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(30)
         ;
 
-        // TODO: reject payment of reward if not invoiced and approved
+        // When
+        client.post()
+                .uri(getApiURI(POST_REWARDS_PAY.formatted(rewardId)))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "network": "ETHEREUM",
+                            "reference": "0x14",
+                            "recipientAccount": "ofux.eth"
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody()
+                .json("""
+                        {
+                            "message": "Reward %s is not payable on ETHEREUM"
+                        }
+                        """.formatted(rewardId));
 
         // When
         final var invoiceId = invoiceReward(UserId.of(ofux.user().getId()), KAAPER, RewardId.of(rewardId));
