@@ -158,7 +158,11 @@ public class BillingProfileService implements BillingProfileFacadePort {
     }
 
     private void selectBillingProfileForUserAndProjects(@NonNull BillingProfile.Id billingProfileId, @NonNull UserId userId, Set<ProjectId> projectIds) {
-        if (projectIds != null) projectIds.forEach(projectId -> billingProfileStoragePort.savePayoutPreference(billingProfileId, userId, projectId));
+        if (projectIds != null)
+            projectIds.forEach(projectId -> {
+                billingProfileStoragePort.savePayoutPreference(billingProfileId, userId, projectId);
+                accountingObserverPort.onPayoutPreferenceChanged(billingProfileId, userId, projectId);
+            });
     }
 
     @Override
