@@ -12,8 +12,8 @@ import java.util.Map;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
-public class BatchPaymentExporter {
-    
+public class PaymentExporter {
+
     public static String csv(List<PayableReward> payableRewards, Map<RewardId, Wallet> wallets) {
         final CSVFormat csvFormat = CSVFormat.DEFAULT.builder().build();
 
