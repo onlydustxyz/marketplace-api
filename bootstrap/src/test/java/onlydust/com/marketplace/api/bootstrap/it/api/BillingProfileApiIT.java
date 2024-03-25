@@ -1,10 +1,12 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import net.minidev.json.JSONArray;
+import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import org.junit.jupiter.api.Assertions;
@@ -12,9 +14,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
+
+    @Autowired
+    BillingProfileService billingProfileService;
+    @Autowired
+    PayoutPreferenceFacadePort payoutPreferenceFacadePort;
 
     @Test
     void should_be_authenticated() {
@@ -200,9 +209,6 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.billingProfiles[?(@.type == 'INDIVIDUAL')]")
                 .value(jsonArray -> Assertions.assertEquals(1, ((JSONArray) jsonArray).toArray().length));
     }
-
-    @Autowired
-    BillingProfileService billingProfileService;
 
     @Test
     void should_get_update_delete_billing_profile_by_id() {
@@ -485,5 +491,72 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                           "starknetAddress": "0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798",
                           "missingStarknetWallet": null
                         }""");
+    }
+
+    @Test
+    void should_delete_manually_associated_billing_profile() {
+        // Given
+        final var antho = userAuthHelper.authenticateAnthony();
+        final var kaaper = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
+        final var firstAdminId = UserId.of(antho.user().getId());
+
+        final var billingProfile = billingProfileService.createCompanyBillingProfile(firstAdminId, faker.rickAndMorty().character(), null);
+        payoutPreferenceFacadePort.setPayoutPreference(kaaper, billingProfile.id(), firstAdminId);
+
+        // When
+        client.delete()
+                .uri(getApiURI(BILLING_PROFILES_DELETE_BY_ID.formatted(billingProfile.id().toString())))
+                .header("Authorization", "Bearer " + antho.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(ME_GET_REWARDS), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "20",
+                        "sort", "AMOUNT",
+                        "direction", "DESC")
+                ))
+                .header("Authorization", "Bearer " + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+    }
+
+    @Test
+    void should_delete_automatically_associated_billing_profile() {
+        // Given
+        final var antho = userAuthHelper.authenticateAnthony();
+        final var kaaper = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
+        final var firstAdminId = UserId.of(antho.user().getId());
+
+        final var billingProfile = billingProfileService.createCompanyBillingProfile(firstAdminId, faker.rickAndMorty().character(), Set.of(kaaper));
+
+        // When
+        client.delete()
+                .uri(getApiURI(BILLING_PROFILES_DELETE_BY_ID.formatted(billingProfile.id().toString())))
+                .header("Authorization", "Bearer " + antho.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(ME_GET_REWARDS), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "20",
+                        "sort", "AMOUNT",
+                        "direction", "DESC")
+                ))
+                .header("Authorization", "Bearer " + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
     }
 }
