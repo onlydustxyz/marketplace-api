@@ -45,7 +45,6 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     private final @NonNull ShortBillingProfileViewRepository shortBillingProfileViewRepository;
     private final @NonNull BillingProfileUserRightsViewRepository billingProfileUserRightsViewRepository;
     private final @NonNull RewardViewRepository rewardViewRepository;
-    private final @NonNull BillingProfileLinkViewRepository billingProfileLinkViewRepository;
 
 
     @Override
@@ -139,7 +138,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
         final var invoiceMandateLatestVersionDate = globalSettingsRepository.get().getInvoiceMandateLatestVersionDate();
 
         return billingProfileRepository.findById(billingProfileId.value()).map(billingProfileEntity -> {
-            final var billingProfileCustomData = billingProfileLinkViewRepository.findById(billingProfileId.value())
+            final var billingProfileCustomData = shortBillingProfileViewRepository.findById(billingProfileId.value())
                     .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
             return switch (billingProfileEntity.getType()) {
                 case INDIVIDUAL -> {
@@ -152,6 +151,8 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
                             .missingPayoutInfo(billingProfileCustomData.getMissingPayoutInfo())
                             .missingVerification(billingProfileCustomData.getMissingVerification())
+                            .rewardCount(billingProfileCustomData.getRewardCount())
+                            .invoiceableRewardCount(billingProfileCustomData.getInvoiceableRewardCount())
                             .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                             .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                             .build();
@@ -174,6 +175,9 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
                             .missingPayoutInfo(billingProfileCustomData.getMissingPayoutInfo())
                             .missingVerification(billingProfileCustomData.getMissingVerification())
+                            .rewardCount(billingProfileCustomData.getRewardCount())
+                            .invoiceableRewardCount(billingProfileCustomData.getInvoiceableRewardCount())
+                            .missingVerification(billingProfileCustomData.getMissingVerification())
                             .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                             .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                             .build();
@@ -195,6 +199,9 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
                             .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
                             .missingPayoutInfo(billingProfileCustomData.getMissingPayoutInfo())
+                            .missingVerification(billingProfileCustomData.getMissingVerification())
+                            .rewardCount(billingProfileCustomData.getRewardCount())
+                            .invoiceableRewardCount(billingProfileCustomData.getInvoiceableRewardCount())
                             .missingVerification(billingProfileCustomData.getMissingVerification())
                             .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                             .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)

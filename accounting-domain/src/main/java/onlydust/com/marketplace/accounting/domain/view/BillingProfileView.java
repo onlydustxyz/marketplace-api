@@ -26,6 +26,8 @@ public class BillingProfileView {
     ZonedDateTime invoiceMandateAcceptedAt;
     @Getter(AccessLevel.NONE)
     ZonedDateTime invoiceMandateLatestVersionDate;
+    Integer rewardCount;
+    Integer invoiceableRewardCount;
     Boolean missingPayoutInfo;
     Boolean missingVerification;
 

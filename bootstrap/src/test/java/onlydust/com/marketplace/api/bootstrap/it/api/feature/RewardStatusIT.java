@@ -1974,6 +1974,15 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.billingProfiles[0].invoiceableRewardCount").isEqualTo(1);
 
         client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(individualBPId)))
+                .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateUser(individualBPAdminGithubId).jwt())
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.invoiceableRewardCount").isEqualTo(1);
+
+        client.get()
                 .uri(getApiURI(BILLING_PROFILES_INVOICEABLE_REWARDS.formatted(individualBPId)))
                 .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateUser(individualBPAdminGithubId).jwt())
                 .exchange()
@@ -2146,6 +2155,15 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.billingProfiles.length()").isEqualTo(1)
                 .jsonPath("$.billingProfiles[0].invoiceableRewardCount").isEqualTo(3);
+
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(companyBPId)))
+                .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateUser(companyBPAdmin1GithubId).jwt())
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.invoiceableRewardCount").isEqualTo(3);
 
         client.get()
                 .uri(getApiURI(BILLING_PROFILES_INVOICEABLE_REWARDS.formatted(companyBPId)))
@@ -2324,6 +2342,15 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.billingProfiles.length()").isEqualTo(1)
                 .jsonPath("$.billingProfiles[0].invoiceableRewardCount").isEqualTo(2);
+
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(selfEmployedBPId)))
+                .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateUser(selfEmployedBPAdminGithubId).jwt())
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.invoiceableRewardCount").isEqualTo(2);
 
         client.get()
                 .uri(getApiURI(BILLING_PROFILES_INVOICEABLE_REWARDS.formatted(selfEmployedBPId)))

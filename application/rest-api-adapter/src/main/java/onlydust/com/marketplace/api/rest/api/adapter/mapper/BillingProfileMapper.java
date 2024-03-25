@@ -244,6 +244,8 @@ public interface BillingProfileMapper {
         response.setStatus(verificationStatusToResponse(view.getVerificationStatus()));
         response.setEnabled(view.getEnabled());
         response.setInvoiceMandateAccepted(view.isInvoiceMandateAccepted());
+        response.setRewardCount(view.getRewardCount());
+        response.setInvoiceableRewardCount(view.getInvoiceableRewardCount());
         response.setMissingPayoutInfo(view.getMissingPayoutInfo());
         response.setMissingVerification(view.getMissingVerification());
         response.setVerificationBlocked(view.isVerificationBlocked());

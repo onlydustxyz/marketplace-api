@@ -5468,6 +5468,10 @@ components:
           type: boolean
         invoiceMandateAccepted:
           type: boolean
+        rewardCount:
+          type: integer
+        invoiceableRewardCount:
+          type: integer
         missingPayoutInfo:
           type: boolean
           description: True if any reward that is included in an invoice in this billing profile

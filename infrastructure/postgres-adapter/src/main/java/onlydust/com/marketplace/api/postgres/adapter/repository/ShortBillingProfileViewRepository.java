@@ -1,14 +1,43 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortBillingProfileViewEntity;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ShortBillingProfileViewRepository extends JpaRepository<ShortBillingProfileViewEntity, UUID> {
+
+    @Query(value = """
+            select bp.id,
+                bp.name,
+                bp.type,
+                bp.invoice_mandate_accepted_at,
+                bp.verification_status,
+                bp.enabled,
+                NULL as role,
+                false pending_invitation,
+                count(r.*) reward_count,
+                count(rs.reward_id) filter ( where rs.status = 'PENDING_REQUEST' ) invoiceable_reward_count,
+                count(rs.reward_id) filter ( where rs.status = 'PAYOUT_INFO_MISSING' ) > 0 as missing_payout_info,
+                count(rs.reward_id) filter ( where rs.status = 'PENDING_VERIFICATION' ) > 0 as missing_verification
+            from accounting.billing_profiles bp
+                left join rewards r on r.billing_profile_id = bp.id
+                left join accounting.reward_statuses rs on rs.reward_id = r.id
+            where bp.id = :billingProfileId
+            group by bp.id,
+                bp.name,
+                bp.type,
+                bp.invoice_mandate_accepted_at,
+                bp.verification_status,
+                bp.enabled
+            """, nativeQuery = true)
+    @NotNull
+    Optional<ShortBillingProfileViewEntity> findById(@NotNull UUID billingProfileId);
 
     @Query(value = """
             select bp.id,
