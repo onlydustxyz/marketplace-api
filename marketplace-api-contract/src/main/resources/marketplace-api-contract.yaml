@@ -4616,6 +4616,8 @@ components:
         - missingPayoutInfo
         - missingVerification
         - verificationBlocked
+        - rewardCount
+        - invoiceableRewardCount
         - enabled
         - role
       properties:
@@ -5685,7 +5687,23 @@ components:
         project:
           $ref: '#/components/schemas/ShortProjectResponse'
         billingProfile:
-          $ref: '#/components/schemas/ShortBillingProfileResponse'
+          $ref: '#/components/schemas/PayoutPreferenceBillingProfileResponse'
+
+    PayoutPreferenceBillingProfileResponse:
+      type: object
+      required:
+        - id
+        - name
+        - type
+      properties:
+        id:
+          $ref: '#/components/schemas/BillingProfileId'
+        name:
+          type: string
+        type:
+          $ref: '#/components/schemas/BillingProfileType'
+        enabled:
+          type: boolean
 
     BillingProfileInvoiceableRewardsResponse:
       type: object
