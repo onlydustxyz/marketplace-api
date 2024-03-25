@@ -1,11 +1,5 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.view.BillingProfileLinkView;
-import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
-import onlydust.com.marketplace.project.domain.view.ProjectLeaderLinkView;
-import onlydust.com.marketplace.project.domain.view.ProjectLedView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLedIdViewEntity;
@@ -18,6 +12,11 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.Alloc
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactChanelEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactInformationIdEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
+import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.view.BillingProfileLinkView;
+import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
+import onlydust.com.marketplace.project.domain.view.ProjectLeaderLinkView;
+import onlydust.com.marketplace.project.domain.view.ProjectLedView;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -53,7 +52,8 @@ public interface UserMapper {
     static User mapUserToDomain(UserViewEntity user, Date termsAndConditionsLatestVersionDate,
                                 List<ProjectLedIdViewEntity> projectLedIdViewEntities,
                                 List<ApplicationEntity> applications,
-                                List<BillingProfileLinkView> billingProfiles) {
+                                List<BillingProfileLinkView> billingProfiles,
+                                boolean hasAnyRewardPendingBillingProfile) {
         return User.builder()
                 .id(user.getId())
                 .githubUserId(user.getGithubUserId())
@@ -90,6 +90,7 @@ public interface UserMapper {
                 .projectsAppliedTo(applications.stream().map(ApplicationEntity::getProjectId).toList())
                 .createdAt(user.getCreatedAt())
                 .billingProfiles(billingProfiles)
+                .isMissingPayoutPreference(hasAnyRewardPendingBillingProfile)
                 .build();
     }
 

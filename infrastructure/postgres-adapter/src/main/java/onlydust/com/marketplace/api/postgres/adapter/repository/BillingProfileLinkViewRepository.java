@@ -14,8 +14,8 @@ public interface BillingProfileLinkViewRepository extends JpaRepository<BillingP
                    bp.type,
                    bp.verification_status,
                    bpu.role,
-                   count(rs.reward_id) filter ( where rs.status = 'PAYOUT_INFO_MISSING' ) = 0 as missing_payout_info,
-                   count(rs.reward_id) filter ( where rs.status = 'PENDING_VERIFICATION' ) = 0 as missing_verification
+                   count(rs.reward_id) filter ( where rs.status = 'PAYOUT_INFO_MISSING' ) > 0 as missing_payout_info,
+                   count(rs.reward_id) filter ( where rs.status = 'PENDING_VERIFICATION' ) > 0 as missing_verification
             from accounting.billing_profiles bp
             join accounting.billing_profiles_users bpu on bpu.billing_profile_id = bp.id and bpu.user_id = :userId
             left join rewards r on r.billing_profile_id = bp.id

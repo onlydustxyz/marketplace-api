@@ -28,6 +28,7 @@ public class User {
     List<UUID> projectsAppliedTo = new ArrayList<>();
     @Builder.Default
     List<BillingProfileLinkView> billingProfiles = new ArrayList<>();
+    boolean isMissingPayoutPreference;
 
     @Getter(AccessLevel.NONE)
     boolean hasAcceptedLatestTermsAndConditions;

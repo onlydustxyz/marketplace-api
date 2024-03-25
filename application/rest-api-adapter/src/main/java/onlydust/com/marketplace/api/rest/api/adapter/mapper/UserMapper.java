@@ -270,6 +270,7 @@ public interface UserMapper {
                     case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
                 })).toList()
         );
+        getMeResponse.setMissingPayoutPreference(authenticatedUser.isMissingPayoutPreference());
         return getMeResponse;
     }
 

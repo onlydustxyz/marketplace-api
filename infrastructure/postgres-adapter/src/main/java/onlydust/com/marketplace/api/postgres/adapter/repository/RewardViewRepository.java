@@ -94,4 +94,15 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
             """)
     void markRewardAsPaymentNotified(List<UUID> rewardIds);
 
+    @Query(value = """
+            SELECT EXISTS(
+                SELECT 1
+                FROM rewards r
+                         JOIN accounting.reward_statuses rs ON rs.reward_id = r.id
+                WHERE r.recipient_id = :githubUserId
+                  AND rs.status = 'PENDING_BILLING_PROFILE'
+            )
+            """, nativeQuery = true)
+    boolean existsPendingBillingProfileByRecipientId(Long githubUserId);
+
 }
