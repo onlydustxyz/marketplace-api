@@ -8,7 +8,6 @@ import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
-import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.PaymentPort;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
@@ -39,7 +38,6 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 public class BackofficeAccountingManagementRestApi implements BackofficeAccountingManagementApi {
     private final AccountingFacadePort accountingFacadePort;
     private final RewardFacadePort rewardFacadePort;
-    private final CurrencyFacadePort currencyFacadePort;
     private final UserFacadePort userFacadePort;
     private final AccountingRewardPort accountingRewardPort;
     private final PaymentPort paymentPort;
@@ -222,6 +220,12 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     @Override
     public ResponseEntity<BatchPaymentDetailsResponse> getBatchPayment(UUID batchPaymentId) {
         return ResponseEntity.ok(BatchPaymentMapper.domainToDetailedResponse(paymentPort.findPaymentById(Payment.Id.of(batchPaymentId))));
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteBatchPayment(UUID batchPaymentId) {
+        paymentPort.deletePaymentById(Payment.Id.of(batchPaymentId));
+        return ResponseEntity.noContent().build();
     }
 
     @Override

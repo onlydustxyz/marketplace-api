@@ -18,4 +18,5 @@ public interface PaymentPort {
 
     BatchPaymentDetailsView findPaymentById(Payment.Id batchPaymentId);
 
+    void deletePaymentById(Payment.Id paymentId);
 }

@@ -3099,7 +3099,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                         Instant.now())
         ));
         final BackofficeAccountingManagementRestApi backofficeAccountingManagementRestApi = new BackofficeAccountingManagementRestApi(accountingService,
-                rewardService, currencyFacadePort, userFacadePort,
+                rewardService, userFacadePort,
                 new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, mailNotificationPort), new PaymentService(
                 accountingRewardStoragePort, invoiceStoragePort, accountingService
         ));

@@ -184,4 +184,9 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     public void saveAll(List<Payment> payments) {
         batchPaymentRepository.saveAll(payments.stream().map(BatchPaymentEntity::fromDomain).toList());
     }
+
+    @Override
+    public void deletePayment(Payment.Id paymentId) {
+        batchPaymentRepository.deleteById(paymentId.value());
+    }
 }

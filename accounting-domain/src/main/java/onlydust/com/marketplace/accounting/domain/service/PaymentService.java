@@ -97,4 +97,17 @@ public class PaymentService implements PaymentPort {
         }).toList();
     }
 
+    @Override
+    @Transactional
+    public void deletePaymentById(Payment.Id paymentId) {
+        final var payment = accountingRewardStoragePort.findPayment(paymentId)
+                .orElseThrow(() -> notFound("Batch payment %s not found".formatted(paymentId.value())));
+
+        if (payment.status() != Payment.Status.TO_PAY) {
+            throw badRequest("Batch payment %s is already paid".formatted(paymentId.value()));
+        }
+
+        accountingFacadePort.cancel(payment);
+        accountingRewardStoragePort.deletePayment(paymentId);
+    }
 }

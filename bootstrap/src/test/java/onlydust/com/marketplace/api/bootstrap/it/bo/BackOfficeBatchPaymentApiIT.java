@@ -520,7 +520,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
     @Order(5)
     void should_fail_to_mark_batch_payment_as_paid_when_transaction_reference_is_invalid() {
         client.put()
-                .uri(getApiURI(PUT_REWARDS_BATCH_PAYMENTS.formatted(ethBatchPaymentId)))
+                .uri(getApiURI(REWARDS_BATCH_PAYMENTS.formatted(ethBatchPaymentId)))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -538,7 +538,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
     @Order(6)
     void should_mark_batch_payment_as_paid() {
         client.put()
-                .uri(getApiURI(PUT_REWARDS_BATCH_PAYMENTS.formatted(ethBatchPaymentId)))
+                .uri(getApiURI(REWARDS_BATCH_PAYMENTS.formatted(ethBatchPaymentId)))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -613,7 +613,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
     @Order(7)
     void should_fail_to_mark_batch_payment_as_paid_when_it_is_already_paid() {
         client.put()
-                .uri(getApiURI(PUT_REWARDS_BATCH_PAYMENTS.formatted(ethBatchPaymentId)))
+                .uri(getApiURI(REWARDS_BATCH_PAYMENTS.formatted(ethBatchPaymentId)))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -627,4 +627,35 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                 .is4xxClientError();
     }
 
+    @Test
+    @Order(7)
+    void should_fail_to_delete_batch_payment_when_it_is_already_paid() {
+        client.delete()
+                .uri(getApiURI(REWARDS_BATCH_PAYMENTS.formatted(ethBatchPaymentId)))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is4xxClientError();
+    }
+
+    @Test
+    @Order(7)
+    void should_delete_batch_payment_when_it_is_not_already_paid() {
+        client.delete()
+                .uri(getApiURI(REWARDS_BATCH_PAYMENTS.formatted(sepaBatchPaymentId)))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        client.get()
+                .uri(getApiURI(GET_REWARDS_BATCH_PAYMENTS_BY_ID.formatted(sepaBatchPaymentId)))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
 }

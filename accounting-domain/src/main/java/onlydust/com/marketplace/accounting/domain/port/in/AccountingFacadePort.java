@@ -28,7 +28,7 @@ public interface AccountingFacadePort {
 
     void cancel(final @NonNull RewardId rewardId, @NonNull Currency.Id currencyId);
 
-    void cancel(@NonNull Payment.Id paymentId, @NonNull Currency.Id currencyId);
+    void cancel(@NonNull Payment payment);
 
     void confirm(Payment payment);
 
