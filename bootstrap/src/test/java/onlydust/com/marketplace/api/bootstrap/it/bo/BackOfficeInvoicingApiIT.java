@@ -223,7 +223,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
 
     @Test
     @Order(2)
-    void should_list_invoices_v2() throws IOException {
+    void should_list_invoices_v2() {
 
         // When
         client
@@ -730,7 +730,6 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
         ;
 
     }
-
 
     @Test
     @Order(6)

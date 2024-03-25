@@ -139,15 +139,6 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     }
 
     @Override
-    public ResponseEntity<PendingPaymentListResponse> getPendingPayments() {
-        final var payableRewards = accountingFacadePort.getPayableRewards();
-
-        return ResponseEntity.ok(new PendingPaymentListResponse()
-                .payments(payableRewards.stream().map(BackOfficeMapper::mapPendingPaymentToResponse).toList())
-        );
-    }
-
-    @Override
     public ResponseEntity<Void> payReward(UUID rewardId, PayRewardRequest payRewardRequest) {
         final var reward = rewardFacadePort.getReward(rewardId)
                 .orElseThrow(() -> notFound("Reward %s not found".formatted(rewardId)));

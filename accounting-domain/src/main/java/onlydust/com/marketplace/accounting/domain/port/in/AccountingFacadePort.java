@@ -48,8 +48,6 @@ public interface AccountingFacadePort {
 
     SponsorAccountStatement updateSponsorAccount(final @NonNull SponsorAccount.Id sponsorAccountId, ZonedDateTime lockedUntil);
 
-    List<PayableReward> getPayableRewards();
-
     Page<HistoricalTransaction> transactionHistory(SponsorId sponsorId, Integer pageIndex, Integer pageSize);
 
     List<Network> networksOf(Currency.Id currencyId, RewardId rewardId);

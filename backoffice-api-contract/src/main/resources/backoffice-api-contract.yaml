@@ -526,30 +526,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/pending-payments:
-    get:
-      security:
-        - apiKey: [ ]
-      tags:
-        - BackofficeAccountingManagement
-      summary: Get pending payments
-      operationId: getPendingPayments
-      description: |
-        Get list of payments to process. 
-        The returned list should contain all necessary information to process the payments.
-        Also, all payments present in the list are payable (all required conditions are matched).
-      responses:
-        "200":
-          description: 'List of payments to process'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PendingPaymentListResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
   /bo/v1/rewards/{rewardId}/pay:
     post:
       security:
@@ -1962,33 +1938,6 @@ components:
         id:
           $ref: '#/components/schemas/TransactionId'
 
-    PendingPaymentListResponse:
-      type: object
-      required:
-        - payments
-      properties:
-        payments:
-          type: array
-          items:
-            $ref: '#/components/schemas/PendingPaymentResponse'
-
-    PendingPaymentResponse:
-      type: object
-      required:
-        - rewardId
-        - recipientAccountNumber
-        - amount
-        - currency
-      properties:
-        rewardId:
-          $ref: '#/components/schemas/RewardId'
-        recipientAccountNumber:
-          type: string
-        amount:
-          type: number
-        currency:
-          $ref: '#/components/schemas/TransactionalCurrencyResponse'
-
     TransactionType:
       type: string
       enum:
@@ -2861,23 +2810,6 @@ components:
           format: uri
         decimals:
           type: integer
-
-    TransactionalCurrencyResponse:
-      allOf:
-        - $ref: '#/components/schemas/ShortCurrencyResponse'
-        - type: object
-          description: Information about a currency that can be used to perform transactions
-          required:
-            - type
-          properties:
-            type:
-              $ref: '#/components/schemas/CurrencyType'
-            standard:
-              $ref: '#/components/schemas/CurrencyStandard'
-            blockchain:
-              $ref: '#/components/schemas/BlockchainContract'
-            address:
-              $ref: '#/components/schemas/ContractAddress'
 
     SponsorId:
       type: string

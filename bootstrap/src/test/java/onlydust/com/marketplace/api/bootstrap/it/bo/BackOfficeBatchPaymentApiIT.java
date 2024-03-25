@@ -38,7 +38,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeApiIT {
-
     @Autowired
     BillingProfileService billingProfileService;
     @Autowired
@@ -108,7 +107,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                 RewardId.of("4ac9d6ac-f2ca-43d5-901a-ac7f5b149d72"),
                 RewardId.of("cdea7e15-a757-4aa1-a209-a0a535e9af94")));
 
-        newAnthonyInvoiceToReview(List.of(
+        newAnthonyApprovedInvoice(List.of(
                 RewardId.of("d22f75ab-d9f5-4dc6-9a85-60dcd7452028")));
 
         // Already paid invoice
@@ -123,7 +122,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
         olivierInvoiceIds.add(invoiceId);
     }
 
-    private void newAnthonyInvoiceToReview(List<RewardId> rewardIds) throws IOException {
+    private void newAnthonyApprovedInvoice(List<RewardId> rewardIds) throws IOException {
         final Invoice.Id invoiceId = billingProfileService.previewInvoice(anthony, anthonyBillingProfile.getId(), rewardIds).id();
         billingProfileService.uploadGeneratedInvoice(anthony, anthonyBillingProfile.getId(), invoiceId,
                 new FileSystemResource(Objects.requireNonNull(getClass().getResource("/invoices/invoice-sample.pdf")).getFile()).getInputStream());
@@ -168,6 +167,22 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
         final var csv2 = new MutableObject<String>();
         final var network2 = new MutableObject<String>();
         final var batchPaymentId2 = new MutableObject<String>();
+
+        client
+                .put()
+                .uri(getApiURI(PUT_INVOICES_STATUS.formatted(olivierInvoiceIds.get(0))))
+                .header("Api-Key", apiKey())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "status": "APPROVED"
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .isNoContent()
+        ;
+
         client.post()
                 .uri(getApiURI(POST_REWARDS_BATCH_PAYMENTS))
                 .contentType(MediaType.APPLICATION_JSON)
