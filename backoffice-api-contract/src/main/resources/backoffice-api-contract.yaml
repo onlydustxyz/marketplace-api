@@ -2123,8 +2123,7 @@ components:
           type: string
           format: uuid
         githubUserId:
-          type: integer
-          format: int64
+          $ref: '#/components/schemas/GithubUserId'
 
 
     UserPage:
@@ -2205,8 +2204,7 @@ components:
         email:
           type: string
         githubUserId:
-          type: integer
-          format: int64
+          $ref: '#/components/schemas/GithubUserId'
         githubLogin:
           type: string
         githubHtmlUrl:
@@ -2329,6 +2327,7 @@ components:
         - status
         - billingProfile
         - createdAt
+        - createdBy
         - totalEquivalent
         - rewardsPerNetwork
       properties:
@@ -2345,6 +2344,8 @@ components:
         createdAt:
           type: string
           format: date-time
+        createdBy:
+          $ref: '#/components/schemas/UserResponse'
         totalEquivalent:
           $ref: '#/components/schemas/MoneyResponse'
         rewardsPerNetwork:
@@ -2549,6 +2550,11 @@ components:
       format: uuid
       description: Billing profile ID
 
+    GithubUserId:
+      type: integer
+      format: int64
+      description: Github User ID
+
     BillingProfileResponse:
       type: object
       required:
@@ -2572,25 +2578,38 @@ components:
         admins:
           type: array
           items:
-            $ref: '#/components/schemas/BillingProfileAdminResponse'
+            $ref: '#/components/schemas/UserResponse'
 
-    BillingProfileAdminResponse:
+    GithubUserResponse:
       type: object
       required:
-        - login
+        - githubUserId
+        - githubLogin
+        - githubAvatarUrl
         - email
       properties:
-        login:
+        githubUserId:
+          $ref: '#/components/schemas/GithubUserId'
+        githubLogin:
           type: string
           example: ofux
-        name:
+        githubAvatarUrl:
           type: string
-          example: Olivier Fuxet
+          format: uri
         email:
           type: string
+          format: email
           example: olivier@foobar.org
-        avatarUrl:
-          type: string
+
+    UserResponse:
+      allOf:
+        - $ref: '#/components/schemas/GithubUserResponse'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/UserId'
+            name:
+              type: string
 
     BillingProfileType:
       type: string

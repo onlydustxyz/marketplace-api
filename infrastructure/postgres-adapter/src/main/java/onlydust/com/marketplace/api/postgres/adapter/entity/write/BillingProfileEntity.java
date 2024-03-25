@@ -2,7 +2,11 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.TypeDef;
@@ -17,6 +21,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.toSet;
 
 @Entity
 @AllArgsConstructor
@@ -106,6 +111,36 @@ public class BillingProfileEntity {
                 )
                 .enabled(billingProfile.enabled())
                 .build();
+    }
+
+    public BillingProfile toDomain() {
+        return switch (type) {
+            case COMPANY -> CompanyBillingProfile.builder()
+                    .id(BillingProfile.Id.of(id))
+                    .name(name)
+                    .status(verificationStatus.toDomain())
+                    .enabled(enabled)
+                    .kyb(kyb.toDomain())
+                    .members(users.stream().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role.toDomain())).collect(toSet()))
+                    .build();
+            case SELF_EMPLOYED -> SelfEmployedBillingProfile.builder()
+                    .id(BillingProfile.Id.of(id))
+                    .name(name)
+                    .status(verificationStatus.toDomain())
+                    .enabled(enabled)
+                    .kyb(kyb.toDomain())
+                    .owner(users.stream().findFirst().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role.toDomain())).orElseThrow())
+                    .build();
+            case INDIVIDUAL -> IndividualBillingProfile.builder()
+                    .id(BillingProfile.Id.of(id))
+                    .name(name)
+                    .status(verificationStatus.toDomain())
+                    .enabled(enabled)
+                    .kyc(kyc.toDomain())
+                    .owner(users.stream().findFirst().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role.toDomain())).orElseThrow())
+                    .currentYearPaymentAmount(PositiveAmount.ZERO)
+                    .build();
+        };
     }
 
 }

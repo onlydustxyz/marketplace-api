@@ -3,10 +3,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.*;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
@@ -55,22 +53,11 @@ public class BackofficeRewardViewEntity {
     @ManyToOne
     CurrencyEntity currency;
 
-    @Type(type = "billing_profile_type")
-    @Enumerated(EnumType.STRING)
-    BillingProfileEntity.Type billingProfileType;
-    String billingProfileName;
-    UUID billingProfileId;
-    @Type(type = "verification_status")
-    @Enumerated(EnumType.STRING)
-    VerificationStatusEntity billingProfileVerificationStatus;
-    @Type(type = "jsonb")
-    ShortBillingProfileAdminView.Admin invoiceCreator;
+    @ManyToOne
+    BillingProfileEntity billingProfile;
 
-    UUID invoiceId;
-    String invoiceNumber;
-    @Type(type = "invoice_status")
-    @Enumerated(EnumType.STRING)
-    InvoiceEntity.Status invoiceStatus;
+    @ManyToOne
+    InvoiceEntity invoice;
 
     @Type(type = "jsonb")
     List<String> transactionReferences;
@@ -111,29 +98,14 @@ public class BackofficeRewardViewEntity {
                         .shortDescription(this.projectShortDescription)
                         .slug(this.projectSlug)
                         .build())
-                .billingProfileAdmin(isNull(this.billingProfileId) ? null :
-                        ShortBillingProfileAdminView.builder()
-                                .admins(isNull(this.invoiceCreator) ? List.of() : List.of(this.invoiceCreator))
-                                .billingProfileId(BillingProfile.Id.of(this.billingProfileId))
-                                .billingProfileName(this.billingProfileName)
-                                .billingProfileType(switch (this.billingProfileType) {
-                                    case INDIVIDUAL -> BillingProfile.Type.INDIVIDUAL;
-                                    case COMPANY -> BillingProfile.Type.COMPANY;
-                                    case SELF_EMPLOYED -> BillingProfile.Type.SELF_EMPLOYED;
-                                })
-                                .verificationStatus(this.billingProfileVerificationStatus.toDomain())
-                                .build())
+                .billingProfile(isNull(this.billingProfile) ? null : this.billingProfile.toDomain())
                 .recipient(new ShortContributorView(this.recipientLogin, this.recipientAvatarUrl))
                 .sponsors(isNull(this.sponsors) ? List.of() : this.sponsors.stream()
                         .map(SponsorLinkView::toDomain)
                         .sorted(comparing(ShortSponsorView::name))
                         .toList())
                 .money(new MoneyView(this.amount, this.currency.toDomain(), this.statusData.usdConversionRate(), this.statusData.amountUsdEquivalent()))
-                .invoice(isNull(this.invoiceId) ? null : ShortInvoiceView.builder()
-                        .id(Invoice.Id.of(this.invoiceId))
-                        .number(Invoice.Number.fromString(this.invoiceNumber))
-                        .status(Invoice.Status.valueOf(this.invoiceStatus.toString()))
-                        .build())
+                .invoice(isNull(this.invoice) ? null : invoice.toShortView())
                 .transactionReferences(isNull(this.transactionReferences) ? List.of() : this.transactionReferences)
                 .paidToAccountNumbers(isNull(this.paidToAccountNumbers) ? List.of() : this.paidToAccountNumbers)
                 .build();

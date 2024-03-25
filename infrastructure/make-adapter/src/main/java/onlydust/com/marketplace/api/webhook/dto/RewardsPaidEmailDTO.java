@@ -9,8 +9,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-import static java.util.Objects.isNull;
-
 @Builder
 @Data
 public class RewardsPaidEmailDTO {
@@ -24,9 +22,7 @@ public class RewardsPaidEmailDTO {
     public static RewardsPaidEmailDTO from(@NotNull final String email, @NotNull final List<BackofficeRewardView> rewardViews) {
         return RewardsPaidEmailDTO.builder()
                 .recipientEmail(email)
-                .recipientName(isNull(rewardViews.get(0).billingProfileAdmin().admins().get(0).firstName()) ?
-                        rewardViews.get(0).billingProfileAdmin().admins().get(0).login() :
-                        rewardViews.get(0).billingProfileAdmin().admins().get(0).firstName())
+                .recipientName(rewardViews.get(0).invoice().createdBy().name())
                 .rewardNames(String.join("<br>", rewardViews.stream()
                         .map(r -> String.join(" - ", r.id().pretty(), r.project().name(), r.money().currency().code().toString(),
                                 r.money().amount().toString()))

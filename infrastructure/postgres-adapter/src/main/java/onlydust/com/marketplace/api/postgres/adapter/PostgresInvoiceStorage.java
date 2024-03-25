@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
@@ -81,12 +82,12 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     }
 
     @Override
-    public Page<Invoice> invoicesOf(final @NonNull BillingProfile.Id billingProfileId, final @NonNull Integer pageNumber, final @NonNull Integer pageSize,
-                                    final @NonNull Invoice.Sort sort, final @NonNull SortDirection direction) {
+    public Page<InvoiceView> invoicesOf(final @NonNull BillingProfile.Id billingProfileId, final @NonNull Integer pageNumber, final @NonNull Integer pageSize,
+                                        final @NonNull Invoice.Sort sort, final @NonNull SortDirection direction) {
         final var page = invoiceRepository.findAllByBillingProfileIdAndStatusNot(billingProfileId.value(), InvoiceEntity.Status.DRAFT,
                 PageRequest.of(pageNumber, pageSize, sortBy(sort, direction == SortDirection.asc ? Sort.Direction.ASC : Sort.Direction.DESC)));
-        return Page.<Invoice>builder()
-                .content(page.getContent().stream().map(InvoiceEntity::toDomain).toList())
+        return Page.<InvoiceView>builder()
+                .content(page.getContent().stream().map(InvoiceEntity::toView).toList())
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();
@@ -95,6 +96,11 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     @Override
     public Optional<Invoice> get(final @NonNull Invoice.Id invoiceId) {
         return invoiceRepository.findById(invoiceId.value()).map(InvoiceEntity::toDomain);
+    }
+
+    @Override
+    public Optional<InvoiceView> getView(final @NonNull Invoice.Id invoiceId) {
+        return invoiceRepository.findById(invoiceId.value()).map(InvoiceEntity::toView);
     }
 
     @Override

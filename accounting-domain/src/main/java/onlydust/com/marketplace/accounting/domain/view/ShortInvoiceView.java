@@ -8,6 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.Invoice;
 public record ShortInvoiceView(
         @NonNull Invoice.Id id,
         @NonNull Invoice.Number number,
-        @NonNull Invoice.Status status
+        @NonNull Invoice.Status status,
+        @NonNull UserView createdBy
 ) {
 }

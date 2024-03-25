@@ -3,6 +3,7 @@ package onlydust.com.marketplace.accounting.domain.model.billingprofile;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
@@ -11,6 +12,7 @@ import java.util.Set;
 
 @Getter
 @Accessors(fluent = true)
+@SuperBuilder
 public class CompanyBillingProfile extends BillingProfile {
     @NonNull
     private final Set<User> members;

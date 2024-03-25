@@ -429,16 +429,17 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "sumsubUrl": null
                             },
                             "kyc": null,
-                            "admins": [
-                              {
-                                "login": null,
-                                "name": "ofux",
-                                "email": "olivier.fuxet@gmail.com",
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
-                              }
-                            ]
+                            "admins": null
                           },
                           "rejectionReason": null,
+                          "createdBy": {
+                            "githubUserId": 595505,
+                            "githubLogin": "ofux",
+                            "githubAvatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4",
+                            "email": "olivier.fuxet@gmail.com",
+                            "id": "e461c019-ba23-4671-9b6c-3a5a18748af9",
+                            "name": "Olivier Fuxet"
+                          },
                           "totalEquivalent": {
                             "amount": 1212.000,
                             "currency": {

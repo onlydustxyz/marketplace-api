@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeInvoicingManagementApi;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.*;
@@ -83,10 +81,9 @@ public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicing
     public ResponseEntity<InvoiceResponse> getInvoice(UUID invoiceId) {
         final var invoice = invoiceFacadePort.find(Invoice.Id.of(invoiceId))
                 .orElseThrow(() -> notFound("Invoice %s not found".formatted(invoiceId)));
-        final var billingProfileAdmins = billingProfileFacadePort.getCoworkers(invoice.billingProfileSnapshot().id(), Set.of(BillingProfile.User.Role.ADMIN));
         final var rewards = accountingRewardPort.findByInvoiceId(Invoice.Id.of(invoiceId));
 
-        final var response = mapInvoiceToContract(invoice, billingProfileAdmins, rewards);
+        final var response = mapInvoiceToContract(invoice, rewards);
         return ResponseEntity.ok(response);
     }
 

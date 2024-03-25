@@ -5,7 +5,6 @@ import onlydust.com.backoffice.api.contract.model.SearchRewardItemResponse;
 import onlydust.com.backoffice.api.contract.model.SearchRewardsResponse;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
@@ -223,17 +222,12 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "5f9060a7-6f9e-4ef7-a1e4-1aaa4c85f03c",
                               "billingProfile": {
-                                "name": "Antho SASU",
-                                "type": "COMPANY",
+                                "name": "Olivier SASU",
+                                "type": "SELF_EMPLOYED",
                                 "verificationStatus": "VERIFIED",
-                                "admins": [
-                                  {
-                                    "login": "AnthonyBuisset",
-                                    "name": "Anthony BUISSET",
-                                    "email": "abuisset@gmail.com",
-                                    "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
-                                  }
-                                ]
+                                "kyb": null,
+                                "kyc": null,
+                                "admins": null
                               },
                               "invoice": {
                                 "number": "OD-ANTHO-SASU-001",
@@ -283,17 +277,12 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "fab7aaf4-9b0c-4e52-bc9b-72ce08131617",
                               "billingProfile": {
-                                "name": "Antho SASU",
-                                "type": "COMPANY",
+                                "name": "Olivier SASU",
+                                "type": "SELF_EMPLOYED",
                                 "verificationStatus": "VERIFIED",
-                                "admins": [
-                                  {
-                                    "login": "AnthonyBuisset",
-                                    "name": "Anthony BUISSET",
-                                    "email": "abuisset@gmail.com",
-                                    "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
-                                  }
-                                ]
+                                "kyb": null,
+                                "kyc": null,
+                                "admins": null
                               },
                               "invoice": {
                                 "number": "OD-ANTHO-SASU-001",
@@ -388,17 +377,12 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "736e0554-f30e-4315-9731-7611fa089dcf",
                               "billingProfile": {
-                                "name": "Antho SASU",
-                                "type": "COMPANY",
+                                "name": "Olivier SASU",
+                                "type": "SELF_EMPLOYED",
                                 "verificationStatus": "VERIFIED",
-                                "admins": [
-                                  {
-                                    "login": "AnthonyBuisset",
-                                    "name": "Anthony BUISSET",
-                                    "email": "abuisset@gmail.com",
-                                    "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
-                                  }
-                                ]
+                                "kyb": null,
+                                "kyc": null,
+                                "admins": null
                               },
                               "invoice": {
                                 "number": "OD-ANTHO-SASU-001",
@@ -526,17 +510,12 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "5f9060a7-6f9e-4ef7-a1e4-1aaa4c85f03c",
                               "billingProfile": {
-                                "name": "Antho SASU",
-                                "type": "COMPANY",
+                                "name": "Olivier SASU",
+                                "type": "SELF_EMPLOYED",
                                 "verificationStatus": "VERIFIED",
-                                "admins": [
-                                  {
-                                    "login": "AnthonyBuisset",
-                                    "name": "Anthony BUISSET",
-                                    "email": "abuisset@gmail.com",
-                                    "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
-                                  }
-                                ]
+                                "kyb": null,
+                                "kyc": null,
+                                "admins": null
                               },
                               "invoice": {
                                 "number": "OD-ANTHO-SASU-001",
@@ -586,17 +565,12 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "fab7aaf4-9b0c-4e52-bc9b-72ce08131617",
                               "billingProfile": {
-                                "name": "Antho SASU",
-                                "type": "COMPANY",
+                                "name": "Olivier SASU",
+                                "type": "SELF_EMPLOYED",
                                 "verificationStatus": "VERIFIED",
-                                "admins": [
-                                  {
-                                    "login": "AnthonyBuisset",
-                                    "name": "Anthony BUISSET",
-                                    "email": "abuisset@gmail.com",
-                                    "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
-                                  }
-                                ]
+                                "kyb": null,
+                                "kyc": null,
+                                "admins": null
                               },
                               "invoice": {
                                 "number": "OD-ANTHO-SASU-001",
@@ -801,17 +775,12 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "bdb59436-1b93-4c3c-a6e2-b8b09411280c",
                               "billingProfile": {
-                                "name": "Pierre Qui roule n'amasse pas mousses",
+                                "name": "Olivier",
                                 "type": "INDIVIDUAL",
                                 "verificationStatus": "VERIFIED",
-                                "admins": [
-                                  {
-                                    "login": "PierreOucif",
-                                    "name": "Pierre Qui roule n'amasse pas mousses",
-                                    "email": "pierre.oucif@gadz.org",
-                                    "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
-                                  }
-                                ]
+                                "kyb": null,
+                                "kyc": null,
+                                "admins": null
                               },
                               "invoice": {
                                 "number": "OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001",
@@ -861,17 +830,12 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "e23ad82b-27c5-4840-9481-da31aef6ba1b",
                               "billingProfile": {
-                                "name": "Pierre Qui roule n'amasse pas mousses",
+                                "name": "Olivier",
                                 "type": "INDIVIDUAL",
                                 "verificationStatus": "VERIFIED",
-                                "admins": [
-                                  {
-                                    "login": "PierreOucif",
-                                    "name": "Pierre Qui roule n'amasse pas mousses",
-                                    "email": "pierre.oucif@gadz.org",
-                                    "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
-                                  }
-                                ]
+                                "kyb": null,
+                                "kyc": null,
+                                "admins": null
                               },
                               "invoice": {
                                 "number": "OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001",
@@ -921,17 +885,12 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "72f257fa-1b20-433d-9cdd-88d5182b7369",
                               "billingProfile": {
-                                "name": "Pierre Qui roule n'amasse pas mousses",
+                                "name": "Olivier",
                                 "type": "INDIVIDUAL",
                                 "verificationStatus": "VERIFIED",
-                                "admins": [
-                                  {
-                                    "login": "PierreOucif",
-                                    "name": "Pierre Qui roule n'amasse pas mousses",
-                                    "email": "pierre.oucif@gadz.org",
-                                    "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
-                                  }
-                                ]
+                                "kyb": null,
+                                "kyc": null,
+                                "admins": null
                               },
                               "invoice": {
                                 "number": "OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001",
@@ -981,17 +940,12 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "91c7e960-37ba-4334-ba91-f1b02f1927ab",
                               "billingProfile": {
-                                "name": "Pierre Qui roule n'amasse pas mousses",
+                                "name": "Olivier",
                                 "type": "INDIVIDUAL",
                                 "verificationStatus": "VERIFIED",
-                                "admins": [
-                                  {
-                                    "login": "PierreOucif",
-                                    "name": "Pierre Qui roule n'amasse pas mousses",
-                                    "email": "pierre.oucif@gadz.org",
-                                    "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
-                                  }
-                                ]
+                                "kyb": null,
+                                "kyc": null,
+                                "admins": null
                               },
                               "invoice": {
                                 "number": "OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001",
@@ -1041,17 +995,12 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "e6152967-9bd4-40e6-bad5-c9c4a9578d0f",
                               "billingProfile": {
-                                "name": "Pierre Qui roule n'amasse pas mousses",
+                                "name": "Olivier",
                                 "type": "INDIVIDUAL",
                                 "verificationStatus": "VERIFIED",
-                                "admins": [
-                                  {
-                                    "login": "PierreOucif",
-                                    "name": "Pierre Qui roule n'amasse pas mousses",
-                                    "email": "pierre.oucif@gadz.org",
-                                    "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
-                                  }
-                                ]
+                                "kyb": null,
+                                "kyc": null,
+                                "admins": null
                               },
                               "invoice": {
                                 "number": "OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001",
@@ -1121,12 +1070,12 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .returnResult().getResponseBody();
 
         assertThat(csv).isEqualToIgnoringWhitespace("""
-                Project,Recipient,Recipient Github,Amount,Currency,Contributions,Status,Requested at,Processed at,Transaction Hash,Payout information,Pretty ID,Sponsors,Recipient email,Verification status,Account type,Invoice number,Invoice id,Budget,Conversion rate,Dollar Amount
-                Starklings,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:48.146947Z,2023-02-09T07:35:03.828Z,[0x0],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#BDB59",[No Sponsor],VERIFIED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.0100000000000000,1010.00
-                Starklings,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",2500,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:40.924453Z,2023-02-09T07:35:03.417Z,[0x0],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#E23AD",[No Sponsor],VERIFIED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.0100000000000000,2525.00
-                Starklings,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",750,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:31.946777Z,2023-02-09T07:35:02.985Z,[0x0],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#72F25",[No Sponsor],VERIFIED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.0100000000000000,757.50
-                Starklings,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:20.274391Z,2023-02-09T07:35:02.582Z,[0x0],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#91C7E",[No Sponsor],VERIFIED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.0100000000000000,1010.00
-                oscar's awesome project,"[PierreOucif,pierre.oucif@gadz.org,Pierre Qui roule n'amasse pas mousses]",500,USDC,[https://github.com/onlydustxyz/marketplace-frontend/pull/663],COMPLETE,2023-02-08T09:14:56.053584Z,2023-02-27T11:56:28.044Z,[0x0],[0xd8da6bf26964af9d7eed9e03e53415d37aa96045],"#E6152",[No Sponsor],VERIFIED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,oscar's awesome project - USDC,1.0100000000000000,505.00
+                Project,Recipient Github,Recipient email,Recipient name,Amount,Currency,Contributions,Status,Requested at,Processed at,Transaction Hash,Payout information,Pretty ID,Sponsors,Recipient email,Verification status,Account type,Invoice number,Invoice id,Budget,Conversion rate,Dollar Amount
+                Starklings,PierreOucif,pierre.oucif@gadz.org,Pierre Oucif,1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:48.146947Z,2023-02-09T07:35:03.828Z,[0x0],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#BDB59",[No Sponsor],VERIFIED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.0100000000000000,1010.00
+                Starklings,PierreOucif,pierre.oucif@gadz.org,Pierre Oucif,2500,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:40.924453Z,2023-02-09T07:35:03.417Z,[0x0],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#E23AD",[No Sponsor],VERIFIED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.0100000000000000,2525.00
+                Starklings,PierreOucif,pierre.oucif@gadz.org,Pierre Oucif,750,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:31.946777Z,2023-02-09T07:35:02.985Z,[0x0],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#72F25",[No Sponsor],VERIFIED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.0100000000000000,757.50
+                Starklings,PierreOucif,pierre.oucif@gadz.org,Pierre Oucif,1000,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-02-09T07:24:20.274391Z,2023-02-09T07:35:02.582Z,[0x0],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#91C7E",[No Sponsor],VERIFIED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,Starklings - USDC,1.0100000000000000,1010.00
+                oscar's awesome project,PierreOucif,pierre.oucif@gadz.org,Pierre Oucif,500,USDC,[https://github.com/onlydustxyz/marketplace-frontend/pull/663],COMPLETE,2023-02-08T09:14:56.053584Z,2023-02-27T11:56:28.044Z,[0x0],[0xd8da6bf26964af9d7eed9e03e53415d37aa96045],"#E6152",[No Sponsor],VERIFIED,INDIVIDUAL,OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001,%s,oscar's awesome project - USDC,1.0100000000000000,505.00
                 """.formatted(pierreInvoiceIds.get(0),
                 pierreInvoiceIds.get(0),
                 pierreInvoiceIds.get(0),
@@ -1151,16 +1100,16 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .returnResult().getResponseBody();
 
         assertThat(csv).isEqualToIgnoringWhitespace("""
-                Project,Recipient,Recipient Github,Amount,Currency,Contributions,Status,Requested at,Processed at,Transaction Hash,Payout information,Pretty ID,Sponsors,Recipient email,Verification status,Account type,Invoice number,Invoice id,Budget,Conversion rate,Dollar Amount
-                Bretzel,"[AnthonyBuisset,abuisset@gmail.com,Anthony BUISSET]",1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-26T15:57:29.834949Z,2023-09-26T21:08:01.957Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#736E0","[Coca Cola, OGC Nissa Ineos]",VERIFIED,SELF_EMPLOYED,OD-ANTHO-SASU-001,%s,Bretzel - USDC,1.0100000000000000,1010.0000
-                Bretzel,,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-26T08:43:36.823851Z,2023-09-26T21:08:01.735916Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#1C56D","[Coca Cola, OGC Nissa Ineos]",,,,,Bretzel - USDC,1.0100000000000000,1010.0000
-                Bretzel,,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-25T13:12:26.971685Z,2023-09-26T21:08:01.601831Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#4CCF3","[Coca Cola, OGC Nissa Ineos]",,,,,Bretzel - USDC,1.0100000000000000,1010.0000
-                Bretzel,,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-25T13:01:35.433511Z,2023-09-26T21:25:50.605546Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#CF65A","[Coca Cola, OGC Nissa Ineos]",,,,,Bretzel - USDC,1.0100000000000000,1010.0000
-                Bretzel,,1000,USDC,[https://github.com/gregcha/bretzel-app/issues/1],COMPLETE,2023-08-10T14:25:38.310796Z,2023-09-26T21:25:49.941482Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#1CCB3","[Coca Cola, OGC Nissa Ineos]",,,,,Bretzel - USDC,1.0100000000000000,1010.00
-                Bretzel,,1000,USDC,[https://github.com/gregcha/bretzel-site/issues/1],COMPLETE,2023-07-26T10:06:57.034426Z,2023-09-26T21:25:48.826952Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#B69D6","[Coca Cola, OGC Nissa Ineos]",,,,,Bretzel - USDC,1.0100000000000000,1010.00
-                Taco Tuesday,,1000,USD,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-07-23T08:34:56.803043Z,2023-09-26T21:28:32.053680Z,[OK cool],[FR7640618802650004034616528],"#0D951",[Red Bull],,,,,Taco Tuesday - USD,1.00000000000000000000,1000
-                Mooooooonlight,,1000,USDC,[https://github.com/onlydustxyz/marketplace-frontend/pull/743],COMPLETE,2023-03-01T12:48:51.425766Z,2023-09-26T20:22:12.865097Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#AB855","[Starknet Foundation, Theodo]",,,,,Mooooooonlight - USDC,1.0100000000000000,1010.00
-                Marketplace 2,,438,USD,[https://github.com/onlydustxyz/marketplace-frontend/pull/642],COMPLETE,2023-02-02T15:20:35.665817Z,2023-09-26T20:24:00.439566Z,[Coucou les filles],[GB33BUKB20201555555555],"#C5AE2",[No Sponsor],,,,,Marketplace 2 - USD,1.00000000000000000000,438
+                Project,Recipient Github,Recipient email,Recipient name,Amount,Currency,Contributions,Status,Requested at,Processed at,Transaction Hash,Payout information,Pretty ID,Sponsors,Recipient email,Verification status,Account type,Invoice number,Invoice id,Budget,Conversion rate,Dollar Amount
+                Bretzel,AnthonyBuisset,abuisset@gmail.com,Anthony BUISSET,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-26T15:57:29.834949Z,2023-09-26T21:08:01.957Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#736E0","[Coca Cola, OGC Nissa Ineos]",VERIFIED,SELF_EMPLOYED,OD-ANTHO-SASU-001,%s,Bretzel - USDC,1.0100000000000000,1010.0000
+                Bretzel,,,,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-26T08:43:36.823851Z,2023-09-26T21:08:01.735916Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#1C56D","[Coca Cola, OGC Nissa Ineos]",,,,,Bretzel - USDC,1.0100000000000000,1010.0000
+                Bretzel,,,,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-25T13:12:26.971685Z,2023-09-26T21:08:01.601831Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#4CCF3","[Coca Cola, OGC Nissa Ineos]",,,,,Bretzel - USDC,1.0100000000000000,1010.0000
+                Bretzel,,,,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-25T13:01:35.433511Z,2023-09-26T21:25:50.605546Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#CF65A","[Coca Cola, OGC Nissa Ineos]",,,,,Bretzel - USDC,1.0100000000000000,1010.0000
+                Bretzel,,,,1000,USDC,[https://github.com/gregcha/bretzel-app/issues/1],COMPLETE,2023-08-10T14:25:38.310796Z,2023-09-26T21:25:49.941482Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#1CCB3","[Coca Cola, OGC Nissa Ineos]",,,,,Bretzel - USDC,1.0100000000000000,1010.00
+                Bretzel,,,,1000,USDC,[https://github.com/gregcha/bretzel-site/issues/1],COMPLETE,2023-07-26T10:06:57.034426Z,2023-09-26T21:25:48.826952Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#B69D6","[Coca Cola, OGC Nissa Ineos]",,,,,Bretzel - USDC,1.0100000000000000,1010.00
+                Taco Tuesday,,,,1000,USD,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-07-23T08:34:56.803043Z,2023-09-26T21:28:32.053680Z,[OK cool],[FR7640618802650004034616528],"#0D951",[Red Bull],,,,,Taco Tuesday - USD,1.00000000000000000000,1000
+                Mooooooonlight,,,,1000,USDC,[https://github.com/onlydustxyz/marketplace-frontend/pull/743],COMPLETE,2023-03-01T12:48:51.425766Z,2023-09-26T20:22:12.865097Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#AB855","[Starknet Foundation, Theodo]",,,,,Mooooooonlight - USDC,1.0100000000000000,1010.00
+                Marketplace 2,,,,438,USD,[https://github.com/onlydustxyz/marketplace-frontend/pull/642],COMPLETE,2023-02-02T15:20:35.665817Z,2023-09-26T20:24:00.439566Z,[Coucou les filles],[GB33BUKB20201555555555],"#C5AE2",[No Sponsor],,,,,Marketplace 2 - USD,1.00000000000000000000,438
                 """.formatted(anthonyInvoiceIds.get(0)));
     }
 
@@ -1181,7 +1130,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .returnResult().getResponseBody();
 
         assertThat(csv).isEqualToIgnoringWhitespace("""
-                Project,Recipient,Recipient Github,Amount,Currency,Contributions,Status,Requested at,Processed at,Transaction Hash,Payout information,Pretty ID,Sponsors,Recipient email,Verification status,Account type,Invoice number,Invoice id,Budget,Conversion rate,Dollar Amount
+                Project,Recipient Github,Recipient email,Recipient name,Amount,Currency,Contributions,Status,Requested at,Processed at,Transaction Hash,Payout information,Pretty ID,Sponsors,Recipient email,Verification status,Account type,Invoice number,Invoice id,Budget,Conversion rate,Dollar Amount
                 """);
     }
 }
