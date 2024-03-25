@@ -21,8 +21,8 @@ public interface ShortBillingProfileViewRepository extends JpaRepository<ShortBi
                 false pending_invitation,
                 count(r.*) reward_count,
                 count(rs.reward_id) filter ( where rs.status = 'PENDING_REQUEST' ) invoiceable_reward_count,
-                count(rs.reward_id) filter ( where rs.status = 'PAYOUT_INFO_MISSING' ) = 0 as missing_payout_info,
-                count(rs.reward_id) filter ( where rs.status = 'PENDING_VERIFICATION' ) = 0 as missing_verification
+                count(rs.reward_id) filter ( where rs.status = 'PAYOUT_INFO_MISSING' ) > 0 as missing_payout_info,
+                count(rs.reward_id) filter ( where rs.status = 'PENDING_VERIFICATION' ) > 0 as missing_verification
             from accounting.billing_profiles bp
                 join accounting.billing_profiles_users bpu on bp.id = bpu.billing_profile_id and bpu.user_id = :userId
                 left join rewards r on r.billing_profile_id = bp.id
@@ -49,8 +49,8 @@ public interface ShortBillingProfileViewRepository extends JpaRepository<ShortBi
                 false pending_invitation,
                 count(r.*) reward_count,
                 count(rs.reward_id) filter ( where rs.status = 'PENDING_REQUEST' ) invoiceable_reward_count,
-                count(rs.reward_id) filter ( where rs.status = 'PAYOUT_INFO_MISSING' ) = 0 as missing_payout_info,
-                count(rs.reward_id) filter ( where rs.status = 'PENDING_VERIFICATION' ) = 0 as missing_verification
+                count(rs.reward_id) filter ( where rs.status = 'PAYOUT_INFO_MISSING' ) > 0 as missing_payout_info,
+                count(rs.reward_id) filter ( where rs.status = 'PENDING_VERIFICATION' ) > 0 as missing_verification
             from accounting.billing_profiles bp
                 join accounting.billing_profiles_users bpu on bp.id = bpu.billing_profile_id and bpu.user_id = :userId
                 left join rewards r on r.billing_profile_id = bp.id
@@ -76,8 +76,8 @@ public interface ShortBillingProfileViewRepository extends JpaRepository<ShortBi
                 true pending_invitation,
                 count(r2.*) reward_count,
                 count(rs2.reward_id) filter ( where rs2.status = 'PENDING_REQUEST' ) invoiceable_reward_count,
-                count(rs2.reward_id) filter ( where rs2.status = 'PAYOUT_INFO_MISSING' ) = 0 as missing_payout_info,
-                count(rs2.reward_id) filter ( where rs2.status = 'PENDING_VERIFICATION' ) = 0 as missing_verification
+                count(rs2.reward_id) filter ( where rs2.status = 'PAYOUT_INFO_MISSING' ) > 0 as missing_payout_info,
+                count(rs2.reward_id) filter ( where rs2.status = 'PENDING_VERIFICATION' ) > 0 as missing_verification
             from iam.users u
                 join accounting.billing_profiles_user_invitations bpui on bpui.github_user_id = u.github_user_id and bpui.accepted = false
                 join accounting.billing_profiles bp2 on bp2.id = bpui.billing_profile_id
