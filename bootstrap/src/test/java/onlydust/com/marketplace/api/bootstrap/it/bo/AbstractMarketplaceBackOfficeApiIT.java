@@ -158,7 +158,6 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String POST_PROJECTS_BUDGETS_ALLOCATE = "/bo/v1/projects/%s/budgets/allocate";
     protected static final String POST_PROJECTS_BUDGETS_UNALLOCATE = "/bo/v1/projects/%s/budgets/unallocate";
     protected static final String POST_REWARDS_PAY = "/bo/v1/rewards/%s/pay";
-    protected static final String GET_PENDING_PAYMENTS = "/bo/v1/pending-payments";
     protected static final String GET_ECOSYSTEMS = "/bo/v1/ecosystems";
     protected static final String GET_USERS = "/bo/v1/users";
     protected static final String GET_PROJECTS = "/bo/v1/projects";
@@ -175,7 +174,6 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String PUT_INVOICES_STATUS = "/bo/v1/invoices/%s/status";
     protected static final String EXTERNAL_INVOICE = "/bo/v1/external/invoices/%s";
     protected static final String ME_REWARD = "/api/v1/me/rewards/%s";
-    protected static final String POST_REWARDS_PAY_VO = "/bo/v0/rewards/%s/pay";
     protected static final String POST_REWARDS_SEARCH = "/bo/v1/rewards/search";
     protected static final String POST_REWARDS_BATCH_PAYMENTS = "/bo/v1/rewards/batch-payments";
     protected static final String PUT_REWARDS_BATCH_PAYMENTS = "/bo/v1/rewards/batch-payments/%s";
@@ -183,7 +181,6 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String GET_REWARDS_BATCH_PAYMENTS = "/bo/v1/rewards/batch-payments";
     protected static final String REWARDS = "/bo/v1/rewards";
     protected static final String GET_REWARDS_CSV = "/bo/v1/rewards/csv";
-    protected static final String PUT_REWARDS_NOTIFY_PAYMENTS = "/bo/v1/rewards/notify-payments";
 
     protected String apiKey() {
         return backOfficeApiKeyAuthenticationConfig.getApiKey();

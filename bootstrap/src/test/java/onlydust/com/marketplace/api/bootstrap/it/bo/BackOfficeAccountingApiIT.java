@@ -3,24 +3,37 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import onlydust.com.backoffice.api.contract.model.AccountResponse;
-import onlydust.com.marketplace.accounting.domain.model.ProjectId;
-import onlydust.com.marketplace.accounting.domain.model.SponsorId;
+import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.api.contract.model.CreateRewardResponse;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
+import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
+import java.net.URL;
+import java.util.List;
 import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static onlydust.com.marketplace.api.bootstrap.helper.CurrencyHelper.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -37,6 +50,14 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     private SponsorAccountRepository sponsorAccountRepository;
     @Autowired
     private AccountBookRepository accountBookRepository;
+    @Autowired
+    private BillingProfileFacadePort billingProfileFacadePort;
+    @Autowired
+    private PayoutPreferenceFacadePort payoutPreferenceFacadePort;
+    @Autowired
+    private BillingProfileStoragePort billingProfileStoragePort;
+    @Autowired
+    PdfStoragePort pdfStoragePort;
 
     @BeforeEach
     void setup() {
@@ -611,23 +632,28 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(30)
         ;
 
+        // TODO: reject payment of reward if not invoiced and approved
+
         // When
-        client.get()
-                .uri(getApiURI(GET_PENDING_PAYMENTS))
+        final var invoiceId = invoiceReward(UserId.of(ofux.user().getId()), KAAPER, RewardId.of(rewardId));
+
+        // When
+        client.post()
+                .uri(getApiURI(POST_REWARDS_SEARCH))
                 .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                            {
+                                "invoiceIds": ["%s"]
+                            }
+                        """.formatted(invoiceId))
+                // Then
                 .exchange()
                 .expectStatus()
-                .isOk()
+                .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.payments.size()").isEqualTo(1)
-                .jsonPath("$.payments[0].amount").isEqualTo(30)
-                .jsonPath("$.payments[0].currency.code").isEqualTo("USDC")
-                .jsonPath("$.payments[0].currency.name").isEqualTo("USD Coin")
-                .jsonPath("$.payments[0].currency.type").isEqualTo("CRYPTO")
-                .jsonPath("$.payments[0].currency.blockchain").isEqualTo("ETHEREUM")
-                .jsonPath("$.payments[0].currency.address").isEqualTo("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48")
-                .jsonPath("$.payments[0].recipientAccountNumber").doesNotExist()
-                .jsonPath("$.payments[0].rewardId").isEqualTo(rewardId.toString());
+                .jsonPath("$.rewards.length()").isEqualTo(1)
+                .jsonPath("$.rewards[0].id").isEqualTo(rewardId.toString());
 
         // When
         client.post()
@@ -646,15 +672,22 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .isNoContent();
 
         // When
-        client.get()
-                .uri(getApiURI(GET_PENDING_PAYMENTS))
+        client.post()
+                .uri(getApiURI(POST_REWARDS_SEARCH))
                 .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                            {
+                                "invoiceIds": ["%s"]
+                            }
+                        """.formatted(invoiceId))
+                // Then
                 .exchange()
                 .expectStatus()
-                .isOk()
+                .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.payments.size()").isEqualTo(0)
-        ;
+                .jsonPath("$.rewards.length()").isEqualTo(0);
+
 
         client.get()
                 .uri(getApiURI(String.format(ME_REWARD, rewardId)))
@@ -668,7 +701,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                         {
                            "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
                            "amount": 30,
-                           "dollarsEquivalent": null,
+                           "dollarsEquivalent": 30.3,
                            "status": "COMPLETE",
                            "from": {
                              "login": "AnthonyBuisset"
@@ -762,98 +795,23 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                         """);
     }
 
-    @Test
-    void should_not_list_cancelled_rewards() {
-        // Given
-        final var antho = userAuthHelper.authenticateAnthony();
-        final var ofux = userAuthHelper.authenticateOlivier();
+    private Invoice.Id invoiceReward(UserId userId, ProjectId projectId, RewardId rewardId) {
+        final var billingProfile = billingProfileFacadePort.createIndividualBillingProfile(userId, "Personal", null);
+        billingProfileStoragePort.updateBillingProfileStatus(billingProfile.id(), VerificationStatus.VERIFIED);
+        billingProfileStoragePort.saveKyc(billingProfile.kyc().toBuilder().firstName(faker.name().firstName()).address(faker.address().fullAddress()).usCitizen(false).country(Country.fromIso3("FRA")).build());
+        billingProfileFacadePort.updatePayoutInfo(billingProfile.id(), userId, PayoutInfo.builder().ethWallet(Ethereum.wallet("ofux.eth")).build());
+        payoutPreferenceFacadePort.setPayoutPreference(projectId, billingProfile.id(), userId);
 
-        final var accountId = client.post()
-                .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(REDBULL)))
-                .header("Api-Key", apiKey())
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "currencyId": "%s",
-                            "receipt": {
-                                "reference": "0x01",
-                                "amount": 100,
-                                "network": "ETHEREUM",
-                                "thirdPartyName": "RedBull",
-                                "thirdPartyAccountNumber": "red-bull.eth"
-                            }
-                        }
-                        """.formatted(STRK))
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(AccountResponse.class)
-                .returnResult()
-                .getResponseBody().getId();
+        final var invoiceId = billingProfileFacadePort.previewInvoice(userId, billingProfile.id(), List.of(rewardId)).id();
+        final var pdf = new ByteArrayInputStream(faker.lorem().paragraph().getBytes());
 
-        // Given
-        client.post()
-                .uri(getApiURI(POST_PROJECTS_BUDGETS_ALLOCATE.formatted(KAAPER)))
-                .header("Api-Key", apiKey())
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "sponsorAccountId": "%s",
-                            "amount": 100
-                        }
-                        """.formatted(accountId))
-                .exchange()
-                .expectStatus()
-                .isNoContent();
+        when(pdfStoragePort.upload(eq(invoiceId.value() + ".pdf"), any())).then(invocation -> {
+            final var fileName = invocation.getArgument(0, String.class);
+            return new URL("https://s3.storage.com/%s".formatted(fileName));
+        });
 
-        indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/%d".formatted(ofux.user().getGithubUserId())))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
-                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+        billingProfileFacadePort.uploadGeneratedInvoice(userId, billingProfile.id(), invoiceId, pdf);
 
-        // Given
-        final var rewardId = client.post()
-                .uri(getApiURI(PROJECTS_REWARDS.formatted(KAAPER)))
-                .header("Authorization", BEARER_PREFIX + antho.jwt())
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "recipientId": "%d",
-                            "amount": 30,
-                            "currencyId": "%s",
-                            "items": [{
-                                "type": "PULL_REQUEST",
-                                "id": "1703880973",
-                                "number": 325,
-                                "repoId": 698096830
-                            }]
-                        }
-                        """.formatted(ofux.user().getGithubUserId(), STRK))
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(CreateRewardResponse.class)
-                .returnResult().getResponseBody().getId();
-
-        // Given
-        client.delete()
-                .uri(getApiURI(PROJECTS_REWARD.formatted(KAAPER, rewardId)))
-                .header("Authorization", BEARER_PREFIX + antho.jwt())
-                .exchange()
-                .expectStatus()
-                .isNoContent();
-
-        // When
-        client.get()
-                .uri(getApiURI(GET_PENDING_PAYMENTS))
-                .header("Api-Key", apiKey())
-                .exchange()
-                .expectStatus()
-                .isOk()
-                // Then
-                .expectBody()
-                .jsonPath("$.payments.size()").isEqualTo(0)
-        ;
+        return invoiceId;
     }
 }
