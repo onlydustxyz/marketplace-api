@@ -11,7 +11,6 @@ import onlydust.com.marketplace.accounting.domain.view.TotalMoneyView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
-import onlydust.com.marketplace.kernel.model.blockchain.Hash;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.view.ProjectSponsorView;
@@ -689,26 +688,6 @@ public interface BackOfficeMapper {
             case APTOS -> TransactionNetwork.APTOS;
             case SEPA -> TransactionNetwork.SEPA;
         };
-    }
-
-    static PendingPaymentResponse mapPendingPaymentToResponse(PayableReward payableReward) {
-        return new PendingPaymentResponse()
-                .rewardId(payableReward.id().value())
-                .amount(payableReward.amount().getValue())
-                .currency(mapTransactionalCurrency(payableReward.currency()))
-                ;
-    }
-
-    static TransactionalCurrencyResponse mapTransactionalCurrency(PayableCurrency currency) {
-        return new TransactionalCurrencyResponse()
-                .id(currency.id().value())
-                .code(currency.code().toString())
-                .name(currency.name())
-                .logoUrl(currency.logoUrl().orElse(null))
-                .type(mapCurrencyType(currency.type()))
-                .standard(currency.standard().map(BackOfficeMapper::mapCurrencyStandard).orElse(null))
-                .blockchain(currency.blockchain().map(BackOfficeMapper::mapBlockchain).orElse(null))
-                .address(currency.address().map(Hash::toString).orElse(null));
     }
 
     static RewardStatus map(RewardStatusContract rewardStatus) {

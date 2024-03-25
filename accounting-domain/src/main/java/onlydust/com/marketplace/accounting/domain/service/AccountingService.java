@@ -236,11 +236,6 @@ public class AccountingService implements AccountingFacadePort {
         return sponsorAccountStatement;
     }
 
-    @Override
-    public List<PayableReward> getPayableRewards() {
-        return currencyStorage.all().stream().flatMap(currency -> new PayableRewardAggregator(sponsorAccountStorage, currency).getPayableRewards()).toList();
-    }
-
     public List<PayableReward> getPayableRewards(Set<RewardId> rewardIds) {
         return currencyStorage.all().stream().flatMap(currency -> new PayableRewardAggregator(sponsorAccountStorage, currency).getPayableRewards(rewardIds)).toList();
     }
