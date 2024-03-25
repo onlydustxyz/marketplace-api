@@ -1,25 +1,41 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import net.minidev.json.JSONArray;
-import onlydust.com.marketplace.accounting.domain.model.ProjectId;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
+import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
+import onlydust.com.marketplace.api.bootstrap.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.contract.model.RewardItemRequest;
+import onlydust.com.marketplace.api.contract.model.RewardRequest;
+import onlydust.com.marketplace.api.contract.model.RewardType;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.BodyInserters;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+
 public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
 
+    @Autowired
+    AccountingService accountingService;
     @Autowired
     BillingProfileService billingProfileService;
     @Autowired
@@ -371,12 +387,13 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_put_and_get_billing_profile_payout_infos() {
         // Given
-        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
-                faker.number().randomNumber() + faker.number().randomNumber(), faker.name().name(),
-                faker.internet().url(), false);
+        final var projectId = ProjectId.of("f39b827f-df73-498c-8853-99bc3f562723");
+        final var sponsorId = UUID.fromString("eb04a5de-4802-4071-be7b-9007b563d48d");
+        final var authenticatedUser = userAuthHelper.authenticatePierre();
         final SelfEmployedBillingProfile selfEmployedBillingProfile =
                 billingProfileService.createSelfEmployedBillingProfile(UserId.of(authenticatedUser.user().getId()),
-                        faker.rickAndMorty().character(), null);
+                        faker.rickAndMorty().character(), Set.of(projectId));
+        accountingHelper.patchBillingProfile(selfEmployedBillingProfile.id().value(), null, VerificationStatusEntity.VERIFIED);
 
         // When
         client.get()
@@ -389,17 +406,17 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "hasValidPayoutSettings": null,
+                          "hasValidPayoutSettings": true,
                           "bankAccount": null,
-                          "missingBankAccount": null,
+                          "missingBankAccount": false,
                           "ethWallet": null,
-                          "missingEthWallet": null,
+                          "missingEthWallet": false,
                           "optimismAddress": null,
-                          "missingOptimismWallet": null,
+                          "missingOptimismWallet": false,
                           "aptosAddress": null,
-                          "missingAptosWallet": null,
+                          "missingAptosWallet": false,
                           "starknetAddress": null,
-                          "missingStarknetWallet": null
+                          "missingStarknetWallet": false
                         }""");
 
         client.put()
@@ -434,20 +451,20 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "hasValidPayoutSettings": null,
+                          "hasValidPayoutSettings": true,
                           "bankAccount": {
                             "bic": "DAAEFRPPCCT",
                             "number": "FR5417569000301995586997O41"
                           },
-                          "missingBankAccount": null,
+                          "missingBankAccount": false,
                           "ethWallet": "vitalik.eth",
-                          "missingEthWallet": null,
+                          "missingEthWallet": false,
                           "optimismAddress": "0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545",
-                          "missingOptimismWallet": null,
+                          "missingOptimismWallet": false,
                           "aptosAddress": "0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5",
-                          "missingAptosWallet": null,
+                          "missingAptosWallet": false,
                           "starknetAddress": "0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798",
-                          "missingStarknetWallet": null
+                          "missingStarknetWallet": false
                         }""");
 
         client.put()
@@ -479,17 +496,103 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "hasValidPayoutSettings": null,
+                          "hasValidPayoutSettings": true,
                           "bankAccount": null,
-                          "missingBankAccount": null,
+                          "missingBankAccount": false,
                           "ethWallet": null,
-                          "missingEthWallet": null,
+                          "missingEthWallet": false,
                           "optimismAddress": "0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545",
-                          "missingOptimismWallet": null,
+                          "missingOptimismWallet": false,
                           "aptosAddress": null,
-                          "missingAptosWallet": null,
+                          "missingAptosWallet": false,
                           "starknetAddress": "0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798",
-                          "missingStarknetWallet": null
+                          "missingStarknetWallet": false
+                        }""");
+
+        // When
+        final UUID strkId = currencyRepository.findByCode("STRK").orElseThrow().id();
+        final SponsorAccountStatement strk = accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
+                Currency.Id.of(strkId), null,
+                new SponsorAccount.Transaction(SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(), Amount.of(200000L),
+                        faker.rickAndMorty().character(), faker.hacker().verb()));
+        accountingService.allocate(strk.account().id(), projectId, PositiveAmount.of(100000L), Currency.Id.of(strkId));
+
+        final UUID ethId = currencyRepository.findByCode("ETH").orElseThrow().id();
+        final SponsorAccountStatement eth = accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
+                Currency.Id.of(ethId), null,
+                new SponsorAccount.Transaction(SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(), Amount.of(200000L),
+                        faker.rickAndMorty().character(), faker.hacker().verb()));
+        accountingService.allocate(eth.account().id(), projectId, PositiveAmount.of(100000L), Currency.Id.of(ethId));
+
+        indexerApiWireMockServer.stubFor(WireMock.put(
+                        WireMock.urlEqualTo("/api/v1/users/%s".formatted(authenticatedUser.user().getGithubUserId())))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+
+        client.post()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId)))
+                .header("Authorization", BEARER_PREFIX + authenticatedUser.jwt())
+                .body(BodyInserters.fromValue(new RewardRequest()
+                        .amount(BigDecimal.valueOf(10L))
+                        .currencyId(CurrencyHelper.STRK.value())
+                        .recipientId(authenticatedUser.user().getGithubUserId())
+                        .items(List.of(
+                                new RewardItemRequest().id("0011051356")
+                                        .type(RewardType.PULL_REQUEST)
+                                        .number(1L)
+                                        .repoId(55223344L)
+                        ))))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        indexerApiWireMockServer.stubFor(WireMock.put(
+                        WireMock.urlEqualTo("/api/v1/users/%s".formatted(authenticatedUser.user().getGithubUserId())))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+
+        client.post()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId)))
+                .header("Authorization", BEARER_PREFIX + authenticatedUser.jwt())
+                .body(BodyInserters.fromValue(new RewardRequest()
+                        .amount(BigDecimal.valueOf(20L))
+                        .currencyId(CurrencyHelper.ETH.value())
+                        .recipientId(authenticatedUser.user().getGithubUserId())
+                        .items(List.of(
+                                new RewardItemRequest().id("0011051356")
+                                        .type(RewardType.PULL_REQUEST)
+                                        .number(1L)
+                                        .repoId(55223344L)
+                        ))))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_PAYOUT_INFO.formatted(selfEmployedBillingProfile.id().value())))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "hasValidPayoutSettings": false,
+                          "bankAccount": null,
+                          "missingBankAccount": false,
+                          "ethWallet": null,
+                          "missingEthWallet": true,
+                          "optimismAddress": "0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545",
+                          "missingOptimismWallet": false,
+                          "aptosAddress": null,
+                          "missingAptosWallet": false,
+                          "starknetAddress": "0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798",
+                          "missingStarknetWallet": false
                         }""");
     }
 
