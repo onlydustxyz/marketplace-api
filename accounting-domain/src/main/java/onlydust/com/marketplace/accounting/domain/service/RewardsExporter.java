@@ -15,8 +15,10 @@ public class RewardsExporter {
 
     private static final String[] HEADERS = new String[]{
             "Project",
-            "Recipient",
-            "Recipient Github",
+            "Invoice Creator Github",
+            "Invoice Creator email",
+            "Invoice Creator name",
+            "Recipient name",
             "Amount",
             "Currency",
             "Contributions",
@@ -47,9 +49,10 @@ public class RewardsExporter {
             for (final var reward : rewards) {
                 csvPrinter.printRecord(
                         reward.project().name(),
-                        //TODO X add kyc/kyb name (company name or person name)
-                        isNull(reward.billingProfileAdmin()) ? null : reward.billingProfileAdmin().admins().stream()
-                                .map(a -> new InvoiceCreator(a.login(), a.email(), a.firstName() + " " + a.lastName())).toList(),
+                        isNull(reward.invoice()) ? null : reward.invoice().createdBy().githubLogin(),
+                        isNull(reward.invoice()) ? null : reward.invoice().createdBy().email(),
+                        isNull(reward.invoice()) ? null : reward.invoice().createdBy().name(),
+                        isNull(reward.billingProfile()) ? null : reward.billingProfile().subject(),
                         reward.money().amount(),
                         reward.money().currency().code(),
                         reward.githubUrls(),
@@ -60,8 +63,8 @@ public class RewardsExporter {
                         reward.paidToAccountNumbers(),
                         reward.id().pretty(),
                         reward.sponsors().stream().map(ShortSponsorView::name).toList(),
-                        isNull(reward.billingProfileAdmin()) ? null : reward.billingProfileAdmin().verificationStatus(),
-                        isNull(reward.billingProfileAdmin()) ? null : reward.billingProfileAdmin().billingProfileType(),
+                        isNull(reward.billingProfile()) ? null : reward.billingProfile().status(),
+                        isNull(reward.billingProfile()) ? null : reward.billingProfile().type(),
                         isNull(reward.invoice()) ? null : reward.invoice().number(),
                         isNull(reward.invoice()) ? null : reward.invoice().id(),
                         "%s - %s".formatted(reward.project().name(), reward.money().currency().code()),

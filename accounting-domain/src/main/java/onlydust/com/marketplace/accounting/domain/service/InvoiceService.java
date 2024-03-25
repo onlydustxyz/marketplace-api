@@ -5,6 +5,7 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.InvoiceDownload;
+import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
 import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
@@ -28,8 +29,8 @@ public class InvoiceService implements InvoiceFacadePort {
     private final @NonNull BillingProfileObserver billingProfileObserver;
 
     @Override
-    public Optional<Invoice> find(Invoice.@NonNull Id id) {
-        return invoiceStoragePort.get(id);
+    public Optional<InvoiceView> find(Invoice.@NonNull Id id) {
+        return invoiceStoragePort.getView(id);
     }
 
     @Override

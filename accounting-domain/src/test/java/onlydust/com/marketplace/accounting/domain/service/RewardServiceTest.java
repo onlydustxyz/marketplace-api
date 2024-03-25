@@ -5,19 +5,18 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
-import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
-import onlydust.com.marketplace.accounting.domain.view.MoneyView;
-import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileAdminView;
-import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
+import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -100,18 +99,7 @@ public class RewardServiceTest {
         return BackofficeRewardView.builder()
                 .id(RewardId.random())
                 .status(RewardStatus.PROCESSING)
-                .billingProfileAdmin(ShortBillingProfileAdminView.builder()
-                        .admins(List.of(
-                                new ShortBillingProfileAdminView.Admin(faker.name().username(),
-                                        faker.internet().avatar(),
-                                        email,
-                                        faker.name().firstName(),
-                                        faker.name().lastName())
-                        ))
-                        .billingProfileName(faker.gameOfThrones().character())
-                        .billingProfileType(BillingProfile.Type.COMPANY)
-                        .billingProfileId(BillingProfile.Id.random())
-                        .build())
+                .billingProfile(new CompanyBillingProfile(faker.gameOfThrones().character(), UserId.random()))
                 .requestedAt(ZonedDateTime.now())
                 .githubUrls(List.of())
                 .sponsors(List.of())
@@ -120,6 +108,19 @@ public class RewardServiceTest {
                 .money(new MoneyView(BigDecimal.ONE, currency, null, null))
                 .transactionReferences(List.of())
                 .paidToAccountNumbers(List.of())
+                .invoice(ShortInvoiceView.builder()
+                        .id(Invoice.Id.random())
+                        .number(Invoice.Number.fromString("OD-NAME-001"))
+                        .status(Invoice.Status.APPROVED)
+                        .createdBy(new UserView(
+                                faker.number().randomNumber(),
+                                faker.name().username(),
+                                URI.create(faker.internet().avatar()),
+                                email,
+                                UserId.random(),
+                                faker.name().firstName()
+                        ))
+                        .build())
                 .build();
     }
 }

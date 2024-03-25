@@ -139,6 +139,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     }
 
     @Override
+    @Transactional
     public List<BackofficeRewardView> findRewardsById(Set<RewardId> rewardIds) {
         return rewardDetailsViewRepository.findAllByRewardIds(rewardIds.stream().map(UuidWrapper::value).toList())
                 .stream()
@@ -147,6 +148,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     }
 
     @Override
+    @Transactional
     public Page<BackofficeRewardView> findRewards(int pageIndex, int pageSize,
                                                   @NonNull Set<RewardStatus> statuses,
                                                   Date fromRequestedAt, Date toRequestedAt,

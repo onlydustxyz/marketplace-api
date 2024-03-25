@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain.port.out;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -18,8 +19,10 @@ public interface InvoiceStoragePort {
 
     void deleteDraftsOf(final @NonNull BillingProfile.Id billingProfileId);
 
-    Page<Invoice> invoicesOf(final @NonNull BillingProfile.Id billingProfileId, final @NonNull Integer pageNumber, final @NonNull Integer pageSize,
-                             final @NonNull Invoice.Sort sort, final @NonNull SortDirection direction);
+    Page<InvoiceView> invoicesOf(final @NonNull BillingProfile.Id billingProfileId, final @NonNull Integer pageNumber, final @NonNull Integer pageSize,
+                                 final @NonNull Invoice.Sort sort, final @NonNull SortDirection direction);
+
+    Optional<InvoiceView> getView(final @NonNull Invoice.Id invoiceId);
 
     Optional<Invoice> get(final @NonNull Invoice.Id invoiceId);
 

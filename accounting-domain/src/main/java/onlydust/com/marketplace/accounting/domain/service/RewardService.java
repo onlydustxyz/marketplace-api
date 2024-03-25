@@ -12,7 +12,6 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -62,9 +61,9 @@ public class RewardService implements AccountingRewardPort {
 
     @Override
     public void notifyAllNewPaidRewards() {
-        final List<BackofficeRewardView> rewardViews = accountingRewardStoragePort.findPaidRewardsToNotify();
-        for (Map.Entry<String, List<BackofficeRewardView>> listOfPaidRewardsMapToAdminEmail :
-                rewardViews.stream().collect(groupingBy(rewardView -> rewardView.billingProfileAdmin().admins().get(0).email())).entrySet()) {
+        final var rewardViews = accountingRewardStoragePort.findPaidRewardsToNotify();
+        for (final var listOfPaidRewardsMapToAdminEmail :
+                rewardViews.stream().collect(groupingBy(rewardView -> rewardView.invoice().createdBy().email())).entrySet()) {
             mailNotificationPort.sendRewardsPaidMail(listOfPaidRewardsMapToAdminEmail.getKey(), listOfPaidRewardsMapToAdminEmail.getValue());
         }
         accountingRewardStoragePort.markRewardsAsPaymentNotified(rewardViews.stream()

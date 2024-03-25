@@ -83,7 +83,7 @@ public class PaymentService implements PaymentPort {
             final var rewards = payment.rewards().stream().sorted(Comparator.comparing(r -> r.id().value())).toList();
             payment
                     .invoices(invoices)
-                    .csv(BatchPaymentExporter.csv(rewards, wallets));
+                    .csv(PaymentExporter.csv(rewards, wallets));
         });
 
         accountingRewardStoragePort.saveAll(payments);

@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
 import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
@@ -244,7 +245,7 @@ public interface BillingProfileMapper {
     }
 
 
-    static BillingProfileInvoicesPageResponse map(Page<Invoice> page, Integer pageIndex) {
+    static BillingProfileInvoicesPageResponse map(Page<InvoiceView> page, Integer pageIndex) {
         return new BillingProfileInvoicesPageResponse()
                 .invoices(page.getContent().stream().map(BillingProfileMapper::mapToBillingProfileInvoicesPageItemResponse).toList())
                 .hasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()))
@@ -253,7 +254,7 @@ public interface BillingProfileMapper {
                 .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()));
     }
 
-    static BillingProfileInvoicesPageItemResponse mapToBillingProfileInvoicesPageItemResponse(Invoice invoice) {
+    static BillingProfileInvoicesPageItemResponse mapToBillingProfileInvoicesPageItemResponse(InvoiceView invoice) {
         return new BillingProfileInvoicesPageItemResponse()
                 .id(invoice.id().value())
                 .number(invoice.number().value())

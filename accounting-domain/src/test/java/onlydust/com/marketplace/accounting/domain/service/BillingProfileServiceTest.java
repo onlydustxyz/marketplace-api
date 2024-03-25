@@ -13,6 +13,7 @@ import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileUserRightsView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
+import onlydust.com.marketplace.accounting.domain.view.UserView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
@@ -27,6 +28,7 @@ import org.mockito.ArgumentCaptor;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -321,8 +323,24 @@ class BillingProfileServiceTest {
         @Test
         void should_list_invoices() {
             // Given
+            final var invoiceView = new InvoiceView(
+                    invoice.id(),
+                    invoice.billingProfileSnapshot(),
+                    new UserView(faker.number().randomNumber(), faker.name().username(), URI.create(faker.internet().avatar()),
+                            faker.internet().emailAddress(), UserId.random(), faker.name().firstName()),
+                    invoice.createdAt(),
+                    Money.of(faker.number().randomNumber(1, true), USD),
+                    invoice.createdAt().plusDays(30),
+                    invoice.number(),
+                    invoice.status(),
+                    invoice.rewards(),
+                    invoice.url(),
+                    invoice.originalFileName(),
+                    null
+            );
+
             when(invoiceStoragePort.invoicesOf(billingProfileId, 1, 10, Invoice.Sort.STATUS, SortDirection.asc))
-                    .thenReturn(Page.<Invoice>builder().content(List.of(invoice)).totalItemNumber(1).totalPageNumber(1).build());
+                    .thenReturn(Page.<InvoiceView>builder().content(List.of(invoiceView)).totalItemNumber(1).totalPageNumber(1).build());
 
             // When
             final var invoices = billingProfileService.invoicesOf(userId, billingProfileId, 1, 10, Invoice.Sort.STATUS, SortDirection.asc);

@@ -29,6 +29,11 @@ public class IndividualBillingProfile extends BillingProfile {
     }
 
     @Override
+    public String subject() {
+        return kyc().getLastName() == null ? kyc().getFirstName() : kyc().getFirstName() + " " + kyc().getLastName();
+    }
+
+    @Override
     public Type type() {
         return Type.INDIVIDUAL;
     }

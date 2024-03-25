@@ -282,10 +282,10 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                             {
                               "id": "4ac9d6ac-f2ca-43d5-901a-ac7f5b149d72",
                               "billingProfile": {
-                                "name": "Olivier Inc.",
+                                "name": "Olive Company",
                                 "type": "COMPANY",
                                 "verificationStatus": "VERIFIED",
-                                "admins": []
+                                "admins": null
                               },
                               "requestedAt": "2022-12-23T12:43:50.356166Z",
                               "processedAt": null,
@@ -318,17 +318,10 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                             {
                               "id": "d22f75ab-d9f5-4dc6-9a85-60dcd7452028",
                               "billingProfile": {
-                                "name": "Antho Arbuste",
+                                "name": "Anthony BUISSET",
                                 "type": "INDIVIDUAL",
                                 "verificationStatus": "VERIFIED",
-                                "admins": [
-                                  {
-                                    "login": "AnthonyBuisset",
-                                    "name": "Antho Arbuste",
-                                    "email": "abuisset@gmail.com",
-                                    "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
-                                  }
-                                ]
+                                "admins": null
                               },
                               "requestedAt": "2023-09-20T07:59:16.657487Z",
                               "processedAt": null,

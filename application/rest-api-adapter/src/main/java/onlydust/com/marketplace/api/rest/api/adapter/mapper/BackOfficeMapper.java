@@ -6,7 +6,6 @@ import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
 import onlydust.com.marketplace.accounting.domain.view.TotalMoneyView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
@@ -369,17 +368,7 @@ public interface BackOfficeMapper {
                 .id(invoice.id().value())
                 .status(mapInvoiceInternalStatus(invoice.status()))
                 .createdAt(invoice.createdAt())
-                .billingProfile(new BillingProfileResponse()
-                        .id(invoice.billingProfileSnapshot().id().value())
-                        .type(switch (invoice.billingProfileType()) {
-                            case COMPANY -> BillingProfileType.COMPANY;
-                            case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
-                            case SELF_EMPLOYED -> BillingProfileType.SELF_EMPLOYED;
-                        })
-                        .name(invoice.billingProfileSnapshot().subject())
-                        .kyc(invoice.billingProfileSnapshot().kyc().map(BackOfficeMapper::mapKyc).orElse(null))
-                        .kyb(invoice.billingProfileSnapshot().kyb().map(BackOfficeMapper::mapKyb).orElse(null))
-                )
+                .billingProfile(map(invoice.billingProfileSnapshot()))
                 .rewardCount(invoice.rewards().size())
                 .totalUsdEquivalent(invoice.totalAfterTax().getValue())
                 .totalsPerCurrency(invoice.rewards().stream().map(reward ->
@@ -413,40 +402,56 @@ public interface BackOfficeMapper {
     }
 
     @SneakyThrows
-    static InvoiceResponse mapInvoiceToContract(final Invoice invoice, List<BillingProfileCoworkerView> billingProfileAdmins,
-                                                final List<BackofficeRewardView> rewards) {
+    static InvoiceResponse mapInvoiceToContract(final InvoiceView invoice, final List<BackofficeRewardView> rewards) {
         return new InvoiceResponse()
                 .id(invoice.id().value())
                 .number(invoice.number().toString())
                 .rejectionReason(invoice.rejectionReason())
                 .status(mapInvoiceInternalStatus(invoice.status()))
                 .createdAt(invoice.createdAt())
-                .billingProfile(new BillingProfileResponse()
-                        .id(invoice.billingProfileSnapshot().id().value())
-                        .type(switch (invoice.billingProfileType()) {
-                            case COMPANY -> BillingProfileType.COMPANY;
-                            case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
-                            case SELF_EMPLOYED -> BillingProfileType.SELF_EMPLOYED;
-                        })
-                        .name(invoice.billingProfileSnapshot().subject())
-                        .admins(billingProfileAdmins.stream()
-                                .map(admin -> new BillingProfileAdminResponse()
-                                        .name(admin.login())
-                                        .avatarUrl(admin.avatarUrl())
-                                        .email(admin.email())
-                                ).toList()
-                        )
-                        .kyc(invoice.billingProfileSnapshot().kyc().map(BackOfficeMapper::mapKyc).orElse(null))
-                        .kyb(invoice.billingProfileSnapshot().kyb().map(BackOfficeMapper::mapKyb).orElse(null))
-                )
+                .createdBy(map(invoice.createdBy()))
+                .billingProfile(map(invoice.billingProfileSnapshot()))
                 .totalEquivalent(new MoneyResponse()
                         .amount(invoice.totalAfterTax().getValue())
                         .currency(toShortCurrency(invoice.totalAfterTax().getCurrency()))
                 )
-                .rewardsPerNetwork(mapInvoiceRewardsPerNetworks(invoice, rewards));
+                .rewardsPerNetwork(mapInvoiceRewardsPerNetworks(invoice.billingProfileSnapshot().wallets(), rewards));
     }
 
-    static List<InvoiceRewardsPerNetwork> mapInvoiceRewardsPerNetworks(final Invoice invoice, final List<BackofficeRewardView> rewards) {
+    static UserResponse map(onlydust.com.marketplace.accounting.domain.view.UserView userView) {
+        return new UserResponse()
+                .id(userView.id().value())
+                .githubUserId(userView.githubUserId())
+                .githubLogin(userView.githubLogin())
+                .githubAvatarUrl(URI.create(userView.githubAvatarUrl().toString()))
+                .email(userView.email())
+                .name(userView.name());
+    }
+
+    static UserResponse map(UserView user) {
+        return new UserResponse()
+                .githubUserId(user.getGithubUserId())
+                .githubLogin(user.getGithubLogin())
+                .githubAvatarUrl(URI.create(user.getGithubAvatarUrl()))
+                .email(user.getEmail())
+                .id(user.getId())
+                .name(user.getFirstname() + " " + user.getLastname());
+    }
+
+    private static BillingProfileResponse map(Invoice.BillingProfileSnapshot billingProfileSnapshot) {
+        return new BillingProfileResponse()
+                .id(billingProfileSnapshot.id().value())
+                .type(switch (billingProfileSnapshot.type()) {
+                    case COMPANY -> BillingProfileType.COMPANY;
+                    case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
+                    case SELF_EMPLOYED -> BillingProfileType.SELF_EMPLOYED;
+                })
+                .name(billingProfileSnapshot.subject())
+                .kyc(billingProfileSnapshot.kyc().map(BackOfficeMapper::mapKyc).orElse(null))
+                .kyb(billingProfileSnapshot.kyb().map(BackOfficeMapper::mapKyb).orElse(null));
+    }
+
+    static List<InvoiceRewardsPerNetwork> mapInvoiceRewardsPerNetworks(final List<Wallet> wallets, final List<BackofficeRewardView> rewards) {
         return rewards.stream().collect(groupingBy(BackofficeRewardView::network))
                 .entrySet().stream()
                 .map(e -> {
@@ -457,7 +462,7 @@ public interface BackOfficeMapper {
 
                             return new InvoiceRewardsPerNetwork()
                                     .network(mapNetwork(e.getKey()))
-                                    .billingAccountNumber(invoice.wallets().stream()
+                                    .billingAccountNumber(wallets.stream()
                                             .filter(w -> w.network() == e.getKey())
                                             .findFirst()
                                             .map(Wallet::address)

@@ -50,7 +50,7 @@ public class UserProfileInfoEntity {
     @Column(name = "languages", columnDefinition = "jsonb")
     Map<String, Long> languages;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", updatable = false, insertable = false)
     List<ContactInformationEntity> contactInformations;
 
