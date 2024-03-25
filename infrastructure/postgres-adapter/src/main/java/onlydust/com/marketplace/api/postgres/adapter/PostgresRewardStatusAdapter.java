@@ -9,7 +9,8 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.RewardStatusRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -66,7 +67,7 @@ public class PostgresRewardStatusAdapter implements RewardStatusStorage {
 
     @Override
     @Transactional
-    public void disabledBillingProfile(BillingProfile.Id billingProfileId) {
+    public void removeBillingProfile(BillingProfile.Id billingProfileId) {
         rewardRepository.removeBillingProfileId(billingProfileId.value());
     }
 

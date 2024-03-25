@@ -25,4 +25,6 @@ public interface AccountingObserverPort {
 
     void onBillingProfileEnabled(BillingProfile.Id billingProfileId, Boolean enabled);
 
+    void onBillingProfileDeleted(BillingProfile.Id billingProfileId);
+
 }

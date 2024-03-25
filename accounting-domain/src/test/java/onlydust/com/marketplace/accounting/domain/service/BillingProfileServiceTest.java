@@ -1539,6 +1539,7 @@ class BillingProfileServiceTest {
 
         // Then
         verify(billingProfileStoragePort).deleteBillingProfile(billingProfileId);
+        verify(accountingObserverPort).onBillingProfileDeleted(billingProfileId);
     }
 
     @Test

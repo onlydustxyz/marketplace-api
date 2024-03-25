@@ -122,18 +122,18 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
     public void onBillingProfileUpdated(BillingProfileVerificationUpdated billingProfileVerificationUpdated) {
         final BillingProfile.Id billingProfileId =
                 billingProfileVerificationUpdated.isAChildrenKYC() ?
-                billingProfileStoragePort.findKybByParentExternalId(billingProfileVerificationUpdated.getParentExternalApplicantId())
-                        .orElseThrow(() -> internalServerError("KYB not found for parentExternalApplicantId %s"
-                                .formatted(billingProfileVerificationUpdated.getParentExternalApplicantId()))).getBillingProfileId()
-                :
-                switch (billingProfileVerificationUpdated.getType()) {
-                    case KYB -> billingProfileStoragePort.findKybById(billingProfileVerificationUpdated.getVerificationId())
-                            .orElseThrow(() -> internalServerError("KYB %s not found"
-                                    .formatted(billingProfileVerificationUpdated.getVerificationId()))).getBillingProfileId();
-                    case KYC -> billingProfileStoragePort.findKycById(billingProfileVerificationUpdated.getVerificationId())
-                            .orElseThrow(() -> internalServerError("KYC %s not found"
-                                    .formatted(billingProfileVerificationUpdated.getVerificationId()))).getBillingProfileId();
-                };
+                        billingProfileStoragePort.findKybByParentExternalId(billingProfileVerificationUpdated.getParentExternalApplicantId())
+                                .orElseThrow(() -> internalServerError("KYB not found for parentExternalApplicantId %s"
+                                        .formatted(billingProfileVerificationUpdated.getParentExternalApplicantId()))).getBillingProfileId()
+                        :
+                        switch (billingProfileVerificationUpdated.getType()) {
+                            case KYB -> billingProfileStoragePort.findKybById(billingProfileVerificationUpdated.getVerificationId())
+                                    .orElseThrow(() -> internalServerError("KYB %s not found"
+                                            .formatted(billingProfileVerificationUpdated.getVerificationId()))).getBillingProfileId();
+                            case KYC -> billingProfileStoragePort.findKycById(billingProfileVerificationUpdated.getVerificationId())
+                                    .orElseThrow(() -> internalServerError("KYC %s not found"
+                                            .formatted(billingProfileVerificationUpdated.getVerificationId()))).getBillingProfileId();
+                        };
         refreshRewardsUsdEquivalentOf(billingProfileId);
     }
 
@@ -148,8 +148,13 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
         if (enabled) {
             rewardStatusStorage.enableBillingProfile(billingProfileId);
         } else {
-            rewardStatusStorage.disabledBillingProfile(billingProfileId);
+            rewardStatusStorage.removeBillingProfile(billingProfileId);
         }
+    }
+
+    @Override
+    public void onBillingProfileDeleted(BillingProfile.Id billingProfileId) {
+        rewardStatusStorage.removeBillingProfile(billingProfileId);
     }
 
     private void refreshRewardsUsdEquivalentOf(BillingProfile.Id billingProfileId) {
