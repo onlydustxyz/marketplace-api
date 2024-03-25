@@ -213,7 +213,6 @@ public class Invoice {
             }
         }
 
-        // TODO X: store the vatRegulationState
         public record KybSnapshot(@NonNull String registrationNumber,
                                   @NonNull String name,
                                   @NonNull String address,
@@ -222,9 +221,12 @@ public class Invoice {
                                   @NonNull Boolean subjectToEuVAT,
                                   @NonNull Boolean inEuropeanUnion,
                                   @NonNull Boolean isFrance,
+                                  @NonNull VatRegulationState vatRegulationState,
+                                  @NonNull BigDecimal taxRate,
                                   String euVATNumber
         ) {
             public static KybSnapshot of(Kyb kyb) {
+                final var vatRegulationState = vatRegulationStateOf(kyb);
                 return new KybSnapshot(
                         kyb.getRegistrationNumber(),
                         kyb.getName(),
@@ -234,19 +236,17 @@ public class Invoice {
                         kyb.getSubjectToEuropeVAT(),
                         kyb.getCountry().inEuropeanUnion(),
                         kyb.getCountry().isFrance(),
+                        vatRegulationState,
+                        vatRegulationState == VatRegulationState.APPLICABLE ? BigDecimal.valueOf(0.2) : BigDecimal.ZERO,
                         kyb.getEuVATNumber()
                 );
             }
 
-            public VatRegulationState vatRegulationState() {
-                if (!inEuropeanUnion) return VatRegulationState.NOT_APPLICABLE_NON_UE;
-                if (!isFrance) return VatRegulationState.REVERSE_CHARGE;
-                if (!subjectToEuVAT) return VatRegulationState.NOT_APPLICABLE_FRENCH_NOT_SUBJECT;
+            private static VatRegulationState vatRegulationStateOf(Kyb kyb) {
+                if (!kyb.getCountry().inEuropeanUnion()) return VatRegulationState.NOT_APPLICABLE_NON_UE;
+                if (!kyb.getCountry().isFrance()) return VatRegulationState.REVERSE_CHARGE;
+                if (!kyb.getSubjectToEuropeVAT()) return VatRegulationState.NOT_APPLICABLE_FRENCH_NOT_SUBJECT;
                 return VatRegulationState.APPLICABLE;
-            }
-
-            public BigDecimal taxRate() {
-                return vatRegulationState() == VatRegulationState.APPLICABLE ? BigDecimal.valueOf(0.2) : BigDecimal.ZERO;
             }
 
             @Deprecated
