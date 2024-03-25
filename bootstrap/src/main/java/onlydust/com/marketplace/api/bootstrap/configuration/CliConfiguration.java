@@ -1,11 +1,14 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
 import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.EventRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
+import onlydust.com.marketplace.cli.AccountBookDisplay;
 import onlydust.com.marketplace.cli.NewAccountingMigration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,5 +28,11 @@ public class CliConfiguration {
     ) {
         return new NewAccountingMigration(eventRepository, currencyStorage, accountingFacadePort, sponsorRepository, userViewRepository,
                 billingProfileRepository);
+    }
+
+    @Bean
+    public AccountBookDisplay accountBookDisplay(final CurrencyStorage currencyStorage, final SponsorAccountStorage sponsorAccountStorage,
+                                                 final AccountBookEventStorage accountBookEventStorage) {
+        return new AccountBookDisplay(currencyStorage, sponsorAccountStorage, accountBookEventStorage);
     }
 }

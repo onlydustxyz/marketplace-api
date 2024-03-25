@@ -2,14 +2,21 @@ package onlydust.com.marketplace.accounting.domain.model.accountbook;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Amount;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.kernel.visitor.Visitable;
 import onlydust.com.marketplace.kernel.visitor.Visitor;
 import org.jgrapht.Graph;
+import org.jgrapht.graph.AsSubgraph;
 import org.jgrapht.graph.SimpleDirectedGraph;
+import org.jgrapht.nio.Attribute;
+import org.jgrapht.nio.DefaultAttribute;
+import org.jgrapht.nio.dot.DOTExporter;
 import org.jgrapht.traverse.DepthFirstIterator;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -321,6 +328,10 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         return visitor.visit(this);
     }
 
+    public void export(Exporter exporter) {
+        exporter.export(this);
+    }
+
     private record VertexWithBalance(@NonNull Vertex vertex, @NonNull PositiveAmount balance) {
     }
 
@@ -356,5 +367,76 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     @AllArgsConstructor(staticName = "of")
     private static class Vertex {
         private final AccountId accountId;
+    }
+
+    public interface Exporter {
+        void export(AccountBookState state);
+    }
+
+    @AllArgsConstructor
+    public static class DotExporter implements Exporter {
+        private final String filePath;
+        private final AccountId root;
+
+        @Override
+        @SneakyThrows
+        public void export(AccountBookState state) {
+            final var exporter = new DOTExporter<Vertex, Edge>();
+
+            exporter.setVertexAttributeProvider(this::attributes);
+            exporter.setEdgeAttributeProvider(this::attributes);
+            exporter.setVertexIdProvider(this::idOf);
+
+            final var writer = new BufferedWriter(new FileWriter(filePath));
+
+            final var graph = getSubgraph(state, root);
+
+            exporter.exportGraph(graph, writer);
+        }
+
+        private AsSubgraph<Vertex, Edge> getSubgraph(AccountBookState state, AccountId root) {
+            return new AsSubgraph<>(state.graph, state.graph.vertexSet().stream()
+                    .filter(v -> v.accountId.equals(root) || state.hasParent(v, root) ||
+                                 state.accountVertices(root).stream().anyMatch(r -> state.hasParent(r, v.accountId)))
+                    .collect(Collectors.toSet())
+            );
+        }
+
+        private Map<String, Attribute> attributes(Vertex v) {
+            return Map.of(
+                    "label", DefaultAttribute.createAttribute(v.accountId.toString()),
+                    "style", DefaultAttribute.createAttribute("filled"),
+                    "color", colorOf(v),
+                    "fontcolor", DefaultAttribute.createAttribute("black"),
+                    "labelfontcolor", DefaultAttribute.createAttribute("black")
+            );
+        }
+
+        private String hexToDec(String hex) {
+            return String.valueOf(Integer.parseInt(hex, 16));
+        }
+
+        Attribute colorOf(Vertex v) {
+            return DefaultAttribute.createAttribute(v.accountId.type() == null ? "#000000" :
+                    switch (v.accountId.type()) {
+                        case SPONSOR_ACCOUNT -> "lightcoral";
+                        case REWARD -> "palegreen";
+                        case PROJECT -> "mediumpurple1";
+                        case PAYMENT -> "salmon1";
+                    });
+        }
+
+        String idOf(Vertex v) {
+            return v.accountId == ROOT ? String.valueOf(v.hashCode()) : hexToDec(v.accountId.toString().substring(0, 5));
+        }
+
+        private Map<String, Attribute> attributes(Edge e) {
+            return Map.of("label", DefaultAttribute.createAttribute(e.amount.toString()),
+                    "color", DefaultAttribute.createAttribute("#000000"));
+        }
+    }
+
+    public static <T> Exporter ToDot(String filePath, T root) {
+        return new DotExporter(filePath, root == null ? ROOT : AccountId.of(root));
     }
 }
