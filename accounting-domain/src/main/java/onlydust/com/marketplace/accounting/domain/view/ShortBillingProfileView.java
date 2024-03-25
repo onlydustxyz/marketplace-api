@@ -38,6 +38,6 @@ public class ShortBillingProfileView {
     }
 
     public boolean isVerificationBlocked() {
-        return verificationStatus == VerificationStatus.REJECTED || verificationStatus == VerificationStatus.CLOSED;
+        return verificationStatus.isBlocked();
     }
 }

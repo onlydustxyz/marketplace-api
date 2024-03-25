@@ -14,4 +14,8 @@ public enum VerificationStatus {
     CLOSED(4);
 
     final int priority;
+
+    public boolean isBlocked() {
+        return this == VerificationStatus.REJECTED || this == VerificationStatus.CLOSED;
+    }
 }

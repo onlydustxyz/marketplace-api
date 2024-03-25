@@ -28,10 +28,14 @@ public class BillingProfileLinkView {
 
     public enum VerificationStatus {
         VERIFIED, UNDER_REVIEW, STARTED, NOT_STARTED, REJECTED, CLOSED;
+
+        public boolean isBlocked() {
+            return this == VerificationStatus.REJECTED || this == VerificationStatus.CLOSED;
+        }
     }
 
     public boolean isVerificationBlocked() {
-        return verificationStatus == VerificationStatus.REJECTED || verificationStatus == VerificationStatus.CLOSED;
+        return verificationStatus.isBlocked();
     }
 
     public RewardStatus.UserBillingProfile toUserBillingProfile() {
