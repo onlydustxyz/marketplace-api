@@ -199,3 +199,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000118_remove_swift_network.sql
   - include:
       file: db/changelog/changelogs/00000119_migrate_billing_profile_id_to_rewards.sql
+  - include:
+      file: db/changelog/changelogs/00000120_migrate_vat_in_snapshots.sql
