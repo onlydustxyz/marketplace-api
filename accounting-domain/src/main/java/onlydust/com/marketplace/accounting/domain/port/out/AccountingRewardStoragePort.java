@@ -16,7 +16,7 @@ import java.util.Set;
 
 public interface AccountingRewardStoragePort {
 
-    List<BackofficeRewardView> searchRewards(List<Invoice.Status> statuses, List<Invoice.Id> invoiceIds);
+    List<BackofficeRewardView> searchRewards(List<Invoice.Status> statuses, List<Invoice.Id> invoiceIds, List<RewardStatus> rewardStatuses);
 
     List<BackofficeRewardView> getInvoiceRewards(@NonNull Invoice.Id invoiceId);
 

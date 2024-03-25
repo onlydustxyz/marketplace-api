@@ -75,10 +75,11 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
 
     @Override
     @Transactional(readOnly = true)
-    public List<BackofficeRewardView> searchRewards(List<Invoice.Status> statuses, List<Invoice.Id> invoiceIds) {
-        return rewardDetailsViewRepository.findAllByInvoiceStatusesAndInvoiceIds(
-                        statuses != null ? statuses.stream().map(Invoice.Status::toString).toList() : null,
-                        invoiceIds != null ? invoiceIds.stream().map(Invoice.Id::value).toList() : null
+    public List<BackofficeRewardView> searchRewards(List<Invoice.Status> invoiceStatuses, List<Invoice.Id> invoiceIds, List<RewardStatus> rewardStatuses) {
+        return rewardDetailsViewRepository.findAllByInvoiceStatusesAndInvoiceIdsAndRewardStatuses(
+                        invoiceStatuses != null ? invoiceStatuses.stream().map(Invoice.Status::toString).toList() : null,
+                        invoiceIds != null ? invoiceIds.stream().map(Invoice.Id::value).toList() : null,
+                        rewardStatuses != null ? rewardStatuses.stream().map(RewardStatusEntity::from).map(Enum::toString).toList() : null
                 )
                 .stream()
                 .map(BackofficeRewardViewEntity::toDomain)
