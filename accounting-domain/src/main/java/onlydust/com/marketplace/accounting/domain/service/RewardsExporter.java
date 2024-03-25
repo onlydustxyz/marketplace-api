@@ -15,8 +15,9 @@ public class RewardsExporter {
 
     private static final String[] HEADERS = new String[]{
             "Project",
-            "Recipient Github",
-            "Recipient email",
+            "Invoice Creator Github",
+            "Invoice Creator email",
+            "Invoice Creator name",
             "Recipient name",
             "Amount",
             "Currency",
@@ -51,6 +52,7 @@ public class RewardsExporter {
                         isNull(reward.invoice()) ? null : reward.invoice().createdBy().githubLogin(),
                         isNull(reward.invoice()) ? null : reward.invoice().createdBy().email(),
                         isNull(reward.invoice()) ? null : reward.invoice().createdBy().name(),
+                        isNull(reward.billingProfile()) ? null : reward.billingProfile().subject(),
                         reward.money().amount(),
                         reward.money().currency().code(),
                         reward.githubUrls(),

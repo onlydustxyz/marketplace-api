@@ -22,6 +22,11 @@ public class SelfEmployedBillingProfile extends BillingProfile {
     }
 
     @Override
+    public String subject() {
+        return kyb().getName();
+    }
+
+    @Override
     public Type type() {
         return Type.SELF_EMPLOYED;
     }

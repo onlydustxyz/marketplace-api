@@ -26,6 +26,11 @@ public class CompanyBillingProfile extends BillingProfile {
     }
 
     @Override
+    public String subject() {
+        return kyb().getName();
+    }
+
+    @Override
     public Type type() {
         return Type.COMPANY;
     }

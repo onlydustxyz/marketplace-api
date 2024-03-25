@@ -27,6 +27,8 @@ public abstract class BillingProfile {
     @NonNull
     protected final Boolean enabled;
 
+    public abstract String subject();
+
     protected BillingProfile(@NonNull String name) {
         this.id = Id.random();
         this.name = name;
