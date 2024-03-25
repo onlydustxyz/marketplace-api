@@ -17,7 +17,7 @@ public interface AccountingRewardPort {
                                           Date fromRequestedAt, Date toRequestedAt,
                                           Date fromProcessedAt, Date toProcessedAt);
 
-    List<BackofficeRewardView> searchRewardsByInvoiceIds(List<Invoice.Id> invoiceIds);
+    List<BackofficeRewardView> processingRewardsByInvoiceIds(List<Invoice.Id> invoiceIds);
 
     String exportRewardsCSV(List<RewardStatus> statuses,
                             Date fromRequestedAt, Date toRequestedAt,

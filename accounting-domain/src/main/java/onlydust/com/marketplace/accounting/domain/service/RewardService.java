@@ -22,17 +22,8 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badReq
 
 @AllArgsConstructor
 public class RewardService implements AccountingRewardPort {
-
-    // TODO X: remove
-    private static final List<onlydust.com.marketplace.accounting.domain.model.Currency.Code> CURRENCY_CODES_AVAILABLE_FOR_BATCH_PAYMENT = List.of(
-            onlydust.com.marketplace.accounting.domain.model.Currency.Code.STRK,
-            onlydust.com.marketplace.accounting.domain.model.Currency.Code.USDC,
-            Currency.Code.LORDS
-    );
-
     private final AccountingRewardStoragePort accountingRewardStoragePort;
     private final MailNotificationPort mailNotificationPort;
-
 
     @Override
     public List<BackofficeRewardView> findByInvoiceId(Invoice.Id invoiceId) {
@@ -49,12 +40,9 @@ public class RewardService implements AccountingRewardPort {
     }
 
     @Override
-    public List<BackofficeRewardView> searchRewardsByInvoiceIds(List<Invoice.Id> invoiceIds) {
-        return accountingRewardStoragePort.searchRewards(List.of(Invoice.Status.APPROVED), invoiceIds)
-                .stream()
-                .filter(rewardView -> CURRENCY_CODES_AVAILABLE_FOR_BATCH_PAYMENT.contains(rewardView.money().currency().code()))
-                // TODO X: use reward status instead of this filter (could be added to the SQL query)
-                .filter(rewardView -> isNull(rewardView.processedAt()) && rewardView.transactionReferences().isEmpty())
+    public List<BackofficeRewardView> processingRewardsByInvoiceIds(List<Invoice.Id> invoiceIds) {
+        return accountingRewardStoragePort.searchRewards(List.of(Invoice.Status.APPROVED), invoiceIds, List.of(RewardStatus.PROCESSING)).stream()
+                .filter(r -> r.money().currency().type().equals(Currency.Type.CRYPTO))
                 .toList();
     }
 

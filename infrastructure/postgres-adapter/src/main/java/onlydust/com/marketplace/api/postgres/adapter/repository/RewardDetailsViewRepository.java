@@ -116,8 +116,10 @@ public interface RewardDetailsViewRepository extends JpaRepository<BackofficeRew
     @Query(value = SELECT + """
             where (coalesce(:invoiceStatuses) is null or cast(i.status as text) in (:invoiceStatuses))
             and (coalesce(:invoiceIds) is null or i.id in (:invoiceIds))
+            and (coalesce(:rewardStatuses) is null or cast(rs.status as text) in (:rewardStatuses))
             """, nativeQuery = true)
-    List<BackofficeRewardViewEntity> findAllByInvoiceStatusesAndInvoiceIds(List<String> invoiceStatuses, List<UUID> invoiceIds);
+    List<BackofficeRewardViewEntity> findAllByInvoiceStatusesAndInvoiceIdsAndRewardStatuses(List<String> invoiceStatuses, List<UUID> invoiceIds,
+                                                                                            List<String> rewardStatuses);
 
     @Query(value = SELECT + """
             where i.id = :invoiceId

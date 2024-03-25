@@ -22,6 +22,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -72,7 +73,7 @@ public class RewardServiceTest {
         final List<Invoice.Id> invoiceIds = List.of(Invoice.Id.of(UUID.randomUUID()));
 
         // When
-        when(accountingRewardStoragePort.searchRewards(List.of(Invoice.Status.APPROVED), invoiceIds))
+        when(accountingRewardStoragePort.searchRewards(List.of(Invoice.Status.APPROVED), invoiceIds, List.of(RewardStatus.PROCESSING)))
                 .thenReturn(List.of(
                         generateRewardStubForCurrency(Currencies.ETH),
                         generateRewardStubForCurrency(Currencies.EUR),
@@ -82,64 +83,13 @@ public class RewardServiceTest {
                         generateRewardStubForCurrency(Currencies.USDC),
                         generateRewardStubForCurrency(Currencies.APT),
                         generateRewardStubForCurrency(Currencies.LORDS),
-                        generateRewardStubForCurrency(Currencies.STRK),
-                        BackofficeRewardView.builder()
-                                .id(RewardId.random())
-                                .status(RewardStatus.PROCESSING)
-                                .billingProfileAdmin(ShortBillingProfileAdminView.builder()
-                                        .admins(List.of(
-                                                new ShortBillingProfileAdminView.Admin(faker.name().username(),
-                                                        faker.internet().avatar(),
-                                                        faker.internet().emailAddress(),
-                                                        faker.name().firstName(),
-                                                        faker.name().lastName())
-                                        ))
-                                        .billingProfileName(faker.gameOfThrones().character())
-                                        .billingProfileType(BillingProfile.Type.COMPANY)
-                                        .billingProfileId(BillingProfile.Id.random())
-                                        .build())
-                                .requestedAt(ZonedDateTime.now())
-                                .githubUrls(List.of())
-                                .sponsors(List.of())
-                                .project(new ShortProjectView(ProjectId.random(), faker.rickAndMorty().character(), faker.internet().url(),
-                                        faker.weather().description(), faker.name().username()))
-                                .processedAt(ZonedDateTime.now())
-                                .money(new MoneyView(BigDecimal.ONE, Currencies.USDC, null, null))
-                                .transactionReferences(List.of(faker.random().hex()))
-                                .paidToAccountNumbers(List.of(faker.random().hex()))
-                                .build(),
-                        BackofficeRewardView.builder()
-                                .id(RewardId.random())
-                                .status(RewardStatus.PROCESSING)
-                                .billingProfileAdmin(ShortBillingProfileAdminView.builder()
-                                        .admins(List.of(
-                                                new ShortBillingProfileAdminView.Admin(faker.name().username(),
-                                                        faker.internet().avatar(),
-                                                        faker.internet().emailAddress(),
-                                                        faker.name().firstName(),
-                                                        faker.name().lastName())
-                                        ))
-                                        .billingProfileName(faker.gameOfThrones().character())
-                                        .billingProfileType(BillingProfile.Type.COMPANY)
-                                        .billingProfileId(BillingProfile.Id.random())
-                                        .build())
-                                .requestedAt(ZonedDateTime.now())
-                                .githubUrls(List.of())
-                                .sponsors(List.of())
-                                .project(new ShortProjectView(ProjectId.random(), faker.rickAndMorty().character(), faker.internet().url(),
-                                        faker.weather().description(), faker.name().username()))
-                                .transactionReferences(List.of(faker.random().hex()))
-                                .paidToAccountNumbers(List.of(faker.random().hex()))
-                                .money(new MoneyView(BigDecimal.ONE, Currencies.USDC, null, null))
-                                .build()
+                        generateRewardStubForCurrency(Currencies.STRK)
                 ));
-        final List<BackofficeRewardView> rewardViews = rewardService.searchRewardsByInvoiceIds(invoiceIds);
+        final var rewardViews = rewardService.processingRewardsByInvoiceIds(invoiceIds);
 
         // Then
-        assertEquals(3, rewardViews.size());
-        assertEquals(Currency.Code.USDC, rewardViews.get(0).money().currency().code());
-        assertEquals(Currency.Code.LORDS, rewardViews.get(1).money().currency().code());
-        assertEquals(Currency.Code.STRK, rewardViews.get(2).money().currency().code());
+        assertEquals(6, rewardViews.size());
+        assertThat(rewardViews).allMatch(r -> r.money().currency().type().equals(Currency.Type.CRYPTO));
     }
 
     private BackofficeRewardView generateRewardStubForCurrency(final Currency currency) {
