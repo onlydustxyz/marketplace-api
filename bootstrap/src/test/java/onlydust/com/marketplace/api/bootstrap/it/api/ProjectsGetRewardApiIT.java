@@ -5,7 +5,6 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileRe
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.text.ParseException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -35,7 +34,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_get_reward_given_a_project_lead() throws ParseException {
+    void should_get_reward_given_a_project_lead() {
         // Given
         final String jwt = userAuthHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
@@ -57,7 +56,13 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "id": "85f8358c-5339-42ac-a577-16d7760d1e28",
-                          "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
+                          "currency": {
+                            "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                            "code": "USDC",
+                            "name": "USD Coin",
+                            "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                            "decimals": 6
+                          },
                           "amount": 1000,
                           "dollarsEquivalent": 1010.00,
                           "status": "PENDING_CONTRIBUTOR",
@@ -78,6 +83,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                           },
                           "createdAt": "2023-09-19T07:38:52.590518Z",
                           "processedAt": null,
+                          "billingProfileId": "20282367-56b0-42d3-81d3-5e4b38f67e3e",
                           "project": {
                             "id": "f39b827f-df73-498c-8853-99bc3f562723",
                             "slug": "qa-new-contributions",
