@@ -1317,7 +1317,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         ));
 
         // To avoid to stub all the Sumsub flow ...
-        final UUID kycId = billingProfileService.getBillingProfile(BillingProfile.Id.of(individualBPId), UserId.of(individualBPAdminId)).getKyc().getId();
+        final UUID kycId = billingProfileService.getBillingProfile(BillingProfile.Id.of(individualBPId), UserId.of(individualBPAdminId),
+                GithubUserId.of(individualBPAdminGithubId)).getKyc().getId();
         billingProfileStoragePort.saveKyc(Kyc.builder()
                 .id(kycId)
                 .externalApplicantId(faker.rickAndMorty().character())
@@ -1476,7 +1477,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         ));
 
         // When
-        final UUID companyKybId = billingProfileService.getBillingProfile(BillingProfile.Id.of(companyBPId), UserId.of(companyBPAdmin1Id)).getKyb().getId();
+        final UUID companyKybId = billingProfileService.getBillingProfile(BillingProfile.Id.of(companyBPId), UserId.of(companyBPAdmin1Id),
+                GithubUserId.of(companyBPAdmin1GithubId)).getKyb().getId();
         billingProfileStoragePort.saveKyb(Kyb.builder()
                 .billingProfileId(BillingProfile.Id.of(companyBPId))
                 .registrationNumber(faker.idNumber().valid())
@@ -1636,7 +1638,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
         // When
         final UUID selfEmployedKybId =
-                billingProfileService.getBillingProfile(BillingProfile.Id.of(selfEmployedBPId), UserId.of(selfEmployedBPAdminId)).getKyb().getId();
+                billingProfileService.getBillingProfile(BillingProfile.Id.of(selfEmployedBPId), UserId.of(selfEmployedBPAdminId),
+                        GithubUserId.of(selfEmployedBPAdminGithubId)).getKyb().getId();
         billingProfileStoragePort.saveKyb(Kyb.builder()
                 .billingProfileId(BillingProfile.Id.of(selfEmployedBPId))
                 .registrationNumber(faker.idNumber().valid())

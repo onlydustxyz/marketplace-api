@@ -23,4 +23,6 @@ public interface BillingProfileUserInvitationRepository extends JpaRepository<Bi
                 where billing_profile_id = :billingProfileId and github_user_id = :githubUserId
             """)
     void acceptInvitation(UUID billingProfileId, Long githubUserId);
+
+    boolean existsByBillingProfileIdAndGithubUserIdAndAcceptedIsFalse(UUID billingProfileId, Long githubUserId);
 }

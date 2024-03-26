@@ -94,4 +94,6 @@ public interface BillingProfileStoragePort {
     void updateBillingProfileType(BillingProfile.Id billingProfileId, BillingProfile.Type type);
 
     List<BillingProfileRewardView> findInvoiceableRewardsForBillingProfile(BillingProfile.Id billingProfileId);
+
+    boolean isUserInvitedTo(BillingProfile.Id billingProfileId, GithubUserId githubUserId);
 }
