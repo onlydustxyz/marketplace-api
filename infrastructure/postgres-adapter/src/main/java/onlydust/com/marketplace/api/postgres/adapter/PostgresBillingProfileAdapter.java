@@ -20,7 +20,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Stream;
@@ -61,7 +60,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional(readOnly = true)
     public Optional<ShortBillingProfileView> findIndividualBillingProfileForUser(UserId ownerId) {
-        return shortBillingProfileViewRepository.findIndividualProfilesForUserId(ownerId.value())
+        return shortBillingProfileViewRepository.findBillingProfilesForUserId(ownerId.value(), List.of(BillingProfile.Type.INDIVIDUAL.name()))
                 .stream().map(ShortBillingProfileViewEntity::toView).findFirst();
     }
 
@@ -69,7 +68,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Transactional(readOnly = true)
     public List<ShortBillingProfileView> findAllBillingProfilesForUser(UserId userId) {
         final var invoiceMandateLatestVersionDate = globalSettingsRepository.get().getInvoiceMandateLatestVersionDate();
-        final var billingProfiles = shortBillingProfileViewRepository.findBillingProfilesForUserId(userId.value());
+        final var billingProfiles = shortBillingProfileViewRepository.findBillingProfilesForUserId(userId.value(), List.of());
         final var billingProfilesInvitedOn = shortBillingProfileViewRepository.findBillingProfilesForUserIdInvited(userId.value());
         return Stream.concat(billingProfiles.stream(), billingProfilesInvitedOn.stream())
                 .map(ShortBillingProfileViewEntity::toView)
@@ -122,7 +121,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional(readOnly = true)
     public boolean isUserMemberOf(BillingProfile.Id billingProfileId, UserId userId) {
-        return shortBillingProfileViewRepository.findBillingProfilesForUserId(userId.value()).stream()
+        return shortBillingProfileViewRepository.findBillingProfilesForUserId(userId.value(), List.of()).stream()
                 .anyMatch(shortBillingProfileViewEntity -> shortBillingProfileViewEntity.getId().equals(billingProfileId.value()));
     }
 
@@ -152,15 +151,14 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .name(billingProfileEntity.getName())
                             .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
                             .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
-                            .missingPayoutInfo(billingProfileCustomData.getMissingPayoutInfo())
-                            .missingVerification(billingProfileCustomData.getMissingVerification())
-                            .rewardCount(billingProfileCustomData.getRewardCount())
-                            .invoiceableRewardCount(billingProfileCustomData.getInvoiceableRewardCount())
+                            .missingPayoutInfo(billingProfileCustomData.getStats().missingPayoutInfo())
+                            .missingVerification(billingProfileCustomData.getStats().missingVerification())
+                            .rewardCount(billingProfileCustomData.getStats().rewardCount())
+                            .invoiceableRewardCount(billingProfileCustomData.getStats().invoiceableRewardCount())
                             .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                             .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                             .currentYearPaymentLimit(individualBillingProfile.currentYearPaymentLimit())
-                            .currentYearPaymentAmount(PositiveAmount.of(isNull(billingProfileCustomData.getCurrentYearPaymentAmount()) ? BigDecimal.ZERO :
-                                    billingProfileCustomData.getCurrentYearPaymentAmount()))
+                            .currentYearPaymentAmount(PositiveAmount.of(billingProfileCustomData.getStats().currentYearPaymentAmount()))
                             .admins(billingProfileEntity.getUsers().stream().map(BillingProfileUserEntity::toView).toList())
                             .build();
                     final Optional<KycEntity> optionalKycEntity = kycRepository.findByBillingProfileId(billingProfileId.value());
@@ -178,10 +176,10 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .enabled(billingProfileEntity.getEnabled())
                             .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
                             .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
-                            .missingPayoutInfo(billingProfileCustomData.getMissingPayoutInfo())
-                            .missingVerification(billingProfileCustomData.getMissingVerification())
-                            .rewardCount(billingProfileCustomData.getRewardCount())
-                            .invoiceableRewardCount(billingProfileCustomData.getInvoiceableRewardCount())
+                            .missingPayoutInfo(billingProfileCustomData.getStats().missingPayoutInfo())
+                            .missingVerification(billingProfileCustomData.getStats().missingVerification())
+                            .rewardCount(billingProfileCustomData.getStats().rewardCount())
+                            .invoiceableRewardCount(billingProfileCustomData.getStats().invoiceableRewardCount())
                             .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                             .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                             .admins(billingProfileEntity.getUsers().stream().map(BillingProfileUserEntity::toView).toList())
@@ -203,10 +201,10 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                             .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
                             .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
-                            .missingPayoutInfo(billingProfileCustomData.getMissingPayoutInfo())
-                            .missingVerification(billingProfileCustomData.getMissingVerification())
-                            .rewardCount(billingProfileCustomData.getRewardCount())
-                            .invoiceableRewardCount(billingProfileCustomData.getInvoiceableRewardCount())
+                            .missingPayoutInfo(billingProfileCustomData.getStats().missingPayoutInfo())
+                            .missingVerification(billingProfileCustomData.getStats().missingVerification())
+                            .rewardCount(billingProfileCustomData.getStats().rewardCount())
+                            .invoiceableRewardCount(billingProfileCustomData.getStats().invoiceableRewardCount())
                             .admins(billingProfileEntity.getUsers().stream().map(BillingProfileUserEntity::toView).toList())
                             .build();
                     final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());

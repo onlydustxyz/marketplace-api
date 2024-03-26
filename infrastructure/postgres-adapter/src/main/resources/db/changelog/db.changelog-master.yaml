@@ -203,3 +203,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000120_migrate_vat_in_snapshots.sql
   - include:
       file: db/changelog/changelogs/00000121_add_missing_foreign_key.sql
+  - include:
+      file: db/changelog/changelogs/00000122_billing_profiles_stats.sql

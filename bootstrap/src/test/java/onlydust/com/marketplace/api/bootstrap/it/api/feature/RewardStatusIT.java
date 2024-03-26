@@ -3104,6 +3104,16 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                         .build()
         ));
 
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(individualBPId)))
+                .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateUser(individualBPAdminGithubId).jwt())
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.invoiceableRewardCount").isEqualTo(0)
+                .jsonPath("$.currentYearPaymentLimit").isEqualTo(5000)
+                .jsonPath("$.currentYearPaymentAmount").isEqualTo(34);
     }
 
     @Autowired
