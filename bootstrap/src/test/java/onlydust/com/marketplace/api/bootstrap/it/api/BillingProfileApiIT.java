@@ -17,8 +17,7 @@ import onlydust.com.marketplace.api.contract.model.RewardItemRequest;
 import onlydust.com.marketplace.api.contract.model.RewardRequest;
 import onlydust.com.marketplace.api.contract.model.RewardType;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -32,6 +31,7 @@ import java.util.UUID;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
@@ -42,6 +42,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
     PayoutPreferenceFacadePort payoutPreferenceFacadePort;
 
     @Test
+    @Order(10)
     void should_be_authenticated() {
         // When
         client.post()
@@ -59,6 +60,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(20)
     void should_create_all_type_of_billing_profiles() {
         final String jwt =
                 userAuthHelper.newFakeUser(UUID.randomUUID(), faker.number().randomNumber() + faker.number().randomNumber(), faker.name().name(),
@@ -227,6 +229,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(30)
     void should_get_update_delete_billing_profile_by_id() {
         // Given
         final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
@@ -385,11 +388,15 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(40)
     void should_put_and_get_billing_profile_payout_infos() {
         // Given
         final var projectId = ProjectId.of("f39b827f-df73-498c-8853-99bc3f562723");
         final var sponsorId = UUID.fromString("eb04a5de-4802-4071-be7b-9007b563d48d");
-        final var authenticatedUser = userAuthHelper.authenticatePierre();
+        final var pierre = userAuthHelper.authenticatePierre();
+        final var authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
+                faker.number().randomNumber(11, true), faker.name().name(),
+                faker.internet().url(), false);
         final SelfEmployedBillingProfile selfEmployedBillingProfile =
                 billingProfileService.createSelfEmployedBillingProfile(UserId.of(authenticatedUser.user().getId()),
                         faker.rickAndMorty().character(), Set.of(projectId));
@@ -532,7 +539,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
 
         client.post()
                 .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId)))
-                .header("Authorization", BEARER_PREFIX + authenticatedUser.jwt())
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
                 .body(BodyInserters.fromValue(new RewardRequest()
                         .amount(BigDecimal.valueOf(10L))
                         .currencyId(CurrencyHelper.STRK.value())
@@ -556,7 +563,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
 
         client.post()
                 .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId)))
-                .header("Authorization", BEARER_PREFIX + authenticatedUser.jwt())
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
                 .body(BodyInserters.fromValue(new RewardRequest()
                         .amount(BigDecimal.valueOf(20L))
                         .currencyId(CurrencyHelper.ETH.value())
@@ -597,6 +604,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(50)
     void should_delete_manually_associated_billing_profile() {
         // Given
         final var antho = userAuthHelper.authenticateAnthony();
@@ -631,6 +639,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(60)
     void should_delete_automatically_associated_billing_profile() {
         // Given
         final var antho = userAuthHelper.authenticateAnthony();

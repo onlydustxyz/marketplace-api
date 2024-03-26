@@ -14,8 +14,8 @@ public interface PayoutInfoViewRepository extends JpaRepository<PayoutInfoViewEn
                     ARRAY_AGG(distinct rsd.networks) as networks
                 FROM accounting.billing_profiles bp
                     LEFT JOIN rewards r ON r.billing_profile_id = bp.id
-                    LEFT JOIN accounting.reward_statuses rs ON rs.reward_id = r.id
-                    LEFT JOIN (SELECT rsd.reward_id, unnest(rsd.networks) as networks FROM accounting.reward_status_data rsd) rsd ON rsd.reward_id = rs.reward_id AND rs.status = 'PAYOUT_INFO_MISSING'
+                    LEFT JOIN accounting.reward_statuses rs ON rs.reward_id = r.id AND rs.status = 'PAYOUT_INFO_MISSING'
+                    LEFT JOIN (SELECT rsd.reward_id, unnest(rsd.networks) as networks FROM accounting.reward_status_data rsd) rsd ON rsd.reward_id = rs.reward_id
                 WHERE bp.id = :billingProfileId
                 GROUP BY bp.id
             """, nativeQuery = true)
