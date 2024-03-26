@@ -10,11 +10,7 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileUserRightsView;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
-import onlydust.com.marketplace.accounting.domain.view.PayoutInfoView;
-import onlydust.com.marketplace.accounting.domain.view.UserView;
+import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
@@ -25,6 +21,8 @@ import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 
 import java.io.ByteArrayInputStream;
@@ -1381,6 +1379,58 @@ class BillingProfileServiceTest {
     }
 
     @Test
+    void should_downgrade_user() {
+        // Given
+        final var billingProfileId = BillingProfile.Id.random();
+        final var admin = UserId.random();
+        final var coworkerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        final var coworkerUserId = UserId.of(UUID.randomUUID());
+
+        when(billingProfileStoragePort.isAdmin(billingProfileId, admin)).thenReturn(true);
+        when(billingProfileStoragePort.getCoworker(billingProfileId, coworkerGithubUserId)).thenReturn(Optional.of(
+                BillingProfileCoworkerView.builder()
+                        .userId(coworkerUserId)
+                        .githubUserId(coworkerGithubUserId)
+                        .role(BillingProfile.User.Role.ADMIN)
+                        .joinedAt(ZonedDateTime.now())
+                        .rewardCount(0)
+                        .build()
+        ));
+
+        // When
+        billingProfileService.updateCoworkerRole(billingProfileId, admin, coworkerGithubUserId, BillingProfile.User.Role.MEMBER);
+
+        // Then
+        verify(billingProfileStoragePort).updateCoworkerRole(billingProfileId, coworkerUserId, BillingProfile.User.Role.MEMBER);
+    }
+
+    @Test
+    void should_upgrade_user() {
+        // Given
+        final var billingProfileId = BillingProfile.Id.random();
+        final var admin = UserId.random();
+        final var coworkerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        final var coworkerUserId = UserId.of(UUID.randomUUID());
+
+        when(billingProfileStoragePort.isAdmin(billingProfileId, admin)).thenReturn(true);
+        when(billingProfileStoragePort.getCoworker(billingProfileId, coworkerGithubUserId)).thenReturn(Optional.of(
+                BillingProfileCoworkerView.builder()
+                        .userId(coworkerUserId)
+                        .githubUserId(coworkerGithubUserId)
+                        .role(BillingProfile.User.Role.MEMBER)
+                        .joinedAt(ZonedDateTime.now())
+                        .rewardCount(0)
+                        .build()
+        ));
+
+        // When
+        billingProfileService.updateCoworkerRole(billingProfileId, admin, coworkerGithubUserId, BillingProfile.User.Role.ADMIN);
+
+        // Then
+        verify(billingProfileStoragePort).updateCoworkerRole(billingProfileId, coworkerUserId, BillingProfile.User.Role.ADMIN);
+    }
+
+    @Test
     void should_remove_user_when_caller_is_user() {
         // Given
         final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
@@ -1406,6 +1456,31 @@ class BillingProfileServiceTest {
     }
 
     @Test
+    void should_downgrade_user_when_caller_is_user() {
+        // Given
+        final var billingProfileId = BillingProfile.Id.random();
+        final var admin = UserId.random();
+        final var coworkerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+
+        when(billingProfileStoragePort.isAdmin(billingProfileId, admin)).thenReturn(true);
+        when(billingProfileStoragePort.getCoworker(billingProfileId, coworkerGithubUserId)).thenReturn(Optional.of(
+                BillingProfileCoworkerView.builder()
+                        .userId(admin)
+                        .githubUserId(coworkerGithubUserId)
+                        .role(BillingProfile.User.Role.ADMIN)
+                        .joinedAt(ZonedDateTime.now())
+                        .rewardCount(0)
+                        .build()
+        ));
+
+        // When
+        billingProfileService.updateCoworkerRole(billingProfileId, admin, coworkerGithubUserId, BillingProfile.User.Role.MEMBER);
+
+        // Then
+        verify(billingProfileStoragePort).updateCoworkerRole(billingProfileId, admin, BillingProfile.User.Role.MEMBER);
+    }
+
+    @Test
     void should_not_remove_user_when_not_found() {
         // Given
         final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
@@ -1424,6 +1499,35 @@ class BillingProfileServiceTest {
 
         // Then
         verify(billingProfileStoragePort, never()).deleteCoworker(eq(billingProfileId), eq(invitedUserId));
+    }
+
+    @Test
+    void should_not_downgrade_user_when_not_found() {
+        // Given
+        final var billingProfileId = BillingProfile.Id.random();
+        final var admin = UserId.random();
+        final var coworkerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+
+        when(billingProfileStoragePort.isAdmin(billingProfileId, admin)).thenReturn(true);
+        when(billingProfileStoragePort.getCoworker(billingProfileId, coworkerGithubUserId)).thenReturn(Optional.of(
+                BillingProfileCoworkerView.builder()
+                        .userId(admin)
+                        .githubUserId(coworkerGithubUserId)
+                        .role(BillingProfile.User.Role.ADMIN)
+                        .joinedAt(ZonedDateTime.now())
+                        .rewardCount(0)
+                        .billingProfileAdminCount(1)
+                        .build()
+        ));
+
+        // When
+        assertThatThrownBy(() -> billingProfileService.updateCoworkerRole(billingProfileId, admin, coworkerGithubUserId, BillingProfile.User.Role.MEMBER))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Cannot downgrade user %s of billing profile %s".formatted(admin, billingProfileId));
+
+        // Then
+        verify(billingProfileStoragePort, never()).updateCoworkerRole(any(), any(), any());
     }
 
     @Test
@@ -1456,6 +1560,26 @@ class BillingProfileServiceTest {
     }
 
     @Test
+    void should_not_downgrade_user_when_last_admin() {
+        // Given
+        final var billingProfileId = BillingProfile.Id.random();
+        final var admin = UserId.random();
+        final var coworkerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+
+        when(billingProfileStoragePort.isAdmin(billingProfileId, admin)).thenReturn(true);
+        when(billingProfileStoragePort.getCoworker(billingProfileId, coworkerGithubUserId)).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> billingProfileService.updateCoworkerRole(billingProfileId, admin, coworkerGithubUserId, BillingProfile.User.Role.MEMBER))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Coworker %d not found for billing profile %s".formatted(coworkerGithubUserId.value(), billingProfileId.value()));
+
+        // Then
+        verify(billingProfileStoragePort, never()).updateCoworkerRole(any(), any(), any());
+    }
+
+    @Test
     void should_not_remove_user_when_caller_is_not_admin_and_not_removed_user() {
         // Given
         final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
@@ -1485,6 +1609,25 @@ class BillingProfileServiceTest {
         verify(billingProfileStoragePort, never()).deleteCoworker(eq(billingProfileId), eq(invitedUserId));
     }
 
+    @ParameterizedTest
+    @EnumSource(value = BillingProfile.User.Role.class)
+    void should_not_modify_user_role_when_caller_is_not_admin(BillingProfile.User.Role role) {
+        // Given
+        final var billingProfileId = BillingProfile.Id.random();
+        final var admin = UserId.random();
+        final var coworkerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+
+        when(billingProfileStoragePort.isAdmin(billingProfileId, admin)).thenReturn(false);
+
+        // When
+        assertThatThrownBy(() -> billingProfileService.updateCoworkerRole(billingProfileId, admin, coworkerGithubUserId, role))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("User %s must be admin to manage billing profile %s coworkers".formatted(admin.value(), billingProfileId.value()));
+
+        // Then
+        verify(billingProfileStoragePort, never()).updateCoworkerRole(any(), any(), any());
+    }
 
     @Test
     void should_not_delete_billing_profile_given_a_user_not_admin() {

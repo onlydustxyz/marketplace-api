@@ -38,6 +38,10 @@ public class BillingProfileCoworkerView {
         return !hasJoined() || (!isLastAdmin() && !hasInvoicedRewards());
     }
 
+    public boolean downgradable() {
+        return !isLastAdmin();
+    }
+
     private boolean hasInvoicedRewards() {
         return rewardCount != null && rewardCount > 0;
     }

@@ -297,6 +297,21 @@ public class BillingProfileService implements BillingProfileFacadePort {
     }
 
     @Override
+    public void updateCoworkerRole(BillingProfile.Id billingProfileId, UserId updatedBy, GithubUserId coworkerGithubUserId, BillingProfile.User.Role role) {
+        if (!billingProfileStoragePort.isAdmin(billingProfileId, updatedBy))
+            throw unauthorized("User %s must be admin to manage billing profile %s coworkers".formatted(updatedBy, billingProfileId));
+
+        final var coworker = billingProfileStoragePort.getCoworker(billingProfileId, coworkerGithubUserId)
+                .orElseThrow(() -> notFound("Coworker %s not found for billing profile %s"
+                        .formatted(coworkerGithubUserId, billingProfileId)));
+
+        if (role == BillingProfile.User.Role.MEMBER && !coworker.downgradable())
+            throw badRequest("Cannot downgrade user %s of billing profile %s".formatted(coworker.userId(), billingProfileId));
+
+        billingProfileStoragePort.updateCoworkerRole(billingProfileId, coworker.userId(), role);
+    }
+
+    @Override
     @Transactional
     public void deleteBillingProfile(UserId userId, BillingProfile.Id billingProfileId) {
         if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
