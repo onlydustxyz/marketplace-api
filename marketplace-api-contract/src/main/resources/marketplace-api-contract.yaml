@@ -2073,37 +2073,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/github/installations/{installationId}:
-    get:
-      deprecated: true
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Github
-      summary: Get Github organization and repositories linked to installation Id
-      operationId: getGithubInstallation
-      description: |
-        Get Github Organization and  Repositories for installation Id
-      parameters:
-        - in: path
-          name: installationId
-          required: true
-          schema:
-            $ref: '#/components/schemas/GithubInstallationId'
-      responses:
-        "200":
-          description: 'Github installation info'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InstallationResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
   /api/v1/events/on-contributions-change:
     post:
       security:
@@ -4884,17 +4853,6 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/ContributorResponse'
-
-    InstallationResponse:
-      type: object
-      required:
-        - id
-        - organization
-      properties:
-        id:
-          $ref: '#/components/schemas/GithubInstallationId'
-        organization:
-          $ref: '#/components/schemas/GithubOrganizationResponse'
 
     UploadImageResponse:
       type: object

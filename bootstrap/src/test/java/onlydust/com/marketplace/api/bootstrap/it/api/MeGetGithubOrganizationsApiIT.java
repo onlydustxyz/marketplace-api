@@ -689,36 +689,6 @@ public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
     GithubAuthorizedRepoRepository githubAuthorizedRepoRepository;
 
     @Test
-    void should_get_github_account_from_installation_id() {
-        final String jwt = userAuthHelper.authenticatePierre().jwt();
-        client.get()
-                .uri(getApiURI(GITHUB_INSTALLATIONS_GET + "/44741576"))
-                .header("Authorization", "Bearer " + jwt)
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(ONLYDUST_ACCOUNT_JSON);
-    }
-
-    @Test
-    void should_return_404_when_not_found() {
-        final String jwt = userAuthHelper.authenticatePierre().jwt();
-        client.get()
-                .uri(getApiURI(GITHUB_INSTALLATIONS_GET + "/0"))
-                .header("Authorization", "Bearer " + jwt)
-                .exchange()
-                // Then
-                .expectStatus()
-                .isNotFound()
-                .expectBody()
-                .jsonPath("$.id").isNotEmpty()
-                .jsonPath("$.status").isEqualTo(404)
-                .jsonPath("$.message").isEqualTo("Installation 0 not found");
-    }
-
-    @Test
     void should_return_user_organizations() {
         // Given
         final GithubAppInstallationEntity githubAppInstallationEntity = new GithubAppInstallationEntity();
