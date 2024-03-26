@@ -522,6 +522,7 @@ class BillingProfileServiceTest {
         assertThat(billingProfile.owner().role()).isEqualTo(BillingProfile.User.Role.ADMIN);
         verify(billingProfileStoragePort).save(billingProfile);
         verify(billingProfileStoragePort, never()).savePayoutPreference(eq(billingProfile.id()), eq(userId), any());
+        verify(accountingObserverPort, never()).onPayoutPreferenceChanged(any(), any(), any());
     }
 
     @Test
@@ -541,6 +542,7 @@ class BillingProfileServiceTest {
         assertThat(billingProfile.owner().role()).isEqualTo(BillingProfile.User.Role.ADMIN);
         verify(billingProfileStoragePort).save(billingProfile);
         verify(billingProfileStoragePort).savePayoutPreference(billingProfile.id(), userId, selectForProjects.iterator().next());
+        verify(accountingObserverPort).onPayoutPreferenceChanged(billingProfile.id(), userId, selectForProjects.iterator().next());
     }
 
     @Test
@@ -559,6 +561,8 @@ class BillingProfileServiceTest {
         assertThat(billingProfile.owner().role()).isEqualTo(BillingProfile.User.Role.ADMIN);
         verify(billingProfileStoragePort).save(billingProfile);
         verify(billingProfileStoragePort, never()).savePayoutPreference(eq(billingProfile.id()), eq(userId), any());
+        verify(accountingObserverPort, never()).onPayoutPreferenceChanged(any(), any(), any());
+
     }
 
     @Test
@@ -578,6 +582,7 @@ class BillingProfileServiceTest {
         assertThat(billingProfile.owner().role()).isEqualTo(BillingProfile.User.Role.ADMIN);
         verify(billingProfileStoragePort).save(billingProfile);
         verify(billingProfileStoragePort).savePayoutPreference(billingProfile.id(), userId, selectForProjects.iterator().next());
+        verify(accountingObserverPort).onPayoutPreferenceChanged(billingProfile.id(), userId, selectForProjects.iterator().next());
     }
 
     @Test
@@ -595,6 +600,7 @@ class BillingProfileServiceTest {
         assertThat(billingProfile.members()).containsExactlyInAnyOrder(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN));
         verify(billingProfileStoragePort).save(billingProfile);
         verify(billingProfileStoragePort, never()).savePayoutPreference(eq(billingProfile.id()), eq(userId), any());
+        verify(accountingObserverPort, never()).onPayoutPreferenceChanged(any(), any(), any());
     }
 
     @Test
@@ -613,6 +619,7 @@ class BillingProfileServiceTest {
         assertThat(billingProfile.members()).containsExactlyInAnyOrder(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN));
         verify(billingProfileStoragePort).save(billingProfile);
         verify(billingProfileStoragePort).savePayoutPreference(billingProfile.id(), userId, selectForProjects.iterator().next());
+        verify(accountingObserverPort).onPayoutPreferenceChanged(billingProfile.id(), userId, selectForProjects.iterator().next());
     }
 
     @Nested
@@ -1532,6 +1539,7 @@ class BillingProfileServiceTest {
 
         // Then
         verify(billingProfileStoragePort).deleteBillingProfile(billingProfileId);
+        verify(accountingObserverPort).onBillingProfileDeleted(billingProfileId);
     }
 
     @Test

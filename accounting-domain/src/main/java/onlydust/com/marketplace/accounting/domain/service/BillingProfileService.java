@@ -158,7 +158,11 @@ public class BillingProfileService implements BillingProfileFacadePort {
     }
 
     private void selectBillingProfileForUserAndProjects(@NonNull BillingProfile.Id billingProfileId, @NonNull UserId userId, Set<ProjectId> projectIds) {
-        if (projectIds != null) projectIds.forEach(projectId -> billingProfileStoragePort.savePayoutPreference(billingProfileId, userId, projectId));
+        if (projectIds != null)
+            projectIds.forEach(projectId -> {
+                billingProfileStoragePort.savePayoutPreference(billingProfileId, userId, projectId);
+                accountingObserverPort.onPayoutPreferenceChanged(billingProfileId, userId, projectId);
+            });
     }
 
     @Override
@@ -293,11 +297,13 @@ public class BillingProfileService implements BillingProfileFacadePort {
     }
 
     @Override
+    @Transactional
     public void deleteBillingProfile(UserId userId, BillingProfile.Id billingProfileId) {
         if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
             throw unauthorized("User %s must be admin to delete billing profile %s".formatted(userId.value(), billingProfileId.value()));
         if (billingProfileStoragePort.doesBillingProfileHaveSomeInvoices(billingProfileId))
             throw unauthorized("Cannot delete billing profile %s with invoice(s)".formatted(billingProfileId.value()));
+        accountingObserverPort.onBillingProfileDeleted(billingProfileId);
         billingProfileStoragePort.deleteBillingProfile(billingProfileId);
     }
 
