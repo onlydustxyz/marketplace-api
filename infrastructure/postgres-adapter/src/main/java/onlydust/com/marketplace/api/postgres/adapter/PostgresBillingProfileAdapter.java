@@ -121,8 +121,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional(readOnly = true)
     public boolean isUserMemberOf(BillingProfile.Id billingProfileId, UserId userId) {
-        return shortBillingProfileViewRepository.findBillingProfilesForUserId(userId.value(), List.of()).stream()
-                .anyMatch(shortBillingProfileViewEntity -> shortBillingProfileViewEntity.getId().equals(billingProfileId.value()));
+        return billingProfileUserRepository.existsByBillingProfileIdAndUserId(billingProfileId.value(), userId.value());
     }
 
     @Override
@@ -433,5 +432,10 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     public List<BillingProfileRewardView> findInvoiceableRewardsForBillingProfile(BillingProfile.Id billingProfileId) {
         return rewardViewRepository.findInvoiceableRewardsForBillingProfile(billingProfileId.value())
                 .stream().map(RewardViewEntity::toBillingProfileReward).toList();
+    }
+
+    @Override
+    public boolean isUserInvitedTo(BillingProfile.Id billingProfileId, GithubUserId githubUserId) {
+        return billingProfileUserInvitationRepository.existsByBillingProfileIdAndGithubUserIdAndAcceptedIsFalse(billingProfileId.value(), githubUserId.value());
     }
 }

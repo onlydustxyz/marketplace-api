@@ -143,7 +143,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     public ResponseEntity<BillingProfileResponse> getBillingProfile(UUID billingProfileId) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final BillingProfileView billingProfileView = billingProfileFacadePort.getBillingProfile(BillingProfile.Id.of(billingProfileId),
-                UserId.of(authenticatedUser.getId()));
+                UserId.of(authenticatedUser.getId()), GithubUserId.of(authenticatedUser.getGithubUserId()));
         return ok(BillingProfileMapper.billingProfileViewToResponse(billingProfileView));
     }
 

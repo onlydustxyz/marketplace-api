@@ -10,4 +10,5 @@ public interface BillingProfileUserRepository extends JpaRepository<BillingProfi
 
     Optional<BillingProfileUserEntity> findByBillingProfileIdAndUserId(UUID billingProfileId, UUID userId);
 
+    Boolean existsByBillingProfileIdAndUserId(UUID billingProfileId, UUID userId);
 }

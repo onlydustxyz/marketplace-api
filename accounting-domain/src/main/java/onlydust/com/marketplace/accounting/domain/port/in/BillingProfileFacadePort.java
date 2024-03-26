@@ -40,7 +40,7 @@ public interface BillingProfileFacadePort {
 
     List<ShortBillingProfileView> getBillingProfilesForUser(UserId userId);
 
-    BillingProfileView getBillingProfile(BillingProfile.Id billingProfileId, UserId userId);
+    BillingProfileView getBillingProfile(BillingProfile.Id billingProfileId, UserId userId, GithubUserId githubUserId);
 
     PayoutInfoView getPayoutInfo(BillingProfile.Id billingProfileId, UserId userId);
 
