@@ -4,6 +4,7 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import onlydust.com.backoffice.api.contract.model.AccountResponse;
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
@@ -818,6 +819,10 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
     @Test
     void should_get_billing_profile() {
+        final var billingProfileId = BillingProfile.Id.of("1253b889-e5d5-49ee-8e8a-21405ccab8a6");
+        final var billingProfile = billingProfileStoragePort.findById(billingProfileId).orElseThrow();
+        billingProfileStoragePort.saveKyb(billingProfile.getKyb().toBuilder().externalApplicantId("123456").build());
+
         client.get()
                 .uri(getApiURI(BILLING_PROFILE.formatted("1253b889-e5d5-49ee-8e8a-21405ccab8a6")))
                 .header("Api-Key", apiKey())
@@ -841,7 +846,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                             "usEntity": null,
                             "subjectToEuropeVAT": null,
                             "euVATNumber": null,
-                            "sumsubUrl": null
+                            "sumsubUrl": "https://cockpit.sumsub.com/checkus/#/applicant/123456/basicInfo?clientId=onlydust"
                           },
                           "kyc": null,
                           "admins": [
