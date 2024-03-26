@@ -3,6 +3,7 @@ package onlydust.com.marketplace.accounting.domain.view;
 import lombok.Builder;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
@@ -13,6 +14,7 @@ import java.util.List;
 @Builder
 public record BackofficeRewardView(
         @NonNull RewardId id,
+        Payment.Id paymentId,
         @NonNull RewardStatus status,
         @NonNull ZonedDateTime requestedAt,
         ZonedDateTime processedAt,

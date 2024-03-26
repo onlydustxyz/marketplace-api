@@ -50,6 +50,8 @@ public interface RewardDetailsViewRepository extends JpaRepository<BackofficeRew
                                i.id                                     invoice_id,
                                i.number                                 invoice_number,
                                i.status                                 invoice_status,
+                               
+                               batch_payment.id                         batch_payment_id,
 
                                receipts.transaction_references,
                                receipts.paid_to_account_numbers
@@ -65,6 +67,8 @@ public interface RewardDetailsViewRepository extends JpaRepository<BackofficeRew
                                  left join accounting.billing_profiles bp on bp.id = i.billing_profile_id
                                  left join accounting.kyb kyb on kyb.billing_profile_id = i.billing_profile_id
                                  left join accounting.kyc kyc on kyc.billing_profile_id = i.billing_profile_id
+
+                                 left join lateral (select batch_payment_id as id from accounting.batch_payment_rewards bpr where bpr.reward_id = r.id limit 1) batch_payment on true
 
                                  left join (select creator.id, jsonb_build_object(
                                                     'login', coalesce(creator_ga.login, creator.github_login),

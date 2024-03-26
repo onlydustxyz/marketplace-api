@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeApiIT {
@@ -257,6 +258,24 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                 """);
         ethBatchPaymentId = Payment.Id.of(network1.getValue().equals("ETHEREUM") ? batchPaymentId1.getValue() : batchPaymentId2.getValue());
         sepaBatchPaymentId = Payment.Id.of(network1.getValue().equals("SEPA") ? batchPaymentId1.getValue() : batchPaymentId2.getValue());
+
+        client.post()
+                .uri(getApiURI(POST_REWARDS_SEARCH))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                            {
+                            "invoiceIds": ["%s","%s"]
+                            }
+                        """.formatted(
+                        olivierInvoiceIds.get(0),
+                        anthonyInvoiceIds.get(0)))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.rewards[0].paymentId").isEqualTo(ethBatchPaymentId.toString());
     }
 
     @Test

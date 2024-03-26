@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import com.github.javafaker.Faker;
-import onlydust.com.backoffice.api.contract.model.SearchRewardItemResponse;
 import onlydust.com.backoffice.api.contract.model.SearchRewardsResponse;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
@@ -166,7 +165,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
         setUp();
 
         // When
-        final SearchRewardsResponse searchRewardsResponse = client.post()
+        final var response = client.post()
                 .uri(getApiURI(POST_REWARDS_SEARCH))
                 .header("Api-Key", apiKey())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -185,7 +184,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .is2xxSuccessful()
                 .returnResult(SearchRewardsResponse.class)
                 .getResponseBody().blockFirst();
-        final List<UUID> expectedRewardIds = List.of(
+
+        final var expectedRewardIds = List.of(
                 UUID.fromString("061e2c7e-bda4-49a8-9914-2e76926f70c2"),
                 UUID.fromString("ee28315c-7a84-4052-9308-c2236eeafda1"),
                 UUID.fromString("d067b24d-115a-45e9-92de-94dd1d01b184"),
@@ -193,9 +193,11 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 UUID.fromString("5083ac1f-4325-4d47-9760-cbc9ab82f25c"),
                 UUID.fromString("e6ee79ae-b3f0-4f4e-b7e3-9e643bc27236")
         );
-        for (SearchRewardItemResponse reward : searchRewardsResponse.getRewards()) {
+
+        for (final var reward : response.getRewards()) {
             assertThat(expectedRewardIds).contains(reward.getId());
             assertThat(List.of(Currency.Code.USDC_STR, Currency.Code.LORDS_STR, Currency.Code.STRK_STR)).contains(reward.getMoney().getCurrency().getCode());
+            assertThat(reward.getPaymentId()).isNull();
         }
     }
 
@@ -221,6 +223,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           "rewards": [
                             {
                               "id": "5f9060a7-6f9e-4ef7-a1e4-1aaa4c85f03c",
+                              "paymentId": null,
                               "billingProfile": {
                                 "name": "Olivier SASU",
                                 "type": "SELF_EMPLOYED",
@@ -276,6 +279,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             },
                             {
                               "id": "fab7aaf4-9b0c-4e52-bc9b-72ce08131617",
+                              "paymentId": null,
                               "billingProfile": {
                                 "name": "Olivier SASU",
                                 "type": "SELF_EMPLOYED",
@@ -331,6 +335,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             },
                             {
                               "id": "64fb2732-5632-4b09-a8b1-217485648129",
+                              "paymentId": null,
                               "billingProfile": null,
                               "invoice": null,
                               "status": "PENDING_VERIFICATION",
@@ -376,6 +381,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             },
                             {
                               "id": "736e0554-f30e-4315-9731-7611fa089dcf",
+                              "paymentId": null,
                               "billingProfile": {
                                 "name": "Olivier SASU",
                                 "type": "SELF_EMPLOYED",
@@ -435,6 +441,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             },
                             {
                               "id": "1c56d096-5284-4ae3-af3c-dd2b3211fb73",
+                              "paymentId": null,
                               "billingProfile": null,
                               "invoice": null,
                               "status": "COMPLETE",

@@ -471,6 +471,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "rewards": [
                                 {
                                   "id": "6587511b-3791-47c6-8430-8f793606c63a",
+                                  "paymentId": null,
                                   "requestedAt": "2023-09-20T08:01:47.616674Z",
                                   "processedAt": null,
                                   "githubUrls": [
