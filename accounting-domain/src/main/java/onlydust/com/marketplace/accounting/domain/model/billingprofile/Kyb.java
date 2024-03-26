@@ -39,4 +39,9 @@ public class Kyb {
                 .status(VerificationStatus.NOT_STARTED)
                 .build();
     }
+
+    public String sumsubUrl() {
+        return externalApplicantId == null ? null :
+                "https://cockpit.sumsub.com/checkus/#/applicant/%s/basicInfo?clientId=onlydust".formatted(externalApplicantId);
+    }
 }

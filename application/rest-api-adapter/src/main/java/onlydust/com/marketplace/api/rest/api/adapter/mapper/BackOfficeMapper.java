@@ -761,7 +761,7 @@ public interface BackOfficeMapper {
                 .idDocumentNumber(kyc.getIdDocumentNumber())
                 .validUntil(kyc.getValidUntil() == null ? null : kyc.getValidUntil().toInstant().atZone(ZoneOffset.UTC))
                 .idDocumentCountryCode(kyc.getIdDocumentCountryCode())
-                .sumsubUrl(null) // TODO
+                .sumsubUrl(kyc.sumsubUrl())
                 ;
     }
 
@@ -785,7 +785,7 @@ public interface BackOfficeMapper {
                 .usEntity(kyb.getUsEntity())
                 .subjectToEuropeVAT(kyb.getSubjectToEuropeVAT())
                 .euVATNumber(kyb.getEuVATNumber())
-                .sumsubUrl(null) // TODO
+                .sumsubUrl(kyb.sumsubUrl())
                 ;
     }
 

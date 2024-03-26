@@ -41,6 +41,11 @@ public class Kyc {
                 .build();
     }
 
+    public String sumsubUrl() {
+        return externalApplicantId == null ? null :
+                "https://cockpit.sumsub.com/checkus/#/applicant/%s/basicInfo?clientId=onlydust".formatted(externalApplicantId);
+    }
+
     public enum IdDocumentTypeEnum {
         PASSPORT,
         ID_CARD,
