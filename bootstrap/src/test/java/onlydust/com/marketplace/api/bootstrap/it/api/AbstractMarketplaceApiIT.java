@@ -112,7 +112,6 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_GET_PROFILE_GITHUB = "/api/v1/me/profile/github";
     protected static final String USERS_GET = "/api/v1/users";
     protected static final String USERS_GET_BY_LOGIN = "/api/v1/users/login";
-    protected static final String GITHUB_INSTALLATIONS_GET = "/api/v1/github/installations";
     protected static final String ME_GET_ORGANIZATIONS = "/api/v1/me/organizations";
     protected static final String EVENT_ON_CONTRIBUTIONS_CHANGE_POST = "/api/v1/events/on-contributions-change";
     protected static final String SUGGEST_NEW_TECHNOLOGY = "/api/v1/technologies";

@@ -61,56 +61,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "avatarUrl": "https://avatars.githubusercontent.com/u/74653697?v=4"
                 }
               ],
-              "repos": [
-                {
-                  "id": 380954304,
-                  "owner": "gregcha",
-                  "name": "bretzel-app",
-                  "description": null,
-                  "htmlUrl": "https://github.com/gregcha/bretzel-app",
-                  "stars": 0,
-                  "forkCount": 0,
-                  "hasIssues": true,
-                  "isIncludedInProject": null,
-                  "isAuthorizedInGithubApp": true
-                },
-                {
-                  "id": 452047076,
-                  "owner": "gregcha",
-                  "name": "bretzel-site",
-                  "description": null,
-                  "htmlUrl": "https://github.com/gregcha/bretzel-site",
-                  "stars": 0,
-                  "forkCount": 0,
-                  "hasIssues": true,
-                  "isIncludedInProject": null,
-                  "isAuthorizedInGithubApp": true
-                },
-                {
-                  "id": 466482535,
-                  "owner": "gregcha",
-                  "name": "bretzel-ressources",
-                  "description": null,
-                  "htmlUrl": "https://github.com/gregcha/bretzel-ressources",
-                  "stars": 0,
-                  "forkCount": 0,
-                  "hasIssues": true,
-                  "isIncludedInProject": null,
-                  "isAuthorizedInGithubApp": true
-                },
-                {
-                  "id": 659718526,
-                  "owner": "KasarLabs",
-                  "name": "deoxys-telemetry",
-                  "description": "Deoxys Telemetry service",
-                  "htmlUrl": "https://github.com/KasarLabs/deoxys-telemetry",
-                  "stars": 0,
-                  "forkCount": 1,
-                  "hasIssues": false,
-                  "isIncludedInProject": null,
-                  "isAuthorizedInGithubApp": false
-                }
-              ],
               "organizations": [
                 {
                   "githubUserId": 8642470,
@@ -271,56 +221,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "login": "antiyro",
                   "htmlUrl": "https://github.com/antiyro",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/74653697?v=4"
-                }
-              ],
-              "repos": [
-                {
-                  "id": 380954304,
-                  "owner": "gregcha",
-                  "name": "bretzel-app",
-                  "description": null,
-                  "htmlUrl": "https://github.com/gregcha/bretzel-app",
-                  "stars": 0,
-                  "forkCount": 0,
-                  "hasIssues": true,
-                  "isIncludedInProject": null,
-                  "isAuthorizedInGithubApp": true
-                },
-                {
-                  "id": 452047076,
-                  "owner": "gregcha",
-                  "name": "bretzel-site",
-                  "description": null,
-                  "htmlUrl": "https://github.com/gregcha/bretzel-site",
-                  "stars": 0,
-                  "forkCount": 0,
-                  "hasIssues": true,
-                  "isIncludedInProject": null,
-                  "isAuthorizedInGithubApp": true
-                },
-                {
-                  "id": 466482535,
-                  "owner": "gregcha",
-                  "name": "bretzel-ressources",
-                  "description": null,
-                  "htmlUrl": "https://github.com/gregcha/bretzel-ressources",
-                  "stars": 0,
-                  "forkCount": 0,
-                  "hasIssues": true,
-                  "isIncludedInProject": null,
-                  "isAuthorizedInGithubApp": true
-                },
-                {
-                  "id": 659718526,
-                  "owner": "KasarLabs",
-                  "name": "deoxys-telemetry",
-                  "description": "Deoxys Telemetry service",
-                  "htmlUrl": "https://github.com/KasarLabs/deoxys-telemetry",
-                  "stars": 0,
-                  "forkCount": 1,
-                  "hasIssues": false,
-                  "isIncludedInProject": null,
-                  "isAuthorizedInGithubApp": false
                 }
               ],
               "organizations": [
@@ -502,32 +402,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "login": "ofux",
                   "htmlUrl": "https://github.com/ofux",
                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
-                }
-              ],
-              "repos": [
-                {
-                  "id": 302082426,
-                  "owner": "gregcha",
-                  "name": "crew-app",
-                  "description": null,
-                  "htmlUrl": "https://github.com/gregcha/crew-app",
-                  "stars": 0,
-                  "forkCount": 0,
-                  "hasIssues": true,
-                  "isIncludedInProject": null,
-                  "isAuthorizedInGithubApp": true
-                },
-                {
-                  "id": 602953043,
-                  "owner": "od-mocks",
-                  "name": "cool-repo-A",
-                  "description": "This is repo A for our e2e tests",
-                  "htmlUrl": "https://github.com/od-mocks/cool-repo-A",
-                  "stars": 1,
-                  "forkCount": 2,
-                  "hasIssues": true,
-                  "isIncludedInProject": null,
-                  "isAuthorizedInGithubApp": false
                 }
               ],
               "organizations": [

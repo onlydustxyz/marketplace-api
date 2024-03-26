@@ -55,11 +55,6 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public GithubRestApi githubRestApi(final GithubInstallationFacadePort githubInstallationFacadePort) {
-        return new GithubRestApi(githubInstallationFacadePort);
-    }
-
-    @Bean
     BillingProfileRestApi billingProfileRestApi(final AuthenticatedAppUserService authenticatedAppUserService,
                                                 final BillingProfileFacadePort billingProfileFacadePort,
                                                 final CurrencyFacadePort currencyFacadePort) {
