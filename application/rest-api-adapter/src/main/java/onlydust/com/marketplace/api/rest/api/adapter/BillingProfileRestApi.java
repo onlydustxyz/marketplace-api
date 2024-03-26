@@ -8,7 +8,6 @@ import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
@@ -123,16 +122,21 @@ public class BillingProfileRestApi implements BillingProfilesApi {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final Set<ProjectId> projectIds = isNull(billingProfileRequest.getSelectForProjects()) ? Set.of() :
                 billingProfileRequest.getSelectForProjects().stream().map(ProjectId::of).collect(Collectors.toSet());
-        final BillingProfileResponse billingProfileResponse = BillingProfileMapper.billingProfileToResponse(switch (billingProfileRequest.getType()) {
-            case COMPANY -> billingProfileFacadePort.createCompanyBillingProfile(UserId.of(authenticatedUser.getId()), billingProfileRequest.getName(),
+        final var newBillingProfile = switch (billingProfileRequest.getType()) {
+            case COMPANY -> billingProfileFacadePort.createCompanyBillingProfile(
+                    UserId.of(authenticatedUser.getId()),
+                    billingProfileRequest.getName(),
                     projectIds);
-            case SELF_EMPLOYED ->
-                    billingProfileFacadePort.createSelfEmployedBillingProfile(UserId.of(authenticatedUser.getId()), billingProfileRequest.getName(),
-                            projectIds);
-            case INDIVIDUAL -> billingProfileFacadePort.createIndividualBillingProfile(UserId.of(authenticatedUser.getId()), billingProfileRequest.getName(),
+            case SELF_EMPLOYED -> billingProfileFacadePort.createSelfEmployedBillingProfile(
+                    UserId.of(authenticatedUser.getId()),
+                    billingProfileRequest.getName(),
                     projectIds);
-        });
-        return ok(billingProfileResponse);
+            case INDIVIDUAL -> billingProfileFacadePort.createIndividualBillingProfile(
+                    UserId.of(authenticatedUser.getId()),
+                    billingProfileRequest.getName(),
+                    projectIds);
+        };
+        return getBillingProfile(newBillingProfile.id().value());
     }
 
     @Override
@@ -146,7 +150,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     @Override
     public ResponseEntity<BillingProfilePayoutInfoResponse> getPayoutInfo(UUID billingProfileId) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        PayoutInfo payoutInfo = billingProfileFacadePort.getPayoutInfo(BillingProfile.Id.of(billingProfileId), UserId.of(authenticatedUser.getId()));
+        final var payoutInfo = billingProfileFacadePort.getPayoutInfo(BillingProfile.Id.of(billingProfileId), UserId.of(authenticatedUser.getId()));
         return ok(PayoutInfoMapper.mapToResponse(payoutInfo));
     }
 

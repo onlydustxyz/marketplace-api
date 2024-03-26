@@ -3021,43 +3021,6 @@ components:
         owner:
           $ref: '#/components/schemas/PersonIdentity'
 
-    UserPayoutSettingsResponse:
-      type: object
-      properties:
-        hasValidPayoutSettings:
-          type: boolean
-        sepaAccount:
-          type: object
-          properties:
-            bic:
-              type: string
-              example: DAAEFRPPCCT
-            iban:
-              type: string
-              example: FR5417569000301995586997O41
-        missingSepaAccount:
-          type: boolean
-        ethWallet:
-          type: string
-          description: ETH wallet address or ENS
-          example: vitalik.eth
-        missingEthWallet:
-          type: boolean
-        optimismAddress:
-          type: string
-          example: 0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545
-        missingOptimismWallet:
-          type: boolean
-        aptosAddress:
-          type: string
-          example: 0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5
-        missingAptosWallet:
-          type: boolean
-        starknetAddress:
-          type: string
-          example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
-        missingStarknetWallet:
-          type: boolean
     BillingProfilePayoutInfoResponse:
       type: object
       properties:
@@ -3095,31 +3058,6 @@ components:
           example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
         missingStarknetWallet:
           type: boolean
-    UserPayoutSettingsRequest:
-      type: object
-      properties:
-        sepaAccount:
-          type: object
-          properties:
-            bic:
-              type: string
-              example: DAAEFRPPCCT
-            iban:
-              type: string
-              example: FR5417569000301995586997O41
-        ethWallet:
-          type: string
-          description: ETH wallet address or ENS
-          example: vitalik.eth
-        optimismAddress:
-          type: string
-          example: 0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545
-        aptosAddress:
-          type: string
-          example: 0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5
-        starknetAddress:
-          type: string
-          example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
 
     BillingProfilePayoutInfoRequest:
       type: object
@@ -4625,6 +4563,9 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/BillingProfileLinkResponse'
+            missingPayoutPreference:
+              type: boolean
+              description: True if the user has not selected any billing profile for a project on which he has pending rewards.
             firstName:
               type: string
             lastName:
@@ -4672,8 +4613,11 @@ components:
         - name
         - type
         - invoiceMandateAccepted
-        - hasValidPayoutMethods
-        - hasValidVerificationValid
+        - missingPayoutInfo
+        - missingVerification
+        - verificationBlocked
+        - rewardCount
+        - invoiceableRewardCount
         - enabled
         - role
       properties:
@@ -4696,19 +4640,26 @@ components:
           type: boolean
         role:
           $ref: '#/components/schemas/BillingProfileCoworkerRole'
-        hasValidPayoutMethods:
-          description: Always true when no pending rewards
+        missingPayoutInfo:
           type: boolean
-        hasValidVerificationValid:
-          description: Always true when no pending rewards
+          description: True if any reward that is included in an invoice in this billing profile
+            requires some payout info to be set in order to be payable.
+            Always false when no pending rewards.
+        missingVerification:
           type: boolean
+          description: True if there is any reward belonging to this billing profile and its status is not VERIFIED.
+            Always false when no pending rewards.
+        verificationBlocked:
+          type: boolean
+          description: True if the billing profile verification process is blocked.
     BillingProfileLinkResponse:
       type: object
       required:
         - id
         - type
-        - hasValidPayoutMethods
-        - hasValidVerificationValid
+        - missingPayoutInfo
+        - missingVerification
+        - verificationBlocked
         - verificationStatus
         - role
       properties:
@@ -4721,12 +4672,18 @@ components:
           $ref: '#/components/schemas/BillingProfileCoworkerRole'
         verificationStatus:
           $ref: '#/components/schemas/VerificationStatus'
-        hasValidPayoutMethods:
-          description: Always true when no pending rewards
+        missingPayoutInfo:
           type: boolean
-        hasValidVerificationValid:
-          description: Always true when no pending rewards
+          description: True if any reward that is included in an invoice in this billing profile
+            requires some payout info to be set in order to be payable.
+            Always false when no pending rewards.
+        missingVerification:
           type: boolean
+          description: True if there is any reward belonging to this billing profile and its status is not VERIFIED.
+            Always false when no pending rewards.
+        verificationBlocked:
+          type: boolean
+          description: True if the billing profile verification process is blocked.
     ProjectLedShortResponse:
       type: object
       required:
@@ -5485,6 +5442,10 @@ components:
         - name
         - me
         - enabled
+        - invoiceMandateAccepted
+        - missingPayoutInfo
+        - missingVerification
+        - verificationBlocked
       properties:
         id:
           $ref: '#/components/schemas/BillingProfileId'
@@ -5505,6 +5466,24 @@ components:
           description: True if the billing profile can be switched from company to self-employed type (eg. no other coworkers)
         enabled:
           type: boolean
+        invoiceMandateAccepted:
+          type: boolean
+        rewardCount:
+          type: integer
+        invoiceableRewardCount:
+          type: integer
+        missingPayoutInfo:
+          type: boolean
+          description: True if any reward that is included in an invoice in this billing profile
+            requires some payout info to be set in order to be payable.
+            Always false when no pending rewards.
+        missingVerification:
+          type: boolean
+          description: True if there is any reward belonging to this billing profile and its status is not VERIFIED.
+            Always false when no pending rewards.
+        verificationBlocked:
+          type: boolean
+          description: True if the billing profile verification process is blocked.
         me:
           type: object
           required:
@@ -5712,7 +5691,23 @@ components:
         project:
           $ref: '#/components/schemas/ShortProjectResponse'
         billingProfile:
-          $ref: '#/components/schemas/ShortBillingProfileResponse'
+          $ref: '#/components/schemas/PayoutPreferenceBillingProfileResponse'
+
+    PayoutPreferenceBillingProfileResponse:
+      type: object
+      required:
+        - id
+        - name
+        - type
+      properties:
+        id:
+          $ref: '#/components/schemas/BillingProfileId'
+        name:
+          type: string
+        type:
+          $ref: '#/components/schemas/BillingProfileType'
+        enabled:
+          type: boolean
 
     BillingProfileInvoiceableRewardsResponse:
       type: object

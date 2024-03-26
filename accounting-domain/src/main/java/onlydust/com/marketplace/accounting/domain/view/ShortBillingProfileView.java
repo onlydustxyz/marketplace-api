@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 
 import java.time.ZonedDateTime;
 
@@ -13,6 +14,8 @@ import java.time.ZonedDateTime;
 public class ShortBillingProfileView {
     BillingProfile.Id id;
     BillingProfile.Type type;
+    BillingProfile.User.Role role;
+    VerificationStatus verificationStatus;
     String name;
     Boolean enabled;
     Boolean pendingInvitationResponse;
@@ -21,9 +24,10 @@ public class ShortBillingProfileView {
     @Getter(AccessLevel.NONE)
     @Setter
     ZonedDateTime invoiceMandateLatestVersionDate;
-    BillingProfile.User.Role role;
     Integer rewardCount;
     Integer invoiceableRewardCount;
+    Boolean missingPayoutInfo;
+    Boolean missingVerification;
 
     public boolean isInvoiceMandateAccepted() {
         if (type == BillingProfile.Type.INDIVIDUAL) return true;
@@ -31,5 +35,9 @@ public class ShortBillingProfileView {
         return invoiceMandateAcceptedAt != null &&
                invoiceMandateLatestVersionDate != null &&
                invoiceMandateAcceptedAt.isAfter(invoiceMandateLatestVersionDate);
+    }
+
+    public boolean isVerificationBlocked() {
+        return verificationStatus.isBlocked();
     }
 }

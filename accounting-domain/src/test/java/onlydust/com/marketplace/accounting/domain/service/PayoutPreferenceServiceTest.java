@@ -7,7 +7,6 @@ import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserverPor
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PayoutPreferenceStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.PayoutPreferenceView;
-import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.BeforeEach;
@@ -144,8 +143,8 @@ public class PayoutPreferenceServiceTest {
                                 .shortDescription("")
                                 .name("")
                                 .build())
-                        .shortBillingProfileView(
-                                ShortBillingProfileView.builder()
+                        .billingProfileView(
+                                PayoutPreferenceView.BillingProfileView.builder()
                                         .type(BillingProfile.Type.COMPANY)
                                         .enabled(false)
                                         .name("")
@@ -160,8 +159,8 @@ public class PayoutPreferenceServiceTest {
                                 .shortDescription("")
                                 .name("")
                                 .build())
-                        .shortBillingProfileView(
-                                ShortBillingProfileView.builder()
+                        .billingProfileView(
+                                PayoutPreferenceView.BillingProfileView.builder()
                                         .type(BillingProfile.Type.COMPANY)
                                         .enabled(true)
                                         .name("")
@@ -179,7 +178,7 @@ public class PayoutPreferenceServiceTest {
         // Then
         assertEquals(3, payoutPreferences.size());
         assertEquals(payoutPreferenceViews.get(0), payoutPreferences.get(0));
-        assertEquals(payoutPreferenceViews.get(1).toBuilder().shortBillingProfileView(null).build(), payoutPreferences.get(1));
+        assertEquals(payoutPreferenceViews.get(1).toBuilder().billingProfileView(null).build(), payoutPreferences.get(1));
         assertEquals(payoutPreferenceViews.get(2), payoutPreferences.get(2));
     }
 }

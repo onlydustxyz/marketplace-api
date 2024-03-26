@@ -253,8 +253,9 @@ public interface UserMapper {
                     case ADMIN -> BillingProfileCoworkerRole.ADMIN;
                     case MEMBER -> BillingProfileCoworkerRole.MEMBER;
                 })
-                .hasValidPayoutMethods(bp.hasValidPayoutMethods())
-                .hasValidVerificationValid(bp.hasValidVerificationStatus())
+                .missingPayoutInfo(bp.missingPayoutInfo())
+                .missingVerification(bp.missingVerification())
+                .verificationBlocked(bp.isVerificationBlocked())
                 .verificationStatus(switch (bp.verificationStatus()) {
                     case VERIFIED -> VerificationStatus.VERIFIED;
                     case UNDER_REVIEW -> VerificationStatus.UNDER_REVIEW;
@@ -269,6 +270,7 @@ public interface UserMapper {
                     case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
                 })).toList()
         );
+        getMeResponse.setMissingPayoutPreference(authenticatedUser.isMissingPayoutPreference());
         return getMeResponse;
     }
 

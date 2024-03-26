@@ -3,14 +3,15 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
 import onlydust.com.marketplace.accounting.domain.model.Money;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
-import onlydust.com.marketplace.api.contract.model.VerificationStatus;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -31,48 +32,6 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMor
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
 
 public interface BillingProfileMapper {
-
-    static BillingProfileResponse billingProfileToResponse(final BillingProfile billingProfile) {
-        final BillingProfileResponse billingProfileResponse = new BillingProfileResponse();
-        billingProfileResponse.setEnabled(billingProfile.enabled());
-        if (billingProfile instanceof IndividualBillingProfile individualBillingProfile) {
-            return individualBillingProfileToResponse(individualBillingProfile, billingProfileResponse);
-        } else if (billingProfile instanceof CompanyBillingProfile companyBillingProfile) {
-            billingProfileResponse.setType(BillingProfileType.COMPANY);
-            billingProfileResponse.setKyb(kybToResponse(companyBillingProfile.kyb()));
-            billingProfileResponse.setId(companyBillingProfile.id().value());
-            billingProfileResponse.setName(companyBillingProfile.name());
-            billingProfileResponse.setIsSwitchableToSelfEmployed(companyBillingProfile.isSwitchableToSelfEmployed());
-            billingProfileResponse.setStatus(verificationStatusToResponse(companyBillingProfile.status()));
-            billingProfileResponse.setIsSwitchableToSelfEmployed(true);
-            return billingProfileResponse;
-        } else if (billingProfile instanceof SelfEmployedBillingProfile selfEmployedBillingProfile) {
-            billingProfileResponse.setType(BillingProfileType.SELF_EMPLOYED);
-            billingProfileResponse.setKyb(kybToResponse(selfEmployedBillingProfile.kyb()));
-            billingProfileResponse.setId(selfEmployedBillingProfile.id().value());
-            billingProfileResponse.setName(selfEmployedBillingProfile.name());
-            billingProfileResponse.setIsSwitchableToSelfEmployed(selfEmployedBillingProfile.isSwitchableToCompany());
-            billingProfileResponse.setStatus(verificationStatusToResponse(selfEmployedBillingProfile.status()));
-            billingProfileResponse.setIsSwitchableToSelfEmployed(false);
-            return billingProfileResponse;
-        } else {
-            throw OnlyDustException.internalServerError("Failed to cast billing profile to billing profile type");
-        }
-    }
-
-
-    private static @NotNull BillingProfileResponse individualBillingProfileToResponse(IndividualBillingProfile individualBillingProfile,
-                                                                                      BillingProfileResponse billingProfileResponse) {
-        billingProfileResponse.setId(individualBillingProfile.id().value());
-        billingProfileResponse.setName(individualBillingProfile.name());
-        billingProfileResponse.setType(BillingProfileType.INDIVIDUAL);
-        billingProfileResponse.setKyc(kycToResponse(individualBillingProfile.kyc()));
-        billingProfileResponse.setCurrentYearPaymentAmount(individualBillingProfile.currentYearPaymentAmount().getValue());
-        billingProfileResponse.setCurrentYearPaymentLimit(individualBillingProfile.currentYearPaymentLimit().getValue());
-        billingProfileResponse.setIsSwitchableToSelfEmployed(false);
-        billingProfileResponse.setStatus(verificationStatusToResponse(individualBillingProfile.status()));
-        return billingProfileResponse;
-    }
 
     private static @NotNull KYCResponse kycToResponse(final Kyc kyc) {
         final KYCResponse response = new KYCResponse();
@@ -276,15 +235,21 @@ public interface BillingProfileMapper {
     }
 
     static BillingProfileResponse billingProfileViewToResponse(BillingProfileView view) {
-        final BillingProfileResponse billingProfileResponse = new BillingProfileResponse();
-        billingProfileResponse.setId(view.getId().value());
-        billingProfileResponse.setName(view.getName());
-        billingProfileResponse.setType(map(view.getType()));
-        billingProfileResponse.setKyb(isNull(view.getKyb()) ? null : kybToResponse(view.getKyb()));
-        billingProfileResponse.setKyc(isNull(view.getKyc()) ? null : kycToResponse(view.getKyc()));
-        billingProfileResponse.setStatus(verificationStatusToResponse(view.getVerificationStatus()));
-        billingProfileResponse.setEnabled(view.getEnabled());
-        billingProfileResponse.setMe(isNull(view.getMe()) ? null :
+        final var response = new BillingProfileResponse();
+        response.setId(view.getId().value());
+        response.setName(view.getName());
+        response.setType(map(view.getType()));
+        response.setKyb(isNull(view.getKyb()) ? null : kybToResponse(view.getKyb()));
+        response.setKyc(isNull(view.getKyc()) ? null : kycToResponse(view.getKyc()));
+        response.setStatus(verificationStatusToResponse(view.getVerificationStatus()));
+        response.setEnabled(view.getEnabled());
+        response.setInvoiceMandateAccepted(view.isInvoiceMandateAccepted());
+        response.setRewardCount(view.getRewardCount());
+        response.setInvoiceableRewardCount(view.getInvoiceableRewardCount());
+        response.setMissingPayoutInfo(view.getMissingPayoutInfo());
+        response.setMissingVerification(view.getMissingVerification());
+        response.setVerificationBlocked(view.isVerificationBlocked());
+        response.setMe(isNull(view.getMe()) ? null :
                 new BillingProfileResponseMe()
                         .canLeave(view.getMe().canLeave())
                         .canDelete(view.getMe().canDelete())
@@ -299,8 +264,8 @@ public interface BillingProfileMapper {
                                         .invitedAt(view.getMe().invitation().invitedAt())
                         )
         );
-        billingProfileResponse.setIsSwitchableToSelfEmployed(view.isSwitchableToSelfEmployed());
-        return billingProfileResponse;
+        response.setIsSwitchableToSelfEmployed(view.isSwitchableToSelfEmployed());
+        return response;
     }
 
     static BillingProfileCoworkersPageResponse coworkersPageToResponse(Page<BillingProfileCoworkerView> coworkersPage, int pageIndex) {

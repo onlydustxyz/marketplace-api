@@ -27,8 +27,8 @@ public class PayoutPreferenceService implements PayoutPreferenceFacadePort {
         return payoutPreferenceStoragePort.findAllByUserId(userId)
                 .stream()
                 .map(view -> {
-                    if (nonNull(view.shortBillingProfileView()) && !view.shortBillingProfileView().getEnabled()) {
-                        return view.toBuilder().shortBillingProfileView(null).build();
+                    if (nonNull(view.billingProfileView()) && !view.billingProfileView().enabled()) {
+                        return view.toBuilder().billingProfileView(null).build();
                     }
                     return view;
                 })

@@ -18,6 +18,7 @@ import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.view.*;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,31 +58,26 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Override
     @Transactional(readOnly = true)
     public Optional<User> getUserByGithubId(Long githubId) {
-        Optional<UserViewEntity> user = userViewRepository.findByGithubUserId(githubId);
-        return user.map(u -> {
-            final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(u.getId()).stream()
-                    .sorted(Comparator.comparing(ProjectLedIdViewEntity::getProjectSlug))
-                    .toList();
-            final var applications = applicationRepository.findAllByApplicantId(u.getId());
-            final var billingProfiles = billingProfileLinkViewRepository.findByUserId(u.getId()).stream().map(BillingProfileLinkViewEntity::toDomain).toList();
-            return mapUserToDomain(u, globalSettingsRepository.get().getTermsAndConditionsLatestVersionDate(),
-                    projectLedIdsByUserId, applications, billingProfiles);
-        });
+        return userViewRepository.findByGithubUserId(githubId).map(this::getUserDetails);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<User> getUserById(UUID userId) {
-        Optional<UserViewEntity> user = userViewRepository.findById(userId);
-        return user.map(u -> {
-            final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(u.getId()).stream()
-                    .sorted(Comparator.comparing(ProjectLedIdViewEntity::getProjectSlug))
-                    .toList();
-            final var applications = applicationRepository.findAllByApplicantId(u.getId());
-            final var billingProfiles = billingProfileLinkViewRepository.findByUserId(u.getId()).stream().map(BillingProfileLinkViewEntity::toDomain).toList();
-            return mapUserToDomain(u, globalSettingsRepository.get().getTermsAndConditionsLatestVersionDate(),
-                    projectLedIdsByUserId, applications, billingProfiles);
-        });
+        return userViewRepository.findById(userId).map(this::getUserDetails);
+    }
+
+    private User getUserDetails(@NotNull UserViewEntity user) {
+        final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(user.getId()).stream()
+                .sorted(Comparator.comparing(ProjectLedIdViewEntity::getProjectSlug))
+                .toList();
+        final var applications = applicationRepository.findAllByApplicantId(user.getId());
+        final var billingProfiles = billingProfileLinkViewRepository.findByUserId(user.getId()).stream()
+                .map(BillingProfileLinkViewEntity::toDomain)
+                .toList();
+        final var hasAnyRewardPendingBillingProfile = rewardViewRepository.existsPendingBillingProfileByRecipientId(user.getGithubUserId());
+        return mapUserToDomain(user, globalSettingsRepository.get().getTermsAndConditionsLatestVersionDate(),
+                projectLedIdsByUserId, applications, billingProfiles, hasAnyRewardPendingBillingProfile);
     }
 
     @Override

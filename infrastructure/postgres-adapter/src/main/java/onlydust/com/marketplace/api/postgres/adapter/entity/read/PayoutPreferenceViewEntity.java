@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.view.PayoutPreferenceView;
-import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
 import org.hibernate.annotations.TypeDef;
@@ -52,8 +51,8 @@ public class PayoutPreferenceViewEntity {
 
     public PayoutPreferenceView toDomain() {
         return PayoutPreferenceView.builder()
-                .shortBillingProfileView(isNull(billingProfileId) ? null :
-                        ShortBillingProfileView.builder()
+                .billingProfileView(isNull(billingProfileId) ? null :
+                        PayoutPreferenceView.BillingProfileView.builder()
                                 .id(BillingProfile.Id.of(this.billingProfileId))
                                 .name(this.billingProfileName)
                                 .type(this.billingProfileType.toDomain())

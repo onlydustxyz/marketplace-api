@@ -1,8 +1,20 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.SneakyThrows;
+import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.service.AccountingService;
+import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.Auth0ApiClientStub;
+import onlydust.com.marketplace.api.bootstrap.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.contract.model.RewardItemRequest;
+import onlydust.com.marketplace.api.contract.model.RewardRequest;
+import onlydust.com.marketplace.api.contract.model.RewardType;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
@@ -16,13 +28,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.BodyInserters;
 
+import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,11 +48,14 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
     @Autowired
     ApplicationRepository applicationRepository;
-
     @Autowired
     ProjectLeadRepository projectLeadRepository;
     @Autowired
     ProjectRepoRepository projectRepoRepository;
+    @Autowired
+    BillingProfileService billingProfileService;
+    @Autowired
+    AccountingService accountingService;
 
     @Test
     void should_update_onboarding_state() {
@@ -454,14 +473,14 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.email").isEqualTo(newEmail);
     }
 
-    //    @Test - TODO: restore during alerting development
-    void should_return_has_valid_billing_profile() {
+    @Test
+    void should_return_billing_profiles_and_missingPayoutPreference() {
         // Given
-        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
-                faker.number().randomNumber() + faker.number().randomNumber(), faker.hacker().abbreviation(),
+        final var authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
+                faker.number().randomNumber(11, true), "another-fake-user",
                 faker.internet().url(), false);
 
-        // When
+        // When user has no BP and no reward
         client.get()
                 .uri(ME_GET)
                 .header("Authorization", "Bearer " + authenticatedUser.jwt())
@@ -470,9 +489,16 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.hasValidBillingProfile").isEqualTo(true);
+                .json("""
+                        {
+                          "billingProfiles": [],
+                          "missingPayoutPreference": false
+                        }
+                        """);
 
-        // When
+        // When user has a not-verified BP and no reward
+        final var individualBillingProfile = billingProfileService.createIndividualBillingProfile(UserId.of(authenticatedUser.user().getId()),
+                faker.rickAndMorty().character(), null);
         client.get()
                 .uri(ME_GET)
                 .header("Authorization", "Bearer " + authenticatedUser.jwt())
@@ -481,14 +507,31 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.hasValidBillingProfile").isEqualTo(false);
+                .json("""
+                        {
+                          "billingProfiles": [{
+                                                "id": "%s",
+                                                "type": "INDIVIDUAL",
+                                                "role": "ADMIN",
+                                                "verificationStatus": "NOT_STARTED",
+                                                "missingPayoutInfo": false,
+                                                "missingVerification": false,
+                                                "verificationBlocked": false
+                                              }],
+                          "missingPayoutPreference": false
+                        }
+                        """.formatted(individualBillingProfile.id().value()));
 
-//        userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
-//                .userId(user.getId())
-//                .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.COMPANY)
-//                .build());
-
-        // When
+        // When user has a not-verified BP and some reward
+        final var projectId = ProjectId.of("f39b827f-df73-498c-8853-99bc3f562723");
+        final var sponsorId = UUID.fromString("eb04a5de-4802-4071-be7b-9007b563d48d");
+        final var usdc = currencyRepository.findByCode("USDC").orElseThrow().id();
+        final var usdcSponsorAccount = accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
+                Currency.Id.of(usdc), null,
+                new SponsorAccount.Transaction(SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(), Amount.of(200000L),
+                        faker.rickAndMorty().character(), faker.hacker().verb()));
+        accountingService.allocate(usdcSponsorAccount.account().id(), projectId, PositiveAmount.of(100000L), Currency.Id.of(usdc));
+        sendRewardToRecipient(authenticatedUser.user().getGithubUserId(), 100L, projectId.value());
         client.get()
                 .uri(ME_GET)
                 .header("Authorization", "Bearer " + authenticatedUser.jwt())
@@ -497,14 +540,23 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.hasValidBillingProfile").isEqualTo(true);
+                .json("""
+                        {
+                          "billingProfiles": [{
+                                                "id": "%s",
+                                                "type": "INDIVIDUAL",
+                                                "role": "ADMIN",
+                                                "verificationStatus": "NOT_STARTED",
+                                                "missingPayoutInfo": false,
+                                                "missingVerification": false,
+                                                "verificationBlocked": false
+                                              }],
+                          "missingPayoutPreference": true
+                        }
+                        """.formatted(individualBillingProfile.id().value()));
 
-//        userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
-//                .userId(user.getId())
-//                .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.INDIVIDUAL)
-//                .build());
-
-        // When
+        // When the user set missing payout preferences
+        updatePayoutPreferences(authenticatedUser.user().getGithubUserId(), individualBillingProfile.id(), projectId.value());
         client.get()
                 .uri(ME_GET)
                 .header("Authorization", "Bearer " + authenticatedUser.jwt())
@@ -513,9 +565,23 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.hasValidBillingProfile").isEqualTo(false);
+                .json("""
+                        {
+                          "billingProfiles": [{
+                                                "id": "%s",
+                                                "type": "INDIVIDUAL",
+                                                "role": "ADMIN",
+                                                "verificationStatus": "NOT_STARTED",
+                                                "missingPayoutInfo": false,
+                                                "missingVerification": true,
+                                                "verificationBlocked": false
+                                              }],
+                          "missingPayoutPreference": false
+                        }
+                        """.formatted(individualBillingProfile.id().value()));
 
-        // When
+        // When the user gets his BP verification blocked
+        accountingHelper.patchBillingProfile(individualBillingProfile.id().value(), null, VerificationStatusEntity.CLOSED);
         client.get()
                 .uri(ME_GET)
                 .header("Authorization", "Bearer " + authenticatedUser.jwt())
@@ -524,6 +590,136 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.hasValidBillingProfile").isEqualTo(true);
+                .json("""
+                        {
+                          "billingProfiles": [{
+                                                "id": "%s",
+                                                "type": "INDIVIDUAL",
+                                                "role": "ADMIN",
+                                                "verificationStatus": "CLOSED",
+                                                "missingPayoutInfo": false,
+                                                "missingVerification": true,
+                                                "verificationBlocked": true
+                                              }],
+                          "missingPayoutPreference": false
+                        }
+                        """.formatted(individualBillingProfile.id().value()));
+
+        // When the user gets his BP verified
+        accountingHelper.patchBillingProfile(individualBillingProfile.id().value(), null, VerificationStatusEntity.VERIFIED);
+        client.get()
+                .uri(ME_GET)
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "billingProfiles": [{
+                                                "id": "%s",
+                                                "type": "INDIVIDUAL",
+                                                "role": "ADMIN",
+                                                "verificationStatus": "VERIFIED",
+                                                "missingPayoutInfo": true,
+                                                "missingVerification": false,
+                                                "verificationBlocked": false
+                                              }],
+                          "missingPayoutPreference": false
+                        }
+                        """.formatted(individualBillingProfile.id().value()));
+
+        // When the user adds some payout infos
+        client.put()
+                .uri(getApiURI(BILLING_PROFILES_PUT_PAYOUT_INFO.formatted(individualBillingProfile.id().value())))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "aptosAddress": "0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5",
+                          "ethWallet": "vitalik.eth",
+                          "optimismAddress": "0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545",
+                          "bankAccount": {
+                            "bic": "DAAEFRPPCCT",
+                            "number": "FR5417569000301995586997O41"
+                          },
+                          "starknetAddress": "0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+        client.get()
+                .uri(ME_GET)
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "billingProfiles": [{
+                                                "id": "%s",
+                                                "type": "INDIVIDUAL",
+                                                "role": "ADMIN",
+                                                "verificationStatus": "VERIFIED",
+                                                "missingPayoutInfo": false,
+                                                "missingVerification": false,
+                                                "verificationBlocked": false
+                                              }],
+                          "missingPayoutPreference": false
+                        }
+                        """.formatted(individualBillingProfile.id().value()));
+    }
+
+    private void sendRewardToRecipient(Long recipientId, Long amount, UUID projectId) {
+        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
+        final RewardRequest rewardRequest = new RewardRequest()
+                .amount(BigDecimal.valueOf(amount))
+                .currencyId(CurrencyHelper.USDC.value())
+                .recipientId(recipientId)
+                .items(List.of(
+                        new RewardItemRequest().id("0011051356")
+                                .type(RewardType.PULL_REQUEST)
+                                .number(1L)
+                                .repoId(55223344L)
+                ));
+
+        // When
+        indexerApiWireMockServer.stubFor(WireMock.put(
+                        WireMock.urlEqualTo("/api/v1/users/%s".formatted(recipientId)))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+
+        client.post()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId)))
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                .body(BodyInserters.fromValue(rewardRequest))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+    }
+
+    private void updatePayoutPreferences(final Long githubUserId, BillingProfile.Id billingProfileId, final UUID projectId) {
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.authenticateUser(githubUserId);
+        client.put()
+                .uri(getApiURI(ME_PUT_PAYOUT_PREFERENCES))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "billingProfileId": "%s",
+                          "projectId": "%s"
+                        }
+                        """.formatted(isNull(billingProfileId) ? null : billingProfileId.value(), projectId))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
     }
 }
