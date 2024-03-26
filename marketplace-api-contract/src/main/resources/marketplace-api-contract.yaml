@@ -3636,13 +3636,6 @@ components:
           maxItems: 3
           items:
             $ref: '#/components/schemas/GithubUserResponse'
-        # For now, we let the flatten repos list here to avoid breaking changes. However, it is marked as deprecated.
-        # The 'organizations' field should be used instead.
-        repos:
-          deprecated: true
-          type: array
-          items:
-            $ref: '#/components/schemas/GithubRepoResponse'
         organizations:
           type: array
           items:

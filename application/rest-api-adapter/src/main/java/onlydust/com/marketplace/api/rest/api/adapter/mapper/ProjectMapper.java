@@ -1,13 +1,12 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.project.domain.model.MoreInfoLink;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.UpdateProjectCommand;
-import onlydust.com.marketplace.project.domain.view.*;
-import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.view.*;
 
 import java.net.URI;
@@ -99,17 +98,6 @@ public interface ProjectMapper {
                     .isInvitedAsProjectLead(project.getMe().isInvitedAsProjectLead())
                     .isContributor(project.getMe().isContributor())
                     .hasApplied(project.getMe().hasApplied()));
-
-        //TODO: this list is kept for backwards compatibility with the old API
-        final var repos = new ArrayList<GithubRepoResponse>();
-        for (ProjectOrganizationView organization : project.getOrganizations()) {
-            repos.addAll(organization.getRepos().stream()
-                    .filter(ProjectOrganizationRepoView::getIsIncludedInProject)
-                    .map(ProjectMapper::mapRepo)
-                    .toList());
-        }
-        repos.sort(comparing(GithubRepoResponse::getId));
-        projectResponse.setRepos(repos);
 
         return projectResponse;
     }
