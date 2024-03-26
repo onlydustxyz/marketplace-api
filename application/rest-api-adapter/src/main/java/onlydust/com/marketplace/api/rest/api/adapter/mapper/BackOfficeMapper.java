@@ -496,6 +496,7 @@ public interface BackOfficeMapper {
                                         .avatarUrl(sponsor.logoUrl())
                         ).toList())
                         .money(moneyViewToResponse(reward.money()))
+                        .status(map(reward.status().asBackofficeUser()))
                         .transactionReferences(reward.transactionReferences())
                 )
                 .sorted(comparing(InvoiceRewardResponse::getRequestedAt))

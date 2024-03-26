@@ -474,6 +474,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                   "paymentId": null,
                                   "requestedAt": "2023-09-20T08:01:47.616674Z",
                                   "processedAt": null,
+                                  "status": "PENDING_VERIFICATION",
                                   "githubUrls": [
                                     "https://github.com/onlydustxyz/marketplace-frontend/pull/1026",
                                     "https://github.com/onlydustxyz/marketplace-frontend/pull/1037",
