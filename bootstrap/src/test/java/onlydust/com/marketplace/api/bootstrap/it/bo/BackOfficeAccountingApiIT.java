@@ -673,7 +673,8 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.rewards.length()").isEqualTo(1)
-                .jsonPath("$.rewards[0].id").isEqualTo(rewardId.toString());
+                .jsonPath("$.rewards[0].id").isEqualTo(rewardId.toString())
+                .jsonPath("$.rewards[0].paymentId").doesNotExist();
 
         // When
         client.post()

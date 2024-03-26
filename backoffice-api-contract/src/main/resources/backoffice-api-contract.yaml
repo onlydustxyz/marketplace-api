@@ -792,7 +792,7 @@ paths:
           name: batchPaymentId
           required: true
           schema:
-            $ref: '#/components/schemas/BatchPaymentId'
+            $ref: '#/components/schemas/PaymentId'
       responses:
         "200":
           description: Batch payment details
@@ -818,7 +818,7 @@ paths:
           name: batchPaymentId
           required: true
           schema:
-            $ref: '#/components/schemas/BatchPaymentId'
+            $ref: '#/components/schemas/PaymentId'
       requestBody:
         description: Transaction hash
         required: true
@@ -847,7 +847,7 @@ paths:
           name: batchPaymentId
           required: true
           schema:
-            $ref: '#/components/schemas/BatchPaymentId'
+            $ref: '#/components/schemas/PaymentId'
       responses:
         "204":
           description: 'Batch payment deleted'
@@ -2910,6 +2910,8 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/RewardId'
+        paymentId:
+          $ref: '#/components/schemas/PaymentId'
         billingProfile:
           $ref: '#/components/schemas/BillingProfileResponse'
         requestedAt:
@@ -3010,6 +3012,8 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/RewardId'
+        paymentId:
+          $ref: '#/components/schemas/PaymentId'
         billingProfile:
           $ref: '#/components/schemas/BillingProfileResponse'
         invoice:
@@ -3080,6 +3084,8 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/RewardId'
+        paymentId:
+          $ref: '#/components/schemas/PaymentId'
         requestedAt:
           type: string
           format: date-time
@@ -3169,7 +3175,7 @@ components:
           items:
             $ref: '#/components/schemas/InvoiceId'
 
-    BatchPaymentId:
+    PaymentId:
       type: string
       format: uuid
     BatchPaymentsResponse:
@@ -3191,7 +3197,7 @@ components:
         - network
       properties:
         id:
-          $ref: '#/components/schemas/BatchPaymentId'
+          $ref: '#/components/schemas/PaymentId'
         createdAt:
           type: string
           format: date-time

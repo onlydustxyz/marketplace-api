@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.*;
+import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.view.*;
@@ -64,6 +65,8 @@ public class BackofficeRewardViewEntity {
     @Type(type = "jsonb")
     List<String> paidToAccountNumbers;
 
+    UUID batchPaymentId;
+
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
     @NonNull RewardStatusEntity status;
@@ -87,6 +90,7 @@ public class BackofficeRewardViewEntity {
     public BackofficeRewardView toDomain() {
         return BackofficeRewardView.builder()
                 .id(RewardId.of(this.id))
+                .paymentId(batchPaymentId == null ? null : Payment.Id.of(batchPaymentId))
                 .status(status.toDomain())
                 .requestedAt(DateMapper.ofNullable(this.requestedAt))
                 .processedAt(DateMapper.ofNullable(this.statusData.paidAt()))

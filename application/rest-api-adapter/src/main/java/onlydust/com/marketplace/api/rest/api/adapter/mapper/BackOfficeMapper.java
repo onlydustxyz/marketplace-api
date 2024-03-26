@@ -479,6 +479,7 @@ public interface BackOfficeMapper {
         return rewards.stream()
                 .map(reward -> new InvoiceRewardResponse()
                         .id(reward.id().value())
+                        .paymentId(reward.paymentId() == null ? null : reward.paymentId().value())
                         .requestedAt(reward.requestedAt())
                         .processedAt(reward.processedAt())
                         .githubUrls(reward.githubUrls())

@@ -26,6 +26,7 @@ public interface SearchRewardMapper {
     static SearchRewardItemResponse mapToItem(BackofficeRewardView view) {
         return new SearchRewardItemResponse()
                 .id(view.id().value())
+                .paymentId(view.paymentId() == null ? null : view.paymentId().value())
                 .githubUrls(view.githubUrls())
                 .processedAt(view.processedAt())
                 .requestedAt(view.requestedAt())
@@ -71,6 +72,7 @@ public interface SearchRewardMapper {
         response.setNextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()));
         page.getContent().forEach(rewardDetailsView -> response.addRewardsItem(new RewardPageItemResponse()
                 .id(rewardDetailsView.id().value())
+                .paymentId(rewardDetailsView.paymentId() == null ? null : rewardDetailsView.paymentId().value())
                 .status(map(rewardDetailsView.status().asBackofficeUser()))
                 .requestedAt(rewardDetailsView.requestedAt())
                 .processedAt(rewardDetailsView.processedAt())
