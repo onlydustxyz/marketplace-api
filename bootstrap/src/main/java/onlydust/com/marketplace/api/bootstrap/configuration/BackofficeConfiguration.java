@@ -55,11 +55,10 @@ public class BackofficeConfiguration {
     public BackofficeAccountingManagementRestApi backofficeAccountingManagementRestApi(
             final AccountingFacadePort accountingFacadePort,
             final RewardFacadePort rewardFacadePort,
-            final CurrencyFacadePort currencyFacadePort,
             final UserFacadePort userFacadePort,
             final AccountingRewardPort accountingRewardPort,
             final PaymentPort paymentPort) {
-        return new BackofficeAccountingManagementRestApi(accountingFacadePort, rewardFacadePort, currencyFacadePort, userFacadePort, accountingRewardPort,
+        return new BackofficeAccountingManagementRestApi(accountingFacadePort, rewardFacadePort, userFacadePort, accountingRewardPort,
                 paymentPort);
     }
 

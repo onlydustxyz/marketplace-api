@@ -176,7 +176,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String ME_REWARD = "/api/v1/me/rewards/%s";
     protected static final String POST_REWARDS_SEARCH = "/bo/v1/rewards/search";
     protected static final String POST_REWARDS_BATCH_PAYMENTS = "/bo/v1/rewards/batch-payments";
-    protected static final String PUT_REWARDS_BATCH_PAYMENTS = "/bo/v1/rewards/batch-payments/%s";
+    protected static final String REWARDS_BATCH_PAYMENTS = "/bo/v1/rewards/batch-payments/%s";
     protected static final String GET_REWARDS_BATCH_PAYMENTS_BY_ID = "/bo/v1/rewards/batch-payments/%s";
     protected static final String GET_REWARDS_BATCH_PAYMENTS = "/bo/v1/rewards/batch-payments";
     protected static final String REWARDS = "/bo/v1/rewards";

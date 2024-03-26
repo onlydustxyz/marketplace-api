@@ -157,7 +157,14 @@ public class AccountingService implements AccountingFacadePort {
 
     @Override
     @Transactional
-    public void cancel(@NonNull Payment.Id paymentId, @NonNull Currency.Id currencyId) {
+    public void cancel(@NonNull Payment payment) {
+        payment.rewards().stream()
+                .map(PayableReward::currency)
+                .distinct()
+                .forEach(currency -> cancel(payment.id(), currency.id()));
+    }
+
+    private void cancel(@NonNull Payment.Id paymentId, @NonNull Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
 

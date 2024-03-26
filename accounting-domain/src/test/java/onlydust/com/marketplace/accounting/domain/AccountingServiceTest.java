@@ -549,7 +549,7 @@ public class AccountingServiceTest {
                     .hasMessageContaining("Reward %s is not payable".formatted(rewardId1));
 
             // When
-            accountingService.cancel(payments.get(0).id(), currency.id());
+            accountingService.cancel(payments.get(0));
 
             // Then
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
