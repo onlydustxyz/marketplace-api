@@ -227,6 +227,20 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     }
 
     @Override
+    public ResponseEntity<Void> updateCoworkerRole(UUID billingProfileId, Long githubUserId, UpdateCoworkerRoleRequest request) {
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var role = switch (request.getRole()) {
+            case ADMIN -> BillingProfile.User.Role.ADMIN;
+            case MEMBER -> BillingProfile.User.Role.MEMBER;
+        };
+
+        billingProfileFacadePort.updateCoworkerRole(BillingProfile.Id.of(billingProfileId), UserId.of(authenticatedUser.getId()),
+                GithubUserId.of(githubUserId), role);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
     public ResponseEntity<BillingProfileInvoiceableRewardsResponse> getInvoiceableRewards(UUID billingProfileId) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var invoiceableRewards = billingProfileFacadePort.getInvoiceableRewardsForBillingProfile(UserId.of(authenticatedUser.getId()),

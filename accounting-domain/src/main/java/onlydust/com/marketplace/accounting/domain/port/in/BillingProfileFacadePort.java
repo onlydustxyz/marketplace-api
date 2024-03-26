@@ -58,6 +58,8 @@ public interface BillingProfileFacadePort {
 
     void removeCoworker(BillingProfile.Id billingProfileId, UserId removeByUserId, GithubUserId removeByGithubUserId, GithubUserId githubUserId);
 
+    void updateCoworkerRole(BillingProfile.Id billingProfileId, UserId updatedBy, GithubUserId coworkerGithubUserId, BillingProfile.User.Role role);
+
     void deleteBillingProfile(UserId userId, BillingProfile.Id billingProfileId);
 
     void enableBillingProfile(UserId userId, BillingProfile.Id billingProfileId, Boolean enable);

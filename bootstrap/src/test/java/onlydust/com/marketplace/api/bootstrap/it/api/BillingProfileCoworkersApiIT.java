@@ -744,6 +744,192 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                         """);
     }
 
+    @Test
+    void should_update_coworkers_role() {
+        // Given
+        final var admin = userAuthHelper.newFakeUser(UUID.randomUUID(),
+                faker.number().randomNumber(10, true), "boss.armstrong", "https://www.plop.org", false);
+        final var coworker = userAuthHelper.authenticateAnthony();
+        final var adminId = UserId.of(admin.user().getId());
+
+        final var companyBillingProfile = billingProfileService.createCompanyBillingProfile(adminId, faker.rickAndMorty().character(), null);
+
+        indexerApiWireMockServer.stubFor(WireMock.put(
+                        WireMock.urlEqualTo("/api/v1/users/%d".formatted(coworker.user().getGithubUserId())))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+
+        // When
+        client.post()
+                .uri(getApiURI(BILLING_PROFILES_POST_COWORKER_INVITATIONS.formatted(companyBillingProfile.id().value().toString())))
+                .header("Authorization", "Bearer " + admin.jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "githubUserId": %d,
+                          "role": "MEMBER"
+                        }
+                        """.formatted(coworker.user().getGithubUserId()))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // Then
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_COWORKERS.formatted(companyBillingProfile.id().value().toString()),
+                        Map.of("pageIndex", "0", "pageSize", "50")))
+                .header("Authorization", "Bearer " + admin.jwt())
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.coworkers.length()").isEqualTo(2)
+                .jsonPath("$.coworkers[0].id").isEqualTo(adminId.toString())
+                .jsonPath("$.coworkers[0].role").isEqualTo("ADMIN")
+                .jsonPath("$.coworkers[1].githubUserId").isEqualTo(coworker.user().getGithubUserId())
+                .jsonPath("$.coworkers[1].role").isEqualTo("MEMBER")
+        ;
+
+        // When
+        client.put()
+                .uri(getApiURI(BILLING_PROFILES_COWORKER_ROLE.formatted(companyBillingProfile.id().toString(), coworker.user().getGithubUserId())))
+                .header("Authorization", "Bearer " + admin.jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "role": "ADMIN"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        // Then
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_COWORKERS.formatted(companyBillingProfile.id().value().toString()),
+                        Map.of("pageIndex", "0", "pageSize", "50")))
+                .header("Authorization", "Bearer " + admin.jwt())
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.coworkers.length()").isEqualTo(2)
+                .jsonPath("$.coworkers[0].id").isEqualTo(adminId.toString())
+                .jsonPath("$.coworkers[0].role").isEqualTo("ADMIN")
+                .jsonPath("$.coworkers[1].githubUserId").isEqualTo(coworker.user().getGithubUserId())
+                .jsonPath("$.coworkers[1].role").isEqualTo("ADMIN")
+        ;
+
+        // When
+        client.put()
+                .uri(getApiURI(BILLING_PROFILES_COWORKER_ROLE.formatted(companyBillingProfile.id().value().toString(), coworker.user().getGithubUserId())))
+                .header("Authorization", "Bearer " + admin.jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "role": "MEMBER"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        // Then
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_COWORKERS.formatted(companyBillingProfile.id().value().toString()),
+                        Map.of("pageIndex", "0", "pageSize", "50")))
+                .header("Authorization", "Bearer " + admin.jwt())
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.coworkers.length()").isEqualTo(2)
+                .jsonPath("$.coworkers[0].id").isEqualTo(adminId.toString())
+                .jsonPath("$.coworkers[0].role").isEqualTo("ADMIN")
+                .jsonPath("$.coworkers[1].githubUserId").isEqualTo(coworker.user().getGithubUserId())
+                .jsonPath("$.coworkers[1].role").isEqualTo("MEMBER")
+        ;
+
+        client.post()
+                .uri(getApiURI(ME_BILLING_PROFILES_POST_COWORKER_INVITATIONS.formatted(companyBillingProfile.id().value().toString())))
+                .header("Authorization", "Bearer " + coworker.jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "accepted": true
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // When
+        client.put()
+                .uri(getApiURI(BILLING_PROFILES_COWORKER_ROLE.formatted(companyBillingProfile.id().toString(), coworker.user().getGithubUserId())))
+                .header("Authorization", "Bearer " + admin.jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "role": "ADMIN"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        // Then
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_COWORKERS.formatted(companyBillingProfile.id().value().toString()),
+                        Map.of("pageIndex", "0", "pageSize", "50")))
+                .header("Authorization", "Bearer " + admin.jwt())
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.coworkers.length()").isEqualTo(2)
+                .jsonPath("$.coworkers[0].id").isEqualTo(adminId.toString())
+                .jsonPath("$.coworkers[0].role").isEqualTo("ADMIN")
+                .jsonPath("$.coworkers[1].githubUserId").isEqualTo(coworker.user().getGithubUserId())
+                .jsonPath("$.coworkers[1].role").isEqualTo("ADMIN")
+        ;
+
+        // When
+        client.put()
+                .uri(getApiURI(BILLING_PROFILES_COWORKER_ROLE.formatted(companyBillingProfile.id().value().toString(), coworker.user().getGithubUserId())))
+                .header("Authorization", "Bearer " + admin.jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "role": "MEMBER"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        // Then
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_COWORKERS.formatted(companyBillingProfile.id().value().toString()),
+                        Map.of("pageIndex", "0", "pageSize", "50")))
+                .header("Authorization", "Bearer " + admin.jwt())
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.coworkers.length()").isEqualTo(2)
+                .jsonPath("$.coworkers[0].id").isEqualTo(adminId.toString())
+                .jsonPath("$.coworkers[0].role").isEqualTo("ADMIN")
+                .jsonPath("$.coworkers[1].githubUserId").isEqualTo(coworker.user().getGithubUserId())
+                .jsonPath("$.coworkers[1].role").isEqualTo("MEMBER")
+        ;
+    }
 
     @Test
     void should_cancel_coworker_invitation_from_company() {

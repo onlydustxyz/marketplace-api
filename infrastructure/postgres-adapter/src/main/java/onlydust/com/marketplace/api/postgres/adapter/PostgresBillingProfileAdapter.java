@@ -339,6 +339,24 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     }
 
     @Override
+    @Transactional
+    public void updateCoworkerRole(BillingProfile.Id billingProfileId, UserId userId, BillingProfile.User.Role role) {
+        final var user = billingProfileUserRepository.findByBillingProfileIdAndUserId(billingProfileId.value(), userId.value())
+                .orElseThrow(() -> notFound("User %s is not a member of billing profile %s".formatted(userId, billingProfileId)));
+        billingProfileUserRepository.save(user.toBuilder().role(BillingProfileUserEntity.Role.fromDomain(role)).build());
+    }
+
+    @Override
+    public void updateCoworkerInvitationRole(BillingProfile.Id billingProfileId, GithubUserId invitedUser, BillingProfile.User.Role role) {
+        final var invitation = billingProfileUserInvitationRepository.findById(
+                        new BillingProfileUserInvitationEntity.PrimaryKey(billingProfileId.value(), invitedUser.value()))
+                .orElseThrow(() -> notFound("User %s is not invited to billing profile %s".formatted(invitedUser, billingProfileId)));
+
+        billingProfileUserInvitationRepository.save(invitation.toBuilder().role(BillingProfileUserEntity.Role.fromDomain(role)).build());
+    }
+
+
+    @Override
     @Transactional(readOnly = true)
     public Optional<BillingProfileCoworkerView> getInvitedCoworker(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId) {
         return billingProfileUserViewRepository.findInvitedUserByBillingProfileIdAndGithubId(billingProfileId.value(), invitedGithubUserId.value())

@@ -67,6 +67,10 @@ public interface BillingProfileStoragePort {
 
     void saveCoworker(BillingProfile.Id billingProfileId, UserId invitedUser, BillingProfile.User.Role role, ZonedDateTime acceptedAt);
 
+    void updateCoworkerRole(BillingProfile.Id billingProfileId, UserId userId, BillingProfile.User.Role role);
+
+    void updateCoworkerInvitationRole(BillingProfile.Id billingProfileId, GithubUserId invitedUser, BillingProfile.User.Role role);
+
     Optional<BillingProfileCoworkerView> getInvitedCoworker(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId);
 
     Optional<BillingProfileCoworkerView> getCoworker(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId);
