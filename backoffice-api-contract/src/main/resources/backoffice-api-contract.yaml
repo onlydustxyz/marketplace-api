@@ -876,6 +876,34 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/billing-profiles/{billingProfileId}:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Get billing profiles by id
+      operationId: getBillingProfilesById
+      description: |
+        Get billing profiles by id
+      parameters:
+        - in: path
+          name: billingProfileId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BillingProfileId'
+      responses:
+        "200":
+          description: 'billing profiles'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingProfileResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   # BackofficeSponsorManagement ===============================================================
   /bo/v1/sponsors:
     get:
@@ -1380,34 +1408,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectPage'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
-  /bo/v1/billing-profiles/{billingProfileId}:
-    get:
-      security:
-        - apiKey: [ ]
-      tags:
-        - Backoffice
-      summary: Get billing profiles by id
-      operationId: getBillingProfilesById
-      description: |
-        Get billing profiles by id
-      parameters:
-        - in: path
-          name: billingProfileId
-          required: true
-          schema:
-            $ref: '#/components/schemas/BillingProfileId'
-      responses:
-        "200":
-          description: 'billing profiles'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BillingProfilesDetailsResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -3301,20 +3301,3 @@ components:
               type: string
             transactionHash:
               type: string
-
-    BillingProfilesDetailsResponse:
-      allOf:
-        - $ref: '#/components/schemas/BillingProfileResponse'
-        - type: object
-          required:
-            - rewardsPerNetwork
-            - invoices
-          properties:
-            rewardsPerNetwork:
-              type: array
-              items:
-                $ref: '#/components/schemas/InvoiceRewardsPerNetwork'
-            invoices:
-              type: array
-              items:
-                $ref: '#/components/schemas/InvoicePageItemResponse'

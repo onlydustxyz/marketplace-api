@@ -67,4 +67,6 @@ public interface BillingProfileFacadePort {
     void updateBillingProfileType(BillingProfile.Id billingProfileId, UserId userId, BillingProfile.Type type);
 
     List<BillingProfileRewardView> getInvoiceableRewardsForBillingProfile(UserId userId, BillingProfile.Id billingProfileId);
+
+    BillingProfileView getById(BillingProfile.Id id);
 }

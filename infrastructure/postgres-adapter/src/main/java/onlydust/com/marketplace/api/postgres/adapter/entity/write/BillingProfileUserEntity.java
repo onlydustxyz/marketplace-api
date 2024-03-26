@@ -3,6 +3,10 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -11,6 +15,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.net.URI;
 import java.util.Date;
 import java.util.UUID;
 
@@ -34,6 +39,10 @@ public class BillingProfileUserEntity {
     @Column(name = "user_id", nullable = false, updatable = false)
     UUID userId;
 
+    @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @OneToOne
+    UserViewEntity user;
+
     @Column(name = "role", nullable = false)
     @Type(type = "billing_profile_type")
     @Enumerated(EnumType.STRING)
@@ -49,6 +58,15 @@ public class BillingProfileUserEntity {
     @Column(name = "tech_updated_at", nullable = false)
     @EqualsAndHashCode.Exclude
     private Date updatedAt;
+
+    public BillingProfileView.User toView() {
+        return new BillingProfileView.User(
+                UserId.of(user.getId()),
+                GithubUserId.of(user.getGithubUserId()),
+                user.getGithubLogin(),
+                URI.create(user.getGithubAvatarUrl()),
+                user.getGithubEmail());
+    }
 
     public enum Role {
         ADMIN, MEMBER;

@@ -155,6 +155,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .invoiceableRewardCount(billingProfileCustomData.getInvoiceableRewardCount())
                             .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                             .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
+                            .admins(billingProfileEntity.getUsers().stream().map(BillingProfileUserEntity::toView).toList())
                             .build();
                     final Optional<KycEntity> optionalKycEntity = kycRepository.findByBillingProfileId(billingProfileId.value());
                     if (optionalKycEntity.isPresent()) {
@@ -180,6 +181,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .missingVerification(billingProfileCustomData.getMissingVerification())
                             .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                             .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
+                            .admins(billingProfileEntity.getUsers().stream().map(BillingProfileUserEntity::toView).toList())
                             .build();
                     final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
                     if (optionalKybEntity.isPresent()) {
@@ -205,6 +207,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .missingVerification(billingProfileCustomData.getMissingVerification())
                             .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                             .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
+                            .admins(billingProfileEntity.getUsers().stream().map(BillingProfileUserEntity::toView).toList())
                             .build();
                     final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
                     if (optionalKybEntity.isPresent()) {

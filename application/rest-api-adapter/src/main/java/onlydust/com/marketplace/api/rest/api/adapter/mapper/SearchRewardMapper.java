@@ -115,18 +115,7 @@ public interface SearchRewardMapper {
                 .id(billingProfile.id().value())
                 .type(mapBillingProfileType(billingProfile.type()))
                 .name(billingProfile.name())
-                .verificationStatus(mapVerificationStatus(billingProfile.status()));
-    }
-
-    static VerificationStatus mapVerificationStatus(onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus status) {
-        return switch (status) {
-            case NOT_STARTED -> VerificationStatus.NOT_STARTED;
-            case STARTED -> VerificationStatus.STARTED;
-            case UNDER_REVIEW -> VerificationStatus.UNDER_REVIEW;
-            case VERIFIED -> VerificationStatus.VERIFIED;
-            case REJECTED -> VerificationStatus.REJECTED;
-            case CLOSED -> VerificationStatus.CLOSED;
-        };
+                .verificationStatus(map(billingProfile.status()));
     }
 
     static BillingProfileType mapBillingProfileType(BillingProfile.Type type) {
