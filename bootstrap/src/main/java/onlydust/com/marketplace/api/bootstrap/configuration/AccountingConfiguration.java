@@ -100,7 +100,7 @@ public class AccountingConfiguration {
     }
 
     @Bean
-    public SponsorFacadePort sponsorFacadePort(final SponsorStoragePort sponsorStoragePort) {
-        return new SponsorService(sponsorStoragePort);
+    public SponsorFacadePort sponsorFacadePort(final SponsorStoragePort sponsorStoragePort, final ImageStoragePort imageStoragePort) {
+        return new SponsorService(sponsorStoragePort, imageStoragePort);
     }
 }
