@@ -5014,6 +5014,8 @@ components:
             - project
             - receipt
           properties:
+            billingProfileId:
+              $ref: '#/components/schemas/BillingProfileId'
             project:
               $ref: '#/components/schemas/ShortProjectResponse'
             receipt:

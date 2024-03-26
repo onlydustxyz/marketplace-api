@@ -1,21 +1,13 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.ReceiptEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardStatusRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
@@ -173,5 +165,62 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                         """);
     }
 
+    @Test
+    void should_get_my_reward() {
+        // Given
+        final var user = userAuthHelper.authenticatePierre();
+        final var rewardId = UUID.fromString("85f8358c-5339-42ac-a577-16d7760d1e28");
 
+        // When
+        client.get()
+                .uri(getApiURI(String.format(ME_REWARD, rewardId)))
+                .header("Authorization", BEARER_PREFIX + user.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "id": "85f8358c-5339-42ac-a577-16d7760d1e28",
+                          "currency": {
+                            "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                            "code": "USDC",
+                            "name": "USD Coin",
+                            "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                            "decimals": 6
+                          },
+                          "amount": 1000,
+                          "dollarsEquivalent": 1010.00,
+                          "status": "PENDING_VERIFICATION",
+                          "unlockDate": null,
+                          "from": {
+                            "githubUserId": 16590657,
+                            "login": "PierreOucif",
+                            "htmlUrl": null,
+                            "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                            "isRegistered": null
+                          },
+                          "to": {
+                            "githubUserId": 16590657,
+                            "login": "PierreOucif",
+                            "htmlUrl": null,
+                            "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                            "isRegistered": null
+                          },
+                          "createdAt": "2023-09-19T07:38:52.590518Z",
+                          "processedAt": null,
+                          "billingProfileId": "20282367-56b0-42d3-81d3-5e4b38f67e3e",
+                          "project": {
+                            "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                            "slug": "qa-new-contributions",
+                            "name": "QA new contributions",
+                            "shortDescription": "QA new contributions",
+                            "logoUrl": null,
+                            "visibility": "PUBLIC"
+                          },
+                          "receipt": null
+                        }
+                        """);
+    }
 }
