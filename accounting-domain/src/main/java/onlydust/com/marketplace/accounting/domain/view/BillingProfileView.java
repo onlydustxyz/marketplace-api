@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.view;
 
 import lombok.*;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
@@ -32,6 +33,9 @@ public class BillingProfileView {
     Integer invoiceableRewardCount;
     Boolean missingPayoutInfo;
     Boolean missingVerification;
+
+    PositiveAmount currentYearPaymentLimit;
+    PositiveAmount currentYearPaymentAmount;
 
     public boolean isVerified() {
         return verificationStatus == VerificationStatus.VERIFIED;

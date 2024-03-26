@@ -18,14 +18,11 @@ public class IndividualBillingProfile extends BillingProfile {
     private final User owner;
     @NonNull
     private final Kyc kyc;
-    @NonNull
-    private final PositiveAmount currentYearPaymentAmount;
 
     public IndividualBillingProfile(@NonNull String name, @NonNull UserId ownerId) {
         super(name);
         this.owner = new User(ownerId, User.Role.ADMIN);
         this.kyc = Kyc.initForUserAndBillingProfile(ownerId, this.id());
-        this.currentYearPaymentAmount = PositiveAmount.ZERO;
     }
 
     @Override

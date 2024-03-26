@@ -10,10 +10,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationSt
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -46,10 +43,10 @@ public class ShortBillingProfileViewEntity {
     Date invoiceMandateAcceptedAt;
     Boolean enabled;
     Boolean pendingInvitation;
-    Integer rewardCount;
-    Integer invoiceableRewardCount;
-    Boolean missingPayoutInfo;
-    Boolean missingVerification;
+
+    @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "billingProfileId")
+    BillingProfileStatsViewEntity stats;
 
     public ZonedDateTime getInvoiceMandateAcceptedAt() {
         return isNull(invoiceMandateAcceptedAt) ? null : new Date(invoiceMandateAcceptedAt.getTime()).toInstant().atZone(ZoneOffset.UTC);
@@ -65,10 +62,10 @@ public class ShortBillingProfileViewEntity {
                 .enabled(this.enabled)
                 .pendingInvitationResponse(this.pendingInvitation)
                 .invoiceMandateAcceptedAt(this.getInvoiceMandateAcceptedAt())
-                .rewardCount(this.rewardCount)
-                .invoiceableRewardCount(this.invoiceableRewardCount)
-                .missingVerification(this.missingVerification)
-                .missingPayoutInfo(this.missingPayoutInfo)
+                .rewardCount(this.stats.rewardCount())
+                .invoiceableRewardCount(this.stats.invoiceableRewardCount())
+                .missingVerification(this.stats.missingVerification())
+                .missingPayoutInfo(this.stats.missingPayoutInfo())
                 .build();
     }
 }

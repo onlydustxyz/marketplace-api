@@ -633,14 +633,12 @@ class BillingProfileServiceTest {
         }
 
         @Test
-        void should_return_current_year_payment_limit_and_amount() {
+        void should_return_current_year_payment_limit() {
             // When
             final var limit = billingProfile.currentYearPaymentLimit();
-            final var amount = billingProfile.currentYearPaymentAmount();
 
             // Then
             assertThat(limit).isEqualTo(PositiveAmount.of(5000L));
-            assertThat(amount).isEqualTo(PositiveAmount.ZERO);
         }
     }
 
