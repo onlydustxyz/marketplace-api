@@ -120,7 +120,6 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
         ;
     }
 
-
     @Test
     @Order(3)
     void should_reject_erc20_support_from_invalid_contract() {
@@ -142,7 +141,6 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .isNotFound()
         ;
     }
-
 
     @Test
     @Order(4)
@@ -174,7 +172,6 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .jsonPath("$.description").isEqualTo("USDC (USDC) is a cryptocurrency and operates on the Ethereum platform.")
         ;
     }
-
 
     @Test
     @Order(5)

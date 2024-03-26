@@ -4,26 +4,37 @@ import onlydust.com.backoffice.api.contract.model.AccountResponse;
 import onlydust.com.backoffice.api.contract.model.SponsorResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectSponsorRepository;
+import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Map;
 
 import static onlydust.com.marketplace.api.bootstrap.helper.CurrencyHelper.STRK;
 import static onlydust.com.marketplace.api.bootstrap.it.bo.BackOfficeAccountingApiIT.BRETZEL;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.web.reactive.function.BodyInserters.fromResource;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
     @Autowired
     ProjectSponsorRepository projectSponsorRepository;
+
+    @Autowired
+    private ImageStoragePort imageStoragePort;
 
     @Test
     @Order(1)
@@ -113,7 +124,6 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         }
                         """);
     }
-
 
     @Test
     @Order(2)
@@ -1043,5 +1053,22 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         """);
 
 
+    }
+
+    @Test
+    void should_upload_sponsor_logo() throws MalformedURLException {
+        when(imageStoragePort.storeImage(any(InputStream.class)))
+                .thenReturn(new URL("https://s3.amazon.com/logo.jpeg"));
+
+        client.post()
+                .uri(getApiURI(SPONSORS_LOGO))
+                .header("Api-Key", apiKey())
+                .body(fromResource(new FileSystemResource(getClass().getResource("/images/logo-sample.jpeg").getFile())))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.url").isEqualTo("https://s3.amazon.com/logo.jpeg");
     }
 }
