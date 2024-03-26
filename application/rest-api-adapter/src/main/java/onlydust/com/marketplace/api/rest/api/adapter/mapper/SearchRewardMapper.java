@@ -32,6 +32,7 @@ public interface SearchRewardMapper {
                 .requestedAt(view.requestedAt())
                 .money(moneyViewToResponse(view.money())
                 )
+                .status(map(view.status().asBackofficeUser()))
                 .project(new ProjectLinkResponse()
                         .name(view.project().name())
                         .logoUrl(view.project().logoUrl()))

@@ -2962,6 +2962,8 @@ components:
           type: array
           items:
             type: string
+        status:
+          $ref: '#/components/schemas/RewardStatusContract'
         project:
           $ref: '#/components/schemas/ProjectLinkResponse'
         sponsors:
@@ -3130,6 +3132,8 @@ components:
         processedAt:
           type: string
           format: date-time
+        status:
+          $ref: '#/components/schemas/RewardStatusContract'
         githubUrls:
           type: array
           items:

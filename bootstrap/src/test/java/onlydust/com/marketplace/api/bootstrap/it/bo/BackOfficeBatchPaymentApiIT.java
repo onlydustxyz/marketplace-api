@@ -275,6 +275,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.rewards[0].status").isEqualTo("PROCESSING")
                 .jsonPath("$.rewards[0].paymentId").isEqualTo(ethBatchPaymentId.toString());
     }
 
@@ -315,6 +316,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                           "rewards": [
                             {
                               "id": "4ac9d6ac-f2ca-43d5-901a-ac7f5b149d72",
+                              "status": "PENDING_SIGNUP",
                               "billingProfile": {
                                 "name": "Olive Company",
                                 "type": "COMPANY",
@@ -351,6 +353,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                             },
                             {
                               "id": "d22f75ab-d9f5-4dc6-9a85-60dcd7452028",
+                              "status": "PROCESSING",
                               "billingProfile": {
                                 "name": "Anthony BUISSET",
                                 "type": "INDIVIDUAL",
