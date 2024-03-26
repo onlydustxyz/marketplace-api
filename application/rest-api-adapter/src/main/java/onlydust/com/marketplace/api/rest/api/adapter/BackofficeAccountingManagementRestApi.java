@@ -6,8 +6,10 @@ import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeAccountingManagementApi;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
+import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.PaymentPort;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
@@ -41,6 +43,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     private final UserFacadePort userFacadePort;
     private final AccountingRewardPort accountingRewardPort;
     private final PaymentPort paymentPort;
+    private final BillingProfileFacadePort billingProfileFacadePort;
 
     @Override
     public ResponseEntity<AccountResponse> createSponsorAccount(UUID sponsorUuid, CreateAccountRequest createAccountRequest) {
@@ -245,5 +248,10 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     public ResponseEntity<Void> notifyRewardsPaid() {
         accountingRewardPort.notifyAllNewPaidRewards();
         return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<BillingProfileResponse> getBillingProfilesById(UUID billingProfileId) {
+        return ResponseEntity.ok(BackOfficeMapper.map(billingProfileFacadePort.getById(BillingProfile.Id.of(billingProfileId))));
     }
 }

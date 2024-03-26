@@ -1,12 +1,13 @@
 package onlydust.com.marketplace.accounting.domain.view;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Value;
+import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 
+import java.net.URI;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Value
 @Builder(toBuilder = true)
@@ -21,6 +22,7 @@ public class BillingProfileView {
     VerificationStatus verificationStatus;
     PayoutInfo payoutInfo;
     Boolean enabled;
+    List<User> admins;
 
     @Getter(AccessLevel.NONE)
     ZonedDateTime invoiceMandateAcceptedAt;
@@ -49,5 +51,14 @@ public class BillingProfileView {
 
     public boolean isVerificationBlocked() {
         return verificationStatus.isBlocked();
+    }
+
+    public record User(
+            @NonNull UserId id,
+            @NonNull GithubUserId githubUserId,
+            @NonNull String githubLogin,
+            @NonNull URI githubAvatarUrl,
+            @NonNull String email
+    ) {
     }
 }

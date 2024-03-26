@@ -816,6 +816,48 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                         """);
     }
 
+    @Test
+    void should_get_billing_profile() {
+        client.get()
+                .uri(getApiURI(BILLING_PROFILE.formatted("1253b889-e5d5-49ee-8e8a-21405ccab8a6")))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "id": "1253b889-e5d5-49ee-8e8a-21405ccab8a6",
+                          "name": "Company",
+                          "type": "SELF_EMPLOYED",
+                          "verificationStatus": "NOT_STARTED",
+                          "kyb": {
+                            "name": null,
+                            "registrationNumber": null,
+                            "registrationDate": null,
+                            "address": "19 rue pasteur, 92300, Levallois, France",
+                            "country": "France",
+                            "countryCode": "FRA",
+                            "usEntity": null,
+                            "subjectToEuropeVAT": null,
+                            "euVATNumber": null,
+                            "sumsubUrl": null
+                          },
+                          "kyc": null,
+                          "admins": [
+                            {
+                              "githubUserId": 31901905,
+                              "githubLogin": "kaelsky",
+                              "githubAvatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
+                              "email": "chimansky.mickael@gmail.com",
+                              "id": "a0da3c1e-6493-4ea1-8bd0-8c46d653f274",
+                              "name": null
+                            }
+                          ]
+                        }
+                        """);
+    }
+
     private Invoice.Id invoiceReward(UserId userId, ProjectId projectId, RewardId rewardId) {
         final var billingProfile = billingProfileFacadePort.createIndividualBillingProfile(userId, "Personal", null);
         billingProfileStoragePort.updateBillingProfileStatus(billingProfile.id(), VerificationStatus.VERIFIED);

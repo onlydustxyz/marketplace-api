@@ -57,9 +57,10 @@ public class BackofficeConfiguration {
             final RewardFacadePort rewardFacadePort,
             final UserFacadePort userFacadePort,
             final AccountingRewardPort accountingRewardPort,
-            final PaymentPort paymentPort) {
+            final PaymentPort paymentPort,
+            final BillingProfileFacadePort billingProfileFacadePort) {
         return new BackofficeAccountingManagementRestApi(accountingFacadePort, rewardFacadePort, userFacadePort, accountingRewardPort,
-                paymentPort);
+                paymentPort, billingProfileFacadePort);
     }
 
     @Bean

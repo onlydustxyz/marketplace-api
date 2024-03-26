@@ -358,4 +358,10 @@ public class BillingProfileService implements BillingProfileFacadePort {
             throw unauthorized("User %s must be admin to get invoiceable rewards of billing profile %s".formatted(userId.value(), billingProfileId.value()));
         return billingProfileStoragePort.findInvoiceableRewardsForBillingProfile(billingProfileId);
     }
+
+    @Override
+    public BillingProfileView getById(BillingProfile.Id id) {
+        return billingProfileStoragePort.findById(id)
+                .orElseThrow(() -> notFound("Billing profile %s not found".formatted(id)));
+    }
 }

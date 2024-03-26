@@ -3125,11 +3125,13 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 new Quote(Currency.Id.of(accountingHelper.strk().id()), Currency.Id.of(accountingHelper.usd().id()), BigDecimal.valueOf(strkToUsd3),
                         Instant.now())
         ));
-        final BackofficeAccountingManagementRestApi backofficeAccountingManagementRestApi = new BackofficeAccountingManagementRestApi(accountingService,
-                rewardService, userFacadePort,
-                new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, mailNotificationPort), new PaymentService(
-                accountingRewardStoragePort, invoiceStoragePort, accountingService
-        ));
+        final var backofficeAccountingManagementRestApi = new BackofficeAccountingManagementRestApi(
+                accountingService,
+                rewardService,
+                userFacadePort,
+                new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, mailNotificationPort),
+                new PaymentService(accountingRewardStoragePort, invoiceStoragePort, accountingService),
+                billingProfileService);
         backofficeAccountingManagementRestApi.payReward(individualBPAdminRewardId1,
                 new PayRewardRequest().network(TransactionNetwork.ETHEREUM).recipientAccount("0xa11c0edBa8924280Df7f258B370371bD985C8B0B").reference(
                         "0xb1c3579ffbe3eabe6f88c58a037367dee7de6c06262cfecc3bd2e8c013cc5156"));

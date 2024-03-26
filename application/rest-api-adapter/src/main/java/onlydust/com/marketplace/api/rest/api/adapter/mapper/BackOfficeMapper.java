@@ -4,8 +4,12 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
 import onlydust.com.marketplace.accounting.domain.view.TotalMoneyView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
@@ -718,6 +722,89 @@ public interface BackOfficeMapper {
             case PENDING_REQUEST -> RewardStatusContract.PENDING_REQUEST;
             case PROCESSING -> RewardStatusContract.PROCESSING;
             case COMPLETE -> RewardStatusContract.COMPLETE;
+        };
+    }
+
+
+    static BillingProfileResponse map(BillingProfileView billingProfile) {
+        return new BillingProfileResponse()
+                .id(billingProfile.getId().value())
+                .name(billingProfile.getName())
+                .type(map(billingProfile.getType()))
+                .verificationStatus(map(billingProfile.getVerificationStatus()))
+                .kyb(billingProfile.getKyb() == null ? null : map(billingProfile.getKyb()))
+                .kyc(billingProfile.getKyc() == null ? null : map(billingProfile.getKyc()))
+                .admins(billingProfile.getAdmins().stream().map(BackOfficeMapper::map).toList())
+                ;
+    }
+
+    static UserResponse map(BillingProfileView.User user) {
+        return new UserResponse()
+                .id(user.id().value())
+                .githubUserId(user.githubUserId().value())
+                .githubLogin(user.githubLogin())
+                .githubAvatarUrl(user.githubAvatarUrl())
+                .email(user.email())
+                ;
+    }
+
+    static KycResponse map(Kyc kyc) {
+        return new KycResponse()
+                .firstName(kyc.getFirstName())
+                .lastName(kyc.getLastName())
+                .birthdate(kyc.getBirthdate() == null ? null : kyc.getBirthdate().toInstant().atZone(ZoneOffset.UTC))
+                .address(kyc.getAddress())
+                .country(kyc.getCountry() == null ? null : kyc.getCountry().display().orElse(kyc.getCountry().iso3Code()))
+                .countryCode(kyc.getCountry() == null ? null : kyc.getCountry().iso3Code())
+                .usCitizen(kyc.getUsCitizen())
+                .idDocumentType(kyc.getIdDocumentType() == null ? null : map(kyc.getIdDocumentType()))
+                .idDocumentNumber(kyc.getIdDocumentNumber())
+                .validUntil(kyc.getValidUntil() == null ? null : kyc.getValidUntil().toInstant().atZone(ZoneOffset.UTC))
+                .idDocumentCountryCode(kyc.getIdDocumentCountryCode())
+                .sumsubUrl(null) // TODO
+                ;
+    }
+
+    static KycResponse.IdDocumentTypeEnum map(Kyc.IdDocumentTypeEnum idDocumentType) {
+        return switch (idDocumentType) {
+            case PASSPORT -> KycResponse.IdDocumentTypeEnum.PASSPORT;
+            case ID_CARD -> KycResponse.IdDocumentTypeEnum.ID_CARD;
+            case RESIDENCE_PERMIT -> KycResponse.IdDocumentTypeEnum.RESIDENCE_PERMIT;
+            case DRIVER_LICENSE -> KycResponse.IdDocumentTypeEnum.DRIVER_LICENSE;
+        };
+    }
+
+    static KybResponse map(Kyb kyb) {
+        return new KybResponse()
+                .name(kyb.getName())
+                .registrationNumber(kyb.getRegistrationNumber())
+                .registrationDate(kyb.getRegistrationDate() == null ? null : kyb.getRegistrationDate().toInstant().atZone(ZoneOffset.UTC))
+                .address(kyb.getAddress())
+                .country(kyb.getCountry() == null ? null : kyb.getCountry().display().orElse(kyb.getCountry().iso3Code()))
+                .countryCode(kyb.getCountry() == null ? null : kyb.getCountry().iso3Code())
+                .usEntity(kyb.getUsEntity())
+                .subjectToEuropeVAT(kyb.getSubjectToEuropeVAT())
+                .euVATNumber(kyb.getEuVATNumber())
+                .sumsubUrl(null) // TODO
+                ;
+    }
+
+    static VerificationStatus map(onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus status) {
+        return switch (status) {
+            case NOT_STARTED -> VerificationStatus.NOT_STARTED;
+            case STARTED -> VerificationStatus.STARTED;
+            case UNDER_REVIEW -> VerificationStatus.UNDER_REVIEW;
+            case VERIFIED -> VerificationStatus.VERIFIED;
+            case REJECTED -> VerificationStatus.REJECTED;
+            case CLOSED -> VerificationStatus.CLOSED;
+        };
+    }
+
+    static BillingProfileType map(BillingProfile.Type type) {
+        return switch (type) {
+            case COMPANY -> BillingProfileType.COMPANY;
+            case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
+            case SELF_EMPLOYED -> BillingProfileType.SELF_EMPLOYED;
         };
     }
 }
