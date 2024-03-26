@@ -308,7 +308,10 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (role == BillingProfile.User.Role.MEMBER && !coworker.downgradable())
             throw badRequest("Cannot downgrade user %s of billing profile %s".formatted(coworker.userId(), billingProfileId));
 
-        billingProfileStoragePort.updateCoworkerRole(billingProfileId, coworker.userId(), role);
+        if (coworker.joinedAt() == null)
+            billingProfileStoragePort.updateCoworkerInvitationRole(billingProfileId, coworkerGithubUserId, role);
+        else
+            billingProfileStoragePort.updateCoworkerRole(billingProfileId, coworker.userId(), role);
     }
 
     @Override

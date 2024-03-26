@@ -1404,6 +1404,35 @@ class BillingProfileServiceTest {
         verify(billingProfileStoragePort).updateCoworkerRole(billingProfileId, coworkerUserId, BillingProfile.User.Role.MEMBER);
     }
 
+    @ParameterizedTest
+    @EnumSource(value = BillingProfile.User.Role.class)
+    void should_update_invited_user_role(BillingProfile.User.Role role) {
+        // Given
+        final var billingProfileId = BillingProfile.Id.random();
+        final var admin = UserId.random();
+        final var coworkerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
+        final var coworkerUserId = UserId.of(UUID.randomUUID());
+
+        when(billingProfileStoragePort.isAdmin(billingProfileId, admin)).thenReturn(true);
+        when(billingProfileStoragePort.getCoworker(billingProfileId, coworkerGithubUserId)).thenReturn(Optional.of(
+                BillingProfileCoworkerView.builder()
+                        .userId(coworkerUserId)
+                        .githubUserId(coworkerGithubUserId)
+                        .role(role == BillingProfile.User.Role.ADMIN ? BillingProfile.User.Role.MEMBER : BillingProfile.User.Role.ADMIN)
+                        .joinedAt(null)
+                        .rewardCount(0)
+                        .build()
+        ));
+
+        // When
+        billingProfileService.updateCoworkerRole(billingProfileId, admin, coworkerGithubUserId, role);
+
+        // Then
+        verify(billingProfileStoragePort, never()).updateCoworkerRole(any(), any(), any());
+        verify(billingProfileStoragePort).updateCoworkerInvitationRole(billingProfileId, coworkerGithubUserId, role);
+    }
+
+
     @Test
     void should_upgrade_user() {
         // Given
