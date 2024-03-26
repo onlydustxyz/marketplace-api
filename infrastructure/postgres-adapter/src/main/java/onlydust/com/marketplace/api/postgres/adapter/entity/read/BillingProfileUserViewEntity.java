@@ -34,8 +34,7 @@ public class BillingProfileUserViewEntity {
     @Id
     Long githubUserId;
 
-    @Column(name = "role", nullable = false)
-    @Type(type = "billing_profile_type")
+    @Type(type = "billing_profile_role")
     @Enumerated(EnumType.STRING)
     BillingProfileUserEntity.Role role;
 

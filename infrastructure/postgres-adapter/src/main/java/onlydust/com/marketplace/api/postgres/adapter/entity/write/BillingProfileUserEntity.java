@@ -43,8 +43,7 @@ public class BillingProfileUserEntity {
     @OneToOne
     UserViewEntity user;
 
-    @Column(name = "role", nullable = false)
-    @Type(type = "billing_profile_type")
+    @Type(type = "billing_profile_role")
     @Enumerated(EnumType.STRING)
     Role role;
 
