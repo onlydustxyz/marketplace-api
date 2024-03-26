@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
@@ -27,9 +26,6 @@ import static java.util.Objects.isNull;
 @Data
 @Entity
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-@TypeDef(name = "billing_profile_type", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "invoice_status", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "verification_status", typeClass = PostgreSQLEnumType.class)
 public class BackofficeRewardViewEntity {
     @Id
     @NonNull UUID id;

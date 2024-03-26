@@ -19,13 +19,13 @@ import static java.util.Objects.isNull;
 public class BillingProfileUserRightsViewEntity {
     @Id
     UUID userId;
-    @Type(type = "billing_profile_type")
+    @Type(type = "billing_profile_role")
     @Enumerated(EnumType.STRING)
     BillingProfileUserEntity.Role userRole;
     @Column(name = "has_bp_some_invoices")
     Boolean hasBillingProfileSomeInvoices;
     Boolean hasUserSomeLinkedInvoices;
-    @Type(type = "billing_profile_type")
+    @Type(type = "billing_profile_role")
     @Enumerated(EnumType.STRING)
     BillingProfileUserEntity.Role invitedRole;
     ZonedDateTime invitedAt;
