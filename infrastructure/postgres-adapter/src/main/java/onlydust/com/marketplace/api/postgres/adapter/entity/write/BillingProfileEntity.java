@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
-import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
@@ -138,7 +137,6 @@ public class BillingProfileEntity {
                     .enabled(enabled)
                     .kyc(kyc.toDomain())
                     .owner(users.stream().findFirst().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role.toDomain())).orElseThrow())
-                    .currentYearPaymentAmount(PositiveAmount.ZERO)
                     .build();
         };
     }

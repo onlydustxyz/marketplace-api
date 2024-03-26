@@ -1980,7 +1980,9 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.invoiceableRewardCount").isEqualTo(1);
+                .jsonPath("$.invoiceableRewardCount").isEqualTo(1)
+                .jsonPath("$.currentYearPaymentLimit").isEqualTo(5000)
+                .jsonPath("$.currentYearPaymentAmount").isEqualTo(0);
 
         client.get()
                 .uri(getApiURI(BILLING_PROFILES_INVOICEABLE_REWARDS.formatted(individualBPId)))
@@ -3287,6 +3289,17 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                         ))
                         .build()
         ));
+
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(individualBPId)))
+                .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateUser(individualBPAdminGithubId).jwt())
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.invoiceableRewardCount").isEqualTo(0)
+                .jsonPath("$.currentYearPaymentLimit").isEqualTo(5000)
+                .jsonPath("$.currentYearPaymentAmount").isEqualTo(34);
     }
 
     // TODO X: ajouter et tester les usdEquivalents avant et après la sealing date

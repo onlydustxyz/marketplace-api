@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Stream;
@@ -142,6 +144,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                     .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
             return switch (billingProfileEntity.getType()) {
                 case INDIVIDUAL -> {
+                    final var individualBillingProfile = (IndividualBillingProfile) billingProfileEntity.toDomain();
                     BillingProfileView billingProfileView = BillingProfileView.builder()
                             .enabled(billingProfileEntity.getEnabled())
                             .type(BillingProfile.Type.INDIVIDUAL)
@@ -155,6 +158,9 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .invoiceableRewardCount(billingProfileCustomData.getInvoiceableRewardCount())
                             .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                             .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
+                            .currentYearPaymentLimit(individualBillingProfile.currentYearPaymentLimit())
+                            .currentYearPaymentAmount(PositiveAmount.of(isNull(billingProfileCustomData.getCurrentYearPaymentAmount()) ? BigDecimal.ZERO :
+                                    billingProfileCustomData.getCurrentYearPaymentAmount()))
                             .admins(billingProfileEntity.getUsers().stream().map(BillingProfileUserEntity::toView).toList())
                             .build();
                     final Optional<KycEntity> optionalKycEntity = kycRepository.findByBillingProfileId(billingProfileId.value());
@@ -170,15 +176,12 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .id(billingProfileId)
                             .name(billingProfileEntity.getName())
                             .enabled(billingProfileEntity.getEnabled())
-                            .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
-                            .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                             .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
                             .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
                             .missingPayoutInfo(billingProfileCustomData.getMissingPayoutInfo())
                             .missingVerification(billingProfileCustomData.getMissingVerification())
                             .rewardCount(billingProfileCustomData.getRewardCount())
                             .invoiceableRewardCount(billingProfileCustomData.getInvoiceableRewardCount())
-                            .missingVerification(billingProfileCustomData.getMissingVerification())
                             .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                             .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                             .admins(billingProfileEntity.getUsers().stream().map(BillingProfileUserEntity::toView).toList())
@@ -204,9 +207,6 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .missingVerification(billingProfileCustomData.getMissingVerification())
                             .rewardCount(billingProfileCustomData.getRewardCount())
                             .invoiceableRewardCount(billingProfileCustomData.getInvoiceableRewardCount())
-                            .missingVerification(billingProfileCustomData.getMissingVerification())
-                            .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
-                            .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                             .admins(billingProfileEntity.getUsers().stream().map(BillingProfileUserEntity::toView).toList())
                             .build();
                     final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());

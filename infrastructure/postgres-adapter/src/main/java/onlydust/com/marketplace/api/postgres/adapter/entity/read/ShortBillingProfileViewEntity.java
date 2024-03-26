@@ -14,6 +14,7 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -50,6 +51,8 @@ public class ShortBillingProfileViewEntity {
     Integer invoiceableRewardCount;
     Boolean missingPayoutInfo;
     Boolean missingVerification;
+
+    BigDecimal currentYearPaymentAmount;
 
     public ZonedDateTime getInvoiceMandateAcceptedAt() {
         return isNull(invoiceMandateAcceptedAt) ? null : new Date(invoiceMandateAcceptedAt.getTime()).toInstant().atZone(ZoneOffset.UTC);

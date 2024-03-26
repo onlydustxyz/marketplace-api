@@ -243,6 +243,8 @@ public interface BillingProfileMapper {
         response.setKyc(isNull(view.getKyc()) ? null : kycToResponse(view.getKyc()));
         response.setStatus(verificationStatusToResponse(view.getVerificationStatus()));
         response.setEnabled(view.getEnabled());
+        response.setCurrentYearPaymentLimit(isNull(view.getCurrentYearPaymentLimit()) ? null : view.getCurrentYearPaymentLimit().getValue());
+        response.setCurrentYearPaymentAmount(isNull(view.getCurrentYearPaymentAmount()) ? null : view.getCurrentYearPaymentAmount().getValue());
         response.setInvoiceMandateAccepted(view.isInvoiceMandateAccepted());
         response.setRewardCount(view.getRewardCount());
         response.setInvoiceableRewardCount(view.getInvoiceableRewardCount());
