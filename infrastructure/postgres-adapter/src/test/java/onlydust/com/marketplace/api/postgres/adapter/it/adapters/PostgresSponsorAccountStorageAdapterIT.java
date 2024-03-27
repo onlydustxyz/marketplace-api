@@ -12,6 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PostgresSponsorAccountStorageAdapterIT extends AbstractPostgresIT {
@@ -39,7 +41,7 @@ class PostgresSponsorAccountStorageAdapterIT extends AbstractPostgresIT {
     void should_return_sponsor_ledger_when_found() {
         // Given
         final var sponsorId = SponsorId.random();
-        final SponsorEntity sponsor = new SponsorEntity(sponsorId.value(), "sponsor", "", "");
+        final SponsorEntity sponsor = new SponsorEntity(sponsorId.value(), "sponsor", "", "", Set.of());
         sponsorRepository.save(sponsor);
         final var ledger = new SponsorAccount(SponsorId.of(sponsor.getId()), currency);
 

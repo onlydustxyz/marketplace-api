@@ -7,8 +7,10 @@ import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
+import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
@@ -29,8 +31,10 @@ public class RewardServiceTest {
 
     private final Faker faker = new Faker();
     private final AccountingRewardStoragePort accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
+    private final AccountingFacadePort accountingFacadePort = mock(AccountingFacadePort.class);
+    private final SponsorStoragePort sponsorStoragePort = mock(SponsorStoragePort.class);
     private final MailNotificationPort mailNotificationPort = mock(MailNotificationPort.class);
-    private final RewardService rewardService = new RewardService(accountingRewardStoragePort, mailNotificationPort);
+    private final RewardService rewardService = new RewardService(accountingRewardStoragePort, mailNotificationPort, accountingFacadePort, sponsorStoragePort);
 
 
     @BeforeEach

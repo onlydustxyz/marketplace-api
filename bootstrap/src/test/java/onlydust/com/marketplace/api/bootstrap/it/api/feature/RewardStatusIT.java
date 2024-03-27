@@ -3375,6 +3375,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     @Autowired
     UserFacadePort userFacadePort;
     @Autowired
+    SponsorStoragePort sponsorStoragePort;
+    @Autowired
     AccountingRewardStoragePort accountingRewardStoragePort;
     @Autowired
     MailNotificationPort mailNotificationPort;
@@ -3395,7 +3397,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 accountingService,
                 rewardService,
                 userFacadePort,
-                new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, mailNotificationPort),
+                new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, mailNotificationPort, accountingService,
+                        sponsorStoragePort),
                 new PaymentService(accountingRewardStoragePort, invoiceStoragePort, accountingService),
                 billingProfileService);
         backofficeAccountingManagementRestApi.payReward(individualBPAdminRewardId1,

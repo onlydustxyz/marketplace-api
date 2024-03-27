@@ -705,7 +705,71 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "logoUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp",
                               "projects": [
                                 {
-                                  "name": "Zero title 18",
+                                  "name": "kaaper",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Zero title 2",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Cairo foundry",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "The Ultimate project",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Deluge",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Zero title 15",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Zero title 7",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Zero title 6",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Mû du Bélier",
+                                  "logoUrl": "https://cdn.filestackcontent.com/llgXpbEzSMaSC1lpzTdj"
+                                },
+                                {
+                                  "name": "My awesome project",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Starklings",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
+                                },
+                                {
+                                  "name": "Zero title 19",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "QA new contributions",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Cairo streams",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Zero title 4",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Zero title 9",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Zero title 1",
                                   "logoUrl": null
                                 },
                                 {
@@ -713,52 +777,28 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "logoUrl": null
                                 },
                                 {
-                                  "name": "kaaper",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "My super project",
-                                  "logoUrl": "https://cdn.filestackcontent.com/n3AJNeS5OX5biqh1DnAx"
-                                },
-                                {
-                                  "name": "Apibara",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "Camus du Verseau",
-                                  "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/10/ban_saint_seiya_awakening_kotz_saga_gemeaux.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=dc04302de827b79180762741085d71ec"
-                                },
-                                {
-                                  "name": "Zero title 1",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "kaaper2",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "Paco's project",
-                                  "logoUrl": "https://dl.airtable.com/.attachments/01f2dd7497313a1fa13b4c5546429318/764531e3/8bUn9t8ORk6LLyMRcu78"
-                                },
-                                {
-                                  "name": "Zero title 4",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "Zama",
-                                  "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M"
-                                },
-                                {
-                                  "name": "Zero title 15",
-                                  "logoUrl": null
-                                },
-                                {
                                   "name": "Zero title 5",
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1458710211645943860.png"
                                 },
                                 {
-                                  "name": "Fresh",
+                                  "name": "kaaper 3",
                                   "logoUrl": null
+                                },
+                                {
+                                  "name": "Marketplace 2",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Paris est Magique",
+                                  "logoUrl": "https://cdn.filestackcontent.com/Qa94g2pVRDGgURSWz5zQ"
+                                },
+                                {
+                                  "name": "Red bull",
+                                  "logoUrl": "https://cdn.filestackcontent.com/cZCHED10RzuEloOXuk7A"
+                                },
+                                {
+                                  "name": "Zama",
+                                  "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M"
                                 },
                                 {
                                   "name": "Cal.com",
@@ -769,7 +809,67 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "logoUrl": "https://dl.airtable.com/.attachments/75bca1dce6735d434b19631814ec84b0/2a9cad0b/aeZxLjpJQre2uXBQDoQf"
                                 },
                                 {
-                                  "name": "The Ultimate project",
+                                  "name": "My super project",
+                                  "logoUrl": "https://cdn.filestackcontent.com/n3AJNeS5OX5biqh1DnAx"
+                                },
+                                {
+                                  "name": "OnlyDust Marketplace",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Fresh",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Milo du Scorpion",
+                                  "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/10/ban_saint_seiya_awakening_kotz_milo_scorpion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=ab68737019442bf0718949f3ff9c779f"
+                                },
+                                {
+                                  "name": "Poor Project",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Apibara",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "DogGPT",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15366926246018901574.jpg"
+                                },
+                                {
+                                  "name": "Zero title 10",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Shura du Capricorne",
+                                  "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/10/ban_saint_seiya_awakening_kotz_shaka_vierge.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=c7c3ac0e384ecc21c9f2abc329ec9dfc"
+                                },
+                                {
+                                  "name": "Zero title 13",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Bretzel 196",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "kaaper2",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Camus du Verseau",
+                                  "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/10/ban_saint_seiya_awakening_kotz_saga_gemeaux.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=dc04302de827b79180762741085d71ec"
+                                },
+                                {
+                                  "name": "Zero title 16",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Zero title 18",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "name": "Zero title 8",
                                   "logoUrl": null
                                 },
                                 {
@@ -777,36 +877,28 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "logoUrl": null
                                 },
                                 {
-                                  "name": "Zero title 2",
+                                  "name": "Zero title 20",
                                   "logoUrl": null
                                 },
                                 {
-                                  "name": "Zero title 6",
+                                  "name": "Long project",
                                   "logoUrl": null
-                                },
-                                {
-                                  "name": "No sponsors",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "Deoxys",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4391015415333593216.jpg"
                                 },
                                 {
                                   "name": "Zero title 14",
                                   "logoUrl": null
                                 },
                                 {
-                                  "name": "QA new contributions",
-                                  "logoUrl": null
+                                  "name": "Pizzeria Yoshi !",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png"
                                 },
                                 {
-                                  "name": "Zero title 3",
-                                  "logoUrl": null
+                                  "name": "Monday",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/17809999902614173931.png"
                                 },
                                 {
-                                  "name": "OnlyDust Marketplace",
-                                  "logoUrl": null
+                                  "name": "Paco's project",
+                                  "logoUrl": "https://dl.airtable.com/.attachments/01f2dd7497313a1fa13b4c5546429318/764531e3/8bUn9t8ORk6LLyMRcu78"
                                 },
                                 {
                                   "name": "Yolo croute",
@@ -817,116 +909,24 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "logoUrl": null
                                 },
                                 {
-                                  "name": "Zero title 7",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "Cairo foundry",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "Poor Project",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "Zero title 9",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "Zero title 10",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "Pizzeria Yoshi !",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png"
-                                },
-                                {
-                                  "name": "Zero title 19",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "Zero title 20",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "Marketplace 2",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "Red bull",
-                                  "logoUrl": "https://cdn.filestackcontent.com/cZCHED10RzuEloOXuk7A"
-                                },
-                                {
-                                  "name": "Starklings",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
-                                },
-                                {
-                                  "name": "Shura du Capricorne",
-                                  "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/10/ban_saint_seiya_awakening_kotz_shaka_vierge.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=c7c3ac0e384ecc21c9f2abc329ec9dfc"
+                                  "name": "Deoxys",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4391015415333593216.jpg"
                                 },
                                 {
                                   "name": "Zero title 17",
                                   "logoUrl": null
                                 },
                                 {
-                                  "name": "Paris est Magique",
-                                  "logoUrl": "https://cdn.filestackcontent.com/Qa94g2pVRDGgURSWz5zQ"
+                                  "name": "No sponsors",
+                                  "logoUrl": null
                                 },
                                 {
-                                  "name": "Monday",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/17809999902614173931.png"
+                                  "name": "Zero title 3",
+                                  "logoUrl": null
                                 },
                                 {
                                   "name": "B Conseil",
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png"
-                                },
-                                {
-                                  "name": "Zero title 8",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "Milo du Scorpion",
-                                  "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/10/ban_saint_seiya_awakening_kotz_milo_scorpion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=ab68737019442bf0718949f3ff9c779f"
-                                },
-                                {
-                                  "name": "Zero title 13",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "My awesome project",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "kaaper 3",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "DogGPT",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15366926246018901574.jpg"
-                                },
-                                {
-                                  "name": "Mû du Bélier",
-                                  "logoUrl": "https://cdn.filestackcontent.com/llgXpbEzSMaSC1lpzTdj"
-                                },
-                                {
-                                  "name": "Cairo streams",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "Long project",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "Deluge",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "Bretzel 196",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "name": "Zero title 16",
-                                  "logoUrl": null
                                 }
                               ]
                             },
@@ -945,12 +945,12 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aldebaran_taureau.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=ab78704b124d2de9525a8af91ef7c4ed"
                                 },
                                 {
-                                  "name": "Bretzel",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
-                                },
-                                {
                                   "name": "Anthology project",
                                   "logoUrl": "https://cdn.filestackcontent.com/pgjvFWS8Teq2Yns89IKg"
+                                },
+                                {
+                                  "name": "Bretzel",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                                 }
                               ]
                             },
@@ -1021,12 +1021,12 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png",
                               "projects": [
                                 {
-                                  "name": "Mooooooonlight",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
-                                },
-                                {
                                   "name": "Zero title 11",
                                   "logoUrl": null
+                                },
+                                {
+                                  "name": "Mooooooonlight",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
                                 }
                               ]
                             },

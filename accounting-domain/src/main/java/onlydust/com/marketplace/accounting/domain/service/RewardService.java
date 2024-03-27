@@ -4,10 +4,13 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
+import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
+import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
@@ -19,11 +22,14 @@ import java.util.stream.Collectors;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.groupingBy;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
 public class RewardService implements AccountingRewardPort {
     private final AccountingRewardStoragePort accountingRewardStoragePort;
     private final MailNotificationPort mailNotificationPort;
+    private final AccountingFacadePort accountingFacadePort;
+    private final SponsorStoragePort sponsorStoragePort;
 
     @Override
     public List<BackofficeRewardView> findByInvoiceId(Invoice.Id invoiceId) {
@@ -74,7 +80,14 @@ public class RewardService implements AccountingRewardPort {
 
     @Override
     public BackofficeRewardView getReward(RewardId id) {
-        return accountingRewardStoragePort.getReward(id)
+        final var reward = accountingRewardStoragePort.getReward(id)
                 .orElseThrow(() -> badRequest("Reward %s not found".formatted(id)));
+
+        final var sponsors = accountingFacadePort.sponsorsOf(reward.id()).stream()
+                .map(sponsorId -> sponsorStoragePort.get(sponsorId).orElseThrow(() -> notFound("Sponsor %s not found".formatted(id))))
+                .map(SponsorView::toShortView)
+                .toList();
+
+        return reward.toBuilder().sponsors(sponsors).build();
     }
 }
