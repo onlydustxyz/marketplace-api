@@ -6,12 +6,13 @@ import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Getter
 public class SlackNotificationStub implements NotificationPort {
 
-    private final List<BillingProfileVerificationUpdated> notifications = new ArrayList<>();
+    private final List<BillingProfileVerificationUpdated> notifications = Collections.synchronizedList(new ArrayList<>());
 
     @Override
     public void notifyNewEvent(Event event) {
