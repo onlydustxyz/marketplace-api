@@ -7,6 +7,7 @@ import lombok.NonNull;
 import onlydust.com.backoffice.api.contract.model.PayRewardRequest;
 import onlydust.com.backoffice.api.contract.model.TransactionNetwork;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
@@ -39,20 +40,19 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.testcontainers.shaded.org.apache.commons.lang3.mutable.MutableObject;
 
 import javax.persistence.EntityManagerFactory;
 import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RewardStatusIT extends AbstractMarketplaceApiIT {
@@ -443,12 +443,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(10L)
                                         .pendingAmount(10L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(individualBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(100L)
                                         .pendingAmount(100L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -460,12 +462,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(200L)
                                         .pendingAmount(200L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -477,12 +481,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(300L)
                                         .pendingAmount(300L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -494,12 +500,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(400L)
                                         .pendingAmount(400L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -511,12 +519,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(50L)
                                         .pendingAmount(50L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(500L)
                                         .pendingAmount(500L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build()
@@ -579,12 +589,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(10L)
                                         .pendingAmount(10L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(individualBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(100L)
                                         .pendingAmount(100L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -596,12 +608,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(200L)
                                         .pendingAmount(200L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -613,12 +627,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(300L)
                                         .pendingAmount(300L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -630,12 +646,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(400L)
                                         .pendingAmount(400L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -647,12 +665,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(50L)
                                         .pendingAmount(50L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(500L)
                                         .pendingAmount(500L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build()
@@ -693,12 +713,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(10L)
                                         .pendingAmount(10L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(individualBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(100L)
                                         .pendingAmount(100L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -710,12 +732,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(200L)
                                         .pendingAmount(200L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -727,18 +751,21 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(300L)
                                         .pendingAmount(300L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -750,12 +777,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(400L)
                                         .pendingAmount(400L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -767,12 +796,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(50L)
                                         .pendingAmount(50L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(500L)
                                         .pendingAmount(500L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build()
@@ -810,12 +841,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(10L)
                                         .pendingAmount(10L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(individualBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(100L)
                                         .pendingAmount(100L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -827,18 +860,21 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(200L)
                                         .pendingAmount(200L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -850,18 +886,21 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(300L)
                                         .pendingAmount(300L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -873,12 +912,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(400L)
                                         .pendingAmount(400L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -890,12 +931,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(50L)
                                         .pendingAmount(50L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(500L)
                                         .pendingAmount(500L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build()
@@ -914,12 +957,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(10L)
                                         .pendingAmount(10L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(individualBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(100L)
                                         .pendingAmount(100L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -931,24 +976,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(200L)
                                         .pendingAmount(200L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -960,24 +1009,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(300L)
                                         .pendingAmount(300L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -989,12 +1042,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_COMPANY")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(400L)
                                         .pendingAmount(400L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -1006,12 +1061,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(50L)
                                         .pendingAmount(50L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(500L)
                                         .pendingAmount(500L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build()
@@ -1051,12 +1108,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(10L)
                                         .pendingAmount(10L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(individualBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(100L)
                                         .pendingAmount(100L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -1068,24 +1127,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(200L)
                                         .pendingAmount(200L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -1097,24 +1160,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(300L)
                                         .pendingAmount(300L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -1126,12 +1193,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_COMPANY")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(400L)
                                         .pendingAmount(400L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -1143,12 +1212,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(50L)
                                         .pendingAmount(50L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(500L)
                                         .pendingAmount(500L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build()
@@ -1195,12 +1266,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(10L)
                                         .pendingAmount(10L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(individualBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(100L)
                                         .pendingAmount(100L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -1212,24 +1285,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(200L)
                                         .pendingAmount(200L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -1241,24 +1318,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(300L)
                                         .pendingAmount(300L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -1270,12 +1351,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_COMPANY")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(400L)
                                         .pendingAmount(400L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -1287,18 +1370,21 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(50L)
                                         .pendingAmount(50L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId12)
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(55L)
                                         .pendingAmount(55L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(500L)
                                         .pendingAmount(500L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build()
@@ -1367,12 +1453,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(10L)
                                         .pendingAmount(10L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(individualBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(100L)
                                         .pendingAmount(100L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -1384,24 +1472,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(200L)
                                         .pendingAmount(200L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -1413,24 +1505,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(300L)
                                         .pendingAmount(300L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -1442,12 +1538,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_COMPANY")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(400L)
                                         .pendingAmount(400L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -1459,18 +1557,21 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(50L)
                                         .pendingAmount(50L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId12)
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(55L)
                                         .pendingAmount(55L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(500L)
                                         .pendingAmount(500L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build()
@@ -1527,12 +1628,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(10L)
                                         .pendingAmount(10L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(individualBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(100L)
                                         .pendingAmount(100L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -1544,24 +1647,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(200L)
                                         .pendingAmount(200L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -1573,24 +1680,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(300L)
                                         .pendingAmount(300L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -1602,12 +1713,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_COMPANY")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(400L)
                                         .pendingAmount(400L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -1619,18 +1732,21 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(50L)
                                         .pendingAmount(50L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId12)
                                         .status("PENDING_VERIFICATION")
                                         .rewardedAmount(55L)
                                         .pendingAmount(55L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(500L)
                                         .pendingAmount(500L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build()
@@ -1690,12 +1806,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(10L)
                                         .pendingAmount(10L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(individualBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(100L)
                                         .pendingAmount(100L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -1707,24 +1825,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(200L)
                                         .pendingAmount(200L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -1736,24 +1858,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(300L)
                                         .pendingAmount(300L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -1765,12 +1891,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_COMPANY")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(400L)
                                         .pendingAmount(400L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -1782,18 +1910,21 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(50L)
                                         .pendingAmount(50L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId12)
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(55L)
                                         .pendingAmount(55L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(500L)
                                         .pendingAmount(500L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build()
@@ -1802,7 +1933,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_not_display_transaction_details_given_a_billing_profile_member() {
-
+        // TODO X: ne pas remonter les receipt details pour un BP member
     }
 
 
@@ -1848,12 +1979,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(10L)
                                         .pendingAmount(10L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(individualBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(100L)
                                         .pendingAmount(100L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -1865,24 +1998,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(200L)
                                         .pendingAmount(200L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -1894,24 +2031,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(300L)
                                         .pendingAmount(300L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -1923,12 +2064,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_COMPANY")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(400L)
                                         .pendingAmount(400L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -1940,18 +2083,21 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(50L)
                                         .pendingAmount(50L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId12)
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(55L)
                                         .pendingAmount(55L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(500L)
                                         .pendingAmount(500L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build()
@@ -2033,12 +2179,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(10L)
                                         .pendingAmount(10L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(individualBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(100L)
                                         .pendingAmount(100L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -2050,24 +2198,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(200L)
                                         .pendingAmount(200L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -2079,24 +2231,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(300L)
                                         .pendingAmount(300L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -2108,12 +2264,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_COMPANY")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(400L)
                                         .pendingAmount(400L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -2125,18 +2283,21 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(50L)
                                         .pendingAmount(50L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId12)
                                         .status("PAYOUT_INFO_MISSING")
                                         .rewardedAmount(55L)
                                         .pendingAmount(55L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(500L)
                                         .pendingAmount(500L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build()
@@ -2220,12 +2381,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(10L)
                                         .pendingAmount(10L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(individualBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(100L)
                                         .pendingAmount(100L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -2237,24 +2400,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(200L)
                                         .pendingAmount(200L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -2266,24 +2433,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(300L)
                                         .pendingAmount(300L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -2295,12 +2466,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_COMPANY")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(400L)
                                         .pendingAmount(400L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -2312,18 +2485,21 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(50L)
                                         .pendingAmount(50L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId12)
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(55L)
                                         .pendingAmount(55L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(500L)
                                         .pendingAmount(500L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build()
@@ -2413,12 +2589,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PROCESSING")
                                         .rewardedAmount(10L)
                                         .pendingAmount(10L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(individualBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(100L)
                                         .pendingAmount(100L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -2430,24 +2608,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(200L)
                                         .pendingAmount(200L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -2459,24 +2641,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(300L)
                                         .pendingAmount(300L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -2488,12 +2674,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_COMPANY")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(400L)
                                         .pendingAmount(400L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -2505,18 +2693,21 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(50L)
                                         .pendingAmount(50L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId12)
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(55L)
                                         .pendingAmount(55L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(500L)
                                         .pendingAmount(500L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build()
@@ -2560,12 +2751,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PROCESSING")
                                         .rewardedAmount(10L)
                                         .pendingAmount(10L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(individualBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(100L)
                                         .pendingAmount(100L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -2577,24 +2770,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PROCESSING")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PROCESSING")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(200L)
                                         .pendingAmount(200L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PROCESSING")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -2606,24 +2803,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PROCESSING")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PROCESSING")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(300L)
                                         .pendingAmount(300L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PROCESSING")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -2635,12 +2836,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PROCESSING")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(400L)
                                         .pendingAmount(400L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -2652,18 +2855,21 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(50L)
                                         .pendingAmount(50L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId12)
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(55L)
                                         .pendingAmount(55L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(500L)
                                         .pendingAmount(500L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build()
@@ -2707,12 +2913,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PROCESSING")
                                         .rewardedAmount(10L)
                                         .pendingAmount(10L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(individualBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(100L)
                                         .pendingAmount(100L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -2724,24 +2932,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PROCESSING")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PROCESSING")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(200L)
                                         .pendingAmount(200L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PROCESSING")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -2753,24 +2965,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PROCESSING")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PROCESSING")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(300L)
                                         .pendingAmount(300L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PROCESSING")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -2782,12 +2998,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PROCESSING")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(400L)
                                         .pendingAmount(400L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -2799,18 +3017,21 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PROCESSING")
                                         .rewardedAmount(50L)
                                         .pendingAmount(50L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId12)
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(55L)
                                         .pendingAmount(55L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(500L)
                                         .pendingAmount(500L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build()
@@ -2850,12 +3071,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PROCESSING")
                                         .rewardedAmount(10L)
                                         .pendingAmount(10L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(individualBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(100L)
                                         .pendingAmount(100L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -2867,24 +3090,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PROCESSING")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PROCESSING")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(200L)
                                         .pendingAmount(200L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PROCESSING")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -2896,24 +3123,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PROCESSING")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PROCESSING")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(300L)
                                         .pendingAmount(300L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PROCESSING")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -2925,12 +3156,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PROCESSING")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(400L)
                                         .pendingAmount(400L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -2942,18 +3175,21 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(50L)
                                         .pendingAmount(50L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId12)
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(55L)
                                         .pendingAmount(55L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(500L)
                                         .pendingAmount(500L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build()
@@ -2998,12 +3234,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PROCESSING")
                                         .rewardedAmount(10L)
                                         .pendingAmount(10L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(individualBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(100L)
                                         .pendingAmount(100L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -3015,24 +3253,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PROCESSING")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PROCESSING")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(200L)
                                         .pendingAmount(200L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PROCESSING")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -3044,24 +3286,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PROCESSING")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PROCESSING")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(300L)
                                         .pendingAmount(300L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PROCESSING")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -3073,12 +3319,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PROCESSING")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(400L)
                                         .pendingAmount(400L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -3090,18 +3338,21 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PROCESSING")
                                         .rewardedAmount(50L)
                                         .pendingAmount(50L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId12)
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(55L)
                                         .pendingAmount(55L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(500L)
                                         .pendingAmount(500L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build()
@@ -3194,12 +3445,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("COMPLETE")
                                         .rewardedAmount(10L)
                                         .pendingAmount(0L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(individualBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(100L)
                                         .pendingAmount(100L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -3211,24 +3464,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("COMPLETE")
                                         .rewardedAmount(40L)
                                         .pendingAmount(0L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("COMPLETE")
                                         .rewardedAmount(20L)
                                         .pendingAmount(0L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(200L)
                                         .pendingAmount(200L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("COMPLETE")
                                         .rewardedAmount(30L)
                                         .pendingAmount(0L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -3240,24 +3497,28 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("COMPLETE")
                                         .rewardedAmount(40L)
                                         .pendingAmount(0L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("COMPLETE")
                                         .rewardedAmount(30L)
                                         .pendingAmount(0L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(300L)
                                         .pendingAmount(300L)
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("COMPLETE")
                                         .rewardedAmount(20L)
                                         .pendingAmount(0L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -3269,12 +3530,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("COMPLETE")
                                         .rewardedAmount(40L)
                                         .pendingAmount(0L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(400L)
                                         .pendingAmount(400L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build(),
@@ -3286,18 +3549,21 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("COMPLETE")
                                         .rewardedAmount(50L)
                                         .pendingAmount(0L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId12)
                                         .status("PENDING_REQUEST")
                                         .rewardedAmount(55L)
                                         .pendingAmount(0L)
+                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(selfEmployedBPAdminRewardId2)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(500L)
                                         .pendingAmount(555L)
+                                        .usdConversionRate(Optional.empty())
                                         .build()
                         ))
                         .build()
@@ -3315,11 +3581,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.currentYearPaymentAmount").isEqualTo(34);
     }
 
-    // TODO X: ajouter et tester les usdEquivalents avant et après la sealing date
-    // TODO X: ne pas remonter les receipt details pour un BP member
     // TODO X: tester les cas particuliers des snails : PAYMENT_BLOCKED et LOCKED
-    // TODO X: ajouter les recipients (juste pour les BP de type company ?) dans my rewards et my reward details
-
 
     private void assertGetMyRewardsStatus(final List<MyRewardDatum> myRewardData) {
         for (MyRewardDatum myRewardDatum : myRewardData) {
@@ -3337,11 +3599,20 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
             long rewardedAmount = 0;
             long pendingAmount = 0;
+            BigDecimal usdEquivalent = BigDecimal.ZERO;
 
             for (RewardDatum rewardDatum : myRewardDatum.rewardData()) {
+                final var rewardAmountAsList = new MutableObject<List<Integer>>();
+                final var rewardUsdEquivalentAsList = new MutableObject<List<Double>>();
                 bodyContentSpec
                         .jsonPath("$.rewards[?(@.id == '%s')].status".formatted(rewardDatum.rewardId.toString()))
-                        .isEqualTo(rewardDatum.status);
+                        .isEqualTo(rewardDatum.status)
+                        .jsonPath("$.rewards[?(@.id == '%s')].amount.total".formatted(rewardDatum.rewardId.toString()))
+                        .value(rewardAmountAsList::setValue)
+                        .jsonPath("$.rewards[?(@.id == '%s')].amount.dollarsEquivalent".formatted(rewardDatum.rewardId.toString()))
+                        .value(rewardUsdEquivalentAsList::setValue);
+                assertThat(rewardAmountAsList.getValue().get(0).longValue()).isEqualTo(rewardDatum.rewardedAmount);
+                assertThat(rewardUsdEquivalentAsList.getValue().get(0)).isEqualTo(rewardDatum.usdEquivalent().map(BigDecimal::doubleValue).orElse(null));
 
                 if (rewardDatum.status().equals("COMPLETE")) {
                     bodyContentSpec.jsonPath("$.rewards[?(@.id == '%s')].processedAt".formatted(rewardDatum.rewardId.toString())).isNotEmpty();
@@ -3351,7 +3622,10 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
                 rewardedAmount += rewardDatum.rewardedAmount;
                 pendingAmount += rewardDatum.pendingAmount;
+                usdEquivalent = usdEquivalent.add(rewardDatum.usdEquivalent().orElse(BigDecimal.ZERO));
 
+                final var rewardAmount = new MutableObject<Long>();
+                final var rewardUsdEquivalent = new MutableObject<BigDecimal>();
                 client.get()
                         .uri(getApiURI(ME_REWARD.formatted(rewardDatum.rewardId.toString())))
                         .header("Authorization", BEARER_PREFIX + authenticatedUser.jwt())
@@ -3361,13 +3635,22 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                         .is2xxSuccessful()
                         .expectBody()
                         .jsonPath("$.status").isEqualTo(rewardDatum.status)
-                        .jsonPath("$.amount").isEqualTo(rewardDatum.rewardedAmount);
+                        .jsonPath("$.amount").value(rewardAmount::setValue, Long.class)
+                        .jsonPath("$.dollarsEquivalent").value(rewardUsdEquivalent::setValue, BigDecimal.class);
+                assertThat(rewardAmount.getValue()).isEqualTo(rewardDatum.rewardedAmount);
+                assertThat(rewardUsdEquivalent.getValue()).isEqualTo(rewardDatum.usdEquivalent().orElse(null));
             }
 
 
-            bodyContentSpec.jsonPath("$.rewardedAmount.amount").isEqualTo(rewardedAmount)
+            final var totalAmount = new MutableObject<Long>();
+            final var totalUsdEquivalent = new MutableObject<BigDecimal>();
+            bodyContentSpec
+                    .jsonPath("$.rewardedAmount.amount").value(totalAmount::setValue, Long.class)
+                    .jsonPath("$.rewardedAmount.usdEquivalent").value(totalUsdEquivalent::setValue, BigDecimal.class)
                     .jsonPath("$.pendingAmount.amount").isEqualTo(pendingAmount);
 
+            assertThat(totalAmount.getValue()).isEqualTo(rewardedAmount);
+            assertThat(totalUsdEquivalent.getValue()).isEqualTo(usdEquivalent);
         }
     }
 
@@ -3376,7 +3659,12 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     }
 
     @Builder
-    private record RewardDatum(@NonNull UUID rewardId, @NonNull String status, @NonNull Long rewardedAmount, @NonNull Long pendingAmount) {
+    private record RewardDatum(@NonNull UUID rewardId, @NonNull String status, @NonNull Long rewardedAmount, @NonNull Long pendingAmount,
+                               @NonNull Optional<Double> usdConversionRate) {
+
+        Optional<BigDecimal> usdEquivalent() {
+            return usdConversionRate.map(rate -> BigDecimal.valueOf(rewardedAmount).multiply(BigDecimal.valueOf(rate)));
+        }
     }
 
     private void assertGetProjectRewardsStatusOnProject(final UUID projectId, final Map<UUID, String> rewardStatusMapToId) {
