@@ -125,6 +125,27 @@ paths:
             items:
               $ref: '#/components/schemas/InvoiceInternalStatus'
           style: form
+        - in: query
+          name: currencies
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/CurrencyId'
+          style: form
+        - in: query
+          name: billingProfileTypes
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/BillingProfileType'
+          style: form
+        - in: query
+          name: search
+          required: false
+          schema:
+            type: string
       responses:
         "200":
           description: 'Invoice page'

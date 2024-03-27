@@ -808,4 +808,12 @@ public interface BackOfficeMapper {
             case SELF_EMPLOYED -> BillingProfileType.SELF_EMPLOYED;
         };
     }
+
+    static BillingProfile.Type map(BillingProfileType billingProfileType) {
+        return switch (billingProfileType) {
+            case COMPANY -> BillingProfile.Type.COMPANY;
+            case INDIVIDUAL -> BillingProfile.Type.INDIVIDUAL;
+            case SELF_EMPLOYED -> BillingProfile.Type.SELF_EMPLOYED;
+        };
+    }
 }

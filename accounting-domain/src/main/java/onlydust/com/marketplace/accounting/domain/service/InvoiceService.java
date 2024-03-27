@@ -3,9 +3,11 @@ package onlydust.com.marketplace.accounting.domain.service;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.InvoiceDownload;
 import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
@@ -34,9 +36,9 @@ public class InvoiceService implements InvoiceFacadePort {
     }
 
     @Override
-    public Page<Invoice> findAll(final @NonNull List<Invoice.Id> ids, final @NonNull List<Invoice.Status> statuses, final @NonNull Integer pageIndex,
-                                 final @NonNull Integer pageSize) {
-        return invoiceStoragePort.findAll(ids, statuses, pageIndex, pageSize);
+    public Page<Invoice> findAll(@NonNull List<Invoice.Id> ids, @NonNull List<Invoice.Status> statuses, @NonNull List<Currency.Id> currencyIds,
+                                 @NonNull List<BillingProfile.Type> billingProfileTypes, String search, @NonNull Integer pageIndex, @NonNull Integer pageSize) {
+        return invoiceStoragePort.findAll(ids, statuses, currencyIds, billingProfileTypes, search, pageIndex, pageSize);
     }
 
     @Override
