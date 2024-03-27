@@ -57,6 +57,10 @@ public class BillingProfileView {
         return verificationStatus.isBlocked();
     }
 
+    public String subject() {
+        return kyc == null ? kyb.getName() : kyc.fullName();
+    }
+
     public record User(
             @NonNull UserId id,
             @NonNull GithubUserId githubUserId,

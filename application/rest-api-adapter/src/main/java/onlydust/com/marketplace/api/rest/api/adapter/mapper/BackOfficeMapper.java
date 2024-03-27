@@ -449,7 +449,7 @@ public interface BackOfficeMapper {
                     case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
                     case SELF_EMPLOYED -> BillingProfileType.SELF_EMPLOYED;
                 })
-                .name(billingProfileSnapshot.subject())
+                .subject(billingProfileSnapshot.subject())
                 .kyc(billingProfileSnapshot.kyc().map(BackOfficeMapper::mapKyc).orElse(null))
                 .kyb(billingProfileSnapshot.kyb().map(BackOfficeMapper::mapKyb).orElse(null));
     }
@@ -730,7 +730,7 @@ public interface BackOfficeMapper {
     static BillingProfileResponse map(BillingProfileView billingProfile) {
         return new BillingProfileResponse()
                 .id(billingProfile.getId().value())
-                .name(billingProfile.getName())
+                .subject(billingProfile.subject())
                 .type(map(billingProfile.getType()))
                 .verificationStatus(map(billingProfile.getVerificationStatus()))
                 .kyb(billingProfile.getKyb() == null ? null : map(billingProfile.getKyb()))

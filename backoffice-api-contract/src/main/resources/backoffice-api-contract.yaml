@@ -2591,12 +2591,12 @@ components:
       type: object
       required:
         - id
-        - name
+        - subject
         - type
       properties:
         id:
           $ref: '#/components/schemas/BillingProfileId'
-        name:
+        subject:
           type: string
           example: Apple Inc.
         type:
