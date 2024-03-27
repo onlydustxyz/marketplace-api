@@ -100,28 +100,28 @@ public class InvoiceEntity {
         return ShortInvoiceView.builder()
                 .id(Invoice.Id.of(id))
                 .number(Invoice.Number.fromString(number))
-                .createdBy(new UserView(
-                        createdBy.getGithubUserId(),
-                        createdBy.getGithubLogin(),
-                        URI.create(createdBy.getGithubAvatarUrl()),
-                        createdBy.getGithubEmail(),
-                        UserId.of(createdBy.getId()),
-                        createdBy.getProfile().getFirstName() + " " + createdBy.getProfile().getLastName()))
+                .createdBy(getCreatedBy())
                 .status(status.toDomain())
                 .build();
+    }
+
+    @NonNull
+    private UserView getCreatedBy() {
+        return new UserView(
+                createdBy.getGithubUserId(),
+                createdBy.getGithubLogin(),
+                URI.create(createdBy.getGithubAvatarUrl()),
+                createdBy.getGithubEmail(),
+                UserId.of(createdBy.getId()),
+                createdBy.getProfile() == null ? createdBy.getGithubLogin() :
+                        createdBy.getProfile().getFirstName() + " " + createdBy.getProfile().getLastName());
     }
 
     public InvoiceView toView() {
         return new InvoiceView(
                 Invoice.Id.of(id),
                 data.billingProfileSnapshot(),
-                new UserView(
-                        createdBy.getGithubUserId(),
-                        createdBy.getGithubLogin(),
-                        URI.create(createdBy.getGithubAvatarUrl()),
-                        createdBy.getGithubEmail(),
-                        UserId.of(createdBy.getId()),
-                        createdBy.getProfile().getFirstName() + " " + createdBy.getProfile().getLastName()),
+                getCreatedBy(),
                 createdAt,
                 Money.of(amount, currency.toDomain()),
                 data.dueAt,

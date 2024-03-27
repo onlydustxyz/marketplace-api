@@ -16,15 +16,13 @@ import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserProfileInfoRepository;
 import onlydust.com.marketplace.api.webhook.Config;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import onlydust.com.marketplace.project.domain.service.UserService;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
@@ -62,6 +60,9 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     KycRepository kycRepository;
     @Autowired
     KybRepository kybRepository;
+    @Autowired
+    UserProfileInfoRepository userProfileInfoRepository;
+
     private final Faker faker = new Faker();
 
     UserId userId;
@@ -71,11 +72,14 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
 
     static final List<Invoice.Id> companyBillingProfileToReviewInvoices = new ArrayList<>();
 
-    void setUp() throws IOException {
-        // Given
+    @BeforeEach
+    void setupAll() {
         final UserAuthHelper.AuthenticatedUser olivier = userAuthHelper.authenticateOlivier();
         userId = UserId.of(olivier.user().getId());
+    }
 
+    void setUp() throws IOException {
+        // Given
         companyBillingProfile = billingProfileService.createCompanyBillingProfile(userId, "Apple Inc.", null);
         billingProfileService.updatePayoutInfo(companyBillingProfile.id(), userId,
                 PayoutInfo.builder().ethWallet(new WalletLocator(new Name(userId + ".eth"))).build());
@@ -647,6 +651,9 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     @Test
     @Order(5)
     void should_reject_invoices() {
+        // Delete ofux user profile to check fallback of "createdBy.name" field in invoice details
+        userProfileInfoRepository.deleteById(userId.value());
+
         final String rejectionReason = faker.rickAndMorty().character();
         client
                 .put()
@@ -672,7 +679,6 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
 
         notificationOutboxJob.run();
 
-
         final Invoice invoice = invoiceStoragePort.get(companyBillingProfileToReviewInvoices.get(1)).orElseThrow();
         makeWebhookSendRejectedInvoiceMailWireMockServer.verify(1,
                 postRequestedFor(urlEqualTo("/?api-key=%s".formatted(webhookHttpClientProperties.getApiKey())))
@@ -697,6 +703,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.createdBy.name").isEqualTo("ofux")
                 .jsonPath("$.rejectionReason").isEqualTo(rejectionReason);
 
         client
