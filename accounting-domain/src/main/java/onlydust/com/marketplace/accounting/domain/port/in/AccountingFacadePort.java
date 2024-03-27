@@ -51,4 +51,6 @@ public interface AccountingFacadePort {
     Page<HistoricalTransaction> transactionHistory(SponsorId sponsorId, Integer pageIndex, Integer pageSize);
 
     List<Network> networksOf(Currency.Id currencyId, RewardId rewardId);
+
+    List<SponsorId> sponsorsOf(RewardId id);
 }

@@ -2,6 +2,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
+import onlydust.com.marketplace.accounting.domain.model.ProjectId;
+import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.project.domain.model.Project;
@@ -106,6 +108,16 @@ public class ProjectEntity {
                 .id(id)
                 .name(name)
                 .logoUrl(logoUrl)
+                .build();
+    }
+
+    public ShortProjectView toView() {
+        return ShortProjectView.builder()
+                .slug(key)
+                .name(name)
+                .logoUrl(logoUrl)
+                .shortDescription(shortDescription)
+                .id(ProjectId.of(id))
                 .build();
     }
 }

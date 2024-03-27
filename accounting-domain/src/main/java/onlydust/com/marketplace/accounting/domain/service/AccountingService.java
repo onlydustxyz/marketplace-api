@@ -399,4 +399,15 @@ public class AccountingService implements AccountingFacadePort {
                 .map(Optional::get)
                 .toList();
     }
+
+    @Override
+    public List<SponsorId> sponsorsOf(RewardId id) {
+        return currencyStorage.all().stream()
+                .flatMap(currency -> getAccountBook(currency.id()).state().balancePerOrigin(AccountId.of(id)).keySet().stream())
+                .map(AccountId::sponsorAccountId)
+                .map(this::mustGetSponsorAccount)
+                .map(SponsorAccount::sponsorId)
+                .distinct()
+                .toList();
+    }
 }

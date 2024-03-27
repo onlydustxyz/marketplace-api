@@ -1,45 +1,36 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.ProjectId;
+import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
-import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.SponsorViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-import static java.util.Objects.isNull;
+import java.util.Optional;
 
 @AllArgsConstructor
 public class PostgresSponsorAdapter implements SponsorStoragePort {
-    private final SponsorViewRepository sponsorViewRepository;
+    private final SponsorRepository sponsorRepository;
 
     @Override
+    @Transactional
     public Page<SponsorView> findSponsors(int pageIndex, int pageSize) {
-        final var page = sponsorViewRepository.findAll(PageRequest.of(pageIndex, pageSize));
+        final var page = sponsorRepository.findAll(PageRequest.of(pageIndex, pageSize, Sort.by("name")));
         return Page.<SponsorView>builder()
-                .content(page.getContent().stream().map(entity ->
-                        SponsorView.builder()
-                                .id(entity.getId())
-                                .name(entity.getName())
-                                .url(entity.getUrl())
-                                .logoUrl(entity.getLogoUrl())
-                                .projects(isNull(entity.getProjects()) ? List.of() : entity.getProjects().stream()
-                                        .map(p -> ShortProjectView.builder()
-                                                .slug(p.getSlug())
-                                                .name(p.getName())
-                                                .logoUrl(p.getLogoUrl())
-                                                .shortDescription(p.getShortDescription())
-                                                .id(ProjectId.of(p.getId()))
-                                                .build()
-                                        ).toList())
-                                .build()
-                ).toList())
+                .content(page.getContent().stream().map(SponsorEntity::toView).toList())
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public Optional<SponsorView> get(SponsorId sponsorId) {
+        return sponsorRepository.findById(sponsorId.value()).map(SponsorEntity::toView);
     }
 }

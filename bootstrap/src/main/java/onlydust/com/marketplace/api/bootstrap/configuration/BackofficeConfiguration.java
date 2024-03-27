@@ -4,6 +4,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.*;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
+import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.PaymentService;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
@@ -69,8 +70,11 @@ public class BackofficeConfiguration {
 
     @Bean
     public AccountingRewardPort accountingRewardPort(final AccountingRewardStoragePort accountingRewardStoragePort,
-                                                     final MailNotificationPort mailNotificationPort) {
-        return new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, mailNotificationPort);
+                                                     final MailNotificationPort mailNotificationPort,
+                                                     final AccountingFacadePort accountingFacadePort,
+                                                     final SponsorStoragePort sponsorStoragePort) {
+        return new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, mailNotificationPort, accountingFacadePort,
+                sponsorStoragePort);
     }
 
     @Bean

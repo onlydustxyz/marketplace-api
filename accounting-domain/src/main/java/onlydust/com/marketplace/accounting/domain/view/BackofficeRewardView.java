@@ -11,7 +11,7 @@ import onlydust.com.marketplace.kernel.model.RewardStatus;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-@Builder
+@Builder(toBuilder = true)
 public record BackofficeRewardView(
         @NonNull RewardId id,
         Payment.Id paymentId,
