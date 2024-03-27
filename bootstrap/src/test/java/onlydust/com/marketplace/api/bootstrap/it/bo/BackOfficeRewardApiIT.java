@@ -225,7 +225,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "id": "5f9060a7-6f9e-4ef7-a1e4-1aaa4c85f03c",
                               "paymentId": null,
                               "billingProfile": {
-                                "name": "Olivier SASU",
+                                "subject": "Antho SASU",
                                 "type": "SELF_EMPLOYED",
                                 "verificationStatus": "VERIFIED",
                                 "kyb": null,
@@ -281,7 +281,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "id": "fab7aaf4-9b0c-4e52-bc9b-72ce08131617",
                               "paymentId": null,
                               "billingProfile": {
-                                "name": "Olivier SASU",
+                                "subject": "Antho SASU",
                                 "type": "SELF_EMPLOYED",
                                 "verificationStatus": "VERIFIED",
                                 "kyb": null,
@@ -383,7 +383,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "id": "736e0554-f30e-4315-9731-7611fa089dcf",
                               "paymentId": null,
                               "billingProfile": {
-                                "name": "Olivier SASU",
+                                "subject": "Antho SASU",
                                 "type": "SELF_EMPLOYED",
                                 "verificationStatus": "VERIFIED",
                                 "kyb": null,
@@ -517,7 +517,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "5f9060a7-6f9e-4ef7-a1e4-1aaa4c85f03c",
                               "billingProfile": {
-                                "name": "Olivier SASU",
+                                "subject": "Antho SASU",
                                 "type": "SELF_EMPLOYED",
                                 "verificationStatus": "VERIFIED",
                                 "kyb": null,
@@ -572,7 +572,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "fab7aaf4-9b0c-4e52-bc9b-72ce08131617",
                               "billingProfile": {
-                                "name": "Olivier SASU",
+                                "subject": "Antho SASU",
                                 "type": "SELF_EMPLOYED",
                                 "verificationStatus": "VERIFIED",
                                 "kyb": null,
@@ -782,7 +782,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "bdb59436-1b93-4c3c-a6e2-b8b09411280c",
                               "billingProfile": {
-                                "name": "Olivier",
+                                "subject": "Pierre Qui roule n'amasse pas mousses",
                                 "type": "INDIVIDUAL",
                                 "verificationStatus": "VERIFIED",
                                 "kyb": null,
@@ -837,7 +837,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "e23ad82b-27c5-4840-9481-da31aef6ba1b",
                               "billingProfile": {
-                                "name": "Olivier",
+                                "subject": "Pierre Qui roule n'amasse pas mousses",
                                 "type": "INDIVIDUAL",
                                 "verificationStatus": "VERIFIED",
                                 "kyb": null,
@@ -892,7 +892,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "72f257fa-1b20-433d-9cdd-88d5182b7369",
                               "billingProfile": {
-                                "name": "Olivier",
+                                "subject": "Pierre Qui roule n'amasse pas mousses",
                                 "type": "INDIVIDUAL",
                                 "verificationStatus": "VERIFIED",
                                 "kyb": null,
@@ -947,7 +947,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "91c7e960-37ba-4334-ba91-f1b02f1927ab",
                               "billingProfile": {
-                                "name": "Olivier",
+                                "subject": "Pierre Qui roule n'amasse pas mousses",
                                 "type": "INDIVIDUAL",
                                 "verificationStatus": "VERIFIED",
                                 "kyb": null,
@@ -1002,7 +1002,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "e6152967-9bd4-40e6-bad5-c9c4a9578d0f",
                               "billingProfile": {
-                                "name": "Olivier",
+                                "subject": "Pierre Qui roule n'amasse pas mousses",
                                 "type": "INDIVIDUAL",
                                 "verificationStatus": "VERIFIED",
                                 "kyb": null,

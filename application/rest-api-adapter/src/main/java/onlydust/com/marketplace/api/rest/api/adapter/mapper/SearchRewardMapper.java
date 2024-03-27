@@ -115,7 +115,7 @@ public interface SearchRewardMapper {
         return new BillingProfileResponse()
                 .id(billingProfile.id().value())
                 .type(mapBillingProfileType(billingProfile.type()))
-                .name(billingProfile.name())
+                .subject(billingProfile.subject())
                 .verificationStatus(map(billingProfile.status()));
     }
 

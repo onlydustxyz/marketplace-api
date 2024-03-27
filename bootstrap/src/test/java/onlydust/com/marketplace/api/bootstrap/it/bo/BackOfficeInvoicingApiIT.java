@@ -250,7 +250,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                             {
                               "status": "TO_REVIEW",
                               "billingProfile": {
-                                "name": "Apple Inc.",
+                                "subject": "Apple Inc.",
                                 "type": "COMPANY",
                                 "verificationStatus": null,
                                 "kyb": {
@@ -309,7 +309,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                             {
                               "status": "TO_REVIEW",
                               "billingProfile": {
-                                "name": "Apple Inc.",
+                                "subject": "Apple Inc.",
                                 "type": "COMPANY",
                                 "verificationStatus": null,
                                 "kyb": {
@@ -357,7 +357,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                             {
                               "status": "TO_REVIEW",
                               "billingProfile": {
-                                "name": "Apple Inc.",
+                                "subject": "Apple Inc.",
                                 "type": "COMPANY",
                                 "verificationStatus": null,
                                 "kyb": {
@@ -413,7 +413,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "number": "OD-APPLE-INC--001",
                           "status": "TO_REVIEW",
                           "billingProfile": {
-                            "name": "Apple Inc.",
+                            "subject": "Apple Inc.",
                             "type": "COMPANY",
                             "verificationStatus": null,
                             "kyb": {
