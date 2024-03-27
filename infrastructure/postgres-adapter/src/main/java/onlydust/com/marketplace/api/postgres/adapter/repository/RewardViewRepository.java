@@ -30,14 +30,18 @@ public interface RewardViewRepository extends JpaRepository<RewardViewEntity, UU
                    github_recipient.id          AS recipient_id,
                    github_recipient.login       AS recipient_login,
                    user_avatar_url(r.recipient_id, github_recipient.avatar_url)  AS recipient_avatar_url,
+                   github_recipient.html_url    AS recipient_html_url,
+                   recipient.id IS NOT NULL     AS recipient_is_registered,
                    github_requestor.id          AS requestor_id,
                    github_requestor.login       AS requestor_login,
-                   user_avatar_url(github_requestor.id, github_requestor.avatar_url)  AS requestor_avatar_url
+                   user_avatar_url(github_requestor.id, github_requestor.avatar_url)  AS requestor_avatar_url,
+                   github_requestor.html_url    AS requestor_html_url
             from rewards r
                  JOIN accounting.reward_status_data rsd ON rsd.reward_id = r.id
                  JOIN accounting.reward_statuses rs ON rs.reward_id = r.id
                  JOIN LATERAL (SELECT count(*) as count from reward_items ri where reward_id = r.id) ri ON TRUE
                  JOIN indexer_exp.github_accounts github_recipient ON github_recipient.id = r.recipient_id
+                 LEFT JOIN iam.users recipient ON recipient.github_user_id = r.recipient_id
                  JOIN iam.users requestor ON requestor.id = r.requestor_id
                  JOIN indexer_exp.github_accounts github_requestor ON github_requestor.id = requestor.github_user_id
             """;

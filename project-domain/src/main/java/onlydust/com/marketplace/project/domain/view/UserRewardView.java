@@ -2,10 +2,8 @@ package onlydust.com.marketplace.project.domain.view;
 
 import lombok.Builder;
 import lombok.Data;
-import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -22,19 +20,9 @@ public class UserRewardView {
     String rewardedOnProjectLogoUrl;
     RewardStatus status;
     Date unlockDate;
-    Amount amount;
-    Long recipientId;
-    String recipientLogin;
-    String recipientAvatarUrl;
+    Money amount;
+    ContributorLinkView rewardedUser;
     UUID billingProfileId;
-
-    @Data
-    @Builder
-    public static class Amount {
-        BigDecimal total;
-        CurrencyView currency;
-        BigDecimal dollarsEquivalent;
-    }
 
     @Data
     @Builder

@@ -9,10 +9,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.ReceiptEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
-import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
-import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
-import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
-import onlydust.com.marketplace.project.domain.view.UserRewardView;
+import onlydust.com.marketplace.project.domain.view.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -39,9 +36,12 @@ public class RewardViewEntity {
     UUID billingProfileId;
     String recipientLogin;
     String recipientAvatarUrl;
+    String recipientHtmlUrl;
+    Boolean recipientIsRegistered;
     Long requestorId;
     String requestorLogin;
     String requestorAvatarUrl;
+    String requestorHtmlUrl;
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
     @NonNull RewardStatusEntity status;
@@ -60,11 +60,7 @@ public class RewardViewEntity {
     public RewardDetailsView toDomain() {
         return RewardDetailsView.builder()
                 .id(id)
-                .to(GithubUserIdentity.builder()
-                        .githubAvatarUrl(recipientAvatarUrl)
-                        .githubLogin(recipientLogin)
-                        .githubUserId(recipientId)
-                        .build())
+                .to(to())
                 .amount(amount)
                 .createdAt(requestedAt)
                 .processedAt(statusData.paidAt())
@@ -72,14 +68,30 @@ public class RewardViewEntity {
                 .dollarsEquivalent(statusData.amountUsdEquivalent())
                 .status(status.toDomain())
                 .unlockDate(statusData.unlockDate())
-                .from(GithubUserIdentity.builder()
-                        .githubUserId(requestorId)
-                        .githubLogin(requestorLogin)
-                        .githubAvatarUrl(requestorAvatarUrl)
-                        .build())
+                .from(from())
                 .project(project.toDomain())
                 .receipt(receipts.stream().findFirst().map(ReceiptEntity::toDomain).orElse(null))
-                .billingProfileId(this.billingProfileId)
+                .billingProfileId(billingProfileId)
+                .build();
+    }
+
+    private ContributorLinkView to() {
+        return ContributorLinkView.builder()
+                .avatarUrl(recipientAvatarUrl)
+                .login(recipientLogin)
+                .githubUserId(recipientId)
+                .url(recipientHtmlUrl)
+                .isRegistered(recipientIsRegistered)
+                .build();
+    }
+
+    private ContributorLinkView from() {
+        return ContributorLinkView.builder()
+                .githubUserId(requestorId)
+                .login(requestorLogin)
+                .avatarUrl(requestorAvatarUrl)
+                .url(requestorHtmlUrl)
+                .isRegistered(true)
                 .build();
     }
 
@@ -93,15 +105,9 @@ public class RewardViewEntity {
                 .rewardedOnProjectLogoUrl(project.getLogoUrl())
                 .status(status.toDomain())
                 .unlockDate(statusData.unlockDate())
-                .amount(UserRewardView.Amount.builder()
-                        .total(amount)
-                        .currency(currency.toView())
-                        .dollarsEquivalent(statusData.amountUsdEquivalent())
-                        .build())
+                .amount(amount())
                 .numberOfRewardedContributions(contributionCount)
-                .recipientAvatarUrl(recipientAvatarUrl)
-                .recipientId(recipientId)
-                .recipientLogin(recipientLogin)
+                .rewardedUser(to())
                 .billingProfileId(billingProfileId)
                 .build();
     }
@@ -112,16 +118,19 @@ public class RewardViewEntity {
                 .numberOfRewardedContributions(contributionCount)
                 .requestedAt(requestedAt)
                 .processedAt(statusData.paidAt())
-                .rewardedUserLogin(recipientLogin)
-                .rewardedUserAvatar(recipientAvatarUrl)
+                .rewardedUser(to())
                 .status(status.toDomain())
                 .unlockDate(statusData.unlockDate())
-                .amount(ProjectRewardView.Amount.builder()
-                        .total(amount)
-                        .currency(currency.toView())
-                        .dollarsEquivalent(statusData.amountUsdEquivalent())
-                        .build())
+                .amount(amount())
                 .numberOfRewardedContributions(contributionCount)
+                .build();
+    }
+
+    private Money amount() {
+        return Money.builder()
+                .amount(amount)
+                .currency(currency.toView())
+                .usdEquivalent(statusData.amountUsdEquivalent())
                 .build();
     }
 

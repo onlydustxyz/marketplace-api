@@ -42,8 +42,7 @@ public interface ProjectRewardMapper {
         final RewardPageItemResponse rewardPageItemResponse = new RewardPageItemResponse();
         rewardPageItemResponse.setId(view.getId());
         rewardPageItemResponse.setNumberOfRewardedContributions(view.getNumberOfRewardedContributions());
-        rewardPageItemResponse.setRewardedUserLogin(view.getRewardedUserLogin());
-        rewardPageItemResponse.setRewardedUserAvatar(view.getRewardedUserAvatar());
+        rewardPageItemResponse.setRewardedUser(ContributorMapper.of(view.getRewardedUser()));
         final RewardAmountResponse amount = mapRewardAmountToResponse(view);
         rewardPageItemResponse.setAmount(amount);
         rewardPageItemResponse.setStatus(RewardMapper.map(view.getStatus().asProjectLead()));
@@ -54,10 +53,9 @@ public interface ProjectRewardMapper {
     }
 
     static RewardAmountResponse mapRewardAmountToResponse(ProjectRewardView view) {
-        final RewardAmountResponse amount = new RewardAmountResponse();
-        amount.setCurrency(mapCurrency(view.getAmount().getCurrency()));
-        amount.setDollarsEquivalent(view.getAmount().getDollarsEquivalent());
-        amount.setTotal(view.getAmount().getTotal());
-        return amount;
+        return new RewardAmountResponse()
+                .currency(mapCurrency(view.getAmount().getCurrency()))
+                .dollarsEquivalent(view.getAmount().getUsdEquivalent())
+                .total(view.getAmount().getAmount());
     }
 }
