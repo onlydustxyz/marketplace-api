@@ -203,6 +203,62 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
     @Test
     @Order(2)
+    void should_get_reward_by_id() {
+        // When
+        client.get()
+                .uri(getApiURI(BO_REWARD.formatted("061e2c7e-bda4-49a8-9914-2e76926f70c2")))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "id": "061e2c7e-bda4-49a8-9914-2e76926f70c2",
+                          "paymentId": null,
+                          "billingProfile": {
+                            "subject": "Olivier Inc.",
+                            "type": "COMPANY",
+                            "verificationStatus": "VERIFIED",
+                            "kyb": null,
+                            "kyc": null,
+                            "admins": null
+                          },
+                          "requestedAt": "2023-05-15T12:15:54.25529Z",
+                          "processedAt": "2023-07-27T10:27:14.522Z",
+                          "githubUrls": [
+                            "https://github.com/od-mocks/cool-repo-A/pull/397"
+                          ],
+                          "status": "COMPLETE",
+                          "project": {
+                            "name": "Pizzeria Yoshi !",
+                            "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png"
+                          },
+                          "sponsors": [
+                            {
+                              "name": "No Sponsor",
+                              "avatarUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
+                            }
+                          ],
+                          "money": {
+                            "amount": 1000,
+                            "currency": {
+                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                              "code": "USDC",
+                              "name": "USD Coin",
+                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                              "decimals": 6
+                            },
+                            "dollarsEquivalent": 1010.00,
+                            "conversionRate": 1.0100000000000000
+                          }
+                        }
+                        """);
+    }
+
+    @Test
+    @Order(2)
     void should_get_all_rewards() {
 
         // When

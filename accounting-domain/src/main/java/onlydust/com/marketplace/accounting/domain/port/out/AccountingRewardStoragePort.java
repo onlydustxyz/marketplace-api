@@ -42,4 +42,6 @@ public interface AccountingRewardStoragePort {
     void saveAll(List<Payment> payments);
 
     void deletePayment(Payment.Id paymentId);
+
+    Optional<BackofficeRewardView> getReward(RewardId id);
 }
