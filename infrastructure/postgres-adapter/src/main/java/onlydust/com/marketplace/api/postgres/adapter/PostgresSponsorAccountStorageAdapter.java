@@ -18,6 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Comparator.comparing;
+
 @AllArgsConstructor
 public class PostgresSponsorAccountStorageAdapter implements SponsorAccountStorage {
     private final SponsorAccountRepository sponsorAccountRepository;
@@ -44,7 +46,10 @@ public class PostgresSponsorAccountStorageAdapter implements SponsorAccountStora
 
     @Override
     public List<SponsorAccount> getSponsorAccounts(SponsorId sponsorId) {
-        return sponsorAccountRepository.findAllBySponsorId(sponsorId.value()).stream().map(SponsorAccountEntity::toDomain).toList();
+        return sponsorAccountRepository.findAllBySponsorId(sponsorId.value()).stream()
+                .map(SponsorAccountEntity::toDomain)
+                .sorted(comparing(a -> a.currency().code().toString().toUpperCase()))
+                .toList();
     }
 
     @Override

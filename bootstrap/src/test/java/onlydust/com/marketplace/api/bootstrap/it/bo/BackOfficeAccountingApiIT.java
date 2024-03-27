@@ -21,6 +21,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.testcontainers.shaded.org.apache.commons.lang3.mutable.MutableObject;
 
 import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
@@ -378,6 +379,9 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .isOk();
 
         // When
+        final var currency1 = new MutableObject<String>();
+        final var currency2 = new MutableObject<String>();
+
         client.get()
                 .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(THEODO)))
                 .header("Api-Key", apiKey())
@@ -386,6 +390,9 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectStatus()
                 .isOk()
                 .expectBody()
+                .jsonPath("$.accounts.size()").isEqualTo(2)
+                .jsonPath("$.accounts[0].currency.code").value(currency1::setValue)
+                .jsonPath("$.accounts[1].currency.code").value(currency2::setValue)
                 .json("""
                         {
                           "accounts": [
@@ -433,6 +440,8 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                           ]
                         }
                         """);
+
+        assertThat(currency1.getValue().compareToIgnoreCase(currency2.getValue())).isLessThan(0);
     }
 
     @Test
