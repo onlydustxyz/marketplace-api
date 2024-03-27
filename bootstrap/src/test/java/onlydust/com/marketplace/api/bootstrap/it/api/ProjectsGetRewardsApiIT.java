@@ -82,7 +82,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .expectStatus()
                 .isOk()
-                .expectBody().consumeWith(System.out::println)
+                .expectBody()
                 .jsonPath("$.rewards[0].id").isEqualTo("2ac80cc6-7e83-4eef-bc0c-932b58f683c0")
                 .jsonPath("$.rewards[0].status").isEqualTo("PENDING_CONTRIBUTOR")
                 .jsonPath("$.rewards[0].amount.currency.code").isEqualTo("APT")
@@ -201,7 +201,8 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.rewards[?(@.rewardedUserLogin != 'gregcha')]").doesNotExist()
+                .jsonPath("$.rewards[?(@.rewardedUser.login != 'gregcha')]").doesNotExist()
+                .jsonPath("$.rewards[?(@.rewardedUser.login == 'gregcha')]").exists()
                 .jsonPath("$.remainingBudget.amount").doesNotExist()
                 .jsonPath("$.remainingBudget.currency").doesNotExist()
                 .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(5446182)

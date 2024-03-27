@@ -88,13 +88,26 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "status": "PENDING_REQUEST",
                               "unlockDate": null,
                               "amount": {
-                                "total": 500,
-                                "currency": {"id":"48388edb-fda2-4a32-b228-28152a147500","code":"APT","name":"Aptos Coin","logoUrl":null,"decimals":8},
-                                "dollarsEquivalent": 100000
+                                "total": 500.0,
+                                "currency": {
+                                  "id": "48388edb-fda2-4a32-b228-28152a147500",
+                                  "code": "APT",
+                                  "name": "Aptos Coin",
+                                  "logoUrl": null,
+                                  "decimals": 8
+                                },
+                                "dollarsEquivalent": 100000.0
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
                               "rewardedOnProjectLogoUrl": null,
+                              "rewardedUser": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "htmlUrl": "https://github.com/PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": true
+                              },
                               "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
                             },
                             {
@@ -104,13 +117,26 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "status": "COMPLETE",
                               "unlockDate": null,
                               "amount": {
-                                "total": 50,
-                                "currency": {"id":"71bdfcf4-74ee-486b-8cfe-5d841dd93d5c","code":"ETH","name":"Ether","logoUrl":null,"decimals":18},
-                                "dollarsEquivalent": 75000
+                                "total": 50.0,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "dollarsEquivalent": 75000.0
                               },
                               "numberOfRewardedContributions": 1,
                               "rewardedOnProjectName": "QA new contributions",
                               "rewardedOnProjectLogoUrl": null,
+                              "rewardedUser": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "htmlUrl": "https://github.com/PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": true
+                              },
                               "id": "e1498a17-5090-4071-a88a-6f0b0c337c3a"
                             },
                             {
@@ -119,13 +145,26 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "status": "COMPLETE",
                               "unlockDate": null,
                               "amount": {
-                                "total": 10,
-                                "currency": {"id":"71bdfcf4-74ee-486b-8cfe-5d841dd93d5c","code":"ETH","name":"Ether","logoUrl":null,"decimals":18},
-                                "dollarsEquivalent": 15000
+                                "total": 10.0,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "dollarsEquivalent": 15000.0
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
                               "rewardedOnProjectLogoUrl": null,
+                              "rewardedUser": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "htmlUrl": "https://github.com/PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": true
+                              },
                               "id": "40fda3c6-2a3f-4cdd-ba12-0499dd232d53"
                             },
                             {
@@ -136,12 +175,25 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": null,
                               "amount": {
                                 "total": 1000,
-                                "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
                                 "dollarsEquivalent": 1010.00
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
                               "rewardedOnProjectLogoUrl": null,
+                              "rewardedUser": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "htmlUrl": "https://github.com/PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": true
+                              },
                               "id": "85f8358c-5339-42ac-a577-16d7760d1e28"
                             },
                             {
@@ -151,13 +203,26 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "status": "PAYOUT_INFO_MISSING",
                               "unlockDate": "2024-08-23T00:00:00Z",
                               "amount": {
-                                "total": 30,
-                                "currency": {"id":"00ca98a5-0197-4b76-a208-4bfc55ea8256","code":"OP","name":"Optimism","logoUrl":null,"decimals":18},
+                                "total": 30.0,
+                                "currency": {
+                                  "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
+                                  "code": "OP",
+                                  "name": "Optimism",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
                                 "dollarsEquivalent": null
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
                               "rewardedOnProjectLogoUrl": null,
+                              "rewardedUser": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "htmlUrl": "https://github.com/PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": true
+                              },
                               "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"
                             },
                             {
@@ -167,13 +232,26 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "status": "PAYOUT_INFO_MISSING",
                               "unlockDate": null,
                               "amount": {
-                                "total": 9511147,
-                                "currency": {"id":"81b7e948-954f-4718-bad3-b70a0edd27e1","code":"STRK","name":"StarkNet Token","logoUrl":null,"decimals":18},
+                                "total": 9511147.0,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
                                 "dollarsEquivalent": null
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
                               "rewardedOnProjectLogoUrl": null,
+                              "rewardedUser": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "htmlUrl": "https://github.com/PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": true
+                              },
                               "id": "5b96ca1e-4ad2-41c1-8819-520b885d9223"
                             }
                           ],
@@ -192,8 +270,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                             "usdEquivalent": 101010.00
                           },
                           "receivedRewardsCount": 6,
-                          "rewardedContributionsCount": 26,
-                          "rewardingProjectsCount": 1
+                          "rewardedContributionsCount": 26
                         }
                         """);
     }

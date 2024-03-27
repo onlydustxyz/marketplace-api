@@ -3467,16 +3467,15 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
               "from": {
                 "githubUserId": 16590657,
                 "login": "PierreOucif",
-                "htmlUrl": null,
+                "htmlUrl": "https://github.com/PierreOucif",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                "isRegistered": null
+                "isRegistered": true
               },
               "to": {
                 "githubUserId": 1,
                 "login": "mmaderic",
-                "htmlUrl": null,
-                "avatarUrl": "https://avatars.githubusercontent.com/u/39437117?v=4",
-                "isRegistered": null
+                "htmlUrl": "https://github.com/mmaderic",
+                "avatarUrl": "https://avatars.githubusercontent.com/u/39437117?v=4"
               },
               
               "project": {
@@ -3503,16 +3502,15 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
               "from": {
                 "githubUserId": 16590657,
                 "login": "PierreOucif",
-                "htmlUrl": null,
+                "htmlUrl": "https://github.com/PierreOucif",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                "isRegistered": null
+                "isRegistered": true
               },
               "to": {
                 "githubUserId": 1,
                 "login": "mmaderic",
-                "htmlUrl": null,
-                "avatarUrl": "https://avatars.githubusercontent.com/u/39437117?v=4",
-                "isRegistered": null
+                "htmlUrl": "https://github.com/mmaderic",
+                "avatarUrl": "https://avatars.githubusercontent.com/u/39437117?v=4"
               },
               
               "project": {
@@ -3541,16 +3539,15 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                "from": {
                  "githubUserId": 16590657,
                  "login": "PierreOucif",
-                 "htmlUrl": null,
+                 "htmlUrl": "https://github.com/PierreOucif",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                 "isRegistered": null
+                 "isRegistered": true
                },
                "to": {
                  "githubUserId": 2,
                  "login": "jannesblobel",
-                 "htmlUrl": null,
-                 "avatarUrl": "https://avatars.githubusercontent.com/u/72493222?v=4",
-                 "isRegistered": null
+                 "htmlUrl": "https://github.com/jannesblobel",
+                 "avatarUrl": "https://avatars.githubusercontent.com/u/72493222?v=4"
                },
                
                "project": {
@@ -3578,16 +3575,15 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                "from": {
                  "githubUserId": 16590657,
                  "login": "PierreOucif",
-                 "htmlUrl": null,
+                 "htmlUrl": "https://github.com/PierreOucif",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                 "isRegistered": null
+                 "isRegistered": true
                },
                "to": {
                  "githubUserId": 2,
                  "login": "jannesblobel",
-                 "htmlUrl": null,
-                 "avatarUrl": "https://avatars.githubusercontent.com/u/72493222?v=4",
-                 "isRegistered": null
+                 "htmlUrl": "https://github.com/jannesblobel",
+                 "avatarUrl": "https://avatars.githubusercontent.com/u/72493222?v=4"
                },
                
                "project": {
@@ -3615,16 +3611,15 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                "from": {
                  "githubUserId": 16590657,
                  "login": "PierreOucif",
-                 "htmlUrl": null,
+                 "htmlUrl": "https://github.com/PierreOucif",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                 "isRegistered": null
+                 "isRegistered": true
                },
                "to": {
                  "githubUserId": 3,
                  "login": "nickdbush",
-                 "htmlUrl": null,
-                 "avatarUrl": "https://avatars.githubusercontent.com/u/10998201?v=4",
-                 "isRegistered": null
+                 "htmlUrl": "https://github.com/nickdbush",
+                 "avatarUrl": "https://avatars.githubusercontent.com/u/10998201?v=4"
                },
                
                "project": {
@@ -3652,16 +3647,15 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                "from": {
                  "githubUserId": 16590657,
                  "login": "PierreOucif",
-                 "htmlUrl": null,
+                 "htmlUrl": "https://github.com/PierreOucif",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                 "isRegistered": null
+                 "isRegistered": true
                },
                "to": {
                  "githubUserId": 3,
                  "login": "nickdbush",
-                 "htmlUrl": null,
-                 "avatarUrl": "https://avatars.githubusercontent.com/u/10998201?v=4",
-                 "isRegistered": null
+                 "htmlUrl": "https://github.com/nickdbush",
+                 "avatarUrl": "https://avatars.githubusercontent.com/u/10998201?v=4"
                },
                
                "project": {
@@ -3689,16 +3683,15 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                "from": {
                  "githubUserId": 16590657,
                  "login": "PierreOucif",
-                 "htmlUrl": null,
+                 "htmlUrl": "https://github.com/PierreOucif",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                 "isRegistered": null
+                 "isRegistered": true
                },
                "to": {
                  "githubUserId": 5,
                  "login": "yanns",
-                 "htmlUrl": null,
-                 "avatarUrl": "https://avatars.githubusercontent.com/u/51669?v=4",
-                 "isRegistered": null
+                 "htmlUrl": "https://github.com/yanns",
+                 "avatarUrl": "https://avatars.githubusercontent.com/u/51669?v=4"
                },
                
                "project": {
@@ -3726,16 +3719,15 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                "from": {
                  "githubUserId": 16590657,
                  "login": "PierreOucif",
-                 "htmlUrl": null,
+                 "htmlUrl": "https://github.com/PierreOucif",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                 "isRegistered": null
+                 "isRegistered": true
                },
                "to": {
                  "githubUserId": 5,
                  "login": "yanns",
-                 "htmlUrl": null,
-                 "avatarUrl": "https://avatars.githubusercontent.com/u/51669?v=4",
-                 "isRegistered": null
+                 "htmlUrl": "https://github.com/yanns",
+                 "avatarUrl": "https://avatars.githubusercontent.com/u/51669?v=4"
                },
                
                "project": {
@@ -3763,16 +3755,15 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                "from": {
                  "githubUserId": 16590657,
                  "login": "PierreOucif",
-                 "htmlUrl": null,
+                 "htmlUrl": "https://github.com/PierreOucif",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                 "isRegistered": null
+                 "isRegistered": true
                },
                "to": {
                  "githubUserId": 5,
                  "login": "yanns",
-                 "htmlUrl": null,
-                 "avatarUrl": "https://avatars.githubusercontent.com/u/51669?v=4",
-                 "isRegistered": null
+                 "htmlUrl": "https://github.com/yanns",
+                 "avatarUrl": "https://avatars.githubusercontent.com/u/51669?v=4"
                },
                
                "project": {
@@ -3801,16 +3792,15 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
               "from": {
                 "githubUserId": 16590657,
                 "login": "PierreOucif",
-                "htmlUrl": null,
+                "htmlUrl": "https://github.com/PierreOucif",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                "isRegistered": null
+                "isRegistered": true
               },
               "to": {
                 "githubUserId": 4,
                 "login": "acomminos",
-                "htmlUrl": null,
-                "avatarUrl": "https://avatars.githubusercontent.com/u/628035?v=4",
-                "isRegistered": null
+                "htmlUrl": "https://github.com/acomminos",
+                "avatarUrl": "https://avatars.githubusercontent.com/u/628035?v=4"
               },
               
               "project": {
@@ -3837,16 +3827,15 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
               "from": {
                 "githubUserId": 16590657,
                 "login": "PierreOucif",
-                "htmlUrl": null,
+                "htmlUrl": "https://github.com/PierreOucif",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                "isRegistered": null
+                "isRegistered": true
               },
               "to": {
                 "githubUserId": 4,
                 "login": "acomminos",
-                "htmlUrl": null,
-                "avatarUrl": "https://avatars.githubusercontent.com/u/628035?v=4",
-                "isRegistered": null
+                "htmlUrl": "https://github.com/acomminos",
+                "avatarUrl": "https://avatars.githubusercontent.com/u/628035?v=4"
               },
               
               "project": {

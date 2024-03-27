@@ -309,7 +309,7 @@ public class UserServiceTest {
         final UUID rewardId = UUID.randomUUID();
         final long recipientId = 1L;
         final RewardDetailsView expectedReward =
-                RewardDetailsView.builder().id(rewardId).to(GithubUserIdentity.builder().githubUserId(recipientId).build()).build();
+                RewardDetailsView.builder().id(rewardId).to(ContributorLinkView.builder().githubUserId(recipientId).build()).build();
         final List<UUID> companyAdminBillingProfileIds = List.of();
 
         // When
@@ -332,7 +332,7 @@ public class UserServiceTest {
         final RewardDetailsView expectedReward =
                 RewardDetailsView.builder().id(rewardId)
                         .billingProfileId(companyAdminBillingProfileIds.get(0))
-                        .to(GithubUserIdentity.builder()
+                        .to(ContributorLinkView.builder()
                                 .githubUserId(recipientId).build()).build();
 
         // When
@@ -353,7 +353,7 @@ public class UserServiceTest {
         final UUID rewardId = UUID.randomUUID();
         final long recipientId = 1L;
         final RewardDetailsView expectedReward =
-                RewardDetailsView.builder().id(rewardId).to(GithubUserIdentity.builder().githubUserId(2L).build()).build();
+                RewardDetailsView.builder().id(rewardId).to(ContributorLinkView.builder().githubUserId(2L).build()).build();
         final List<UUID> companyAdminBillingProfileIds = List.of();
 
         // When
@@ -379,7 +379,7 @@ public class UserServiceTest {
         final long recipientId = 1L;
         final List<UUID> companyAdminBillingProfileIds = List.of(UUID.randomUUID());
         final RewardDetailsView expectedReward =
-                RewardDetailsView.builder().id(rewardId).to(GithubUserIdentity.builder().githubUserId(2L).build()).build();
+                RewardDetailsView.builder().id(rewardId).to(ContributorLinkView.builder().githubUserId(2L).build()).build();
 
         // When
         when(userStoragePort.findRewardById(rewardId))

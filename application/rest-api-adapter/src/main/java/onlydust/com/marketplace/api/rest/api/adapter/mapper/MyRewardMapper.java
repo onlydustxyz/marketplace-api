@@ -43,8 +43,9 @@ public interface MyRewardMapper {
                 .rewardedOnProjectLogoUrl(view.getRewardedOnProjectLogoUrl())
                 .rewardedOnProjectName(view.getRewardedOnProjectName())
                 .amount(mapRewardAmountToResponse(view))
+                .rewardedUser(ContributorMapper.of(view.getRewardedUser()))
                 .status(RewardMapper.map(view.getStatus().getRewardStatusForUser(view.getId(),
-                        view.getRecipientId(), view.getBillingProfileId(), githubUserId,
+                        view.getRewardedUser().getGithubUserId(), view.getBillingProfileId(), githubUserId,
                         billingProfiles.stream().map(BillingProfileLinkView::toUserBillingProfile).toList())))
                 .requestedAt(DateMapper.toZoneDateTime(view.getRequestedAt()))
                 .processedAt(DateMapper.toZoneDateTime(view.getProcessedAt()))
@@ -55,8 +56,8 @@ public interface MyRewardMapper {
     private static RewardAmountResponse mapRewardAmountToResponse(UserRewardView view) {
         return new RewardAmountResponse()
                 .currency(mapCurrency(view.getAmount().getCurrency()))
-                .dollarsEquivalent(view.getAmount().getDollarsEquivalent())
-                .total(view.getAmount().getTotal());
+                .dollarsEquivalent(view.getAmount().getUsdEquivalent())
+                .total(view.getAmount().getAmount());
     }
 
 }

@@ -3903,8 +3903,7 @@ components:
       required:
         - status
         - numberOfRewardedContributions
-        - rewardedUserLogin
-        - rewardedUserAvatar
+        - rewardedUser
         - amount
         - requestedAt
         - id
@@ -3928,12 +3927,8 @@ components:
         numberOfRewardedContributions:
           type: integer
           example: 11
-        rewardedUserLogin:
-          type: string
-          example: PierreOucif
-        rewardedUserAvatar:
-          type: string
-          example: https://avatars.githubusercontent.com/u/16590657?v=4
+        rewardedUser:
+          $ref: '#/components/schemas/ContributorResponse'
         id:
           $ref: '#/components/schemas/RewardId'
     MyRewardPageItemResponse:
@@ -3945,6 +3940,7 @@ components:
         - amount
         - rewardedOnProjectName
         - rewardedOnProjectLogoUrl
+        - rewardedUser
         - id
         - projectId
       properties:
@@ -3976,6 +3972,8 @@ components:
         rewardedOnProjectLogoUrl:
           type: string
           example: https://onlydust.xyz/cdn-cgi/image/width=100/https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png
+        rewardedUser:
+          $ref: '#/components/schemas/ContributorResponse'
         id:
           $ref: '#/components/schemas/RewardId'
     RewardType:

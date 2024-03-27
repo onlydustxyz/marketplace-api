@@ -10,6 +10,7 @@ import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.view.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,18 +41,21 @@ public interface RewardMapper {
                 .build();
     }
 
-    static RewardDetailsResponse projectRewardDetailsToResponse(RewardDetailsView rewardDetailsView) {
-        final var response = new RewardDetailsResponse()
+    static RewardDetailsResponse commonRewardDetailsToResponse(RewardDetailsView rewardDetailsView) {
+        return new RewardDetailsResponse()
                 .from(new ContributorResponse()
                         .githubUserId(rewardDetailsView.getFrom().getGithubUserId())
-                        .avatarUrl(rewardDetailsView.getFrom().getGithubAvatarUrl())
-                        .login(rewardDetailsView.getFrom().getGithubLogin())
+                        .avatarUrl(rewardDetailsView.getFrom().getAvatarUrl())
+                        .login(rewardDetailsView.getFrom().getLogin())
+                        .htmlUrl(URI.create(rewardDetailsView.getFrom().getUrl()))
+                        .isRegistered(rewardDetailsView.getFrom().getIsRegistered())
                 )
-                .to(
-                        new ContributorResponse()
-                                .githubUserId(rewardDetailsView.getTo().getGithubUserId())
-                                .avatarUrl(rewardDetailsView.getTo().getGithubAvatarUrl())
-                                .login(rewardDetailsView.getTo().getGithubLogin())
+                .to(new ContributorResponse()
+                        .githubUserId(rewardDetailsView.getTo().getGithubUserId())
+                        .avatarUrl(rewardDetailsView.getTo().getAvatarUrl())
+                        .login(rewardDetailsView.getTo().getLogin())
+                        .htmlUrl(URI.create(rewardDetailsView.getTo().getUrl()))
+                        .isRegistered(rewardDetailsView.getTo().getIsRegistered())
                 )
                 .createdAt(DateMapper.toZoneDateTime(rewardDetailsView.getCreatedAt()))
                 .processedAt(DateMapper.toZoneDateTime(rewardDetailsView.getProcessedAt()))
@@ -63,40 +67,20 @@ public interface RewardMapper {
                 .receipt(receiptToResponse(rewardDetailsView.getReceipt()))
                 .project(ProjectMapper.mapShortProjectResponse(rewardDetailsView.getProject()))
                 .billingProfileId(rewardDetailsView.getBillingProfileId());
-        response.status(map(rewardDetailsView.getStatus().asProjectLead()));
-        return response;
+    }
+
+    static RewardDetailsResponse projectRewardDetailsToResponse(RewardDetailsView rewardDetailsView) {
+        return commonRewardDetailsToResponse(rewardDetailsView)
+                .status(map(rewardDetailsView.getStatus().asProjectLead()));
     }
 
     static RewardDetailsResponse myRewardDetailsToResponse(RewardDetailsView rewardDetailsView, Long githubUserId,
                                                            List<BillingProfileLinkView> billingProfiles) {
-        final var response = new RewardDetailsResponse()
-                .from(new ContributorResponse()
-                        .githubUserId(rewardDetailsView.getFrom().getGithubUserId())
-                        .avatarUrl(rewardDetailsView.getFrom().getGithubAvatarUrl())
-                        .login(rewardDetailsView.getFrom().getGithubLogin())
-                )
-                .to(
-                        new ContributorResponse()
-                                .githubUserId(rewardDetailsView.getTo().getGithubUserId())
-                                .avatarUrl(rewardDetailsView.getTo().getGithubAvatarUrl())
-                                .login(rewardDetailsView.getTo().getGithubLogin())
-                )
-                .createdAt(DateMapper.toZoneDateTime(rewardDetailsView.getCreatedAt()))
-                .processedAt(DateMapper.toZoneDateTime(rewardDetailsView.getProcessedAt()))
-                .amount(rewardDetailsView.getAmount())
-                .currency(mapCurrency(rewardDetailsView.getCurrency()))
-                .unlockDate(DateMapper.toZoneDateTime(rewardDetailsView.getUnlockDate()))
-                .dollarsEquivalent(rewardDetailsView.getDollarsEquivalent())
-                .id(rewardDetailsView.getId())
-                .receipt(receiptToResponse(rewardDetailsView.getReceipt()))
-                .project(ProjectMapper.mapShortProjectResponse(rewardDetailsView.getProject()))
-                .billingProfileId(rewardDetailsView.getBillingProfileId());
-        response.status(map(rewardDetailsView.getStatus().getRewardStatusForUser(rewardDetailsView.getId(),
-                rewardDetailsView.getTo().getGithubUserId(), rewardDetailsView.getBillingProfileId(), githubUserId,
-                billingProfiles.stream().map(BillingProfileLinkView::toUserBillingProfile).toList())));
-        return response;
+        return commonRewardDetailsToResponse(rewardDetailsView)
+                .status(map(rewardDetailsView.getStatus().getRewardStatusForUser(rewardDetailsView.getId(),
+                        rewardDetailsView.getTo().getGithubUserId(), rewardDetailsView.getBillingProfileId(), githubUserId,
+                        billingProfiles.stream().map(BillingProfileLinkView::toUserBillingProfile).toList())));
     }
-
 
     static RewardStatusContract map(RewardStatus status) {
         return switch (status) {
