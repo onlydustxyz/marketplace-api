@@ -85,6 +85,14 @@ public class BillingProfileEntity {
                 case SELF_EMPLOYED -> BillingProfile.Type.SELF_EMPLOYED;
             };
         }
+
+        public static Type of(final BillingProfile.Type type) {
+            return switch (type) {
+                case INDIVIDUAL -> INDIVIDUAL;
+                case COMPANY -> COMPANY;
+                case SELF_EMPLOYED -> SELF_EMPLOYED;
+            };
+        }
     }
 
     public ZonedDateTime getInvoiceMandateAcceptedAt() {

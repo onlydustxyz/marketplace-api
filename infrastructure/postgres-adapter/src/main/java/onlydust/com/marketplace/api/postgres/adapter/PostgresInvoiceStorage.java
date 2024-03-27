@@ -2,11 +2,13 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
@@ -104,11 +106,15 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     }
 
     @Override
-    public Page<Invoice> findAll(final @NonNull List<Invoice.Id> ids, final @NonNull List<Invoice.Status> statuses, Integer pageIndex, Integer pageSize) {
-        final var pageRequest = PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
-
-        final var page = ids.isEmpty() ? invoiceRepository.findAllByStatusIn(statuses.stream().map(InvoiceEntity.Status::of).toList(), pageRequest) :
-                invoiceRepository.findAllByIdInAndStatusNot(ids.stream().map(Invoice.Id::value).toList(), InvoiceEntity.Status.DRAFT, pageRequest);
+    public Page<Invoice> findAll(@NonNull List<Invoice.Id> ids, @NonNull List<Invoice.Status> statuses, @NonNull List<Currency.Id> currencyIds,
+                                 @NonNull List<BillingProfile.Type> billingProfileTypes, String search, @NonNull Integer pageIndex, @NonNull Integer pageSize) {
+        final var page = invoiceRepository.findAllExceptDrafts(
+                ids.stream().map(Invoice.Id::value).toList(),
+                statuses.stream().map(InvoiceEntity.Status::of).map(Enum::toString).toList(),
+                currencyIds.stream().map(Currency.Id::value).toList(),
+                billingProfileTypes.stream().map(BillingProfileEntity.Type::of).map(Enum::toString).toList(),
+                search == null ? "" : search,
+                PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "created_at")));
 
         return Page.<Invoice>builder()
                 .content(page.getContent().stream().map(InvoiceEntity::toDomain).toList())

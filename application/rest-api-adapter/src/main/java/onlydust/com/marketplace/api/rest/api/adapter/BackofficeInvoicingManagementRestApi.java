@@ -5,9 +5,9 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeInvoicingManagementApi;
 import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
-import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
@@ -33,10 +33,8 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicingManagementApi {
     private final InvoiceFacadePort invoiceFacadePort;
     private final AccountingRewardPort accountingRewardPort;
-    private final BillingProfileFacadePort billingProfileFacadePort;
     private final QueryParamTokenAuthenticationService.Config queryParamTokenAuthenticationConfig;
     final static Integer MAX_PAGE_SIZE = Integer.MAX_VALUE;
-    final static List<InvoiceInternalStatus> ALL_STATUSES = List.of(InvoiceInternalStatus.values());
 
     @Override
     public ResponseEntity<InvoicePage> getInvoicePage(Integer pageIndex, Integer pageSize, List<UUID> invoiceIds,
@@ -45,7 +43,10 @@ public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicing
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final var page = invoiceFacadePort.findAll(
                 Optional.ofNullable(invoiceIds).orElse(List.of()).stream().map(Invoice.Id::of).toList(),
-                Optional.ofNullable(internalStatuses).orElse(ALL_STATUSES).stream().map(BackOfficeMapper::mapInvoiceStatus).toList(),
+                Optional.ofNullable(internalStatuses).orElse(List.of()).stream().map(BackOfficeMapper::mapInvoiceStatus).toList(),
+                List.of(),
+                List.of(),
+                null,
                 sanitizedPageIndex,
                 sanitizedPageSize
         );
@@ -59,13 +60,16 @@ public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicing
     }
 
     @Override
-    public ResponseEntity<InvoicePageV2> getInvoicePageV2(Integer pageIndex, Integer pageSize, List<UUID> invoiceIds,
-                                                          List<InvoiceInternalStatus> statuses) {
-        final int sanitizedPageSize = sanitizePageSize(pageSize, MAX_PAGE_SIZE);
+    public ResponseEntity<InvoicePageV2> getInvoicePageV2(Integer pageIndex, Integer pageSize, List<UUID> invoiceIds, List<InvoiceInternalStatus> statuses,
+                                                          List<UUID> currencies, List<BillingProfileType> billingProfileTypes, String search) {
+        final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final var page = invoiceFacadePort.findAll(
                 Optional.ofNullable(invoiceIds).orElse(List.of()).stream().map(Invoice.Id::of).toList(),
-                Optional.ofNullable(statuses).orElse(ALL_STATUSES).stream().map(BackOfficeMapper::mapInvoiceStatus).toList(),
+                Optional.ofNullable(statuses).orElse(List.of()).stream().map(BackOfficeMapper::mapInvoiceStatus).toList(),
+                Optional.ofNullable(currencies).orElse(List.of()).stream().map(Currency.Id::of).toList(),
+                Optional.ofNullable(billingProfileTypes).orElse(List.of()).stream().map(BackOfficeMapper::map).toList(),
+                search,
                 sanitizedPageIndex,
                 sanitizedPageSize
         );

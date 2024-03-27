@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.port.out;
 
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
@@ -26,7 +27,8 @@ public interface InvoiceStoragePort {
 
     Optional<Invoice> get(final @NonNull Invoice.Id invoiceId);
 
-    Page<Invoice> findAll(final @NonNull List<Invoice.Id> ids, final @NonNull List<Invoice.Status> statuses, Integer pageIndex, Integer pageSize);
+    Page<Invoice> findAll(@NonNull List<Invoice.Id> ids, @NonNull List<Invoice.Status> statuses, @NonNull List<Currency.Id> currencyIds,
+                          @NonNull List<BillingProfile.Type> billingProfileTypes, String search, @NonNull Integer pageIndex, @NonNull Integer pageSize);
 
     Optional<Invoice> invoiceOf(RewardId rewardId);
 

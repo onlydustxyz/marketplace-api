@@ -767,6 +767,147 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     }
 
     @Test
+    @Order(6)
+    void should_filter_invoices_by_currencies() {
+
+        // When
+        client
+                .get()
+                .uri(getApiURI(V2_INVOICES, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10",
+                        "currencyIds", "562bbf65-8a71-4d30-ad63-520c0d68ba27")))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "invoices": [
+                            {
+                              "totalsPerCurrency": [
+                                {
+                                  "currency": { "code": "USDC" }
+                                },
+                                {
+                                  "currency": { "code": "USDC" }
+                                },
+                                {
+                                  "currency": { "code": "USDC" }
+                                }
+                              ]
+                            },
+                            {
+                              "totalsPerCurrency": [
+                                {
+                                  "currency": { "code": "USDC" }
+                                },
+                                {
+                                  "currency": { "code": "USDC" }
+                                }
+                              ]
+                            },
+                            {
+                              "totalsPerCurrency": [
+                                {
+                                  "currency": { "code": "USDC" }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                        """)
+        ;
+    }
+
+    @Test
+    @Order(6)
+    void should_filter_invoices_by_billing_profile_type() {
+
+        // When
+        client
+                .get()
+                .uri(getApiURI(V2_INVOICES, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10",
+                        "billingProfileTypes", "COMPANY,SELF_EMPLOYED")))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "invoices": [
+                            {
+                              "billingProfile": {
+                                "type": "COMPANY"
+                              }
+                            },
+                            {
+                              "billingProfile": {
+                                "type": "COMPANY"
+                              }
+                            },
+                            {
+                              "billingProfile": {
+                                "type": "COMPANY"
+                              }
+                            }
+                          ]
+                        }
+                        """)
+        ;
+    }
+
+    @Test
+    @Order(6)
+    void should_search_invoices() {
+
+        // When
+        client
+                .get()
+                .uri(getApiURI(V2_INVOICES, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10",
+                        "search", "apple")))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "invoices": [
+                            {
+                              "billingProfile": {
+                                "kyb": {
+                                  "name": "Apple Inc."
+                                }
+                              }
+                            },
+                            {
+                              "billingProfile": {
+                                "kyb": {
+                                  "name": "Apple Inc."
+                                }
+                              }
+                            },
+                            {
+                              "billingProfile": {
+                                "kyb": {
+                                  "name": "Apple Inc."
+                                }
+                              }
+                            }
+                          ]
+                        }
+                        """)
+        ;
+    }
+
+    @Test
     @Order(7)
     void should_download_invoices() {
         final var invoiceId = companyBillingProfileToReviewInvoices.get(0);
