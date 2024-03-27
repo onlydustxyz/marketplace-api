@@ -3,6 +3,7 @@ package onlydust.com.marketplace.accounting.domain.service;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
@@ -69,5 +70,11 @@ public class RewardService implements AccountingRewardPort {
         accountingRewardStoragePort.markRewardsAsPaymentNotified(rewardViews.stream()
                 .map(BackofficeRewardView::id)
                 .toList());
+    }
+
+    @Override
+    public BackofficeRewardView getReward(RewardId id) {
+        return accountingRewardStoragePort.getReward(id)
+                .orElseThrow(() -> badRequest("Reward %s not found".formatted(id)));
     }
 }

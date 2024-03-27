@@ -208,6 +208,12 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     }
 
     @Override
+    public ResponseEntity<SearchRewardItemResponse> getReward(UUID rewardId) {
+        final var reward = accountingRewardPort.getReward(RewardId.of(rewardId));
+        return ResponseEntity.ok(SearchRewardMapper.mapToItem(reward));
+    }
+
+    @Override
     public ResponseEntity<BatchPaymentsResponse> createBatchPayments(PostBatchPaymentRequest postBatchPaymentRequest) {
         final var batchPayments =
                 paymentPort.createPaymentsForInvoices(postBatchPaymentRequest.getInvoiceIds().stream().map(Invoice.Id::of).toList());

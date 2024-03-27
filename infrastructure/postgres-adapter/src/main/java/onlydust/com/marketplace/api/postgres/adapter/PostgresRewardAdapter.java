@@ -189,4 +189,10 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     public void deletePayment(Payment.Id paymentId) {
         batchPaymentRepository.deleteById(paymentId.value());
     }
+
+    @Override
+    @Transactional
+    public Optional<BackofficeRewardView> getReward(RewardId id) {
+        return rewardDetailsViewRepository.findAllByRewardIds(List.of(id.value())).stream().findFirst().map(BackofficeRewardViewEntity::toDomain);
+    }
 }

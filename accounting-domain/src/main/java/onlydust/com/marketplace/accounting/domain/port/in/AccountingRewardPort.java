@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.port.in;
 
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -24,4 +25,6 @@ public interface AccountingRewardPort {
                             Date fromProcessedAt, Date toProcessedAt);
 
     void notifyAllNewPaidRewards();
+
+    BackofficeRewardView getReward(RewardId id);
 }
