@@ -17,6 +17,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationSt
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
 import onlydust.com.marketplace.api.webhook.Config;
+import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import org.junit.jupiter.api.MethodOrderer;
@@ -73,7 +74,10 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
         anthonyBillingProfile = billingProfileService.createSelfEmployedBillingProfile(this.anthony, "Olivier SASU", null);
         billingProfileService.updatePayoutInfo(anthonyBillingProfile.id(), this.anthony,
-                PayoutInfo.builder().ethWallet(new WalletLocator(new Name(this.anthony + ".eth"))).build());
+                PayoutInfo.builder()
+                        .ethWallet(new WalletLocator(new Name(this.anthony + ".eth")))
+                        .bankAccount(new BankAccount("BNPAFRPPXXX", "FR7630004000031234567890143"))
+                        .build());
         accountingHelper.patchBillingProfile(anthonyBillingProfile.id().value(), null, VerificationStatusEntity.VERIFIED);
 
         pierreBillingProfile = billingProfileService.createIndividualBillingProfile(this.pierre, "Olivier", null);
@@ -252,7 +256,78 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             },
                             "dollarsEquivalent": 1010.00,
                             "conversionRate": 1.0100000000000000
-                          }
+                          },
+                          "receipts": [
+                            {
+                              "id": "123a7450-bc51-428d-9ee5-b817f06da922",
+                              "reference": "0x0",
+                              "amount": null,
+                              "network": "ETHEREUM",
+                              "thirdPartyName": "Anthony BUISSET",
+                              "thirdPartyAccountNumber": "0xba9e280b752b09ea866e9cc0c8fe0fcef241b63c"
+                            }
+                          ],
+                          "pendingPayments": []
+                        }
+                        """);
+
+        // When
+        client.get()
+                .uri(getApiURI(BO_REWARD.formatted("fab7aaf4-9b0c-4e52-bc9b-72ce08131617")))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "id": "fab7aaf4-9b0c-4e52-bc9b-72ce08131617",
+                          "paymentId": null,
+                          "billingProfile": {
+                            "subject": "Antho SASU",
+                            "type": "SELF_EMPLOYED",
+                            "verificationStatus": "VERIFIED",
+                            "kyb": null,
+                            "kyc": null,
+                            "admins": null
+                          },
+                          "requestedAt": "2023-10-08T10:06:42.730697Z",
+                          "processedAt": null,
+                          "githubUrls": [
+                            "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
+                          ],
+                          "status": "PENDING_VERIFICATION",
+                          "project": {
+                            "name": "Bretzel",
+                            "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                          },
+                          "sponsors": [
+                            {
+                              "name": "Coca Cola",
+                              "avatarUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                            }
+                          ],
+                          "money": {
+                            "amount": 1000.00,
+                            "currency": {
+                              "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                              "code": "USD",
+                              "name": "US Dollar",
+                              "logoUrl": null,
+                              "decimals": 2
+                            },
+                            "dollarsEquivalent": 1000.00,
+                            "conversionRate": 1.00000000000000000000
+                          },
+                          "receipts": [],
+                          "pendingPayments": [
+                            {
+                              "network": "SEPA",
+                              "billingAccountNumber": "FR7630004000031234567890143",
+                              "amount": 1000.00
+                            }
+                          ]
                         }
                         """);
     }

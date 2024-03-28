@@ -11,7 +11,6 @@ import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
 import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.view.ShortInvoiceView;
 import onlydust.com.marketplace.accounting.domain.view.UserView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import org.hibernate.annotations.Type;
@@ -94,15 +93,6 @@ public class InvoiceEntity {
                 .originalFileName(invoice.originalFileName())
                 .rejectionReason(invoice.rejectionReason())
                 .data(Data.of(invoice));
-    }
-
-    public ShortInvoiceView toShortView() {
-        return ShortInvoiceView.builder()
-                .id(Invoice.Id.of(id))
-                .number(Invoice.Number.fromString(number))
-                .createdBy(getCreatedBy())
-                .status(status.toDomain())
-                .build();
     }
 
     @NonNull

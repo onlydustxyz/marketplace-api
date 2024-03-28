@@ -1,32 +1,16 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
-import lombok.*;
-import lombok.experimental.Accessors;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Value
-@Accessors(fluent = true)
-public class Receipt {
-    @NonNull
-    Id id;
-    @NonNull
-    RewardId rewardId;
-    @NonNull
-    ZonedDateTime createdAt;
-    @NonNull
-    Network network;
-    @NonNull
-    String reference;
-    @NonNull
-    String thirdPartyName;
-    @NonNull
-    String thirdPartyAccountNumber;
-
+public record Receipt(@NonNull Id id, @NonNull RewardId rewardId, @NonNull ZonedDateTime createdAt,
+                      @NonNull Network network, @NonNull String reference, @NonNull String thirdPartyName, @NonNull String thirdPartyAccountNumber) {
     public static Receipt of(@NonNull final RewardId rewardId, @NonNull final Payment.Reference reference) {
         return new Receipt(Id.random(),
                 rewardId,

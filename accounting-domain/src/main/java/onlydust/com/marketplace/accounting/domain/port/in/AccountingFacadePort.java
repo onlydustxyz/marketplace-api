@@ -6,6 +6,7 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -52,5 +53,7 @@ public interface AccountingFacadePort {
 
     List<Network> networksOf(Currency.Id currencyId, RewardId rewardId);
 
-    List<SponsorId> sponsorsOf(RewardId id);
+    Map<SponsorAccount, PositiveAmount> balancesPerOrigin(RewardId id, Currency.Id currencyId);
+
+    Map<SponsorAccount, PositiveAmount> transferredAmountPerOrigin(RewardId id, Currency.Id currencyId);
 }

@@ -2,8 +2,7 @@ package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
@@ -14,13 +13,12 @@ import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.reducing;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -83,11 +81,20 @@ public class RewardService implements AccountingRewardPort {
         final var reward = accountingRewardStoragePort.getReward(id)
                 .orElseThrow(() -> badRequest("Reward %s not found".formatted(id)));
 
-        final var sponsors = accountingFacadePort.sponsorsOf(reward.id()).stream()
-                .map(sponsorId -> sponsorStoragePort.get(sponsorId).orElseThrow(() -> notFound("Sponsor %s not found".formatted(id))))
+        final var sponsors = accountingFacadePort.transferredAmountPerOrigin(reward.id(), reward.money().currency().id()).keySet().stream()
+                .map(sponsorAccount -> sponsorStoragePort.get(sponsorAccount.sponsorId()).orElseThrow(() -> notFound("Sponsor %s not found".formatted(id))))
                 .map(SponsorView::toShortView)
                 .toList();
 
-        return reward.toBuilder().sponsors(sponsors).build();
+        final Map<Network, PositiveAmount> pendingPayments = reward.invoice() == null ? new HashMap<>() :
+                accountingFacadePort.balancesPerOrigin(reward.id(), reward.money().currency().id())
+                        .entrySet().stream()
+                        .filter(e -> e.getValue().isStrictlyPositive())
+                        .collect(groupingBy(e -> e.getKey().network().orElseThrow(), reducing(PositiveAmount.ZERO, Map.Entry::getValue, PositiveAmount::add)));
+
+        return reward.toBuilder()
+                .sponsors(sponsors)
+                .pendingPayments(pendingPayments)
+                .build();
     }
 }

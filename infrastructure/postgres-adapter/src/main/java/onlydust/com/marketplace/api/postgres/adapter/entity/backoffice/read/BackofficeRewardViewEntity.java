@@ -56,12 +56,13 @@ public class BackofficeRewardViewEntity {
     @ManyToOne
     InvoiceEntity invoice;
 
-    @Type(type = "jsonb")
-    List<String> transactionReferences;
-    @Type(type = "jsonb")
-    List<String> paidToAccountNumbers;
-
     UUID batchPaymentId;
+
+    @OneToMany
+    @JoinTable(schema = "accounting", name = "rewards_receipts",
+            joinColumns = @JoinColumn(name = "reward_id"),
+            inverseJoinColumns = @JoinColumn(name = "receipt_id"))
+    List<ReceiptEntity> receipts;
 
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
@@ -105,9 +106,8 @@ public class BackofficeRewardViewEntity {
                         .sorted(comparing(ShortSponsorView::name))
                         .toList())
                 .money(new MoneyView(this.amount, this.currency.toDomain(), this.statusData.usdConversionRate(), this.statusData.amountUsdEquivalent()))
-                .invoice(isNull(this.invoice) ? null : invoice.toShortView())
-                .transactionReferences(isNull(this.transactionReferences) ? List.of() : this.transactionReferences)
-                .paidToAccountNumbers(isNull(this.paidToAccountNumbers) ? List.of() : this.paidToAccountNumbers)
+                .invoice(isNull(this.invoice) ? null : invoice.toView())
+                .receipts(isNull(this.receipts) ? List.of() : this.receipts.stream().map(r -> r.toDomain(RewardId.of(this.id))).toList())
                 .build();
     }
 }

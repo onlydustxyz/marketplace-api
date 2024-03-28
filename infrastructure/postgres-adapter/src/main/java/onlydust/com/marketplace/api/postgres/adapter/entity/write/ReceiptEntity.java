@@ -4,12 +4,14 @@ import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Receipt;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.project.domain.view.ReceiptView;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.UUID;
 
@@ -46,7 +48,7 @@ public class ReceiptEntity {
         );
     }
 
-    public ReceiptView toDomain() {
+    public ReceiptView toView() {
         return ReceiptView.builder()
                 .type(network == NetworkEnumEntity.sepa ? ReceiptView.Type.FIAT : ReceiptView.Type.CRYPTO)
                 .blockchain(switch (network) {
@@ -60,5 +62,15 @@ public class ReceiptEntity {
                 .iban(network == NetworkEnumEntity.sepa ? thirdPartyAccountNumber : null)
                 .transactionReference(transactionReference)
                 .build();
+    }
+
+    public Receipt toDomain(RewardId rewardId) {
+        return new Receipt(Receipt.Id.of(id),
+                rewardId,
+                createdAt.toInstant().atZone(ZoneOffset.UTC),
+                network.toNetwork(),
+                transactionReference,
+                thirdPartyName,
+                thirdPartyAccountNumber);
     }
 }
