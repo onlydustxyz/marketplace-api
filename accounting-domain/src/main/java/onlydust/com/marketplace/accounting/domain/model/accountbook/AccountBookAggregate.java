@@ -1,7 +1,5 @@
 package onlydust.com.marketplace.accounting.domain.model.accountbook;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
@@ -12,35 +10,21 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
 public class AccountBookAggregate implements AccountBook {
     private final AccountBookState state = new AccountBookState();
-    private final List<AccountBookEvent> pendingEvents = new ArrayList<>();
+    private final List<IdentifiedAccountBookEvent> pendingEvents = new ArrayList<>();
 
-    public static AccountBookAggregate fromEvents(final @NonNull Collection<AccountBookEvent> events) {
+    private long lastEventId = 0;
+
+    public static AccountBookAggregate fromEvents(final @NonNull List<IdentifiedAccountBookEvent> events) {
         AccountBookAggregate aggregate = new AccountBookAggregate();
-        events.forEach(aggregate.state::accept);
+        aggregate.receive(events);
         return aggregate;
-    }
-
-    @Deprecated
-    public static AccountBookAggregate fromEventsDebug(final @NonNull Collection<AccountBookEvent> events) {
-        AccountBookAggregate aggregate = new AccountBookAggregate();
-        try {
-            events.forEach(aggregate.state::accept);
-        } catch (Exception e) {
-            LOGGER.error("Error while event sourcing account book", e);
-        }
-        return aggregate;
-    }
-
-    public static AccountBookAggregate fromEvents(final @NonNull AccountBookEvent... events) {
-        return fromEvents(List.of(events));
     }
 
     public static AccountBookAggregate empty() {
-        return fromEvents();
+        return fromEvents(List.of());
     }
 
     @Override
@@ -72,14 +56,41 @@ public class AccountBookAggregate implements AccountBook {
         return state;
     }
 
-    public List<AccountBookEvent> pendingEvents() {
-        return pendingEvents;
+
+    public List<IdentifiedAccountBookEvent> pendingEvents() {
+        return List.copyOf(pendingEvents);
+    }
+
+    public void clearPendingEvents() {
+        pendingEvents.clear();
+    }
+
+    public void receive(Collection<IdentifiedAccountBookEvent> events) {
+        events.forEach(this::receive);
+    }
+
+    private <R> R receive(IdentifiedAccountBookEvent<R> event) {
+        if (event.id() != nextEventId()) {
+            throw new IllegalStateException("Invalid event id. Expected %d, got %d".formatted(nextEventId(), event.id()));
+        }
+        incrementEventId();
+        return state.accept(event.data());
     }
 
     private <R> R emit(AccountBookEvent<R> event) {
-        pendingEvents.add(event);
+        pendingEvents.add(new IdentifiedAccountBookEvent<>(nextEventId(), event));
+        incrementEventId();
         return state.accept(event);
     }
+
+    private void incrementEventId() {
+        ++lastEventId;
+    }
+
+    public long nextEventId() {
+        return lastEventId + 1;
+    }
+
 
     @EventType("Mint")
     public record MintEvent(@NonNull AccountId account, @NonNull PositiveAmount amount) implements AccountBookEvent<Void> {

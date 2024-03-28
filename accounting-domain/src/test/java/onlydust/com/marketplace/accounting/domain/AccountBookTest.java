@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.accounting.domain;
 
+import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
@@ -8,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookA
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.RefundEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.TransferEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookEvent;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.Test;
 
@@ -20,12 +22,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class AccountBookTest {
+
+    public static AccountBookAggregate accountBookFromEvents(final @NonNull List<AccountBookEvent> events) {
+        List<IdentifiedAccountBookEvent> identifiedAccountBookEvents = new ArrayList<>();
+        for (int i = 0; i < events.size(); i++) {
+            identifiedAccountBookEvents.add(new IdentifiedAccountBookEvent<>(i + 1, events.get(i)));
+        }
+        return AccountBookAggregate.fromEvents(identifiedAccountBookEvents);
+    }
+
+    public static AccountBookAggregate accountBookFromEvents(final @NonNull AccountBookEvent... events) {
+        return accountBookFromEvents(List.of(events));
+    }
+
     @Test
     public void should_mint() {
         // Given
         final var account = AccountId.of(SponsorAccount.Id.random());
         final var amount = PositiveAmount.of(100L);
-        final var accountBook = AccountBookAggregate.fromEvents();
+        final var accountBook = accountBookFromEvents();
 
         // When
         accountBook.mint(account, amount);
@@ -39,7 +54,7 @@ public class AccountBookTest {
         // Given
         final var account = AccountId.of(SponsorAccount.Id.random());
         final var amount = PositiveAmount.of(100L);
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(account, amount)
         );
 
@@ -55,7 +70,7 @@ public class AccountBookTest {
         // Given
         final var account = AccountId.of(SponsorAccount.Id.random());
         final var amount = PositiveAmount.of(100L);
-        final var accountBook = AccountBookAggregate.fromEvents();
+        final var accountBook = accountBookFromEvents();
 
         // When
         assertThatThrownBy(() -> accountBook.burn(account, amount))
@@ -72,7 +87,7 @@ public class AccountBookTest {
         final var sender = AccountId.of(SponsorAccount.Id.random());
         final var recipient = AccountId.of(SponsorAccount.Id.random());
         final var amount = PositiveAmount.of(100L);
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(sender, amount)
         );
 
@@ -89,7 +104,7 @@ public class AccountBookTest {
         // Given
         final var sender = AccountId.of(SponsorAccount.Id.random());
         final var amount = PositiveAmount.of(100L);
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(sender, amount)
         );
 
@@ -108,7 +123,7 @@ public class AccountBookTest {
         final var sender = AccountId.of(SponsorAccount.Id.random());
         final var recipient = AccountId.of(SponsorAccount.Id.random());
         final var amount = PositiveAmount.of(100L);
-        final var accountBook = AccountBookAggregate.fromEvents();
+        final var accountBook = accountBookFromEvents();
 
         // When
         assertThatThrownBy(() -> accountBook.transfer(sender, recipient, amount))
@@ -126,7 +141,7 @@ public class AccountBookTest {
         final var sender = AccountId.of(SponsorAccount.Id.random());
         final var recipient = AccountId.of(SponsorAccount.Id.random());
         final var amount = PositiveAmount.of(100L);
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(sender, amount),
                 new TransferEvent(sender, recipient, amount)
         );
@@ -148,7 +163,7 @@ public class AccountBookTest {
         final var account2 = AccountId.of(SponsorAccount.Id.random());
         final var account3 = AccountId.of(SponsorAccount.Id.random());
         final var amount = PositiveAmount.of(100L);
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(account1, amount),
                 new TransferEvent(account1, account2, amount),
                 new TransferEvent(account2, account3, amount)
@@ -181,7 +196,7 @@ public class AccountBookTest {
         final var account1 = AccountId.of(SponsorAccount.Id.random());
         final var account2 = AccountId.of(SponsorAccount.Id.random());
         final var account3 = AccountId.of(SponsorAccount.Id.random());
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(account1, PositiveAmount.of(100L)),
                 new TransferEvent(account1, account2, PositiveAmount.of(100L)),
                 new TransferEvent(account2, account3, PositiveAmount.of(60L))
@@ -212,7 +227,7 @@ public class AccountBookTest {
         final var account1 = AccountId.of(SponsorAccount.Id.random());
         final var account2 = AccountId.of(SponsorAccount.Id.random());
         final var amount = PositiveAmount.of(100L);
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(account1, amount),
                 new TransferEvent(account1, account2, amount)
         );
@@ -236,7 +251,7 @@ public class AccountBookTest {
         final var account2 = AccountId.of(SponsorAccount.Id.random());
         final var account3 = AccountId.of(SponsorAccount.Id.random());
         final var amount = PositiveAmount.of(100L);
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(account1, amount),
                 new TransferEvent(account1, account2, amount),
                 new TransferEvent(account2, account3, PositiveAmount.of(50L))
@@ -263,7 +278,7 @@ public class AccountBookTest {
         final var sender = AccountId.of(SponsorAccount.Id.random());
         final var recipient = AccountId.of(SponsorAccount.Id.random());
         final var amount = PositiveAmount.of(100L);
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(sender, amount),
                 new TransferEvent(sender, recipient, amount)
         );
@@ -287,7 +302,7 @@ public class AccountBookTest {
         final var recipient = AccountId.of(SponsorAccount.Id.random());
         final var amount1 = PositiveAmount.of(100L);
         final var amount2 = PositiveAmount.of(70L);
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(sender1, amount1),
                 new MintEvent(sender2, amount2),
                 new TransferEvent(sender1, recipient, amount1),
@@ -313,7 +328,7 @@ public class AccountBookTest {
         final var sender = AccountId.of(SponsorAccount.Id.random());
         final var recipient = AccountId.of(SponsorAccount.Id.random());
         final var amount = PositiveAmount.of(100L);
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(sender, amount),
                 new TransferEvent(sender, recipient, amount)
         );
@@ -337,7 +352,7 @@ public class AccountBookTest {
         final var recipient = AccountId.of(SponsorAccount.Id.random());
         final var recipient2 = AccountId.of(SponsorAccount.Id.random());
         final var amount = PositiveAmount.of(100L);
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(sender, amount),
                 new TransferEvent(sender, recipient, amount),
                 new TransferEvent(recipient, recipient2, PositiveAmount.of(10L))
@@ -363,7 +378,7 @@ public class AccountBookTest {
         final var account1 = AccountId.of(SponsorAccount.Id.random());
         final var account2 = AccountId.of(SponsorAccount.Id.random());
         final var account3 = AccountId.of(SponsorAccount.Id.random());
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(account1, PositiveAmount.of(100L)),
                 new MintEvent(account2, PositiveAmount.of(100L))
         );
@@ -378,8 +393,8 @@ public class AccountBookTest {
         assertThat(accountBook.state().balanceOf(account3)).isEqualTo(PositiveAmount.of(80L));
 
         assertThat(accountBook.pendingEvents()).containsExactly(
-                new TransferEvent(account1, account3, PositiveAmount.of(50L)),
-                new TransferEvent(account2, account3, PositiveAmount.of(30L))
+                new IdentifiedAccountBookEvent<>(3, new TransferEvent(account1, account3, PositiveAmount.of(50L))),
+                new IdentifiedAccountBookEvent<>(4, new TransferEvent(account2, account3, PositiveAmount.of(30L)))
         );
     }
 
@@ -389,7 +404,7 @@ public class AccountBookTest {
         final var account1 = AccountId.of(SponsorAccount.Id.random());
         final var account2 = AccountId.of(SponsorAccount.Id.random());
         final var account3 = AccountId.of(SponsorAccount.Id.random());
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(account1, PositiveAmount.of(100L))
         );
 
@@ -403,8 +418,8 @@ public class AccountBookTest {
         assertThat(accountBook.state().balanceOf(account3)).isEqualTo(PositiveAmount.of(30L));
 
         assertThat(accountBook.pendingEvents()).containsExactly(
-                new TransferEvent(account1, account2, PositiveAmount.of(50L)),
-                new TransferEvent(account1, account3, PositiveAmount.of(30L))
+                new IdentifiedAccountBookEvent<>(2, new TransferEvent(account1, account2, PositiveAmount.of(50L))),
+                new IdentifiedAccountBookEvent<>(3, new TransferEvent(account1, account3, PositiveAmount.of(30L)))
         );
     }
 
@@ -418,7 +433,7 @@ public class AccountBookTest {
         final var project1 = AccountId.of(SponsorAccount.Id.random());
         final var project2 = AccountId.of(SponsorAccount.Id.random());
         final var contributor = AccountId.of(SponsorAccount.Id.random());
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(sponsor1, PositiveAmount.of(100_000L)),
                 new MintEvent(sponsor2, PositiveAmount.of(100_000L)),
 
@@ -467,7 +482,7 @@ public class AccountBookTest {
         assertThat(accountBook.state().balanceOf(contributor)).isEqualTo(PositiveAmount.of(3_600L));
 
         assertThat(accountBook.pendingEvents()).containsExactly(
-                new RefundEvent(project2, committee2, PositiveAmount.of(700L))
+                new IdentifiedAccountBookEvent<>(19, new RefundEvent(project2, committee2, PositiveAmount.of(700L)))
         );
     }
 
@@ -476,7 +491,7 @@ public class AccountBookTest {
         // Given
         final var recipient = AccountId.of(SponsorAccount.Id.random());
         final var amount = PositiveAmount.of(100L);
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(recipient, amount)
         );
 
@@ -494,7 +509,7 @@ public class AccountBookTest {
         final var account1 = AccountId.of(SponsorAccount.Id.random());
         final var account2 = AccountId.of(SponsorAccount.Id.random());
         final var account3 = AccountId.of(SponsorAccount.Id.random());
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(account1, PositiveAmount.of(100L)),
                 new TransferEvent(account1, account2, PositiveAmount.of(50L)),
                 new TransferEvent(account1, account3, PositiveAmount.of(30L)),
@@ -522,7 +537,7 @@ public class AccountBookTest {
         final var account1 = AccountId.of(SponsorAccount.Id.random());
         final var account2 = AccountId.of(SponsorAccount.Id.random());
         final var account3 = AccountId.of(SponsorAccount.Id.random());
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(account1, PositiveAmount.of(100L)),
                 new TransferEvent(account1, account2, PositiveAmount.of(50L)),
                 new TransferEvent(account2, account3, PositiveAmount.of(5L)),
@@ -560,7 +575,7 @@ public class AccountBookTest {
         final var account2 = AccountId.of(SponsorAccount.Id.random());
         final var account3 = AccountId.of(SponsorAccount.Id.random());
         final var account4 = AccountId.of(SponsorAccount.Id.random());
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(account0, PositiveAmount.of(100L)),
                 new TransferEvent(account0, account1, PositiveAmount.of(100L)),
                 new RefundEvent(account1, account0, PositiveAmount.of(1L)),
@@ -600,7 +615,7 @@ public class AccountBookTest {
         final var account2 = AccountId.of(SponsorAccount.Id.random());
         final var account3 = AccountId.of(SponsorAccount.Id.random());
         final var account4 = AccountId.of(SponsorAccount.Id.random());
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(account0, PositiveAmount.of(100L)),
                 new TransferEvent(account0, account1, PositiveAmount.of(100L)),
                 new RefundEvent(account1, account0, PositiveAmount.of(1L)),
@@ -647,7 +662,7 @@ public class AccountBookTest {
         final var account2 = AccountId.of(SponsorAccount.Id.random());
         final var account3 = AccountId.of(SponsorAccount.Id.random());
 
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(account0, PositiveAmount.of(100L)),
                 new MintEvent(account1, PositiveAmount.of(100L)),
 
@@ -679,7 +694,7 @@ public class AccountBookTest {
         final var sponsor2 = AccountId.of(SponsorAccount.Id.random());
         final var project = AccountId.of(ProjectId.random());
         final var reward = AccountId.of(RewardId.random());
-        final var accountBook = AccountBookAggregate.fromEvents(
+        final var accountBook = accountBookFromEvents(
                 new MintEvent(sponsor, PositiveAmount.of(100L)),
                 new MintEvent(sponsor2, PositiveAmount.of(100L))
         );
@@ -781,10 +796,10 @@ public class AccountBookTest {
         Runtime.getRuntime().gc();
         final var startMemory = Runtime.getRuntime().totalMemory();
         final var startTime = System.currentTimeMillis();
-        AccountBookAggregate.fromEvents(events);
+        accountBookFromEvents(events);
         final var endMemory = Runtime.getRuntime().totalMemory();
         for (int i = 1; i < iterations; i++) {
-            AccountBookAggregate.fromEvents(events);
+            accountBookFromEvents(events);
         }
         final var endTime = System.currentTimeMillis();
         System.out.printf("Benchmark took %d ms and %d MB%n", (endTime - startTime) / iterations, (endMemory - startMemory) / 1024 / 1024);

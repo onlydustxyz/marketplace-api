@@ -221,3 +221,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000128_fix_yearly_total_computation.sql
   - include:
       file: db/changelog/changelogs/00000129_differentiate_payment_blocked.sql
+  - include:
+      file: db/changelog/changelogs/00000200_no_more_sequence_for_account_book_events.sql

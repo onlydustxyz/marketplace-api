@@ -3,10 +3,11 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookEvent;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountBookEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountBookEventEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookEventRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
 
 import javax.transaction.Transactional;
@@ -15,23 +16,34 @@ import java.util.List;
 @AllArgsConstructor
 public class PostgresAccountBookEventStorage implements AccountBookEventStorage {
     private final @NonNull AccountBookRepository accountBookRepository;
+    private final @NonNull AccountBookEventRepository accountBookEventRepository;
 
     @Override
-    public List<AccountBookEvent> get(Currency currency) {
+    public List<IdentifiedAccountBookEvent> getAll(final @NonNull Currency currency) {
         return accountBookRepository.findByCurrencyId(currency.id().value())
-                .map(AccountBookEntity::getEvents)
+                .map(accountBookEntity -> accountBookEventRepository.findAllByAccountBookId(accountBookEntity.getId()))
                 .orElse(List.of())
-                .stream().map(AccountBookEventEntity::getEvent)
+                .stream().map(AccountBookEventEntity::toIdentifiedAccountBookEvent)
+                .toList();
+    }
+
+    @Override
+    public List<IdentifiedAccountBookEvent> getSince(final @NonNull Currency currency, final long eventId) {
+        return accountBookRepository.findByCurrencyId(currency.id().value())
+                .map(accountBookEntity -> accountBookEventRepository.findAllByAccountBookIdAndIdGreaterThanEqual(accountBookEntity.getId(), eventId))
+                .orElse(List.of())
+                .stream().map(AccountBookEventEntity::toIdentifiedAccountBookEvent)
                 .toList();
     }
 
     @Override
     @Transactional
-    public void save(Currency currency, List<AccountBookEvent> pendingEvents) {
+    public void save(final @NonNull Currency currency, final @NonNull List<IdentifiedAccountBookEvent> pendingEvents) {
         final var accountBookEntity = accountBookRepository.findByCurrencyId(currency.id().value())
                 .orElse(AccountBookEntity.of(currency.id().value()));
 
-        pendingEvents.forEach(accountBookEntity::add);
-        accountBookRepository.saveAndFlush(accountBookEntity);
+        accountBookEventRepository.saveAllAndFlush(pendingEvents.stream()
+                .map(event -> AccountBookEventEntity.of(accountBookEntity.getId(), event))
+                .toList());
     }
 }

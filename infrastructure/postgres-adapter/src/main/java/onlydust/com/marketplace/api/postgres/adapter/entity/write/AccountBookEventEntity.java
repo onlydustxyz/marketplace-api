@@ -5,11 +5,15 @@ import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookEvent;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
 import onlydust.com.marketplace.kernel.model.EventIdResolver;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -24,7 +28,7 @@ import java.util.UUID;
 public class AccountBookEventEntity {
     @Id
     @EqualsAndHashCode.Include
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NonNull
     private final Long id;
 
     private final UUID accountBookId;
@@ -47,5 +51,13 @@ public class AccountBookEventEntity {
         @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "@type")
         @JsonTypeIdResolver(EventIdResolver.class)
         private AccountBookEvent event;
+    }
+
+    public static AccountBookEventEntity of(UUID accountBookId, IdentifiedAccountBookEvent<?> event) {
+        return new AccountBookEventEntity(event.id(), accountBookId, ZonedDateTime.now(), new Payload(event.data()));
+    }
+
+    public IdentifiedAccountBookEvent toIdentifiedAccountBookEvent() {
+        return new IdentifiedAccountBookEvent(id, payload.event);
     }
 }
