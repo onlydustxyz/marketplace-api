@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 public interface SponsorFacadePort {
-    Page<SponsorView> listSponsors(int sanitizedPageIndex, int sanitizedPageSize);
+    Page<SponsorView> listSponsors(String search, int sanitizedPageIndex, int sanitizedPageSize);
 
     URL uploadLogo(InputStream imageInputStream);
 }

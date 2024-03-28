@@ -16,8 +16,8 @@ public class SponsorService implements SponsorFacadePort {
     private final ImageStoragePort imageStoragePort;
 
     @Override
-    public Page<SponsorView> listSponsors(int pageIndex, int pageSize) {
-        return sponsorStoragePort.findSponsors(pageIndex, pageSize);
+    public Page<SponsorView> listSponsors(String search, int pageIndex, int pageSize) {
+        return sponsorStoragePort.findSponsors(search, pageIndex, pageSize);
     }
 
     @Override

@@ -1056,6 +1056,33 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
     }
 
     @Test
+    @Order(6)
+    void should_get_sponsors_by_name_for_new_bo() {
+
+        // When
+        client.get()
+                .uri(getApiURI(GET_SPONSORS, Map.of("pageIndex", "0", "pageSize", "10", "search", "coca")))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "sponsors": [
+                            {
+                              "name": "Coca Cola"
+                            },
+                            {
+                              "name": "Coca Colax"
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
     void should_upload_sponsor_logo() throws MalformedURLException {
         when(imageStoragePort.storeImage(any(InputStream.class)))
                 .thenReturn(new URL("https://s3.amazon.com/logo.jpeg"));

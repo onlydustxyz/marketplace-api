@@ -57,11 +57,10 @@ public class BackofficeSponsorManagementRestApi implements BackofficeSponsorMana
     }
 
     @Override
-    public ResponseEntity<SponsorPage> getSponsorPage(Integer pageIndex, Integer pageSize) {
+    public ResponseEntity<SponsorPage> getSponsorPage(Integer pageIndex, Integer pageSize, String search) {
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final int sanitizedPageSize = sanitizePageSize(pageSize);
-        final var sponsorPage =
-                sponsorFacadePort.listSponsors(sanitizedPageIndex, sanitizedPageSize);
+        final var sponsorPage = sponsorFacadePort.listSponsors(search, sanitizedPageIndex, sanitizedPageSize);
 
         final var response = SponsorMapper.sponsorPageToResponse(sponsorPage, sanitizedPageIndex);
 
