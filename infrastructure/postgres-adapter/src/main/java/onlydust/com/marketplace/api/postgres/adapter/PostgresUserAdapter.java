@@ -83,7 +83,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Override
     @Transactional
     public User createUser(User user) {
-        return mapCreatedUserToDomain(userRepository.save(mapUserToEntity(user)));
+        return mapCreatedUserToDomain(userRepository.saveAndFlush(mapUserToEntity(user)));
     }
 
     @Override
