@@ -16,7 +16,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.intern
 public record BatchPaymentDetailsView(
         @NonNull Payment payment,
         @NonNull
-        List<BackofficeRewardView> rewardViews
+        List<RewardDetailsView> rewardViews
 ) {
 
     public List<TotalMoneyView> totalsPerCurrency() {

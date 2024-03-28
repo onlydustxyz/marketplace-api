@@ -446,7 +446,7 @@ public interface BackOfficeMapper {
                 ;
     }
 
-    static ShortRewardResponse mapToShortResponse(BackofficeRewardView reward) {
+    static ShortRewardResponse mapToShortResponse(RewardDetailsView reward) {
         return new ShortRewardResponse()
                 .id(reward.id().value())
                 .status(map(reward.status().asBackofficeUser()))
@@ -499,7 +499,7 @@ public interface BackOfficeMapper {
                 .kyb(billingProfileSnapshot.kyb().map(BackOfficeMapper::mapKyb).orElse(null));
     }
 
-    static List<TotalMoneyWithUsdEquivalentResponse> mapNetworkRewardTotals(final List<BackofficeRewardView> rewards) {
+    static List<TotalMoneyWithUsdEquivalentResponse> mapNetworkRewardTotals(final List<RewardDetailsView> rewards) {
         return rewards.stream().collect(groupingBy(r -> r.money().currency()))
                 .entrySet().stream()
                 .map(e -> {
@@ -517,7 +517,7 @@ public interface BackOfficeMapper {
                 .toList();
     }
 
-    static RewardDetailsResponse map(BackofficeRewardView view) {
+    static RewardDetailsResponse map(RewardDetailsView view) {
         final var response = new RewardDetailsResponse()
                 .id(view.id().value())
                 .paymentId(view.paymentId() == null ? null : view.paymentId().value())
@@ -589,7 +589,7 @@ public interface BackOfficeMapper {
                 .dollarsEquivalent(view.dollarsEquivalent());
     }
 
-    static RewardPageResponse rewardPageToResponse(int pageIndex, Page<BackofficeRewardView> page) {
+    static RewardPageResponse rewardPageToResponse(int pageIndex, Page<RewardDetailsView> page) {
         final RewardPageResponse response = new RewardPageResponse();
         response.setTotalPageNumber(page.getTotalPageNumber());
         response.setTotalItemNumber(page.getTotalItemNumber());

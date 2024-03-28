@@ -9,7 +9,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -31,10 +31,10 @@ public class RewardService implements AccountingRewardPort {
     private final SponsorStoragePort sponsorStoragePort;
 
     @Override
-    public Page<BackofficeRewardView> getRewards(int pageIndex, int pageSize,
-                                                 List<RewardStatus> statuses,
-                                                 Date fromRequestedAt, Date toRequestedAt,
-                                                 Date fromProcessedAt, Date toProcessedAt) {
+    public Page<RewardDetailsView> getRewards(int pageIndex, int pageSize,
+                                              List<RewardStatus> statuses,
+                                              Date fromRequestedAt, Date toRequestedAt,
+                                              Date fromProcessedAt, Date toProcessedAt) {
         final Set<RewardStatus> sanitizedStatuses = isNull(statuses) ? Set.of() : statuses.stream().collect(Collectors.toUnmodifiableSet());
         return accountingRewardStoragePort.findRewards(pageIndex, pageSize, sanitizedStatuses, fromRequestedAt, toRequestedAt, fromProcessedAt, toProcessedAt);
     }
@@ -61,12 +61,12 @@ public class RewardService implements AccountingRewardPort {
             mailNotificationPort.sendRewardsPaidMail(listOfPaidRewardsMapToAdminEmail.getKey(), listOfPaidRewardsMapToAdminEmail.getValue());
         }
         accountingRewardStoragePort.markRewardsAsPaymentNotified(rewardViews.stream()
-                .map(BackofficeRewardView::id)
+                .map(RewardDetailsView::id)
                 .toList());
     }
 
     @Override
-    public BackofficeRewardView getReward(RewardId id) {
+    public RewardDetailsView getReward(RewardId id) {
         final var reward = accountingRewardStoragePort.getReward(id)
                 .orElseThrow(() -> badRequest("Reward %s not found".formatted(id)));
 

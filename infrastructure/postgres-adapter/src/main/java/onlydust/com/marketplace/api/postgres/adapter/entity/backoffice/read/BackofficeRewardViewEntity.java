@@ -84,8 +84,8 @@ public class BackofficeRewardViewEntity {
         }
     }
 
-    public BackofficeRewardView toDomain() {
-        return BackofficeRewardView.builder()
+    public RewardDetailsView toDomain() {
+        return RewardDetailsView.builder()
                 .id(RewardId.of(this.id))
                 .paymentId(batchPaymentId == null ? null : Payment.Id.of(batchPaymentId))
                 .status(status.toDomain())

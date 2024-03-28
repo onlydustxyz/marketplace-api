@@ -11,7 +11,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.PaymentPort;
-import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BatchPaymentMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
@@ -165,7 +165,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
 
-        final Page<BackofficeRewardView> rewards = accountingRewardPort.getRewards(
+        final Page<RewardDetailsView> rewards = accountingRewardPort.getRewards(
                 sanitizedPageIndex,
                 sanitizedPageSize,
                 statuses != null ? statuses.stream().map(BackOfficeMapper::map).toList() : null,

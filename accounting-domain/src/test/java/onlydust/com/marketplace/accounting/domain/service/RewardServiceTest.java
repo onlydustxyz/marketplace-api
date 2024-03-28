@@ -10,8 +10,8 @@ import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStora
 import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
-import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
 import onlydust.com.marketplace.accounting.domain.view.UserView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
@@ -50,7 +50,7 @@ public class RewardServiceTest {
         final var r21 = generateRewardStubForCurrencyAndEmail(Currencies.STRK, email2);
         final var r12 = generateRewardStubForCurrencyAndEmail(Currencies.OP, email1);
         final var r22 = generateRewardStubForCurrencyAndEmail(Currencies.APT, email2);
-        final List<BackofficeRewardView> rewardViews = List.of(
+        final List<RewardDetailsView> rewardViews = List.of(
                 r11,
                 r12,
                 r21,
@@ -65,12 +65,12 @@ public class RewardServiceTest {
         // Then
         verify(mailNotificationPort, times(1)).sendRewardsPaidMail(email1, List.of(r11, r12));
         verify(mailNotificationPort, times(1)).sendRewardsPaidMail(email2, List.of(r21, r22));
-        verify(accountingRewardStoragePort).markRewardsAsPaymentNotified(rewardViews.stream().map(BackofficeRewardView::id).toList());
+        verify(accountingRewardStoragePort).markRewardsAsPaymentNotified(rewardViews.stream().map(RewardDetailsView::id).toList());
     }
 
 
-    private BackofficeRewardView generateRewardStubForCurrencyAndEmail(final Currency currency, final String email) {
-        return BackofficeRewardView.builder()
+    private RewardDetailsView generateRewardStubForCurrencyAndEmail(final Currency currency, final String email) {
+        return RewardDetailsView.builder()
                 .id(RewardId.random())
                 .status(RewardStatus.PROCESSING)
                 .billingProfile(new CompanyBillingProfile(faker.gameOfThrones().character(), UserId.random()))
