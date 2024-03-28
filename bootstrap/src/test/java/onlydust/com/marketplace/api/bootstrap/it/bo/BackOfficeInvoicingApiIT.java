@@ -3,10 +3,9 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
@@ -29,13 +28,12 @@ import org.springframework.http.MediaType;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.api.bootstrap.it.api.AbstractMarketplaceApiIT.ME_PUT_PAYOUT_PREFERENCES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -67,15 +65,13 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
 
     UserId userId;
     CompanyBillingProfile companyBillingProfile;
-    SelfEmployedBillingProfile selfEmployedBillingProfile;
-    IndividualBillingProfile individualBillingProfile;
 
     static final List<Invoice.Id> companyBillingProfileToReviewInvoices = new ArrayList<>();
 
     @BeforeEach
     void setupAll() {
-        final UserAuthHelper.AuthenticatedUser olivier = userAuthHelper.authenticateOlivier();
-        userId = UserId.of(olivier.user().getId());
+        final UserAuthHelper.AuthenticatedUser anthony = userAuthHelper.authenticateAnthony();
+        userId = UserId.of(anthony.user().getId());
     }
 
     void setUp() throws IOException {
@@ -84,16 +80,6 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
         billingProfileService.updatePayoutInfo(companyBillingProfile.id(), userId,
                 PayoutInfo.builder().ethWallet(new WalletLocator(new Name(userId + ".eth"))).build());
         accountingHelper.patchBillingProfile(companyBillingProfile.id().value(), null, VerificationStatusEntity.VERIFIED);
-
-        selfEmployedBillingProfile = billingProfileService.createSelfEmployedBillingProfile(userId, "Olivier SASU", null);
-        billingProfileService.updatePayoutInfo(selfEmployedBillingProfile.id(), userId,
-                PayoutInfo.builder().ethWallet(new WalletLocator(new Name(userId + ".eth"))).build());
-        accountingHelper.patchBillingProfile(selfEmployedBillingProfile.id().value(), null, VerificationStatusEntity.VERIFIED);
-
-        individualBillingProfile = billingProfileService.createIndividualBillingProfile(userId, "Olivier", null);
-        billingProfileService.updatePayoutInfo(individualBillingProfile.id(), userId,
-                PayoutInfo.builder().ethWallet(new WalletLocator(new Name(userId + ".eth"))).build());
-        accountingHelper.patchBillingProfile(individualBillingProfile.id().value(), null, VerificationStatusEntity.VERIFIED);
 
         kybRepository.findByBillingProfileId(companyBillingProfile.id().value())
                 .ifPresent(kyb -> kybRepository.save(kyb.toBuilder()
@@ -106,25 +92,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         .usEntity(false)
                         .subjectToEuVAT(true)
                         .verificationStatus(VerificationStatusEntity.VERIFIED).build()));
-        kybRepository.findByBillingProfileId(selfEmployedBillingProfile.id().value())
-                .ifPresent(kyb -> kybRepository.save(kyb.toBuilder()
-                        .country("FRA")
-                        .address("2 Infinite Loop, Cupertino, CA 95014, United States")
-                        .euVATNumber("FR0987654321")
-                        .name("Olivier SASU")
-                        .registrationDate(faker.date().birthday())
-                        .registrationNumber("ABC123456789")
-                        .usEntity(false)
-                        .subjectToEuVAT(true)
-                        .verificationStatus(VerificationStatusEntity.VERIFIED).build()));
-        kycRepository.findByBillingProfileId(individualBillingProfile.id().value())
-                .ifPresent(kyc -> kycRepository.save(kyc.toBuilder()
-                        .country("FRA")
-                        .address("3 Infinite Loop, Cupertino, CA 95014, United States")
-                        .firstName("Olivier")
-                        .birthdate(faker.date().birthday())
-                        .usCitizen(false)
-                        .verificationStatus(VerificationStatusEntity.VERIFIED).build()));
+
+        updatePayoutPreferences(43467246L, companyBillingProfile.id(), UUID.fromString("298a547f-ecb6-4ab2-8975-68f4e9bf7b39"));
 
         // Given
         newCompanyInvoiceToReview(List.of(
@@ -136,6 +105,33 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 RewardId.of("0b275f04-bdb1-4d4f-8cd1-76fe135ccbdf"),
                 RewardId.of("335e45a5-7f59-4519-8a12-1addc530214c"),
                 RewardId.of("e9ebbe59-fb74-4a6c-9a51-6d9050412977")));
+//        newCompanyInvoiceToReview(List.of(
+//                RewardId.of("f0c1b882-76f2-47d0-9331-151ce1f99281")));
+//        newCompanyInvoiceToReview(List.of(
+//                RewardId.of("95e079c9-609c-4531-8c5c-13217306b299"),
+//                RewardId.of("e33ea956-d2f5-496b-acf9-e2350faddb16")));
+//        newCompanyInvoiceToReview(List.of(
+//                RewardId.of("e9ebbe59-fb74-4a6c-9a51-6d9050412977"),
+//                RewardId.of("335e45a5-7f59-4519-8a12-1addc530214c"),
+//                RewardId.of("0b275f04-bdb1-4d4f-8cd1-76fe135ccbdf")));
+    }
+
+    private void updatePayoutPreferences(final Long githubUserId, BillingProfile.Id billingProfileId, final UUID projectId) {
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.authenticateUser(githubUserId);
+        client.put()
+                .uri(getApiURI(ME_PUT_PAYOUT_PREFERENCES))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "billingProfileId": "%s",
+                          "projectId": "%s"
+                        }
+                        """.formatted(isNull(billingProfileId) ? null : billingProfileId.value(), projectId))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
     }
 
     private void newCompanyInvoiceToReview(List<RewardId> rewardIds) throws IOException {
@@ -437,12 +433,12 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                           },
                           "rejectionReason": null,
                           "createdBy": {
-                            "githubUserId": 595505,
-                            "githubLogin": "ofux",
-                            "githubAvatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4",
-                            "email": "olivier.fuxet@gmail.com",
-                            "id": "e461c019-ba23-4671-9b6c-3a5a18748af9",
-                            "name": "Olivier Fuxet"
+                            "githubUserId": 43467246,
+                            "githubLogin": "AnthonyBuisset",
+                            "githubAvatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                            "email": "abuisset@gmail.com",
+                            "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                            "name": "Anthony BUISSET"
                           },
                           "totalEquivalent": {
                             "amount": 1212.000,
@@ -457,7 +453,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "rewardsPerNetwork": [
                             {
                               "network": "ETHEREUM",
-                              "billingAccountNumber": "e461c019-ba23-4671-9b6c-3a5a18748af9.eth",
+                              "billingAccountNumber": "747e663f-4e68-4b42-965b-b5aebedcd4c4.eth",
                               "totalUsdEquivalent": 1010.00,
                               "totalsPerCurrency": [
                                 {
@@ -478,7 +474,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                   "paymentId": null,
                                   "requestedAt": "2023-09-20T08:01:47.616674Z",
                                   "processedAt": null,
-                                  "status": "PENDING_VERIFICATION",
+                                  "status": "PROCESSING",
                                   "githubUrls": [
                                     "https://github.com/onlydustxyz/marketplace-frontend/pull/1026",
                                     "https://github.com/onlydustxyz/marketplace-frontend/pull/1037",
@@ -651,7 +647,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     @Test
     @Order(5)
     void should_reject_invoices() {
-        // Delete ofux user profile to check fallback of "createdBy.name" field in invoice details
+        // Delete AnthonyBuisset user profile to check fallback of "createdBy.name" field in invoice details
         userProfileInfoRepository.deleteById(userId.value());
 
         final String rejectionReason = faker.rickAndMorty().character();
@@ -683,8 +679,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
         makeWebhookSendRejectedInvoiceMailWireMockServer.verify(1,
                 postRequestedFor(urlEqualTo("/?api-key=%s".formatted(webhookHttpClientProperties.getApiKey())))
                         .withHeader("Content-Type", equalTo("application/json"))
-                        .withRequestBody(matchingJsonPath("$.recipientEmail", equalTo("olivier.fuxet@gmail.com")))
-                        .withRequestBody(matchingJsonPath("$.recipientName", equalTo("Olivier")))
+                        .withRequestBody(matchingJsonPath("$.recipientEmail", equalTo("abuisset@gmail.com")))
+                        .withRequestBody(matchingJsonPath("$.recipientName", equalTo("AnthonyBuisset")))
                         .withRequestBody(matchingJsonPath("$.rewardCount", equalTo(String.valueOf(invoice.rewards().size()))))
                         .withRequestBody(matchingJsonPath("$.invoiceName", equalTo(invoice.number().value())))
                         .withRequestBody(matchingJsonPath("$.totalUsdAmount", equalTo("2020.0")))
@@ -703,7 +699,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.createdBy.name").isEqualTo("ofux")
+                .jsonPath("$.createdBy.name").isEqualTo("AnthonyBuisset")
                 .jsonPath("$.rejectionReason").isEqualTo(rejectionReason);
 
         client
