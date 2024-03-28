@@ -1,13 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.project.domain.model.GithubRepo;
-import onlydust.com.marketplace.project.domain.model.Project;
-import onlydust.com.marketplace.project.domain.port.output.ContributionStoragePort;
-import onlydust.com.marketplace.project.domain.view.ContributionDetailsView;
-import onlydust.com.marketplace.project.domain.view.ContributionView;
-import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionRewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CustomIgnoredContributionEntity;
@@ -17,6 +10,13 @@ import onlydust.com.marketplace.api.postgres.adapter.mapper.GithubRepoMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.SortDirection;
+import onlydust.com.marketplace.project.domain.model.GithubRepo;
+import onlydust.com.marketplace.project.domain.model.Project;
+import onlydust.com.marketplace.project.domain.port.output.ContributionStoragePort;
+import onlydust.com.marketplace.project.domain.view.ContributionDetailsView;
+import onlydust.com.marketplace.project.domain.view.ContributionView;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.JpaSort;
@@ -122,7 +122,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
     @Override
     @Transactional
     public void ignoreContributions(UUID projectId, List<String> contributionIds) {
-        customIgnoredContributionsRepository.saveAll(contributionIds.stream().map(contributionId ->
+        customIgnoredContributionsRepository.saveAllAndFlush(contributionIds.stream().map(contributionId ->
                 CustomIgnoredContributionEntity.builder()
                         .id(CustomIgnoredContributionEntity.Id.builder()
                                 .projectId(projectId)
@@ -132,7 +132,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
                         .build()
         ).toList());
 
-        ignoredContributionsRepository.saveAll(contributionIds.stream().map(contributionId ->
+        ignoredContributionsRepository.saveAllAndFlush(contributionIds.stream().map(contributionId ->
                 IgnoredContributionEntity.builder()
                         .id(IgnoredContributionEntity.Id.builder()
                                 .projectId(projectId)
@@ -145,7 +145,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
     @Override
     @Transactional
     public void unignoreContributions(UUID projectId, List<String> contributionIds) {
-        customIgnoredContributionsRepository.saveAll(contributionIds.stream().map(contributionId ->
+        customIgnoredContributionsRepository.saveAllAndFlush(contributionIds.stream().map(contributionId ->
                 CustomIgnoredContributionEntity.builder()
                         .id(CustomIgnoredContributionEntity.Id.builder()
                                 .projectId(projectId)

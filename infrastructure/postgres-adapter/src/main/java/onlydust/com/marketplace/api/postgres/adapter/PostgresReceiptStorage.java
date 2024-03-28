@@ -19,6 +19,6 @@ public class PostgresReceiptStorage implements ReceiptStoragePort {
         final var reward = rewardRepository.findById(receipt.rewardId().value())
                 .orElseThrow(() -> notFound("Reward %s not found".formatted(receipt.rewardId())));
         reward.receipts().add(ReceiptEntity.of(receipt));
-        rewardRepository.save(reward);
+        rewardRepository.saveAndFlush(reward);
     }
 }

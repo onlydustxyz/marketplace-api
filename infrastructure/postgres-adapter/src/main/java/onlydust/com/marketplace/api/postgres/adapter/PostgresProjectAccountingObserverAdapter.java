@@ -21,12 +21,12 @@ public class PostgresProjectAccountingObserverAdapter implements ProjectAccounti
 
     @Override
     public void onAllowanceUpdated(ProjectId projectId, Currency.Id currencyId, PositiveAmount currentAllowance, PositiveAmount initialAllowance) {
-        projectAllowanceRepository.save(new ProjectAllowanceEntity(projectId.value(), currencyId.value(), currentAllowance.getValue(),
+        projectAllowanceRepository.saveAndFlush(new ProjectAllowanceEntity(projectId.value(), currencyId.value(), currentAllowance.getValue(),
                 initialAllowance.getValue()));
     }
 
     @Override
     public void onBudgetAllocatedToProject(SponsorId from, ProjectId to) {
-        projectSponsorRepository.save(new ProjectSponsorEntity(to.value(), from.value(), new Date()));
+        projectSponsorRepository.saveAndFlush(new ProjectSponsorEntity(to.value(), from.value(), new Date()));
     }
 }

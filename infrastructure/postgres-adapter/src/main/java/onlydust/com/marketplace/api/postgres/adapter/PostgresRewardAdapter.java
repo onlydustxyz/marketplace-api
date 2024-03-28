@@ -49,7 +49,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     public void save(Reward reward) {
         final var currency = currencyStorage.get(Currency.Id.of(reward.currencyId().value()))
                 .orElseThrow(() -> OnlyDustException.internalServerError("Currency %s not found".formatted(reward.currencyId())));
-        rewardRepository.save(RewardEntity.of(reward, currency));
+        rewardRepository.saveAndFlush(RewardEntity.of(reward, currency));
     }
 
     @Override
@@ -104,7 +104,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     @Override
     @Transactional
     public void savePayment(Payment payment) {
-        batchPaymentRepository.save(BatchPaymentEntity.fromDomain(payment));
+        batchPaymentRepository.saveAndFlush(BatchPaymentEntity.fromDomain(payment));
     }
 
     @Override
@@ -182,7 +182,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     @Override
     @Transactional
     public void saveAll(List<Payment> payments) {
-        batchPaymentRepository.saveAll(payments.stream().map(BatchPaymentEntity::fromDomain).toList());
+        batchPaymentRepository.saveAllAndFlush(payments.stream().map(BatchPaymentEntity::fromDomain).toList());
     }
 
     @Override

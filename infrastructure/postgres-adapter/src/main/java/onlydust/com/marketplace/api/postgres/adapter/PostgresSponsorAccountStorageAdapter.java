@@ -32,7 +32,7 @@ public class PostgresSponsorAccountStorageAdapter implements SponsorAccountStora
 
     @Override
     public void save(SponsorAccount... sponsorAccounts) {
-        sponsorAccountRepository.saveAll(Arrays.stream(sponsorAccounts).map(SponsorAccountEntity::of).toList());
+        sponsorAccountRepository.saveAllAndFlush(Arrays.stream(sponsorAccounts).map(SponsorAccountEntity::of).toList());
     }
 
     @Override
@@ -41,7 +41,7 @@ public class PostgresSponsorAccountStorageAdapter implements SponsorAccountStora
                 .orElseThrow(() -> OnlyDustException.notFound("Sponsor account %s not found".formatted(sponsorAccountId)));
 
         sponsorAccount.getTransactions().removeIf(t -> t.getId().equals(transactionId.value()));
-        sponsorAccountRepository.save(sponsorAccount);
+        sponsorAccountRepository.saveAndFlush(sponsorAccount);
     }
 
     @Override

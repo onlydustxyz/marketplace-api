@@ -20,6 +20,6 @@ public class PostgresBackofficeUserAdapter implements BackofficeUserStoragePort 
 
     @Override
     public void save(@NonNull BackofficeUser user) {
-        backofficeUserRepository.save(BackofficeUserEntity.fromDomain(user));
+        backofficeUserRepository.saveAndFlush(BackofficeUserEntity.fromDomain(user));
     }
 }

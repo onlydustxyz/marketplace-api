@@ -31,7 +31,7 @@ public class PostgresOutboxAdapter<E extends EventEntity> implements OutboxPort 
 
         entity.setStatus(EventEntity.Status.PROCESSED);
         entity.setError(null);
-        outboxRepository.save(entity);
+        outboxRepository.saveAndFlush(entity);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class PostgresOutboxAdapter<E extends EventEntity> implements OutboxPort 
 
         entity.setStatus(EventEntity.Status.FAILED);
         entity.setError(message);
-        outboxRepository.save(entity);
+        outboxRepository.saveAndFlush(entity);
     }
 
     @Override
@@ -51,6 +51,6 @@ public class PostgresOutboxAdapter<E extends EventEntity> implements OutboxPort 
 
         entity.setStatus(EventEntity.Status.SKIPPED);
         entity.setError(message);
-        outboxRepository.save(entity);
+        outboxRepository.saveAndFlush(entity);
     }
 }
