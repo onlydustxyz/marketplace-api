@@ -168,7 +168,7 @@ public class PostgresConfiguration {
                                                    final RewardStatsRepository rewardStatsRepository,
                                                    final RewardViewRepository rewardViewRepository,
                                                    final CurrencyRepository currencyRepository,
-                                                   final BillingProfileLinkViewRepository billingProfileLinkViewRepository) {
+                                                   final BillingProfileUserRepository billingProfileUserRepository) {
         return new PostgresUserAdapter(
                 customUserRepository,
                 customContributorRepository,
@@ -186,7 +186,7 @@ public class PostgresConfiguration {
                 rewardStatsRepository,
                 rewardViewRepository,
                 currencyRepository,
-                billingProfileLinkViewRepository);
+                billingProfileUserRepository);
     }
 
     @Bean

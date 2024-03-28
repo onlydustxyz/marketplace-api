@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBi
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileStatsViewEntity;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -63,6 +64,10 @@ public class BillingProfileEntity {
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "billingProfile")
     PayoutInfoEntity payoutInfo;
     Boolean enabled;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id", referencedColumnName = "billing_profile_id", insertable = false, updatable = false)
+    BillingProfileStatsViewEntity stats;
 
     @CreationTimestamp
     @Column(name = "tech_created_at", nullable = false, updatable = false)

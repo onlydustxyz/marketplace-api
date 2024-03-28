@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
@@ -53,7 +54,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final RewardStatsRepository rewardStatsRepository;
     private final RewardViewRepository rewardViewRepository;
     private final CurrencyRepository currencyRepository;
-    private final BillingProfileLinkViewRepository billingProfileLinkViewRepository;
+    private final BillingProfileUserRepository billingProfileUserRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -72,8 +73,8 @@ public class PostgresUserAdapter implements UserStoragePort {
                 .sorted(Comparator.comparing(ProjectLedIdViewEntity::getProjectSlug))
                 .toList();
         final var applications = applicationRepository.findAllByApplicantId(user.getId());
-        final var billingProfiles = billingProfileLinkViewRepository.findByUserId(user.getId()).stream()
-                .map(BillingProfileLinkViewEntity::toDomain)
+        final var billingProfiles = billingProfileUserRepository.findByUserId(user.getId()).stream()
+                .map(BillingProfileUserEntity::toBillingProfileLinkView)
                 .toList();
         final var hasAnyRewardPendingBillingProfile = rewardViewRepository.existsPendingBillingProfileByRecipientId(user.getGithubUserId());
         return mapUserToDomain(user, globalSettingsRepository.get().getTermsAndConditionsLatestVersionDate(),
