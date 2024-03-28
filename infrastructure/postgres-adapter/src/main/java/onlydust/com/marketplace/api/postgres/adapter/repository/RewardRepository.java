@@ -23,8 +23,12 @@ public interface RewardRepository extends JpaRepository<RewardEntity, UUID> {
     @Query(nativeQuery = true, value = """
                 update public.rewards
                 set billing_profile_id = :billingProfileId
-                where project_id = :projectId and recipient_id in (select github_user_id from iam.users where id = :recipientUserId)
-                and invoice_id is null
+                from accounting.reward_statuses rs
+                where
+                    project_id = :projectId and 
+                    recipient_id in (select github_user_id from iam.users where id = :recipientUserId) and
+                    rs.reward_id = id and
+                    rs.status < 'PROCESSING'
             """)
     void updateBillingProfileForRecipientUserIdAndProjectId(UUID billingProfileId, UUID recipientUserId, UUID projectId);
 
@@ -38,7 +42,8 @@ public interface RewardRepository extends JpaRepository<RewardEntity, UUID> {
 
     @Query(value = """
                 select r from RewardEntity r
-                where r.billingProfileId = :billingProfileId and r.invoiceId is null
+                join RewardStatusEntity rs on rs.rewardId = r.id and rs.status < 'PROCESSING'
+                where r.billingProfileId = :billingProfileId
             """)
     List<RewardEntity> getRewardIdsToBeRemovedFromBillingProfile(UUID billingProfileId);
 
