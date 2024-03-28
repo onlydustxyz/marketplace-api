@@ -8,6 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
+import onlydust.com.marketplace.accounting.domain.view.RewardAssociations;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.InvoiceViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
@@ -17,8 +18,8 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,6 +60,19 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
         }
         rewardRepository.saveAllAndFlush(rewards.stream().map(pr -> pr.invoiceId(invoice.id().value())).toList());
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<RewardAssociations> getRewardAssociations(List<RewardId> rewardIds) {
+        return rewardRepository.findAllById(rewardIds.stream().map(RewardId::value).toList())
+                .stream().map(r -> new RewardAssociations(
+                        RewardId.of(r.id()),
+                        r.status().toDomain(),
+                        r.invoiceId() == null ? null : Invoice.Id.of(r.invoiceId()),
+                        r.billingProfileId() == null ? null : BillingProfile.Id.of(r.billingProfileId())
+                )).toList();
+    }
+
 
     @Override
     @Transactional

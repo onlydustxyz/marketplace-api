@@ -653,7 +653,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isBadRequest()
                 .expectBody()
-                .jsonPath("$.message").isEqualTo("Some rewards are already invoiced");
+                .jsonPath("$.message").isEqualTo("Some rewards don't have the PENDING_REQUEST status");
     }
 
     @Test
@@ -975,7 +975,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     @Test
     @Order(104)
     void preview_with_both_billing_profile_types() {
-        final var rewardId = "fa097fab-9c01-4afa-bf1f-8d07029e03af";
+        final var rewardId = "f0c1b882-76f2-47d0-9331-151ce1f99281";
         final var em = entityManagerFactory.createEntityManager();
 
         // First, generate an invoice preview with the company billing profile
@@ -1047,7 +1047,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
         // And generate another preview for another reward
         client.get()
                 .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(companyBillingProfileId), Map.of(
-                        "rewardIds", "b917e003-2880-4958-995b-06805fb0e928"
+                        "rewardIds", "95e079c9-609c-4531-8c5c-13217306b299"
                 )))
                 .header("Authorization", BEARER_PREFIX + antho.jwt())
                 .exchange()

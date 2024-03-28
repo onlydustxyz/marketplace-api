@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.view.RewardAssociations;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 
@@ -35,6 +36,8 @@ public interface InvoiceStoragePort {
     int getNextSequenceNumber(BillingProfile.Id billingProfileId);
 
     List<Invoice.Reward> findRewards(List<RewardId> rewardIds);
+
+    List<RewardAssociations> getRewardAssociations(List<RewardId> rewardIds);
 
     List<Invoice> getAll(List<Invoice.Id> invoiceIds);
 }
