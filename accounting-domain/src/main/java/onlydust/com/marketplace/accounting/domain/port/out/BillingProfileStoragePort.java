@@ -83,7 +83,7 @@ public interface BillingProfileStoragePort {
 
     void deleteBillingProfile(BillingProfile.Id billingProfileId);
 
-    void enableBillingProfile(BillingProfile.Id billingProfileId, Boolean enabled);
+    void updateEnableBillingProfile(BillingProfile.Id billingProfileId, Boolean enabled);
 
     boolean isEnabled(BillingProfile.Id billingProfileId);
 

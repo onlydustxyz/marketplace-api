@@ -276,7 +276,7 @@ public class AccountingObserverTest {
             when(accountBookFacade.unlockDateOf(any())).thenReturn(Optional.of(unlockDate.toInstant()));
             when(accountBookFacade.networksOf(any())).thenReturn(Set.of(Network.ETHEREUM, Network.OPTIMISM));
 
-            when(rewardStatusStorage.get(any())).then(invocation -> {
+            when(rewardStatusStorage.get(any(RewardId.class))).then(invocation -> {
                 final var rewardId = invocation.getArgument(0, RewardId.class);
                 return Optional.of(new RewardStatusData(rewardId));
             });
@@ -324,7 +324,7 @@ public class AccountingObserverTest {
             when(accountBookFacade.unlockDateOf(any())).thenReturn(Optional.of(unlockDate.plusDays(1).toInstant()));
             when(accountBookFacade.networksOf(any())).thenReturn(Set.of(Network.APTOS, Network.OPTIMISM));
 
-            when(rewardStatusStorage.get(any())).then(invocation -> {
+            when(rewardStatusStorage.get(any(RewardId.class))).then(invocation -> {
                 final var rewardId = invocation.getArgument(0, RewardId.class);
                 return Optional.of(new RewardStatusData(rewardId)
                         .sponsorHasEnoughFund(rewardId.equals(rewardId1))
@@ -382,7 +382,7 @@ public class AccountingObserverTest {
         @Test
         public void should_update_reward_status_data() {
             // Given
-            when(rewardStatusStorage.get(any())).then(invocation -> {
+            when(rewardStatusStorage.get(any(RewardId.class))).then(invocation -> {
                 final var rewardId = invocation.getArgument(0, RewardId.class);
                 return Optional.of(new RewardStatusData(rewardId));
             });
@@ -433,7 +433,7 @@ public class AccountingObserverTest {
         @Test
         public void should_update_reward_status_data() {
             // Given
-            when(rewardStatusStorage.get(any())).then(invocation -> {
+            when(rewardStatusStorage.get(any(RewardId.class))).then(invocation -> {
                 final var rewardId = invocation.getArgument(0, RewardId.class);
                 return Optional.of(new RewardStatusData(rewardId).invoiceReceivedAt(invoice.createdAt()));
             });
@@ -628,7 +628,7 @@ public class AccountingObserverTest {
             verify(rewardStatusStorage).notPaid(kyb.getBillingProfileId());
         }
 
-         @Test
+        @Test
         void should_refresh_usd_equivalent_given_a_kyc_children() {
             // Given
             final UUID kybId = UUID.randomUUID();
@@ -663,7 +663,57 @@ public class AccountingObserverTest {
         }
 
 
+    }
 
+    @Nested
+    class OnBillingProfileDeleted {
+        @Test
+        void should_refresh_usd_equivalent() {
+            // Given
+            final var billingProfileId = BillingProfile.Id.random();
+            final var updatedRewardIds = List.of(RewardId.random(), RewardId.random());
 
+            // When
+            when(rewardStatusStorage.removeBillingProfile(billingProfileId)).thenReturn(updatedRewardIds);
+            accountingObserver.onBillingProfileDeleted(billingProfileId);
+
+            // Then
+            verify(rewardStatusStorage).removeBillingProfile(billingProfileId);
+            verify(rewardStatusStorage).get(updatedRewardIds);
+        }
+    }
+
+    @Nested
+    class OnBillingProfileDisabled {
+        @Test
+        void should_refresh_usd_equivalent() {
+            // Given
+            final var billingProfileId = BillingProfile.Id.random();
+            final var updatedRewardIds = List.of(RewardId.random(), RewardId.random());
+
+            // When
+            when(rewardStatusStorage.removeBillingProfile(billingProfileId)).thenReturn(updatedRewardIds);
+            accountingObserver.onBillingProfileEnableChanged(billingProfileId, false);
+
+            // Then
+            verify(rewardStatusStorage).removeBillingProfile(billingProfileId);
+            verify(rewardStatusStorage).get(updatedRewardIds);
+        }
+    }
+
+    @Nested
+    class OnBillingProfileEnabled {
+        @Test
+        void should_refresh_usd_equivalent() {
+            // Given
+            final var billingProfileId = BillingProfile.Id.random();
+
+            // When
+            accountingObserver.onBillingProfileEnableChanged(billingProfileId, true);
+
+            // Then
+            verify(rewardStatusStorage, never()).removeBillingProfile(billingProfileId);
+            verify(rewardStatusStorage, never()).get(any(List.class));
+        }
     }
 }

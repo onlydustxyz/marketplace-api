@@ -15,6 +15,8 @@ public interface RewardStatusStorage {
 
     Optional<RewardStatusData> get(final @NonNull RewardId rewardId);
 
+    List<RewardStatusData> get(final @NonNull List<RewardId> rewardIds);
+
     void delete(RewardId rewardId);
 
     List<RewardStatusData> notPaid();
@@ -23,9 +25,7 @@ public interface RewardStatusStorage {
 
     void updateBillingProfileForRecipientUserIdAndProjectId(BillingProfile.Id billingProfileId, UserId userId, ProjectId projectId);
 
-    void enableBillingProfile(BillingProfile.Id billingProfileId);
-
-    void removeBillingProfile(BillingProfile.Id billingProfileId);
+    List<RewardId> removeBillingProfile(BillingProfile.Id billingProfileId);
 
     void updateBillingProfileFromRecipientPayoutPreferences(RewardId rewardId);
 }

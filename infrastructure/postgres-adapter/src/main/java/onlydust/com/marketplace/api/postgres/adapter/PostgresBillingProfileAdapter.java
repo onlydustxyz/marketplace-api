@@ -405,7 +405,8 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional
-    public void enableBillingProfile(BillingProfile.Id billingProfileId, Boolean enabled) {
+    public void updateEnableBillingProfile(BillingProfile.Id billingProfileId, Boolean enabled) {
+        payoutPreferenceRepository.deleteAllByBillingProfileId(billingProfileId.value());
         billingProfileRepository.updateEnabled(billingProfileId.value(), enabled);
     }
 
