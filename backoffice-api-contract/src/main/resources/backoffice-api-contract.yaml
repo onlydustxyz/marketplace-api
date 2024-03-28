@@ -3021,7 +3021,32 @@ components:
             $ref: '#/components/schemas/SponsorLinkResponse'
         money:
           $ref: '#/components/schemas/MoneyWithUsdEquivalentResponse'
+        invoiceId:
+          $ref: '#/components/schemas/InvoiceId'
+        receipts:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionReceipt'
+        pendingPayments:
+          type: array
+          items:
+            $ref: '#/components/schemas/PendingPaymentSummaryResponse'
 
+    PendingPaymentSummaryResponse:
+      type: object
+      required:
+        - network
+        - billingAccountNumber
+        - amount
+      properties:
+        network:
+          $ref: '#/components/schemas/TransactionNetwork'
+        billingAccountNumber:
+          type: string
+          description: IBAN, account number, ENS or wallet address
+        amount:
+          type: number
+    
     TransactionHistoryPageResponse:
       type: object
       required:

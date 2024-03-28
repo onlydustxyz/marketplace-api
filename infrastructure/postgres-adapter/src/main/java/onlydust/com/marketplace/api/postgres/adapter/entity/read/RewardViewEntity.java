@@ -70,7 +70,7 @@ public class RewardViewEntity {
                 .unlockDate(statusData.unlockDate())
                 .from(from())
                 .project(project.toDomain())
-                .receipt(receipts.stream().findFirst().map(ReceiptEntity::toDomain).orElse(null))
+                .receipt(receipts.stream().findFirst().map(ReceiptEntity::toView).orElse(null))
                 .billingProfileId(billingProfileId)
                 .build();
     }

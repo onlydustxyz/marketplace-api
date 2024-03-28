@@ -1,13 +1,16 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Receipt;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.TotalMoneyView;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Comparator.comparing;
@@ -24,7 +27,7 @@ public interface SearchRewardMapper {
     }
 
     static SearchRewardItemResponse mapToItem(BackofficeRewardView view) {
-        return new SearchRewardItemResponse()
+        final var response = new SearchRewardItemResponse()
                 .id(view.id().value())
                 .paymentId(view.paymentId() == null ? null : view.paymentId().value())
                 .githubUrls(view.githubUrls())
@@ -41,7 +44,29 @@ public interface SearchRewardMapper {
                                 .name(shortSponsorView.name())
                                 .avatarUrl(shortSponsorView.logoUrl()))
                         .toList())
-                .billingProfile(mapBillingProfile(view.billingProfile()));
+                .billingProfile(mapBillingProfile(view.billingProfile()))
+                .invoiceId(view.invoice() == null ? null : view.invoice().id().value())
+                .receipts(view.receipts().stream().map(SearchRewardMapper::mapReceipt).toList())
+                .pendingPayments(new ArrayList<>());
+
+        if (view.invoice() != null && view.pendingPayments() != null)
+            view.pendingPayments().forEach((network, amount) -> response.addPendingPaymentsItem(
+                    new PendingPaymentSummaryResponse()
+                            .amount(amount.getValue())
+                            .network(mapNetwork(network))
+                            .billingAccountNumber(view.invoice().billingProfileSnapshot().wallet(network).map(Wallet::address).orElse(null))
+            ));
+
+        return response;
+    }
+
+    static TransactionReceipt mapReceipt(Receipt receipt) {
+        return new TransactionReceipt()
+                .id(receipt.id().value())
+                .network(mapNetwork(receipt.network()))
+                .reference(receipt.reference())
+                .thirdPartyName(receipt.thirdPartyName())
+                .thirdPartyAccountNumber(receipt.thirdPartyAccountNumber());
     }
 
     static MoneyWithUsdEquivalentResponse moneyViewToResponse(final MoneyView view) {

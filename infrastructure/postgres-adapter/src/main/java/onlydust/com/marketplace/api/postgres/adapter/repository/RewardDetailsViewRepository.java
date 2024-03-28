@@ -51,10 +51,7 @@ public interface RewardDetailsViewRepository extends JpaRepository<BackofficeRew
                                i.number                                 invoice_number,
                                i.status                                 invoice_status,
                                
-                               batch_payment.id                         batch_payment_id,
-
-                               receipts.transaction_references,
-                               receipts.paid_to_account_numbers
+                               batch_payment.id                         batch_payment_id
 
                         from rewards r
                                  join accounting.reward_statuses rs on rs.reward_id = r.id
@@ -88,12 +85,6 @@ public interface RewardDetailsViewRepository extends JpaRepository<BackofficeRew
                                             group by ps2.project_id) s2 on s2.project_id = r.project_id
                                  left join iam.users u on u.github_user_id = r.recipient_id
                                  left join user_profile_info upi on upi.id = u.id
-                                 left join (select rr.reward_id,
-                                                   jsonb_agg(re.transaction_reference) transaction_references,
-                                                   jsonb_agg(re.third_party_account_number) paid_to_account_numbers
-                                            from accounting.receipts re
-                                            join accounting.rewards_receipts rr on rr.receipt_id = re.id
-                                            group by rr.reward_id) receipts on receipts.reward_id = r.id
                                  left join (select ri.reward_id, jsonb_agg(coalesce(gpr.html_url, gcr.html_url, gi.html_url)) urls
                                        from reward_items ri
                                                 left join indexer_exp.github_pull_requests gpr on cast(gpr.id as text) = ri.id

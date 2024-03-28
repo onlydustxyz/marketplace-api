@@ -2,14 +2,13 @@ package onlydust.com.marketplace.accounting.domain.view;
 
 import lombok.Builder;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.Network;
-import onlydust.com.marketplace.accounting.domain.model.Payment;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Builder(toBuilder = true)
 public record BackofficeRewardView(
@@ -24,14 +23,22 @@ public record BackofficeRewardView(
         @NonNull MoneyView money,
         BillingProfile billingProfile,
         ShortContributorView recipient,
-        ShortInvoiceView invoice,
-        @NonNull List<String> transactionReferences,
-        @NonNull List<String> paidToAccountNumbers,
-        ZonedDateTime paidNotificationSentAt
+        InvoiceView invoice,
+        List<Receipt> receipts,
+        ZonedDateTime paidNotificationSentAt,
+        Map<Network, PositiveAmount> pendingPayments
 ) {
 
     @Deprecated
     public Network network() {
         return money().currency().legacyNetwork();
+    }
+
+    public List<String> transactionReferences() {
+        return receipts.stream().map(Receipt::reference).toList();
+    }
+
+    public List<String> paidToAccountNumbers() {
+        return receipts.stream().map(Receipt::thirdPartyAccountNumber).toList();
     }
 }
