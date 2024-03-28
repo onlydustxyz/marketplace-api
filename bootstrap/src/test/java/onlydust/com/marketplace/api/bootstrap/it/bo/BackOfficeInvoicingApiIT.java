@@ -3,10 +3,9 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
@@ -29,13 +28,12 @@ import org.springframework.http.MediaType;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.api.bootstrap.it.api.AbstractMarketplaceApiIT.ME_PUT_PAYOUT_PREFERENCES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -67,15 +65,13 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
 
     UserId userId;
     CompanyBillingProfile companyBillingProfile;
-    SelfEmployedBillingProfile selfEmployedBillingProfile;
-    IndividualBillingProfile individualBillingProfile;
 
     static final List<Invoice.Id> companyBillingProfileToReviewInvoices = new ArrayList<>();
 
     @BeforeEach
     void setupAll() {
-        final UserAuthHelper.AuthenticatedUser olivier = userAuthHelper.authenticateOlivier();
-        userId = UserId.of(olivier.user().getId());
+        final UserAuthHelper.AuthenticatedUser anthony = userAuthHelper.authenticateAnthony();
+        userId = UserId.of(anthony.user().getId());
     }
 
     void setUp() throws IOException {
@@ -84,16 +80,6 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
         billingProfileService.updatePayoutInfo(companyBillingProfile.id(), userId,
                 PayoutInfo.builder().ethWallet(new WalletLocator(new Name(userId + ".eth"))).build());
         accountingHelper.patchBillingProfile(companyBillingProfile.id().value(), null, VerificationStatusEntity.VERIFIED);
-
-        selfEmployedBillingProfile = billingProfileService.createSelfEmployedBillingProfile(userId, "Olivier SASU", null);
-        billingProfileService.updatePayoutInfo(selfEmployedBillingProfile.id(), userId,
-                PayoutInfo.builder().ethWallet(new WalletLocator(new Name(userId + ".eth"))).build());
-        accountingHelper.patchBillingProfile(selfEmployedBillingProfile.id().value(), null, VerificationStatusEntity.VERIFIED);
-
-        individualBillingProfile = billingProfileService.createIndividualBillingProfile(userId, "Olivier", null);
-        billingProfileService.updatePayoutInfo(individualBillingProfile.id(), userId,
-                PayoutInfo.builder().ethWallet(new WalletLocator(new Name(userId + ".eth"))).build());
-        accountingHelper.patchBillingProfile(individualBillingProfile.id().value(), null, VerificationStatusEntity.VERIFIED);
 
         kybRepository.findByBillingProfileId(companyBillingProfile.id().value())
                 .ifPresent(kyb -> kybRepository.save(kyb.toBuilder()
@@ -106,25 +92,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         .usEntity(false)
                         .subjectToEuVAT(true)
                         .verificationStatus(VerificationStatusEntity.VERIFIED).build()));
-        kybRepository.findByBillingProfileId(selfEmployedBillingProfile.id().value())
-                .ifPresent(kyb -> kybRepository.save(kyb.toBuilder()
-                        .country("FRA")
-                        .address("2 Infinite Loop, Cupertino, CA 95014, United States")
-                        .euVATNumber("FR0987654321")
-                        .name("Olivier SASU")
-                        .registrationDate(faker.date().birthday())
-                        .registrationNumber("ABC123456789")
-                        .usEntity(false)
-                        .subjectToEuVAT(true)
-                        .verificationStatus(VerificationStatusEntity.VERIFIED).build()));
-        kycRepository.findByBillingProfileId(individualBillingProfile.id().value())
-                .ifPresent(kyc -> kycRepository.save(kyc.toBuilder()
-                        .country("FRA")
-                        .address("3 Infinite Loop, Cupertino, CA 95014, United States")
-                        .firstName("Olivier")
-                        .birthdate(faker.date().birthday())
-                        .usCitizen(false)
-                        .verificationStatus(VerificationStatusEntity.VERIFIED).build()));
+
+        updatePayoutPreferences(43467246L, companyBillingProfile.id(), UUID.fromString("298a547f-ecb6-4ab2-8975-68f4e9bf7b39"));
 
         // Given
         newCompanyInvoiceToReview(List.of(
@@ -136,6 +105,33 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 RewardId.of("0b275f04-bdb1-4d4f-8cd1-76fe135ccbdf"),
                 RewardId.of("335e45a5-7f59-4519-8a12-1addc530214c"),
                 RewardId.of("e9ebbe59-fb74-4a6c-9a51-6d9050412977")));
+//        newCompanyInvoiceToReview(List.of(
+//                RewardId.of("f0c1b882-76f2-47d0-9331-151ce1f99281")));
+//        newCompanyInvoiceToReview(List.of(
+//                RewardId.of("95e079c9-609c-4531-8c5c-13217306b299"),
+//                RewardId.of("e33ea956-d2f5-496b-acf9-e2350faddb16")));
+//        newCompanyInvoiceToReview(List.of(
+//                RewardId.of("e9ebbe59-fb74-4a6c-9a51-6d9050412977"),
+//                RewardId.of("335e45a5-7f59-4519-8a12-1addc530214c"),
+//                RewardId.of("0b275f04-bdb1-4d4f-8cd1-76fe135ccbdf")));
+    }
+
+    private void updatePayoutPreferences(final Long githubUserId, BillingProfile.Id billingProfileId, final UUID projectId) {
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.authenticateUser(githubUserId);
+        client.put()
+                .uri(getApiURI(ME_PUT_PAYOUT_PREFERENCES))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "billingProfileId": "%s",
+                          "projectId": "%s"
+                        }
+                        """.formatted(isNull(billingProfileId) ? null : billingProfileId.value(), projectId))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
     }
 
     private void newCompanyInvoiceToReview(List<RewardId> rewardIds) throws IOException {
@@ -391,12 +387,12 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                           },
                           "rejectionReason": null,
                           "createdBy": {
-                            "githubUserId": 595505,
-                            "githubLogin": "ofux",
-                            "githubAvatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
-                            "email": "olivier.fuxet@gmail.com",
-                            "id": "e461c019-ba23-4671-9b6c-3a5a18748af9",
-                            "name": "Olivier Fuxet"
+                            "githubUserId": 43467246,
+                            "githubLogin": "AnthonyBuisset",
+                            "githubAvatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                            "email": "abuisset@gmail.com",
+                            "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                            "name": "Anthony BUISSET"
                           },
                           "totalEquivalent": {
                             "amount": 1212.000,
@@ -407,7 +403,145 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "logoUrl": null,
                               "decimals": 2
                             }
-                          }
+                          },
+                          "rewardsPerNetwork": [
+                            {
+                              "network": "ETHEREUM",
+                              "billingAccountNumber": "747e663f-4e68-4b42-965b-b5aebedcd4c4.eth",
+                              "totalUsdEquivalent": 1010.00,
+                              "totalsPerCurrency": [
+                                {
+                                  "amount": 1000,
+                                  "currency": {
+                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                    "code": "USDC",
+                                    "name": "USD Coin",
+                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                    "decimals": 6
+                                  },
+                                  "dollarsEquivalent": 1010.00
+                                }
+                              ],
+                              "rewards": [
+                                {
+                                  "id": "6587511b-3791-47c6-8430-8f793606c63a",
+                                  "paymentId": null,
+                                  "requestedAt": "2023-09-20T08:01:47.616674Z",
+                                  "processedAt": null,
+                                  "status": "PROCESSING",
+                                  "githubUrls": [
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1026",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1037",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1038",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1039",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1040",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1041",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1042",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1043",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1044",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1045",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1048",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1049",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1052",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1053",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1054",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1056",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1059",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1063",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1064",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1065",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1067",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1068",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1070",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1071",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1073",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1075",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1076",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1077",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1079",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1080",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1081",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1082",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1084",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1085",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1087",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1088",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1090",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1091",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1100",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1103",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1104",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1105",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1107",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1108",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1112",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1113",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1114",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1115",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1117",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1118",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1121",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1122",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1124",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1129",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1131",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1132",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1133",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1137",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1143",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1148",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1150",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1151",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1152",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1160",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1161",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1162",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1163",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1164",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1165",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1167",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1168",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1169",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1172",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1174",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1175",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1204",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1212",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1217",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1235",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1237",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1239",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1240",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1241",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1247",
+                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/62"
+                                  ],
+                                  "project": {
+                                    "name": "kaaper",
+                                    "logoUrl": null
+                                  },
+                                  "sponsors": [
+                                    {
+                                      "name": "No Sponsor",
+                                      "avatarUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
+                                    }
+                                  ],
+                                  "money": {
+                                    "amount": 1000,
+                                    "currency": {
+                                      "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                      "code": "USDC",
+                                      "name": "USD Coin",
+                                      "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                      "decimals": 6
+                                    },
+                                    "dollarsEquivalent": 1010.00,
+                                    "conversionRate": 1.0100000000000000
+                                  }
+                                }
+                              ]
+                            }
+                          ]
                         }
                         """)
         ;
@@ -467,7 +601,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     @Test
     @Order(5)
     void should_reject_invoices() {
-        // Delete ofux user profile to check fallback of "createdBy.name" field in invoice details
+        // Delete AnthonyBuisset user profile to check fallback of "createdBy.name" field in invoice details
         userProfileInfoRepository.deleteById(userId.value());
 
         final String rejectionReason = faker.rickAndMorty().character();
@@ -499,8 +633,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
         makeWebhookSendRejectedInvoiceMailWireMockServer.verify(1,
                 postRequestedFor(urlEqualTo("/?api-key=%s".formatted(webhookHttpClientProperties.getApiKey())))
                         .withHeader("Content-Type", equalTo("application/json"))
-                        .withRequestBody(matchingJsonPath("$.recipientEmail", equalTo("olivier.fuxet@gmail.com")))
-                        .withRequestBody(matchingJsonPath("$.recipientName", equalTo("Olivier")))
+                        .withRequestBody(matchingJsonPath("$.recipientEmail", equalTo("abuisset@gmail.com")))
+                        .withRequestBody(matchingJsonPath("$.recipientName", equalTo("AnthonyBuisset")))
                         .withRequestBody(matchingJsonPath("$.rewardCount", equalTo(String.valueOf(invoice.rewards().size()))))
                         .withRequestBody(matchingJsonPath("$.invoiceName", equalTo(invoice.number().value())))
                         .withRequestBody(matchingJsonPath("$.totalUsdAmount", equalTo("2020.0")))
@@ -519,7 +653,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.createdBy.name").isEqualTo("ofux")
+                .jsonPath("$.createdBy.name").isEqualTo("AnthonyBuisset")
                 .jsonPath("$.rejectionReason").isEqualTo(rejectionReason);
 
         client
