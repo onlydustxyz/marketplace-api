@@ -3955,6 +3955,8 @@ components:
         projectId:
           type: string
           format: uuid
+        billingProfileId:
+          $ref: '#/components/schemas/BillingProfileId'
         status:
           $ref: '#/components/schemas/RewardStatusContract'
         unlockDate:
