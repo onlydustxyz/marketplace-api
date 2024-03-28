@@ -54,7 +54,7 @@ public class BackofficeRewardViewEntity {
     BillingProfileEntity billingProfile;
 
     @ManyToOne
-    InvoiceEntity invoice;
+    InvoiceViewEntity invoice;
 
     UUID batchPaymentId;
 

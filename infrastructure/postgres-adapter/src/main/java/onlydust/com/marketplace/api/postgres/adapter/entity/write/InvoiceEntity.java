@@ -8,18 +8,13 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
-import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.view.UserView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.net.URI;
 import java.net.URL;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -38,19 +33,14 @@ public class InvoiceEntity {
     @NonNull UUID id;
     @NonNull UUID billingProfileId;
     @NonNull String number;
-    @Column(name = "created_by")
-    @NonNull UUID createdById;
+    @NonNull UUID createdBy;
 
-    @ManyToOne
-    @JoinColumn(name = "created_by", insertable = false, updatable = false)
-    @NonNull UserViewEntity createdBy;
     @NonNull ZonedDateTime createdAt;
     @Enumerated(EnumType.STRING)
     @Type(type = "invoice_status")
     @NonNull Status status;
     @NonNull BigDecimal amount;
-    @ManyToOne
-    @NonNull CurrencyEntity currency;
+    @NonNull UUID currencyId;
     URL url;
     String originalFileName;
     String rejectionReason;
@@ -62,7 +52,7 @@ public class InvoiceEntity {
         return new Invoice(
                 Invoice.Id.of(id),
                 data.billingProfileSnapshot(),
-                UserId.of(createdById),
+                UserId.of(createdBy),
                 createdAt,
                 data.dueAt,
                 Invoice.Number.fromString(number),
@@ -84,44 +74,15 @@ public class InvoiceEntity {
         this
                 .billingProfileId(invoice.billingProfileSnapshot().id().value())
                 .number(invoice.number().toString())
-                .createdById(invoice.createdBy().value())
+                .createdBy(invoice.createdBy().value())
                 .createdAt(invoice.createdAt())
                 .status(Status.of(invoice.status()))
                 .url(invoice.url())
                 .amount(invoice.totalAfterTax().getValue())
-                .currency(CurrencyEntity.of(invoice.totalAfterTax().getCurrency()))
+                .currencyId(invoice.totalAfterTax().getCurrency().id().value())
                 .originalFileName(invoice.originalFileName())
                 .rejectionReason(invoice.rejectionReason())
                 .data(Data.of(invoice));
-    }
-
-    @NonNull
-    private UserView getCreatedBy() {
-        return new UserView(
-                createdBy.getGithubUserId(),
-                createdBy.getGithubLogin(),
-                URI.create(createdBy.getGithubAvatarUrl()),
-                createdBy.getGithubEmail(),
-                UserId.of(createdBy.getId()),
-                createdBy.getProfile() == null ? createdBy.getGithubLogin() :
-                        createdBy.getProfile().getFirstName() + " " + createdBy.getProfile().getLastName());
-    }
-
-    public InvoiceView toView() {
-        return new InvoiceView(
-                Invoice.Id.of(id),
-                data.billingProfileSnapshot(),
-                getCreatedBy(),
-                createdAt,
-                Money.of(amount, currency.toDomain()),
-                data.dueAt,
-                Invoice.Number.fromString(number),
-                status.toDomain(),
-                data.rewards.stream().map(InvoiceRewardEntity::forInvoice).toList(),
-                url,
-                originalFileName,
-                rejectionReason
-        );
     }
 
     public enum Status {

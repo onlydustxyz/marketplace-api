@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.view.RewardShortView;
 import onlydust.com.marketplace.accounting.domain.view.UserView;
 
 import java.net.URL;
@@ -16,7 +17,7 @@ public record InvoiceView(
         @NonNull ZonedDateTime dueAt,
         @NonNull Invoice.Number number,
         @NonNull Invoice.Status status,
-        @NonNull List<Invoice.Reward> rewards,
+        @NonNull List<RewardShortView> rewards,
         URL url,
         String originalFileName,
         String rejectionReason

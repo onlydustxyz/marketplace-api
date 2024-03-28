@@ -11,8 +11,10 @@ import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRewardRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
@@ -29,6 +31,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 public class PostgresInvoiceStorage implements InvoiceStoragePort {
     private final @NonNull InvoiceRewardRepository invoiceRewardRepository;
     private final @NonNull InvoiceRepository invoiceRepository;
+    private final @NonNull InvoiceViewRepository invoiceViewRepository;
     private final @NonNull RewardRepository rewardRepository;
 
     @Override
@@ -86,10 +89,10 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     @Override
     public Page<InvoiceView> invoicesOf(final @NonNull BillingProfile.Id billingProfileId, final @NonNull Integer pageNumber, final @NonNull Integer pageSize,
                                         final @NonNull Invoice.Sort sort, final @NonNull SortDirection direction) {
-        final var page = invoiceRepository.findAllByBillingProfileIdAndStatusNot(billingProfileId.value(), InvoiceEntity.Status.DRAFT,
+        final var page = invoiceViewRepository.findAllByBillingProfileIdAndStatusNot(billingProfileId.value(), InvoiceEntity.Status.DRAFT,
                 PageRequest.of(pageNumber, pageSize, sortBy(sort, direction == SortDirection.asc ? Sort.Direction.ASC : Sort.Direction.DESC)));
         return Page.<InvoiceView>builder()
-                .content(page.getContent().stream().map(InvoiceEntity::toView).toList())
+                .content(page.getContent().stream().map(InvoiceViewEntity::toView).toList())
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();
@@ -102,7 +105,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
 
     @Override
     public Optional<InvoiceView> getView(final @NonNull Invoice.Id invoiceId) {
-        return invoiceRepository.findById(invoiceId.value()).map(InvoiceEntity::toView);
+        return invoiceViewRepository.findById(invoiceId.value()).map(InvoiceViewEntity::toView);
     }
 
     @Override

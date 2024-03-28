@@ -37,8 +37,6 @@ public class AccountingHelper {
     @Autowired
     InvoiceRepository invoiceRepository;
     @Autowired
-    UserViewRepository userViewRepository;
-    @Autowired
     BillingProfileRepository billingProfileRepository;
     @Autowired
     KybRepository kybRepository;
@@ -113,18 +111,15 @@ public class AccountingHelper {
 
         final var rewards = invoiceRewardRepository.findAll(rewardIds);
 
-        final var createdBy = userViewRepository.findByGithubUserId(43467246L).orElseThrow();
-
         return new InvoiceEntity(
                 id,
                 UUID.randomUUID(),
                 Invoice.Number.of(12, lastName, firstName).toString(),
                 UUID.randomUUID(),
-                createdBy,
                 ZonedDateTime.now().minusDays(1),
                 InvoiceEntity.Status.TO_REVIEW,
                 rewards.stream().map(InvoiceRewardEntity::targetAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add),
-                rewards.get(0).targetCurrency(),
+                rewards.get(0).targetCurrency().id(),
                 new URL("https://s3.storage.com/invoice.pdf"),
                 null,
                 null,

@@ -332,7 +332,7 @@ class BillingProfileServiceTest {
                     invoice.createdAt().plusDays(30),
                     invoice.number(),
                     invoice.status(),
-                    invoice.rewards(),
+                    List.of(),
                     invoice.url(),
                     invoice.originalFileName(),
                     null

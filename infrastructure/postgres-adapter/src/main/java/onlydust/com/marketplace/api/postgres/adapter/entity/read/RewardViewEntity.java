@@ -3,7 +3,10 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileRewardView;
+import onlydust.com.marketplace.accounting.domain.view.MoneyView;
+import onlydust.com.marketplace.accounting.domain.view.RewardShortView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ReceiptEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
@@ -22,12 +25,12 @@ import java.util.UUID;
 @Entity
 public class RewardViewEntity {
     @Id
-    UUID id;
-    Date requestedAt;
+    @NonNull UUID id;
+    @NonNull Date requestedAt;
     @ManyToOne
     @JoinColumn(name = "project_id", referencedColumnName = "project_id")
     @NonNull ProjectEntity project;
-    BigDecimal amount;
+    @NonNull BigDecimal amount;
     @ManyToOne
     @NonNull CurrencyEntity currency;
     Integer contributionCount;
@@ -154,6 +157,15 @@ public class RewardViewEntity {
                 .recipientId(recipientId)
                 .recipientLogin(recipientLogin)
                 .billingProfileId(billingProfileId)
+                .build();
+    }
+
+    public RewardShortView toShortView() {
+        return RewardShortView.builder()
+                .id(RewardId.of(id))
+                .status(status.toDomain())
+                .project(project.toView())
+                .money(new MoneyView(amount, currency.toDomain(), statusData.usdConversionRate(), statusData.amountUsdEquivalent()))
                 .build();
     }
 }

@@ -427,23 +427,15 @@ public interface BackOfficeMapper {
                 .rewards(invoice.rewards().stream().map(BackOfficeMapper::mapToShortResponse).toList());
     }
 
-    static ShortRewardResponse mapToShortResponse(Invoice.Reward reward) {
+    static ShortRewardResponse mapToShortResponse(RewardShortView reward) {
         return new ShortRewardResponse()
                 .id(reward.id().value())
-//                .status(map(reward.status().asBackofficeUser()))// TODO
+                .status(map(reward.status().asBackofficeUser()))
                 .project(new ProjectLinkResponse()
-                                .name(reward.projectName())
-//                        .logoUrl(reward.project().logoUrl()) // TODO
+                        .name(reward.project().name())
+                        .logoUrl(reward.project().logoUrl())
                 )
-                .money(moneyToResponse(reward.amount()));
-    }
-
-    static MoneyWithUsdEquivalentResponse moneyToResponse(Money amount) {
-        return new MoneyWithUsdEquivalentResponse()
-                .amount(amount.getValue())
-                .currency(toShortCurrency(amount.getCurrency()))
-//                .dollarsEquivalent(amount.().orElse(null) // TODO
-                ;
+                .money(moneyViewToResponse(reward.money()));
     }
 
     static ShortRewardResponse mapToShortResponse(RewardDetailsView reward) {

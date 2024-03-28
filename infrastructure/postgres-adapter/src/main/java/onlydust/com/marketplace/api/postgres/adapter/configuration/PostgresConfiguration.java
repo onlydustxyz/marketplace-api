@@ -305,9 +305,10 @@ public class PostgresConfiguration {
     InvoiceStoragePort invoicePreviewStoragePort(
             final @NonNull InvoiceRewardRepository invoiceRewardRepository,
             final @NonNull InvoiceRepository invoiceRepository,
-            final @NonNull RewardRepository rewardRepository) {
+            final @NonNull RewardRepository rewardRepository,
+            final @NonNull InvoiceViewRepository invoiceViewRepository) {
         return new PostgresInvoiceStorage(invoiceRewardRepository,
-                invoiceRepository, rewardRepository);
+                invoiceRepository, invoiceViewRepository, rewardRepository);
     }
 
     @Bean
