@@ -1,8 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import com.github.javafaker.Faker;
-import onlydust.com.backoffice.api.contract.model.SearchRewardsResponse;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
@@ -26,10 +24,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.MediaType;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -160,49 +160,6 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
         billingProfileService.uploadGeneratedInvoice(pierre, pierreBillingProfile.id(), invoiceId,
                 new FileSystemResource(Objects.requireNonNull(getClass().getResource("/invoices/invoice-sample.pdf")).getFile()).getInputStream());
         pierreInvoiceIds.add(invoiceId);
-    }
-
-    @Test
-    @Order(1)
-    void should_search_payable_rewards_to_pay_given_a_list_of_invoice_id() throws IOException {
-        // Given
-        setUp();
-
-        // When
-        final var response = client.post()
-                .uri(getApiURI(POST_REWARDS_SEARCH))
-                .header("Api-Key", apiKey())
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                            {
-                            "invoiceIds": ["%s","%s","%s"]
-                            }
-                        """.formatted(
-                        olivierInvoiceIds.get(0).value(),
-                        olivierInvoiceIds.get(1).value(),
-                        olivierInvoiceIds.get(2).value()
-                ))
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .returnResult(SearchRewardsResponse.class)
-                .getResponseBody().blockFirst();
-
-        final var expectedRewardIds = List.of(
-                UUID.fromString("061e2c7e-bda4-49a8-9914-2e76926f70c2"),
-                UUID.fromString("ee28315c-7a84-4052-9308-c2236eeafda1"),
-                UUID.fromString("d067b24d-115a-45e9-92de-94dd1d01b184"),
-                UUID.fromString("d506a05d-3739-452f-928d-45ea81d33079"),
-                UUID.fromString("5083ac1f-4325-4d47-9760-cbc9ab82f25c"),
-                UUID.fromString("e6ee79ae-b3f0-4f4e-b7e3-9e643bc27236")
-        );
-
-        for (final var reward : response.getRewards()) {
-            assertThat(expectedRewardIds).contains(reward.getId());
-            assertThat(List.of(Currency.Code.USDC_STR, Currency.Code.LORDS_STR, Currency.Code.STRK_STR)).contains(reward.getMoney().getCurrency().getCode());
-            assertThat(reward.getPaymentId()).isNull();
-        }
     }
 
     @Test

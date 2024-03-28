@@ -23,10 +23,7 @@ import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class RewardServiceTest {
@@ -71,35 +68,6 @@ public class RewardServiceTest {
         verify(accountingRewardStoragePort).markRewardsAsPaymentNotified(rewardViews.stream().map(BackofficeRewardView::id).toList());
     }
 
-
-    @Test
-    void should_search_for_batch_payment() {
-        // Given
-        final List<Invoice.Id> invoiceIds = List.of(Invoice.Id.of(UUID.randomUUID()));
-
-        // When
-        when(accountingRewardStoragePort.searchRewards(List.of(Invoice.Status.APPROVED), invoiceIds, List.of(RewardStatus.PROCESSING)))
-                .thenReturn(List.of(
-                        generateRewardStubForCurrency(Currencies.ETH),
-                        generateRewardStubForCurrency(Currencies.EUR),
-                        generateRewardStubForCurrency(Currencies.OP),
-                        generateRewardStubForCurrency(Currencies.USD),
-                        generateRewardStubForCurrency(Currencies.USD),
-                        generateRewardStubForCurrency(Currencies.USDC),
-                        generateRewardStubForCurrency(Currencies.APT),
-                        generateRewardStubForCurrency(Currencies.LORDS),
-                        generateRewardStubForCurrency(Currencies.STRK)
-                ));
-        final var rewardViews = rewardService.processingRewardsByInvoiceIds(invoiceIds);
-
-        // Then
-        assertEquals(6, rewardViews.size());
-        assertThat(rewardViews).allMatch(r -> r.money().currency().type().equals(Currency.Type.CRYPTO));
-    }
-
-    private BackofficeRewardView generateRewardStubForCurrency(final Currency currency) {
-        return generateRewardStubForCurrencyAndEmail(currency, faker.rickAndMorty().character());
-    }
 
     private BackofficeRewardView generateRewardStubForCurrencyAndEmail(final Currency currency, final String email) {
         return BackofficeRewardView.builder()

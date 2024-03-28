@@ -1,8 +1,9 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
@@ -30,24 +31,12 @@ public class RewardService implements AccountingRewardPort {
     private final SponsorStoragePort sponsorStoragePort;
 
     @Override
-    public List<BackofficeRewardView> findByInvoiceId(Invoice.Id invoiceId) {
-        return accountingRewardStoragePort.getInvoiceRewards(invoiceId);
-    }
-
-    @Override
     public Page<BackofficeRewardView> getRewards(int pageIndex, int pageSize,
                                                  List<RewardStatus> statuses,
                                                  Date fromRequestedAt, Date toRequestedAt,
                                                  Date fromProcessedAt, Date toProcessedAt) {
         final Set<RewardStatus> sanitizedStatuses = isNull(statuses) ? Set.of() : statuses.stream().collect(Collectors.toUnmodifiableSet());
         return accountingRewardStoragePort.findRewards(pageIndex, pageSize, sanitizedStatuses, fromRequestedAt, toRequestedAt, fromProcessedAt, toProcessedAt);
-    }
-
-    @Override
-    public List<BackofficeRewardView> processingRewardsByInvoiceIds(List<Invoice.Id> invoiceIds) {
-        return accountingRewardStoragePort.searchRewards(List.of(Invoice.Status.APPROVED), invoiceIds, List.of(RewardStatus.PROCESSING)).stream()
-                .filter(r -> r.money().currency().type().equals(Currency.Type.CRYPTO))
-                .toList();
     }
 
     @Override

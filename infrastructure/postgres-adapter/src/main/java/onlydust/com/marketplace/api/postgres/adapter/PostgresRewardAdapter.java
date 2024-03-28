@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
@@ -70,28 +69,6 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
         return shortProjectViewEntityRepository.listProjectsByRewardRecipient(githubUserId)
                 .stream()
                 .map(ProjectMapper::mapShortProjectViewToProject)
-                .toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<BackofficeRewardView> searchRewards(List<Invoice.Status> invoiceStatuses, List<Invoice.Id> invoiceIds, List<RewardStatus> rewardStatuses) {
-        return rewardDetailsViewRepository.findAllByInvoiceStatusesAndInvoiceIdsAndRewardStatuses(
-                        invoiceStatuses != null ? invoiceStatuses.stream().map(Invoice.Status::toString).toList() : null,
-                        invoiceIds != null ? invoiceIds.stream().map(Invoice.Id::value).toList() : null,
-                        rewardStatuses != null ? rewardStatuses.stream().map(RewardStatusEntity::from).map(Enum::toString).toList() : null
-                )
-                .stream()
-                .map(BackofficeRewardViewEntity::toDomain)
-                .toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<BackofficeRewardView> getInvoiceRewards(@NonNull Invoice.Id invoiceId) {
-        return rewardDetailsViewRepository.findAllByInvoiceId(invoiceId.value())
-                .stream()
-                .map(BackofficeRewardViewEntity::toDomain)
                 .toList();
     }
 

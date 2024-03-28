@@ -8,29 +8,28 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
-import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
-import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
-import onlydust.com.marketplace.accounting.domain.view.TotalMoneyView;
+import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.view.ProjectSponsorView;
+import onlydust.com.marketplace.project.domain.view.backoffice.SponsorView;
+import onlydust.com.marketplace.project.domain.view.backoffice.UserView;
 import onlydust.com.marketplace.project.domain.view.backoffice.*;
 
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.reducing;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.SearchRewardMapper.moneyViewToResponse;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.SearchRewardMapper.totalMoneyViewToResponse;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.ETHEREUM;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
@@ -371,7 +370,7 @@ public interface BackOfficeMapper {
                 .id(invoice.id().value())
                 .status(mapInvoiceInternalStatus(invoice.status()))
                 .createdAt(invoice.createdAt())
-                .billingProfile(map(invoice.billingProfileSnapshot()))
+                .billingProfile(mapToLinkResponse(invoice.billingProfileSnapshot()))
                 .rewardCount(invoice.rewards().size())
                 .totalUsdEquivalent(invoice.totalAfterTax().getValue())
                 .totalsPerCurrency(invoice.rewards().stream().map(reward ->
@@ -380,6 +379,13 @@ public interface BackOfficeMapper {
                                 .currency(toShortCurrency(reward.amount().getCurrency()))
                                 .dollarsEquivalent(reward.target().getValue())
                 ).toList());
+    }
+
+    static BillingProfileLinkResponse mapToLinkResponse(Invoice.BillingProfileSnapshot billingProfileSnapshot) {
+        return new BillingProfileLinkResponse()
+                .id(billingProfileSnapshot.id().value())
+                .type(map(billingProfileSnapshot.type()))
+                .subject(billingProfileSnapshot.subject());
     }
 
     static KybResponse mapKyb(Invoice.BillingProfileSnapshot.KybSnapshot kybSnapshot) {
@@ -405,20 +411,59 @@ public interface BackOfficeMapper {
     }
 
     @SneakyThrows
-    static InvoiceResponse mapInvoiceToContract(final InvoiceView invoice, final List<BackofficeRewardView> rewards) {
-        return new InvoiceResponse()
+    static InvoiceDetailsResponse mapInvoiceToContract(final InvoiceView invoice) {
+        return new InvoiceDetailsResponse()
                 .id(invoice.id().value())
                 .number(invoice.number().toString())
-                .rejectionReason(invoice.rejectionReason())
                 .status(mapInvoiceInternalStatus(invoice.status()))
+                .billingProfile(mapToShortResponse(invoice.billingProfileSnapshot()))
+                .rejectionReason(invoice.rejectionReason())
                 .createdAt(invoice.createdAt())
                 .createdBy(map(invoice.createdBy()))
-                .billingProfile(map(invoice.billingProfileSnapshot()))
                 .totalEquivalent(new MoneyResponse()
                         .amount(invoice.totalAfterTax().getValue())
                         .currency(toShortCurrency(invoice.totalAfterTax().getCurrency()))
                 )
-                .rewardsPerNetwork(mapInvoiceRewardsPerNetworks(invoice.billingProfileSnapshot().wallets(), rewards));
+                .rewards(invoice.rewards().stream().map(BackOfficeMapper::mapToShortResponse).toList());
+    }
+
+    static ShortRewardResponse mapToShortResponse(Invoice.Reward reward) {
+        return new ShortRewardResponse()
+                .id(reward.id().value())
+//                .status(map(reward.status().asBackofficeUser()))// TODO
+                .project(new ProjectLinkResponse()
+                                .name(reward.projectName())
+//                        .logoUrl(reward.project().logoUrl()) // TODO
+                )
+                .money(moneyToResponse(reward.amount()));
+    }
+
+    static MoneyWithUsdEquivalentResponse moneyToResponse(Money amount) {
+        return new MoneyWithUsdEquivalentResponse()
+                .amount(amount.getValue())
+                .currency(toShortCurrency(amount.getCurrency()))
+//                .dollarsEquivalent(amount.().orElse(null) // TODO
+                ;
+    }
+
+    static ShortRewardResponse mapToShortResponse(BackofficeRewardView reward) {
+        return new ShortRewardResponse()
+                .id(reward.id().value())
+                .status(map(reward.status().asBackofficeUser()))
+                .project(new ProjectLinkResponse()
+                        .name(reward.project().name())
+                        .logoUrl(reward.project().logoUrl()))
+                .money(moneyViewToResponse(reward.money()));
+    }
+
+    static BillingProfileShortResponse mapToShortResponse(Invoice.BillingProfileSnapshot billingProfileSnapshot) {
+        return new BillingProfileShortResponse()
+                .id(billingProfileSnapshot.id().value())
+                .type(map(billingProfileSnapshot.type()))
+                .subject(billingProfileSnapshot.subject())
+                .verificationStatus(VerificationStatus.VERIFIED)
+                .kyc(billingProfileSnapshot.kyc().map(BackOfficeMapper::mapKyc).orElse(null))
+                .kyb(billingProfileSnapshot.kyb().map(BackOfficeMapper::mapKyb).orElse(null));
     }
 
     static UserResponse map(onlydust.com.marketplace.accounting.domain.view.UserView userView) {
@@ -454,55 +499,6 @@ public interface BackOfficeMapper {
                 .kyb(billingProfileSnapshot.kyb().map(BackOfficeMapper::mapKyb).orElse(null));
     }
 
-    static List<InvoiceRewardsPerNetwork> mapInvoiceRewardsPerNetworks(final List<Wallet> wallets, final List<BackofficeRewardView> rewards) {
-        return rewards.stream().collect(groupingBy(BackofficeRewardView::network))
-                .entrySet().stream()
-                .map(e -> {
-                            final var totalUsdEquivalent = e.getValue().stream()
-                                    .map(r -> r.money().dollarsEquivalent().orElse(BigDecimal.ZERO))
-                                    .reduce(BigDecimal::add)
-                                    .orElseThrow(() -> internalServerError("No reward found for network %s".formatted(e.getKey())));
-
-                            return new InvoiceRewardsPerNetwork()
-                                    .network(mapNetwork(e.getKey()))
-                                    .billingAccountNumber(wallets.stream()
-                                            .filter(w -> w.network() == e.getKey())
-                                            .findFirst()
-                                            .map(Wallet::address)
-                                            .orElse(null))
-                                    .totalUsdEquivalent(totalUsdEquivalent)
-                                    .totalsPerCurrency(mapNetworkRewardTotals(e.getValue()))
-                                    .rewards(mapNetworkRewards(e.getValue()));
-                        }
-                )
-                .sorted(comparing(InvoiceRewardsPerNetwork::getNetwork))
-                .toList();
-    }
-
-    static List<InvoiceRewardResponse> mapNetworkRewards(final List<BackofficeRewardView> rewards) {
-        return rewards.stream()
-                .map(reward -> new InvoiceRewardResponse()
-                        .id(reward.id().value())
-                        .paymentId(reward.paymentId() == null ? null : reward.paymentId().value())
-                        .requestedAt(reward.requestedAt())
-                        .processedAt(reward.processedAt())
-                        .githubUrls(reward.githubUrls())
-                        .project(new ProjectLinkResponse()
-                                .name(reward.project().name())
-                                .logoUrl(reward.project().logoUrl()))
-                        .sponsors(reward.sponsors().stream().map(sponsor ->
-                                new SponsorLinkResponse()
-                                        .name(sponsor.name())
-                                        .avatarUrl(sponsor.logoUrl())
-                        ).toList())
-                        .money(moneyViewToResponse(reward.money()))
-                        .status(map(reward.status().asBackofficeUser()))
-                        .transactionReferences(reward.transactionReferences())
-                )
-                .sorted(comparing(InvoiceRewardResponse::getRequestedAt))
-                .toList();
-    }
-
     static List<TotalMoneyWithUsdEquivalentResponse> mapNetworkRewardTotals(final List<BackofficeRewardView> rewards) {
         return rewards.stream().collect(groupingBy(r -> r.money().currency()))
                 .entrySet().stream()
@@ -519,6 +515,109 @@ public interface BackOfficeMapper {
                 )
                 .sorted(comparing(r -> r.getCurrency().getCode()))
                 .toList();
+    }
+
+    static RewardDetailsResponse map(BackofficeRewardView view) {
+        final var response = new RewardDetailsResponse()
+                .id(view.id().value())
+                .paymentId(view.paymentId() == null ? null : view.paymentId().value())
+                .githubUrls(view.githubUrls())
+                .processedAt(view.processedAt())
+                .requestedAt(view.requestedAt())
+                .money(moneyViewToResponse(view.money())
+                )
+                .status(BackOfficeMapper.map(view.status().asBackofficeUser()))
+                .project(new ProjectLinkResponse()
+                        .name(view.project().name())
+                        .logoUrl(view.project().logoUrl()))
+                .sponsors(view.sponsors().stream()
+                        .map(shortSponsorView -> new SponsorLinkResponse()
+                                .name(shortSponsorView.name())
+                                .avatarUrl(shortSponsorView.logoUrl()))
+                        .toList())
+                .billingProfile(mapToLinkResponse(view.billingProfile()))
+                .invoiceId(view.invoice() == null ? null : view.invoice().id().value())
+                .receipts(view.receipts().stream().map(BackOfficeMapper::mapReceipt).toList())
+                .pendingPayments(new ArrayList<>())
+                .paidNotificationDate(view.paidNotificationSentAt());
+
+        if (view.invoice() != null && view.pendingPayments() != null)
+            view.pendingPayments().forEach((network, amount) -> response.addPendingPaymentsItem(
+                    new PendingPaymentSummaryResponse()
+                            .amount(amount.getValue())
+                            .network(mapNetwork(network))
+                            .billingAccountNumber(view.invoice().billingProfileSnapshot().wallet(network).map(Wallet::address).orElse(null))
+            ));
+
+        return response;
+    }
+
+    static BillingProfileLinkResponse mapToLinkResponse(BillingProfile billingProfile) {
+        return billingProfile == null ? null : new BillingProfileLinkResponse()
+                .id(billingProfile.id().value())
+                .type(map(billingProfile.type()))
+                .subject(billingProfile.subject());
+    }
+
+    static TransactionReceipt mapReceipt(Receipt receipt) {
+        return new TransactionReceipt()
+                .id(receipt.id().value())
+                .network(mapNetwork(receipt.network()))
+                .reference(receipt.reference())
+                .thirdPartyName(receipt.thirdPartyName())
+                .thirdPartyAccountNumber(receipt.thirdPartyAccountNumber());
+    }
+
+    static MoneyWithUsdEquivalentResponse moneyViewToResponse(final MoneyView view) {
+        if (view == null) {
+            return null;
+        }
+        return new MoneyWithUsdEquivalentResponse()
+                .amount(view.amount())
+                .currency(toShortCurrency(view.currency()))
+                .conversionRate(view.usdConversionRate().orElse(null))
+                .dollarsEquivalent(view.dollarsEquivalent().orElse(null));
+    }
+
+    static TotalMoneyWithUsdEquivalentResponse totalMoneyViewToResponse(final TotalMoneyView view) {
+        if (view == null) {
+            return null;
+        }
+        return new TotalMoneyWithUsdEquivalentResponse()
+                .amount(view.amount())
+                .currency(toShortCurrency(view.currency()))
+                .dollarsEquivalent(view.dollarsEquivalent());
+    }
+
+    static RewardPageResponse rewardPageToResponse(int pageIndex, Page<BackofficeRewardView> page) {
+        final RewardPageResponse response = new RewardPageResponse();
+        response.setTotalPageNumber(page.getTotalPageNumber());
+        response.setTotalItemNumber(page.getTotalItemNumber());
+        response.setHasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()));
+        response.setNextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()));
+        page.getContent().forEach(rewardDetailsView -> response.addRewardsItem(new RewardPageItemResponse()
+                .id(rewardDetailsView.id().value())
+                .status(BackOfficeMapper.map(rewardDetailsView.status().asBackofficeUser()))
+                .requestedAt(rewardDetailsView.requestedAt())
+                .project(new ProjectLinkResponse()
+                        .name(rewardDetailsView.project().name())
+                        .logoUrl(rewardDetailsView.project().logoUrl()))
+                .money(moneyViewToResponse(rewardDetailsView.money()))
+                .billingProfile(mapToLinkResponse(rewardDetailsView.billingProfile()))
+                .invoice(rewardDetailsView.invoice() != null ?
+                        new InvoiceLinkResponse()
+                                .id(rewardDetailsView.invoice().id().value())
+                                .number(rewardDetailsView.invoice().number().toString())
+                                .status(mapInvoiceInternalStatus(rewardDetailsView.invoice().status()))
+                        : null
+                )
+                .recipient(rewardDetailsView.recipient() != null ?
+                        new RecipientLinkResponse()
+                                .login(rewardDetailsView.recipient().login())
+                                .avatarUrl(rewardDetailsView.recipient().avatarUrl())
+                        : null)
+        ));
+        return response;
     }
 
     static InvoiceStatus mapInvoiceStatus(final Invoice.Status status) {

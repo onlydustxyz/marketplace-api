@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.accounting.domain.port.out;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
@@ -15,10 +14,6 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface AccountingRewardStoragePort {
-
-    List<BackofficeRewardView> searchRewards(List<Invoice.Status> statuses, List<Invoice.Id> invoiceIds, List<RewardStatus> rewardStatuses);
-
-    List<BackofficeRewardView> getInvoiceRewards(@NonNull Invoice.Id invoiceId);
 
     Optional<Payment> findPayment(Payment.Id batchPaymentId);
 
