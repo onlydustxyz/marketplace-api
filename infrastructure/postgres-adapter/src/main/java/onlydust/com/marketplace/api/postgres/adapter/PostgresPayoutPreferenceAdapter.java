@@ -41,6 +41,6 @@ public class PostgresPayoutPreferenceAdapter implements PayoutPreferenceStorageP
     @Override
     @Transactional
     public void save(ProjectId projectId, BillingProfile.Id billingProfileId, UserId userId) {
-        payoutPreferenceRepository.save(PayoutPreferenceEntity.fromDomain(projectId, billingProfileId, userId));
+        payoutPreferenceRepository.saveAndFlush(PayoutPreferenceEntity.fromDomain(projectId, billingProfileId, userId));
     }
 }

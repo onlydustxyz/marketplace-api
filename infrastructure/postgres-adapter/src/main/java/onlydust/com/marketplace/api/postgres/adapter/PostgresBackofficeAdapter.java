@@ -129,7 +129,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     @Override
     @Transactional
     public Ecosystem createEcosystem(Ecosystem ecosystem) {
-        return ecosystemRepository.save(EcosystemEntity.fromDomain(ecosystem)).toDomain();
+        return ecosystemRepository.saveAndFlush(EcosystemEntity.fromDomain(ecosystem)).toDomain();
     }
 
     @Override
@@ -147,7 +147,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
                         .url(sponsor.url())
                         .logoUrl(sponsor.logoUrl())
                         .build());
-        boSponsorRepository.save(entity);
+        boSponsorRepository.saveAndFlush(entity);
     }
 
     @Override

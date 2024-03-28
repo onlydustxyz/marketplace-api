@@ -242,7 +242,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         .rank(0)
                         .build();
 
-        this.projectRepository.save(projectEntity);
+        this.projectRepository.saveAndFlush(projectEntity);
 
         return projectRepository.getKeyById(projectId);
     }
@@ -336,7 +336,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
             }
         }
 
-        this.projectRepository.save(project);
+        this.projectRepository.saveAndFlush(project);
     }
 
 
@@ -485,7 +485,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     public void hideContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId) {
-        hiddenContributorRepository.save(HiddenContributorEntity.builder()
+        hiddenContributorRepository.saveAndFlush(HiddenContributorEntity.builder()
                 .projectId(projectId)
                 .projectLeadId(projectLeadId)
                 .contributorGithubUserId(contributorGithubUserId)

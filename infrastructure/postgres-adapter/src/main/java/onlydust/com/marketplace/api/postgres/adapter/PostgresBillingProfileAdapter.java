@@ -54,7 +54,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
         final var billingProfile = billingProfileRepository.findById(billingProfileId.value())
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
         billingProfile.setInvoiceMandateAcceptedAt(Date.from(acceptanceDate.toInstant()));
-        billingProfileRepository.save(billingProfile);
+        billingProfileRepository.saveAndFlush(billingProfile);
     }
 
     @Override
@@ -79,37 +79,37 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional
     public void save(IndividualBillingProfile billingProfile) {
-        billingProfileRepository.save(BillingProfileEntity.fromDomain(billingProfile, billingProfile.owner().id(), now()));
+        billingProfileRepository.saveAndFlush(BillingProfileEntity.fromDomain(billingProfile, billingProfile.owner().id(), now()));
         final Optional<KycEntity> optionalKycEntity = kycRepository.findByBillingProfileId(billingProfile.id().value());
         if (optionalKycEntity.isEmpty()) {
-            kycRepository.save(KycEntity.fromDomain(billingProfile.kyc()));
+            kycRepository.saveAndFlush(KycEntity.fromDomain(billingProfile.kyc()));
         }
     }
 
     @Override
     @Transactional
     public void save(SelfEmployedBillingProfile billingProfile) {
-        billingProfileRepository.save(BillingProfileEntity.fromDomain(billingProfile, billingProfile.owner().id(), now()));
+        billingProfileRepository.saveAndFlush(BillingProfileEntity.fromDomain(billingProfile, billingProfile.owner().id(), now()));
         final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfile.id().value());
         if (optionalKybEntity.isEmpty()) {
-            kybRepository.save(KybEntity.fromDomain(billingProfile.kyb()));
+            kybRepository.saveAndFlush(KybEntity.fromDomain(billingProfile.kyb()));
         }
     }
 
     @Override
     @Transactional
     public void save(CompanyBillingProfile billingProfile) {
-        billingProfileRepository.save(BillingProfileEntity.fromDomain(billingProfile,
+        billingProfileRepository.saveAndFlush(BillingProfileEntity.fromDomain(billingProfile,
                 billingProfile.members().stream().map(BillingProfile.User::id).toList().get(0), now()));
         final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfile.id().value());
         if (optionalKybEntity.isEmpty()) {
-            kybRepository.save(KybEntity.fromDomain(billingProfile.kyb()));
+            kybRepository.saveAndFlush(KybEntity.fromDomain(billingProfile.kyb()));
         }
     }
 
     @Override
     public void savePayoutPreference(BillingProfile.Id billingProfileId, UserId userId, ProjectId projectId) {
-        payoutPreferenceRepository.save(PayoutPreferenceEntity.builder()
+        payoutPreferenceRepository.saveAndFlush(PayoutPreferenceEntity.builder()
                 .billingProfileId(billingProfileId.value())
                 .id(PayoutPreferenceEntity.PrimaryKey.builder()
                         .userId(userId.value())
@@ -256,7 +256,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional
     public void saveKyc(Kyc kyc) {
-        kycRepository.save(KycEntity.fromDomain(kyc));
+        kycRepository.saveAndFlush(KycEntity.fromDomain(kyc));
     }
 
     @Override
@@ -274,7 +274,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional
     public void saveKyb(Kyb kyb) {
-        kybRepository.save(KybEntity.fromDomain(kyb));
+        kybRepository.saveAndFlush(KybEntity.fromDomain(kyb));
     }
 
     @Override
@@ -295,7 +295,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional
     public void saveChildrenKyc(String externalApplicantId, String parentExternalApplicantId, VerificationStatus verificationStatus) {
-        childrenKycRepository.save(ChildrenKycEntity.builder()
+        childrenKycRepository.saveAndFlush(ChildrenKycEntity.builder()
                 .applicantId(externalApplicantId)
                 .parentApplicantId(parentExternalApplicantId)
                 .verificationStatus(VerificationStatusEntity.fromDomain(verificationStatus))
@@ -306,7 +306,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Transactional
     public void saveCoworkerInvitation(BillingProfile.Id billingProfileId, UserId invitedBy, GithubUserId invitedUser, BillingProfile.User.Role role,
                                        ZonedDateTime invitedAt) {
-        billingProfileUserInvitationRepository.save(BillingProfileUserInvitationEntity.builder()
+        billingProfileUserInvitationRepository.saveAndFlush(BillingProfileUserInvitationEntity.builder()
                 .billingProfileId(billingProfileId.value())
                 .invitedBy(invitedBy.value())
                 .githubUserId(invitedUser.value())
@@ -330,7 +330,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional
     public void saveCoworker(BillingProfile.Id billingProfileId, UserId invitedUser, BillingProfile.User.Role role, ZonedDateTime acceptedAt) {
-        billingProfileUserRepository.save(BillingProfileUserEntity.builder()
+        billingProfileUserRepository.saveAndFlush(BillingProfileUserEntity.builder()
                 .billingProfileId(billingProfileId.value())
                 .userId(invitedUser.value())
                 .role(BillingProfileUserEntity.Role.fromDomain(role))
@@ -343,7 +343,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     public void updateCoworkerRole(BillingProfile.Id billingProfileId, UserId userId, BillingProfile.User.Role role) {
         final var user = billingProfileUserRepository.findByBillingProfileIdAndUserId(billingProfileId.value(), userId.value())
                 .orElseThrow(() -> notFound("User %s is not a member of billing profile %s".formatted(userId, billingProfileId)));
-        billingProfileUserRepository.save(user.toBuilder().role(BillingProfileUserEntity.Role.fromDomain(role)).build());
+        billingProfileUserRepository.saveAndFlush(user.toBuilder().role(BillingProfileUserEntity.Role.fromDomain(role)).build());
     }
 
     @Override
@@ -352,7 +352,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                         new BillingProfileUserInvitationEntity.PrimaryKey(billingProfileId.value(), invitedUser.value()))
                 .orElseThrow(() -> notFound("User %s is not invited to billing profile %s".formatted(invitedUser, billingProfileId)));
 
-        billingProfileUserInvitationRepository.save(invitation.toBuilder().role(BillingProfileUserEntity.Role.fromDomain(role)).build());
+        billingProfileUserInvitationRepository.saveAndFlush(invitation.toBuilder().role(BillingProfileUserEntity.Role.fromDomain(role)).build());
     }
 
 

@@ -16,7 +16,7 @@ public class PostgresCurrencyAdapter implements CurrencyStorage {
 
     @Override
     public void save(Currency currency) {
-        repository.save(CurrencyEntity.of(currency));
+        repository.saveAndFlush(CurrencyEntity.of(currency));
     }
 
     @Override

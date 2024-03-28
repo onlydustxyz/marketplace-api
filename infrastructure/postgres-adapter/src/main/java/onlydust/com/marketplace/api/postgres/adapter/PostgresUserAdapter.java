@@ -91,7 +91,7 @@ public class PostgresUserAdapter implements UserStoragePort {
         userRepository.findById(userId)
                 .ifPresentOrElse(userEntity -> {
                     userEntity.setLastSeenAt(lastSeenAt);
-                    userRepository.save(userEntity);
+                    userRepository.saveAndFlush(userEntity);
                 }, () -> {
                     throw notFound(format("User with id %s not found", userId));
                 });
@@ -148,7 +148,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Override
     @Transactional
     public void saveProfile(UUID userId, UserProfile userProfile) {
-        userProfileInfoRepository.save(mapUserProfileToEntity(userId, userProfile));
+        userProfileInfoRepository.saveAndFlush(mapUserProfileToEntity(userId, userProfile));
     }
 
     @Override
@@ -157,13 +157,13 @@ public class PostgresUserAdapter implements UserStoragePort {
         onboardingRepository.findById(userId)
                 .ifPresentOrElse(onboardingEntity -> {
                     onboardingEntity.setProfileWizardDisplayDate(date);
-                    onboardingRepository.save(onboardingEntity);
+                    onboardingRepository.saveAndFlush(onboardingEntity);
                 }, () -> {
                     final OnboardingEntity onboardingEntity = OnboardingEntity.builder()
                             .id(userId)
                             .profileWizardDisplayDate(date)
                             .build();
-                    onboardingRepository.save(onboardingEntity);
+                    onboardingRepository.saveAndFlush(onboardingEntity);
                 });
     }
 
@@ -173,13 +173,13 @@ public class PostgresUserAdapter implements UserStoragePort {
         onboardingRepository.findById(userId)
                 .ifPresentOrElse(onboardingEntity -> {
                     onboardingEntity.setTermsAndConditionsAcceptanceDate(date);
-                    onboardingRepository.save(onboardingEntity);
+                    onboardingRepository.saveAndFlush(onboardingEntity);
                 }, () -> {
                     final OnboardingEntity onboardingEntity = OnboardingEntity.builder()
                             .id(userId)
                             .termsAndConditionsAcceptanceDate(date)
                             .build();
-                    onboardingRepository.save(onboardingEntity);
+                    onboardingRepository.saveAndFlush(onboardingEntity);
                 });
     }
 
@@ -194,7 +194,7 @@ public class PostgresUserAdapter implements UserStoragePort {
                 .orElseThrow(() -> notFound(format("User with githubId %d not found", githubUserId)));
 
         projectLeaderInvitationRepository.delete(invitation);
-        projectLeadRepository.save(new ProjectLeadEntity(projectId, user.getId()));
+        projectLeadRepository.saveAndFlush(new ProjectLeadEntity(projectId, user.getId()));
         return user.getId();
     }
 
@@ -209,7 +209,7 @@ public class PostgresUserAdapter implements UserStoragePort {
                             throw OnlyDustException.badRequest(format("Application already exists for project %s " +
                                                                       "and user %s", projectId, userId));
                         },
-                        () -> applicationRepository.save(ApplicationEntity.builder()
+                        () -> applicationRepository.saveAndFlush(ApplicationEntity.builder()
                                 .applicantId(userId)
                                 .projectId(projectId)
                                 .id(applicationId)
@@ -315,7 +315,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Override
     @Transactional
     public void saveProjectLead(UUID userId, UUID projectId) {
-        projectLeadRepository.save(new ProjectLeadEntity(projectId, userId));
+        projectLeadRepository.saveAndFlush(new ProjectLeadEntity(projectId, userId));
     }
 
     @Override
