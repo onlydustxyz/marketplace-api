@@ -19,8 +19,9 @@ public class PostgresSponsorAdapter implements SponsorStoragePort {
 
     @Override
     @Transactional
-    public Page<SponsorView> findSponsors(int pageIndex, int pageSize) {
-        final var page = sponsorRepository.findAll(PageRequest.of(pageIndex, pageSize, Sort.by("name")));
+    public Page<SponsorView> findSponsors(String search, int pageIndex, int pageSize) {
+        final var page = sponsorRepository.findAllByNameContainingIgnoreCase(search == null ? "" : search,
+                PageRequest.of(pageIndex, pageSize, Sort.by("name")));
         return Page.<SponsorView>builder()
                 .content(page.getContent().stream().map(SponsorEntity::toView).toList())
                 .totalItemNumber((int) page.getTotalElements())
