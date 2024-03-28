@@ -23,7 +23,6 @@ public interface PayoutPreferenceMapper {
         return new PayoutPreferenceBillingProfileResponse()
                 .id(view.id().value())
                 .name(view.name())
-                .enabled(view.enabled())
                 .type(BillingProfileMapper.map(view.type()));
     }
 

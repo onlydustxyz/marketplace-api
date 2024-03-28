@@ -330,8 +330,8 @@ public class BillingProfileService implements BillingProfileFacadePort {
     public void enableBillingProfile(UserId userId, BillingProfile.Id billingProfileId, Boolean enabled) {
         if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
             throw unauthorized("User %s must be admin to enable billing profile %s".formatted(userId.value(), billingProfileId.value()));
-        billingProfileStoragePort.enableBillingProfile(billingProfileId, enabled);
-        accountingObserverPort.onBillingProfileEnabled(billingProfileId, enabled);
+        billingProfileStoragePort.updateEnableBillingProfile(billingProfileId, enabled);
+        accountingObserverPort.onBillingProfileEnableChanged(billingProfileId, enabled);
     }
 
     @Override

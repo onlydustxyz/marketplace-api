@@ -12,6 +12,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.*;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
@@ -144,25 +145,31 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
     }
 
     @Override
-    public void onBillingProfileEnabled(BillingProfile.Id billingProfileId, Boolean enabled) {
-        if (enabled) {
-            rewardStatusStorage.enableBillingProfile(billingProfileId);
-        } else {
-            rewardStatusStorage.removeBillingProfile(billingProfileId);
+    public void onBillingProfileEnableChanged(BillingProfile.Id billingProfileId, Boolean enabled) {
+        if (!enabled) {
+            final var updatedRewardIds = rewardStatusStorage.removeBillingProfile(billingProfileId);
+            refreshRewardsUsdEquivalentOf(updatedRewardIds);
         }
     }
 
     @Override
     public void onBillingProfileDeleted(BillingProfile.Id billingProfileId) {
-        rewardStatusStorage.removeBillingProfile(billingProfileId);
+        final var updatedRewardIds = rewardStatusStorage.removeBillingProfile(billingProfileId);
+        refreshRewardsUsdEquivalentOf(updatedRewardIds);
     }
 
     private void refreshRewardsUsdEquivalentOf(BillingProfile.Id billingProfileId) {
-        rewardStatusStorage.notPaid(billingProfileId).forEach(rewardStatus -> rewardStatusStorage.save(rewardStatus.usdAmount(usdAmountOf(rewardStatus.rewardId())
-                .orElse(null))));
+        rewardStatusStorage.notPaid(billingProfileId)
+                .forEach(rewardStatus -> rewardStatusStorage.save(rewardStatus.usdAmount(usdAmountOf(rewardStatus.rewardId()).orElse(null))));
+    }
+
+    private void refreshRewardsUsdEquivalentOf(List<RewardId> rewardIds) {
+        rewardStatusStorage.get(rewardIds)
+                .forEach(rewardStatus -> rewardStatusStorage.save(rewardStatus.usdAmount(usdAmountOf(rewardStatus.rewardId()).orElse(null))));
     }
 
     public void refreshRewardsUsdEquivalents() {
-        rewardStatusStorage.notPaid().forEach(rewardStatus -> rewardStatusStorage.save(rewardStatus.usdAmount(usdAmountOf(rewardStatus.rewardId()).orElse(null))));
+        rewardStatusStorage.notPaid()
+                .forEach(rewardStatus -> rewardStatusStorage.save(rewardStatus.usdAmount(usdAmountOf(rewardStatus.rewardId()).orElse(null))));
     }
 }

@@ -23,7 +23,7 @@ public interface AccountingObserverPort {
 
     void onPayoutPreferenceChanged(BillingProfile.Id billingProfileId, UserId userId, ProjectId projectId);
 
-    void onBillingProfileEnabled(BillingProfile.Id billingProfileId, Boolean enabled);
+    void onBillingProfileEnableChanged(BillingProfile.Id billingProfileId, Boolean enabled);
 
     void onBillingProfileDeleted(BillingProfile.Id billingProfileId);
 

@@ -1774,7 +1774,7 @@ class BillingProfileServiceTest {
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("User %s must be admin to enable billing profile %s".formatted(userId.value(), billingProfileId.value()));
-        verify(billingProfileStoragePort, never()).enableBillingProfile(billingProfileId, false);
+        verify(billingProfileStoragePort, never()).updateEnableBillingProfile(billingProfileId, false);
     }
 
     @Test
@@ -1789,8 +1789,8 @@ class BillingProfileServiceTest {
         billingProfileService.enableBillingProfile(userId, billingProfileId, true);
 
         // Then
-        verify(billingProfileStoragePort).enableBillingProfile(billingProfileId, true);
-        verify(accountingObserverPort).onBillingProfileEnabled(billingProfileId, true);
+        verify(billingProfileStoragePort).updateEnableBillingProfile(billingProfileId, true);
+        verify(accountingObserverPort).onBillingProfileEnableChanged(billingProfileId, true);
     }
 
     @Test

@@ -8,6 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.RewardStatusData;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardStatusRepository;
@@ -30,6 +31,12 @@ public class PostgresRewardStatusAdapter implements RewardStatusStorage {
     public Optional<RewardStatusData> get(final @NonNull RewardId rewardId) {
         return rewardStatusRepository.findById(rewardId.value())
                 .map(RewardStatusDataEntity::toRewardStatus);
+    }
+
+    @Override
+    public List<RewardStatusData> get(@NonNull List<RewardId> rewardIds) {
+        return rewardStatusRepository.findAllById(rewardIds.stream().map(RewardId::value).toList())
+                .stream().map(RewardStatusDataEntity::toRewardStatus).toList();
     }
 
     @Override
@@ -61,14 +68,10 @@ public class PostgresRewardStatusAdapter implements RewardStatusStorage {
 
     @Override
     @Transactional
-    public void enableBillingProfile(BillingProfile.Id billingProfileId) {
-        rewardRepository.addBillingProfileId(billingProfileId.value());
-    }
-
-    @Override
-    @Transactional
-    public void removeBillingProfile(BillingProfile.Id billingProfileId) {
-        rewardRepository.removeBillingProfileId(billingProfileId.value());
+    public List<RewardId> removeBillingProfile(BillingProfile.Id billingProfileId) {
+        final var rewardIds = rewardRepository.getRewardIdsToBeRemovedFromBillingProfile(billingProfileId.value()).stream().map(RewardEntity::id).toList();
+        rewardRepository.removeBillingProfileIdOf(rewardIds);
+        return rewardIds.stream().map(RewardId::of).toList();
     }
 
     @Override
