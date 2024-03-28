@@ -85,6 +85,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "requestedAt": "2023-09-19T07:38:22.018458Z",
                               "processedAt": null,
                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                              "billingProfileId": "20282367-56b0-42d3-81d3-5e4b38f67e3e",
                               "status": "PENDING_REQUEST",
                               "unlockDate": null,
                               "amount": {
@@ -114,6 +115,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "requestedAt": "2023-09-20T08:46:52.77875Z",
                               "processedAt": "2023-08-12T00:00:00Z",
                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                              "billingProfileId": "20282367-56b0-42d3-81d3-5e4b38f67e3e",
                               "status": "COMPLETE",
                               "unlockDate": null,
                               "amount": {
@@ -142,6 +144,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                             {
                               "requestedAt": "2023-09-19T07:40:26.971981Z",
                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                              "billingProfileId": "20282367-56b0-42d3-81d3-5e4b38f67e3e",
                               "status": "COMPLETE",
                               "unlockDate": null,
                               "amount": {
@@ -171,6 +174,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "requestedAt": "2023-09-19T07:38:52.590518Z",
                               "processedAt": null,
                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                              "billingProfileId": "20282367-56b0-42d3-81d3-5e4b38f67e3e",
                               "status": "PENDING_REQUEST",
                               "unlockDate": null,
                               "amount": {
@@ -200,6 +204,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "requestedAt": "2023-09-19T07:39:54.45638Z",
                               "processedAt": null,
                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                              "billingProfileId": "20282367-56b0-42d3-81d3-5e4b38f67e3e",
                               "status": "PAYOUT_INFO_MISSING",
                               "unlockDate": "2024-08-23T00:00:00Z",
                               "amount": {
@@ -229,6 +234,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "requestedAt": "2023-09-19T07:39:23.730967Z",
                               "processedAt": null,
                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                              "billingProfileId": "20282367-56b0-42d3-81d3-5e4b38f67e3e",
                               "status": "PAYOUT_INFO_MISSING",
                               "unlockDate": null,
                               "amount": {
