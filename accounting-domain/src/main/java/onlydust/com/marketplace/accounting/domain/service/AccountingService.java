@@ -9,8 +9,10 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookS
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import javax.transaction.Transactional;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +61,7 @@ public class AccountingService implements AccountingFacadePort {
         if (amount.isPositive()) accountBook.mint(AccountId.of(sponsorAccountId), PositiveAmount.of(amount));
         else accountBook.refund(AccountId.of(sponsorAccountId), AccountId.ROOT, PositiveAmount.of(amount.negate()));
 
-        accountBookEventStorage.save(sponsorAccount.currency(), accountBook.pendingEvents());
+        saveAccountBook(sponsorAccount.currency(), accountBook);
         return sponsorAccountStatement(sponsorAccount, accountBook);
     }
 
@@ -139,7 +141,7 @@ public class AccountingService implements AccountingFacadePort {
         final var accountBook = getAccountBook(currency);
 
         rewards.forEach(reward -> accountBook.transfer(AccountId.of(reward.id()), AccountId.of(paymentId), reward.amount()));
-        accountBookEventStorage.save(currency, accountBook.pendingEvents());
+        saveAccountBook(currency, accountBook);
     }
 
     @Override
@@ -149,7 +151,7 @@ public class AccountingService implements AccountingFacadePort {
         final var accountBook = getAccountBook(currency);
 
         final var refundedAccounts = accountBook.refund(AccountId.of(rewardId));
-        accountBookEventStorage.save(currency, accountBook.pendingEvents());
+        saveAccountBook(currency, accountBook);
         accountingObserver.onRewardCancelled(rewardId);
         refundedAccounts.stream().filter(AccountId::isProject).map(AccountId::projectId).forEach(refundedProjectId -> onAllowanceUpdated(refundedProjectId,
                 currencyId, accountBook.state()));
@@ -169,7 +171,7 @@ public class AccountingService implements AccountingFacadePort {
         final var accountBook = getAccountBook(currency);
 
         accountBook.refund(AccountId.of(paymentId));
-        accountBookEventStorage.save(currency, accountBook.pendingEvents());
+        saveAccountBook(currency, accountBook);
     }
 
     @Override
@@ -185,7 +187,7 @@ public class AccountingService implements AccountingFacadePort {
         final var accountBook = getAccountBook(currency);
 
         accountBook.burn(AccountId.of(payment.id()), rewards.stream().map(PayableReward::amount).reduce(PositiveAmount::add).orElse(PositiveAmount.ZERO));
-        accountBookEventStorage.save(currency, accountBook.pendingEvents());
+        saveAccountBook(currency, accountBook);
 
         rewards.forEach(r -> confirm(accountBook, r, payment.referenceFor(r.id())));
     }
@@ -268,7 +270,7 @@ public class AccountingService implements AccountingFacadePort {
         final var accountBook = getAccountBook(currency);
 
         accountBook.transfer(AccountId.of(from), AccountId.of(to), amount);
-        accountBookEventStorage.save(currency, accountBook.pendingEvents());
+        saveAccountBook(currency, accountBook);
         return accountBook;
     }
 
@@ -277,7 +279,7 @@ public class AccountingService implements AccountingFacadePort {
         final var accountBook = getAccountBook(currency);
 
         accountBook.refund(AccountId.of(from), AccountId.of(to), amount);
-        accountBookEventStorage.save(currency, accountBook.pendingEvents());
+        saveAccountBook(currency, accountBook);
         return accountBook;
     }
 
@@ -300,7 +302,17 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     private AccountBookAggregate getAccountBook(Currency currency) {
-        return AccountBookAggregate.fromEvents(accountBookEventStorage.get(currency));
+        return AccountBookAggregate.fromEvents(accountBookEventStorage.getAll(currency));
+    }
+
+    private void saveAccountBook(Currency currency, AccountBookAggregate accountBook) {
+        accountBookEventStorage.save(currency, accountBook.pendingEvents());
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            public void afterCommit() {
+                // Clear pending events after successful transaction commit
+                accountBook.clearPendingEvents();
+            }
+        });
     }
 
     private AccountBookAggregate getAccountBook(Currency.Id currencyId) {

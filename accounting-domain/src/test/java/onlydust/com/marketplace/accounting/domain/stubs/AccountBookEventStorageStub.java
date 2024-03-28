@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.stubs;
 
 import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookEvent;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
 
 import java.util.ArrayList;
@@ -10,16 +10,21 @@ import java.util.List;
 import java.util.Map;
 
 public class AccountBookEventStorageStub implements AccountBookEventStorage {
-    public final Map<Currency, List<AccountBookEvent>> events = new HashMap<>();
+    public final Map<Currency, List<IdentifiedAccountBookEvent>> events = new HashMap<>();
 
     @Override
-    public List<AccountBookEvent> get(Currency currency) {
+    public List<IdentifiedAccountBookEvent> getAll(Currency currency) {
         return events.getOrDefault(currency, new ArrayList<>());
     }
 
     @Override
-    public void save(Currency currency, List<AccountBookEvent> pendingEvents) {
-        final var events = new ArrayList<>(get(currency));
+    public List<IdentifiedAccountBookEvent> getSince(Currency currency, long eventId) {
+        return events.getOrDefault(currency, new ArrayList<>()).stream().dropWhile(event -> event.id() < eventId).toList();
+    }
+
+    @Override
+    public void save(Currency currency, List<IdentifiedAccountBookEvent> pendingEvents) {
+        final var events = new ArrayList<>(getAll(currency));
         events.addAll(pendingEvents);
         this.events.put(currency, events);
     }

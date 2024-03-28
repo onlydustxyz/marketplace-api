@@ -26,6 +26,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.*;
 
+import static onlydust.com.marketplace.accounting.domain.AccountBookTest.accountBookFromEvents;
 import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyb;
 import static onlydust.com.marketplace.accounting.domain.stubs.Currencies.ETH;
 import static onlydust.com.marketplace.accounting.domain.stubs.Currencies.USD;
@@ -90,7 +91,7 @@ public class AccountingObserverTest {
             final var projectAccountId = AccountId.of(projectId1);
             final var rewardAccountId = AccountId.of(rewardId);
 
-            accountBook = AccountBookAggregate.fromEvents(
+            accountBook = accountBookFromEvents(
                     new AccountBookAggregate.MintEvent(sponsorAccountAccountId, PositiveAmount.of(100L)),
                     new AccountBookAggregate.TransferEvent(sponsorAccountAccountId, projectAccountId, PositiveAmount.of(100L)),
                     new AccountBookAggregate.TransferEvent(projectAccountId, rewardAccountId, PositiveAmount.of(20L))
@@ -628,7 +629,7 @@ public class AccountingObserverTest {
             verify(rewardStatusStorage).notPaid(kyb.getBillingProfileId());
         }
 
-         @Test
+        @Test
         void should_refresh_usd_equivalent_given_a_kyc_children() {
             // Given
             final UUID kybId = UUID.randomUUID();
@@ -661,8 +662,6 @@ public class AccountingObserverTest {
                     .hasMessage("KYB not found for parentExternalApplicantId %s".formatted(billingProfileVerificationUpdated.getParentExternalApplicantId()));
             verifyNoInteractions(rewardStatusStorage);
         }
-
-
 
 
     }

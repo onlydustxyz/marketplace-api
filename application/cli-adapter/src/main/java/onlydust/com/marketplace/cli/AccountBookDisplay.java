@@ -41,8 +41,8 @@ public class AccountBookDisplay implements CommandLineRunner {
                 sponsorAccountStorage.getSponsorAccounts(sponsorId).stream().filter(s -> s.currency().equals(currency)).findFirst()
                         .orElseThrow(() -> new IllegalArgumentException("Sponsor %s has no account for currency %s".formatted(sponsorId, currencyCode)));
 
-        final var events = accountBookEventStorage.get(currency);
-        final var accountBook = AccountBookAggregate.fromEventsDebug(events);
+        final var events = accountBookEventStorage.getAll(currency);
+        final var accountBook = AccountBookAggregate.fromEvents(events);
         accountBook.state().export(ToDot("account_book.dot", sponsorAccount == null ? null : sponsorAccount.id()));
     }
 

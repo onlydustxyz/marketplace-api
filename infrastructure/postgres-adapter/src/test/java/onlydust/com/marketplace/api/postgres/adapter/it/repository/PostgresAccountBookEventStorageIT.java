@@ -37,7 +37,7 @@ public class PostgresAccountBookEventStorageIT extends AbstractPostgresIT {
     @Test
     @Transactional
     void should_return_empy_list_when_not_found() {
-        assertThat(postgresAccountBookEventStorage.get(currency)).isEmpty();
+        assertThat(postgresAccountBookEventStorage.getAll(currency)).isEmpty();
     }
 
     @SneakyThrows
@@ -57,6 +57,6 @@ public class PostgresAccountBookEventStorageIT extends AbstractPostgresIT {
         postgresAccountBookEventStorage.save(currency, events2);
 
         final var allEvents = Stream.of(events1, events2).flatMap(List::stream).toList();
-        assertThat(postgresAccountBookEventStorage.get(currency)).containsExactlyElementsOf(allEvents);
+        assertThat(postgresAccountBookEventStorage.getAll(currency)).containsExactlyElementsOf(allEvents);
     }
 }
