@@ -5658,8 +5658,6 @@ components:
           type: string
         type:
           $ref: '#/components/schemas/BillingProfileType'
-        enabled:
-          type: boolean
 
     BillingProfileInvoiceableRewardsResponse:
       type: object

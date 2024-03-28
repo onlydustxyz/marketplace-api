@@ -6,13 +6,10 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserverPort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PayoutPreferenceStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.PayoutPreferenceView;
-import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -121,64 +118,5 @@ public class PayoutPreferenceServiceTest {
         // Then
         verify(payoutPreferenceStoragePort).save(projectId, billingProfileId, userId);
         verify(accountingObserverPort).onPayoutPreferenceChanged(billingProfileId, userId, projectId);
-    }
-
-    @Test
-    void should_get_payout_preferences_given_some_billing_profiles_disabled() {
-        // Given
-        final UserId userId = UserId.random();
-        final List<PayoutPreferenceView> payoutPreferenceViews = List.of(
-                PayoutPreferenceView.builder()
-                        .shortProjectView(ShortProjectView.builder()
-                                .id(ProjectId.random())
-                                .slug("slug-1")
-                                .shortDescription("")
-                                .name("")
-                                .build())
-                        .build(),
-                PayoutPreferenceView.builder()
-                        .shortProjectView(ShortProjectView.builder()
-                                .id(ProjectId.random())
-                                .slug("slug-1")
-                                .shortDescription("")
-                                .name("")
-                                .build())
-                        .billingProfileView(
-                                PayoutPreferenceView.BillingProfileView.builder()
-                                        .type(BillingProfile.Type.COMPANY)
-                                        .enabled(false)
-                                        .name("")
-                                        .id(BillingProfile.Id.random())
-                                        .build()
-                        )
-                        .build(),
-                PayoutPreferenceView.builder()
-                        .shortProjectView(ShortProjectView.builder()
-                                .id(ProjectId.random())
-                                .slug("slug-1")
-                                .shortDescription("")
-                                .name("")
-                                .build())
-                        .billingProfileView(
-                                PayoutPreferenceView.BillingProfileView.builder()
-                                        .type(BillingProfile.Type.COMPANY)
-                                        .enabled(true)
-                                        .name("")
-                                        .id(BillingProfile.Id.random())
-                                        .build()
-                        )
-                        .build()
-        );
-
-        // When
-        when(payoutPreferenceStoragePort.findAllByUserId(userId))
-                .thenReturn(payoutPreferenceViews);
-        final List<PayoutPreferenceView> payoutPreferences = payoutPreferenceService.getPayoutPreferences(userId);
-
-        // Then
-        assertEquals(3, payoutPreferences.size());
-        assertEquals(payoutPreferenceViews.get(0), payoutPreferences.get(0));
-        assertEquals(payoutPreferenceViews.get(1).toBuilder().billingProfileView(null).build(), payoutPreferences.get(1));
-        assertEquals(payoutPreferenceViews.get(2), payoutPreferences.get(2));
     }
 }

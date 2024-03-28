@@ -13,7 +13,6 @@ public record PayoutPreferenceView(
     public record BillingProfileView(
             @NonNull BillingProfile.Id id,
             @NonNull String name,
-            @NonNull BillingProfile.Type type,
-            @NonNull Boolean enabled) {
+            @NonNull BillingProfile.Type type) {
     }
 }

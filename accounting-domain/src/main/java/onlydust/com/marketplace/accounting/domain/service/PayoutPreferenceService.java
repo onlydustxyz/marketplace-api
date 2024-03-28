@@ -12,7 +12,6 @@ import onlydust.com.marketplace.accounting.domain.view.PayoutPreferenceView;
 
 import java.util.List;
 
-import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 
 @AllArgsConstructor
@@ -24,15 +23,7 @@ public class PayoutPreferenceService implements PayoutPreferenceFacadePort {
 
     @Override
     public List<PayoutPreferenceView> getPayoutPreferences(UserId userId) {
-        return payoutPreferenceStoragePort.findAllByUserId(userId)
-                .stream()
-                .map(view -> {
-                    if (nonNull(view.billingProfileView()) && !view.billingProfileView().enabled()) {
-                        return view.toBuilder().billingProfileView(null).build();
-                    }
-                    return view;
-                })
-                .toList();
+        return payoutPreferenceStoragePort.findAllByUserId(userId);
     }
 
     @Override
