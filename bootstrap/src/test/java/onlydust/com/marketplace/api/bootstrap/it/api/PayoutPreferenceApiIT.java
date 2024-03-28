@@ -6,7 +6,9 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmplo
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
@@ -88,6 +90,12 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
         final RewardEntity r3 = rewardRepository.save(new RewardEntity(UUID.randomUUID(), projectEntities.get(2).getId(), userId.value(),
                 authenticatedUser.user().getGithubUserId(),
                 STRK, BigDecimal.ONE, new Date(), List.of(), null, null, null, null));
+
+        Stream.of(r1, r2, r3).forEach(r -> rewardStatusRepository.save(new RewardStatusDataEntity()
+                .rewardId(r.id())
+                .amountUsdEquivalent(BigDecimal.ONE)
+                .networks(new NetworkEnumEntity[]{NetworkEnumEntity.starknet}))
+        );
 
         // When
         client.get()
@@ -381,6 +389,42 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful();
 
         assertEquals(companyBillingProfile.id().value(), rewardRepository.findById(r1.id()).orElseThrow().billingProfileId());
+
+        final var r2Status = rewardStatusRepository.findById(r2.id()).orElseThrow();
+        rewardStatusRepository.save(r2Status.paidAt(new Date())); // Mark as paid without invoice (case for rewards before pennylane)
+
+        client.put()
+                .uri(getApiURI(ME_PUT_PAYOUT_PREFERENCES))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "billingProfileId": "%s",
+                          "projectId": "%s"
+                        }
+                        """.formatted(individualBillingProfile.id().value(), projectEntities.get(1).getId()))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        assertEquals(rewardRepository.findById(r2.id()).orElseThrow().billingProfileId(), selfEmployedBillingProfile.id().value());
+
+        client.put()
+                .uri(getApiURI(BILLING_PROFILES_ENABLE_BY_ID.formatted(selfEmployedBillingProfile.id().value())))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "enable": false
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        assertEquals(rewardRepository.findById(r2.id()).orElseThrow().billingProfileId(), selfEmployedBillingProfile.id().value());
     }
 
 
