@@ -1933,7 +1933,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
     @Test
     @Order(41)
-    void should_display_payout_info_missing_even_after_billing_profile_has_been_disabled() {
+    void should_display_pending_billing_profile_after_billing_profile_has_been_disabled() {
         // Given
         setUp();
 
@@ -1986,18 +1986,11 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                         .githubUserId(companyBPAdmin1GithubId)
                         .rewardData(List.of(
                                 RewardDatum.builder()
-                                        .rewardId(companyBPMember1RewardId1)
-                                        .status("PENDING_BILLING_PROFILE")
-                                        .rewardedAmount(40L)
-                                        .pendingAmount(40L)
-                                        .usdConversionRate(Optional.of(strkToUsd2))
-                                        .build(),
-                                RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
-                                        .usdConversionRate(Optional.of(strkToUsd2))
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId2)
@@ -2005,13 +1998,6 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .rewardedAmount(200L)
                                         .pendingAmount(200L)
                                         .usdConversionRate(Optional.empty())
-                                        .build(),
-                                RewardDatum.builder()
-                                        .rewardId(companyBPAdmin2RewardId1)
-                                        .status("PENDING_BILLING_PROFILE")
-                                        .rewardedAmount(30L)
-                                        .pendingAmount(30L)
-                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -2019,18 +2005,11 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                         .githubUserId(companyBPAdmin2GithubId)
                         .rewardData(List.of(
                                 RewardDatum.builder()
-                                        .rewardId(companyBPMember1RewardId1)
-                                        .status("PENDING_BILLING_PROFILE")
-                                        .rewardedAmount(40L)
-                                        .pendingAmount(40L)
-                                        .usdConversionRate(Optional.of(strkToUsd2))
-                                        .build(),
-                                RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
-                                        .usdConversionRate(Optional.of(strkToUsd2))
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId2)
@@ -2038,13 +2017,6 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .rewardedAmount(300L)
                                         .pendingAmount(300L)
                                         .usdConversionRate(Optional.empty())
-                                        .build(),
-                                RewardDatum.builder()
-                                        .rewardId(companyBPAdmin1RewardId1)
-                                        .status("PENDING_BILLING_PROFILE")
-                                        .rewardedAmount(20L)
-                                        .pendingAmount(20L)
-                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -2056,7 +2028,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
-                                        .usdConversionRate(Optional.of(strkToUsd2))
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId2)
@@ -2096,7 +2068,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         ));
 
         // When it is enabled again
-        billingProfileService.enableBillingProfile(UserId.of(individualBPAdminId), BillingProfile.Id.of(individualBPId), true);
+        billingProfileService.enableBillingProfile(UserId.of(companyBPAdmin1Id), BillingProfile.Id.of(companyBPId), true);
 
         // Then it should NOT be automatically re-selected in payout preferences
         assertGetProjectRewardsStatusOnProject(
@@ -2144,18 +2116,11 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                         .githubUserId(companyBPAdmin1GithubId)
                         .rewardData(List.of(
                                 RewardDatum.builder()
-                                        .rewardId(companyBPMember1RewardId1)
-                                        .status("PENDING_BILLING_PROFILE")
-                                        .rewardedAmount(40L)
-                                        .pendingAmount(40L)
-                                        .usdConversionRate(Optional.of(strkToUsd2))
-                                        .build(),
-                                RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId1)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(20L)
                                         .pendingAmount(20L)
-                                        .usdConversionRate(Optional.of(strkToUsd2))
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin1RewardId2)
@@ -2163,13 +2128,6 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .rewardedAmount(200L)
                                         .pendingAmount(200L)
                                         .usdConversionRate(Optional.empty())
-                                        .build(),
-                                RewardDatum.builder()
-                                        .rewardId(companyBPAdmin2RewardId1)
-                                        .status("PENDING_BILLING_PROFILE")
-                                        .rewardedAmount(30L)
-                                        .pendingAmount(30L)
-                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -2177,18 +2135,11 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                         .githubUserId(companyBPAdmin2GithubId)
                         .rewardData(List.of(
                                 RewardDatum.builder()
-                                        .rewardId(companyBPMember1RewardId1)
-                                        .status("PENDING_BILLING_PROFILE")
-                                        .rewardedAmount(40L)
-                                        .pendingAmount(40L)
-                                        .usdConversionRate(Optional.of(strkToUsd2))
-                                        .build(),
-                                RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId1)
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(30L)
                                         .pendingAmount(30L)
-                                        .usdConversionRate(Optional.of(strkToUsd2))
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPAdmin2RewardId2)
@@ -2196,13 +2147,6 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .rewardedAmount(300L)
                                         .pendingAmount(300L)
                                         .usdConversionRate(Optional.empty())
-                                        .build(),
-                                RewardDatum.builder()
-                                        .rewardId(companyBPAdmin1RewardId1)
-                                        .status("PENDING_BILLING_PROFILE")
-                                        .rewardedAmount(20L)
-                                        .pendingAmount(20L)
-                                        .usdConversionRate(Optional.of(strkToUsd2))
                                         .build()
                         ))
                         .build(),
@@ -2214,7 +2158,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                                         .status("PENDING_BILLING_PROFILE")
                                         .rewardedAmount(40L)
                                         .pendingAmount(40L)
-                                        .usdConversionRate(Optional.of(strkToUsd2))
+                                        .usdConversionRate(Optional.empty())
                                         .build(),
                                 RewardDatum.builder()
                                         .rewardId(companyBPMember1RewardId2)
