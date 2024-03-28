@@ -39,6 +39,9 @@ public class RewardEntity {
     InvoiceEntity invoice;
     @Column(name = "billing_profile_id", insertable = false, updatable = false)
     UUID billingProfileId;
+    @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "reward_id", insertable = false, updatable = false)
+    RewardStatusEntity status;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(

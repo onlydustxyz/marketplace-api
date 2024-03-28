@@ -44,7 +44,7 @@ public enum RewardStatus {
         return switch (this) {
             case PENDING_BILLING_PROFILE -> PENDING_BILLING_PROFILE;
             case PENDING_SIGNUP, PENDING_CONTRIBUTOR, PENDING_COMPANY, PENDING_VERIFICATION, PAYMENT_BLOCKED, PAYOUT_INFO_MISSING, LOCKED, PENDING_REQUEST,
-                 PROCESSING, COMPLETE -> throw internalServerError("Impossible %s status as recipient".formatted(this.name()));
+                    PROCESSING, COMPLETE -> throw internalServerError("Impossible %s status as recipient".formatted(this.name()));
         };
     }
 
@@ -95,6 +95,10 @@ public enum RewardStatus {
         }
         throw internalServerError("Cannot map reward %s to correct reward status %s because no condition was matched".formatted(rewardId,
                 this));
+    }
+
+    public boolean isPendingRequest() {
+        return this == PENDING_REQUEST;
     }
 
     @Builder
