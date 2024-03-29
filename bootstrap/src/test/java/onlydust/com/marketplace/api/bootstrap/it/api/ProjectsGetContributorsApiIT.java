@@ -22,7 +22,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     private static final String GET_PROJECT_CONTRIBUTORS_PAGE_0 = """
             {
               "totalPageNumber": 5,
-              "totalItemNumber": 18,
+              "totalItemNumber": 20,
               "hasMore": true,
               "nextPageIndex": 1,
               "hasHiddenContributors": false,
@@ -32,34 +32,11 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "login": "AnthonyBuisset",
                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                   "isRegistered": true,
-                  "contributionCount": 885,
+                  "contributionCount": 888,
                   "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 2692632.50,
-                    "details": [
-                      {
-                        "totalAmount": 3250,
-                        "totalDollarsEquivalent": 3250,
-                        "currency": {
-                          "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                          "code": "USD",
-                          "name": "US Dollar",
-                          "logoUrl": null,
-                          "decimals": 2
-                        }
-                      },
-                      {
-                        "totalAmount": 19750,
-                        "totalDollarsEquivalent": 2689382.50,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -72,34 +49,11 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "login": "ofux",
                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                   "isRegistered": true,
-                  "contributionCount": 570,
+                  "contributionCount": 574,
                   "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 20855.02,
-                    "details": [
-                      {
-                        "totalAmount": 4188,
-                        "totalDollarsEquivalent": 4188,
-                        "currency": {
-                          "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                          "code": "USD",
-                          "name": "US Dollar",
-                          "logoUrl": null,
-                          "decimals": 2
-                        }
-                      },
-                      {
-                        "totalAmount": 16502,
-                        "totalDollarsEquivalent": 16667.02,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -112,23 +66,11 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "login": "Bernardstanislas",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4",
                   "isRegistered": true,
-                  "contributionCount": 375,
+                  "contributionCount": 380,
                   "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 11552.38,
-                    "details": [
-                      {
-                        "totalAmount": 11438,
-                        "totalDollarsEquivalent": 11552.38,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -142,13 +84,13 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
                   "isRegistered": true,
                   "contributionCount": 213,
-                  "rewardCount": 0,
+                  "rewardCount": 1,
                   "earned": {
-                    "totalAmount": 24242.02,
+                    "totalAmount": 1010.00,
                     "details": [
                       {
-                        "totalAmount": 24002,
-                        "totalDollarsEquivalent": 24242.02,
+                        "totalAmount": 1000,
+                        "totalDollarsEquivalent": 1010.00,
                         "currency": {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
@@ -171,7 +113,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     private static final String GET_PROJECT_CONTRIBUTORS_PAGE_1 = """
             {
               "totalPageNumber": 5,
-              "totalItemNumber": 18,
+              "totalItemNumber": 20,
               "hasMore": true,
               "nextPageIndex": 2,
               "hasHiddenContributors": false,
@@ -181,23 +123,11 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "login": "PierreOucif",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                   "isRegistered": true,
-                  "contributionCount": 147,
-                  "rewardCount": 6,
+                  "contributionCount": 148,
+                  "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 6060.00,
-                    "details": [
-                      {
-                        "totalAmount": 6000,
-                        "totalDollarsEquivalent": 6060.00,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -213,20 +143,8 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionCount": 146,
                   "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 1010.00,
-                    "details": [
-                      {
-                        "totalAmount": 1000,
-                        "totalDollarsEquivalent": 1010.00,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -274,11 +192,28 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     private static final String GET_PROJECT_CONTRIBUTORS_PROJECT_LEAD = """
             {
               "totalPageNumber": 1,
-              "totalItemNumber": 18,
+              "totalItemNumber": 20,
               "hasMore": false,
               "nextPageIndex": 0,
               "hasHiddenContributors": false,
               "contributors": [
+                {
+                  "githubUserId": 45336124,
+                  "login": "MaximeBeasse",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/45336124?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 1,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": 1,
+                  "pullRequestToReward": 0,
+                  "issueToReward": 1,
+                  "codeReviewToReward": 0,
+                  "hidden": false
+                },
                 {
                   "githubUserId": 102823832,
                   "login": "SamuelKer",
@@ -311,6 +246,23 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "pullRequestToReward": 0,
                   "issueToReward": 0,
                   "codeReviewToReward": 1,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 8495664,
+                  "login": "doomed-theory",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/8495664?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 1,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": 1,
+                  "pullRequestToReward": 1,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 0,
                   "hidden": false
                 },
                 {
@@ -370,22 +322,10 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
                   "isRegistered": false,
                   "contributionCount": 21,
-                  "rewardCount": 0,
+                  "rewardCount": 1,
                   "earned": {
-                    "totalAmount": 3977.38,
-                    "details": [
-                      {
-                        "totalAmount": 3938,
-                        "totalDollarsEquivalent": 3977.38,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
                   "contributionToRewardCount": 21,
                   "pullRequestToReward": 8,
@@ -401,20 +341,8 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionCount": 36,
                   "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 505.00,
-                    "details": [
-                      {
-                        "totalAmount": 500,
-                        "totalDollarsEquivalent": 505.00,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
                   "contributionToRewardCount": 36,
                   "pullRequestToReward": 25,
@@ -515,20 +443,8 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionCount": 146,
                   "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 1010.00,
-                    "details": [
-                      {
-                        "totalAmount": 1000,
-                        "totalDollarsEquivalent": 1010.00,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
                   "contributionToRewardCount": 146,
                   "pullRequestToReward": 107,
@@ -541,28 +457,16 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "login": "PierreOucif",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                   "isRegistered": true,
-                  "contributionCount": 147,
-                  "rewardCount": 6,
+                  "contributionCount": 148,
+                  "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 6060.00,
-                    "details": [
-                      {
-                        "totalAmount": 6000,
-                        "totalDollarsEquivalent": 6060.00,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  "contributionToRewardCount": 122,
+                  "contributionToRewardCount": 123,
                   "pullRequestToReward": 5,
                   "issueToReward": 0,
-                  "codeReviewToReward": 117,
+                  "codeReviewToReward": 118,
                   "hidden": false
                 },
                 {
@@ -571,13 +475,13 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
                   "isRegistered": true,
                   "contributionCount": 213,
-                  "rewardCount": 0,
+                  "rewardCount": 1,
                   "earned": {
-                    "totalAmount": 24242.02,
+                    "totalAmount": 1010.00,
                     "details": [
                       {
-                        "totalAmount": 24002,
-                        "totalDollarsEquivalent": 24242.02,
+                        "totalAmount": 1000,
+                        "totalDollarsEquivalent": 1010.00,
                         "currency": {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
@@ -599,28 +503,16 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "login": "Bernardstanislas",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4",
                   "isRegistered": true,
-                  "contributionCount": 375,
+                  "contributionCount": 380,
                   "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 11552.38,
-                    "details": [
-                      {
-                        "totalAmount": 11438,
-                        "totalDollarsEquivalent": 11552.38,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  "contributionToRewardCount": 374,
-                  "pullRequestToReward": 115,
+                  "contributionToRewardCount": 379,
+                  "pullRequestToReward": 119,
                   "issueToReward": 0,
-                  "codeReviewToReward": 259,
+                  "codeReviewToReward": 260,
                   "hidden": false
                 },
                 {
@@ -628,39 +520,16 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "login": "ofux",
                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                   "isRegistered": true,
-                  "contributionCount": 570,
+                  "contributionCount": 574,
                   "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 20855.02,
-                    "details": [
-                      {
-                        "totalAmount": 4188,
-                        "totalDollarsEquivalent": 4188,
-                        "currency": {
-                          "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                          "code": "USD",
-                          "name": "US Dollar",
-                          "logoUrl": null,
-                          "decimals": 2
-                        }
-                      },
-                      {
-                        "totalAmount": 16502,
-                        "totalDollarsEquivalent": 16667.02,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  "contributionToRewardCount": 569,
-                  "pullRequestToReward": 247,
+                  "contributionToRewardCount": 573,
+                  "pullRequestToReward": 250,
                   "issueToReward": 2,
-                  "codeReviewToReward": 320,
+                  "codeReviewToReward": 321,
                   "hidden": false
                 },
                 {
@@ -668,39 +537,16 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "login": "AnthonyBuisset",
                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                   "isRegistered": true,
-                  "contributionCount": 885,
+                  "contributionCount": 888,
                   "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 2692632.50,
-                    "details": [
-                      {
-                        "totalAmount": 3250,
-                        "totalDollarsEquivalent": 3250,
-                        "currency": {
-                          "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                          "code": "USD",
-                          "name": "US Dollar",
-                          "logoUrl": null,
-                          "decimals": 2
-                        }
-                      },
-                      {
-                        "totalAmount": 19750,
-                        "totalDollarsEquivalent": 2689382.50,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  "contributionToRewardCount": 797,
-                  "pullRequestToReward": 416,
+                  "contributionToRewardCount": 800,
+                  "pullRequestToReward": 417,
                   "issueToReward": 11,
-                  "codeReviewToReward": 370,
+                  "codeReviewToReward": 372,
                   "hidden": false
                 }
               ]
@@ -723,20 +569,8 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionCount": 36,
                   "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 505.00,
-                    "details": [
-                      {
-                        "totalAmount": 500,
-                        "totalDollarsEquivalent": 505.00,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
                   "contributionToRewardCount": 36,
                   "pullRequestToReward": 25,
@@ -801,11 +635,28 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     private static final String GET_PROJECT_CONTRIBUTORS_ANONYMOUS = """
             {
               "totalPageNumber": 1,
-              "totalItemNumber": 18,
+              "totalItemNumber": 20,
               "hasMore": false,
               "nextPageIndex": 0,
               "hasHiddenContributors": false,
               "contributors": [
+                {
+                  "githubUserId": 45336124,
+                  "login": "MaximeBeasse",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/45336124?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 1,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
                 {
                   "githubUserId": 102823832,
                   "login": "SamuelKer",
@@ -827,6 +678,23 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 129528947,
                   "login": "VeryDustyBot",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/129528947?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 1,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 8495664,
+                  "login": "doomed-theory",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/8495664?v=4",
                   "isRegistered": false,
                   "contributionCount": 1,
                   "rewardCount": 0,
@@ -897,22 +765,10 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
                   "isRegistered": false,
                   "contributionCount": 21,
-                  "rewardCount": 0,
+                  "rewardCount": 1,
                   "earned": {
-                    "totalAmount": 3977.38,
-                    "details": [
-                      {
-                        "totalAmount": 3938,
-                        "totalDollarsEquivalent": 3977.38,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -928,20 +784,8 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionCount": 36,
                   "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 505.00,
-                    "details": [
-                      {
-                        "totalAmount": 500,
-                        "totalDollarsEquivalent": 505.00,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -1042,6 +886,40 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionCount": 146,
                   "rewardCount": 0,
                   "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 16590657,
+                  "login": "PierreOucif",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                  "isRegistered": true,
+                  "contributionCount": 148,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "hidden": false
+                },
+                {
+                  "githubUserId": 21149076,
+                  "login": "oscarwroche",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
+                  "isRegistered": true,
+                  "contributionCount": 213,
+                  "rewardCount": 1,
+                  "earned": {
                     "totalAmount": 1010.00,
                     "details": [
                       {
@@ -1064,85 +942,15 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "hidden": false
                 },
                 {
-                  "githubUserId": 16590657,
-                  "login": "PierreOucif",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                  "isRegistered": true,
-                  "contributionCount": 147,
-                  "rewardCount": 6,
-                  "earned": {
-                    "totalAmount": 6060.00,
-                    "details": [
-                      {
-                        "totalAmount": 6000,
-                        "totalDollarsEquivalent": 6060.00,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
-                  },
-                  "contributionToRewardCount": null,
-                  "pullRequestToReward": null,
-                  "issueToReward": null,
-                  "codeReviewToReward": null,
-                  "hidden": false
-                },
-                {
-                  "githubUserId": 21149076,
-                  "login": "oscarwroche",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
-                  "isRegistered": true,
-                  "contributionCount": 213,
-                  "rewardCount": 0,
-                  "earned": {
-                    "totalAmount": 24242.02,
-                    "details": [
-                      {
-                        "totalAmount": 24002,
-                        "totalDollarsEquivalent": 24242.02,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
-                  },
-                  "contributionToRewardCount": null,
-                  "pullRequestToReward": null,
-                  "issueToReward": null,
-                  "codeReviewToReward": null,
-                  "hidden": false
-                },
-                {
                   "githubUserId": 4435377,
                   "login": "Bernardstanislas",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4",
                   "isRegistered": true,
-                  "contributionCount": 375,
+                  "contributionCount": 380,
                   "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 11552.38,
-                    "details": [
-                      {
-                        "totalAmount": 11438,
-                        "totalDollarsEquivalent": 11552.38,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -1155,34 +963,11 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "login": "ofux",
                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                   "isRegistered": true,
-                  "contributionCount": 570,
+                  "contributionCount": 574,
                   "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 20855.02,
-                    "details": [
-                      {
-                        "totalAmount": 4188,
-                        "totalDollarsEquivalent": 4188,
-                        "currency": {
-                          "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                          "code": "USD",
-                          "name": "US Dollar",
-                          "logoUrl": null,
-                          "decimals": 2
-                        }
-                      },
-                      {
-                        "totalAmount": 16502,
-                        "totalDollarsEquivalent": 16667.02,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -1195,34 +980,11 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "login": "AnthonyBuisset",
                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                   "isRegistered": true,
-                  "contributionCount": 885,
+                  "contributionCount": 888,
                   "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 2692632.50,
-                    "details": [
-                      {
-                        "totalAmount": 3250,
-                        "totalDollarsEquivalent": 3250,
-                        "currency": {
-                          "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                          "code": "USD",
-                          "name": "US Dollar",
-                          "logoUrl": null,
-                          "decimals": 2
-                        }
-                      },
-                      {
-                        "totalAmount": 19750,
-                        "totalDollarsEquivalent": 2689382.50,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -1240,6 +1002,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
               "totalItemNumber": 4,
               "hasMore": false,
               "nextPageIndex": 0,
+              "hasHiddenContributors": false,
               "contributors": [
                 {
                   "githubUserId": 10167015,
@@ -1249,25 +1012,14 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionCount": 36,
                   "rewardCount": 0,
                   "earned": {
-                      "totalAmount": 505.00,
-                      "details": [
-                        {
-                          "totalAmount": 500,
-                          "totalDollarsEquivalent": 505.00,
-                          "currency": {
-                            "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                            "code": "USDC",
-                            "name": "USD Coin",
-                            "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                            "decimals": 6
-                          }
-                        }
-                      ]
-                    },
+                    "totalAmount": 0,
+                    "details": null
+                  },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
                   "issueToReward": null,
-                  "codeReviewToReward": null
+                  "codeReviewToReward": null,
+                  "hidden": false
                 },
                 {
                   "githubUserId": 10922658,
@@ -1283,7 +1035,8 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
                   "issueToReward": null,
-                  "codeReviewToReward": null
+                  "codeReviewToReward": null,
+                  "hidden": false
                 },
                 {
                   "githubUserId": 17259618,
@@ -1299,7 +1052,8 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
                   "issueToReward": null,
-                  "codeReviewToReward": null
+                  "codeReviewToReward": null,
+                  "hidden": false
                 },
                 {
                   "githubUserId": 5160414,
@@ -1315,7 +1069,8 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
                   "issueToReward": null,
-                  "codeReviewToReward": null
+                  "codeReviewToReward": null,
+                  "hidden": false
                 }
               ]
             }
@@ -1336,31 +1091,8 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionCount": 885,
                   "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 2692632.50,
-                    "details": [
-                      {
-                        "totalAmount": 3250,
-                        "totalDollarsEquivalent": 3250,
-                        "currency": {
-                          "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                          "code": "USD",
-                          "name": "US Dollar",
-                          "logoUrl": null,
-                          "decimals": 2
-                        }
-                      },
-                      {
-                        "totalAmount": 19750,
-                        "totalDollarsEquivalent": 2689382.50,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
                   "contributionToRewardCount": 797,
                   "pullRequestToReward": 416,
@@ -1369,76 +1101,20 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "hidden": false
                 },
                 {
-                  "githubUserId": 16590657,
-                  "login": "PierreOucif",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                  "githubUserId": 4435377,
+                  "login": "Bernardstanislas",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4",
                   "isRegistered": true,
-                  "contributionCount": 147,
-                  "rewardCount": 6,
+                  "contributionCount": 375,
+                  "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 35210.00,
-                    "details": [
-                      {
-                        "totalAmount": 20.5,
-                        "totalDollarsEquivalent": 31426.5,
-                        "currency": {
-                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                          "code": "ETH",
-                          "name": "Ether",
-                          "logoUrl": null,
-                          "decimals": 18
-                        }
-                      },
-                      {
-                        "totalAmount": 450,
-                        "totalDollarsEquivalent": 643.5,
-                        "currency": {
-                          "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
-                          "code": "OP",
-                          "name": "Optimism",
-                          "logoUrl": null,
-                          "decimals": 18
-                        }
-                      },
-                      {
-                        "totalAmount": 2000,
-                        "totalDollarsEquivalent": 1120,
-                        "currency": {
-                          "id": "48388edb-fda2-4a32-b228-28152a147500",
-                          "code": "APT",
-                          "name": "Aptos Coin",
-                          "logoUrl": null,
-                          "decimals": 8
-                        }
-                      },
-                      {
-                        "totalAmount": 2000,
-                        "totalDollarsEquivalent": 2020.00,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      },
-                      {
-                        "totalAmount": 500000,
-                        "totalDollarsEquivalent": 0,
-                        "currency": {
-                          "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                          "code": "STRK",
-                          "name": "StarkNet Token",
-                          "logoUrl": null,
-                          "decimals": 18
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  "contributionToRewardCount": 120,
-                  "pullRequestToReward": 4,
+                  "contributionToRewardCount": 374,
+                  "pullRequestToReward": 115,
                   "issueToReward": 0,
-                  "codeReviewToReward": 116,
+                  "codeReviewToReward": 259,
                   "hidden": false
                 }
               ]
@@ -1461,31 +1137,8 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionCount": 885,
                   "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 2692632.50,
-                    "details": [
-                      {
-                        "totalAmount": 3250,
-                        "totalDollarsEquivalent": 3250,
-                        "currency": {
-                          "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                          "code": "USD",
-                          "name": "US Dollar",
-                          "logoUrl": null,
-                          "decimals": 2
-                        }
-                      },
-                      {
-                        "totalAmount": 19750,
-                        "totalDollarsEquivalent": 2689382.50,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
                   "contributionToRewardCount": 797,
                   "pullRequestToReward": 416,
@@ -1494,32 +1147,20 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "hidden": false
                 },
                 {
-                  "githubUserId": 21149076,
-                  "login": "oscarwroche",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
+                  "githubUserId": 4435377,
+                  "login": "Bernardstanislas",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4",
                   "isRegistered": true,
-                  "contributionCount": 213,
+                  "contributionCount": 375,
                   "rewardCount": 0,
                   "earned": {
-                    "totalAmount": 24242.02,
-                    "details": [
-                      {
-                        "totalAmount": 24002,
-                        "totalDollarsEquivalent": 24242.02,
-                        "currency": {
-                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                          "code": "USDC",
-                          "name": "USD Coin",
-                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                          "decimals": 6
-                        }
-                      }
-                    ]
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  "contributionToRewardCount": 153,
-                  "pullRequestToReward": 57,
+                  "contributionToRewardCount": 374,
+                  "pullRequestToReward": 115,
                   "issueToReward": 0,
-                  "codeReviewToReward": 96,
+                  "codeReviewToReward": 259,
                   "hidden": false
                 }
               ]
@@ -1534,16 +1175,16 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     @Order(1)
     void should_find_project_contributors_as_anonymous_user() {
         // Given
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final UUID projectId = UUID.fromString("594ca5ca-48f7-49a8-9c26-84b949d4fdd9");
 
         // When
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
-                        Map.of("pageIndex", "0", "pageSize", "10000", "sort", "CONTRIBUTION_COUNT")))
+                        Map.of("pageIndex", "0", "pageSize", "100", "sort", "CONTRIBUTION_COUNT")))
                 // Then
                 .exchange()
                 .expectStatus()
-                .isEqualTo(HttpStatus.OK)
+                .is2xxSuccessful()
                 .expectBody()
                 .json(GET_PROJECT_CONTRIBUTORS_ANONYMOUS);
     }
@@ -1552,7 +1193,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     @Order(1)
     void should_find_project_contributors_as_anonymous_user_with_login_filter() {
         // Given
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final UUID projectId = UUID.fromString("594ca5ca-48f7-49a8-9c26-84b949d4fdd9");
 
         // When
         client.get()
@@ -1571,7 +1212,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     @Order(2)
     void should_find_project_with_pagination() {
         // Given
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final UUID projectId = UUID.fromString("594ca5ca-48f7-49a8-9c26-84b949d4fdd9");
 
         // When
         client.get()
@@ -1600,13 +1241,13 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     @Order(4)
     void should_find_project_contributors_as_project_lead() {
         // Given
-        final String jwt = userAuthHelper.authenticatePierre().jwt();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final String jwt = userAuthHelper.authenticateGregoire().jwt();
+        final UUID projectId = UUID.fromString("594ca5ca-48f7-49a8-9c26-84b949d4fdd9");
 
         // When
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
-                        Map.of("pageIndex", "0", "pageSize", "10000", "sort", "CONTRIBUTION_COUNT")))
+                        Map.of("pageIndex", "0", "pageSize", "100", "sort", "CONTRIBUTION_COUNT")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -1615,7 +1256,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json(GET_PROJECT_CONTRIBUTORS_PROJECT_LEAD);
     }
-
 
     @Test
     @Order(5)
