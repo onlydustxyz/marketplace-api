@@ -84,12 +84,6 @@ public interface RewardDetailsViewRepository extends JpaRepository<RewardDetails
     Page<RewardDetailsViewEntity> findUserRewards(Long githubUserId, List<UUID> currencyIds, List<UUID> projectIds, List<UUID> administratedBillingProfileIds,
                                                   String fromDate, String toDate, Pageable pageable);
 
-    @Query(value = SELECT + """
-            WHERE r.billing_profile_id = :billingProfileId
-              AND rs.status = 'PENDING_REQUEST'
-            """, nativeQuery = true)
-    List<RewardDetailsViewEntity> findInvoiceableRewardsForBillingProfile(UUID billingProfileId);
-
     @Modifying
     @Query(nativeQuery = true, value = """
             update rewards

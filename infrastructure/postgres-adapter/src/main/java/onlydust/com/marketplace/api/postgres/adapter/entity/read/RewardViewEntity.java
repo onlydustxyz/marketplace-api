@@ -5,6 +5,7 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileRewardView;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.RewardShortView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
@@ -25,7 +26,10 @@ public class RewardViewEntity {
     @NonNull BigDecimal amount;
     @NonNull Date requestedAt;
     @NonNull UUID requestorId;
-    @NonNull Long recipientId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipientId", referencedColumnName = "github_user_id")
+    @NonNull UserViewEntity recipient;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "billingProfileId")
@@ -66,6 +70,29 @@ public class RewardViewEntity {
                 .status(status.toDomain())
                 .project(project.toView())
                 .money(new MoneyView(amount, currency.toDomain(), statusData.usdConversionRate(), statusData.amountUsdEquivalent()))
+                .build();
+    }
+
+    public BillingProfileRewardView toBillingProfileReward() {
+        return BillingProfileRewardView.builder()
+                .id(id)
+                .projectId(project.getId())
+                .requestedAt(requestedAt)
+                .processedAt(statusData.paidAt())
+                .rewardedOnProjectName(project.getName())
+                .rewardedOnProjectLogoUrl(project.getLogoUrl())
+                .status(status.toDomain())
+                .unlockDate(statusData.unlockDate())
+                .amount(BillingProfileRewardView.Amount.builder()
+                        .total(amount)
+                        .currency(currency.toView())
+                        .dollarsEquivalent(statusData.amountUsdEquivalent())
+                        .build())
+                .numberOfRewardedContributions(rewardItems.size())
+                .recipientAvatarUrl(recipient.githubAvatarUrl)
+                .recipientId(recipient.githubUserId)
+                .recipientLogin(recipient.githubLogin)
+                .billingProfileId(billingProfile.getId())
                 .build();
     }
 }

@@ -44,16 +44,16 @@ public class InvoiceViewEntity {
     @Type(type = "jsonb")
     @NonNull InvoiceEntity.Data data;
 
-    @ManyToOne
-    @JoinColumn(name = "createdBy", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "createdBy")
     @NonNull UserViewEntity createdBy;
 
-    @ManyToOne
-    @JoinColumn(name = "currencyId", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "currencyId")
     @NonNull CurrencyEntity currency;
 
-    @OneToMany
-    @JoinColumn(name = "invoiceId", insertable = false, updatable = false)
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "invoiceId")
     @NonNull List<RewardViewEntity> rewards;
 
     @NonNull

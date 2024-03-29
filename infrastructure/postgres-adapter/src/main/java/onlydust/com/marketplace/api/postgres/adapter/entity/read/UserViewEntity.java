@@ -4,9 +4,9 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import com.vladmihalcea.hibernate.type.array.EnumArrayType;
 import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
 import lombok.*;
-import onlydust.com.marketplace.project.domain.model.UserRole;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserProfileInfoEntity;
+import onlydust.com.marketplace.project.domain.model.UserRole;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -14,6 +14,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
@@ -36,7 +37,7 @@ import java.util.UUID;
                 )
         }
 )
-public class UserViewEntity {
+public class UserViewEntity implements Serializable {
 
     @Id
     @Column(name = "id", nullable = false)

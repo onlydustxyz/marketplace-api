@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileRewardView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ReceiptEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
@@ -131,29 +130,6 @@ public class RewardDetailsViewEntity {
                 .amount(amount)
                 .currency(currency.toView())
                 .usdEquivalent(statusData.amountUsdEquivalent())
-                .build();
-    }
-
-    public BillingProfileRewardView toBillingProfileReward() {
-        return BillingProfileRewardView.builder()
-                .id(id)
-                .projectId(project.getId())
-                .requestedAt(requestedAt)
-                .processedAt(statusData.paidAt())
-                .rewardedOnProjectName(project.getName())
-                .rewardedOnProjectLogoUrl(project.getLogoUrl())
-                .status(status.toDomain())
-                .unlockDate(statusData.unlockDate())
-                .amount(BillingProfileRewardView.Amount.builder()
-                        .total(amount)
-                        .currency(currency.toView())
-                        .dollarsEquivalent(statusData.amountUsdEquivalent())
-                        .build())
-                .numberOfRewardedContributions(contributionCount)
-                .recipientAvatarUrl(recipientAvatarUrl)
-                .recipientId(recipientId)
-                .recipientLogin(recipientLogin)
-                .billingProfileId(billingProfileId)
                 .build();
     }
 }
