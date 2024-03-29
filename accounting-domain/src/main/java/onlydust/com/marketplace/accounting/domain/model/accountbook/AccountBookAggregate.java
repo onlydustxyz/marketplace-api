@@ -52,7 +52,7 @@ public class AccountBookAggregate implements AccountBook {
         return emit(new FullRefundEvent(from));
     }
 
-    public AccountBookState state() {
+    public ReadOnlyAccountBookState state() {
         return state;
     }
 

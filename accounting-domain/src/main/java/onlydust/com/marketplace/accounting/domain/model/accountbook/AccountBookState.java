@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.Amount;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.kernel.visitor.Visitable;
 import onlydust.com.marketplace.kernel.visitor.Visitor;
+import org.jetbrains.annotations.NotNull;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.AsSubgraph;
 import org.jgrapht.graph.SimpleDirectedGraph;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 import static onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId.ROOT;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
-public class AccountBookState implements AccountBook, Visitable<AccountBookState> {
+public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, Visitable<AccountBookState> {
     private final Graph<Vertex, Edge> graph = new SimpleDirectedGraph<>(Edge.class);
     private final Map<AccountId, List<Vertex>> accountVertices = new HashMap<>();
 
@@ -92,31 +93,37 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         }).collect(Collectors.toUnmodifiableSet());
     }
 
+    @Override
     public @NonNull PositiveAmount balanceOf(@NonNull final AccountId account) {
         final var unspentVertices = unspentVerticesOf(account);
         return unspentVertices.stream().map(VertexWithBalance::balance).reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
+    @Override
     public @NonNull PositiveAmount amountReceivedBy(@NonNull final AccountId account) {
         return accountVertices(account).stream()
                 .map(v -> incomingEdgeOf(v).amount).reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
+    @Override
     public @NonNull PositiveAmount refundableBalance(@NonNull AccountId from, @NonNull AccountId to) {
         final var unspentVertices = unspentVerticesOf(from, to);
         return unspentVertices.stream().map(VertexWithBalance::balance).reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
+    @Override
     public @NonNull PositiveAmount transferredAmount(@NonNull AccountId from, @NonNull AccountId to) {
         return accountVertices(to).stream()
                 .filter(v -> hasParent(v, from))
                 .map(v -> incomingEdgeOf(v).amount).reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
+    @Override
     public boolean hasParent(@NonNull AccountId to, @NonNull Collection<AccountId> from) {
         return accountVertices(to).stream().anyMatch(v -> from.stream().anyMatch(f -> hasParent(v, f)));
     }
 
+    @Override
     public @NonNull List<Transaction> transactionsFrom(@NonNull AccountId from) {
         final var startVertices = accountVertices(from);
         final Map<FromTo, PositiveAmount> aggregatedAmounts = new HashMap<>();
@@ -125,6 +132,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         return mapAggregatedAmountsToTransactions(aggregatedAmounts);
     }
 
+    @Override
     public @NonNull List<Transaction> transactionsTo(@NonNull AccountId to) {
         final var startVertices = accountVertices(to);
         final Map<FromTo, PositiveAmount> aggregatedAmounts = new HashMap<>();
@@ -133,6 +141,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         return mapAggregatedAmountsToTransactions(aggregatedAmounts);
     }
 
+    @Override
     public @NonNull Map<AccountId, PositiveAmount> transferredAmountPerOrigin(@NonNull AccountId to) {
         return accountVertices(to).stream()
                 .map(v -> new Transaction(source(v).accountId, to, incomingEdgeOf(v).amount))
@@ -142,6 +151,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
                 ));
     }
 
+    @Override
     public @NonNull Map<AccountId, PositiveAmount> balancePerOrigin(@NonNull AccountId to) {
         return accountVertices(to).stream()
                 .map(v -> new Transaction(source(v).accountId, to, balanceOf(v)))
@@ -239,7 +249,9 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
                 .toList();
     }
 
-    public Map<AccountId, PositiveAmount> unspentChildren(AccountId of) {
+    @Override
+    @NotNull
+    public Map<AccountId, PositiveAmount> unspentChildren(@NotNull AccountId of) {
         return accountVertices(of).stream()
                 .flatMap(v -> unspentChildren(v).entrySet().stream())
                 .collect(Collectors.groupingBy(e -> e.getKey().accountId,
@@ -248,6 +260,8 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
                 ));
     }
 
+    @Override
+    @NotNull
     public Map<AccountId, PositiveAmount> unspentChildren() {
         return unspentChildren(ROOT);
     }
@@ -328,7 +342,8 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         return visitor.visit(this);
     }
 
-    public void export(Exporter exporter) {
+    @Override
+    public void export(@NotNull Exporter exporter) {
         exporter.export(this);
     }
 

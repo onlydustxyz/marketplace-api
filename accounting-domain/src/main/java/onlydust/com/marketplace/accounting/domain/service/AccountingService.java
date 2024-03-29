@@ -5,7 +5,7 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookState;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.ReadOnlyAccountBookState;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -208,7 +208,7 @@ public class AccountingService implements AccountingFacadePort {
             accountingObserver.onRewardPaid(reward.id());
     }
 
-    private static boolean isPaid(AccountBookState accountBookState, RewardId rewardId) {
+    private static boolean isPaid(ReadOnlyAccountBookState accountBookState, RewardId rewardId) {
         final var rewardAccountId = AccountId.of(rewardId);
         return accountBookState.balanceOf(rewardAccountId).isZero() && accountBookState.unspentChildren(rewardAccountId).keySet().stream().noneMatch(AccountId::isPayment);
     }
@@ -283,7 +283,7 @@ public class AccountingService implements AccountingFacadePort {
         return accountBook;
     }
 
-    private void onAllowanceUpdated(ProjectId projectId, Currency.Id currencyId, AccountBookState accountBook) {
+    private void onAllowanceUpdated(ProjectId projectId, Currency.Id currencyId, ReadOnlyAccountBookState accountBook) {
         projectAccountingObserver.onAllowanceUpdated(projectId, currencyId, accountBook.balanceOf(AccountId.of(projectId)),
                 accountBook.amountReceivedBy(AccountId.of(projectId)));
     }
