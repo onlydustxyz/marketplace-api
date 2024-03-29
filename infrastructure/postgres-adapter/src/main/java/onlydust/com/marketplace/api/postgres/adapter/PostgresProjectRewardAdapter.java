@@ -37,6 +37,7 @@ public class PostgresProjectRewardAdapter implements ProjectRewardStoragePort {
     private final CurrencyRepository currencyRepository;
     private final BudgetStatsRepository budgetStatsRepository;
     private final RewardDetailsViewRepository rewardDetailsViewRepository;
+    private final RewardViewRepository rewardViewRepository;
     private final CustomRewardRepository customRewardRepository;
 
     @Override
@@ -110,15 +111,15 @@ public class PostgresProjectRewardAdapter implements ProjectRewardStoragePort {
     }
 
     @Override
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    @Transactional
     public RewardDetailsView getProjectReward(UUID rewardId) {
-        return rewardDetailsViewRepository.find(rewardId)
+        return rewardViewRepository.findById(rewardId)
                 .orElseThrow(() -> notFound("Reward %s not found".formatted(rewardId)))
-                .toDomain();
+                .toView();
     }
 
     @Override
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    @Transactional
     public Page<RewardItemView> getProjectRewardItems(UUID rewardId, int pageIndex, int pageSize) {
         final Integer count = customRewardRepository.countRewardItemsForRewardId(rewardId);
         final List<RewardItemView> rewardItemViews =

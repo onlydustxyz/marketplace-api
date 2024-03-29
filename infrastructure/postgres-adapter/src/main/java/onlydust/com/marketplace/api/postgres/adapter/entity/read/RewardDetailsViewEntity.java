@@ -8,7 +8,10 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.ReceiptEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
-import onlydust.com.marketplace.project.domain.view.*;
+import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
+import onlydust.com.marketplace.project.domain.view.Money;
+import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
+import onlydust.com.marketplace.project.domain.view.UserRewardView;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -55,24 +58,6 @@ public class RewardDetailsViewEntity {
             joinColumns = @JoinColumn(name = "reward_id"),
             inverseJoinColumns = @JoinColumn(name = "receipt_id"))
     Set<ReceiptEntity> receipts = Set.of();
-
-    public RewardDetailsView toDomain() {
-        return RewardDetailsView.builder()
-                .id(id)
-                .to(to())
-                .amount(amount)
-                .createdAt(requestedAt)
-                .processedAt(statusData.paidAt())
-                .currency(currency.toView())
-                .dollarsEquivalent(statusData.amountUsdEquivalent())
-                .status(status.toDomain())
-                .unlockDate(statusData.unlockDate())
-                .from(from())
-                .project(project.toDomain())
-                .receipt(receipts.stream().findFirst().map(ReceiptEntity::toView).orElse(null))
-                .billingProfileId(billingProfileId)
-                .build();
-    }
 
     private ContributorLinkView to() {
         return ContributorLinkView.builder()

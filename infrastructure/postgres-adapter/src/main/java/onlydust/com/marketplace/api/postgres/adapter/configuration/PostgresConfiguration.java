@@ -133,10 +133,11 @@ public class PostgresConfiguration {
                                                                      final CurrencyRepository currencyRepository,
                                                                      final CustomRewardRepository customRewardRepository,
                                                                      final BudgetStatsRepository budgetStatsRepository,
-                                                                     final RewardDetailsViewRepository rewardDetailsViewRepository
+                                                                     final RewardDetailsViewRepository rewardDetailsViewRepository,
+                                                                     final RewardViewRepository rewardViewRepository
     ) {
         return new PostgresProjectRewardAdapter(projectAllowanceRepository, historicalQuoteRepository, currencyRepository, budgetStatsRepository,
-                rewardDetailsViewRepository, customRewardRepository);
+                rewardDetailsViewRepository, rewardViewRepository, customRewardRepository);
     }
 
     @Bean
@@ -166,6 +167,7 @@ public class PostgresConfiguration {
                                                    final ProjectLedIdRepository projectLedIdRepository,
                                                    final RewardStatsRepository rewardStatsRepository,
                                                    final RewardDetailsViewRepository rewardDetailsViewRepository,
+                                                   final RewardViewRepository rewardViewRepository,
                                                    final CurrencyRepository currencyRepository,
                                                    final BillingProfileUserRepository billingProfileUserRepository) {
         return new PostgresUserAdapter(
@@ -184,6 +186,7 @@ public class PostgresConfiguration {
                 projectLedIdRepository,
                 rewardStatsRepository,
                 rewardDetailsViewRepository,
+                rewardViewRepository,
                 currencyRepository,
                 billingProfileUserRepository);
     }

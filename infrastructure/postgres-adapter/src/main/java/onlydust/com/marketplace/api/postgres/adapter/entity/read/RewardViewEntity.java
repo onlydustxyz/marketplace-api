@@ -10,6 +10,8 @@ import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.RewardShortView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
+import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
+import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -25,7 +27,10 @@ public class RewardViewEntity {
     @NonNull UUID id;
     @NonNull BigDecimal amount;
     @NonNull Date requestedAt;
-    @NonNull UUID requestorId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "requestorId")
+    @NonNull UserViewEntity requestor;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipientId", referencedColumnName = "github_user_id")
@@ -92,6 +97,42 @@ public class RewardViewEntity {
                 .recipientAvatarUrl(recipient.githubAvatarUrl)
                 .recipientId(recipient.githubUserId)
                 .recipientLogin(recipient.githubLogin)
+                .billingProfileId(billingProfile.getId())
+                .build();
+    }
+
+    private ContributorLinkView to() {
+        return ContributorLinkView.builder()
+                .avatarUrl(recipient.githubAvatarUrl)
+                .login(recipient.githubLogin)
+                .githubUserId(recipient.githubUserId)
+                .isRegistered(recipient.id != null)
+                .build();
+    }
+
+    private ContributorLinkView from() {
+        return ContributorLinkView.builder()
+                .githubUserId(requestor.githubUserId)
+                .login(requestor.githubLogin)
+                .avatarUrl(requestor.githubAvatarUrl)
+                .isRegistered(true)
+                .build();
+    }
+
+    public RewardDetailsView toView() {
+        return RewardDetailsView.builder()
+                .id(id)
+                .to(to())
+                .amount(amount)
+                .createdAt(requestedAt)
+                .processedAt(statusData.paidAt())
+                .currency(currency.toView())
+                .dollarsEquivalent(statusData.amountUsdEquivalent())
+                .status(status.toDomain())
+                .unlockDate(statusData.unlockDate())
+                .from(from())
+                .project(project.toDomain())
+                .receipt(receipts.stream().findFirst().map(ReceiptEntity::toView).orElse(null))
                 .billingProfileId(billingProfile.getId())
                 .build();
     }

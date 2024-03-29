@@ -53,6 +53,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final ProjectLedIdRepository projectLedIdRepository;
     private final RewardStatsRepository rewardStatsRepository;
     private final RewardDetailsViewRepository rewardDetailsViewRepository;
+    private final RewardViewRepository rewardViewRepository;
     private final CurrencyRepository currencyRepository;
     private final BillingProfileUserRepository billingProfileUserRepository;
 
@@ -76,7 +77,7 @@ public class PostgresUserAdapter implements UserStoragePort {
         final var billingProfiles = billingProfileUserRepository.findByUserId(user.getId()).stream()
                 .map(BillingProfileUserEntity::toBillingProfileLinkView)
                 .toList();
-        final var hasAnyRewardPendingBillingProfile = rewardDetailsViewRepository.existsPendingBillingProfileByRecipientId(user.getGithubUserId());
+        final var hasAnyRewardPendingBillingProfile = rewardViewRepository.existsPendingBillingProfileByRecipientId(user.getGithubUserId());
         return mapUserToDomain(user, globalSettingsRepository.get().getTermsAndConditionsLatestVersionDate(),
                 projectLedIdsByUserId, applications, billingProfiles, hasAnyRewardPendingBillingProfile);
     }
@@ -270,9 +271,9 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Override
     @Transactional(readOnly = true)
     public RewardDetailsView findRewardById(UUID rewardId) {
-        return rewardDetailsViewRepository.find(rewardId)
+        return rewardViewRepository.findById(rewardId)
                 .orElseThrow(() -> notFound(format("Reward with id %s not found", rewardId)))
-                .toDomain();
+                .toView();
     }
 
     @Override

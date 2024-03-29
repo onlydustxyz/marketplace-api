@@ -12,7 +12,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface RewardDetailsViewRepository extends JpaRepository<RewardDetailsViewEntity, UUID> {
@@ -56,11 +55,6 @@ public interface RewardDetailsViewRepository extends JpaRepository<RewardDetails
     }
 
     @Query(value = SELECT + """
-            WHERE r.id = :rewardId
-            """, nativeQuery = true)
-    Optional<RewardDetailsViewEntity> find(UUID rewardId);
-
-    @Query(value = SELECT + """
             WHERE r.project_id = :projectId
               AND (coalesce(:contributorIds) IS NULL OR r.recipient_id IN (:contributorIds))
               AND (coalesce(:currencyIds) IS NULL OR r.currency_id IN (:currencyIds))
@@ -91,16 +85,4 @@ public interface RewardDetailsViewRepository extends JpaRepository<RewardDetails
             where id in (:rewardIds)
             """)
     void markRewardAsPaymentNotified(List<UUID> rewardIds);
-
-    @Query(value = """
-            SELECT EXISTS(
-                SELECT 1
-                FROM rewards r
-                         JOIN accounting.reward_statuses rs ON rs.reward_id = r.id
-                WHERE r.recipient_id = :githubUserId
-                  AND rs.status = 'PENDING_BILLING_PROFILE'
-            )
-            """, nativeQuery = true)
-    boolean existsPendingBillingProfileByRecipientId(Long githubUserId);
-
 }
