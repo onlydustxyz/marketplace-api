@@ -22,6 +22,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 
@@ -99,11 +100,11 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (rewards.stream().anyMatch(r -> !r.status().isPendingRequest())) {
             throw badRequest("Some rewards don't have the PENDING_REQUEST status");
         }
-        if (rewards.stream().anyMatch(r -> nonNull(r.invoiceId()))) {
+        if (rewards.stream().anyMatch(r -> nonNull(r.invoiceId()) && r.invoiceStatus() != Invoice.Status.DRAFT)) {
             throw badRequest("Some rewards are already invoiced");
         }
-        if (rewards.stream().anyMatch(r -> !r.billingProfileId().equals(invoice.billingProfileSnapshot().id()))) {
-            throw badRequest("Some rewards are associated with another billing profile (was expecting %s)".formatted(invoice.billingProfileSnapshot().id()));
+        if (rewards.stream().anyMatch(r -> isNull(r.billingProfileId()) || !r.billingProfileId().equals(invoice.billingProfileSnapshot().id()))) {
+            throw badRequest("Some rewards are not associated with billing profile %s".formatted(invoice.billingProfileSnapshot().id()));
         }
     }
 
@@ -175,11 +176,11 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (rewards.size() != invoice.rewards().size()) {
             throw notFound("Some invoice's rewards were not found (invoice %s). This may happen if a reward was cancelled in the meantime.".formatted(invoice.id()));
         }
-        if (rewards.stream().anyMatch(r -> !r.invoiceId().equals(invoice.id()))) {
-            throw badRequest("Some rewards are associated with another invoice (was expecting %s)".formatted(invoice.id()));
+        if (rewards.stream().anyMatch(r -> isNull(r.invoiceId()) || !r.invoiceId().equals(invoice.id()))) {
+            throw badRequest("Some rewards are not associated with invoice %s".formatted(invoice.id()));
         }
-        if (rewards.stream().anyMatch(r -> !r.billingProfileId().equals(invoice.billingProfileSnapshot().id()))) {
-            throw badRequest("Some rewards are associated with another billing profile (was expecting %s)".formatted(invoice.billingProfileSnapshot().id()));
+        if (rewards.stream().anyMatch(r -> isNull(r.billingProfileId()) || !r.billingProfileId().equals(invoice.billingProfileSnapshot().id()))) {
+            throw badRequest("Some rewards are not associated with billing profile %s".formatted(invoice.billingProfileSnapshot().id()));
         }
     }
 

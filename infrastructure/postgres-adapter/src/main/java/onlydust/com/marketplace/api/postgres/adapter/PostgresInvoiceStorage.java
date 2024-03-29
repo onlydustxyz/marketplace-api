@@ -69,6 +69,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
                         RewardId.of(r.id()),
                         r.status().toDomain(),
                         r.invoiceId() == null ? null : Invoice.Id.of(r.invoiceId()),
+                        r.invoice() == null ? null : r.invoice().status().toDomain(),
                         r.billingProfileId() == null ? null : BillingProfile.Id.of(r.billingProfileId())
                 )).toList();
     }

@@ -624,7 +624,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
 
         client.get()
                 .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(companyBillingProfileId), Map.of(
-                        "rewardIds", "dd7d445f-6915-4955-9bae-078173627b05"
+                        "rewardIds", "e33ea956-d2f5-496b-acf9-e2350faddb16"
                 )))
                 .header("Authorization", BEARER_PREFIX + antho.jwt())
                 .exchange()
@@ -975,7 +975,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     @Test
     @Order(104)
     void preview_with_both_billing_profile_types() {
-        final var rewardId = "f0c1b882-76f2-47d0-9331-151ce1f99281";
+        final var rewardId = "e9ebbe59-fb74-4a6c-9a51-6d9050412977";
         final var em = entityManagerFactory.createEntityManager();
 
         // First, generate an invoice preview with the company billing profile
