@@ -83,7 +83,7 @@ public class AccountingHelper {
                 default -> throw new IllegalArgumentException("Currency code %s not mapped".formatted(currencyCode));
             };
 
-            rewardEntity.currency(currency);
+            rewardEntity.currencyId(currency.id());
             rewardStatus.networks(new NetworkEnumEntity[]{network});
         }
         rewardStatus.amountUsdEquivalent(usdAmount == null ? null : BigDecimal.valueOf(usdAmount.doubleValue()));

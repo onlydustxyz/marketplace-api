@@ -2,11 +2,9 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BackofficeRewardViewEntity;
@@ -15,12 +13,11 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentRe
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
+import onlydust.com.marketplace.api.postgres.adapter.repository.BackofficeRewardViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardDetailsViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.RewardViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ShortProjectViewEntityRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -38,17 +35,14 @@ import java.util.stream.Collectors;
 public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewardStoragePort {
     private final ShortProjectViewEntityRepository shortProjectViewEntityRepository;
     private final BatchPaymentRepository batchPaymentRepository;
-    private final RewardViewRepository rewardViewRepository;
     private final RewardDetailsViewRepository rewardDetailsViewRepository;
+    private final BackofficeRewardViewRepository backofficeRewardViewRepository;
     private final RewardRepository rewardRepository;
-    private final CurrencyStorage currencyStorage;
 
     @Override
     @Transactional
     public void save(Reward reward) {
-        final var currency = currencyStorage.get(Currency.Id.of(reward.currencyId().value()))
-                .orElseThrow(() -> OnlyDustException.internalServerError("Currency %s not found".formatted(reward.currencyId())));
-        rewardRepository.saveAndFlush(RewardEntity.of(reward, currency));
+        rewardRepository.saveAndFlush(RewardEntity.of(reward));
     }
 
     @Override
@@ -109,7 +103,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
         return BatchPaymentDetailsView.builder()
                 .payment(batchPayment.toDomain())
                 .rewardViews(
-                        rewardDetailsViewRepository.findAllByRewardIds(batchPayment.getRewards().stream().map(BatchPaymentRewardEntity::rewardId).toList()).stream()
+                        backofficeRewardViewRepository.findAllByRewardIds(batchPayment.getRewards().stream().map(BatchPaymentRewardEntity::rewardId).toList()).stream()
                                 .map(BackofficeRewardViewEntity::toDomain)
                                 .toList())
                 .build();
@@ -118,7 +112,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     @Override
     @Transactional
     public List<RewardDetailsView> findRewardsById(Set<RewardId> rewardIds) {
-        return rewardDetailsViewRepository.findAllByRewardIds(rewardIds.stream().map(UuidWrapper::value).toList())
+        return backofficeRewardViewRepository.findAllByRewardIds(rewardIds.stream().map(UuidWrapper::value).toList())
                 .stream()
                 .map(BackofficeRewardViewEntity::toDomain)
                 .toList();
@@ -130,7 +124,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
                                                @NonNull Set<RewardStatus> statuses,
                                                Date fromRequestedAt, Date toRequestedAt,
                                                Date fromProcessedAt, Date toProcessedAt) {
-        final var page = rewardDetailsViewRepository.findAllByStatusesAndDates(
+        final var page = backofficeRewardViewRepository.findAllByStatusesAndDates(
                 statuses.stream().map(rewardStatus -> RewardStatusEntity.from(rewardStatus.asBackofficeUser())).map(RewardStatusEntity.Status::toString).toList(),
                 fromRequestedAt, toRequestedAt,
                 fromProcessedAt, toProcessedAt,
@@ -147,13 +141,13 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     @Override
     @Transactional(readOnly = true)
     public List<RewardDetailsView> findPaidRewardsToNotify() {
-        return rewardDetailsViewRepository.findPaidRewardsToNotify().stream().map(BackofficeRewardViewEntity::toDomain).toList();
+        return backofficeRewardViewRepository.findPaidRewardsToNotify().stream().map(BackofficeRewardViewEntity::toDomain).toList();
     }
 
     @Override
     @Transactional
     public void markRewardsAsPaymentNotified(List<RewardId> rewardIds) {
-        rewardViewRepository.markRewardAsPaymentNotified(rewardIds.stream().map(UuidWrapper::value).toList());
+        rewardDetailsViewRepository.markRewardAsPaymentNotified(rewardIds.stream().map(UuidWrapper::value).toList());
     }
 
     @Override
@@ -170,6 +164,6 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     @Override
     @Transactional
     public Optional<RewardDetailsView> getReward(RewardId id) {
-        return rewardDetailsViewRepository.findAllByRewardIds(List.of(id.value())).stream().findFirst().map(BackofficeRewardViewEntity::toDomain);
+        return backofficeRewardViewRepository.findAllByRewardIds(List.of(id.value())).stream().findFirst().map(BackofficeRewardViewEntity::toDomain);
     }
 }

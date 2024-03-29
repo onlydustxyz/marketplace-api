@@ -11,7 +11,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserRightsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardDetailsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortBillingProfileViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
@@ -45,7 +45,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     private final @NonNull BankAccountRepository bankAccountRepository;
     private final @NonNull ShortBillingProfileViewRepository shortBillingProfileViewRepository;
     private final @NonNull BillingProfileUserRightsViewRepository billingProfileUserRightsViewRepository;
-    private final @NonNull RewardViewRepository rewardViewRepository;
+    private final @NonNull RewardDetailsViewRepository rewardDetailsViewRepository;
 
 
     @Override
@@ -431,8 +431,8 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     public List<BillingProfileRewardView> findInvoiceableRewardsForBillingProfile(BillingProfile.Id billingProfileId) {
-        return rewardViewRepository.findInvoiceableRewardsForBillingProfile(billingProfileId.value())
-                .stream().map(RewardViewEntity::toBillingProfileReward).toList();
+        return rewardDetailsViewRepository.findInvoiceableRewardsForBillingProfile(billingProfileId.value())
+                .stream().map(RewardDetailsViewEntity::toBillingProfileReward).toList();
     }
 
     @Override

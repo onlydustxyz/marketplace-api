@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import lombok.*;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.project.domain.model.Reward;
 
 import javax.persistence.*;
@@ -23,21 +23,15 @@ public class RewardEntity {
     @NonNull UUID projectId;
     @NonNull UUID requestorId;
     @NonNull Long recipientId;
-
-    @ManyToOne
-    @NonNull CurrencyEntity currency;
-
+    @NonNull UUID currencyId;
     @NonNull BigDecimal amount;
     @NonNull Date requestedAt;
+    UUID invoiceId;
 
     @OneToMany(mappedBy = "rewardId", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @NonNull List<RewardItemEntity> rewardItems;
 
-    @Column(name = "invoice_id", insertable = false, updatable = false)
-    UUID invoiceId;
-    @ManyToOne
-    InvoiceEntity invoice;
-    @Column(name = "billing_profile_id", insertable = false, updatable = false)
+    @Column(name = "billingProfileId", insertable = false, updatable = false)
     UUID billingProfileId;
 
     @ManyToMany(cascade = CascadeType.ALL)
@@ -49,13 +43,13 @@ public class RewardEntity {
     @Builder.Default
     Set<ReceiptEntity> receipts = new HashSet<>();
 
-    public static RewardEntity of(Reward reward, Currency currency) {
+    public static RewardEntity of(Reward reward) {
         return RewardEntity.builder()
                 .id(reward.id())
                 .projectId(reward.projectId())
                 .requestorId(reward.requestorId())
                 .recipientId(reward.recipientId())
-                .currency(CurrencyEntity.of(currency))
+                .currencyId(reward.currencyId().value())
                 .amount(reward.amount())
                 .requestedAt(reward.requestedAt())
                 .rewardItems(RewardItemEntity.of(reward))
@@ -69,7 +63,7 @@ public class RewardEntity {
                 requestorId,
                 recipientId,
                 amount,
-                currency.toView().id(),
+                CurrencyView.Id.of(currencyId),
                 requestedAt,
                 rewardItems.stream().map(RewardItemEntity::toRewardItem).toList(),
                 invoiceId != null);

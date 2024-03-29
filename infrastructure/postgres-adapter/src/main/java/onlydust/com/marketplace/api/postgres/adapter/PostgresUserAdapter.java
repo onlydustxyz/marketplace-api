@@ -52,7 +52,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final CustomRewardRepository customRewardRepository;
     private final ProjectLedIdRepository projectLedIdRepository;
     private final RewardStatsRepository rewardStatsRepository;
-    private final RewardViewRepository rewardViewRepository;
+    private final RewardDetailsViewRepository rewardDetailsViewRepository;
     private final CurrencyRepository currencyRepository;
     private final BillingProfileUserRepository billingProfileUserRepository;
 
@@ -76,7 +76,7 @@ public class PostgresUserAdapter implements UserStoragePort {
         final var billingProfiles = billingProfileUserRepository.findByUserId(user.getId()).stream()
                 .map(BillingProfileUserEntity::toBillingProfileLinkView)
                 .toList();
-        final var hasAnyRewardPendingBillingProfile = rewardViewRepository.existsPendingBillingProfileByRecipientId(user.getGithubUserId());
+        final var hasAnyRewardPendingBillingProfile = rewardDetailsViewRepository.existsPendingBillingProfileByRecipientId(user.getGithubUserId());
         return mapUserToDomain(user, globalSettingsRepository.get().getTermsAndConditionsLatestVersionDate(),
                 projectLedIdsByUserId, applications, billingProfiles, hasAnyRewardPendingBillingProfile);
     }
@@ -231,9 +231,9 @@ public class PostgresUserAdapter implements UserStoragePort {
         final var toDate = isNull(filters.getTo()) ? null : format.format(filters.getTo());
 
         final var pageRequest = PageRequest.of(pageIndex, pageSize,
-                RewardViewRepository.sortBy(sort, sortDirection == SortDirection.asc ? Direction.ASC : Direction.DESC));
+                RewardDetailsViewRepository.sortBy(sort, sortDirection == SortDirection.asc ? Direction.ASC : Direction.DESC));
 
-        final var page = rewardViewRepository.findUserRewards(githubUserId, filters.getCurrencies(), filters.getProjectIds(),
+        final var page = rewardDetailsViewRepository.findUserRewards(githubUserId, filters.getCurrencies(), filters.getProjectIds(),
                 filters.getAdministratedBillingProfilesIds(), fromDate, toDate, pageRequest);
 
         final var rewardsStats = rewardStatsRepository.findByUser(githubUserId, filters.getCurrencies(), filters.getProjectIds(),
@@ -241,7 +241,7 @@ public class PostgresUserAdapter implements UserStoragePort {
 
         return UserRewardsPageView.builder()
                 .rewards(Page.<UserRewardView>builder()
-                        .content(page.getContent().stream().map(RewardViewEntity::toUserReward).toList())
+                        .content(page.getContent().stream().map(RewardDetailsViewEntity::toUserReward).toList())
                         .totalItemNumber((int) page.getTotalElements())
                         .totalPageNumber(page.getTotalPages())
                         .build())
@@ -270,7 +270,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Override
     @Transactional(readOnly = true)
     public RewardDetailsView findRewardById(UUID rewardId) {
-        return rewardViewRepository.find(rewardId)
+        return rewardDetailsViewRepository.find(rewardId)
                 .orElseThrow(() -> notFound(format("Reward with id %s not found", rewardId)))
                 .toDomain();
     }

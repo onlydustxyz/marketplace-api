@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import lombok.NonNull;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.InvoiceViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceViewEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

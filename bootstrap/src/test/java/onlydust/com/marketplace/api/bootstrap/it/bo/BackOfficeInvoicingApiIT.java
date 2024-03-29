@@ -255,22 +255,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "status": "TO_REVIEW",
                               "billingProfile": {
                                 "subject": "Apple Inc.",
-                                "type": "COMPANY",
-                                "verificationStatus": null,
-                                "kyb": {
-                                  "name": "Apple Inc.",
-                                  "registrationNumber": "123456789",
-                                  "registrationDate": null,
-                                  "address": "1 Infinite Loop, Cupertino, CA 95014, United States",
-                                  "country": "France",
-                                  "countryCode": "FRA",
-                                  "usEntity": false,
-                                  "subjectToEuropeVAT": true,
-                                  "euVATNumber": "FR12345678901",
-                                  "sumsubUrl": null
-                                },
-                                "kyc": null,
-                                "admins": null
+                                "type": "COMPANY"
                               },
                               "rewardCount": 3,
                               "totalUsdEquivalent": 3636.000,
@@ -314,22 +299,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "status": "TO_REVIEW",
                               "billingProfile": {
                                 "subject": "Apple Inc.",
-                                "type": "COMPANY",
-                                "verificationStatus": null,
-                                "kyb": {
-                                  "name": "Apple Inc.",
-                                  "registrationNumber": "123456789",
-                                  "registrationDate": null,
-                                  "address": "1 Infinite Loop, Cupertino, CA 95014, United States",
-                                  "country": "France",
-                                  "countryCode": "FRA",
-                                  "usEntity": false,
-                                  "subjectToEuropeVAT": true,
-                                  "euVATNumber": "FR12345678901",
-                                  "sumsubUrl": null
-                                },
-                                "kyc": null,
-                                "admins": null
+                                "type": "COMPANY"
                               },
                               "rewardCount": 2,
                               "totalUsdEquivalent": 2424.000,
@@ -362,22 +332,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "status": "TO_REVIEW",
                               "billingProfile": {
                                 "subject": "Apple Inc.",
-                                "type": "COMPANY",
-                                "verificationStatus": null,
-                                "kyb": {
-                                  "name": "Apple Inc.",
-                                  "registrationNumber": "123456789",
-                                  "registrationDate": null,
-                                  "address": "1 Infinite Loop, Cupertino, CA 95014, United States",
-                                  "country": "France",
-                                  "countryCode": "FRA",
-                                  "usEntity": false,
-                                  "subjectToEuropeVAT": true,
-                                  "euVATNumber": "FR12345678901",
-                                  "sumsubUrl": null
-                                },
-                                "kyc": null,
-                                "admins": null
+                                "type": "COMPANY"
                               },
                               "rewardCount": 1,
                               "totalUsdEquivalent": 1212.000,

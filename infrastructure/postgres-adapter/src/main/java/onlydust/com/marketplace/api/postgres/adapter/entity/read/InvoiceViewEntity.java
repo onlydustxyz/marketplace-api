@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.write;
+package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -9,8 +9,8 @@ import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
 import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.UserView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -42,7 +42,7 @@ public class InvoiceViewEntity {
     String rejectionReason;
 
     @Type(type = "jsonb")
-    InvoiceEntity.Data data;
+    @NonNull InvoiceEntity.Data data;
 
     @ManyToOne
     @JoinColumn(name = "createdBy", insertable = false, updatable = false)

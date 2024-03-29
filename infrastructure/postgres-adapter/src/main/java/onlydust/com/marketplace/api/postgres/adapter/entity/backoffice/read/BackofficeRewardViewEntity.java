@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.view.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.InvoiceViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import org.hibernate.annotations.Type;
