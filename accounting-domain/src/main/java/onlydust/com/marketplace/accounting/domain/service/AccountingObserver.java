@@ -140,8 +140,8 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
 
     @Override
     public void onPayoutPreferenceChanged(BillingProfile.Id billingProfileId, @NonNull UserId userId, @NonNull ProjectId projectId) {
-        refreshRewardsUsdEquivalentOf(billingProfileId);
         rewardStatusStorage.updateBillingProfileForRecipientUserIdAndProjectId(billingProfileId, userId, projectId);
+        refreshRewardsUsdEquivalentOf(billingProfileId);
     }
 
     @Override

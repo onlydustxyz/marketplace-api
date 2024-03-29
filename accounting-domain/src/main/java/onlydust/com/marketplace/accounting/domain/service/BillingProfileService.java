@@ -20,9 +20,9 @@ import javax.transaction.Transactional;
 import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 
@@ -77,11 +77,6 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .stream().map(r -> r.withNetworks(accountingFacadePort.networksOf(r.amount().getCurrency().id(), r.id())))
                 .toList();
 
-        if (rewards.stream().map(Invoice.Reward::invoiceId).filter(Objects::nonNull)
-                .anyMatch(i -> invoiceStoragePort.get(i).orElseThrow().status().isActive())) {
-            throw badRequest("Some rewards are already invoiced");
-        }
-
         final var billingProfile = billingProfileStoragePort.findById(billingProfileId)
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
         if (!billingProfile.isVerified()) {
@@ -90,10 +85,27 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
         final int sequenceNumber = invoiceStoragePort.getNextSequenceNumber(billingProfileId);
         final var invoice = Invoice.of(billingProfile, sequenceNumber, userId).rewards(rewards);
+        checkInvoicePreviewRewards(invoice);
 
         invoiceStoragePort.deleteDraftsOf(billingProfileId);
         invoiceStoragePort.create(invoice);
         return invoice;
+    }
+
+    private void checkInvoicePreviewRewards(Invoice invoice) {
+        final var rewards = invoiceStoragePort.getRewardAssociations(invoice.rewards().stream().map(Invoice.Reward::id).toList());
+        if (rewards.size() != invoice.rewards().size()) {
+            throw notFound("Some invoice's rewards were not found (invoice %s). This may happen if a reward was cancelled in the meantime.".formatted(invoice.id()));
+        }
+        if (rewards.stream().anyMatch(r -> !r.status().isPendingRequest())) {
+            throw badRequest("Some rewards don't have the PENDING_REQUEST status");
+        }
+        if (rewards.stream().anyMatch(r -> nonNull(r.invoiceId()) && r.invoiceStatus() != Invoice.Status.DRAFT && r.invoiceStatus() != Invoice.Status.REJECTED)) {
+            throw badRequest("Some rewards are already invoiced");
+        }
+        if (rewards.stream().anyMatch(r -> isNull(r.billingProfileId()) || !r.billingProfileId().equals(invoice.billingProfileSnapshot().id()))) {
+            throw badRequest("Some rewards are not associated with billing profile %s".formatted(invoice.billingProfileSnapshot().id()));
+        }
     }
 
     @Override
@@ -147,6 +159,10 @@ public class BillingProfileService implements BillingProfileFacadePort {
         final var invoice = invoiceStoragePort.get(invoiceId)
                 .filter(i -> i.billingProfileSnapshot().id().equals(billingProfileId))
                 .orElseThrow(() -> notFound("Invoice %s not found for billing profile %s".formatted(invoiceId, billingProfileId)));
+        if (invoice.status() != Invoice.Status.DRAFT)
+            throw badRequest("Invoice %s is not in DRAFT status".formatted(invoiceId));
+
+        checkInvoiceRewards(invoice);
 
         final var url = pdfStoragePort.upload(invoice.internalFileName(), data);
         invoiceStoragePort.update(invoice
@@ -155,6 +171,19 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .originalFileName(fileName));
 
         billingProfileObserver.onInvoiceUploaded(billingProfileId, invoiceId, nonNull(fileName));
+    }
+
+    private void checkInvoiceRewards(Invoice invoice) {
+        final var rewards = invoiceStoragePort.getRewardAssociations(invoice.rewards().stream().map(Invoice.Reward::id).toList());
+        if (rewards.size() != invoice.rewards().size()) {
+            throw notFound("Some invoice's rewards were not found (invoice %s). This may happen if a reward was cancelled in the meantime.".formatted(invoice.id()));
+        }
+        if (rewards.stream().anyMatch(r -> isNull(r.invoiceId()) || !r.invoiceId().equals(invoice.id()))) {
+            throw badRequest("Some rewards are not associated with invoice %s".formatted(invoice.id()));
+        }
+        if (rewards.stream().anyMatch(r -> isNull(r.billingProfileId()) || !r.billingProfileId().equals(invoice.billingProfileSnapshot().id()))) {
+            throw badRequest("Some rewards are not associated with billing profile %s".formatted(invoice.billingProfileSnapshot().id()));
+        }
     }
 
     private void selectBillingProfileForUserAndProjects(@NonNull BillingProfile.Id billingProfileId, @NonNull UserId userId, Set<ProjectId> projectIds) {

@@ -12,10 +12,7 @@ import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -58,6 +55,10 @@ public class RewardStatusDataEntity {
     NetworkEnumEntity[] networks;
     BigDecimal amountUsdEquivalent;
     BigDecimal usdConversionRate;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reward_id", referencedColumnName = "reward_id", insertable = false, updatable = false)
+    RewardStatusEntity status;
 
     public static RewardStatusDataEntity of(RewardStatusData rewardStatusData) {
         return RewardStatusDataEntity.builder()

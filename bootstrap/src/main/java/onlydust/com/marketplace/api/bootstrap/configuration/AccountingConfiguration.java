@@ -44,8 +44,8 @@ public class AccountingConfiguration {
                                                              final @NonNull IndexerPort indexerPort,
                                                              final @NonNull AccountingObserverPort accountingObserverPort,
                                                              final @NonNull AccountingFacadePort accountingFacadePort) {
-        return new BillingProfileService(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort, billingProfileObservers, indexerPort,
-                accountingObserverPort, accountingFacadePort);
+        return new BillingProfileService(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort, billingProfileObservers,
+                indexerPort, accountingObserverPort, accountingFacadePort);
     }
 
     @Bean

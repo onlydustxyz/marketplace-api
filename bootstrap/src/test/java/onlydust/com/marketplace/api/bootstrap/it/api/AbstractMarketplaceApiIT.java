@@ -126,7 +126,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String BILLING_PROFILES_TYPE_BY_ID = "/api/v1/billing-profiles/%s/type";
     protected static final String BILLING_PROFILES_INVOICEABLE_REWARDS = "/api/v1/billing-profiles/%s/invoiceable-rewards";
     protected static final String ME_GET_PAYOUT_PREFERENCES = "/api/v1/me/payout-preferences";
-    protected static final String ME_PUT_PAYOUT_PREFERENCES = "/api/v1/me/payout-preferences";
+    public static final String ME_PUT_PAYOUT_PREFERENCES = "/api/v1/me/payout-preferences";
     protected static final String BILLING_PROFILES_GET_COWORKERS = "/api/v1/billing-profiles/%s/coworkers";
     protected static final String BILLING_PROFILES_COWORKER_ROLE = "/api/v1/billing-profiles/%s/coworkers/%d/role";
     protected static final String BILLING_PROFILES_POST_COWORKER_INVITATIONS = "/api/v1/billing-profiles/%s/coworkers";

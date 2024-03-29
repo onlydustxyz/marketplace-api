@@ -12,6 +12,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
@@ -35,8 +36,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import static onlydust.com.marketplace.accounting.domain.model.Invoice.Status.APPROVED;
-import static onlydust.com.marketplace.accounting.domain.model.Invoice.Status.TO_REVIEW;
+import static onlydust.com.marketplace.accounting.domain.model.Invoice.Status.*;
 import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyb;
 import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyc;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -148,6 +148,8 @@ class BillingProfileServiceTest {
             // Given
             when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
+            when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
+                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, null, null, billingProfileId)).toList());
             when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
                     companyBillingProfile)
             );
@@ -209,6 +211,41 @@ class BillingProfileServiceTest {
 
 
         @Test
+        void should_prevent_invoice_preview_if_some_rewards_have_been_cancelled() {
+            // Given
+            final var reward = fakeReward(Invoice.Id.random());
+            rewards = List.of(fakeReward(), fakeReward(), reward, fakeReward());
+            rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
+
+            invoice = Invoice.of(companyBillingProfile, 1, userId)
+                    .rewards(rewards)
+                    .status(Invoice.Status.APPROVED);
+            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
+            when(invoiceStoragePort.get(reward.invoiceId())).thenReturn(Optional.of(invoice));
+
+            when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
+                    BillingProfileView.builder()
+                            .id(billingProfileId)
+                            .type(BillingProfile.Type.INDIVIDUAL)
+                            .kyc(newKyc(billingProfileId, userId))
+                            .payoutInfo(payoutInfo)
+                            .verificationStatus(VerificationStatus.VERIFIED)
+                            .build())
+            );
+            when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(42);
+            when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(List.of(new RewardAssociations(rewardIds.get(0),
+                    RewardStatus.PENDING_REQUEST, null, null, billingProfileId)));
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Some invoice's rewards were not found");
+        }
+
+
+        @Test
         void should_prevent_invoice_preview_if_rewards_are_already_invoiced() {
             // Given
             final var reward = fakeReward(Invoice.Id.random());
@@ -228,15 +265,105 @@ class BillingProfileServiceTest {
                             .type(BillingProfile.Type.INDIVIDUAL)
                             .kyc(newKyc(billingProfileId, userId))
                             .payoutInfo(payoutInfo)
+                            .verificationStatus(VerificationStatus.VERIFIED)
                             .build())
             );
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(42);
+            when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
+                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, Invoice.Id.random(), TO_REVIEW, BillingProfile.Id.random())).toList());
 
             // When
             assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Some rewards are already invoiced");
+
+
+            // Should not reject when rewards are associated with an invoice in DRAFT
+            when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
+                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, Invoice.Id.random(), DRAFT, BillingProfile.Id.random())).toList());
+
+            assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Some rewards are not associated with billing profile");
+
+            // Should not reject when rewards are associated with an invoice in REJECTED
+            when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
+                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, Invoice.Id.random(), REJECTED, BillingProfile.Id.random())).toList());
+
+            assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Some rewards are not associated with billing profile");
+        }
+
+        @Test
+        void should_prevent_invoice_preview_if_rewards_have_wrong_status() {
+            // Given
+            final var reward = fakeReward(Invoice.Id.random());
+            rewards = List.of(fakeReward(), fakeReward(), reward, fakeReward());
+            rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
+
+            invoice = Invoice.of(companyBillingProfile, 1, userId)
+                    .rewards(rewards)
+                    .status(Invoice.Status.APPROVED);
+            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
+            when(invoiceStoragePort.get(reward.invoiceId())).thenReturn(Optional.of(invoice));
+
+            when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
+                    BillingProfileView.builder()
+                            .id(billingProfileId)
+                            .type(BillingProfile.Type.INDIVIDUAL)
+                            .kyc(newKyc(billingProfileId, userId))
+                            .payoutInfo(payoutInfo)
+                            .verificationStatus(VerificationStatus.VERIFIED)
+                            .build())
+            );
+            when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(42);
+            when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
+                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PAYMENT_BLOCKED, Invoice.Id.random(), Invoice.Status.DRAFT, billingProfileId)).toList());
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Some rewards don't have the PENDING_REQUEST status");
+        }
+
+        @Test
+        void should_prevent_invoice_preview_if_rewards_have_wrong_billing_profile() {
+            // Given
+            final var reward = fakeReward(Invoice.Id.random());
+            rewards = List.of(fakeReward(), fakeReward(), reward, fakeReward());
+            rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
+
+            invoice = Invoice.of(companyBillingProfile, 1, userId)
+                    .rewards(rewards)
+                    .status(Invoice.Status.APPROVED);
+            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
+            when(invoiceStoragePort.get(reward.invoiceId())).thenReturn(Optional.of(invoice));
+
+            when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
+                    BillingProfileView.builder()
+                            .id(billingProfileId)
+                            .type(BillingProfile.Type.INDIVIDUAL)
+                            .kyc(newKyc(billingProfileId, userId))
+                            .payoutInfo(payoutInfo)
+                            .verificationStatus(VerificationStatus.VERIFIED)
+                            .build())
+            );
+            when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(42);
+            when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
+                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, null, null, BillingProfile.Id.random())).toList());
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Some rewards are not associated with billing profile %s".formatted(billingProfileId));
         }
 
         @Test
@@ -252,6 +379,21 @@ class BillingProfileServiceTest {
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Invoice %s not found for billing profile %s".formatted(invoice.id(), billingProfileId));
+        }
+
+        @Test
+        void should_prevent_invoice_upload_if_not_a_draft() {
+            // Given
+            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+                    .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).invoiceMandateAcceptedAt(ZonedDateTime.now().minusDays(1)).build()));
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice.status(REJECTED)));
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Invoice %s is not in DRAFT status".formatted(invoice.id()));
         }
 
         @Test
@@ -286,6 +428,72 @@ class BillingProfileServiceTest {
                     .hasMessage("Invoice %s not found for billing profile %s".formatted(invoice.id(), otherBillingProfileId));
         }
 
+        @Test
+        void should_prevent_invoice_upload_when_a_reward_was_cancelled() {
+            // Given
+            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+                    .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).invoiceMandateAcceptedAt(ZonedDateTime.now().minusDays(1)).build()));
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
+            when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(List.of(new RewardAssociations(rewardIds.get(0),
+                    RewardStatus.PENDING_REQUEST, invoice.id(), Invoice.Status.DRAFT, billingProfileId)));
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Some invoice's rewards were not found (invoice %s). This may happen if a reward was cancelled in the meantime.".formatted(invoice.id()));
+        }
+
+        @Test
+        void should_prevent_invoice_upload_when_reward_invoice_id_does_not_match() {
+            // Given
+            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+                    .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).invoiceMandateAcceptedAt(ZonedDateTime.now().minusDays(1)).build()));
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
+            when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
+                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, Invoice.Id.random(), Invoice.Status.DRAFT, billingProfileId)).toList());
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Some rewards are not associated with invoice %s".formatted(invoice.id()));
+        }
+
+        @Test
+        void should_prevent_invoice_upload_when_reward_billing_profile_id_does_not_match() {
+            // Given
+            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+                    .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).invoiceMandateAcceptedAt(ZonedDateTime.now().minusDays(1)).build()));
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
+            when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
+                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, invoice.id(), Invoice.Status.DRAFT, BillingProfile.Id.random())).toList());
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Some rewards are not associated with billing profile %s".formatted(billingProfileId));
+        }
+
+
+        @Test
+        void should_prevent_external_invoice_upload_if_not_a_draft() {
+            // Given
+            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+                    .id(billingProfileId).type(BillingProfile.Type.SELF_EMPLOYED).build()));
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice.status(REJECTED)));
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Invoice %s is not in DRAFT status".formatted(invoice.id()));
+        }
 
         @Test
         void should_prevent_external_invoice_upload_if_billing_profile_does_not_match() {
@@ -316,6 +524,58 @@ class BillingProfileServiceTest {
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Cannot upload an invoice on a disabled billing profile %s".formatted(otherBillingProfileId));
+        }
+
+
+        @Test
+        void should_prevent_external_invoice_upload_when_a_reward_was_cancelled() {
+            // Given
+            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+                    .id(billingProfileId).type(BillingProfile.Type.SELF_EMPLOYED).build()));
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
+            when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(List.of(new RewardAssociations(rewardIds.get(0),
+                    RewardStatus.PENDING_REQUEST, invoice.id(), Invoice.Status.DRAFT, billingProfileId)));
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Some invoice's rewards were not found (invoice %s). This may happen if a reward was cancelled in the meantime.".formatted(invoice.id()));
+        }
+
+        @Test
+        void should_prevent_external_invoice_upload_when_reward_invoice_id_does_not_match() {
+            // Given
+            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+                    .id(billingProfileId).type(BillingProfile.Type.SELF_EMPLOYED).build()));
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
+            when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
+                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, Invoice.Id.random(), Invoice.Status.DRAFT, billingProfileId)).toList());
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Some rewards are not associated with invoice %s".formatted(invoice.id()));
+        }
+
+        @Test
+        void should_prevent_external_invoice_upload_when_reward_billing_profile_id_does_not_match() {
+            // Given
+            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+                    .id(billingProfileId).type(BillingProfile.Type.SELF_EMPLOYED).build()));
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
+            when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
+                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, invoice.id(), Invoice.Status.DRAFT, BillingProfile.Id.random())).toList());
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Some rewards are not associated with billing profile %s".formatted(billingProfileId));
         }
 
         @SneakyThrows
@@ -418,6 +678,8 @@ class BillingProfileServiceTest {
                 final var url = new URL("https://" + faker.internet().url());
                 when(pdfStoragePort.upload(invoice.id() + ".pdf", pdf)).thenReturn(url);
                 when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
+                when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
+                        .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, invoice.id(), Invoice.Status.DRAFT, billingProfileId)).toList());
 
                 // When
                 billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf);
@@ -459,6 +721,8 @@ class BillingProfileServiceTest {
                 final var url = new URL("https://" + faker.internet().url());
                 when(pdfStoragePort.upload(invoice.id() + ".pdf", pdf)).thenReturn(url);
                 when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
+                when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
+                        .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, invoice.id(), Invoice.Status.DRAFT, billingProfileId)).toList());
 
                 // When
                 billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf);
