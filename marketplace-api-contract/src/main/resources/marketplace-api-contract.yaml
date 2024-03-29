@@ -3889,15 +3889,7 @@ components:
         pendingRequestCount:
           type: integer
           description: Number of rewards at pending request status
-    MyRewardsListResponse:
-      type: object
-      required:
-        - rewards
-      properties:
-        rewards:
-          type: array
-          items:
-            $ref: '#/components/schemas/MyRewardPageItemResponse'
+
     RewardPageItemResponse:
       type: object
       required:
