@@ -28,27 +28,27 @@ public class AccountBookAggregate implements AccountBook {
     }
 
     @Override
-    public void mint(AccountId account, PositiveAmount amount) {
+    public synchronized void mint(AccountId account, PositiveAmount amount) {
         emit(new MintEvent(account, amount));
     }
 
     @Override
-    public Collection<Transaction> burn(AccountId account, PositiveAmount amount) {
+    public synchronized Collection<Transaction> burn(AccountId account, PositiveAmount amount) {
         return emit(new BurnEvent(account, amount));
     }
 
     @Override
-    public void transfer(AccountId from, AccountId to, PositiveAmount amount) {
+    public synchronized void transfer(AccountId from, AccountId to, PositiveAmount amount) {
         emit(new TransferEvent(from, to, amount));
     }
 
     @Override
-    public void refund(AccountId from, AccountId to, PositiveAmount amount) {
+    public synchronized void refund(AccountId from, AccountId to, PositiveAmount amount) {
         emit(new RefundEvent(from, to, amount));
     }
 
     @Override
-    public Set<AccountId> refund(AccountId from) {
+    public synchronized Set<AccountId> refund(AccountId from) {
         return emit(new FullRefundEvent(from));
     }
 
@@ -57,15 +57,15 @@ public class AccountBookAggregate implements AccountBook {
     }
 
 
-    public List<IdentifiedAccountBookEvent> pendingEvents() {
+    public synchronized List<IdentifiedAccountBookEvent> pendingEvents() {
         return List.copyOf(pendingEvents);
     }
 
-    public void clearPendingEvents() {
+    public synchronized void clearPendingEvents() {
         pendingEvents.clear();
     }
 
-    public void receive(Collection<IdentifiedAccountBookEvent> events) {
+    public synchronized void receive(Collection<IdentifiedAccountBookEvent> events) {
         events.forEach(this::receive);
     }
 
@@ -83,11 +83,11 @@ public class AccountBookAggregate implements AccountBook {
         return state.accept(event);
     }
 
-    private void incrementEventId() {
+    private synchronized void incrementEventId() {
         ++lastEventId;
     }
 
-    public long nextEventId() {
+    public synchronized long nextEventId() {
         return lastEventId + 1;
     }
 

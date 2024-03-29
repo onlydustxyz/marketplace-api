@@ -43,12 +43,12 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
     }
 
     @Override
-    public void mint(@NonNull final AccountId account, @NonNull final PositiveAmount amount) {
+    public synchronized void mint(@NonNull final AccountId account, @NonNull final PositiveAmount amount) {
         createTransaction(root, account, amount);
     }
 
     @Override
-    public List<Transaction> burn(@NonNull final AccountId account, @NonNull final PositiveAmount amount) {
+    public synchronized List<Transaction> burn(@NonNull final AccountId account, @NonNull final PositiveAmount amount) {
         checkAccountsAreNotTheSame(account, ROOT);
         final var unspentVertices = unspentVerticesOf(account);
         try {
@@ -59,7 +59,7 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
     }
 
     @Override
-    public void transfer(@NonNull final AccountId from, @NonNull final AccountId to, @NonNull final PositiveAmount amount) {
+    public synchronized void transfer(@NonNull final AccountId from, @NonNull final AccountId to, @NonNull final PositiveAmount amount) {
         checkAccountsAreNotTheSame(from, to);
         final var unspentVertices = unspentVerticesOf(from);
         try {
@@ -70,7 +70,7 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
     }
 
     @Override
-    public void refund(@NonNull final AccountId from, @NonNull final AccountId to, @NonNull final PositiveAmount amount) {
+    public synchronized void refund(@NonNull final AccountId from, @NonNull final AccountId to, @NonNull final PositiveAmount amount) {
         checkAccountsAreNotTheSame(from, to);
         final var unspentVertices = unspentVerticesOf(from, to);
         try {
@@ -81,7 +81,7 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
     }
 
     @Override
-    public Set<AccountId> refund(@NonNull final AccountId from) {
+    public synchronized Set<AccountId> refund(@NonNull final AccountId from) {
         final var vertices = accountVertices(from);
         if (vertices.stream().anyMatch(v -> !graph.outgoingEdgesOf(v).isEmpty())) {
             throw badRequest("Cannot entirely refund %s because it has outgoing transactions".formatted(from));
@@ -94,37 +94,37 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
     }
 
     @Override
-    public @NonNull PositiveAmount balanceOf(@NonNull final AccountId account) {
+    public synchronized @NonNull PositiveAmount balanceOf(@NonNull final AccountId account) {
         final var unspentVertices = unspentVerticesOf(account);
         return unspentVertices.stream().map(VertexWithBalance::balance).reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
     @Override
-    public @NonNull PositiveAmount amountReceivedBy(@NonNull final AccountId account) {
+    public synchronized @NonNull PositiveAmount amountReceivedBy(@NonNull final AccountId account) {
         return accountVertices(account).stream()
                 .map(v -> incomingEdgeOf(v).amount).reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
     @Override
-    public @NonNull PositiveAmount refundableBalance(@NonNull AccountId from, @NonNull AccountId to) {
+    public synchronized @NonNull PositiveAmount refundableBalance(@NonNull AccountId from, @NonNull AccountId to) {
         final var unspentVertices = unspentVerticesOf(from, to);
         return unspentVertices.stream().map(VertexWithBalance::balance).reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
     @Override
-    public @NonNull PositiveAmount transferredAmount(@NonNull AccountId from, @NonNull AccountId to) {
+    public synchronized @NonNull PositiveAmount transferredAmount(@NonNull AccountId from, @NonNull AccountId to) {
         return accountVertices(to).stream()
                 .filter(v -> hasParent(v, from))
                 .map(v -> incomingEdgeOf(v).amount).reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
     @Override
-    public boolean hasParent(@NonNull AccountId to, @NonNull Collection<AccountId> from) {
+    public synchronized boolean hasParent(@NonNull AccountId to, @NonNull Collection<AccountId> from) {
         return accountVertices(to).stream().anyMatch(v -> from.stream().anyMatch(f -> hasParent(v, f)));
     }
 
     @Override
-    public @NonNull List<Transaction> transactionsFrom(@NonNull AccountId from) {
+    public synchronized @NonNull List<Transaction> transactionsFrom(@NonNull AccountId from) {
         final var startVertices = accountVertices(from);
         final Map<FromTo, PositiveAmount> aggregatedAmounts = new HashMap<>();
 
@@ -133,7 +133,7 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
     }
 
     @Override
-    public @NonNull List<Transaction> transactionsTo(@NonNull AccountId to) {
+    public synchronized @NonNull List<Transaction> transactionsTo(@NonNull AccountId to) {
         final var startVertices = accountVertices(to);
         final Map<FromTo, PositiveAmount> aggregatedAmounts = new HashMap<>();
 
@@ -142,7 +142,7 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
     }
 
     @Override
-    public @NonNull Map<AccountId, PositiveAmount> transferredAmountPerOrigin(@NonNull AccountId to) {
+    public synchronized @NonNull Map<AccountId, PositiveAmount> transferredAmountPerOrigin(@NonNull AccountId to) {
         return accountVertices(to).stream()
                 .map(v -> new Transaction(source(v).accountId, to, incomingEdgeOf(v).amount))
                 .collect(Collectors.groupingBy(Transaction::from,
@@ -152,7 +152,7 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
     }
 
     @Override
-    public @NonNull Map<AccountId, PositiveAmount> balancePerOrigin(@NonNull AccountId to) {
+    public synchronized @NonNull Map<AccountId, PositiveAmount> balancePerOrigin(@NonNull AccountId to) {
         return accountVertices(to).stream()
                 .map(v -> new Transaction(source(v).accountId, to, balanceOf(v)))
                 .collect(Collectors.groupingBy(Transaction::from,
@@ -251,7 +251,7 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
 
     @Override
     @NotNull
-    public Map<AccountId, PositiveAmount> unspentChildren(@NotNull AccountId of) {
+    public synchronized Map<AccountId, PositiveAmount> unspentChildren(@NotNull AccountId of) {
         return accountVertices(of).stream()
                 .flatMap(v -> unspentChildren(v).entrySet().stream())
                 .collect(Collectors.groupingBy(e -> e.getKey().accountId,
@@ -262,7 +262,7 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
 
     @Override
     @NotNull
-    public Map<AccountId, PositiveAmount> unspentChildren() {
+    public synchronized Map<AccountId, PositiveAmount> unspentChildren() {
         return unspentChildren(ROOT);
     }
 
@@ -338,12 +338,12 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
     }
 
     @Override
-    public <R> R accept(Visitor<AccountBookState, R> visitor) {
+    public synchronized <R> R accept(Visitor<AccountBookState, R> visitor) {
         return visitor.visit(this);
     }
 
     @Override
-    public void export(@NotNull Exporter exporter) {
+    public synchronized void export(@NotNull Exporter exporter) {
         exporter.export(this);
     }
 
