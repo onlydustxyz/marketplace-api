@@ -106,7 +106,7 @@ public class NewAccountingMigration implements CommandLineRunner {
         final var recipient = userViewRepository.findByGithubUserId(recipientId);
 
         if (recipient.isPresent()) {
-            final var billingProfile = billingProfileRepository.findBillingProfilesForUserId(recipient.get().getId()).stream().findFirst();
+            final var billingProfile = billingProfileRepository.findBillingProfilesForUserId(recipient.get().id()).stream().findFirst();
 
             if (billingProfile.isPresent()) {
                 if (billingProfile.get().getKyb() != null && billingProfile.get().getKyb().name() != null)
@@ -116,7 +116,7 @@ public class NewAccountingMigration implements CommandLineRunner {
                     return billingProfile.get().getKyc().getFirstName() + " " + billingProfile.get().getKyc().getLastName();
             }
 
-            return recipient.get().getGithubLogin();
+            return recipient.get().login();
         }
 
         return recipientId.toString();

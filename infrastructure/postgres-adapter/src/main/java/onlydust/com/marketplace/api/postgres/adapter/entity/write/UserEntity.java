@@ -37,26 +37,22 @@ import java.util.UUID;
 public class UserEntity {
 
     @Id
-    @Column(name = "id", nullable = false)
     UUID id;
-    @Column(name = "github_user_id", nullable = false)
     Long githubUserId;
-    @Column(name = "github_login", nullable = false)
     String githubLogin;
-    @Column(name = "github_avatar_url", nullable = false)
     String githubAvatarUrl;
     @Column(name = "email", nullable = false)
     String githubEmail;
     @Type(type = "user_role[]")
-    @Column(name = "roles", nullable = false, columnDefinition = "iam.user_role[]")
+    @Column(nullable = false, columnDefinition = "iam.user_role[]")
     UserRole[] roles;
-    @Column(name = "last_seen_at", nullable = false)
     private Date lastSeenAt;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     @EqualsAndHashCode.Exclude
     private Date createdAt;
+
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     @EqualsAndHashCode.Exclude

@@ -65,11 +65,11 @@ public class BillingProfileUserEntity {
 
     public BillingProfileView.User toView() {
         return new BillingProfileView.User(
-                UserId.of(user.getId()),
-                GithubUserId.of(user.getGithubUserId()),
-                user.getGithubLogin(),
-                URI.create(user.getGithubAvatarUrl()),
-                user.getGithubEmail());
+                UserId.of(user.id()),
+                GithubUserId.of(user.githubUserId()),
+                user.login(),
+                URI.create(user.avatarUrl()),
+                user.githubEmail());
     }
 
     public BillingProfileLinkView toBillingProfileLinkView() {

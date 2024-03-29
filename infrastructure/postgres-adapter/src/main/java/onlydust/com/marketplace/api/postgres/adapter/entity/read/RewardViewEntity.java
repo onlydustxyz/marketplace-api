@@ -33,8 +33,8 @@ public class RewardViewEntity {
     @NonNull UserViewEntity requestor;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recipientId", referencedColumnName = "github_user_id")
-    @NonNull UserViewEntity recipient;
+    @JoinColumn(name = "recipientId", referencedColumnName = "githubUserId")
+    @NonNull AllUserViewEntity recipient;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "billingProfileId")
@@ -94,27 +94,27 @@ public class RewardViewEntity {
                         .dollarsEquivalent(statusData.amountUsdEquivalent())
                         .build())
                 .numberOfRewardedContributions(rewardItems.size())
-                .recipientAvatarUrl(recipient.githubAvatarUrl)
-                .recipientId(recipient.githubUserId)
-                .recipientLogin(recipient.githubLogin)
+                .recipientAvatarUrl(recipient.avatarUrl())
+                .recipientId(recipient.githubUserId())
+                .recipientLogin(recipient.login())
                 .billingProfileId(billingProfile.getId())
                 .build();
     }
 
     private ContributorLinkView to() {
         return ContributorLinkView.builder()
-                .avatarUrl(recipient.githubAvatarUrl)
-                .login(recipient.githubLogin)
-                .githubUserId(recipient.githubUserId)
-                .isRegistered(recipient.id != null)
+                .avatarUrl(recipient.avatarUrl())
+                .login(recipient.login())
+                .githubUserId(recipient.githubUserId())
+                .isRegistered(recipient.isRegistered())
                 .build();
     }
 
     private ContributorLinkView from() {
         return ContributorLinkView.builder()
-                .githubUserId(requestor.githubUserId)
-                .login(requestor.githubLogin)
-                .avatarUrl(requestor.githubAvatarUrl)
+                .githubUserId(requestor.githubUserId())
+                .login(requestor.login())
+                .avatarUrl(requestor.avatarUrl())
                 .isRegistered(true)
                 .build();
     }

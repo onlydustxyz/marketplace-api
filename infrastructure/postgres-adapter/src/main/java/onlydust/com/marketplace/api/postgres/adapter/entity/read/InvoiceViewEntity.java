@@ -59,13 +59,13 @@ public class InvoiceViewEntity {
     @NonNull
     private UserView getCreatedBy() {
         return new UserView(
-                createdBy.getGithubUserId(),
-                createdBy.getGithubLogin(),
-                URI.create(createdBy.getGithubAvatarUrl()),
-                createdBy.getGithubEmail(),
-                UserId.of(createdBy.getId()),
-                createdBy.getProfile() == null ? createdBy.getGithubLogin() :
-                        createdBy.getProfile().getFirstName() + " " + createdBy.getProfile().getLastName());
+                createdBy.githubUserId(),
+                createdBy.login(),
+                URI.create(createdBy.avatarUrl()),
+                createdBy.githubEmail(),
+                UserId.of(createdBy.id()),
+                createdBy.profile() == null ? createdBy.login() :
+                        createdBy.profile().getFirstName() + " " + createdBy.profile().getLastName());
     }
 
     public InvoiceView toView() {

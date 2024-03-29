@@ -393,7 +393,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "createdBy": {
                             "githubUserId": 595505,
                             "githubLogin": "ofux",
-                            "githubAvatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4",
+                            "githubAvatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                             "email": "olivier.fuxet@gmail.com",
                             "id": "e461c019-ba23-4671-9b6c-3a5a18748af9",
                             "name": "Olivier Fuxet"

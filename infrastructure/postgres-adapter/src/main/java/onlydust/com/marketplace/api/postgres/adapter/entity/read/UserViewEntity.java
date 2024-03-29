@@ -4,6 +4,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import com.vladmihalcea.hibernate.type.array.EnumArrayType;
 import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
 import lombok.*;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserProfileInfoEntity;
 import onlydust.com.marketplace.project.domain.model.UserRole;
@@ -20,9 +21,9 @@ import java.util.UUID;
 
 @Entity
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Data
+@Value
 @Builder(toBuilder = true)
 @Table(name = "users", schema = "iam")
 @EntityListeners(AuditingEntityListener.class)
@@ -37,35 +38,48 @@ import java.util.UUID;
                 )
         }
 )
+@Accessors(fluent = true)
 public class UserViewEntity implements Serializable {
-
     @Id
     @Column(name = "id", nullable = false)
     UUID id;
-    @Column(name = "github_user_id", nullable = false)
     Long githubUserId;
-    @Column(name = "github_login", nullable = false)
+
+    @Getter(AccessLevel.NONE)
     String githubLogin;
-    @Column(name = "github_avatar_url", nullable = false)
+    @Getter(AccessLevel.NONE)
     String githubAvatarUrl;
+
     @Column(name = "email", nullable = false)
     String githubEmail;
     @Type(type = "user_role[]")
     @Column(name = "roles", nullable = false, columnDefinition = "iam.user_role[]")
     UserRole[] roles;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id", referencedColumnName = "user_id", insertable = false, updatable = false)
-    private OnboardingEntity onboarding;
+    OnboardingEntity onboarding;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
-    private UserProfileInfoEntity profile;
+    UserProfileInfoEntity profile;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "githubUserId", referencedColumnName = "githubUserId", insertable = false, updatable = false)
+    @NonNull AllUserViewEntity allUserView;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    private Date createdAt;
+    Date createdAt;
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
-    private Date updatedAt;
+    Date updatedAt;
+
+    public String login() {
+        return allUserView.login();
+    }
+
+    public String avatarUrl() {
+        return allUserView.avatarUrl();
+    }
 }

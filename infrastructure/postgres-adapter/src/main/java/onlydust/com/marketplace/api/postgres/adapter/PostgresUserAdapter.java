@@ -70,14 +70,14 @@ public class PostgresUserAdapter implements UserStoragePort {
     }
 
     private User getUserDetails(@NotNull UserViewEntity user) {
-        final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(user.getId()).stream()
+        final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(user.id()).stream()
                 .sorted(Comparator.comparing(ProjectLedIdViewEntity::getProjectSlug))
                 .toList();
-        final var applications = applicationRepository.findAllByApplicantId(user.getId());
-        final var billingProfiles = billingProfileUserRepository.findByUserId(user.getId()).stream()
+        final var applications = applicationRepository.findAllByApplicantId(user.id());
+        final var billingProfiles = billingProfileUserRepository.findByUserId(user.id()).stream()
                 .map(BillingProfileUserEntity::toBillingProfileLinkView)
                 .toList();
-        final var hasAnyRewardPendingBillingProfile = rewardViewRepository.existsPendingBillingProfileByRecipientId(user.getGithubUserId());
+        final var hasAnyRewardPendingBillingProfile = rewardViewRepository.existsPendingBillingProfileByRecipientId(user.githubUserId());
         return mapUserToDomain(user, globalSettingsRepository.get().getTermsAndConditionsLatestVersionDate(),
                 projectLedIdsByUserId, applications, billingProfiles, hasAnyRewardPendingBillingProfile);
     }
