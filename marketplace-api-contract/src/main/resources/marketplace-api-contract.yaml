@@ -2940,7 +2940,6 @@ components:
       required:
         - githubUserId
         - login
-        - htmlUrl
         - avatarUrl
       properties:
         githubUserId:
@@ -2949,9 +2948,6 @@ components:
           type: string
           description: User's Github login
           example: ofux
-        htmlUrl:
-          type: string
-          format: uri
         avatarUrl:
           type: string
           format: url
@@ -3125,6 +3121,9 @@ components:
           properties:
             id:
               $ref: '#/components/schemas/UserId'
+            htmlUrl:
+              type: string
+              format: uri
             location:
               type: string
               description: User location as in Github profile
@@ -3713,6 +3712,9 @@ components:
             name:
               type: string
               example: OnlyDust
+            htmlUrl:
+              type: string
+              format: uri
             repos:
               type: array
               description: Github repos linked to installed organization

@@ -55,7 +55,6 @@ public class RewardableItemViewEntity {
     String githubBody;
     Long githubAuthorId;
     String githubAuthorLogin;
-    String githubAuthorHtmlUrl;
     String githubAuthorAvatarUrl;
 
     public enum ContributionType {

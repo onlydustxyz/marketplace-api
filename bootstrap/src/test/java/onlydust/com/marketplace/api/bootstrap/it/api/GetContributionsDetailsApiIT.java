@@ -73,7 +73,6 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                           "contributor": {
                             "githubUserId": 43467246,
                             "login": "AnthonyBuisset",
-                            "htmlUrl": "https://github.com/AnthonyBuisset",
                             "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                             "isRegistered": true
                           },
@@ -87,7 +86,6 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                           "githubAuthor": {
                             "githubUserId": 34384633,
                             "login": "tdelabro",
-                            "htmlUrl": "https://github.com/tdelabro",
                             "avatarUrl": "https://avatars.githubusercontent.com/u/34384633?v=4"
                           },
                           "githubNumber": 62,
@@ -311,7 +309,6 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                           "contributor": {
                             "githubUserId": 43467246,
                             "login": "AnthonyBuisset",
-                            "htmlUrl": "https://github.com/AnthonyBuisset",
                             "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                             "isRegistered": true
                           },
@@ -325,7 +322,6 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                           "githubAuthor": {
                             "githubUserId": 43467246,
                             "login": "AnthonyBuisset",
-                            "htmlUrl": "https://github.com/AnthonyBuisset",
                             "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
                           },
                           "githubNumber": 17,
@@ -360,7 +356,6 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "githubAuthor": {
                                 "githubUserId": 26416205,
                                 "login": "internnos",
-                                "htmlUrl": "https://github.com/internnos",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/26416205?v=4"
                               },
                               "githubNumber": 17,

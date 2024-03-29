@@ -3,14 +3,14 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import lombok.EqualsAndHashCode;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.project.domain.model.ContributionStatus;
 import onlydust.com.marketplace.project.domain.model.ContributionType;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
@@ -100,7 +100,6 @@ public class ContributionViewEntity {
         final var author = ContributorLinkView.builder()
                 .githubUserId(githubAuthorId)
                 .login(githubAuthorLogin)
-                .url(githubAuthorHtmlUrl)
                 .avatarUrl(githubAuthorAvatarUrl)
                 .build();
 
@@ -114,7 +113,6 @@ public class ContributionViewEntity {
                 .contributor(ContributorLinkView.builder()
                         .githubUserId(contributorId)
                         .login(contributorLogin)
-                        .url(contributorHtmlUrl)
                         .avatarUrl(contributorAvatarUrl)
                         .isRegistered(contributorIsRegistered)
                         .build())

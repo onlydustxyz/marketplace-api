@@ -1,8 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
@@ -36,7 +34,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                               "contributor": {
                                 "githubUserId": 143011364,
                                 "login": "pixelfact",
-                                "htmlUrl": "https://github.com/pixelfact",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
                                 "isRegistered": false
                               },
@@ -61,7 +58,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                               "contributor": {
                                 "githubUserId": 5160414,
                                 "login": "haydencleary",
-                                "htmlUrl": "https://github.com/haydencleary",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
                                 "isRegistered": true
                               },
@@ -86,7 +82,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                               "contributor": {
                                 "githubUserId": 143011364,
                                 "login": "pixelfact",
-                                "htmlUrl": "https://github.com/pixelfact",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
                                 "isRegistered": false
                               },
@@ -111,7 +106,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                               "contributor": {
                                 "githubUserId": 17259618,
                                 "login": "alexbeno",
-                                "htmlUrl": "https://github.com/alexbeno",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
                                 "isRegistered": false
                               },
@@ -136,7 +130,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                               "contributor": {
                                 "githubUserId": 5160414,
                                 "login": "haydencleary",
-                                "htmlUrl": "https://github.com/haydencleary",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
                                 "isRegistered": true
                               },
@@ -185,7 +178,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                             {
                               "githubUserId": 31901905,
                               "login": "kaelsky",
-                              "htmlUrl": "https://github.com/kaelsky",
                               "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
                               "isRegistered": true,
                               "cover": "CYAN",
@@ -204,7 +196,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                             {
                               "githubUserId": 143011364,
                               "login": "pixelfact",
-                              "htmlUrl": "https://github.com/pixelfact",
                               "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
                               "isRegistered": false,
                               "cover": "MAGENTA",
@@ -223,7 +214,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                             {
                               "githubUserId": 5160414,
                               "login": "haydencleary",
-                              "htmlUrl": "https://github.com/haydencleary",
                               "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
                               "isRegistered": true,
                               "cover": "BLUE",
@@ -242,7 +232,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                             {
                               "githubUserId": 17259618,
                               "login": "alexbeno",
-                              "htmlUrl": "https://github.com/alexbeno",
                               "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
                               "isRegistered": false,
                               "cover": "BLUE",
@@ -261,7 +250,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                             {
                               "githubUserId": 21149076,
                               "login": "oscarwroche",
-                              "htmlUrl": "https://github.com/oscarwroche",
                               "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
                               "isRegistered": true,
                               "cover": "CYAN",
@@ -306,7 +294,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                              {
                                "githubUserId": 17259618,
                                "login": "alexbeno",
-                               "htmlUrl": "https://github.com/alexbeno",
                                "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
                                "isRegistered": false,
                                "cover": "BLUE",
@@ -317,7 +304,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                              {
                                "githubUserId": 143011364,
                                "login": "pixelfact",
-                               "htmlUrl": "https://github.com/pixelfact",
                                "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
                                "isRegistered": false,
                                "cover": "MAGENTA",
@@ -328,7 +314,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                              {
                                "githubUserId": 5160414,
                                "login": "haydencleary",
-                               "htmlUrl": "https://github.com/haydencleary",
                                "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
                                "isRegistered": true,
                                "cover": "BLUE",
@@ -339,7 +324,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                              {
                                "githubUserId": 31901905,
                                "login": "kaelsky",
-                               "htmlUrl": "https://github.com/kaelsky",
                                "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
                                "isRegistered": true,
                                "cover": "CYAN",
@@ -350,7 +334,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                              {
                                "githubUserId": 16590657,
                                "login": "PierreOucif",
-                               "htmlUrl": "https://github.com/PierreOucif",
                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                "isRegistered": true,
                                "cover": "CYAN",
@@ -390,7 +373,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                              {
                                "githubUserId": 43467246,
                                "login": "AnthonyBuisset",
-                               "htmlUrl": "https://github.com/AnthonyBuisset",
                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
                                "isRegistered": true,
                                "completedPullRequestCount": 504,
@@ -400,7 +382,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                              {
                                "githubUserId": 595505,
                                "login": "ofux",
-                               "htmlUrl": "https://github.com/ofux",
                                "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4",
                                "isRegistered": true,
                                "completedPullRequestCount": 248,
@@ -410,7 +391,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                              {
                                "githubUserId": 4435377,
                                "login": "Bernardstanislas",
-                               "htmlUrl": "https://github.com/Bernardstanislas",
                                "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4",
                                "isRegistered": true,
                                "completedPullRequestCount": 116,
@@ -420,7 +400,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                              {
                                "githubUserId": 21149076,
                                "login": "oscarwroche",
-                               "htmlUrl": "https://github.com/oscarwroche",
                                "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
                                "isRegistered": true,
                                "completedPullRequestCount": 117,
@@ -430,7 +409,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                              {
                                "githubUserId": 16590657,
                                "login": "PierreOucif",
-                               "htmlUrl": "https://github.com/PierreOucif",
                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                "isRegistered": true,
                                "completedPullRequestCount": 30,
@@ -440,7 +418,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                              {
                                "githubUserId": 34384633,
                                "login": "tdelabro",
-                               "htmlUrl": "https://github.com/tdelabro",
                                "avatarUrl": "https://avatars.githubusercontent.com/u/34384633?v=4",
                                "isRegistered": false,
                                "completedPullRequestCount": 107,
@@ -450,7 +427,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                              {
                                "githubUserId": 5160414,
                                "login": "haydencleary",
-                               "htmlUrl": "https://github.com/haydencleary",
                                "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
                                "isRegistered": true,
                                "completedPullRequestCount": 57,
@@ -460,7 +436,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                              {
                                "githubUserId": 31901905,
                                "login": "kaelsky",
-                               "htmlUrl": "https://github.com/kaelsky",
                                "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
                                "isRegistered": true,
                                "completedPullRequestCount": 88,
@@ -470,7 +445,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                              {
                                "githubUserId": 17259618,
                                "login": "alexbeno",
-                               "htmlUrl": "https://github.com/alexbeno",
                                "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
                                "isRegistered": false,
                                "completedPullRequestCount": 78,
@@ -480,7 +454,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                              {
                                "githubUserId": 143011364,
                                "login": "pixelfact",
-                               "htmlUrl": "https://github.com/pixelfact",
                                "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
                                "isRegistered": false,
                                "completedPullRequestCount": 55,

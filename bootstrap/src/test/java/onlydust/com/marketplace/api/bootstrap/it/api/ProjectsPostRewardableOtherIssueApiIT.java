@@ -93,7 +93,6 @@ public class ProjectsPostRewardableOtherIssueApiIT extends AbstractMarketplaceAp
                           "author": {
                             "githubUserId": 34384633,
                             "login": "tdelabro",
-                            "htmlUrl": "https://github.com/tdelabro",
                             "avatarUrl": "https://avatars.githubusercontent.com/u/34384633?v=4"
                           },
                           "repoName": "starklings",
@@ -105,7 +104,7 @@ public class ProjectsPostRewardableOtherIssueApiIT extends AbstractMarketplaceAp
                           "status": "COMPLETED",
                           "ignored": false,
                           "htmlUrl": "https://github.com/onlydustxyz/starklings/issues/100"
-                        }                        
+                        }
                         """);
     }
 }

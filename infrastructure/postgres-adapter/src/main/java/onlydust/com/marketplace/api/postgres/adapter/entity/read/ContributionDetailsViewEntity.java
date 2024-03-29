@@ -3,15 +3,14 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import lombok.EqualsAndHashCode;
-import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.project.domain.model.ContributionStatus;
 import onlydust.com.marketplace.project.domain.model.ContributionType;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.view.ContributionDetailsView;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
@@ -47,7 +46,6 @@ public class ContributionDetailsViewEntity {
     String githubBody;
     Long githubAuthorId;
     String githubAuthorLogin;
-    String githubAuthorHtmlUrl;
     String githubAuthorAvatarUrl;
     Integer githubCommentsCount;
     Integer githubCommitsCount;
@@ -70,7 +68,6 @@ public class ContributionDetailsViewEntity {
 
     String contributorLogin;
     String contributorAvatarUrl;
-    String contributorHtmlUrl;
     Long contributorId;
     Boolean contributorIsRegistered;
 
@@ -90,7 +87,6 @@ public class ContributionDetailsViewEntity {
     public ContributionDetailsView toView() {
         final var contributor = ContributorLinkView.builder()
                 .login(contributorLogin)
-                .url(contributorHtmlUrl)
                 .avatarUrl(contributorAvatarUrl)
                 .githubUserId(contributorId)
                 .isRegistered(contributorIsRegistered)
@@ -115,7 +111,6 @@ public class ContributionDetailsViewEntity {
         final var author = ContributorLinkView.builder()
                 .githubUserId(githubAuthorId)
                 .login(githubAuthorLogin)
-                .url(githubAuthorHtmlUrl)
                 .avatarUrl(githubAuthorAvatarUrl)
                 .build();
 

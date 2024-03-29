@@ -95,7 +95,6 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "author": {
                                 "githubUserId": 16590657,
                                 "login": "PierreOucif",
-                                "htmlUrl": "https://github.com/PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
                               },
                               "repoName": "marketplace-frontend",
@@ -119,7 +118,6 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "author": {
                                 "githubUserId": 16590657,
                                 "login": "PierreOucif",
-                                "htmlUrl": "https://github.com/PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
                               },
                               "repoName": "marketplace-frontend",
@@ -143,7 +141,6 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "author": {
                                 "githubUserId": 16590657,
                                 "login": "PierreOucif",
-                                "htmlUrl": "https://github.com/PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
                               },
                               "repoName": "marketplace-frontend",
@@ -167,7 +164,6 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "author": {
                                 "githubUserId": 16590657,
                                 "login": "PierreOucif",
-                                "htmlUrl": "https://github.com/PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
                               },
                               "repoName": "marketplace-frontend",
@@ -191,7 +187,6 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "author": {
                                 "githubUserId": 16590657,
                                 "login": "PierreOucif",
-                                "htmlUrl": "https://github.com/PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
                               },
                               "repoName": "marketplace-frontend",
@@ -215,7 +210,6 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "author": {
                                 "githubUserId": 16590657,
                                 "login": "PierreOucif",
-                                "htmlUrl": "https://github.com/PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
                               },
                               "repoName": "marketplace-frontend",
@@ -239,7 +233,6 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "author": {
                                 "githubUserId": 16590657,
                                 "login": "PierreOucif",
-                                "htmlUrl": "https://github.com/PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
                               },
                               "repoName": "marketplace-frontend",
@@ -263,7 +256,6 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "author": {
                                 "githubUserId": 16590657,
                                 "login": "PierreOucif",
-                                "htmlUrl": "https://github.com/PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
                               },
                               "repoName": "marketplace-frontend",
@@ -287,7 +279,6 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "author": {
                                 "githubUserId": 16590657,
                                 "login": "PierreOucif",
-                                "htmlUrl": "https://github.com/PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
                               },
                               "repoName": "marketplace-frontend",
@@ -311,7 +302,6 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "author": {
                                 "githubUserId": 16590657,
                                 "login": "PierreOucif",
-                                "htmlUrl": "https://github.com/PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
                               },
                               "repoName": "marketplace-frontend",
@@ -1820,7 +1810,6 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$..[?(@.contributionId=='72e253a8ea9fef3e9fee718f0b5c901efdbebb0fff8304cbf09f18066edd3e2f')].githubBody").isEqualTo( "IT test structure\nDocker container support\nFirst API integration test: create project")
                 .jsonPath("$..[?(@.contributionId=='72e253a8ea9fef3e9fee718f0b5c901efdbebb0fff8304cbf09f18066edd3e2f')].author.githubUserId").isEqualTo(16590657)
                 .jsonPath("$..[?(@.contributionId=='72e253a8ea9fef3e9fee718f0b5c901efdbebb0fff8304cbf09f18066edd3e2f')].author.login").isEqualTo("PierreOucif")
-                .jsonPath("$..[?(@.contributionId=='72e253a8ea9fef3e9fee718f0b5c901efdbebb0fff8304cbf09f18066edd3e2f')].author.htmlUrl").isEqualTo("https://github.com/PierreOucif")
                 .jsonPath("$..[?(@.contributionId=='72e253a8ea9fef3e9fee718f0b5c901efdbebb0fff8304cbf09f18066edd3e2f')].author.avatarUrl").isEqualTo("https://avatars.githubusercontent.com/u/16590657?v=4")
         ;
         // @formatter:on

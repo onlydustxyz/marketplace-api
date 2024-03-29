@@ -302,7 +302,6 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
                            "author": {
                              "githubUserId": 16590657,
                              "login": "PierreOucif",
-                             "htmlUrl": "https://github.com/PierreOucif",
                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
                            },
                            "repoName": "marketplace-frontend",

@@ -197,14 +197,12 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                           "from": {
                             "githubUserId": 16590657,
                             "login": "PierreOucif",
-                            "htmlUrl": "https://github.com/PierreOucif",
                             "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                             "isRegistered": true
                           },
                           "to": {
                             "githubUserId": 16590657,
                             "login": "PierreOucif",
-                            "htmlUrl": "https://github.com/PierreOucif",
                             "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                             "isRegistered": true
                           },

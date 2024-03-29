@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardableItemViewEntity;
 import onlydust.com.marketplace.project.domain.model.ContributionType;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.RewardableItemView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardableItemViewEntity;
 
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper.githubStatusToDomain;
 
@@ -33,7 +33,6 @@ public interface RewardableItemMapper {
                 .githubAuthor(ContributorLinkView.builder()
                         .githubUserId(rewardableItemViewEntity.getGithubAuthorId())
                         .login(rewardableItemViewEntity.getGithubAuthorLogin())
-                        .url(rewardableItemViewEntity.getGithubAuthorHtmlUrl())
                         .avatarUrl(rewardableItemViewEntity.getGithubAuthorAvatarUrl())
                         .build())
                 .build();

@@ -1,16 +1,14 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.project.domain.view.*;
+import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.view.ChurnedContributorView;
 import onlydust.com.marketplace.project.domain.view.ContributorActivityView;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.NewcomerView;
 import onlydust.com.marketplace.project.domain.view.UserProfileView.ProfileStats.ContributionStats;
-import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 
-import java.net.URI;
 import java.time.ZonedDateTime;
 import java.time.temporal.WeekFields;
 import java.util.stream.IntStream;
@@ -26,7 +24,6 @@ public interface ContributorMapper {
                 .githubUserId(contributorLinkView.getGithubUserId())
                 .login(contributorLinkView.getLogin())
                 .avatarUrl(contributorLinkView.getAvatarUrl())
-                .htmlUrl(URI.create(contributorLinkView.getUrl()))
                 .isRegistered(contributorLinkView.getIsRegistered());
     }
 
@@ -44,7 +41,6 @@ public interface ContributorMapper {
         return new ProjectChurnedContributorsPageItemResponse()
                 .githubUserId(contributor.getGithubId())
                 .login(contributor.getLogin())
-                .htmlUrl(contributor.getHtmlUrl() == null ? null : URI.create(contributor.getHtmlUrl()))
                 .avatarUrl(contributor.getAvatarUrl())
                 .isRegistered(contributor.getIsRegistered())
                 .cover(UserMapper.coverToUserProfileResponse(contributor.getCover()))
@@ -66,7 +62,6 @@ public interface ContributorMapper {
         return new ProjectNewcomersPageItemResponse()
                 .githubUserId(contributor.getGithubId())
                 .login(contributor.getLogin())
-                .htmlUrl(contributor.getHtmlUrl() == null ? null : URI.create(contributor.getHtmlUrl()))
                 .avatarUrl(contributor.getAvatarUrl())
                 .isRegistered(contributor.getIsRegistered())
                 .cover(UserMapper.coverToUserProfileResponse(contributor.getCover()))
@@ -109,7 +104,6 @@ public interface ContributorMapper {
         return new ProjectContributorActivityPageItemResponse()
                 .githubUserId(activity.getGithubId())
                 .login(activity.getLogin())
-                .htmlUrl(activity.getHtmlUrl() == null ? null : URI.create(activity.getHtmlUrl()))
                 .avatarUrl(activity.getAvatarUrl())
                 .isRegistered(activity.getIsRegistered())
                 .completedPullRequestCount(activity.getCompletedPullRequestCount())

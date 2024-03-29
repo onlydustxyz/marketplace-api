@@ -50,7 +50,6 @@ public class ContributionLinkViewEntity {
         final var author = ContributorLinkView.builder()
                 .githubUserId(githubAuthorId)
                 .login(githubAuthorLogin)
-                .url(githubAuthorHtmlUrl)
                 .avatarUrl(githubAuthorAvatarUrl)
                 .build();
 

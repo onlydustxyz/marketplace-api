@@ -64,7 +64,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                           "coworkers": [
                             {
                               "login": "foo.armstrong",
-                              "htmlUrl": null,
                               "avatarUrl": "https://www.plop.org",
                               "isRegistered": true,
                               "role": "ADMIN",
@@ -111,7 +110,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                           "coworkers": [
                             {
                               "login": "bar.armstrong",
-                              "htmlUrl": null,
                               "avatarUrl": "https://www.plop.org",
                               "isRegistered": true,
                               "role": "ADMIN",
@@ -157,7 +155,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                           "coworkers": [
                             {
                               "login": "boss.armstrong",
-                              "htmlUrl": null,
                               "avatarUrl": "https://www.plop.org",
                               "isRegistered": true,
                               "role": "ADMIN",
@@ -235,7 +232,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                           "coworkers": [
                             {
                               "login": "boss.armstrong",
-                              "htmlUrl": null,
                               "avatarUrl": "https://www.plop.org",
                               "isRegistered": true,
                               "role": "ADMIN",
@@ -244,7 +240,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                             {
                               "githubUserId": 123456789999,
                               "login": null,
-                              "htmlUrl": null,
                               "avatarUrl": null,
                               "isRegistered": false,
                               "role": "ADMIN",
@@ -301,7 +296,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                           "coworkers": [
                             {
                               "login": "boss.armstrong",
-                              "htmlUrl": null,
                               "avatarUrl": "https://www.plop.org",
                               "isRegistered": true,
                               "role": "ADMIN",
@@ -310,7 +304,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                             {
                               "githubUserId": 123456789999,
                               "login": null,
-                              "htmlUrl": null,
                               "avatarUrl": null,
                               "isRegistered": false,
                               "role": "ADMIN",
@@ -319,7 +312,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                             {
                               "githubUserId": 595505,
                               "login": "ofux",
-                              "htmlUrl": "https://github.com/ofux",
                               "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                               "isRegistered": true,
                               "id": "e461c019-ba23-4671-9b6c-3a5a18748af9",
@@ -388,7 +380,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                           "coworkers": [
                             {
                               "login": "boss.armstrong",
-                              "htmlUrl": null,
                               "avatarUrl": "https://www.plop.org",
                               "isRegistered": true,
                               "role": "ADMIN",
@@ -397,7 +388,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                             {
                               "githubUserId": 123456789999,
                               "login": null,
-                              "htmlUrl": null,
                               "avatarUrl": null,
                               "isRegistered": false,
                               "role": "ADMIN",
@@ -454,7 +444,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                           "coworkers": [
                             {
                               "login": "boss.armstrong",
-                              "htmlUrl": null,
                               "avatarUrl": "https://www.plop.org",
                               "isRegistered": true,
                               "role": "ADMIN",
@@ -463,7 +452,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                             {
                               "githubUserId": 123456789999,
                               "login": null,
-                              "htmlUrl": null,
                               "avatarUrl": null,
                               "isRegistered": false,
                               "role": "ADMIN",
@@ -472,7 +460,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                             {
                               "githubUserId": 595505,
                               "login": "ofux",
-                              "htmlUrl": "https://github.com/ofux",
                               "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                               "isRegistered": true,
                               "id": "e461c019-ba23-4671-9b6c-3a5a18748af9",
@@ -571,7 +558,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                           "coworkers": [
                             {
                               "login": "boss.armstrong",
-                              "htmlUrl": null,
                               "avatarUrl": "https://www.plop.org",
                               "isRegistered": true,
                               "role": "ADMIN",
@@ -580,7 +566,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                             {
                               "githubUserId": 595505,
                               "login": "ofux",
-                              "htmlUrl": "https://github.com/ofux",
                               "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                               "isRegistered": true,
                               "id": "e461c019-ba23-4671-9b6c-3a5a18748af9",
@@ -590,7 +575,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                             {
                               "githubUserId": 123456789999,
                               "login": null,
-                              "htmlUrl": null,
                               "avatarUrl": null,
                               "isRegistered": false,
                               "role": "ADMIN",
@@ -681,7 +665,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                           "coworkers": [
                             {
                               "login": "boss.armstrong",
-                              "htmlUrl": null,
                               "avatarUrl": "https://www.plop.org",
                               "isRegistered": true,
                               "role": "ADMIN",
@@ -690,7 +673,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                             {
                               "githubUserId": 595505,
                               "login": "ofux",
-                              "htmlUrl": "https://github.com/ofux",
                               "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                               "isRegistered": true,
                               "id": "e461c019-ba23-4671-9b6c-3a5a18748af9",
@@ -733,7 +715,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                           "coworkers": [
                             {
                               "login": "boss.armstrong",
-                              "htmlUrl": null,
                               "avatarUrl": "https://www.plop.org",
                               "isRegistered": true,
                               "role": "ADMIN",
@@ -997,7 +978,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                           "coworkers": [
                             {
                               "login": "boss.armstrong",
-                              "htmlUrl": null,
                               "avatarUrl": "https://www.plop.org",
                               "isRegistered": true,
                               "role": "ADMIN",
@@ -1006,7 +986,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                             {
                               "githubUserId": 123456789999,
                               "login": null,
-                              "htmlUrl": null,
                               "avatarUrl": null,
                               "isRegistered": false,
                               "role": "ADMIN",
@@ -1048,7 +1027,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                           "coworkers": [
                             {
                               "login": "boss.armstrong",
-                              "htmlUrl": null,
                               "avatarUrl": "https://www.plop.org",
                               "isRegistered": true,
                               "role": "ADMIN",

@@ -288,7 +288,6 @@ public interface BillingProfileMapper {
                 .githubUserId(billingProfileCoworkerView.githubUserId() != null ? billingProfileCoworkerView.githubUserId().value() : null)
                 .login(billingProfileCoworkerView.login())
                 .avatarUrl(billingProfileCoworkerView.avatarUrl())
-                .htmlUrl(billingProfileCoworkerView.githubHtmlUrl())
                 .isRegistered(billingProfileCoworkerView.userId() != null)
                 .id(billingProfileCoworkerView.userId() != null ? billingProfileCoworkerView.userId().value() : null)
                 .role(mapRole(billingProfileCoworkerView.role()))

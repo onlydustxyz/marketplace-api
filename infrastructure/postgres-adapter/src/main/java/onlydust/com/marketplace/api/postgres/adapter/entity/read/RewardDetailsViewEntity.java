@@ -38,12 +38,10 @@ public class RewardDetailsViewEntity {
     UUID billingProfileId;
     String recipientLogin;
     String recipientAvatarUrl;
-    String recipientHtmlUrl;
     Boolean recipientIsRegistered;
     Long requestorId;
     String requestorLogin;
     String requestorAvatarUrl;
-    String requestorHtmlUrl;
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
     @NonNull RewardStatusEntity status;
@@ -64,7 +62,6 @@ public class RewardDetailsViewEntity {
                 .avatarUrl(recipientAvatarUrl)
                 .login(recipientLogin)
                 .githubUserId(recipientId)
-                .url(recipientHtmlUrl)
                 .isRegistered(recipientIsRegistered)
                 .build();
     }
@@ -74,7 +71,6 @@ public class RewardDetailsViewEntity {
                 .githubUserId(requestorId)
                 .login(requestorLogin)
                 .avatarUrl(requestorAvatarUrl)
-                .url(requestorHtmlUrl)
                 .isRegistered(true)
                 .build();
     }
