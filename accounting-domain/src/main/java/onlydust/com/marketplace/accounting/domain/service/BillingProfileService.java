@@ -100,7 +100,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (rewards.stream().anyMatch(r -> !r.status().isPendingRequest())) {
             throw badRequest("Some rewards don't have the PENDING_REQUEST status");
         }
-        if (rewards.stream().anyMatch(r -> nonNull(r.invoiceId()) && r.invoiceStatus() != Invoice.Status.DRAFT)) {
+        if (rewards.stream().anyMatch(r -> nonNull(r.invoiceId()) && r.invoiceStatus() != Invoice.Status.DRAFT && r.invoiceStatus() != Invoice.Status.REJECTED)) {
             throw badRequest("Some rewards are already invoiced");
         }
         if (rewards.stream().anyMatch(r -> isNull(r.billingProfileId()) || !r.billingProfileId().equals(invoice.billingProfileSnapshot().id()))) {
@@ -159,6 +159,8 @@ public class BillingProfileService implements BillingProfileFacadePort {
         final var invoice = invoiceStoragePort.get(invoiceId)
                 .filter(i -> i.billingProfileSnapshot().id().equals(billingProfileId))
                 .orElseThrow(() -> notFound("Invoice %s not found for billing profile %s".formatted(invoiceId, billingProfileId)));
+        if (invoice.status() != Invoice.Status.DRAFT)
+            throw badRequest("Invoice %s is not in DRAFT status".formatted(invoiceId));
 
         checkInvoiceRewards(invoice);
 

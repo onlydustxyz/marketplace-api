@@ -36,8 +36,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import static onlydust.com.marketplace.accounting.domain.model.Invoice.Status.APPROVED;
-import static onlydust.com.marketplace.accounting.domain.model.Invoice.Status.TO_REVIEW;
+import static onlydust.com.marketplace.accounting.domain.model.Invoice.Status.*;
 import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyb;
 import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyc;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -278,6 +277,25 @@ class BillingProfileServiceTest {
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Some rewards are already invoiced");
+
+
+            // Should not reject when rewards are associated with an invoice in DRAFT
+            when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
+                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, Invoice.Id.random(), DRAFT, BillingProfile.Id.random())).toList());
+
+            assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Some rewards are not associated with billing profile");
+
+            // Should not reject when rewards are associated with an invoice in REJECTED
+            when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
+                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, Invoice.Id.random(), REJECTED, BillingProfile.Id.random())).toList());
+
+            assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Some rewards are not associated with billing profile");
         }
 
         @Test
@@ -364,6 +382,21 @@ class BillingProfileServiceTest {
         }
 
         @Test
+        void should_prevent_invoice_upload_if_not_a_draft() {
+            // Given
+            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+                    .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).invoiceMandateAcceptedAt(ZonedDateTime.now().minusDays(1)).build()));
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice.status(REJECTED)));
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Invoice %s is not in DRAFT status".formatted(invoice.id()));
+        }
+
+        @Test
         void should_prevent_invoice_upload_given_a_disabled_billing_profile() {
             // Given
             when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(false);
@@ -446,6 +479,21 @@ class BillingProfileServiceTest {
                     .hasMessage("Some rewards are not associated with billing profile %s".formatted(billingProfileId));
         }
 
+
+        @Test
+        void should_prevent_external_invoice_upload_if_not_a_draft() {
+            // Given
+            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+                    .id(billingProfileId).type(BillingProfile.Type.SELF_EMPLOYED).build()));
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice.status(REJECTED)));
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Invoice %s is not in DRAFT status".formatted(invoice.id()));
+        }
 
         @Test
         void should_prevent_external_invoice_upload_if_billing_profile_does_not_match() {
