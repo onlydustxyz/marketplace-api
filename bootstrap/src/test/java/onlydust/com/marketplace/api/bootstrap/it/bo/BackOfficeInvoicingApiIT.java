@@ -374,7 +374,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "billingProfile": {
                             "subject": "Apple Inc.",
                             "type": "COMPANY",
-                            "verificationStatus": null,
+                            "verificationStatus": "VERIFIED",
                             "kyb": {
                               "name": "Apple Inc.",
                               "registrationNumber": "123456789",
@@ -387,8 +387,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "euVATNumber": "FR12345678901",
                               "sumsubUrl": null
                             },
-                            "kyc": null,
-                            "admins": null
+                            "kyc": null
                           },
                           "rejectionReason": null,
                           "createdBy": {
@@ -408,145 +407,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "logoUrl": null,
                               "decimals": 2
                             }
-                          },
-                          "rewardsPerNetwork": [
-                            {
-                              "network": "ETHEREUM",
-                              "billingAccountNumber": "e461c019-ba23-4671-9b6c-3a5a18748af9.eth",
-                              "totalUsdEquivalent": 1010.00,
-                              "totalsPerCurrency": [
-                                {
-                                  "amount": 1000,
-                                  "currency": {
-                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                    "code": "USDC",
-                                    "name": "USD Coin",
-                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                    "decimals": 6
-                                  },
-                                  "dollarsEquivalent": 1010.00
-                                }
-                              ],
-                              "rewards": [
-                                {
-                                  "id": "6587511b-3791-47c6-8430-8f793606c63a",
-                                  "paymentId": null,
-                                  "requestedAt": "2023-09-20T08:01:47.616674Z",
-                                  "processedAt": null,
-                                  "status": "PENDING_VERIFICATION",
-                                  "githubUrls": [
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1026",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1037",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1038",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1039",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1040",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1041",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1042",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1043",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1044",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1045",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1048",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1049",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1052",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1053",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1054",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1056",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1059",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1063",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1064",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1065",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1067",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1068",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1070",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1071",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1073",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1075",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1076",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1077",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1079",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1080",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1081",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1082",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1084",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1085",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1087",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1088",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1090",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1091",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1100",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1103",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1104",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1105",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1107",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1108",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1112",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1113",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1114",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1115",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1117",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1118",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1121",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1122",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1124",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1129",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1131",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1132",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1133",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1137",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1143",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1148",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1150",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1151",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1152",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1160",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1161",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1162",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1163",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1164",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1165",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1167",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1168",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1169",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1172",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1174",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1175",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1204",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1212",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1217",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1235",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1237",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1239",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1240",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1241",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/1247",
-                                    "https://github.com/onlydustxyz/marketplace-frontend/pull/62"
-                                  ],
-                                  "project": {
-                                    "name": "kaaper",
-                                    "logoUrl": null
-                                  },
-                                  "sponsors": [
-                                    {
-                                      "name": "No Sponsor",
-                                      "avatarUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
-                                    }
-                                  ],
-                                  "money": {
-                                    "amount": 1000,
-                                    "currency": {
-                                      "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                      "code": "USDC",
-                                      "name": "USD Coin",
-                                      "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                      "decimals": 6
-                                    },
-                                    "dollarsEquivalent": 1010.00,
-                                    "conversionRate": 1.0100000000000000
-                                  }
-                                }
-                              ]
-                            }
-                          ]
+                          }
                         }
                         """)
         ;
@@ -844,23 +705,17 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "invoices": [
                             {
                               "billingProfile": {
-                                "kyb": {
-                                  "name": "Apple Inc."
-                                }
+                                "subject": "Apple Inc."
                               }
                             },
                             {
                               "billingProfile": {
-                                "kyb": {
-                                  "name": "Apple Inc."
-                                }
+                                "subject": "Apple Inc."
                               }
                             },
                             {
                               "billingProfile": {
-                                "kyb": {
-                                  "name": "Apple Inc."
-                                }
+                                "subject": "Apple Inc."
                               }
                             }
                           ]

@@ -164,7 +164,9 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
     @Test
     @Order(2)
-    void should_get_reward_by_id() {
+    void should_get_reward_by_id() throws IOException {
+        setUp();
+
         // When
         client.get()
                 .uri(getApiURI(BO_REWARD.formatted("061e2c7e-bda4-49a8-9914-2e76926f70c2")))
@@ -180,11 +182,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           "paymentId": null,
                           "billingProfile": {
                             "subject": "Olivier Inc.",
-                            "type": "COMPANY",
-                            "verificationStatus": "VERIFIED",
-                            "kyb": null,
-                            "kyc": null,
-                            "admins": null
+                            "type": "COMPANY"
                           },
                           "requestedAt": "2023-05-15T12:15:54.25529Z",
                           "processedAt": "2023-07-27T10:27:14.522Z",
@@ -243,11 +241,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           "paymentId": null,
                           "billingProfile": {
                             "subject": "Antho SASU",
-                            "type": "SELF_EMPLOYED",
-                            "verificationStatus": "VERIFIED",
-                            "kyb": null,
-                            "kyc": null,
-                            "admins": null
+                            "type": "SELF_EMPLOYED"
                           },
                           "requestedAt": "2023-10-08T10:06:42.730697Z",
                           "processedAt": null,
@@ -311,45 +305,11 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           "rewards": [
                             {
                               "id": "5f9060a7-6f9e-4ef7-a1e4-1aaa4c85f03c",
-                              "paymentId": null,
-                              "billingProfile": {
-                                "subject": "Antho SASU",
-                                "type": "SELF_EMPLOYED",
-                                "verificationStatus": "VERIFIED",
-                                "kyb": null,
-                                "kyc": null,
-                                "admins": null
-                              },
-                              "invoice": {
-                                "number": "OD-ANTHO-SASU-001",
-                                "status": "TO_REVIEW"
-                              },
-                              "status": "PENDING_VERIFICATION",
-                              "requestedAt": "2023-10-08T10:09:31.842962Z",
-                              "processedAt": null,
-                              "githubUrls": [
-                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
-                              ],
-                              "paidNotificationDate": null,
-                              "recipient": {
-                                "login": "gregcha",
-                                "name": null,
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
-                              },
                               "project": {
                                 "name": "Bretzel",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                               },
-                              "sponsors": [
-                                {
-                                  "name": "Coca Cola",
-                                  "avatarUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
-                                },
-                                {
-                                  "name": "OGC Nissa Ineos",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
-                                }
-                              ],
+                              "status": "PENDING_VERIFICATION",
                               "money": {
                                 "amount": 1000.00,
                                 "currency": {
@@ -362,50 +322,22 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "dollarsEquivalent": 1000.00,
                                 "conversionRate": 1.00000000000000000000
                               },
-                              "transactionReferences": [],
-                              "paidTo": []
+                              "recipient": {
+                                "login": "gregcha",
+                                "name": null,
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
+                              },
+                              "billingProfile": null,
+                              "requestedAt": "2023-10-08T10:09:31.842962Z",
+                              "invoice": null
                             },
                             {
                               "id": "fab7aaf4-9b0c-4e52-bc9b-72ce08131617",
-                              "paymentId": null,
-                              "billingProfile": {
-                                "subject": "Antho SASU",
-                                "type": "SELF_EMPLOYED",
-                                "verificationStatus": "VERIFIED",
-                                "kyb": null,
-                                "kyc": null,
-                                "admins": null
-                              },
-                              "invoice": {
-                                "number": "OD-ANTHO-SASU-001",
-                                "status": "TO_REVIEW"
-                              },
-                              "status": "PENDING_VERIFICATION",
-                              "requestedAt": "2023-10-08T10:06:42.730697Z",
-                              "processedAt": null,
-                              "githubUrls": [
-                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
-                              ],
-                              "paidNotificationDate": null,
-                              "recipient": {
-                                "login": "gregcha",
-                                "name": null,
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
-                              },
                               "project": {
                                 "name": "Bretzel",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                               },
-                              "sponsors": [
-                                {
-                                  "name": "Coca Cola",
-                                  "avatarUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
-                                },
-                                {
-                                  "name": "OGC Nissa Ineos",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
-                                }
-                              ],
+                              "status": "PENDING_VERIFICATION",
                               "money": {
                                 "amount": 1000.00,
                                 "currency": {
@@ -418,40 +350,22 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "dollarsEquivalent": 1000.00,
                                 "conversionRate": 1.00000000000000000000
                               },
-                              "transactionReferences": [],
-                              "paidTo": []
+                              "recipient": {
+                                "login": "gregcha",
+                                "name": null,
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
+                              },
+                              "billingProfile": null,
+                              "requestedAt": "2023-10-08T10:06:42.730697Z",
+                              "invoice": null
                             },
                             {
                               "id": "64fb2732-5632-4b09-a8b1-217485648129",
-                              "paymentId": null,
-                              "billingProfile": null,
-                              "invoice": null,
-                              "status": "PENDING_VERIFICATION",
-                              "requestedAt": "2023-10-08T10:00:31.105159Z",
-                              "processedAt": null,
-                              "githubUrls": [
-                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
-                              ],
-                              "paidNotificationDate": null,
-                              "recipient": {
-                                "login": "gregcha",
-                                "name": null,
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
-                              },
                               "project": {
                                 "name": "Bretzel",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                               },
-                              "sponsors": [
-                                {
-                                  "name": "Coca Cola",
-                                  "avatarUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
-                                },
-                                {
-                                  "name": "OGC Nissa Ineos",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
-                                }
-                              ],
+                              "status": "PENDING_VERIFICATION",
                               "money": {
                                 "amount": 1000.00,
                                 "currency": {
@@ -464,50 +378,22 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "dollarsEquivalent": 1000.00,
                                 "conversionRate": 1.00000000000000000000
                               },
-                              "transactionReferences": [],
-                              "paidTo": []
+                              "recipient": {
+                                "login": "gregcha",
+                                "name": null,
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
+                              },
+                              "billingProfile": null,
+                              "requestedAt": "2023-10-08T10:00:31.105159Z",
+                              "invoice": null
                             },
                             {
                               "id": "736e0554-f30e-4315-9731-7611fa089dcf",
-                              "paymentId": null,
-                              "billingProfile": {
-                                "subject": "Antho SASU",
-                                "type": "SELF_EMPLOYED",
-                                "verificationStatus": "VERIFIED",
-                                "kyb": null,
-                                "kyc": null,
-                                "admins": null
-                              },
-                              "invoice": {
-                                "number": "OD-ANTHO-SASU-001",
-                                "status": "TO_REVIEW"
-                              },
-                              "status": "COMPLETE",
-                              "requestedAt": "2023-09-26T15:57:29.834949Z",
-                              "processedAt": "2023-09-26T21:08:01.957Z",
-                              "githubUrls": [
-                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
-                              ],
-                              "paidNotificationDate": null,
-                              "recipient": {
-                                "login": "gregcha",
-                                "name": null,
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
-                              },
                               "project": {
                                 "name": "Bretzel",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                               },
-                              "sponsors": [
-                                {
-                                  "name": "Coca Cola",
-                                  "avatarUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
-                                },
-                                {
-                                  "name": "OGC Nissa Ineos",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
-                                }
-                              ],
+                              "status": "COMPLETE",
                               "money": {
                                 "amount": 1000.00,
                                 "currency": {
@@ -520,44 +406,22 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "dollarsEquivalent": 1010.0000,
                                 "conversionRate": 1.0100000000000000
                               },
-                              "transactionReferences": [
-                                "0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db"
-                              ],
-                              "paidTo": [
-                                "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea"
-                              ]
+                              "recipient": {
+                                "login": "gregcha",
+                                "name": null,
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
+                              },
+                              "billingProfile": null,
+                              "requestedAt": "2023-09-26T15:57:29.834949Z",
+                              "invoice": null
                             },
                             {
                               "id": "1c56d096-5284-4ae3-af3c-dd2b3211fb73",
-                              "paymentId": null,
-                              "billingProfile": null,
-                              "invoice": null,
-                              "status": "COMPLETE",
-                              "requestedAt": "2023-09-26T08:43:36.823851Z",
-                              "processedAt": "2023-09-26T21:08:01.735916Z",
-                              "githubUrls": [
-                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
-                              ],
-                              "paidNotificationDate": null,
-                              "recipient": {
-                                "login": "gregcha",
-                                "name": null,
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
-                              },
                               "project": {
                                 "name": "Bretzel",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                               },
-                              "sponsors": [
-                                {
-                                  "name": "Coca Cola",
-                                  "avatarUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
-                                },
-                                {
-                                  "name": "OGC Nissa Ineos",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
-                                }
-                              ],
+                              "status": "COMPLETE",
                               "money": {
                                 "amount": 1000.00,
                                 "currency": {
@@ -570,12 +434,14 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "dollarsEquivalent": 1010.0000,
                                 "conversionRate": 1.0100000000000000
                               },
-                              "transactionReferences": [
-                                "0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db"
-                              ],
-                              "paidTo": [
-                                "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea"
-                              ]
+                              "recipient": {
+                                "login": "gregcha",
+                                "name": null,
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
+                              },
+                              "billingProfile": null,
+                              "requestedAt": "2023-09-26T08:43:36.823851Z",
+                              "invoice": null
                             }
                           ]
                         }
@@ -595,254 +461,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .json("""
-                        {
-                          "totalPageNumber": 9,
-                          "totalItemNumber": 45,
-                          "hasMore": true,
-                          "nextPageIndex": 1,
-                          "rewards": [
-                            {
-                              "id": "5f9060a7-6f9e-4ef7-a1e4-1aaa4c85f03c",
-                              "billingProfile": {
-                                "subject": "Antho SASU",
-                                "type": "SELF_EMPLOYED",
-                                "verificationStatus": "VERIFIED",
-                                "kyb": null,
-                                "kyc": null,
-                                "admins": null
-                              },
-                              "invoice": {
-                                "number": "OD-ANTHO-SASU-001",
-                                "status": "TO_REVIEW"
-                              },
-                              "status": "PENDING_VERIFICATION",
-                              "requestedAt": "2023-10-08T10:09:31.842962Z",
-                              "processedAt": null,
-                              "githubUrls": [
-                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
-                              ],
-                              "paidNotificationDate": null,
-                              "recipient": {
-                                "login": "gregcha",
-                                "name": null,
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
-                              },
-                              "project": {
-                                "name": "Bretzel",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
-                              },
-                              "sponsors": [
-                                {
-                                  "name": "Coca Cola",
-                                  "avatarUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
-                                },
-                                {
-                                  "name": "OGC Nissa Ineos",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
-                                }
-                              ],
-                              "money": {
-                                "amount": 1000.00,
-                                "currency": {
-                                  "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                                  "code": "USD",
-                                  "name": "US Dollar",
-                                  "logoUrl": null,
-                                  "decimals": 2
-                                },
-                                "dollarsEquivalent": 1000.00,
-                                "conversionRate": 1.00000000000000000000
-                              },
-                              "transactionReferences": [],
-                              "paidTo": []
-                            },
-                            {
-                              "id": "fab7aaf4-9b0c-4e52-bc9b-72ce08131617",
-                              "billingProfile": {
-                                "subject": "Antho SASU",
-                                "type": "SELF_EMPLOYED",
-                                "verificationStatus": "VERIFIED",
-                                "kyb": null,
-                                "kyc": null,
-                                "admins": null
-                              },
-                              "invoice": {
-                                "number": "OD-ANTHO-SASU-001",
-                                "status": "TO_REVIEW"
-                              },
-                              "status": "PENDING_VERIFICATION",
-                              "requestedAt": "2023-10-08T10:06:42.730697Z",
-                              "processedAt": null,
-                              "githubUrls": [
-                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
-                              ],
-                              "paidNotificationDate": null,
-                              "recipient": {
-                                "login": "gregcha",
-                                "name": null,
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
-                              },
-                              "project": {
-                                "name": "Bretzel",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
-                              },
-                              "sponsors": [
-                                {
-                                  "name": "Coca Cola",
-                                  "avatarUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
-                                },
-                                {
-                                  "name": "OGC Nissa Ineos",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
-                                }
-                              ],
-                              "money": {
-                                "amount": 1000.00,
-                                "currency": {
-                                  "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                                  "code": "USD",
-                                  "name": "US Dollar",
-                                  "logoUrl": null,
-                                  "decimals": 2
-                                },
-                                "dollarsEquivalent": 1000.00,
-                                "conversionRate": 1.00000000000000000000
-                              },
-                              "transactionReferences": [],
-                              "paidTo": []
-                            },
-                            {
-                              "id": "64fb2732-5632-4b09-a8b1-217485648129",
-                              "billingProfile": null,
-                              "invoice": null,
-                              "status": "PENDING_VERIFICATION",
-                              "requestedAt": "2023-10-08T10:00:31.105159Z",
-                              "processedAt": null,
-                              "githubUrls": [
-                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
-                              ],
-                              "paidNotificationDate": null,
-                              "recipient": {
-                                "login": "gregcha",
-                                "name": null,
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
-                              },
-                              "project": {
-                                "name": "Bretzel",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
-                              },
-                              "sponsors": [
-                                {
-                                  "name": "Coca Cola",
-                                  "avatarUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
-                                },
-                                {
-                                  "name": "OGC Nissa Ineos",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
-                                }
-                              ],
-                              "money": {
-                                "amount": 1000.00,
-                                "currency": {
-                                  "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                                  "code": "USD",
-                                  "name": "US Dollar",
-                                  "logoUrl": null,
-                                  "decimals": 2
-                                },
-                                "dollarsEquivalent": 1000.00,
-                                "conversionRate": 1.00000000000000000000
-                              },
-                              "transactionReferences": [],
-                              "paidTo": []
-                            },
-                            {
-                              "id": "e1498a17-5090-4071-a88a-6f0b0c337c3a",
-                              "billingProfile": null,
-                              "invoice": null,
-                              "status": "PENDING_VERIFICATION",
-                              "requestedAt": "2023-09-20T08:46:52.77875Z",
-                              "processedAt": null,
-                              "githubUrls": [
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1221"
-                              ],
-                              "paidNotificationDate": null,
-                              "recipient": {
-                                "login": "PierreOucif",
-                                "name": null,
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
-                              },
-                              "project": {
-                                "name": "QA new contributions",
-                                "logoUrl": null
-                              },
-                              "sponsors": [
-                                {
-                                  "name": "No Sponsor",
-                                  "avatarUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
-                                }
-                              ],
-                              "money": {
-                                "amount": 1000,
-                                "currency": {
-                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                  "code": "USDC",
-                                  "name": "USD Coin",
-                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                  "decimals": 6
-                                },
-                                "dollarsEquivalent": 1010.00,
-                                "conversionRate": 1.0100000000000000
-                              },
-                              "transactionReferences": [],
-                              "paidTo": []
-                            },
-                            {
-                              "id": "f0c1b882-76f2-47d0-9331-151ce1f99281",
-                              "billingProfile": null,
-                              "invoice": null,
-                              "status": "PENDING_VERIFICATION",
-                              "requestedAt": "2023-09-20T08:45:02.552217Z",
-                              "processedAt": null,
-                              "githubUrls": [
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1237",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1240"
-                              ],
-                              "paidNotificationDate": null,
-                              "recipient": {
-                                "login": "AnthonyBuisset",
-                                "name": null,
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
-                              },
-                              "project": {
-                                "name": "kaaper",
-                                "logoUrl": null
-                              },
-                              "sponsors": [
-                                {
-                                  "name": "No Sponsor",
-                                  "avatarUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
-                                }
-                              ],
-                              "money": {
-                                "amount": 1000,
-                                "currency": {
-                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                  "code": "USDC",
-                                  "name": "USD Coin",
-                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                  "decimals": 6
-                                },
-                                "dollarsEquivalent": null,
-                                "conversionRate": null
-                              },
-                              "transactionReferences": [],
-                              "paidTo": []
-                            }
-                          ]
-                        }
-                        """);
+                .jsonPath("$.rewards[?(@.status == 'PENDING_VERIFICATION')]").isArray()
+                .jsonPath("$.rewards[?(@.status != 'PENDING_VERIFICATION')]").doesNotExist();
     }
 
     @Test
@@ -851,8 +471,12 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(REWARDS, Map.of("pageIndex", "0", "pageSize", "5", "statuses", "COMPLETE",
-                        "fromRequestedAt", "2023-02-08", "toRequestedAt", "2023-02-10"))
+                .uri(getApiURI(REWARDS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "statuses", "COMPLETE",
+                        "fromRequestedAt", "2023-02-08",
+                        "toRequestedAt", "2023-02-10"))
                 )
                 .header("Api-Key", apiKey())
                 // Then
@@ -860,291 +484,10 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .json("""
-                        {
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 5,
-                          "hasMore": false,
-                          "nextPageIndex": 0,
-                          "rewards": [
-                            {
-                              "id": "bdb59436-1b93-4c3c-a6e2-b8b09411280c",
-                              "billingProfile": {
-                                "subject": "Pierre Qui roule n'amasse pas mousses",
-                                "type": "INDIVIDUAL",
-                                "verificationStatus": "VERIFIED",
-                                "kyb": null,
-                                "kyc": null,
-                                "admins": null
-                              },
-                              "invoice": {
-                                "number": "OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001",
-                                "status": "APPROVED"
-                              },
-                              "status": "COMPLETE",
-                              "requestedAt": "2023-02-09T07:24:48.146947Z",
-                              "processedAt": "2023-02-09T07:35:03.828Z",
-                              "githubUrls": [
-                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
-                              ],
-                              "paidNotificationDate": null,
-                              "recipient": {
-                                "login": "gregcha",
-                                "name": null,
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
-                              },
-                              "project": {
-                                "name": "Starklings",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
-                              },
-                              "sponsors": [
-                                {
-                                  "name": "No Sponsor",
-                                  "avatarUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
-                                }
-                              ],
-                              "money": {
-                                "amount": 1000,
-                                "currency": {
-                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                  "code": "USDC",
-                                  "name": "USD Coin",
-                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                  "decimals": 6
-                                },
-                                "dollarsEquivalent": 1010.00,
-                                "conversionRate": 1.0100000000000000
-                              },
-                              "transactionReferences": [
-                                "0x0"
-                              ],
-                              "paidTo": [
-                                "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea"
-                              ]
-                            },
-                            {
-                              "id": "e23ad82b-27c5-4840-9481-da31aef6ba1b",
-                              "billingProfile": {
-                                "subject": "Pierre Qui roule n'amasse pas mousses",
-                                "type": "INDIVIDUAL",
-                                "verificationStatus": "VERIFIED",
-                                "kyb": null,
-                                "kyc": null,
-                                "admins": null
-                              },
-                              "invoice": {
-                                "number": "OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001",
-                                "status": "APPROVED"
-                              },
-                              "status": "COMPLETE",
-                              "requestedAt": "2023-02-09T07:24:40.924453Z",
-                              "processedAt": "2023-02-09T07:35:03.417Z",
-                              "githubUrls": [
-                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
-                              ],
-                              "paidNotificationDate": null,
-                              "recipient": {
-                                "login": "gregcha",
-                                "name": null,
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
-                              },
-                              "project": {
-                                "name": "Starklings",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
-                              },
-                              "sponsors": [
-                                {
-                                  "name": "No Sponsor",
-                                  "avatarUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
-                                }
-                              ],
-                              "money": {
-                                "amount": 2500,
-                                "currency": {
-                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                  "code": "USDC",
-                                  "name": "USD Coin",
-                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                  "decimals": 6
-                                },
-                                "dollarsEquivalent": 2525.00,
-                                "conversionRate": 1.0100000000000000
-                              },
-                              "transactionReferences": [
-                                "0x0"
-                              ],
-                              "paidTo": [
-                                "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea"
-                              ]
-                            },
-                            {
-                              "id": "72f257fa-1b20-433d-9cdd-88d5182b7369",
-                              "billingProfile": {
-                                "subject": "Pierre Qui roule n'amasse pas mousses",
-                                "type": "INDIVIDUAL",
-                                "verificationStatus": "VERIFIED",
-                                "kyb": null,
-                                "kyc": null,
-                                "admins": null
-                              },
-                              "invoice": {
-                                "number": "OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001",
-                                "status": "APPROVED"
-                              },
-                              "status": "COMPLETE",
-                              "requestedAt": "2023-02-09T07:24:31.946777Z",
-                              "processedAt": "2023-02-09T07:35:02.985Z",
-                              "githubUrls": [
-                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
-                              ],
-                              "paidNotificationDate": null,
-                              "recipient": {
-                                "login": "gregcha",
-                                "name": null,
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
-                              },
-                              "project": {
-                                "name": "Starklings",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
-                              },
-                              "sponsors": [
-                                {
-                                  "name": "No Sponsor",
-                                  "avatarUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
-                                }
-                              ],
-                              "money": {
-                                "amount": 750,
-                                "currency": {
-                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                  "code": "USDC",
-                                  "name": "USD Coin",
-                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                  "decimals": 6
-                                },
-                                "dollarsEquivalent": 757.50,
-                                "conversionRate": 1.0100000000000000
-                              },
-                              "transactionReferences": [
-                                "0x0"
-                              ],
-                              "paidTo": [
-                                "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea"
-                              ]
-                            },
-                            {
-                              "id": "91c7e960-37ba-4334-ba91-f1b02f1927ab",
-                              "billingProfile": {
-                                "subject": "Pierre Qui roule n'amasse pas mousses",
-                                "type": "INDIVIDUAL",
-                                "verificationStatus": "VERIFIED",
-                                "kyb": null,
-                                "kyc": null,
-                                "admins": null
-                              },
-                              "invoice": {
-                                "number": "OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001",
-                                "status": "APPROVED"
-                              },
-                              "status": "COMPLETE",
-                              "requestedAt": "2023-02-09T07:24:20.274391Z",
-                              "processedAt": "2023-02-09T07:35:02.582Z",
-                              "githubUrls": [
-                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
-                              ],
-                              "paidNotificationDate": null,
-                              "recipient": {
-                                "login": "gregcha",
-                                "name": null,
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
-                              },
-                              "project": {
-                                "name": "Starklings",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
-                              },
-                              "sponsors": [
-                                {
-                                  "name": "No Sponsor",
-                                  "avatarUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
-                                }
-                              ],
-                              "money": {
-                                "amount": 1000,
-                                "currency": {
-                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                  "code": "USDC",
-                                  "name": "USD Coin",
-                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                  "decimals": 6
-                                },
-                                "dollarsEquivalent": 1010.00,
-                                "conversionRate": 1.0100000000000000
-                              },
-                              "transactionReferences": [
-                                "0x0"
-                              ],
-                              "paidTo": [
-                                "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea"
-                              ]
-                            },
-                            {
-                              "id": "e6152967-9bd4-40e6-bad5-c9c4a9578d0f",
-                              "billingProfile": {
-                                "subject": "Pierre Qui roule n'amasse pas mousses",
-                                "type": "INDIVIDUAL",
-                                "verificationStatus": "VERIFIED",
-                                "kyb": null,
-                                "kyc": null,
-                                "admins": null
-                              },
-                              "invoice": {
-                                "number": "OD-QUI-ROULE-N-AMASSE-PAS-MOUSSES-PIERRE-001",
-                                "status": "APPROVED"
-                              },
-                              "status": "COMPLETE",
-                              "requestedAt": "2023-02-08T09:14:56.053584Z",
-                              "processedAt": "2023-02-27T11:56:28.044Z",
-                              "githubUrls": [
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/663"
-                              ],
-                              "paidNotificationDate": null,
-                              "recipient": {
-                                "login": "oscarwroche",
-                                "name": null,
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4"
-                              },
-                              "project": {
-                                "name": "oscar's awesome project",
-                                "logoUrl": null
-                              },
-                              "sponsors": [
-                                {
-                                  "name": "No Sponsor",
-                                  "avatarUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
-                                }
-                              ],
-                              "money": {
-                                "amount": 500,
-                                "currency": {
-                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                  "code": "USDC",
-                                  "name": "USD Coin",
-                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                  "decimals": 6
-                                },
-                                "dollarsEquivalent": 505.00,
-                                "conversionRate": 1.0100000000000000
-                              },
-                              "transactionReferences": [
-                                "0x0"
-                              ],
-                              "paidTo": [
-                                "0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
-                              ]
-                            }
-                          ]
-                        }
-                        """);
+                .jsonPath("$.rewards[?(@.status == 'COMPLETE')]").isArray()
+                .jsonPath("$.rewards[?(@.status != 'COMPLETE')]").doesNotExist()
+                .jsonPath("$.rewards[?(@.requestedAt >= '2023-02-08' && @.requestedAt <= '2023-02-10')]").isArray()
+                .jsonPath("$.rewards[?(@.requestedAt < '2023-02-08' || @.requestedAt > '2023-02-10')]").doesNotExist();
     }
 
     @Test

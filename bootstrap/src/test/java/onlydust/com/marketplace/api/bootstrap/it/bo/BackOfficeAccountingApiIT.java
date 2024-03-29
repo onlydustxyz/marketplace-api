@@ -665,7 +665,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                         """.formatted(rewardId));
 
         // When
-        final var invoiceId = invoiceReward(UserId.of(ofux.user().getId()), KAAPER, RewardId.of(rewardId));
+        invoiceReward(UserId.of(ofux.user().getId()), KAAPER, RewardId.of(rewardId));
 
         // When
         client.post()

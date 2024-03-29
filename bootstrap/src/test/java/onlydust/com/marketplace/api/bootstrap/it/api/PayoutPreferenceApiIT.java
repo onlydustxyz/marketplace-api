@@ -83,13 +83,13 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
 
         final RewardEntity r1 = rewardRepository.save(new RewardEntity(UUID.randomUUID(), projectEntities.get(0).getId(), userId.value(),
                 authenticatedUser.user().getGithubUserId(),
-                STRK.id(), BigDecimal.ONE, new Date(), List.of(), null, null, null));
+                STRK.id(), BigDecimal.ONE, new Date(), null, List.of(), null, null));
         final RewardEntity r2 = rewardRepository.save(new RewardEntity(UUID.randomUUID(), projectEntities.get(1).getId(), userId.value(),
                 authenticatedUser.user().getGithubUserId(),
-                STRK.id(), BigDecimal.ONE, new Date(), List.of(), null, null, null));
+                STRK.id(), BigDecimal.ONE, new Date(), null, List.of(), null, null));
         final RewardEntity r3 = rewardRepository.save(new RewardEntity(UUID.randomUUID(), projectEntities.get(2).getId(), userId.value(),
                 authenticatedUser.user().getGithubUserId(),
-                STRK.id(), BigDecimal.ONE, new Date(), List.of(), null, null, null));
+                STRK.id(), BigDecimal.ONE, new Date(), null, List.of(), null, null));
 
         Stream.of(r1, r2, r3).forEach(r -> rewardStatusRepository.save(new RewardStatusDataEntity()
                 .rewardId(r.id())
