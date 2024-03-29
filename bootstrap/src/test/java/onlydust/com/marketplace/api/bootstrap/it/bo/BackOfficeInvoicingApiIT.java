@@ -105,15 +105,6 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 RewardId.of("0b275f04-bdb1-4d4f-8cd1-76fe135ccbdf"),
                 RewardId.of("335e45a5-7f59-4519-8a12-1addc530214c"),
                 RewardId.of("e9ebbe59-fb74-4a6c-9a51-6d9050412977")));
-//        newCompanyInvoiceToReview(List.of(
-//                RewardId.of("f0c1b882-76f2-47d0-9331-151ce1f99281")));
-//        newCompanyInvoiceToReview(List.of(
-//                RewardId.of("95e079c9-609c-4531-8c5c-13217306b299"),
-//                RewardId.of("e33ea956-d2f5-496b-acf9-e2350faddb16")));
-//        newCompanyInvoiceToReview(List.of(
-//                RewardId.of("e9ebbe59-fb74-4a6c-9a51-6d9050412977"),
-//                RewardId.of("335e45a5-7f59-4519-8a12-1addc530214c"),
-//                RewardId.of("0b275f04-bdb1-4d4f-8cd1-76fe135ccbdf")));
     }
 
     private void updatePayoutPreferences(final Long githubUserId, BillingProfile.Id billingProfileId, final UUID projectId) {
