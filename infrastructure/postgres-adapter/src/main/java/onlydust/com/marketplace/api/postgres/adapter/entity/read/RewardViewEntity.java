@@ -38,7 +38,7 @@ public class RewardViewEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "billingProfileId")
-    @NonNull BillingProfileEntity billingProfile;
+    BillingProfileEntity billingProfile;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "currencyId")
@@ -133,7 +133,7 @@ public class RewardViewEntity {
                 .from(from())
                 .project(project.toDomain())
                 .receipt(receipts.stream().findFirst().map(ReceiptEntity::toView).orElse(null))
-                .billingProfileId(billingProfile.getId())
+                .billingProfileId(billingProfile == null ? null : billingProfile.getId())
                 .build();
     }
 }

@@ -308,8 +308,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         companyBPMember1RewardId1 =
                 allRewards.stream().filter(r -> r.projectId().equals(projectId1) && r.recipientId().equals(companyBPMember1GithubId)).findFirst().orElseThrow().id();
         selfEmployedBPAdminRewardId11 =
-                allRewards.stream().filter(r -> r.projectId().equals(projectId1) && r.recipientId().equals(selfEmployedBPAdminGithubId)).findFirst().orElseThrow().id();
-
+                allRewards.stream().filter(r -> r.projectId().equals(projectId1) && r.recipientId().equals(selfEmployedBPAdminGithubId) && r.amount().longValue() == 50L)
+                        .findFirst().orElseThrow().id();
         individualBPAdminRewardId2 =
                 allRewards.stream().filter(r -> r.projectId().equals(projectId2) && r.recipientId().equals(individualBPAdminGithubId)).findFirst().orElseThrow().id();
         companyBPAdmin1RewardId2 =
@@ -321,7 +321,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         selfEmployedBPAdminRewardId2 =
                 allRewards.stream().filter(r -> r.projectId().equals(projectId2) && r.recipientId().equals(selfEmployedBPAdminGithubId)).findFirst().orElseThrow().id();
 
-        selfEmployedBPAdminRewardId12 = rewardRepository.findAll().stream()
+        selfEmployedBPAdminRewardId12 = allRewards.stream()
                 .filter(r -> r.projectId().equals(projectId1) && r.recipientId().equals(selfEmployedBPAdminGithubId) && r.amount().longValue() == 55L)
                 .findFirst().map(RewardEntity::id).orElse(null);
 
@@ -4201,14 +4201,12 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
               "from": {
                 "githubUserId": 16590657,
                 "login": "PierreOucif",
-                "htmlUrl": "https://github.com/PierreOucif",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                 "isRegistered": true
               },
               "to": {
                 "githubUserId": 1,
                 "login": "mmaderic",
-                "htmlUrl": "https://github.com/mmaderic",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/39437117?v=4"
               },
               
@@ -4236,14 +4234,12 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
               "from": {
                 "githubUserId": 16590657,
                 "login": "PierreOucif",
-                "htmlUrl": "https://github.com/PierreOucif",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                 "isRegistered": true
               },
               "to": {
                 "githubUserId": 1,
                 "login": "mmaderic",
-                "htmlUrl": "https://github.com/mmaderic",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/39437117?v=4"
               },
               
@@ -4273,14 +4269,12 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                "from": {
                  "githubUserId": 16590657,
                  "login": "PierreOucif",
-                 "htmlUrl": "https://github.com/PierreOucif",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                  "isRegistered": true
                },
                "to": {
                  "githubUserId": 2,
                  "login": "jannesblobel",
-                 "htmlUrl": "https://github.com/jannesblobel",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/72493222?v=4"
                },
                
@@ -4309,14 +4303,12 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                "from": {
                  "githubUserId": 16590657,
                  "login": "PierreOucif",
-                 "htmlUrl": "https://github.com/PierreOucif",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                  "isRegistered": true
                },
                "to": {
                  "githubUserId": 2,
                  "login": "jannesblobel",
-                 "htmlUrl": "https://github.com/jannesblobel",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/72493222?v=4"
                },
                
@@ -4345,14 +4337,12 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                "from": {
                  "githubUserId": 16590657,
                  "login": "PierreOucif",
-                 "htmlUrl": "https://github.com/PierreOucif",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                  "isRegistered": true
                },
                "to": {
                  "githubUserId": 3,
                  "login": "nickdbush",
-                 "htmlUrl": "https://github.com/nickdbush",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/10998201?v=4"
                },
                
@@ -4381,14 +4371,12 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                "from": {
                  "githubUserId": 16590657,
                  "login": "PierreOucif",
-                 "htmlUrl": "https://github.com/PierreOucif",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                  "isRegistered": true
                },
                "to": {
                  "githubUserId": 3,
                  "login": "nickdbush",
-                 "htmlUrl": "https://github.com/nickdbush",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/10998201?v=4"
                },
                
@@ -4417,14 +4405,12 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                "from": {
                  "githubUserId": 16590657,
                  "login": "PierreOucif",
-                 "htmlUrl": "https://github.com/PierreOucif",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                  "isRegistered": true
                },
                "to": {
                  "githubUserId": 5,
                  "login": "yanns",
-                 "htmlUrl": "https://github.com/yanns",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/51669?v=4"
                },
                
@@ -4453,14 +4439,12 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                "from": {
                  "githubUserId": 16590657,
                  "login": "PierreOucif",
-                 "htmlUrl": "https://github.com/PierreOucif",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                  "isRegistered": true
                },
                "to": {
                  "githubUserId": 5,
                  "login": "yanns",
-                 "htmlUrl": "https://github.com/yanns",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/51669?v=4"
                },
                
@@ -4489,14 +4473,12 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                "from": {
                  "githubUserId": 16590657,
                  "login": "PierreOucif",
-                 "htmlUrl": "https://github.com/PierreOucif",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                  "isRegistered": true
                },
                "to": {
                  "githubUserId": 5,
                  "login": "yanns",
-                 "htmlUrl": "https://github.com/yanns",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/51669?v=4"
                },
                
@@ -4526,14 +4508,12 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
               "from": {
                 "githubUserId": 16590657,
                 "login": "PierreOucif",
-                "htmlUrl": "https://github.com/PierreOucif",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                 "isRegistered": true
               },
               "to": {
                 "githubUserId": 4,
                 "login": "acomminos",
-                "htmlUrl": "https://github.com/acomminos",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/628035?v=4"
               },
               
@@ -4561,14 +4541,12 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
               "from": {
                 "githubUserId": 16590657,
                 "login": "PierreOucif",
-                "htmlUrl": "https://github.com/PierreOucif",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                 "isRegistered": true
               },
               "to": {
                 "githubUserId": 4,
                 "login": "acomminos",
-                "htmlUrl": "https://github.com/acomminos",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/628035?v=4"
               },
               

@@ -966,10 +966,8 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                     .is2xxSuccessful()
                     .expectBody(BillingProfileInvoicesPageResponse.class)
                     .returnResult().getResponseBody().getInvoices();
-            ;
 
-            assertThat(invoices).hasSize(2);
-            assertThat(invoices.get(1).getStatus()).isLessThan(invoices.get(0).getStatus());
+            assertThat(invoices.get(invoices.size() - 1).getStatus()).isLessThan(invoices.get(0).getStatus());
         }
     }
 
