@@ -30,7 +30,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 43467246,
                   "login": "AnthonyBuisset",
-                  "htmlUrl": null,
                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                   "isRegistered": true,
                   "contributionCount": 885,
@@ -71,7 +70,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 595505,
                   "login": "ofux",
-                  "htmlUrl": null,
                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                   "isRegistered": true,
                   "contributionCount": 570,
@@ -112,7 +110,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 4435377,
                   "login": "Bernardstanislas",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4",
                   "isRegistered": true,
                   "contributionCount": 375,
@@ -142,7 +139,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 21149076,
                   "login": "oscarwroche",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
                   "isRegistered": true,
                   "contributionCount": 213,
@@ -183,7 +179,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 16590657,
                   "login": "PierreOucif",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                   "isRegistered": true,
                   "contributionCount": 147,
@@ -213,7 +208,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 34384633,
                   "login": "tdelabro",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/34384633?v=4",
                   "isRegistered": false,
                   "contributionCount": 146,
@@ -243,7 +237,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 5160414,
                   "login": "haydencleary",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
                   "isRegistered": true,
                   "contributionCount": 140,
@@ -261,7 +254,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 31901905,
                   "login": "kaelsky",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
                   "isRegistered": true,
                   "contributionCount": 127,
@@ -290,7 +282,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 102823832,
                   "login": "SamuelKer",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/102823832?v=4",
                   "isRegistered": false,
                   "contributionCount": 1,
@@ -308,7 +299,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 129528947,
                   "login": "VeryDustyBot",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/129528947?v=4",
                   "isRegistered": false,
                   "contributionCount": 1,
@@ -326,7 +316,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 698957,
                   "login": "ltoussaint",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/698957?v=4",
                   "isRegistered": false,
                   "contributionCount": 2,
@@ -344,7 +333,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 112474158,
                   "login": "onlydust-contributor",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
                   "isRegistered": true,
                   "contributionCount": 2,
@@ -362,7 +350,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 98529704,
                   "login": "tekkac",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/98529704?v=4",
                   "isRegistered": false,
                   "contributionCount": 20,
@@ -380,7 +367,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 45264458,
                   "login": "abdelhamidbakhta",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
                   "isRegistered": false,
                   "contributionCount": 21,
@@ -410,7 +396,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 10167015,
                   "login": "lechinoix",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/10167015?v=4",
                   "isRegistered": false,
                   "contributionCount": 36,
@@ -440,7 +425,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 10922658,
                   "login": "alexbensimon",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/10922658?v=4",
                   "isRegistered": true,
                   "contributionCount": 46,
@@ -458,7 +442,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 143011364,
                   "login": "pixelfact",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
                   "isRegistered": false,
                   "contributionCount": 102,
@@ -476,7 +459,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 17259618,
                   "login": "alexbeno",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
                   "isRegistered": false,
                   "contributionCount": 104,
@@ -494,7 +476,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 31901905,
                   "login": "kaelsky",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
                   "isRegistered": true,
                   "contributionCount": 127,
@@ -512,7 +493,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 5160414,
                   "login": "haydencleary",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
                   "isRegistered": true,
                   "contributionCount": 140,
@@ -530,7 +510,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 34384633,
                   "login": "tdelabro",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/34384633?v=4",
                   "isRegistered": false,
                   "contributionCount": 146,
@@ -560,7 +539,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 16590657,
                   "login": "PierreOucif",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                   "isRegistered": true,
                   "contributionCount": 147,
@@ -590,7 +568,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 21149076,
                   "login": "oscarwroche",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
                   "isRegistered": true,
                   "contributionCount": 213,
@@ -620,7 +597,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 4435377,
                   "login": "Bernardstanislas",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4",
                   "isRegistered": true,
                   "contributionCount": 375,
@@ -650,7 +626,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 595505,
                   "login": "ofux",
-                  "htmlUrl": null,
                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                   "isRegistered": true,
                   "contributionCount": 570,
@@ -691,7 +666,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 43467246,
                   "login": "AnthonyBuisset",
-                  "htmlUrl": null,
                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                   "isRegistered": true,
                   "contributionCount": 885,
@@ -744,7 +718,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 10167015,
                   "login": "lechinoix",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/10167015?v=4",
                   "isRegistered": false,
                   "contributionCount": 36,
@@ -774,7 +747,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 10922658,
                   "login": "alexbensimon",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/10922658?v=4",
                   "isRegistered": true,
                   "contributionCount": 46,
@@ -792,7 +764,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 17259618,
                   "login": "alexbeno",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
                   "isRegistered": false,
                   "contributionCount": 104,
@@ -810,7 +781,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 5160414,
                   "login": "haydencleary",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
                   "isRegistered": true,
                   "contributionCount": 140,
@@ -839,7 +809,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 102823832,
                   "login": "SamuelKer",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/102823832?v=4",
                   "isRegistered": false,
                   "contributionCount": 1,
@@ -857,7 +826,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 129528947,
                   "login": "VeryDustyBot",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/129528947?v=4",
                   "isRegistered": false,
                   "contributionCount": 1,
@@ -875,7 +843,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 698957,
                   "login": "ltoussaint",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/698957?v=4",
                   "isRegistered": false,
                   "contributionCount": 2,
@@ -893,7 +860,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 112474158,
                   "login": "onlydust-contributor",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
                   "isRegistered": true,
                   "contributionCount": 2,
@@ -911,7 +877,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 98529704,
                   "login": "tekkac",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/98529704?v=4",
                   "isRegistered": false,
                   "contributionCount": 20,
@@ -929,7 +894,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 45264458,
                   "login": "abdelhamidbakhta",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
                   "isRegistered": false,
                   "contributionCount": 21,
@@ -959,7 +923,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 10167015,
                   "login": "lechinoix",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/10167015?v=4",
                   "isRegistered": false,
                   "contributionCount": 36,
@@ -989,7 +952,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 10922658,
                   "login": "alexbensimon",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/10922658?v=4",
                   "isRegistered": true,
                   "contributionCount": 46,
@@ -1007,7 +969,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 143011364,
                   "login": "pixelfact",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
                   "isRegistered": false,
                   "contributionCount": 102,
@@ -1025,7 +986,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 17259618,
                   "login": "alexbeno",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
                   "isRegistered": false,
                   "contributionCount": 104,
@@ -1043,7 +1003,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 31901905,
                   "login": "kaelsky",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
                   "isRegistered": true,
                   "contributionCount": 127,
@@ -1061,7 +1020,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 5160414,
                   "login": "haydencleary",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
                   "isRegistered": true,
                   "contributionCount": 140,
@@ -1079,7 +1037,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 34384633,
                   "login": "tdelabro",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/34384633?v=4",
                   "isRegistered": false,
                   "contributionCount": 146,
@@ -1109,7 +1066,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 16590657,
                   "login": "PierreOucif",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                   "isRegistered": true,
                   "contributionCount": 147,
@@ -1139,7 +1095,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 21149076,
                   "login": "oscarwroche",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
                   "isRegistered": true,
                   "contributionCount": 213,
@@ -1169,7 +1124,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 4435377,
                   "login": "Bernardstanislas",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4",
                   "isRegistered": true,
                   "contributionCount": 375,
@@ -1199,7 +1153,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 595505,
                   "login": "ofux",
-                  "htmlUrl": null,
                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                   "isRegistered": true,
                   "contributionCount": 570,
@@ -1240,7 +1193,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 43467246,
                   "login": "AnthonyBuisset",
-                  "htmlUrl": null,
                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                   "isRegistered": true,
                   "contributionCount": 885,
@@ -1292,7 +1244,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 10167015,
                   "login": "lechinoix",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/10167015?v=4",
                   "isRegistered": false,
                   "contributionCount": 36,
@@ -1321,7 +1272,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 10922658,
                   "login": "alexbensimon",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/10922658?v=4",
                   "isRegistered": true,
                   "contributionCount": 46,
@@ -1338,7 +1288,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 17259618,
                   "login": "alexbeno",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
                   "isRegistered": false,
                   "contributionCount": 104,
@@ -1355,7 +1304,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 5160414,
                   "login": "haydencleary",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
                   "isRegistered": true,
                   "contributionCount": 140,
@@ -1383,7 +1331,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 43467246,
                   "login": "AnthonyBuisset",
-                  "htmlUrl": null,
                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                   "isRegistered": true,
                   "contributionCount": 885,
@@ -1424,7 +1371,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 16590657,
                   "login": "PierreOucif",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                   "isRegistered": true,
                   "contributionCount": 147,
@@ -1510,7 +1456,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 43467246,
                   "login": "AnthonyBuisset",
-                  "htmlUrl": null,
                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                   "isRegistered": true,
                   "contributionCount": 885,
@@ -1551,7 +1496,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 21149076,
                   "login": "oscarwroche",
-                  "htmlUrl": null,
                   "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
                   "isRegistered": true,
                   "contributionCount": 213,
@@ -1767,25 +1711,25 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
         final var reward1 = rewardRepository.findById(UUID.fromString("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0")).orElseThrow();
-        reward1.currency(currencyRepository.findByCode("ETH").orElseThrow());
+        reward1.currencyId(currencyRepository.findByCode("ETH").orElseThrow().id());
         reward1.amount(BigDecimal.valueOf(20.5));
         rewardRepository.save(reward1);
         rewardStatusRepository.save(rewardStatusRepository.findById(reward1.id()).orElseThrow().amountUsdEquivalent(BigDecimal.valueOf(31426.5)));
 
         final var reward2 = rewardRepository.findById(UUID.fromString("e1498a17-5090-4071-a88a-6f0b0c337c3a")).orElseThrow();
-        reward2.currency(currencyRepository.findByCode("APT").orElseThrow());
+        reward2.currencyId(currencyRepository.findByCode("APT").orElseThrow().id());
         reward2.amount(BigDecimal.valueOf(2000));
         rewardRepository.save(reward2);
         rewardStatusRepository.save(rewardStatusRepository.findById(reward2.id()).orElseThrow().amountUsdEquivalent(BigDecimal.valueOf(1120)));
 
         final var reward3 = rewardRepository.findById(UUID.fromString("40fda3c6-2a3f-4cdd-ba12-0499dd232d53")).orElseThrow();
-        reward3.currency(currencyRepository.findByCode("OP").orElseThrow());
+        reward3.currencyId(currencyRepository.findByCode("OP").orElseThrow().id());
         reward3.amount(BigDecimal.valueOf(450));
         rewardRepository.save(reward3);
         rewardStatusRepository.save(rewardStatusRepository.findById(reward3.id()).orElseThrow().amountUsdEquivalent(BigDecimal.valueOf(643.5)));
 
         final var reward4 = rewardRepository.findById(UUID.fromString("5b96ca1e-4ad2-41c1-8819-520b885d9223")).orElseThrow();
-        reward4.currency(currencyRepository.findByCode("STRK").orElseThrow());
+        reward4.currencyId(currencyRepository.findByCode("STRK").orElseThrow().id());
         reward4.amount(BigDecimal.valueOf(500000));
         rewardRepository.save(reward4);
         rewardStatusRepository.save(rewardStatusRepository.findById(reward4.id()).orElseThrow().amountUsdEquivalent(null));

@@ -947,8 +947,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                     .expectBody(BillingProfileInvoicesPageResponse.class)
                     .returnResult().getResponseBody().getInvoices();
 
-            assertThat(invoices).hasSize(2);
-            assertThat(invoices.get(0).getStatus()).isLessThan(invoices.get(1).getStatus());
+            assertThat(invoices.get(0).getStatus()).isLessThan(invoices.get(invoices.size() - 1).getStatus());
         }
 
         {
@@ -967,10 +966,8 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                     .is2xxSuccessful()
                     .expectBody(BillingProfileInvoicesPageResponse.class)
                     .returnResult().getResponseBody().getInvoices();
-            ;
 
-            assertThat(invoices).hasSize(2);
-            assertThat(invoices.get(1).getStatus()).isLessThan(invoices.get(0).getStatus());
+            assertThat(invoices.get(invoices.size() - 1).getStatus()).isLessThan(invoices.get(0).getStatus());
         }
     }
 
@@ -999,7 +996,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
         assertThat(invoiceOnCompany.status()).isEqualTo(InvoiceEntity.Status.DRAFT);
         assertThat(invoiceOnCompany.data().rewards().stream().anyMatch(r -> r.id().equals(UUID.fromString(rewardId)))).isTrue();
         var reward = entityManagerFactory.createEntityManager().find(RewardEntity.class, UUID.fromString(rewardId));
-        assertThat(reward.invoice().id().toString()).isEqualTo(invoiceOnCompanyId.getValue());
+        assertThat(reward.invoiceId().toString()).isEqualTo(invoiceOnCompanyId.getValue());
 
         // Then switch billing profile type
         final var ownerId = UserId.of(antho.user().getId());
@@ -1042,7 +1039,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
 
         // Check that the reward is part of the approved invoice
         reward = em.find(RewardEntity.class, UUID.fromString(rewardId));
-        assertThat(reward.invoice().id().toString()).isEqualTo(invoiceId.getValue());
+        assertThat(reward.invoiceId().toString()).isEqualTo(invoiceId.getValue());
 
         // Switch back to company billing profile type
         payoutPreferenceFacadePort.setPayoutPreference(PROJECT_ID, BillingProfile.Id.of(companyBillingProfileId), ownerId);
@@ -1061,7 +1058,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
 
         // Now check that the reward is still part of the approved invoice
         reward = em.find(RewardEntity.class, UUID.fromString(rewardId));
-        assertThat(reward.invoice().id().toString()).isEqualTo(invoiceId.getValue());
+        assertThat(reward.invoiceId().toString()).isEqualTo(invoiceId.getValue());
         em.close();
     }
 

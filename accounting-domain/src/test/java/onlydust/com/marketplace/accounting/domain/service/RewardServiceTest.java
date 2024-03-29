@@ -10,8 +10,8 @@ import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStora
 import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
-import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
 import onlydust.com.marketplace.accounting.domain.view.UserView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
@@ -23,10 +23,7 @@ import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class RewardServiceTest {
@@ -53,7 +50,7 @@ public class RewardServiceTest {
         final var r21 = generateRewardStubForCurrencyAndEmail(Currencies.STRK, email2);
         final var r12 = generateRewardStubForCurrencyAndEmail(Currencies.OP, email1);
         final var r22 = generateRewardStubForCurrencyAndEmail(Currencies.APT, email2);
-        final List<BackofficeRewardView> rewardViews = List.of(
+        final List<RewardDetailsView> rewardViews = List.of(
                 r11,
                 r12,
                 r21,
@@ -68,41 +65,12 @@ public class RewardServiceTest {
         // Then
         verify(mailNotificationPort, times(1)).sendRewardsPaidMail(email1, List.of(r11, r12));
         verify(mailNotificationPort, times(1)).sendRewardsPaidMail(email2, List.of(r21, r22));
-        verify(accountingRewardStoragePort).markRewardsAsPaymentNotified(rewardViews.stream().map(BackofficeRewardView::id).toList());
+        verify(accountingRewardStoragePort).markRewardsAsPaymentNotified(rewardViews.stream().map(RewardDetailsView::id).toList());
     }
 
 
-    @Test
-    void should_search_for_batch_payment() {
-        // Given
-        final List<Invoice.Id> invoiceIds = List.of(Invoice.Id.of(UUID.randomUUID()));
-
-        // When
-        when(accountingRewardStoragePort.searchRewards(List.of(Invoice.Status.APPROVED), invoiceIds, List.of(RewardStatus.PROCESSING)))
-                .thenReturn(List.of(
-                        generateRewardStubForCurrency(Currencies.ETH),
-                        generateRewardStubForCurrency(Currencies.EUR),
-                        generateRewardStubForCurrency(Currencies.OP),
-                        generateRewardStubForCurrency(Currencies.USD),
-                        generateRewardStubForCurrency(Currencies.USD),
-                        generateRewardStubForCurrency(Currencies.USDC),
-                        generateRewardStubForCurrency(Currencies.APT),
-                        generateRewardStubForCurrency(Currencies.LORDS),
-                        generateRewardStubForCurrency(Currencies.STRK)
-                ));
-        final var rewardViews = rewardService.processingRewardsByInvoiceIds(invoiceIds);
-
-        // Then
-        assertEquals(6, rewardViews.size());
-        assertThat(rewardViews).allMatch(r -> r.money().currency().type().equals(Currency.Type.CRYPTO));
-    }
-
-    private BackofficeRewardView generateRewardStubForCurrency(final Currency currency) {
-        return generateRewardStubForCurrencyAndEmail(currency, faker.rickAndMorty().character());
-    }
-
-    private BackofficeRewardView generateRewardStubForCurrencyAndEmail(final Currency currency, final String email) {
-        return BackofficeRewardView.builder()
+    private RewardDetailsView generateRewardStubForCurrencyAndEmail(final Currency currency, final String email) {
+        return RewardDetailsView.builder()
                 .id(RewardId.random())
                 .status(RewardStatus.PROCESSING)
                 .billingProfile(new CompanyBillingProfile(faker.gameOfThrones().character(), UserId.random()))

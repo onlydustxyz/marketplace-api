@@ -1,11 +1,10 @@
 package onlydust.com.marketplace.accounting.domain.port.out;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
@@ -16,10 +15,6 @@ import java.util.Set;
 
 public interface AccountingRewardStoragePort {
 
-    List<BackofficeRewardView> searchRewards(List<Invoice.Status> statuses, List<Invoice.Id> invoiceIds, List<RewardStatus> rewardStatuses);
-
-    List<BackofficeRewardView> getInvoiceRewards(@NonNull Invoice.Id invoiceId);
-
     Optional<Payment> findPayment(Payment.Id batchPaymentId);
 
     void savePayment(Payment updatedPayment);
@@ -28,14 +23,14 @@ public interface AccountingRewardStoragePort {
 
     Optional<BatchPaymentDetailsView> findPaymentDetailsById(Payment.Id batchPaymentId);
 
-    List<BackofficeRewardView> findRewardsById(Set<RewardId> rewardIds);
+    List<RewardDetailsView> findRewardsById(Set<RewardId> rewardIds);
 
-    Page<BackofficeRewardView> findRewards(int pageIndex, int pageSize,
-                                           @NonNull Set<RewardStatus> statuses,
-                                           Date fromRequestedAt, Date toRequestedAt,
-                                           Date fromProcessedAt, Date toProcessedAt);
+    Page<RewardDetailsView> findRewards(int pageIndex, int pageSize,
+                                        @NonNull Set<RewardStatus> statuses,
+                                        Date fromRequestedAt, Date toRequestedAt,
+                                        Date fromProcessedAt, Date toProcessedAt);
 
-    List<BackofficeRewardView> findPaidRewardsToNotify();
+    List<RewardDetailsView> findPaidRewardsToNotify();
 
     void markRewardsAsPaymentNotified(List<RewardId> rewardId);
 
@@ -43,5 +38,5 @@ public interface AccountingRewardStoragePort {
 
     void deletePayment(Payment.Id paymentId);
 
-    Optional<BackofficeRewardView> getReward(RewardId id);
+    Optional<RewardDetailsView> getReward(RewardId id);
 }

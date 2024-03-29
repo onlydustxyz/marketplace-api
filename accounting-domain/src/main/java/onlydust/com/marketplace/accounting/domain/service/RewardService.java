@@ -1,14 +1,15 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -30,24 +31,12 @@ public class RewardService implements AccountingRewardPort {
     private final SponsorStoragePort sponsorStoragePort;
 
     @Override
-    public List<BackofficeRewardView> findByInvoiceId(Invoice.Id invoiceId) {
-        return accountingRewardStoragePort.getInvoiceRewards(invoiceId);
-    }
-
-    @Override
-    public Page<BackofficeRewardView> getRewards(int pageIndex, int pageSize,
-                                                 List<RewardStatus> statuses,
-                                                 Date fromRequestedAt, Date toRequestedAt,
-                                                 Date fromProcessedAt, Date toProcessedAt) {
+    public Page<RewardDetailsView> getRewards(int pageIndex, int pageSize,
+                                              List<RewardStatus> statuses,
+                                              Date fromRequestedAt, Date toRequestedAt,
+                                              Date fromProcessedAt, Date toProcessedAt) {
         final Set<RewardStatus> sanitizedStatuses = isNull(statuses) ? Set.of() : statuses.stream().collect(Collectors.toUnmodifiableSet());
         return accountingRewardStoragePort.findRewards(pageIndex, pageSize, sanitizedStatuses, fromRequestedAt, toRequestedAt, fromProcessedAt, toProcessedAt);
-    }
-
-    @Override
-    public List<BackofficeRewardView> processingRewardsByInvoiceIds(List<Invoice.Id> invoiceIds) {
-        return accountingRewardStoragePort.searchRewards(List.of(Invoice.Status.APPROVED), invoiceIds, List.of(RewardStatus.PROCESSING)).stream()
-                .filter(r -> r.money().currency().type().equals(Currency.Type.CRYPTO))
-                .toList();
     }
 
     @Override
@@ -72,12 +61,12 @@ public class RewardService implements AccountingRewardPort {
             mailNotificationPort.sendRewardsPaidMail(listOfPaidRewardsMapToAdminEmail.getKey(), listOfPaidRewardsMapToAdminEmail.getValue());
         }
         accountingRewardStoragePort.markRewardsAsPaymentNotified(rewardViews.stream()
-                .map(BackofficeRewardView::id)
+                .map(RewardDetailsView::id)
                 .toList());
     }
 
     @Override
-    public BackofficeRewardView getReward(RewardId id) {
+    public RewardDetailsView getReward(RewardId id) {
         final var reward = accountingRewardStoragePort.getReward(id)
                 .orElseThrow(() -> badRequest("Reward %s not found".formatted(id)));
 

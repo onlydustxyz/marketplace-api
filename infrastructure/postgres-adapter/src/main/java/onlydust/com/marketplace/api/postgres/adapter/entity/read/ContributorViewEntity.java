@@ -17,7 +17,6 @@ public class ContributorViewEntity {
     @Id
     Long githubUserId;
     String login;
-    String htmlUrl;
     String avatarUrl;
     Boolean isRegistered;
 }

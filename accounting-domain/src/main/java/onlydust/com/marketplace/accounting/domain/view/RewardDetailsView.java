@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @Builder(toBuilder = true)
-public record BackofficeRewardView(
+public record RewardDetailsView(
         @NonNull RewardId id,
         Payment.Id paymentId,
         @NonNull RewardStatus status,

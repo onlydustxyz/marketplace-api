@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.postgres.adapter.configuration;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
@@ -134,10 +133,11 @@ public class PostgresConfiguration {
                                                                      final CurrencyRepository currencyRepository,
                                                                      final CustomRewardRepository customRewardRepository,
                                                                      final BudgetStatsRepository budgetStatsRepository,
+                                                                     final RewardDetailsViewRepository rewardDetailsViewRepository,
                                                                      final RewardViewRepository rewardViewRepository
     ) {
         return new PostgresProjectRewardAdapter(projectAllowanceRepository, historicalQuoteRepository, currencyRepository, budgetStatsRepository,
-                rewardViewRepository, customRewardRepository);
+                rewardDetailsViewRepository, rewardViewRepository, customRewardRepository);
     }
 
     @Bean
@@ -166,6 +166,7 @@ public class PostgresConfiguration {
                                                    final CustomRewardRepository customRewardRepository,
                                                    final ProjectLedIdRepository projectLedIdRepository,
                                                    final RewardStatsRepository rewardStatsRepository,
+                                                   final RewardDetailsViewRepository rewardDetailsViewRepository,
                                                    final RewardViewRepository rewardViewRepository,
                                                    final CurrencyRepository currencyRepository,
                                                    final BillingProfileUserRepository billingProfileUserRepository) {
@@ -184,6 +185,7 @@ public class PostgresConfiguration {
                 customRewardRepository,
                 projectLedIdRepository,
                 rewardStatsRepository,
+                rewardDetailsViewRepository,
                 rewardViewRepository,
                 currencyRepository,
                 billingProfileUserRepository);
@@ -208,12 +210,11 @@ public class PostgresConfiguration {
     @Bean
     public PostgresRewardAdapter postgresRewardAdapter(final ShortProjectViewEntityRepository shortProjectViewEntityRepository,
                                                        final BatchPaymentRepository batchPaymentRepository,
-                                                       final RewardViewRepository rewardViewRepository,
                                                        final RewardDetailsViewRepository rewardDetailsViewRepository,
-                                                       final RewardRepository rewardRepository,
-                                                       final CurrencyStorage currencyStorage) {
+                                                       final BackofficeRewardViewRepository backofficeRewardViewRepository,
+                                                       final RewardRepository rewardRepository) {
         return new PostgresRewardAdapter(shortProjectViewEntityRepository,
-                batchPaymentRepository, rewardViewRepository, rewardDetailsViewRepository, rewardRepository, currencyStorage);
+                batchPaymentRepository, rewardDetailsViewRepository, backofficeRewardViewRepository, rewardRepository);
     }
 
     @Bean
@@ -305,9 +306,11 @@ public class PostgresConfiguration {
     InvoiceStoragePort invoicePreviewStoragePort(
             final @NonNull InvoiceRewardRepository invoiceRewardRepository,
             final @NonNull InvoiceRepository invoiceRepository,
-            final @NonNull RewardRepository rewardRepository) {
+            final @NonNull RewardRepository rewardRepository,
+            final @NonNull RewardViewRepository rewardViewRepository,
+            final @NonNull InvoiceViewRepository invoiceViewRepository) {
         return new PostgresInvoiceStorage(invoiceRewardRepository,
-                invoiceRepository, rewardRepository);
+                invoiceRepository, invoiceViewRepository, rewardRepository, rewardViewRepository);
     }
 
     @Bean

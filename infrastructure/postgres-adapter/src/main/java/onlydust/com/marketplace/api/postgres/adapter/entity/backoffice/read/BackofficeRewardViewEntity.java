@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.view.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.InvoiceViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import org.hibernate.annotations.Type;
@@ -54,7 +55,7 @@ public class BackofficeRewardViewEntity {
     BillingProfileEntity billingProfile;
 
     @ManyToOne
-    InvoiceEntity invoice;
+    InvoiceViewEntity invoice;
 
     UUID batchPaymentId;
 
@@ -84,8 +85,8 @@ public class BackofficeRewardViewEntity {
         }
     }
 
-    public BackofficeRewardView toDomain() {
-        return BackofficeRewardView.builder()
+    public RewardDetailsView toDomain() {
+        return RewardDetailsView.builder()
                 .id(RewardId.of(this.id))
                 .paymentId(batchPaymentId == null ? null : Payment.Id.of(batchPaymentId))
                 .status(status.toDomain())

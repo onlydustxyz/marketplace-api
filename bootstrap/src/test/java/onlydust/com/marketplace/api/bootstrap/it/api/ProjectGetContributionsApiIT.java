@@ -50,7 +50,6 @@ public class ProjectGetContributionsApiIT extends AbstractMarketplaceApiIT {
                               "githubAuthor": {
                                 "githubUserId": 45264458,
                                 "login": "abdelhamidbakhta",
-                                "htmlUrl": "https://github.com/abdelhamidbakhta",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4"
                               },
                               "githubNumber": 1,
@@ -69,7 +68,6 @@ public class ProjectGetContributionsApiIT extends AbstractMarketplaceApiIT {
                               "contributor": {
                                 "githubUserId": 45264458,
                                 "login": "abdelhamidbakhta",
-                                "htmlUrl": "https://github.com/abdelhamidbakhta",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
                                 "isRegistered": false
                               },

@@ -5,7 +5,7 @@ import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificat
 import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceUploaded;
 import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
-import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.api.webhook.Config;
 import onlydust.com.marketplace.api.webhook.MakeWebhookHttpClient;
 import onlydust.com.marketplace.api.webhook.dto.*;
@@ -54,7 +54,7 @@ public class MakeWebhookAdapter implements WebhookPort, MailNotificationPort {
     }
 
     @Override
-    public void sendRewardsPaidMail(@NotNull final String email, @NotNull final List<BackofficeRewardView> rewardViews) {
+    public void sendRewardsPaidMail(@NotNull final String email, @NotNull final List<RewardDetailsView> rewardViews) {
         makeWebhookHttpClient.post(RewardsPaidEmailDTO.from(email, rewardViews), config.getSendRewardsPaidMailUrl(), config.getApiKey());
     }
 }

@@ -82,12 +82,11 @@ public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicing
     }
 
     @Override
-    public ResponseEntity<InvoiceResponse> getInvoice(UUID invoiceId) {
+    public ResponseEntity<InvoiceDetailsResponse> getInvoice(UUID invoiceId) {
         final var invoice = invoiceFacadePort.find(Invoice.Id.of(invoiceId))
                 .orElseThrow(() -> notFound("Invoice %s not found".formatted(invoiceId)));
-        final var rewards = accountingRewardPort.findByInvoiceId(Invoice.Id.of(invoiceId));
 
-        final var response = mapInvoiceToContract(invoice, rewards);
+        final var response = mapInvoiceToContract(invoice);
         return ResponseEntity.ok(response);
     }
 

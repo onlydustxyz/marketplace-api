@@ -13,9 +13,6 @@ import java.util.UUID;
 public interface InvoiceRepository extends JpaRepository<InvoiceEntity, UUID> {
     List<InvoiceEntity> findAllByBillingProfileIdAndStatus(final @NonNull UUID billingProfileId, final @NonNull InvoiceEntity.Status status);
 
-    Page<InvoiceEntity> findAllByBillingProfileIdAndStatusNot(final @NonNull UUID billingProfileId, final @NonNull InvoiceEntity.Status exceptStatus,
-                                                              final @NonNull Pageable pageable);
-
     @Query(value = """
             SELECT
                     i.id                    as id,

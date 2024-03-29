@@ -34,7 +34,6 @@ public interface UserMapper {
                 .githubUserId(user.getGithubUserId())
                 .login(user.getLogin())
                 .avatarUrl(user.getAvatarUrl())
-                .url(user.getHtmlUrl())
                 .isRegistered(user.getIsRegistered())
                 .build();
     }
@@ -55,20 +54,20 @@ public interface UserMapper {
                                 List<BillingProfileLinkView> billingProfiles,
                                 boolean hasAnyRewardPendingBillingProfile) {
         return User.builder()
-                .id(user.getId())
-                .githubUserId(user.getGithubUserId())
-                .githubLogin(user.getGithubLogin())
-                .githubEmail(user.getGithubEmail())
-                .githubAvatarUrl(user.getProfile() != null && user.getProfile().getAvatarUrl() != null ?
-                        user.getProfile().getAvatarUrl() : user.getGithubAvatarUrl())
-                .firstName(nonNull(user.getProfile()) ? user.getProfile().getFirstName() : null)
-                .lastName(nonNull(user.getProfile()) ? user.getProfile().getLastName() : null)
-                .roles(Arrays.stream(user.getRoles()).toList())
-                .hasAcceptedLatestTermsAndConditions(nonNull(user.getOnboarding())
-                                                     && nonNull(user.getOnboarding().getTermsAndConditionsAcceptanceDate())
-                                                     && user.getOnboarding().getTermsAndConditionsAcceptanceDate().after(termsAndConditionsLatestVersionDate))
-                .hasSeenOnboardingWizard(nonNull(user.getOnboarding())
-                                         && nonNull(user.getOnboarding().getProfileWizardDisplayDate()))
+                .id(user.id())
+                .githubUserId(user.githubUserId())
+                .githubLogin(user.login())
+                .githubEmail(user.githubEmail())
+                .githubAvatarUrl(user.profile() != null && user.profile().getAvatarUrl() != null ?
+                        user.profile().getAvatarUrl() : user.avatarUrl())
+                .firstName(nonNull(user.profile()) ? user.profile().getFirstName() : null)
+                .lastName(nonNull(user.profile()) ? user.profile().getLastName() : null)
+                .roles(Arrays.stream(user.roles()).toList())
+                .hasAcceptedLatestTermsAndConditions(nonNull(user.onboarding())
+                                                     && nonNull(user.onboarding().getTermsAndConditionsAcceptanceDate())
+                                                     && user.onboarding().getTermsAndConditionsAcceptanceDate().after(termsAndConditionsLatestVersionDate))
+                .hasSeenOnboardingWizard(nonNull(user.onboarding())
+                                         && nonNull(user.onboarding().getProfileWizardDisplayDate()))
                 .projectsLed(projectLedIdViewEntities.stream()
                         .filter(projectLedIdViewEntity -> !projectLedIdViewEntity.getPending())
                         .map(projectLedIdViewEntity -> ProjectLedView.builder()
@@ -88,7 +87,7 @@ public interface UserMapper {
                                 .contributorCount(projectLedIdViewEntity.getContributorCount())
                                 .build()).toList())
                 .projectsAppliedTo(applications.stream().map(ApplicationEntity::getProjectId).toList())
-                .createdAt(user.getCreatedAt())
+                .createdAt(user.createdAt())
                 .billingProfiles(billingProfiles)
                 .isMissingPayoutPreference(hasAnyRewardPendingBillingProfile)
                 .build();

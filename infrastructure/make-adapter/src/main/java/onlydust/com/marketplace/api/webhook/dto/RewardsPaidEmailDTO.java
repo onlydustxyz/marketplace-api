@@ -4,7 +4,7 @@ package onlydust.com.marketplace.api.webhook.dto;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class RewardsPaidEmailDTO {
     @NonNull
     String rewardNames;
 
-    public static RewardsPaidEmailDTO from(@NotNull final String email, @NotNull final List<BackofficeRewardView> rewardViews) {
+    public static RewardsPaidEmailDTO from(@NotNull final String email, @NotNull final List<RewardDetailsView> rewardViews) {
         return RewardsPaidEmailDTO.builder()
                 .recipientEmail(email)
                 .recipientName(rewardViews.get(0).invoice().createdBy().name())

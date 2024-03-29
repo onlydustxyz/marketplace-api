@@ -665,27 +665,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                         """.formatted(rewardId));
 
         // When
-        final var invoiceId = invoiceReward(UserId.of(ofux.user().getId()), KAAPER, RewardId.of(rewardId));
-
-        // When
-        client.post()
-                .uri(getApiURI(POST_REWARDS_SEARCH))
-                .header("Api-Key", apiKey())
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                            {
-                                "invoiceIds": ["%s"]
-                            }
-                        """.formatted(invoiceId))
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.rewards.length()").isEqualTo(1)
-                .jsonPath("$.rewards[0].id").isEqualTo(rewardId.toString())
-                .jsonPath("$.rewards[0].status").isEqualTo("PROCESSING")
-                .jsonPath("$.rewards[0].paymentId").doesNotExist();
+        invoiceReward(UserId.of(ofux.user().getId()), KAAPER, RewardId.of(rewardId));
 
         // When
         client.post()
@@ -702,24 +682,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .exchange()
                 .expectStatus()
                 .isNoContent();
-
-        // When
-        client.post()
-                .uri(getApiURI(POST_REWARDS_SEARCH))
-                .header("Api-Key", apiKey())
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                            {
-                                "invoiceIds": ["%s"]
-                            }
-                        """.formatted(invoiceId))
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.rewards.length()").isEqualTo(0);
-
 
         client.get()
                 .uri(getApiURI(String.format(ME_REWARD, rewardId)))

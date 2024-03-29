@@ -11,11 +11,10 @@ import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.PaymentPort;
-import onlydust.com.marketplace.accounting.domain.view.BackofficeRewardView;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BatchPaymentMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.SearchRewardMapper;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
@@ -166,7 +165,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
 
-        final Page<BackofficeRewardView> rewards = accountingRewardPort.getRewards(
+        final Page<RewardDetailsView> rewards = accountingRewardPort.getRewards(
                 sanitizedPageIndex,
                 sanitizedPageSize,
                 statuses != null ? statuses.stream().map(BackOfficeMapper::map).toList() : null,
@@ -175,7 +174,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                 DateMapper.parseNullable(fromProcessedAt),
                 DateMapper.parseNullable(toProcessedAt)
         );
-        return ResponseEntity.ok(SearchRewardMapper.rewardPageToResponse(sanitizedPageIndex, rewards));
+        return ResponseEntity.ok(rewardPageToResponse(sanitizedPageIndex, rewards));
     }
 
     @Override
@@ -200,17 +199,9 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     }
 
     @Override
-    public ResponseEntity<SearchRewardsResponse> searchRewards(SearchRewardsRequest searchRewardsRequest) {
-        final var invoiceIds = searchRewardsRequest.getInvoiceIds() != null ?
-                searchRewardsRequest.getInvoiceIds().stream().map(Invoice.Id::of).toList() : null;
-        final List<BackofficeRewardView> rewardViews = accountingRewardPort.processingRewardsByInvoiceIds(invoiceIds);
-        return ResponseEntity.ok(SearchRewardMapper.searchRewardToResponse(rewardViews));
-    }
-
-    @Override
-    public ResponseEntity<SearchRewardItemResponse> getReward(UUID rewardId) {
+    public ResponseEntity<RewardDetailsResponse> getReward(UUID rewardId) {
         final var reward = accountingRewardPort.getReward(RewardId.of(rewardId));
-        return ResponseEntity.ok(SearchRewardMapper.mapToItem(reward));
+        return ResponseEntity.ok(map(reward));
     }
 
     @Override
@@ -258,6 +249,6 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
     @Override
     public ResponseEntity<BillingProfileResponse> getBillingProfilesById(UUID billingProfileId) {
-        return ResponseEntity.ok(BackOfficeMapper.map(billingProfileFacadePort.getById(BillingProfile.Id.of(billingProfileId))));
+        return ResponseEntity.ok(map(billingProfileFacadePort.getById(BillingProfile.Id.of(billingProfileId))));
     }
 }

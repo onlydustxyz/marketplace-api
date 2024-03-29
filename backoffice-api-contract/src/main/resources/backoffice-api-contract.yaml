@@ -180,11 +180,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvoiceResponse'
+                $ref: '#/components/schemas/InvoiceDetailsResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+
   /bo/v1/invoices/{invoiceId}/status:
     put:
       security:
@@ -601,7 +602,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchRewardItemResponse'
+                $ref: '#/components/schemas/RewardDetailsResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -724,35 +725,6 @@ paths:
                 type: string
               example: |-
                 Project,Recipient,Recipient Github,Amount,Currency,Contributions,Status,Requested at,Processed at,Transaction Hash,Payout information,Pretty ID,Sponsors,Recipient email,Verification status,Account type,Invoice number,Invoice id,Budget,Batch payments,Batch payment info,Conversion rate,Dollar Amount
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
-  /bo/v1/rewards/search:
-    post:
-      security:
-        - apiKey: [ ]
-      tags:
-        - BackofficeAccountingManagement
-      summary: Search rewards
-      operationId: searchRewards
-      description: |
-        Search rewards
-      requestBody:
-        description: Payment information
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SearchRewardsRequest'
-      responses:
-        "200":
-          description: 'List of rewards'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SearchRewardsResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -2383,7 +2355,7 @@ components:
         status:
           $ref: '#/components/schemas/InvoiceInternalStatus'
 
-    InvoiceResponse:
+    InvoiceDetailsResponse:
       type: object
       required:
         - id
@@ -2402,7 +2374,7 @@ components:
         status:
           $ref: '#/components/schemas/InvoiceInternalStatus'
         billingProfile:
-          $ref: '#/components/schemas/BillingProfileResponse'
+          $ref: '#/components/schemas/BillingProfileShortResponse'
         rejectionReason:
           type: string
         createdAt:
@@ -2412,10 +2384,10 @@ components:
           $ref: '#/components/schemas/UserResponse'
         totalEquivalent:
           $ref: '#/components/schemas/MoneyResponse'
-        rewardsPerNetwork:
+        rewards:
           type: array
           items:
-            $ref: '#/components/schemas/InvoiceRewardsPerNetwork'
+            $ref: '#/components/schemas/ShortRewardResponse'
 
     KycResponse:
       type: object
@@ -2501,10 +2473,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TotalMoneyWithUsdEquivalentResponse'
-        rewards:
-          type: array
-          items:
-            $ref: '#/components/schemas/InvoiceRewardResponse'
+
 
     InvoicePageV2:
       type: object
@@ -2528,6 +2497,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/InvoicePageItemV2'
+
     InvoicePageItemV2:
       type: object
       required:
@@ -2546,7 +2516,7 @@ components:
         status:
           $ref: '#/components/schemas/InvoiceInternalStatus'
         billingProfile:
-          $ref: '#/components/schemas/BillingProfileResponse'
+          $ref: '#/components/schemas/BillingProfileLinkResponse'
         createdAt:
           type: string
           format: date-time
@@ -2619,7 +2589,7 @@ components:
       format: int64
       description: Github User ID
 
-    BillingProfileResponse:
+    BillingProfileLinkResponse:
       type: object
       required:
         - id
@@ -2633,16 +2603,30 @@ components:
           example: Apple Inc.
         type:
           $ref: '#/components/schemas/BillingProfileType'
-        verificationStatus:
-          $ref: '#/components/schemas/VerificationStatus'
-        kyb:
-          $ref: '#/components/schemas/KybResponse'
-        kyc:
-          $ref: '#/components/schemas/KycResponse'
-        admins:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserResponse'
+
+    BillingProfileShortResponse:
+      allOf:
+        - $ref: '#/components/schemas/BillingProfileLinkResponse'
+        - type: object
+          required:
+            - verificationStatus
+          properties:
+            verificationStatus:
+              $ref: '#/components/schemas/VerificationStatus'
+            kyb:
+              $ref: '#/components/schemas/KybResponse'
+            kyc:
+              $ref: '#/components/schemas/KycResponse'
+
+    BillingProfileResponse:
+      allOf:
+        - $ref: '#/components/schemas/BillingProfileShortResponse'
+        - type: object
+          properties:
+            admins:
+              type: array
+              items:
+                $ref: '#/components/schemas/UserResponse'
 
     GithubUserResponse:
       type: object
@@ -2970,71 +2954,46 @@ components:
       type: string
       format: hex
     
-    SearchRewardsRequest:
-      type: object
-      required:
-        - invoiceIds
-      properties:
-        invoiceIds:
-          type: array
-          items:
-            $ref: '#/components/schemas/InvoiceId'
-    
-    SearchRewardsResponse:
-      type: object
-      required:
-        - rewards
-      properties:
-        rewards:
-          type: array
-          items:
-            $ref: '#/components/schemas/SearchRewardItemResponse'
-
-    SearchRewardItemResponse:
-      type: object
-      required:
-        - id
-        - billingProfileAdmin
-        - requestedAt
-        - githubUrls
-        - project
-      properties:
-        id:
-          $ref: '#/components/schemas/RewardId'
-        paymentId:
-          $ref: '#/components/schemas/PaymentId'
-        billingProfile:
-          $ref: '#/components/schemas/BillingProfileResponse'
-        requestedAt:
-          type: string
-          format: date-time
-        processedAt:
-          type: string
-          format: date-time
-        githubUrls:
-          type: array
-          items:
-            type: string
-        status:
-          $ref: '#/components/schemas/RewardStatusContract'
-        project:
-          $ref: '#/components/schemas/ProjectLinkResponse'
-        sponsors:
-          type: array
-          items:
-            $ref: '#/components/schemas/SponsorLinkResponse'
-        money:
-          $ref: '#/components/schemas/MoneyWithUsdEquivalentResponse'
-        invoiceId:
-          $ref: '#/components/schemas/InvoiceId'
-        receipts:
-          type: array
-          items:
-            $ref: '#/components/schemas/TransactionReceipt'
-        pendingPayments:
-          type: array
-          items:
-            $ref: '#/components/schemas/PendingPaymentSummaryResponse'
+    RewardDetailsResponse:
+      allOf:
+        - $ref: '#/components/schemas/ShortRewardResponse'
+        - type: object
+          required:
+            - billingProfileAdmin
+            - requestedAt
+            - githubUrls
+          properties:
+            paymentId:
+              $ref: '#/components/schemas/PaymentId'
+            billingProfile:
+              $ref: '#/components/schemas/BillingProfileLinkResponse'
+            requestedAt:
+              type: string
+              format: date-time
+            processedAt:
+              type: string
+              format: date-time
+            githubUrls:
+              type: array
+              items:
+                type: string
+            sponsors:
+              type: array
+              items:
+                $ref: '#/components/schemas/SponsorLinkResponse'
+            invoiceId:
+              $ref: '#/components/schemas/InvoiceId'
+            receipts:
+              type: array
+              items:
+                $ref: '#/components/schemas/TransactionReceipt'
+            pendingPayments:
+              type: array
+              items:
+                $ref: '#/components/schemas/PendingPaymentSummaryResponse'
+            paidNotificationDate:
+              type: string
+              format: date-time
 
     PendingPaymentSummaryResponse:
       type: object
@@ -3119,58 +3078,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RewardPageItemResponse'
+
     RewardPageItemResponse:
-      type: object
-      required:
-        - id
-        - billingProfileAdmin
-        - requestedAt
-        - githubUrls
-        - project
-      properties:
-        id:
-          $ref: '#/components/schemas/RewardId'
-        paymentId:
-          $ref: '#/components/schemas/PaymentId'
-        billingProfile:
-          $ref: '#/components/schemas/BillingProfileResponse'
-        invoice:
-          $ref: '#/components/schemas/InvoiceLinkResponse'
-        status:
-          $ref: '#/components/schemas/RewardStatusContract'
-        requestedAt:
-          type: string
-          format: date-time
-        processedAt:
-          type: string
-          format: date-time
-        githubUrls:
-          type: array
-          items:
-            type: string
-        paidNotificationDate:
-          type: string
-          format: date-time
-        recipient:
-          $ref: '#/components/schemas/RecipientLinkResponse'
-        project:
-          $ref: '#/components/schemas/ProjectLinkResponse'
-        sponsors:
-          type: array
-          items:
-            $ref: '#/components/schemas/SponsorLinkResponse'
-        money:
-          $ref: '#/components/schemas/MoneyWithUsdEquivalentResponse'
-        transactionReferences:
-          type: array
-          items:
-            type: string
-            example: 0x1234567890abcdef
-        paidTo:
-          type: array
-          items:
-            type: string
-            example: 0x1234567890abcdef
+      allOf:
+        - $ref: '#/components/schemas/ShortRewardResponse'
+        - type: object
+          required:
+            - recipient
+            - billingProfileAdmin
+            - requestedAt
+            - githubUrls
+          properties:
+            recipient:
+              $ref: '#/components/schemas/RecipientLinkResponse'
+            billingProfile:
+              $ref: '#/components/schemas/BillingProfileLinkResponse'
+            requestedAt:
+              type: string
+              format: date-time
+            invoice:
+              $ref: '#/components/schemas/InvoiceLinkResponse'
 
     RewardStatusContract:
       enum:
@@ -3197,38 +3124,17 @@ components:
         avatarUrl:
           type: string
 
-    InvoiceRewardResponse:
+    ShortRewardResponse:
       type: object
       properties:
         id:
           $ref: '#/components/schemas/RewardId'
-        paymentId:
-          $ref: '#/components/schemas/PaymentId'
-        requestedAt:
-          type: string
-          format: date-time
-        processedAt:
-          type: string
-          format: date-time
-        status:
-          $ref: '#/components/schemas/RewardStatusContract'
-        githubUrls:
-          type: array
-          items:
-            type: string
         project:
           $ref: '#/components/schemas/ProjectLinkResponse'
-        sponsors:
-          type: array
-          items:
-            $ref: '#/components/schemas/SponsorLinkResponse'
+        status:
+          $ref: '#/components/schemas/RewardStatusContract'
         money:
           $ref: '#/components/schemas/MoneyWithUsdEquivalentResponse'
-        transactionReferences:
-          type: array
-          items:
-            type: string
-            example: 0x1234567890abcdef
 
     ProjectLinkResponse:
       type: object
@@ -3298,6 +3204,7 @@ components:
     PaymentId:
       type: string
       format: uuid
+
     BatchPaymentsResponse:
       type: object
       required:
@@ -3307,11 +3214,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/BatchPaymentResponse'
+
     BatchPaymentResponse:
       type: object
       required:
         - id
-        - csv
         - rewardCount
         - totalAmounts
         - network
@@ -3323,8 +3230,6 @@ components:
           format: date-time
         status:
           $ref: '#/components/schemas/BatchPaymentStatus'
-        csv:
-          type: string
         network:
           $ref: '#/components/schemas/TransactionNetwork'
         rewardCount:
@@ -3376,10 +3281,13 @@ components:
     BatchPaymentDetailsResponse:
       allOf:
         - $ref: '#/components/schemas/BatchPaymentResponse'
-        - $ref: '#/components/schemas/SearchRewardsResponse'
         - type: object
           properties:
             csv:
               type: string
             transactionHash:
               type: string
+            rewards:
+              type: array
+              items:
+                $ref: '#/components/schemas/ShortRewardResponse'

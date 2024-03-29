@@ -8,12 +8,11 @@ import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.InvoiceViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRewardRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.springframework.data.domain.PageRequest;
@@ -29,7 +28,9 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 public class PostgresInvoiceStorage implements InvoiceStoragePort {
     private final @NonNull InvoiceRewardRepository invoiceRewardRepository;
     private final @NonNull InvoiceRepository invoiceRepository;
+    private final @NonNull InvoiceViewRepository invoiceViewRepository;
     private final @NonNull RewardRepository rewardRepository;
+    private final @NonNull RewardViewRepository rewardViewRepository;
 
     @Override
     public List<Invoice.Reward> findRewards(List<RewardId> rewardIds) {
@@ -56,7 +57,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
         if (rewards.size() != invoice.rewards().size()) {
             throw notFound("Some invoice's rewards were not found (invoice %s). This may happen if a reward was cancelled in the meantime.".formatted(invoice.id()));
         }
-        rewardRepository.saveAllAndFlush(rewards.stream().map(pr -> pr.invoice(entity)).toList());
+        rewardRepository.saveAllAndFlush(rewards.stream().map(pr -> pr.invoiceId(invoice.id().value())).toList());
     }
 
     @Override
@@ -76,7 +77,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
 
         drafts.forEach(invoice -> {
             final var rewards = rewardRepository.findAllByInvoiceId(invoice.id());
-            rewardRepository.saveAllAndFlush(rewards.stream().map(pr -> pr.invoice(null)).toList());
+            rewardRepository.saveAllAndFlush(rewards.stream().map(pr -> pr.invoiceId(null)).toList());
         });
 
         invoiceRepository.deleteAll(drafts);
@@ -84,12 +85,13 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     }
 
     @Override
+    @Transactional
     public Page<InvoiceView> invoicesOf(final @NonNull BillingProfile.Id billingProfileId, final @NonNull Integer pageNumber, final @NonNull Integer pageSize,
                                         final @NonNull Invoice.Sort sort, final @NonNull SortDirection direction) {
-        final var page = invoiceRepository.findAllByBillingProfileIdAndStatusNot(billingProfileId.value(), InvoiceEntity.Status.DRAFT,
+        final var page = invoiceViewRepository.findAllByBillingProfileIdAndStatusNot(billingProfileId.value(), InvoiceEntity.Status.DRAFT,
                 PageRequest.of(pageNumber, pageSize, sortBy(sort, direction == SortDirection.asc ? Sort.Direction.ASC : Sort.Direction.DESC)));
         return Page.<InvoiceView>builder()
-                .content(page.getContent().stream().map(InvoiceEntity::toView).toList())
+                .content(page.getContent().stream().map(InvoiceViewEntity::toView).toList())
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();
@@ -101,8 +103,9 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     }
 
     @Override
+    @Transactional
     public Optional<InvoiceView> getView(final @NonNull Invoice.Id invoiceId) {
-        return invoiceRepository.findById(invoiceId.value()).map(InvoiceEntity::toView);
+        return invoiceViewRepository.findById(invoiceId.value()).map(InvoiceViewEntity::toView);
     }
 
     @Override
@@ -125,7 +128,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
 
     @Override
     public Optional<Invoice> invoiceOf(RewardId rewardId) {
-        final var reward = rewardRepository.findById(rewardId.value()).orElseThrow(() -> notFound("Reward %s not found".formatted(rewardId)));
+        final var reward = rewardViewRepository.findById(rewardId.value()).orElseThrow(() -> notFound("Reward %s not found".formatted(rewardId)));
         return Optional.ofNullable(reward.invoice()).map(InvoiceEntity::toDomain);
     }
 

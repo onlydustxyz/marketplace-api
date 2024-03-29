@@ -7,6 +7,4 @@ public interface UserLinkView {
     String getLogin();
 
     String getAvatarUrl();
-
-    String getUrl();
 }

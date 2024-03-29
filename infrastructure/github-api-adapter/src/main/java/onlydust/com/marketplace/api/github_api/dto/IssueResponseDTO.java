@@ -53,7 +53,6 @@ public class IssueResponseDTO {
                 .githubAuthor(ContributorLinkView.builder()
                         .githubUserId(this.user.id)
                         .login(this.user.login)
-                        .url(this.user.htmlUrl)
                         .avatarUrl(this.user.avatarUrl)
                         .build())
                 .build();
@@ -76,6 +75,6 @@ public class IssueResponseDTO {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record UserResponseDTO(Long id, String login, @JsonProperty("html_url") String htmlUrl, @JsonProperty("avatar_url") String avatarUrl) {
+    public record UserResponseDTO(Long id, String login, @JsonProperty("avatar_url") String avatarUrl) {
     }
 }

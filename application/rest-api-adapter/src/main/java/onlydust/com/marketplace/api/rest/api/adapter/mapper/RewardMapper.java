@@ -10,7 +10,6 @@ import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.view.*;
 
-import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,14 +46,12 @@ public interface RewardMapper {
                         .githubUserId(rewardDetailsView.getFrom().getGithubUserId())
                         .avatarUrl(rewardDetailsView.getFrom().getAvatarUrl())
                         .login(rewardDetailsView.getFrom().getLogin())
-                        .htmlUrl(URI.create(rewardDetailsView.getFrom().getUrl()))
                         .isRegistered(rewardDetailsView.getFrom().getIsRegistered())
                 )
                 .to(new ContributorResponse()
                         .githubUserId(rewardDetailsView.getTo().getGithubUserId())
                         .avatarUrl(rewardDetailsView.getTo().getAvatarUrl())
                         .login(rewardDetailsView.getTo().getLogin())
-                        .htmlUrl(URI.create(rewardDetailsView.getTo().getUrl()))
                         .isRegistered(rewardDetailsView.getTo().getIsRegistered())
                 )
                 .createdAt(DateMapper.toZoneDateTime(rewardDetailsView.getCreatedAt()))

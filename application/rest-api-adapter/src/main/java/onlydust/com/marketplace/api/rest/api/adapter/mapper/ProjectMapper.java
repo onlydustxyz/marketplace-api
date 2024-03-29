@@ -276,9 +276,6 @@ public interface ProjectMapper {
         user.setGithubUserId(projectLeader.getGithubUserId());
         user.setAvatarUrl(projectLeader.getAvatarUrl());
         user.setLogin(projectLeader.getLogin());
-        if (projectLeader.getUrl() != null) {
-            user.setHtmlUrl(URI.create(projectLeader.getUrl()));
-        }
         return user;
     }
 
@@ -287,9 +284,6 @@ public interface ProjectMapper {
         user.setGithubUserId(userLinkView.getGithubUserId());
         user.setAvatarUrl(userLinkView.getAvatarUrl());
         user.setLogin(userLinkView.getLogin());
-        if (userLinkView.getUrl() != null) {
-            user.setHtmlUrl(URI.create(userLinkView.getUrl()));
-        }
         return user;
     }
 

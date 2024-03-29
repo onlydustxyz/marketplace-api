@@ -430,8 +430,9 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     }
 
     @Override
+    @Transactional
     public List<BillingProfileRewardView> findInvoiceableRewardsForBillingProfile(BillingProfile.Id billingProfileId) {
-        return rewardViewRepository.findInvoiceableRewardsForBillingProfile(billingProfileId.value())
+        return rewardViewRepository.findByBillingProfileIdAndStatusStatus(billingProfileId.value(), RewardStatusEntity.Status.PENDING_REQUEST)
                 .stream().map(RewardViewEntity::toBillingProfileReward).toList();
     }
 

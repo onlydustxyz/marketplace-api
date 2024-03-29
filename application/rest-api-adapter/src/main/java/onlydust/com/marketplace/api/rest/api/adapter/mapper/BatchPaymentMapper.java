@@ -30,12 +30,11 @@ public interface BatchPaymentMapper {
     }
 
     static BatchPaymentResponse domainToResponse(final BatchPaymentDetailsView bp) {
-        final var totalsPerCurrency = bp.totalsPerCurrency().stream().map(SearchRewardMapper::totalMoneyViewToResponse).toList();
+        final var totalsPerCurrency = bp.totalsPerCurrency().stream().map(BackOfficeMapper::totalMoneyViewToResponse).toList();
         return new BatchPaymentResponse()
                 .id(bp.payment().id().value())
                 .createdAt(DateMapper.toZoneDateTime(bp.payment().createdAt()))
                 .status(map(bp.payment().status()))
-                .csv(bp.payment().csv())
                 .rewardCount((long) bp.rewardViews().size())
                 .network(mapNetwork(bp.payment().network()))
                 .totalUsdEquivalent(totalsPerCurrency.stream()
@@ -45,7 +44,7 @@ public interface BatchPaymentMapper {
     }
 
     static BatchPaymentDetailsResponse domainToDetailedResponse(final BatchPaymentDetailsView bp) {
-        final var totalsPerCurrency = bp.totalsPerCurrency().stream().map(SearchRewardMapper::totalMoneyViewToResponse).toList();
+        final var totalsPerCurrency = bp.totalsPerCurrency().stream().map(BackOfficeMapper::totalMoneyViewToResponse).toList();
         return new BatchPaymentDetailsResponse()
                 .id(bp.payment().id().value())
                 .createdAt(DateMapper.toZoneDateTime(bp.payment().createdAt()))
@@ -58,7 +57,7 @@ public interface BatchPaymentMapper {
                         .reduce(BigDecimal.ZERO, BigDecimal::add))
                 .totalsPerCurrency(totalsPerCurrency)
                 .transactionHash(bp.payment().transactionHash())
-                .rewards(bp.rewardViews().stream().map(SearchRewardMapper::mapToItem).toList());
+                .rewards(bp.rewardViews().stream().map(BackOfficeMapper::mapToShortResponse).toList());
     }
 
     static Payment.Status map(final BatchPaymentStatus status) {

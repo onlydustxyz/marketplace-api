@@ -93,7 +93,6 @@ public class ProjectsPostRewardableOtherPullRequestApiIT extends AbstractMarketp
                           "author": {
                             "githubUserId": 7748404,
                             "login": "kvrhdn",
-                            "htmlUrl": "https://github.com/kvrhdn",
                             "avatarUrl": "https://avatars.githubusercontent.com/u/7748404?v=4"
                           },
                           "repoName": "tracing",
