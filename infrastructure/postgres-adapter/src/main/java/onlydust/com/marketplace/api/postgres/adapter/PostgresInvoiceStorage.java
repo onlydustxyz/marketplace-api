@@ -64,13 +64,13 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     @Override
     @Transactional(readOnly = true)
     public List<RewardAssociations> getRewardAssociations(List<RewardId> rewardIds) {
-        return rewardRepository.findAllById(rewardIds.stream().map(RewardId::value).toList())
+        return rewardViewRepository.findAllById(rewardIds.stream().map(RewardId::value).toList())
                 .stream().map(r -> new RewardAssociations(
                         RewardId.of(r.id()),
                         r.status().toDomain(),
-                        r.invoiceId() == null ? null : Invoice.Id.of(r.invoiceId()),
+                        r.invoice() == null ? null : Invoice.Id.of(r.invoice().id()),
                         r.invoice() == null ? null : r.invoice().status().toDomain(),
-                        r.billingProfileId() == null ? null : BillingProfile.Id.of(r.billingProfileId())
+                        r.billingProfile() == null ? null : BillingProfile.Id.of(r.billingProfile().getId())
                 )).toList();
     }
 

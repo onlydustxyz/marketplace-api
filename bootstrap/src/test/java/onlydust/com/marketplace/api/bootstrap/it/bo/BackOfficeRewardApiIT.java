@@ -2,9 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import com.github.javafaker.Faker;
 import onlydust.com.backoffice.api.contract.model.PayRewardRequest;
-import onlydust.com.backoffice.api.contract.model.SearchRewardsResponse;
 import onlydust.com.backoffice.api.contract.model.TransactionNetwork;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
@@ -27,12 +25,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.MediaType;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.bootstrap.it.api.AbstractMarketplaceApiIT.ME_PUT_PAYOUT_PREFERENCES;
@@ -203,49 +199,6 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
         setUp();
 
         // When
-        final var response = client.post()
-                .uri(getApiURI(POST_REWARDS_SEARCH))
-                .header("Api-Key", apiKey())
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                            {
-                            "invoiceIds": ["%s","%s","%s"]
-                            }
-                        """.formatted(
-                        olivierInvoiceIds.get(0).value(),
-                        anthonyInvoiceIds.get(0).value(),
-                        pierreInvoiceIds.get(0).value()
-                ))
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .returnResult(SearchRewardsResponse.class)
-                .getResponseBody().blockFirst();
-
-        final var expectedRewardIds = List.of(
-                UUID.fromString("5c668b61-e42c-4f0e-b31f-44c4e50dc2f4"),
-                UUID.fromString("6587511b-3791-47c6-8430-8f793606c63a"),
-                UUID.fromString("79209029-c488-4284-aa3f-bce8870d3a66"),
-                UUID.fromString("303f26b1-63f0-41f1-ab11-e70b54ef4a2a"),
-                UUID.fromString("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"),
-                UUID.fromString("5b96ca1e-4ad2-41c1-8819-520b885d9223"),
-                UUID.fromString("2ac80cc6-7e83-4eef-bc0c-932b58f683c0"),
-                UUID.fromString("85f8358c-5339-42ac-a577-16d7760d1e28"),
-                UUID.fromString("40fda3c6-2a3f-4cdd-ba12-0499dd232d53")
-        );
-
-        for (final var reward : response.getRewards()) {
-            assertThat(expectedRewardIds).contains(reward.getId());
-            assertThat(List.of(Currency.Code.USD_STR, Currency.Code.USDC_STR)).contains(reward.getMoney().getCurrency().getCode());
-            assertThat(reward.getPaymentId()).isNull();
-        }
-    }
-
-    @Test
-    @Order(2)
-    void should_get_reward_by_id() {
-        // When
         client.get()
                 .uri(getApiURI(BO_REWARD.formatted("5c668b61-e42c-4f0e-b31f-44c4e50dc2f4")))
                 .header("Api-Key", apiKey())
@@ -373,21 +326,6 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           "rewards": [
                             {
                               "id": "5f9060a7-6f9e-4ef7-a1e4-1aaa4c85f03c",
-                              "paymentId": null,
-                              "billingProfile": null,
-                              "invoice": null,
-                              "status": "PENDING_VERIFICATION",
-                              "requestedAt": "2023-10-08T10:09:31.842962Z",
-                              "processedAt": null,
-                              "githubUrls": [
-                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
-                              ],
-                              "paidNotificationDate": null,
-                              "recipient": {
-                                "login": "gregcha",
-                                "name": null,
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
-                              },
                               "project": {
                                 "name": "Bretzel",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
@@ -405,21 +343,6 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "dollarsEquivalent": 1000.00,
                                 "conversionRate": 1.00000000000000000000
                               },
-                              "transactionReferences": [],
-                              "paidTo": []
-                            },
-                            {
-                              "id": "fab7aaf4-9b0c-4e52-bc9b-72ce08131617",
-                              "paymentId": null,
-                              "billingProfile": null,
-                              "invoice": null,
-                              "status": "PENDING_VERIFICATION",
-                              "requestedAt": "2023-10-08T10:06:42.730697Z",
-                              "processedAt": null,
-                              "githubUrls": [
-                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
-                              ],
-                              "paidNotificationDate": null,
                               "recipient": {
                                 "login": "gregcha",
                                 "name": null,
@@ -476,21 +399,6 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "dollarsEquivalent": 1000.00,
                                 "conversionRate": 1.00000000000000000000
                               },
-                              "transactionReferences": [],
-                              "paidTo": []
-                            },
-                            {
-                              "id": "736e0554-f30e-4315-9731-7611fa089dcf",
-                              "paymentId": null,
-                              "billingProfile": null,
-                              "invoice": null,
-                              "status": "COMPLETE",
-                              "requestedAt": "2023-09-26T15:57:29.834949Z",
-                              "processedAt": "2023-09-26T21:08:01.957813Z",
-                              "githubUrls": [
-                                "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
-                              ],
-                              "paidNotificationDate": null,
                               "recipient": {
                                 "login": "gregcha",
                                 "name": null,

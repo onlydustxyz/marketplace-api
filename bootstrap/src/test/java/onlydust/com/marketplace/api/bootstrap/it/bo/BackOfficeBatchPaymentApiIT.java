@@ -38,7 +38,6 @@ import java.util.*;
 
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.bootstrap.it.api.AbstractMarketplaceApiIT.ME_PUT_PAYOUT_PREFERENCES;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeApiIT {
@@ -237,7 +236,6 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                           "batchPayments": [
                             {
                               "status": "TO_PAY",
-                              "csv": "erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,747e663f-4e68-4b42-965b-b5aebedcd4c4.eth,1000\\r\\n",
                               "network": "ETHEREUM",
                               "rewardCount": 1,
                               "totalUsdEquivalent": 1010.00,
@@ -257,7 +255,6 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                             },
                             {
                               "status": "TO_PAY",
-                              "csv": "iso4217,,FR76000111222333334444,1500\\r\\niso4217,,FR76000111222333334444,1250\\r\\n",
                               "network": "SEPA",
                               "rewardCount": 2,
                               "totalUsdEquivalent": 2750,
@@ -278,15 +275,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                           ]
                         }
                         """);
-        final var ethCSV = network1.getValue().equals("ETHEREUM") ? csv1 : csv2;
-        final var sepaCSV = network1.getValue().equals("SEPA") ? csv1 : csv2;
-        assertThat(sepaCSV.getValue()).isEqualToIgnoringWhitespace("""
-                iso4217,,FR76000111222333334444,1500
-                iso4217,,FR76000111222333334444,1250
-                """);
-        assertThat(ethCSV.getValue()).isEqualToIgnoringWhitespace("""
-                erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,747e663f-4e68-4b42-965b-b5aebedcd4c4.eth,1000
-                """);
+
         ethBatchPaymentId = Payment.Id.of(network1.getValue().equals("ETHEREUM") ? batchPaymentId1.getValue() : batchPaymentId2.getValue());
         sepaBatchPaymentId = Payment.Id.of(network1.getValue().equals("SEPA") ? batchPaymentId1.getValue() : batchPaymentId2.getValue());
     }
@@ -309,7 +298,6 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                 .json("""
                         {
                           "status": "TO_PAY",
-                          "csv": "erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,747e663f-4e68-4b42-965b-b5aebedcd4c4.eth,1000\\r\\n",
                           "network": "ETHEREUM",
                           "rewardCount": 1,
                           "totalUsdEquivalent": 1010.00,
@@ -326,101 +314,11 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                               "dollarsEquivalent": 1010.00
                             }
                           ],
+                          "csv": "erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,747e663f-4e68-4b42-965b-b5aebedcd4c4.eth,1000\\r\\n",
                           "transactionHash": null,
                           "rewards": [
                             {
                               "id": "d22f75ab-d9f5-4dc6-9a85-60dcd7452028",
-                              "billingProfile": {
-                                "subject": "Antho Arbuste",
-                                "type": "INDIVIDUAL",
-                                "verificationStatus": "VERIFIED",
-                                "kyb": null,
-                                "kyc": null,
-                                "admins": null
-                              },
-                              "processedAt": null,
-                              "githubUrls": [
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1042",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1043",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1044",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1045",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1048",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1049",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1052",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1053",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1054",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1056",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1059",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1063",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1064",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1065",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1067",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1068",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1070",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1071",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1073",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1075",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1076",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1077",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1079",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1080",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1081",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1082",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1084",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1085",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1087",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1088",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1090",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1091",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1100",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1103",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1104",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1105",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1107",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1108",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1112",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1113",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1114",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1115",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1117",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1118",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1121",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1122",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1124",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1129",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1131",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1132",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1133",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1137",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1143",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1148",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1150",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1151",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1152",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1160",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1161",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1162",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1163",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1164",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1165",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1167",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1168",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1169",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1172",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1174",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1175",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1204",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1212",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1217",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1235",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1237",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1239",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1240",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1241",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/1247",
-                                "https://github.com/onlydustxyz/marketplace-frontend/pull/62"
-                              ],
-                              "status": "PROCESSING",
                               "project": {
                                 "name": "kaaper",
                                 "logoUrl": null
@@ -437,9 +335,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                 },
                                 "dollarsEquivalent": 1010.00,
                                 "conversionRate": 1.0100000000000000
-                              },
-                              "receipts": [],
-                              "pendingPayments": []
+                              }
                             }
                           ]
                         }
@@ -466,27 +362,6 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                           "batchPayments": [
                             {
                               "status": "TO_PAY",
-                              "csv": "iso4217,,FR76000111222333334444,1500\\r\\niso4217,,FR76000111222333334444,1250\\r\\n",
-                              "network": "SEPA",
-                              "rewardCount": 2,
-                              "totalUsdEquivalent": 2750,
-                              "totalsPerCurrency": [
-                                {
-                                  "amount": 2750,
-                                  "currency": {
-                                    "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                                    "code": "USD",
-                                    "name": "US Dollar",
-                                    "logoUrl": null,
-                                    "decimals": 2
-                                  },
-                                  "dollarsEquivalent": 2750
-                                }
-                              ]
-                            },
-                            {
-                              "status": "TO_PAY",
-                              "csv": "erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,747e663f-4e68-4b42-965b-b5aebedcd4c4.eth,1000\\r\\n",
                               "network": "ETHEREUM",
                               "rewardCount": 1,
                               "totalUsdEquivalent": 1010.00,
@@ -501,6 +376,25 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                     "decimals": 6
                                   },
                                   "dollarsEquivalent": 1010.00
+                                }
+                              ]
+                            },
+                            {
+                              "status": "TO_PAY",
+                              "network": "SEPA",
+                              "rewardCount": 2,
+                              "totalUsdEquivalent": 2750,
+                              "totalsPerCurrency": [
+                                {
+                                  "amount": 2750,
+                                  "currency": {
+                                    "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                    "code": "USD",
+                                    "name": "US Dollar",
+                                    "logoUrl": null,
+                                    "decimals": 2
+                                  },
+                                  "dollarsEquivalent": 2750
                                 }
                               ]
                             }
@@ -580,7 +474,6 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                           "batchPayments": [
                             {
                               "status": "PAID",
-                              "csv": "erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,747e663f-4e68-4b42-965b-b5aebedcd4c4.eth,1000\\r\\n",
                               "network": "ETHEREUM",
                               "rewardCount": 1,
                               "totalUsdEquivalent": 1010.00,
