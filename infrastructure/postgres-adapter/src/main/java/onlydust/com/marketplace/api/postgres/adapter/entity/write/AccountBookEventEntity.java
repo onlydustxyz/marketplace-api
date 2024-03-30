@@ -10,10 +10,7 @@ import onlydust.com.marketplace.kernel.model.EventIdResolver;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -25,12 +22,15 @@ import java.util.UUID;
 @NoArgsConstructor(force = true)
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 @Builder
+@IdClass(AccountBookEventEntity.PrimaryKey.class)
 public class AccountBookEventEntity {
     @Id
     @EqualsAndHashCode.Include
     @NonNull
     private final Long id;
-
+    @Id
+    @EqualsAndHashCode.Include
+    @NonNull
     private final UUID accountBookId;
 
     ZonedDateTime timestamp;
@@ -51,6 +51,12 @@ public class AccountBookEventEntity {
         @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "@type")
         @JsonTypeIdResolver(EventIdResolver.class)
         private AccountBookEvent event;
+    }
+
+    @EqualsAndHashCode
+    public static class PrimaryKey implements Serializable {
+        Long id;
+        UUID accountBookId;
     }
 
     public static AccountBookEventEntity of(UUID accountBookId, IdentifiedAccountBookEvent<?> event) {

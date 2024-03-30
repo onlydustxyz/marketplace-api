@@ -30,7 +30,8 @@ public class PostgresAccountBookEventStorage implements AccountBookEventStorage 
     @Override
     public List<IdentifiedAccountBookEvent> getSince(final @NonNull Currency currency, final long eventId) {
         return accountBookRepository.findByCurrencyId(currency.id().value())
-                .map(accountBookEntity -> accountBookEventRepository.findAllByAccountBookIdAndIdGreaterThanEqual(accountBookEntity.getId(), eventId))
+                .map(accountBookEntity -> accountBookEventRepository.findAllByAccountBookIdAndIdGreaterThanEqualOrderByIdAsc(accountBookEntity.getId(),
+                        eventId))
                 .orElse(List.of())
                 .stream().map(AccountBookEventEntity::toIdentifiedAccountBookEvent)
                 .toList();
@@ -40,7 +41,7 @@ public class PostgresAccountBookEventStorage implements AccountBookEventStorage 
     @Transactional
     public void save(final @NonNull Currency currency, final @NonNull List<IdentifiedAccountBookEvent> pendingEvents) {
         final var accountBookEntity = accountBookRepository.findByCurrencyId(currency.id().value())
-                .orElse(AccountBookEntity.of(currency.id().value()));
+                .orElseGet(() -> accountBookRepository.saveAndFlush(AccountBookEntity.of(currency.id().value())));
 
         accountBookEventRepository.saveAllAndFlush(pendingEvents.stream()
                 .map(event -> AccountBookEventEntity.of(accountBookEntity.getId(), event))

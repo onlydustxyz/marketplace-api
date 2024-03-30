@@ -9,5 +9,5 @@ import java.util.UUID;
 public interface AccountBookEventRepository extends JpaRepository<AccountBookEventEntity, Long> {
     List<AccountBookEventEntity> findAllByAccountBookId(UUID accountBookId);
 
-    List<AccountBookEventEntity> findAllByAccountBookIdAndIdGreaterThanEqual(UUID accountBookId, Long eventId);
+    List<AccountBookEventEntity> findAllByAccountBookIdAndIdGreaterThanEqualOrderByIdAsc(UUID accountBookId, Long eventId);
 }
