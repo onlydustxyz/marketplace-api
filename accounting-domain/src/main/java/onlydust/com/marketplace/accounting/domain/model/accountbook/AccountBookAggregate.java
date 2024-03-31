@@ -61,8 +61,10 @@ public class AccountBookAggregate implements AccountBook {
         return List.copyOf(pendingEvents);
     }
 
-    public synchronized void clearPendingEvents() {
+    public synchronized List<IdentifiedAccountBookEvent> getAndClearPendingEvents() {
+        final var events = List.copyOf(pendingEvents);
         pendingEvents.clear();
+        return events;
     }
 
     public synchronized void receive(Collection<IdentifiedAccountBookEvent> events) {

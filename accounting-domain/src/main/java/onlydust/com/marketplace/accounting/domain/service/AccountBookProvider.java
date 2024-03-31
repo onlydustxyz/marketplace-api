@@ -27,7 +27,6 @@ public class AccountBookProvider {
 
     @Transactional
     public synchronized void save(Currency currency, AccountBookAggregate accountBook) {
-        accountBookEventStorage.save(currency, accountBook.pendingEvents());
-        accountBook.clearPendingEvents();
+        accountBookEventStorage.save(currency, accountBook.getAndClearPendingEvents());
     }
 }
