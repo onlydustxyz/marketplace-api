@@ -15,17 +15,17 @@ public class AccountBookEventStorageStub implements AccountBookEventStorage {
     public final Map<Currency, List<IdentifiedAccountBookEvent>> events = new HashMap<>();
 
     @Override
-    public List<IdentifiedAccountBookEvent> getAll(Currency currency) {
+    public synchronized List<IdentifiedAccountBookEvent> getAll(Currency currency) {
         return events.getOrDefault(currency, new ArrayList<>());
     }
 
     @Override
-    public List<IdentifiedAccountBookEvent> getSince(Currency currency, long eventId) {
+    public synchronized List<IdentifiedAccountBookEvent> getSince(Currency currency, long eventId) {
         return getAll(currency).stream().dropWhile(event -> event.id() < eventId).toList();
     }
 
     @Override
-    public void save(Currency currency, List<IdentifiedAccountBookEvent> pendingEvents) {
+    public synchronized void save(Currency currency, List<IdentifiedAccountBookEvent> pendingEvents) {
         final var events = new ArrayList<>(getAll(currency));
         long eventId = events.isEmpty() ? 0 : events.get(events.size() - 1).id();
         for (var event : pendingEvents) {
