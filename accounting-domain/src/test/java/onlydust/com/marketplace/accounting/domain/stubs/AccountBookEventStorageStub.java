@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class AccountBookEventStorageStub implements AccountBookEventStorage {
     public final Map<Currency, List<IdentifiedAccountBookEvent>> events = new HashMap<>();
 
@@ -29,7 +27,8 @@ public class AccountBookEventStorageStub implements AccountBookEventStorage {
         final var events = new ArrayList<>(getAll(currency));
         long eventId = events.isEmpty() ? 0 : events.get(events.size() - 1).id();
         for (var event : pendingEvents) {
-            assertThat(event.id()).isEqualTo(++eventId);
+            if (event.id() != ++eventId)
+                throw new IllegalStateException("Expected event id to be %d, but got %d".formatted(eventId, event.id()));
         }
         events.addAll(pendingEvents);
         this.events.put(currency, events);
