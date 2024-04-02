@@ -209,3 +209,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000123_fix_reward_status_views.sql
   - include:
       file: db/changelog/changelogs/00000124_create_all_users_view.sql
+  - include:
+      file: db/changelog/changelogs/00000125_fix_all_users_view.sql
