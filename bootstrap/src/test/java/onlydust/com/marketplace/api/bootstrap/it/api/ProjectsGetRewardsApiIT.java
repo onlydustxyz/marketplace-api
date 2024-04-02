@@ -424,7 +424,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[1].requestedAt").isEqualTo("2023-09-20T08:46:52.77875Z")
 
                 .jsonPath("$.rewards[2].id").isEqualTo("40fda3c6-2a3f-4cdd-ba12-0499dd232d53")
-                .jsonPath("$.rewards[2].status").isEqualTo("PENDING_CONTRIBUTOR")
+                .jsonPath("$.rewards[2].status").isEqualTo("COMPLETE")
                 .jsonPath("$.rewards[2].amount.currency").isEqualTo("ETH")
                 .jsonPath("$.rewards[2].amount.dollarsEquivalent").isEqualTo("15000")
                 .jsonPath("$.rewards[2].amount.total").isEqualTo("10")
