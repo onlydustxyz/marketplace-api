@@ -48,7 +48,7 @@ CREATE TRIGGER batch_payment_rewards_set_tech_updated_at
 EXECUTE PROCEDURE set_tech_updated_at();
 
 INSERT INTO accounting.batch_payment_invoices (batch_payment_id, invoice_id)
-SELECT r2bp.batch_payment_id, r.invoice_id
+SELECT distinct r2bp.batch_payment_id, r.invoice_id
 FROM reward_to_batch_payment r2bp
          JOIN rewards r ON r2bp.reward_id = r.id
 WHERE r.invoice_id IS NOT NULL;
