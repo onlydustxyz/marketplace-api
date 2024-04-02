@@ -16,7 +16,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.ProjectAccountingObserver;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
-import onlydust.com.marketplace.accounting.domain.service.AccountBookProvider;
+import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.stubs.AccountBookEventStorageStub;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
@@ -85,7 +85,7 @@ public class AccountingServiceTest {
 
     private void setupAccountingService() {
         accountBookEventStorage = new AccountBookEventStorageStub();
-        accountingService = new AccountingService(new AccountBookProvider(accountBookEventStorage), sponsorAccountStorage, currencyStorage, accountingObserver,
+        accountingService = new AccountingService(new CachedAccountBookProvider(accountBookEventStorage), sponsorAccountStorage, currencyStorage, accountingObserver,
                 projectAccountingObserver, invoiceStoragePort);
     }
 

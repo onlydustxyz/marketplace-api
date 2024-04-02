@@ -26,14 +26,12 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 
 @AllArgsConstructor
 public class AccountingService implements AccountingFacadePort {
-    private final AccountBookProvider accountBookProvider;
+    private final CachedAccountBookProvider accountBookProvider;
     private final SponsorAccountStorage sponsorAccountStorage;
     private final CurrencyStorage currencyStorage;
     private final AccountingObserverPort accountingObserver;
     private final ProjectAccountingObserver projectAccountingObserver;
     private final InvoiceStoragePort invoiceStoragePort;
-
-    private final AccountBookAggregate accountBookAggregate = AccountBookAggregate.empty();
 
     @Override
     @Transactional
@@ -331,17 +329,17 @@ public class AccountingService implements AccountingFacadePort {
     class PayableRewardAggregator {
         private final @NonNull CachedSponsorAccountProvider sponsorAccountProvider;
         private final @NonNull Currency currency;
-        private final @NonNull AccountBookAggregate accountBook;
+        private final @NonNull ReadOnlyAccountBookState accountBookState;
 
         public PayableRewardAggregator(final @NonNull SponsorAccountProvider sponsorAccountProvider, final @NonNull Currency currency) {
             this.sponsorAccountProvider = new CachedSponsorAccountProvider(sponsorAccountProvider);
             this.currency = currency;
-            this.accountBook = getAccountBook(currency);
+            this.accountBookState = getAccountBook(currency).state();
         }
 
         public Stream<PayableReward> getPayableRewards(Set<RewardId> rewardIds) {
             final var distinctPayableRewards =
-                    accountBook.state().unspentChildren().keySet().stream()
+                    accountBookState.unspentChildren().keySet().stream()
                             .filter(AccountId::isReward)
                             .filter(rewardAccountId -> rewardIds == null || rewardIds.contains(rewardAccountId.rewardId()))
                             .filter(rewardAccountId -> isPayable(rewardAccountId.rewardId()))
@@ -352,7 +350,7 @@ public class AccountingService implements AccountingFacadePort {
         }
 
         private Stream<PayableReward> trySpend(AccountId rewardAccountId) {
-            return accountBook.state().balancePerOrigin(rewardAccountId).entrySet().stream()
+            return accountBookState.balancePerOrigin(rewardAccountId).entrySet().stream()
                     .filter(e -> e.getValue().isStrictlyPositive())
                     .filter(e -> stillEnoughBalance(e.getKey().sponsorAccountId(), e.getValue()))
                     .peek(e -> spend(e.getKey().sponsorAccountId(), rewardAccountId.rewardId(), e.getValue()))
@@ -381,9 +379,9 @@ public class AccountingService implements AccountingFacadePort {
         }
 
         private boolean isPayable(RewardId rewardId) {
-            if (accountBook.state().balanceOf(AccountId.of(rewardId)).isZero()) return false;
+            if (accountBookState.balanceOf(AccountId.of(rewardId)).isZero()) return false;
 
-            return accountBook.state().balancePerOrigin(AccountId.of(rewardId)).entrySet().stream().allMatch(entry -> {
+            return accountBookState.balancePerOrigin(AccountId.of(rewardId)).entrySet().stream().allMatch(entry -> {
                 final var sponsorAccount = sponsorAccountProvider.get(entry.getKey().sponsorAccountId())
                         .orElseThrow(() -> notFound(("Sponsor account %s not found").formatted(entry.getKey().sponsorAccountId())));
                 return sponsorAccount.unlockedBalance().isGreaterThanOrEqual(entry.getValue());

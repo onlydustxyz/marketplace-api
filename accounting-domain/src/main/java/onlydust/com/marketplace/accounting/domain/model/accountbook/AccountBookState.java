@@ -364,14 +364,14 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
         private final Vertex source;
         private PositiveAmount amount;
 
-        public static PositiveAmount totalAmountOf(Collection<Edge> edges) {
+        private static PositiveAmount totalAmountOf(Collection<Edge> edges) {
             var acc = PositiveAmount.ZERO;
             for (Edge edge : edges)
                 acc = acc.add(edge.amount);
             return acc;
         }
 
-        public void decreaseAmount(PositiveAmount amount) {
+        private void decreaseAmount(PositiveAmount amount) {
             this.amount = PositiveAmount.of(this.amount.subtract(amount));
         }
     }
@@ -431,7 +431,7 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
             return String.valueOf(Integer.parseInt(hex, 16));
         }
 
-        Attribute colorOf(Vertex v) {
+        private Attribute colorOf(Vertex v) {
             return DefaultAttribute.createAttribute(v.accountId.type() == null ? "#000000" :
                     switch (v.accountId.type()) {
                         case SPONSOR_ACCOUNT -> "lightcoral";
@@ -441,7 +441,7 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
                     });
         }
 
-        String idOf(Vertex v) {
+        private String idOf(Vertex v) {
             return v.accountId == ROOT ? String.valueOf(v.hashCode()) : hexToDec(v.accountId.toString().substring(0, 5));
         }
 

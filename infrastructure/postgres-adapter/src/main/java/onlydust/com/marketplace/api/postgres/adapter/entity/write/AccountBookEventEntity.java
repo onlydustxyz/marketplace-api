@@ -27,6 +27,7 @@ public class AccountBookEventEntity {
     @Id
     @EqualsAndHashCode.Include
     @NonNull
+    @Getter
     private final Long id;
     @Id
     @EqualsAndHashCode.Include

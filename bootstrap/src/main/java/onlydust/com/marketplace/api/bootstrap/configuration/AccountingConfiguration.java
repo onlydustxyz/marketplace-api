@@ -13,19 +13,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AccountingConfiguration {
     @Bean
-    public AccountBookProvider accountBookProvider(final @NonNull AccountBookEventStorage accountBookEventStorage) {
-        return new AccountBookProvider(accountBookEventStorage);
+    public CachedAccountBookProvider accountBookProvider(final @NonNull AccountBookEventStorage accountBookEventStorage) {
+        return new CachedAccountBookProvider(accountBookEventStorage);
     }
 
     @Bean
-    public AccountingFacadePort accountingFacadePort(final @NonNull AccountBookProvider accountBookProvider,
+    public AccountingFacadePort accountingFacadePort(final @NonNull CachedAccountBookProvider cachedAccountBookProvider,
                                                      final @NonNull SponsorAccountStorage sponsorAccountStorage,
                                                      final @NonNull CurrencyStorage currencyStorage,
                                                      final @NonNull AccountingObserver accountingObserver,
                                                      final @NonNull ProjectAccountingObserver projectAccountingObserver,
                                                      final @NonNull InvoiceStoragePort invoiceStoragePort
     ) {
-        return new AccountingService(accountBookProvider, sponsorAccountStorage, currencyStorage, accountingObserver, projectAccountingObserver,
+        return new AccountingService(cachedAccountBookProvider, sponsorAccountStorage, currencyStorage, accountingObserver, projectAccountingObserver,
                 invoiceStoragePort);
     }
 

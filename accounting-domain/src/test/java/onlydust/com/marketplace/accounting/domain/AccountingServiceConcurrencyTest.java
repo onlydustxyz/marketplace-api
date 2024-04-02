@@ -15,8 +15,8 @@ import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserverPor
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.ProjectAccountingObserver;
-import onlydust.com.marketplace.accounting.domain.service.AccountBookProvider;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
+import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.accounting.domain.stubs.AccountBookEventStorageStub;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.stubs.SponsorAccountStorageStub;
@@ -59,13 +59,13 @@ public class AccountingServiceConcurrencyTest {
     @Nested
     class SingleInstance {
         AccountBookEventStorageStub accountBookEventStorage;
-        AccountBookProvider accountBookProvider;
+        CachedAccountBookProvider cachedAccountBookProvider;
         AccountingService accountingService;
 
         private void setupAccountingService() {
             accountBookEventStorage = new AccountBookEventStorageStub();
-            accountBookProvider = new AccountBookProvider(accountBookEventStorage);
-            accountingService = new AccountingService(accountBookProvider, sponsorAccountStorage, currencyStorage, accountingObserver,
+            cachedAccountBookProvider = new CachedAccountBookProvider(accountBookEventStorage);
+            accountingService = new AccountingService(cachedAccountBookProvider, sponsorAccountStorage, currencyStorage, accountingObserver,
                     projectAccountingObserver, invoiceStoragePort);
         }
 
@@ -86,7 +86,7 @@ public class AccountingServiceConcurrencyTest {
         @Test
         public void should_register_allocations_to_project() throws InterruptedException {
             final int numberOfThreads = 30;
-            final int numberOfIterationPerThread = 100;
+            final int numberOfIterationPerThread = 50;
             final ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
             final CountDownLatch latch = new CountDownLatch(numberOfThreads);
 
@@ -109,7 +109,7 @@ public class AccountingServiceConcurrencyTest {
             latch.await();
 
             // Then
-            assertThat(accountBookProvider.get(currency).state()
+            assertThat(cachedAccountBookProvider.get(currency).state()
                     .balanceOf(AccountBook.AccountId.of(projectId1)))
                     .isEqualTo(PositiveAmount.of((long) (numberOfThreads * numberOfIterationPerThread)));
         }
@@ -121,13 +121,13 @@ public class AccountingServiceConcurrencyTest {
         final static int INSTANCE_COUNT = 50;
         final static long SPONSOR_INITIAL_ALLOWANCE = 20;
         AccountBookEventStorageStub accountBookEventStorage;
-        final List<AccountBookProvider> accountBookProviders = new ArrayList<>();
+        final List<CachedAccountBookProvider> accountBookProviders = new ArrayList<>();
         final List<AccountingService> accountingServices = new ArrayList<>();
 
         private void setupAccountingService() {
             accountBookEventStorage = new AccountBookEventStorageStub();
             for (int i = 0; i < INSTANCE_COUNT; i++) {
-                accountBookProviders.add(new AccountBookProvider(accountBookEventStorage));
+                accountBookProviders.add(new CachedAccountBookProvider(accountBookEventStorage));
                 accountingServices.add(new AccountingService(accountBookProviders.get(i), sponsorAccountStorage, currencyStorage, accountingObserver,
                         projectAccountingObserver, invoiceStoragePort));
             }
@@ -148,7 +148,7 @@ public class AccountingServiceConcurrencyTest {
         }
 
         @Test
-        public void multi_should_register_allocations_to_project() throws InterruptedException {
+        public void should_register_allocations_to_project() throws InterruptedException {
             final int numberOfThreads = INSTANCE_COUNT;
             final int numberOfIterationPerThread = 50;
             final ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);

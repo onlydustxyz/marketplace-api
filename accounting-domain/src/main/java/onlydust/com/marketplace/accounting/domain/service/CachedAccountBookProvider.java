@@ -8,9 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RequiredArgsConstructor
-public class AccountBookProvider {
+public class CachedAccountBookProvider {
     private final AccountBookEventStorage accountBookEventStorage;
     private final Map<Currency, AccountBookAggregate> accountBooks = new HashMap<>();
 
@@ -27,6 +28,20 @@ public class AccountBookProvider {
 
     @Transactional
     public synchronized void save(Currency currency, AccountBookAggregate accountBook) {
-        accountBookEventStorage.save(currency, accountBook.getAndClearPendingEvents());
+        try {
+            final Optional<Long> lastPersistedEventId = accountBookEventStorage.getLastEventId(currency);
+            final var pendingEvents = accountBook.getAndClearPendingEvents();
+            if (pendingEvents.isEmpty()) {
+                return;
+            }
+            if (lastPersistedEventId.isPresent() && lastPersistedEventId.get() + 1 != pendingEvents.get(0).id()) {
+                throw new IllegalStateException("Expected next event id to be %d but got %d"
+                        .formatted(lastPersistedEventId.get() + 1, pendingEvents.get(0).id()));
+            }
+            accountBookEventStorage.save(currency, pendingEvents);
+        } catch (Exception e) {
+            accountBooks.remove(currency);
+            throw e;
+        }
     }
 }
