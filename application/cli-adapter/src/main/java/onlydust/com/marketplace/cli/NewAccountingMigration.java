@@ -33,11 +33,8 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 @Profile("cli")
 public class NewAccountingMigration implements CommandLineRunner {
     private static final String UNKNOWN = "UNKNOWN";
-    private static final Set<ProjectId> UNLOCKED_OP_PROJECTS = Set.of(
-            ProjectId.of("10961e98-16c7-4fe6-935f-f2f420d6c020"),
-            ProjectId.of("403997b5-2b34-4b3a-ada1-cdad37c83243"),
-            ProjectId.of("f39b827f-df73-498c-8853-99bc3f562723")
-    );
+    private static final Set<ProjectId> UNLOCKED_OP_PROJECTS = Set.of(ProjectId.of("10961e98-16c7-4fe6-935f-f2f420d6c020"), ProjectId.of("403997b5-2b34-4b3a" +
+                                                                                                                                         "-ada1-cdad37c83243"), ProjectId.of("f39b827f-df73-498c-8853-99bc3f562723"));
 
     private final @NonNull EventRepository eventRepository;
     private final @NonNull CurrencyStorage currencyStorage;
@@ -66,10 +63,16 @@ public class NewAccountingMigration implements CommandLineRunner {
 
             stopWatch.start("Creating sponsor accounts");
             sponsorBudgets.forEach((sponsorId, value) -> value.forEach((currency, budgets) -> {
+                if (sponsorId == null) {
+                    LOGGER.warn("Skipping budget without allocation");
+                    return;
+                }
+
                 final var budgetsByUnlockDate = budgets.stream().collect(groupingBy(this::unlockDateOf));
                 budgetsByUnlockDate.forEach((unlockDate, b) -> {
                     final var sponsorAccountStatement = createSponsorAccount(sponsorId, currency, b, unlockDate.orElse(null));
-                    allocateBudgetToProjects(sponsorAccountStatement.account(), currency, b);
+                    if (sponsorAccountStatement != null)
+                        allocateBudgetToProjects(sponsorAccountStatement.account(), currency, b);
                 });
             }));
             stopWatch.stop();
@@ -83,8 +86,7 @@ public class NewAccountingMigration implements CommandLineRunner {
     }
 
     private void processReward(Reward reward) {
-        if (reward.cancelled)
-            return;
+        if (reward.cancelled) return;
 
         LOGGER.info("Processing reward %s of %s %s for %s".formatted(reward.id, reward.amount, reward.currency.code(), reward.recipientId));
         accountingFacadePort.createReward(reward.projectId, reward.id, reward.amount, reward.currency.id());
@@ -104,8 +106,7 @@ public class NewAccountingMigration implements CommandLineRunner {
             final var billingProfile = billingProfileRepository.findBillingProfilesForUserId(recipient.get().getId()).stream().findFirst();
 
             if (billingProfile.isPresent()) {
-                if (billingProfile.get().getKyb() != null && billingProfile.get().getKyb().name() != null)
-                    return billingProfile.get().getKyb().name();
+                if (billingProfile.get().getKyb() != null && billingProfile.get().getKyb().name() != null) return billingProfile.get().getKyb().name();
 
                 if (billingProfile.get().getKyc() != null && billingProfile.get().getKyc().getFirstName() != null && billingProfile.get().getKyc().getLastName() != null)
                     return billingProfile.get().getKyc().getFirstName() + " " + billingProfile.get().getKyc().getLastName();
@@ -126,11 +127,16 @@ public class NewAccountingMigration implements CommandLineRunner {
         final var total = budgets.stream().map(b -> b.amount).reduce(PositiveAmount.ZERO, Amount::add);
         final var sponsor = sponsorRepository.findById(sponsorId.value()).orElseThrow(() -> notFound("Sponsor not found: %s".formatted(sponsorId)));
 
-        LOGGER.info("Creating %s account for sponsor %s (budget: %s)".formatted(currency.code(), sponsor.getName(), total));
-        final var transaction = new SponsorAccount.Transaction(Network.fromCurrencyCode(currency.code().toString()), UNKNOWN, total, sponsor.getName(),
+        if (total.isStrictlyPositive() || total.isNegative()) {
+            LOGGER.info("Creating %s account for sponsor %s (budget: %s)".formatted(currency.code(), sponsor.getName(), total));
+            final var transaction = new SponsorAccount.Transaction(Network.fromCurrencyCode(currency.code().toString()), UNKNOWN, total, sponsor.getName(),
                 UNKNOWN);
 
-        return accountingFacadePort.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(total), unlockDate, transaction);
+            return accountingFacadePort.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(total), unlockDate, transaction);
+        } else {
+            LOGGER.warn("Skipping sponsor %s with no budget".formatted(sponsor.getName()));
+            return null;
+        }
     }
 
     private void allocateBudgetToProjects(SponsorAccount sponsorAccount, Currency currency, List<Budget> budgets) {
@@ -148,8 +154,7 @@ public class NewAccountingMigration implements CommandLineRunner {
     }
 
     private @NonNull Optional<ZonedDateTime> unlockDateOf(Budget budget) {
-        if (budget.currency.code().toString().equals(Currency.Code.OP_STR) && UNLOCKED_OP_PROJECTS.contains(budget.projectId))
-            return Optional.empty();
+        if (budget.currency.code().toString().equals(Currency.Code.OP_STR) && UNLOCKED_OP_PROJECTS.contains(budget.projectId)) return Optional.empty();
 
         return Optional.ofNullable(onlydust.com.marketplace.project.domain.model.Currency.valueOf(budget.currency.code().toString().toUpperCase()).unlockDate()).map(d -> d.toInstant().atZone(ZoneOffset.UTC));
     }
@@ -241,7 +246,7 @@ public class NewAccountingMigration implements CommandLineRunner {
         LOGGER.info("Reading Budget.Allocated event: " + payload);
         final var budget = budget(UUID.fromString(payload.get("id").asText()));
 
-        budget.amount = budget.amount.add(Amount.of(payload.get("amount").asLong()));
+        budget.amount = budget.amount.add(Amount.of(new BigDecimal(payload.get("amount").asText())));
         budget.sponsorId = SponsorId.of(payload.get("sponsor_id").asText());
     }
 
