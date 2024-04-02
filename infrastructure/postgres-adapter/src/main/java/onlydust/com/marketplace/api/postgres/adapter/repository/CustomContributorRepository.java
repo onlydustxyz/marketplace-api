@@ -118,7 +118,7 @@ public class CustomContributorRepository {
                                              c.logo_url                                  as currency_logo_url
                                       from rewards r
                                                join accounting.reward_status_data rsd on rsd.reward_id = r.id
-                                               join accounting.reward_statuses rs on rs.reward_id = r.id and rs.status = 'COMPLETE'
+                                               join accounting.reward_statuses rs on rs.reward_id = r.id
                                                join currencies c on c.id = r.currency_id
                                       group by r.recipient_id, c.id, r.project_id) as user_rewards
                                 group by user_rewards.recipient_id, user_rewards.project_id) totals_earned
