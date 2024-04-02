@@ -50,6 +50,7 @@ public class CustomProjectRewardRepository {
                       (select count(id) from work_items wi where wi.payment_id = pr.id)                        contribution_count,
                       pr.usd_amount as dollars_equivalent,
                       case
+                          when r.id is not null then 'COMPLETE'
                           when u.id is null then 'PENDING_SIGNUP'
                           when not coalesce(bpc.billing_profile_verified, false) then 'PENDING_CONTRIBUTOR'
                           when (case
@@ -60,7 +61,6 @@ public class CustomProjectRewardRepository {
                                     when pr.currency = 'apt' then not payout_checks.wallets @> array [cast('aptos' as network)]
                                     when pr.currency = 'usd' then not payout_checks.has_bank_account
                               end) then 'PENDING_CONTRIBUTOR'
-                          when r.id is not null then 'COMPLETE'
                           when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') and uoop.project_id is null THEN 'LOCKED'
                           else 'PROCESSING'
                           end                                          status
