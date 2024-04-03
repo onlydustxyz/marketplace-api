@@ -12,4 +12,10 @@ import java.math.BigDecimal;
 public record TotalMoneyView(@NonNull BigDecimal amount,
                              @NonNull Currency currency,
                              BigDecimal dollarsEquivalent) {
+    public static TotalMoneyView add(TotalMoneyView left, TotalMoneyView right) {
+        return left == null ? right : new TotalMoneyView(
+                left.amount().add(right.amount()),
+                left.currency(),
+                left.dollarsEquivalent().add(right.dollarsEquivalent()));
+    }
 }

@@ -248,7 +248,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "totalUsdEquivalent": 3636.000,
                               "totalsPerCurrency": [
                                 {
-                                  "amount": 1000,
+                                  "amount": 3000,
                                   "currency": {
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
@@ -256,29 +256,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                     "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                     "decimals": 6
                                   },
-                                  "dollarsEquivalent": 1010.00
-                                },
-                                {
-                                  "amount": 1000,
-                                  "currency": {
-                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                    "code": "USDC",
-                                    "name": "USD Coin",
-                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                    "decimals": 6
-                                  },
-                                  "dollarsEquivalent": 1010.00
-                                },
-                                {
-                                  "amount": 1000,
-                                  "currency": {
-                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                    "code": "USDC",
-                                    "name": "USD Coin",
-                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                    "decimals": 6
-                                  },
-                                  "dollarsEquivalent": 1010.00
+                                  "dollarsEquivalent": 3030.00
                                 }
                               ]
                             },
@@ -292,7 +270,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "totalUsdEquivalent": 2424.000,
                               "totalsPerCurrency": [
                                 {
-                                  "amount": 1000,
+                                  "amount": 2000,
                                   "currency": {
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
@@ -300,18 +278,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                     "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                     "decimals": 6
                                   },
-                                  "dollarsEquivalent": 1010.00
-                                },
-                                {
-                                  "amount": 1000,
-                                  "currency": {
-                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                    "code": "USDC",
-                                    "name": "USD Coin",
-                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                    "decimals": 6
-                                  },
-                                  "dollarsEquivalent": 1010.00
+                                  "dollarsEquivalent": 2020.00
                                 }
                               ]
                             },
@@ -621,20 +588,11 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "totalsPerCurrency": [
                                 {
                                   "currency": { "code": "USDC" }
-                                },
-                                {
-                                  "currency": { "code": "USDC" }
-                                },
-                                {
-                                  "currency": { "code": "USDC" }
                                 }
                               ]
                             },
                             {
                               "totalsPerCurrency": [
-                                {
-                                  "currency": { "code": "USDC" }
-                                },
                                 {
                                   "currency": { "code": "USDC" }
                                 }

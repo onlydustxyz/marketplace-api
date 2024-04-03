@@ -6,6 +6,7 @@ import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
+import onlydust.com.marketplace.accounting.domain.view.TotalMoneyView;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -55,6 +57,16 @@ public class Invoice {
                         Number.of(sequenceNumber, billingProfile.getKyc().getLastName(), billingProfile.getKyc().getFirstName()),
                 Status.DRAFT
         );
+    }
+
+    public Collection<TotalMoneyView> totals() {
+        return rewards.stream()
+                .collect(groupingBy(r -> r.amount.currency,
+                        mapping(r -> new TotalMoneyView(r.amount.value, r.amount.currency, r.target.value),
+                                reducing(null, TotalMoneyView::add))))
+                .values().stream()
+                .sorted(Comparator.comparing(r -> r.currency().code().toString()))
+                .toList();
     }
 
     public enum Status {
