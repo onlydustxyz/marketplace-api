@@ -28,6 +28,7 @@ import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 
 public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
@@ -270,7 +271,265 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                             "usdEquivalent": 101010.00
                           },
                           "receivedRewardsCount": 6,
-                          "rewardedContributionsCount": 26
+                          "rewardedContributionsCount": 26,
+                          "pendingRequestCount": 2
+                        }
+                        """);
+
+        // And given
+        final var olivier = userAuthHelper.authenticateOlivier();
+
+        client.post()
+                .uri(getApiURI(BILLING_PROFILES_POST_COWORKER_INVITATIONS.formatted("20282367-56b0-42d3-81d3-5e4b38f67e3e")))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "githubUserId": %d,
+                          "role": "ADMIN"
+                        }
+                        """.formatted(olivier.user().getGithubUserId()))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        client.post()
+                .uri(getApiURI(ME_BILLING_PROFILES_POST_COWORKER_INVITATIONS.formatted("20282367-56b0-42d3-81d3-5e4b38f67e3e")))
+                .header("Authorization", "Bearer " + olivier.jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "accepted": true
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        client.put()
+                .uri(getApiURI(BILLING_PROFILES_COWORKER_ROLE.formatted("20282367-56b0-42d3-81d3-5e4b38f67e3e", pierre.user().getGithubUserId())))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "role": "MEMBER"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(ME_GET_REWARDS), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "20",
+                        "sort", "AMOUNT",
+                        "direction", "DESC")
+                ))
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isEqualTo(HttpStatus.OK)
+                .expectBody()
+                .json("""
+                        {
+                          "rewards": [
+                            {
+                              "requestedAt": "2023-09-19T07:38:22.018458Z",
+                              "processedAt": null,
+                              "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                              "billingProfileId": "20282367-56b0-42d3-81d3-5e4b38f67e3e",
+                              "status": "PENDING_COMPANY",
+                              "unlockDate": null,
+                              "amount": {
+                                "total": 500.0,
+                                "currency": {
+                                  "id": "48388edb-fda2-4a32-b228-28152a147500",
+                                  "code": "APT",
+                                  "name": "Aptos Coin",
+                                  "logoUrl": null,
+                                  "decimals": 8
+                                },
+                                "dollarsEquivalent": 100000.0
+                              },
+                              "numberOfRewardedContributions": 25,
+                              "rewardedOnProjectName": "QA new contributions",
+                              "rewardedOnProjectLogoUrl": null,
+                              "rewardedUser": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": true
+                              },
+                              "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
+                            },
+                            {
+                              "requestedAt": "2023-09-20T08:46:52.77875Z",
+                              "processedAt": "2023-08-12T00:00:00Z",
+                              "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                              "billingProfileId": "20282367-56b0-42d3-81d3-5e4b38f67e3e",
+                              "status": "COMPLETE",
+                              "unlockDate": null,
+                              "amount": {
+                                "total": 50.0,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "dollarsEquivalent": 75000.0
+                              },
+                              "numberOfRewardedContributions": 1,
+                              "rewardedOnProjectName": "QA new contributions",
+                              "rewardedOnProjectLogoUrl": null,
+                              "rewardedUser": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": true
+                              },
+                              "id": "e1498a17-5090-4071-a88a-6f0b0c337c3a"
+                            },
+                            {
+                              "requestedAt": "2023-09-19T07:40:26.971981Z",
+                              "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                              "billingProfileId": "20282367-56b0-42d3-81d3-5e4b38f67e3e",
+                              "status": "COMPLETE",
+                              "unlockDate": null,
+                              "amount": {
+                                "total": 10.0,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "dollarsEquivalent": 15000.0
+                              },
+                              "numberOfRewardedContributions": 25,
+                              "rewardedOnProjectName": "QA new contributions",
+                              "rewardedOnProjectLogoUrl": null,
+                              "rewardedUser": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": true
+                              },
+                              "id": "40fda3c6-2a3f-4cdd-ba12-0499dd232d53"
+                            },
+                            {
+                              "requestedAt": "2023-09-19T07:38:52.590518Z",
+                              "processedAt": null,
+                              "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                              "billingProfileId": "20282367-56b0-42d3-81d3-5e4b38f67e3e",
+                              "status": "PENDING_COMPANY",
+                              "unlockDate": null,
+                              "amount": {
+                                "total": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "dollarsEquivalent": 1010.00
+                              },
+                              "numberOfRewardedContributions": 25,
+                              "rewardedOnProjectName": "QA new contributions",
+                              "rewardedOnProjectLogoUrl": null,
+                              "rewardedUser": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": true
+                              },
+                              "id": "85f8358c-5339-42ac-a577-16d7760d1e28"
+                            },
+                            {
+                              "requestedAt": "2023-09-19T07:39:54.45638Z",
+                              "processedAt": null,
+                              "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                              "billingProfileId": "20282367-56b0-42d3-81d3-5e4b38f67e3e",
+                              "status": "PENDING_COMPANY",
+                              "unlockDate": "2024-08-23T00:00:00Z",
+                              "amount": {
+                                "total": 30.0,
+                                "currency": {
+                                  "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
+                                  "code": "OP",
+                                  "name": "Optimism",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "dollarsEquivalent": null
+                              },
+                              "numberOfRewardedContributions": 25,
+                              "rewardedOnProjectName": "QA new contributions",
+                              "rewardedOnProjectLogoUrl": null,
+                              "rewardedUser": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": true
+                              },
+                              "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"
+                            },
+                            {
+                              "requestedAt": "2023-09-19T07:39:23.730967Z",
+                              "processedAt": null,
+                              "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                              "billingProfileId": "20282367-56b0-42d3-81d3-5e4b38f67e3e",
+                              "status": "PENDING_COMPANY",
+                              "unlockDate": null,
+                              "amount": {
+                                "total": 9511147.0,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "dollarsEquivalent": null
+                              },
+                              "numberOfRewardedContributions": 25,
+                              "rewardedOnProjectName": "QA new contributions",
+                              "rewardedOnProjectLogoUrl": null,
+                              "rewardedUser": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": true
+                              },
+                              "id": "5b96ca1e-4ad2-41c1-8819-520b885d9223"
+                            }
+                          ],
+                          "hasMore": false,
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 6,
+                          "nextPageIndex": 0,
+                          "rewardedAmount": {
+                            "amount": null,
+                            "currency": null,
+                            "usdEquivalent": 191010.00
+                          },
+                          "pendingAmount": {
+                            "amount": null,
+                            "currency": null,
+                            "usdEquivalent": 101010.00
+                          },
+                          "receivedRewardsCount": 6,
+                          "rewardedContributionsCount": 26,
+                          "pendingRequestCount": 0
                         }
                         """);
     }
