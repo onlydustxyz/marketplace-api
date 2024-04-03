@@ -323,7 +323,9 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (coworker.hasJoined()) {
             billingProfileStoragePort.deleteCoworker(billingProfileId, coworker.userId());
         }
-        billingProfileStoragePort.deleteCoworkerInvitation(billingProfileId, coworker.githubUserId());
+        if (coworker.hasBeenInvited()) {
+            billingProfileStoragePort.deleteCoworkerInvitation(billingProfileId, coworker.githubUserId());
+        }
     }
 
     @Override

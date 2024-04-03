@@ -47,6 +47,14 @@ public interface RewardRepository extends JpaRepository<RewardEntity, UUID> {
             """)
     List<RewardEntity> getRewardIdsToBeRemovedFromBillingProfile(UUID billingProfileId);
 
+    @Query(value = """
+                select r from RewardEntity r
+                join RewardStatusEntity rs on rs.rewardId = r.id and rs.status < 'PROCESSING'
+                where r.billingProfileId = :billingProfileId
+                and r.recipientId = (select u.githubUserId from UserEntity u where u.id = :recipientUserId)
+            """)
+    List<RewardEntity> getRewardIdsToBeRemovedFromBillingProfileForUser(UUID billingProfileId, UUID recipientUserId);
+
     @Modifying
     @Query(nativeQuery = true, value = """
             with s as (select r.id reward_id, pp.billing_profile_id

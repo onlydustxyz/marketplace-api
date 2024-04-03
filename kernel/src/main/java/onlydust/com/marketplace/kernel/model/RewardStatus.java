@@ -3,6 +3,7 @@ package onlydust.com.marketplace.kernel.model;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.util.List;
 import java.util.UUID;
@@ -76,25 +77,38 @@ public enum RewardStatus {
         };
     }
 
+    RewardStatus asOldBillingProfileMember() {
+        return switch (this) {
+            case PENDING_SIGNUP, PENDING_CONTRIBUTOR, PENDING_BILLING_PROFILE, PENDING_COMPANY, PENDING_VERIFICATION,
+                    PAYMENT_BLOCKED, PAYOUT_INFO_MISSING, LOCKED, PENDING_REQUEST ->
+                    throw internalServerError("Impossible %s status as old billing profile member".formatted(this.name()));
+            case PROCESSING -> PROCESSING;
+            case COMPLETE -> COMPLETE;
+        };
+    }
+
     public RewardStatus getRewardStatusForUser(final UUID rewardId, final Long rewardRecipientId, final UUID rewardBillingProfileId,
                                                final Long userGithubUserId, final List<UserBillingProfile> billingProfiles) {
-        if (isNull(rewardBillingProfileId) && rewardRecipientId.equals(userGithubUserId)) {
-            return this.asRecipient();
+        try {
+            if (isNull(rewardBillingProfileId) && rewardRecipientId.equals(userGithubUserId)) {
+                return this.asRecipient();
+            }
+            if (billingProfiles.stream()
+                    .filter(bp -> bp.role() == UserBillingProfile.Role.ADMIN)
+                    .map(UserBillingProfile::id)
+                    .toList().contains(rewardBillingProfileId)) {
+                return this.asBillingProfileAdmin();
+            }
+            if (billingProfiles.stream()
+                    .filter(bp -> bp.role() == UserBillingProfile.Role.MEMBER)
+                    .map(UserBillingProfile::id)
+                    .toList().contains(rewardBillingProfileId)) {
+                return this.asBillingProfileMember();
+            }
+            return this.asOldBillingProfileMember();
+        } catch (OnlyDustException e) {
+            throw internalServerError("Error getting reward status for reward %s and user %s: %s".formatted(rewardId, userGithubUserId, e.getMessage()), e);
         }
-        if (billingProfiles.stream()
-                .filter(bp -> bp.role() == UserBillingProfile.Role.ADMIN)
-                .map(UserBillingProfile::id)
-                .toList().contains(rewardBillingProfileId)) {
-            return this.asBillingProfileAdmin();
-        }
-        if (billingProfiles.stream()
-                .filter(bp -> bp.role() == UserBillingProfile.Role.MEMBER)
-                .map(UserBillingProfile::id)
-                .toList().contains(rewardBillingProfileId)) {
-            return this.asBillingProfileMember();
-        }
-        throw internalServerError("Cannot map reward %s to correct reward status %s because no condition was matched".formatted(rewardId,
-                this));
     }
 
     public boolean isPendingRequest() {
