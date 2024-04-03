@@ -155,6 +155,26 @@ class RewardStatusTest {
         }
 
         @Test
+        void given_an_old_billing_profile_member() {
+            // Given
+            final UUID rewardId = UUID.randomUUID();
+            final long rewardRecipientId = 1L;
+            final UUID rewardBillingProfileId = UUID.randomUUID();
+            final long userGithubUserId = 1L;
+            final List<UserBillingProfile> billingProfiles = List.of(UserBillingProfile.builder()
+                    .role(UserBillingProfile.Role.ADMIN)
+                    .id(UUID.randomUUID())
+                    .build());
+
+            // When
+            final RewardStatus rewardStatusForUser = PROCESSING.getRewardStatusForUser(rewardId, rewardRecipientId, rewardBillingProfileId,
+                    userGithubUserId, billingProfiles);
+
+            // Then
+            assertEquals(PROCESSING, rewardStatusForUser);
+        }
+
+        @Test
         void given_an_invalid_user() {
             // Given
             final UUID rewardId = UUID.randomUUID();
@@ -171,8 +191,8 @@ class RewardStatusTest {
                             userGithubUserId, billingProfiles))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("Cannot map reward %s to correct reward status %s because no condition was matched".formatted(rewardId,
-                            PAYOUT_INFO_MISSING.name()));
+                    .hasMessage("Error getting reward status for reward %s and user %s: Impossible %s status as old billing profile member"
+                            .formatted(rewardId, userGithubUserId, PAYOUT_INFO_MISSING.name()));
         }
     }
 
