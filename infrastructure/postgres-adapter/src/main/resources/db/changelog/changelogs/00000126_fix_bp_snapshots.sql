@@ -29,5 +29,10 @@ where kyb.billing_profile_id = invoices.billing_profile_id
 update accounting.invoices
 set data = jsonb_set(data, '{billingProfileSnapshot, id, uuid}', to_jsonb(billing_profile_id), true);
 
+update accounting.invoices
+set data = jsonb_set(data, '{billingProfileSnapshot, type}'::text[], to_jsonb(bp.type), true)
+from accounting.billing_profiles bp
+where bp.id = billing_profile_id;
+
 alter table payment_requests
     drop constraint if exists payment_requests_invoice_id_fkey;
