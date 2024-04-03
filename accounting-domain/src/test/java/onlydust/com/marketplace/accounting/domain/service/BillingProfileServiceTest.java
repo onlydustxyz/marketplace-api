@@ -1780,6 +1780,7 @@ class BillingProfileServiceTest {
                         .githubUserId(removedGithubUserId)
                         .role(BillingProfile.User.Role.MEMBER)
                         .joinedAt(ZonedDateTime.now())
+                        .invitedAt(ZonedDateTime.now())
                         .rewardCount(0)
                         .build()
         ));

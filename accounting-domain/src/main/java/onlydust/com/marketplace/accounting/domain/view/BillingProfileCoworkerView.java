@@ -53,4 +53,8 @@ public class BillingProfileCoworkerView {
     public boolean hasJoined() {
         return joinedAt != null;
     }
+
+    public boolean hasBeenInvited() {
+        return invitedAt != null;
+    }
 }
