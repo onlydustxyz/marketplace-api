@@ -373,12 +373,9 @@ public interface BackOfficeMapper {
                 .billingProfile(mapToLinkResponse(invoice.billingProfileSnapshot()))
                 .rewardCount(invoice.rewards().size())
                 .totalUsdEquivalent(invoice.totalAfterTax().getValue())
-                .totalsPerCurrency(invoice.rewards().stream().map(reward ->
-                        new TotalMoneyWithUsdEquivalentResponse()
-                                .amount(reward.amount().getValue())
-                                .currency(toShortCurrency(reward.amount().getCurrency()))
-                                .dollarsEquivalent(reward.target().getValue())
-                ).toList());
+                .totalsPerCurrency(invoice.totals().stream()
+                        .map(BackOfficeMapper::totalMoneyViewToResponse)
+                        .toList());
     }
 
     static BillingProfileLinkResponse mapToLinkResponse(Invoice.BillingProfileSnapshot billingProfileSnapshot) {

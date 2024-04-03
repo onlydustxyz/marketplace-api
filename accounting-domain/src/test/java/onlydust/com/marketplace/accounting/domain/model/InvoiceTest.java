@@ -8,6 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.Verificat
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
+import onlydust.com.marketplace.accounting.domain.view.TotalMoneyView;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +27,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class InvoiceTest {
     private final Faker faker = new Faker();
     private final Currency ETH = Currencies.ETH;
+    private final Currency STRK = Currencies.STRK;
+    private final Currency OP = Currencies.OP;
     private final Currency USD = Currencies.USD;
 
     @Test
@@ -42,7 +45,6 @@ class InvoiceTest {
         assertThat(Invoice.Number.of(1, "婷", "陈").value()).isEqualTo("OD-婷-陈-001");
         assertThat(Invoice.Number.of(1, "Ömer", "Aydın").value()).isEqualTo("OD-ÖMER-AYDIN-001");
     }
-
 
     @Nested
     class GivenAnIndividual {
@@ -68,7 +70,11 @@ class InvoiceTest {
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                     Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of()),
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                    Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of())
+                                    Money.of(BigDecimal.TEN, ETH), Money.of(27012L, USD), null, List.of()),
+                            new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                                    Money.of(BigDecimal.valueOf(100), STRK), Money.of(1900L, USD), null, List.of()),
+                            new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                                    Money.of(BigDecimal.valueOf(10), OP), Money.of(BigDecimal.valueOf(31.5), USD), null, List.of())
                     ));
         }
 
@@ -89,10 +95,16 @@ class InvoiceTest {
 
         @Test
         void should_compute_totals() {
-            assertThat(invoice.totalBeforeTax()).isEqualTo(Money.of(BigDecimal.valueOf(5400), USD));
+            assertThat(invoice.totalBeforeTax()).isEqualTo(Money.of(BigDecimal.valueOf(31643.5), USD));
             assertThat(invoice.taxRate()).isEqualTo(BigDecimal.ZERO);
-            assertThat(invoice.totalTax()).isEqualTo(Money.of(BigDecimal.ZERO, USD));
-            assertThat(invoice.totalAfterTax()).isEqualTo(Money.of(BigDecimal.valueOf(5400), USD));
+            assertThat(invoice.totalTax()).isEqualToComparingFieldByField(Money.of(BigDecimal.valueOf(0.0), USD));
+            assertThat(invoice.totalAfterTax()).isEqualTo(Money.of(BigDecimal.valueOf(31643.5), USD));
+
+            assertThat(invoice.totals()).containsExactly(
+                    new TotalMoneyView(BigDecimal.valueOf(11), ETH, BigDecimal.valueOf(29712L)),
+                    new TotalMoneyView(BigDecimal.valueOf(10), OP, BigDecimal.valueOf(31.5)),
+                    new TotalMoneyView(BigDecimal.valueOf(100), STRK, BigDecimal.valueOf(1900L))
+            );
         }
     }
 
@@ -164,6 +176,10 @@ class InvoiceTest {
             assertThat(invoice.taxRate()).isEqualTo(BigDecimal.ZERO);
             assertThat(invoice.totalTax()).isEqualTo(Money.of(BigDecimal.ZERO, USD));
             assertThat(invoice.totalAfterTax()).isEqualTo(Money.of(BigDecimal.valueOf(5400), USD));
+
+            assertThat(invoice.totals()).containsExactly(
+                    new TotalMoneyView(BigDecimal.valueOf(2), ETH, BigDecimal.valueOf(5400))
+            );
         }
     }
 
@@ -236,6 +252,10 @@ class InvoiceTest {
             assertThat(invoice.taxRate()).isEqualTo(BigDecimal.valueOf(0.2));
             assertThat(invoice.totalTax()).isEqualTo(Money.of(BigDecimal.valueOf(1080.0), USD));
             assertThat(invoice.totalAfterTax()).isEqualTo(Money.of(BigDecimal.valueOf(6480.0), USD));
+
+            assertThat(invoice.totals()).containsExactly(
+                    new TotalMoneyView(BigDecimal.valueOf(2), ETH, BigDecimal.valueOf(5400))
+            );
         }
     }
 
@@ -308,6 +328,10 @@ class InvoiceTest {
             assertThat(invoice.taxRate()).isEqualTo(BigDecimal.valueOf(0));
             assertThat(invoice.totalTax()).isEqualTo(Money.of(BigDecimal.ZERO, USD));
             assertThat(invoice.totalAfterTax()).isEqualTo(Money.of(BigDecimal.valueOf(5400), USD));
+
+            assertThat(invoice.totals()).containsExactly(
+                    new TotalMoneyView(BigDecimal.valueOf(2), ETH, BigDecimal.valueOf(5400))
+            );
         }
     }
 
@@ -380,6 +404,10 @@ class InvoiceTest {
             assertThat(invoice.taxRate()).isEqualTo(BigDecimal.ZERO);
             assertThat(invoice.totalTax()).isEqualTo(Money.of(BigDecimal.ZERO, USD));
             assertThat(invoice.totalAfterTax()).isEqualTo(Money.of(BigDecimal.valueOf(5400), USD));
+
+            assertThat(invoice.totals()).containsExactly(
+                    new TotalMoneyView(BigDecimal.valueOf(2), ETH, BigDecimal.valueOf(5400))
+            );
         }
     }
 }
