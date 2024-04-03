@@ -217,3 +217,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000126_fix_bp_snapshots.sql
   - include:
       file: db/changelog/changelogs/00000127_fix_invoice_received_at.sql
+  - include:
+      file: db/changelog/changelogs/00000128_fix_yearly_total_computation.sql
