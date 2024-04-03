@@ -18,9 +18,10 @@ class RewardStatusTest {
     @Test
     void should_get_reward_status_given_a_recipient() {
         assertEquals(PENDING_BILLING_PROFILE, PENDING_BILLING_PROFILE.asRecipient());
+        assertEquals(COMPLETE, COMPLETE.asRecipient());
         for (RewardStatus rewardStatus : List.of(PENDING_SIGNUP, PENDING_CONTRIBUTOR, PENDING_COMPANY, PENDING_VERIFICATION, PAYMENT_BLOCKED,
                 PAYOUT_INFO_MISSING, LOCKED, PENDING_REQUEST,
-                PROCESSING, COMPLETE)) {
+                PROCESSING)) {
             assertThrowImpossibleStatus(rewardStatus::asRecipient, "Impossible %s status as recipient".formatted(rewardStatus.name()));
         }
     }
