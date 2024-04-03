@@ -215,3 +215,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000126_fix_billing_profiles_users.sql
   - include:
       file: db/changelog/changelogs/00000126_fix_bp_snapshots.sql
+  - include:
+      file: db/changelog/changelogs/00000127_fix_invoice_received_at.sql
