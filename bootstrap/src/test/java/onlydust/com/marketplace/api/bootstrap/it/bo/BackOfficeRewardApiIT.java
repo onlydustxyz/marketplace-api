@@ -194,119 +194,32 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
     }
 
     @Test
-    @Order(2)
-    void should_get_reward_by_id() throws IOException {
-        setUp();
-
-        // When
-        client.get()
-                .uri(getApiURI(BO_REWARD.formatted("5c668b61-e42c-4f0e-b31f-44c4e50dc2f4")))
-                .header("Api-Key", apiKey())
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json("""
-                        {
-                          "id": "5c668b61-e42c-4f0e-b31f-44c4e50dc2f4",
-                          "paymentId": null,
-                          "billingProfile": {
-                            "subject": "Olivier Inc.",
-                            "type": "COMPANY"
-                          },
-                          "requestedAt": "2023-03-20T12:33:11.124316Z",
-                          "processedAt": null,
-                          "githubUrls": [
-                            "https://github.com/onlydustxyz/marketplace-frontend/pull/818"
-                          ],
-                          "status": "PROCESSING",
-                          "project": {
-                            "name": "Zero title 5",
-                            "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1458710211645943860.png"
-                          },
-                          "sponsors": [
-                            {
-                              "name": "No Sponsor",
-                              "avatarUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
-                            }
-                          ],
-                          "money": {
-                            "amount": 1250,
-                            "currency": {
-                              "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                              "code": "USD",
-                              "name": "US Dollar",
-                              "logoUrl": null,
-                              "decimals": 2
-                            },
-                            "dollarsEquivalent": 1250,
-                            "conversionRate": 1.00000000000000000000
-                          },
-                          "invoiceId": "%s",
-                          "receipts": [],
-                          "pendingPayments": [
-                            {
-                              "network": "SEPA",
-                              "billingAccountNumber": "FR7600111222333444",
-                              "amount": 1250
-                            }
-                          ]
-                        }
-                        """.formatted(olivierInvoiceIds.get(0).value()));
-
-        // When
-        client.get()
-                .uri(getApiURI(BO_REWARD.formatted("fab7aaf4-9b0c-4e52-bc9b-72ce08131617")))
-                .header("Api-Key", apiKey())
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json("""
-                        {
-                          "id": "fab7aaf4-9b0c-4e52-bc9b-72ce08131617",
-                          "paymentId": null,
-                          "billingProfile": null,
-                          "requestedAt": "2023-10-08T10:06:42.730697Z",
-                          "processedAt": null,
-                          "githubUrls": [
-                            "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
-                          ],
-                          "status": "PENDING_VERIFICATION",
-                          "project": {
-                            "name": "Bretzel",
-                            "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
-                          },
-                          "sponsors": [
-                            {
-                              "name": "Coca Cola",
-                              "avatarUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
-                            }
-                          ],
-                          "money": {
-                            "amount": 1000.00,
-                            "currency": {
-                              "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                              "code": "USD",
-                              "name": "US Dollar",
-                              "logoUrl": null,
-                              "decimals": 2
-                            },
-                            "dollarsEquivalent": 1000.00,
-                            "conversionRate": 1.00000000000000000000
-                          },
-                          "invoiceId": null,
-                          "receipts": [],
-                          "pendingPayments": []
-                        }
-                        """);
-    }
-
-    @Test
-    @Order(2)
+    @Order(1)
     void should_get_all_rewards() {
+        final var gregoire = UserId.of(userAuthHelper.authenticateGregoire().user().getId());
+        final var onlyDustBillingProfileId = BillingProfile.Id.of("9cae91ac-e70f-426f-af0d-e35c1d3578ed");
+
+        billingProfileService.updatePayoutInfo(onlyDustBillingProfileId, gregoire,
+                PayoutInfo.builder()
+                        .ethWallet(new WalletLocator(new Name(gregoire + ".eth")))
+                        .bankAccount(new BankAccount("BNPAFRPPXXX", "FR7630004000031234567890143"))
+                        .build());
+
+        kybRepository.findByBillingProfileId(onlyDustBillingProfileId.value())
+                .ifPresent(kyb -> kybRepository.save(kyb.toBuilder()
+                        .country("FRA")
+                        .address("66 Infinite Loop, Cupertino, CA 95014, United States")
+                        .euVATNumber("FR12345678901")
+                        .name("OnlyDust")
+                        .registrationDate(faker.date().birthday())
+                        .registrationNumber("123456789")
+                        .usEntity(false)
+                        .subjectToEuVAT(false)
+                        .verificationStatus(VerificationStatusEntity.VERIFIED).build()));
+
+        accountingHelper.patchBillingProfile(onlyDustBillingProfileId.value(), null, VerificationStatusEntity.VERIFIED);
+
+        billingProfileService.previewInvoice(gregoire, onlyDustBillingProfileId, List.of(RewardId.of("5f9060a7-6f9e-4ef7-a1e4-1aaa4c85f03c"))).id();
 
         // When
         client.get()
@@ -330,7 +243,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "name": "Bretzel",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                               },
-                              "status": "PENDING_VERIFICATION",
+                              "status": "PENDING_REQUEST",
                               "money": {
                                 "amount": 1000.00,
                                 "currency": {
@@ -358,7 +271,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "name": "Bretzel",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                               },
-                              "status": "PENDING_VERIFICATION",
+                              "status": "PENDING_REQUEST",
                               "money": {
                                 "amount": 1000.00,
                                 "currency": {
@@ -386,7 +299,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "name": "Bretzel",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                               },
-                              "status": "PENDING_VERIFICATION",
+                              "status": "PENDING_REQUEST",
                               "money": {
                                 "amount": 1000.00,
                                 "currency": {
@@ -465,6 +378,104 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "invoice": null
                             }
                           ]
+                        }
+                        """);
+    }
+
+    @Test
+    @Order(2)
+    void should_get_reward_by_id() throws IOException {
+        setUp();
+
+        // When
+        client.get()
+                .uri(getApiURI(BO_REWARD.formatted("5c668b61-e42c-4f0e-b31f-44c4e50dc2f4")))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "id": "5c668b61-e42c-4f0e-b31f-44c4e50dc2f4",
+                          "paymentId": null,
+                          "billingProfile": {
+                            "subject": "Olivier Inc.",
+                            "type": "COMPANY"
+                          },
+                          "requestedAt": "2023-03-20T12:33:11.124316Z",
+                          "processedAt": null,
+                          "githubUrls": [
+                            "https://github.com/onlydustxyz/marketplace-frontend/pull/818"
+                          ],
+                          "status": "PROCESSING",
+                          "project": {
+                            "name": "Zero title 5",
+                            "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1458710211645943860.png"
+                          },
+                          "sponsors": [
+                            {
+                              "name": "No Sponsor",
+                              "avatarUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
+                            }
+                          ],
+                          "money": {
+                            "amount": 1250,
+                            "currency": {
+                              "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                              "code": "USD",
+                              "name": "US Dollar",
+                              "logoUrl": null,
+                              "decimals": 2
+                            },
+                            "dollarsEquivalent": 1250,
+                            "conversionRate": 1.00000000000000000000
+                          },
+                          "invoiceId": "%s",
+                          "receipts": [],
+                          "pendingPayments": [
+                            {
+                              "network": "SEPA",
+                              "billingAccountNumber": "FR7600111222333444",
+                              "amount": 1250
+                            }
+                          ]
+                        }
+                        """.formatted(olivierInvoiceIds.get(0).value()));
+
+        // When
+        client.get()
+                .uri(getApiURI(BO_REWARD.formatted("fab7aaf4-9b0c-4e52-bc9b-72ce08131617")))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "id": "fab7aaf4-9b0c-4e52-bc9b-72ce08131617",
+                          "project": {
+                            "name": "Bretzel",
+                            "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                          },
+                          "status": "PENDING_REQUEST",
+                          "money": {
+                            "amount": 1000.00,
+                            "currency": {
+                              "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                              "code": "USD",
+                              "name": "US Dollar",
+                              "logoUrl": null,
+                              "decimals": 2
+                            },
+                            "dollarsEquivalent": 1000.00,
+                            "conversionRate": 1.00000000000000000000
+                          },
+                          "invoiceId": null,
+                          "receipts": [],
+                          "pendingPayments": []
                         }
                         """);
     }

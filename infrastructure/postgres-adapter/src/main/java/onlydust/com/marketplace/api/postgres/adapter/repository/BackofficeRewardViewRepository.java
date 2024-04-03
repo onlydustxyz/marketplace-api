@@ -60,7 +60,7 @@ public interface BackofficeRewardViewRepository extends JpaRepository<Backoffice
                                  join project_details pd on r.project_id = pd.project_id
                                  left join indexer_exp.github_accounts github_recipient ON github_recipient.id = r.recipient_id
 
-                                 left join accounting.invoices i on i.id = r.invoice_id
+                                 left join accounting.invoices i on i.id = r.invoice_id and i.status != 'DRAFT'
                                  left join accounting.billing_profiles bp on bp.id = i.billing_profile_id
                                  left join accounting.kyb kyb on kyb.billing_profile_id = i.billing_profile_id
                                  left join accounting.kyc kyc on kyc.billing_profile_id = i.billing_profile_id

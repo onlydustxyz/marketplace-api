@@ -213,3 +213,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000125_fix_all_users_view.sql
   - include:
       file: db/changelog/changelogs/00000126_fix_billing_profiles_users.sql
+  - include:
+      file: db/changelog/changelogs/00000126_fix_bp_snapshots.sql
