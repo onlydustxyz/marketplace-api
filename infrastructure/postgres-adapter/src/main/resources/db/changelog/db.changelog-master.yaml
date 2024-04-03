@@ -211,3 +211,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000124_create_all_users_view.sql
   - include:
       file: db/changelog/changelogs/00000125_fix_all_users_view.sql
+  - include:
+      file: db/changelog/changelogs/00000126_fix_billing_profiles_users.sql
