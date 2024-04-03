@@ -2,22 +2,170 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
+import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
+import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.persistence.EntityManagerFactory;
 import java.util.Map;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     BillingProfileService billingProfileService;
+    @Autowired
+    CurrencyRepository currencyRepository;
+    @Autowired
+    BillingProfileStoragePort billingProfileStoragePort;
+    @Autowired
+    EntityManagerFactory entityManagerFactory;
+
+    UserAuthHelper.AuthenticatedUser pierre;
+    BillingProfile.Id companyBillingProfile;
+
+    @BeforeEach
+    void setup() {
+        pierre = userAuthHelper.authenticatePierre();
+        companyBillingProfile = BillingProfile.Id.of(UUID.fromString("20282367-56b0-42d3-81d3-5e4b38f67e3e"));
+
+        accountingHelper.patchBillingProfile(companyBillingProfile.value(), BillingProfileEntity.Type.COMPANY,
+                VerificationStatusEntity.VERIFIED);
+
+        accountingHelper.patchReward("40fda3c6-2a3f-4cdd-ba12-0499dd232d53", 10, "ETH", 15000, null, "2023-07-12");
+        accountingHelper.patchReward("e1498a17-5090-4071-a88a-6f0b0c337c3a", 50, "ETH", 75000, null, "2023-08-12");
+        accountingHelper.patchReward("2ac80cc6-7e83-4eef-bc0c-932b58f683c0", 500, "APT", 100000, null, null);
+        accountingHelper.patchReward("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0", 30, "OP", null, "2023-08-14", null);
+        accountingHelper.patchReward("5b96ca1e-4ad2-41c1-8819-520b885d9223", 9511147, "STRK", null, null, null);
+
+        billingProfileStoragePort.savePayoutInfoForBillingProfile(PayoutInfo.builder()
+                .ethWallet(Ethereum.wallet("vitalik.eth"))
+                .aptosAddress(Aptos.accountAddress("0x" + faker.random().hex(40)))
+                .build(), BillingProfile.Id.of("20282367-56b0-42d3-81d3-5e4b38f67e3e"));
+
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_COWORKERS.formatted(companyBillingProfile.value().toString()),
+                        Map.of("pageIndex", "0", "pageSize", "50")))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 1,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "coworkers": [
+                            {
+                              "githubUserId": 16590657,
+                              "login": "PierreOucif",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                              "isRegistered": true,
+                              "id": "fc92397c-3431-4a84-8054-845376b630a0",
+                              "role": "ADMIN",
+                              "joinedAt": "2024-02-28T17:32:57.617763Z",
+                              "invitedAt": null,
+                              "removable": false
+                            }
+                          ]
+                        }
+                        """);
+
+        indexerApiWireMockServer.stubFor(WireMock.put(
+                        WireMock.urlEqualTo("/api/v1/users/595505"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+
+        // When
+        client.post()
+                .uri(getApiURI(BILLING_PROFILES_POST_COWORKER_INVITATIONS.formatted(companyBillingProfile.value().toString())))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "githubUserId": 595505,
+                          "role": "ADMIN"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        client.post()
+                .uri(getApiURI(ME_BILLING_PROFILES_POST_COWORKER_INVITATIONS.formatted(companyBillingProfile.value().toString())))
+                .header("Authorization", "Bearer " + userAuthHelper.authenticateOlivier().jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "accepted": true
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_COWORKERS.formatted(companyBillingProfile.value().toString()),
+                        Map.of("pageIndex", "0", "pageSize", "50")))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "coworkers": [
+                            {
+                              "githubUserId": 16590657,
+                              "login": "PierreOucif",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                              "isRegistered": true,
+                              "id": "fc92397c-3431-4a84-8054-845376b630a0",
+                              "role": "ADMIN",
+                              "joinedAt": "2024-02-28T17:32:57.617763Z",
+                              "invitedAt": null,
+                              "removable": true
+                            },
+                            {
+                              "githubUserId": 595505,
+                              "login": "ofux",
+                              "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
+                              "isRegistered": true,
+                              "id": "e461c019-ba23-4671-9b6c-3a5a18748af9",
+                              "role": "ADMIN",
+                              "invitedAt": null,
+                              "removable": true
+                            }
+                          ]
+                        }
+                        """);
+    }
 
     @Test
     void should_be_authenticated() {
@@ -719,6 +867,104 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                               "isRegistered": true,
                               "role": "ADMIN",
                               "removable": false
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
+    void should_unlink_payout_preferences_and_rewards_when_removing_coworkers_from_company() {
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_REWARDS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "1000"
+                )))
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "rewards": [
+                            {
+                              "status": "PENDING_REQUEST",
+                              "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
+                            },
+                            {
+                              "status": "PENDING_REQUEST",
+                              "id": "85f8358c-5339-42ac-a577-16d7760d1e28"
+                            },
+                            {
+                              "status": "PAYOUT_INFO_MISSING",
+                              "id": "5b96ca1e-4ad2-41c1-8819-520b885d9223"
+                            },
+                            {
+                              "status": "PAYOUT_INFO_MISSING",
+                              "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"
+                            },
+                            {
+                              "status": "COMPLETE",
+                              "id": "40fda3c6-2a3f-4cdd-ba12-0499dd232d53"
+                            },
+                            {
+                              "status": "COMPLETE",
+                              "id": "e1498a17-5090-4071-a88a-6f0b0c337c3a"
+                            }
+                          ]
+                        }
+                        """);
+
+        // When
+        client.delete()
+                .uri(getApiURI(BILLING_PROFILES_DELETE_COWORKER.formatted(companyBillingProfile.value().toString(), pierre.user().getGithubUserId())))
+                .header("Authorization", "Bearer " + userAuthHelper.authenticateOlivier().jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_REWARDS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "1000"
+                )))
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "rewards": [
+                            {
+                              "status": "PENDING_BILLING_PROFILE",
+                              "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
+                            },
+                            {
+                              "status": "PENDING_BILLING_PROFILE",
+                              "id": "85f8358c-5339-42ac-a577-16d7760d1e28"
+                            },
+                            {
+                              "status": "PENDING_BILLING_PROFILE",
+                              "id": "5b96ca1e-4ad2-41c1-8819-520b885d9223"
+                            },
+                            {
+                              "status": "PENDING_BILLING_PROFILE",
+                              "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"
+                            },
+                            {
+                              "status": "COMPLETE",
+                              "id": "40fda3c6-2a3f-4cdd-ba12-0499dd232d53"
+                            },
+                            {
+                              "status": "COMPLETE",
+                              "id": "e1498a17-5090-4071-a88a-6f0b0c337c3a"
                             }
                           ]
                         }
