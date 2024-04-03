@@ -101,7 +101,7 @@ public class BackofficeRewardViewEntity {
                         .slug(this.projectSlug)
                         .build())
                 .billingProfile(isNull(this.billingProfile) ? null : this.billingProfile.toDomain())
-                .recipient(new ShortContributorView(this.recipientLogin, this.recipientAvatarUrl))
+                .recipient(this.recipientLogin == null ? null : new ShortContributorView(this.recipientLogin, this.recipientAvatarUrl))
                 .sponsors(isNull(this.sponsors) ? List.of() : this.sponsors.stream()
                         .map(SponsorLinkView::toDomain)
                         .sorted(comparing(ShortSponsorView::name))
