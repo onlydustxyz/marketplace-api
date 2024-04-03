@@ -46,6 +46,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     private final @NonNull ShortBillingProfileViewRepository shortBillingProfileViewRepository;
     private final @NonNull BillingProfileUserRightsViewRepository billingProfileUserRightsViewRepository;
     private final @NonNull RewardViewRepository rewardViewRepository;
+    private final @NonNull RewardRepository rewardRepository;
 
 
     @Override
@@ -373,6 +374,10 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional
     public void deleteCoworker(BillingProfile.Id billingProfileId, UserId userId) {
+        payoutPreferenceRepository.deleteAllByBillingProfileIdAndUserId(billingProfileId.value(), userId.value());
+        final var rewardIds = rewardRepository.getRewardIdsToBeRemovedFromBillingProfileForUser(billingProfileId.value(), userId.value())
+                .stream().map(RewardEntity::id).toList();
+        rewardRepository.removeBillingProfileIdOf(rewardIds);
         billingProfileUserRepository.deleteById(new BillingProfileUserEntity.PrimaryKey(userId.value(), billingProfileId.value()));
     }
 

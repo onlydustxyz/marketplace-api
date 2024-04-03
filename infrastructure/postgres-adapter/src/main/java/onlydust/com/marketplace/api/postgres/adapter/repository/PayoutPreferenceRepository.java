@@ -14,4 +14,10 @@ public interface PayoutPreferenceRepository extends JpaRepository<PayoutPreferen
                 delete from accounting.payout_preferences where billing_profile_id = :billingProfileId
             """)
     void deleteAllByBillingProfileId(UUID billingProfileId);
+
+    @Modifying
+    @Query(nativeQuery = true, value = """
+                delete from accounting.payout_preferences where billing_profile_id = :billingProfileId and user_id = :userId
+            """)
+    void deleteAllByBillingProfileIdAndUserId(UUID billingProfileId, UUID userId);
 }
