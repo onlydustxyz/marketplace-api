@@ -4,6 +4,8 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,75 +17,84 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RewardStatusTest {
 
-    @Test
-    void should_get_reward_status_given_a_recipient() {
-        assertEquals(PENDING_BILLING_PROFILE, PENDING_BILLING_PROFILE.asRecipient());
-        assertEquals(COMPLETE, COMPLETE.asRecipient());
-        for (RewardStatus rewardStatus : List.of(PENDING_SIGNUP, PENDING_CONTRIBUTOR, PENDING_COMPANY, PENDING_VERIFICATION, PAYMENT_BLOCKED,
-                PAYOUT_INFO_MISSING, LOCKED, PENDING_REQUEST,
-                PROCESSING)) {
-            assertThrowImpossibleStatus(rewardStatus::asRecipient, "Impossible %s status as recipient".formatted(rewardStatus.name()));
-        }
+    @ParameterizedTest
+    @EnumSource(value = RewardStatus.class, names = {"PENDING_BILLING_PROFILE", "COMPLETE"})
+    void valid_status_as_recipient(RewardStatus status) {
+        assertEquals(status, status.asRecipient());
     }
 
-    @Test
-    void should_get_reward_status_given_a_billing_profile_member() {
-        assertEquals(PENDING_COMPANY, PENDING_VERIFICATION.asBillingProfileMember());
-        assertEquals(PENDING_COMPANY, PAYMENT_BLOCKED.asBillingProfileMember());
-        assertEquals(PENDING_COMPANY, PAYOUT_INFO_MISSING.asBillingProfileMember());
-        assertEquals(PENDING_COMPANY, LOCKED.asBillingProfileMember());
-        assertEquals(PENDING_COMPANY, PENDING_REQUEST.asBillingProfileMember());
-        assertEquals(PROCESSING, PROCESSING.asBillingProfileMember());
-        assertEquals(COMPLETE, COMPLETE.asBillingProfileMember());
-        for (RewardStatus rewardStatus : List.of(PENDING_SIGNUP, PENDING_CONTRIBUTOR, PENDING_BILLING_PROFILE, PENDING_COMPANY)) {
-            assertThrowImpossibleStatus(rewardStatus::asBillingProfileMember, "Impossible %s status as billing profile member".formatted(rewardStatus.name()));
-        }
+    @ParameterizedTest
+    @EnumSource(value = RewardStatus.class, names = {"PENDING_BILLING_PROFILE", "COMPLETE"}, mode = EnumSource.Mode.EXCLUDE)
+    void invalid_status_as_recipient(RewardStatus status) {
+        assertThrowImpossibleStatus(status::asRecipient, "Impossible %s status as recipient".formatted(status.name()));
     }
 
-    @Test
-    void should_get_reward_status_given_a_billing_profile_admin() {
-        assertEquals(PENDING_VERIFICATION, PENDING_VERIFICATION.asBillingProfileAdmin());
-        assertEquals(PAYMENT_BLOCKED, PAYMENT_BLOCKED.asBillingProfileAdmin());
-        assertEquals(PAYOUT_INFO_MISSING, PAYOUT_INFO_MISSING.asBillingProfileAdmin());
-        assertEquals(LOCKED, LOCKED.asBillingProfileAdmin());
-        assertEquals(PENDING_REQUEST, PENDING_REQUEST.asBillingProfileAdmin());
-        assertEquals(PROCESSING, PROCESSING.asBillingProfileAdmin());
-        assertEquals(COMPLETE, COMPLETE.asBillingProfileAdmin());
+    @ParameterizedTest
+    @EnumSource(value = RewardStatus.class, names = {"PROCESSING", "COMPLETE"})
+    void valid_status_as_billing_profile_member(RewardStatus status) {
+        assertEquals(status, status.asBillingProfileMember());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = RewardStatus.class, names = {"PENDING_VERIFICATION", "GEO_BLOCKED", "PAYOUT_INFO_MISSING", "LOCKED", "PENDING_REQUEST"})
+    void pending_company_as_billing_profile_member(RewardStatus status) {
+        assertEquals(PENDING_COMPANY, status.asBillingProfileMember());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = RewardStatus.class, names = {"PENDING_SIGNUP", "INDIVIDUAL_LIMIT_REACHED", "PENDING_CONTRIBUTOR", "PENDING_BILLING_PROFILE",
+            "PENDING_COMPANY"})
+    void invalid_status_as_billing_profile_member(RewardStatus status) {
+        assertThrowImpossibleStatus(status::asBillingProfileMember, "Impossible %s status as billing profile member".formatted(status.name()));
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = RewardStatus.class, names = {"PENDING_VERIFICATION", "GEO_BLOCKED", "INDIVIDUAL_LIMIT_REACHED", "PAYOUT_INFO_MISSING", "LOCKED",
+            "PENDING_REQUEST", "PROCESSING", "COMPLETE"})
+    void valid_status_as_billing_profile_admin(RewardStatus status) {
+        assertEquals(status, status.asBillingProfileAdmin());
+
         for (RewardStatus rewardStatus : List.of(PENDING_SIGNUP, PENDING_CONTRIBUTOR, PENDING_BILLING_PROFILE, PENDING_COMPANY)) {
             assertThrowImpossibleStatus(rewardStatus::asBillingProfileAdmin, "Impossible %s status as billing profile admin".formatted(rewardStatus.name()));
         }
     }
 
-    @Test
-    void should_get_reward_status_given_a_project_lead() {
-        assertEquals(PENDING_SIGNUP, PENDING_SIGNUP.asProjectLead());
-        assertEquals(PENDING_CONTRIBUTOR, PENDING_BILLING_PROFILE.asProjectLead());
-        assertEquals(PENDING_CONTRIBUTOR, PENDING_VERIFICATION.asProjectLead());
-        assertEquals(PENDING_CONTRIBUTOR, PAYMENT_BLOCKED.asProjectLead());
-        assertEquals(PENDING_CONTRIBUTOR, PAYOUT_INFO_MISSING.asProjectLead());
-        assertEquals(PENDING_CONTRIBUTOR, LOCKED.asProjectLead());
-        assertEquals(PENDING_CONTRIBUTOR, PENDING_REQUEST.asProjectLead());
-        assertEquals(PROCESSING, PROCESSING.asProjectLead());
-        assertEquals(COMPLETE, COMPLETE.asProjectLead());
-        for (RewardStatus rewardStatus : List.of(PENDING_CONTRIBUTOR, PENDING_COMPANY)) {
-            assertThrowImpossibleStatus(rewardStatus::asProjectLead, "Impossible %s status as project lead".formatted(rewardStatus.name()));
-        }
+    @ParameterizedTest
+    @EnumSource(value = RewardStatus.class, names = {"PENDING_VERIFICATION", "GEO_BLOCKED", "INDIVIDUAL_LIMIT_REACHED", "PAYOUT_INFO_MISSING", "LOCKED",
+            "PENDING_REQUEST", "PROCESSING", "COMPLETE"}, mode = EnumSource.Mode.EXCLUDE)
+    void invalid_status_as_billing_profile_admin(RewardStatus status) {
+        assertThrowImpossibleStatus(status::asBillingProfileAdmin, "Impossible %s status as billing profile admin".formatted(status.name()));
     }
 
-    @Test
-    void should_get_reward_status_given_backoffice_user() {
-        assertEquals(PENDING_SIGNUP, PENDING_SIGNUP.asBackofficeUser());
-        assertEquals(PENDING_BILLING_PROFILE, PENDING_BILLING_PROFILE.asBackofficeUser());
-        assertEquals(PENDING_VERIFICATION, PENDING_VERIFICATION.asBackofficeUser());
-        assertEquals(PAYMENT_BLOCKED, PAYMENT_BLOCKED.asBackofficeUser());
-        assertEquals(PAYOUT_INFO_MISSING, PAYOUT_INFO_MISSING.asBackofficeUser());
-        assertEquals(LOCKED, LOCKED.asBackofficeUser());
-        assertEquals(PENDING_REQUEST, PENDING_REQUEST.asBackofficeUser());
-        assertEquals(PROCESSING, PROCESSING.asBackofficeUser());
-        assertEquals(COMPLETE, COMPLETE.asBackofficeUser());
-        for (RewardStatus rewardStatus : List.of(PENDING_CONTRIBUTOR, PENDING_COMPANY)) {
-            assertThrowImpossibleStatus(rewardStatus::asBackofficeUser, "Impossible %s status as backoffice user".formatted(rewardStatus.name()));
-        }
+    @ParameterizedTest
+    @EnumSource(value = RewardStatus.class, names = {"PENDING_SIGNUP", "PROCESSING", "COMPLETE"})
+    void valid_status_as_project_lead(RewardStatus status) {
+        assertEquals(status, status.asProjectLead());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = RewardStatus.class, names = {"PENDING_BILLING_PROFILE", "PENDING_VERIFICATION", "GEO_BLOCKED", "INDIVIDUAL_LIMIT_REACHED",
+            "PAYOUT_INFO_MISSING", "LOCKED", "PENDING_REQUEST"})
+    void pending_contributor_status_as_project_lead(RewardStatus status) {
+        assertEquals(PENDING_CONTRIBUTOR, status.asProjectLead());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = RewardStatus.class, names = {"PENDING_CONTRIBUTOR", "PENDING_COMPANY"})
+    void invalid_status_as_project_lead(RewardStatus status) {
+        assertThrowImpossibleStatus(status::asProjectLead, "Impossible %s status as project lead".formatted(status.name()));
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = RewardStatus.class, names = {"PENDING_CONTRIBUTOR", "PENDING_COMPANY"}, mode = EnumSource.Mode.EXCLUDE)
+    void valid_status_as_backoffice_user(RewardStatus status) {
+        assertEquals(status, status.asBackofficeUser());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = RewardStatus.class, names = {"PENDING_CONTRIBUTOR", "PENDING_COMPANY"})
+    void invalid_status_as_backoffice_user(RewardStatus status) {
+        assertThrowImpossibleStatus(status::asBackofficeUser, "Impossible %s status as backoffice user".formatted(status.name()));
     }
 
     void assertThrowImpossibleStatus(final Supplier<RewardStatus> rewardStatusSupplier, final String message) {

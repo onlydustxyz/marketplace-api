@@ -27,16 +27,18 @@ public class RewardStatusEntity {
     Status status;
 
     public enum Status {
-        PENDING_SIGNUP, PENDING_BILLING_PROFILE, PENDING_VERIFICATION, PAYMENT_BLOCKED, PAYOUT_INFO_MISSING, LOCKED, PENDING_REQUEST, PROCESSING, COMPLETE;
+        PENDING_SIGNUP, PENDING_BILLING_PROFILE, PENDING_VERIFICATION, GEO_BLOCKED, INDIVIDUAL_LIMIT_REACHED, PAYOUT_INFO_MISSING, LOCKED, PENDING_REQUEST,
+        PROCESSING, COMPLETE;
     }
 
     public static Status from(RewardStatus rewardStatus) {
         return switch (rewardStatus) {
             case PENDING_SIGNUP -> Status.PENDING_SIGNUP;
-            case PENDING_CONTRIBUTOR,PENDING_COMPANY -> null;
+            case PENDING_CONTRIBUTOR, PENDING_COMPANY -> null;
             case PENDING_BILLING_PROFILE -> Status.PENDING_BILLING_PROFILE;
             case PENDING_VERIFICATION -> Status.PENDING_VERIFICATION;
-            case PAYMENT_BLOCKED -> Status.PAYMENT_BLOCKED;
+            case GEO_BLOCKED -> Status.GEO_BLOCKED;
+            case INDIVIDUAL_LIMIT_REACHED -> Status.INDIVIDUAL_LIMIT_REACHED;
             case PAYOUT_INFO_MISSING -> Status.PAYOUT_INFO_MISSING;
             case LOCKED -> Status.LOCKED;
             case PENDING_REQUEST -> Status.PENDING_REQUEST;
@@ -50,7 +52,8 @@ public class RewardStatusEntity {
             case PENDING_SIGNUP -> RewardStatus.PENDING_SIGNUP;
             case PENDING_BILLING_PROFILE -> RewardStatus.PENDING_BILLING_PROFILE;
             case PENDING_VERIFICATION -> RewardStatus.PENDING_VERIFICATION;
-            case PAYMENT_BLOCKED -> RewardStatus.PAYMENT_BLOCKED;
+            case GEO_BLOCKED -> RewardStatus.GEO_BLOCKED;
+            case INDIVIDUAL_LIMIT_REACHED -> RewardStatus.INDIVIDUAL_LIMIT_REACHED;
             case PAYOUT_INFO_MISSING -> RewardStatus.PAYOUT_INFO_MISSING;
             case LOCKED -> RewardStatus.LOCKED;
             case PENDING_REQUEST -> RewardStatus.PENDING_REQUEST;

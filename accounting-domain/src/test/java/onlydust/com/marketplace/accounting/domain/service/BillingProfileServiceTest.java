@@ -323,7 +323,8 @@ class BillingProfileServiceTest {
             );
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(42);
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
-                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PAYMENT_BLOCKED, Invoice.Id.random(), Invoice.Status.DRAFT, billingProfileId)).toList());
+                    .map(r -> new RewardAssociations(r.id(), RewardStatus.INDIVIDUAL_LIMIT_REACHED, Invoice.Id.random(), Invoice.Status.DRAFT,
+                            billingProfileId)).toList());
 
             // When
             assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))

@@ -219,3 +219,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000127_fix_invoice_received_at.sql
   - include:
       file: db/changelog/changelogs/00000128_fix_yearly_total_computation.sql
+  - include:
+      file: db/changelog/changelogs/00000129_differentiate_payment_blocked.sql
