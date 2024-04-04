@@ -1,9 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.*;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
 import onlydust.com.marketplace.kernel.model.EventIdResolver;
@@ -21,13 +24,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-@Builder
+@Getter
+@Accessors(fluent = true)
 @IdClass(AccountBookEventEntity.PrimaryKey.class)
 public class AccountBookEventEntity {
     @Id
     @EqualsAndHashCode.Include
     @NonNull
-    @Getter
     private final Long id;
     @Id
     @EqualsAndHashCode.Include
@@ -43,6 +46,12 @@ public class AccountBookEventEntity {
 
     public AccountBookEvent getEvent() {
         return payload.event;
+    }
+
+    @SuppressWarnings("unused") // it is used in the repository's native insert query
+    public String payloadAsJsonString() throws JsonProcessingException {
+        final var mapper = new ObjectMapper();
+        return mapper.writeValueAsString(payload);
     }
 
     @Data

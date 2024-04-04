@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @AllArgsConstructor
-public class PostgresAccountBookEventStorage implements AccountBookEventStorage {
+public class PostgresAccountBookEventAdapter implements AccountBookEventStorage {
     private final @NonNull AccountBookRepository accountBookRepository;
     private final @NonNull AccountBookEventRepository accountBookEventRepository;
 
@@ -46,14 +46,14 @@ public class PostgresAccountBookEventStorage implements AccountBookEventStorage 
         final var accountBookEntity = accountBookRepository.findByCurrencyId(currency.id().value())
                 .orElseGet(() -> accountBookRepository.saveAndFlush(AccountBookEntity.of(currency.id().value())));
 
-        accountBookEventRepository.saveAllAndFlush(pendingEvents.stream()
+        pendingEvents.stream()
                 .map(event -> AccountBookEventEntity.of(accountBookEntity.getId(), event))
-                .toList());
+                .forEach(accountBookEventRepository::insert);
     }
 
     @Override
     public Optional<Long> getLastEventId(Currency currency) {
         return accountBookRepository.findByCurrencyId(currency.id().value())
-                .flatMap(accountBookEntity -> accountBookEventRepository.findFirstByAccountBookIdOrderByIdDesc(accountBookEntity.getId()).map(AccountBookEventEntity::getId));
+                .flatMap(accountBookEntity -> accountBookEventRepository.findFirstByAccountBookIdOrderByIdDesc(accountBookEntity.getId()).map(AccountBookEventEntity::id));
     }
 }
