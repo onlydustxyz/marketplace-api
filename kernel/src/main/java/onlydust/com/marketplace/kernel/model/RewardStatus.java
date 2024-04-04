@@ -44,8 +44,9 @@ public enum RewardStatus {
     RewardStatus asRecipient() {
         return switch (this) {
             case PENDING_BILLING_PROFILE -> PENDING_BILLING_PROFILE;
+            case COMPLETE -> COMPLETE;
             case PENDING_SIGNUP, PENDING_CONTRIBUTOR, PENDING_COMPANY, PENDING_VERIFICATION, PAYMENT_BLOCKED, PAYOUT_INFO_MISSING, LOCKED, PENDING_REQUEST,
-                    PROCESSING, COMPLETE -> throw internalServerError("Impossible %s status as recipient".formatted(this.name()));
+                    PROCESSING -> throw internalServerError("Impossible %s status as recipient".formatted(this.name()));
         };
     }
 
