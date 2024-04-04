@@ -3,7 +3,7 @@ package onlydust.com.marketplace.accounting.domain.service;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.ReadOnlyAccountBookState;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
 
 import java.time.Instant;
@@ -16,25 +16,25 @@ import java.util.stream.Collectors;
 public class AccountBookFacade {
 
     private final SponsorAccountStorage sponsorAccountStorage;
-    private final AccountBookAggregate accountBook;
+    private final ReadOnlyAccountBookState accountBookState;
 
     public <T> PositiveAmount balanceOf(T ownerId) {
-        return accountBook.state().balanceOf(AccountBook.AccountId.of(ownerId));
+        return accountBookState.balanceOf(AccountBook.AccountId.of(ownerId));
     }
 
     public <T> PositiveAmount initialBalanceOf(T ownerId) {
-        return accountBook.state().amountReceivedBy(AccountBook.AccountId.of(ownerId));
+        return accountBookState.amountReceivedBy(AccountBook.AccountId.of(ownerId));
     }
 
     public Map<RewardId, PositiveAmount> unpaidRewards(SponsorAccount.Id sponsorAccountId) {
-        return accountBook.state().unspentChildren(AccountBook.AccountId.of(sponsorAccountId)).entrySet().stream()
+        return accountBookState.unspentChildren(AccountBook.AccountId.of(sponsorAccountId)).entrySet().stream()
                 .filter(e -> e.getKey().isReward())
                 .collect(Collectors.toUnmodifiableMap(e -> e.getKey().rewardId(), Map.Entry::getValue));
     }
 
 
     public boolean isFunded(RewardId rewardId) {
-        return accountBook.state().balancePerOrigin(AccountBook.AccountId.of(rewardId)).entrySet().stream()
+        return accountBookState.balancePerOrigin(AccountBook.AccountId.of(rewardId)).entrySet().stream()
                 .allMatch(entry -> {
                     final var sponsorAccount = sponsorAccountStorage.get(entry.getKey().sponsorAccountId()).orElseThrow();
                     return sponsorAccount.balance().isGreaterThanOrEqual(entry.getValue());
@@ -42,7 +42,7 @@ public class AccountBookFacade {
     }
 
     public Set<Network> networksOf(RewardId rewardId) {
-        return accountBook.state().balancePerOrigin(AccountBook.AccountId.of(rewardId)).keySet().stream()
+        return accountBookState.balancePerOrigin(AccountBook.AccountId.of(rewardId)).keySet().stream()
                 .map(accountId -> sponsorAccountStorage.get(accountId.sponsorAccountId()).orElseThrow().network())
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -50,7 +50,7 @@ public class AccountBookFacade {
     }
 
     public Optional<Instant> unlockDateOf(RewardId rewardId) {
-        return accountBook.state().balancePerOrigin(AccountBook.AccountId.of(rewardId)).keySet().stream()
+        return accountBookState.balancePerOrigin(AccountBook.AccountId.of(rewardId)).keySet().stream()
                 .map(accountId -> sponsorAccountStorage.get(accountId.sponsorAccountId()).orElseThrow().lockedUntil())
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -58,6 +58,6 @@ public class AccountBookFacade {
     }
 
     public PositiveAmount unspentBalanceReceivedFrom(SponsorAccount.Id from, ProjectId to) {
-        return accountBook.state().balancePerOrigin(AccountBook.AccountId.of(to)).getOrDefault(AccountBook.AccountId.of(from), PositiveAmount.ZERO);
+        return accountBookState.balancePerOrigin(AccountBook.AccountId.of(to)).getOrDefault(AccountBook.AccountId.of(from), PositiveAmount.ZERO);
     }
 }
