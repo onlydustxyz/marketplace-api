@@ -1096,8 +1096,8 @@ class BillingProfileServiceTest {
         when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
         when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdMember))
                 .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
-                        .hasBillingProfileSomeInvoices(false)
-                        .hasUserSomeRewardsIncludedInInvoicesOnBillingProfile(false)
+                        .billingProfileProcessingRewardsCount(0L)
+                        .userProcessingRewardsCount(0L)
                         .role(BillingProfile.User.Role.MEMBER)
                         .build()));
         final BillingProfileView billingProfile = billingProfileService.getBillingProfile(billingProfileId, userIdMember, githubUserIdInvited);
@@ -1137,8 +1137,8 @@ class BillingProfileServiceTest {
         when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
         when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdNotMember))
                 .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
-                        .hasBillingProfileSomeInvoices(false)
-                        .hasUserSomeRewardsIncludedInInvoicesOnBillingProfile(false)
+                        .billingProfileProcessingRewardsCount(0L)
+                        .userProcessingRewardsCount(0L)
                         .role(BillingProfile.User.Role.MEMBER)
                         .build()));
         final BillingProfileView billingProfile = billingProfileService.getBillingProfile(billingProfileId, userIdNotMember, githubUserIdInvited);
@@ -1177,8 +1177,8 @@ class BillingProfileServiceTest {
         when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
         when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdMember))
                 .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
-                        .hasBillingProfileSomeInvoices(false)
-                        .hasUserSomeRewardsIncludedInInvoicesOnBillingProfile(false)
+                        .billingProfileProcessingRewardsCount(0L)
+                        .userProcessingRewardsCount(0L)
                         .role(BillingProfile.User.Role.ADMIN)
                         .build()));
         final BillingProfileView billingProfile = billingProfileService.getBillingProfile(billingProfileId, userIdMember, githubUserIdInvited);
@@ -1975,15 +1975,18 @@ class BillingProfileServiceTest {
         final UserId userId = UserId.random();
 
         // When
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userId))
-                .thenReturn(false);
+        when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userId))
+                .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
+                        .role(BillingProfile.User.Role.MEMBER)
+                        .billingProfileProcessingRewardsCount(0L)
+                        .build()));
+
 
         // Then
         assertThatThrownBy(() -> billingProfileService.deleteBillingProfile(userId, billingProfileId))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("User %s must be admin to delete billing profile %s".formatted(userId.value(), billingProfileId.value()));
-        verify(billingProfileStoragePort, never()).doesBillingProfileHaveSomeInvoices(billingProfileId);
+                .hasMessage("User %s cannot delete billing profile %s".formatted(userId.value(), billingProfileId.value()));
         verify(billingProfileStoragePort, never()).deleteBillingProfile(billingProfileId);
     }
 
@@ -1994,16 +1997,17 @@ class BillingProfileServiceTest {
         final UserId userId = UserId.random();
 
         // When
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userId))
-                .thenReturn(true);
-        when(billingProfileStoragePort.doesBillingProfileHaveSomeInvoices(billingProfileId))
-                .thenReturn(true);
+        when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userId))
+                .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
+                        .role(BillingProfile.User.Role.ADMIN)
+                        .billingProfileProcessingRewardsCount(1L)
+                        .build()));
 
         // Then
         assertThatThrownBy(() -> billingProfileService.deleteBillingProfile(userId, billingProfileId))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("Cannot delete billing profile %s with invoice(s)".formatted(billingProfileId.value()));
+                .hasMessage("User %s cannot delete billing profile %s".formatted(userId, billingProfileId));
         verify(billingProfileStoragePort, never()).deleteBillingProfile(billingProfileId);
     }
 
@@ -2014,10 +2018,12 @@ class BillingProfileServiceTest {
         final UserId userId = UserId.random();
 
         // When
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userId))
-                .thenReturn(true);
-        when(billingProfileStoragePort.doesBillingProfileHaveSomeInvoices(billingProfileId))
-                .thenReturn(false);
+        when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userId))
+                .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
+                        .role(BillingProfile.User.Role.ADMIN)
+                        .billingProfileProcessingRewardsCount(0L)
+                        .build()));
+
         billingProfileService.deleteBillingProfile(userId, billingProfileId);
 
         // Then
@@ -2147,7 +2153,7 @@ class BillingProfileServiceTest {
             when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .type(BillingProfile.Type.COMPANY).build()));
             when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdAdmin))
-                    .thenReturn(Optional.of(BillingProfileUserRightsView.builder().hasMoreThanOneCoworkers(false).build()));
+                    .thenReturn(Optional.of(BillingProfileUserRightsView.builder().billingProfileCoworkersCount(0L).build()));
 
             // When
             billingProfileService.updateBillingProfileType(billingProfileId, userIdAdmin, type);
@@ -2167,7 +2173,7 @@ class BillingProfileServiceTest {
                     .type(BillingProfile.Type.COMPANY).build()));
             when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdAdmin))
                     .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
-                            .hasMoreThanOneCoworkers(true).build()));
+                            .billingProfileCoworkersCount(2L).build()));
 
             // When
             assertThatThrownBy(() -> billingProfileService.updateBillingProfileType(billingProfileId, userIdAdmin, type))
