@@ -7,7 +7,10 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfile
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.UUID;
@@ -22,9 +25,8 @@ public class BillingProfileUserRightsViewEntity {
     @Type(type = "billing_profile_role")
     @Enumerated(EnumType.STRING)
     BillingProfileUserEntity.Role userRole;
-    @Column(name = "has_bp_some_invoices")
-    Boolean hasBillingProfileSomeInvoices;
-    Boolean hasUserSomeLinkedInvoices;
+    Long billingProfileProcessingRewardsCount;
+    Long userProcessingRewardsCount;
     @Type(type = "billing_profile_role")
     @Enumerated(EnumType.STRING)
     BillingProfileUserEntity.Role invitedRole;
@@ -32,13 +34,13 @@ public class BillingProfileUserRightsViewEntity {
     Long invitedByGithubUserId;
     String invitedByGithubLogin;
     String invitedByGithubAvatarUrl;
-    Boolean hasMoreThanOneCoworker;
+    Long billingProfileCoworkersCount;
 
 
     public BillingProfileUserRightsView toDomain() {
         return BillingProfileUserRightsView.builder()
-                .hasBillingProfileSomeInvoices(this.hasBillingProfileSomeInvoices)
-                .hasUserSomeRewardsIncludedInInvoicesOnBillingProfile(this.hasUserSomeLinkedInvoices)
+                .billingProfileProcessingRewardsCount(this.billingProfileProcessingRewardsCount)
+                .userProcessingRewardsCount(this.userProcessingRewardsCount)
                 .role(isNull(this.userRole) ? null : this.userRole.toDomain())
                 .invitation(Objects.isNull(this.invitedByGithubUserId) ? null : BillingProfileUserRightsView.InvitationView.builder()
                         .githubUserId(GithubUserId.of(this.invitedByGithubUserId))
@@ -47,7 +49,7 @@ public class BillingProfileUserRightsViewEntity {
                         .invitedAt(this.invitedAt)
                         .role(this.invitedRole.toDomain())
                         .build())
-                .hasMoreThanOneCoworkers(this.hasMoreThanOneCoworker)
+                .billingProfileCoworkersCount(this.billingProfileCoworkersCount)
                 .build();
     }
 }

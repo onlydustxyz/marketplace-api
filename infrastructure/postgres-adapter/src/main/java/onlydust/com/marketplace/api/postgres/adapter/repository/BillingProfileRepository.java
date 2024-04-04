@@ -1,14 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
-import org.apache.commons.lang3.function.Failable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface BillingProfileRepository extends JpaRepository<BillingProfileEntity, UUID> {
@@ -20,13 +18,6 @@ public interface BillingProfileRepository extends JpaRepository<BillingProfileEn
                     where id = :billingProfileId
             """, nativeQuery = true)
     void updateBillingProfileVerificationStatus(UUID billingProfileId, String verificationStatus);
-
-    @Query(value = """
-                select count(*) > 0
-                from accounting.invoices
-                where billing_profile_id = :billingProfileId
-            """, nativeQuery = true)
-    boolean hasInvoices(UUID billingProfileId);
 
     @Modifying
     @Query(nativeQuery = true, value = """

@@ -389,12 +389,6 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public boolean doesBillingProfileHaveSomeInvoices(BillingProfile.Id billingProfileId) {
-        return billingProfileRepository.hasInvoices(billingProfileId.value());
-    }
-
-    @Override
     @Transactional
     public void deleteBillingProfile(BillingProfile.Id billingProfileId) {
         kybRepository.findByBillingProfileId(billingProfileId.value())

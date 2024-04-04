@@ -50,7 +50,7 @@ public class BillingProfileView {
     }
 
     public boolean isSwitchableToSelfEmployed() {
-        return this.type == BillingProfile.Type.COMPANY && !this.me.hasMoreThanOneCoworkers();
+        return this.type == BillingProfile.Type.COMPANY && this.me.billingProfileCoworkersCount() == 0;
     }
 
     public boolean isVerificationBlocked() {

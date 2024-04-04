@@ -79,8 +79,6 @@ public interface BillingProfileStoragePort {
 
     Optional<BillingProfileCoworkerView> findBillingProfileAdmin(UserId userId, BillingProfile.Id billingProfileId);
 
-    boolean doesBillingProfileHaveSomeInvoices(BillingProfile.Id billingProfileId);
-
     void deleteBillingProfile(BillingProfile.Id billingProfileId);
 
     void updateEnableBillingProfile(BillingProfile.Id billingProfileId, Boolean enabled);
