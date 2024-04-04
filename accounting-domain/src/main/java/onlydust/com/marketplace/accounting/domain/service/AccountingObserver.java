@@ -87,9 +87,11 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
     public Optional<ConvertedAmount> usdAmountOf(RewardId rewardId) {
         final var usd = currencyStorage.findByCode(Currency.Code.USD).orElseThrow(() -> internalServerError("Currency USD not found"));
 
-        return rewardUsdEquivalentStorage.get(rewardId).flatMap(rewardUsdEquivalent -> rewardUsdEquivalent.equivalenceSealingDate()
-                .flatMap(date -> quoteStorage.nearest(rewardUsdEquivalent.rewardCurrencyId(), usd.id(), date))
-                .map(quote -> new ConvertedAmount(Amount.of(quote.convertToBaseCurrency(rewardUsdEquivalent.rewardAmount())), quote.price())));
+        return rewardUsdEquivalentStorage.get(rewardId).flatMap(rewardUsdEquivalent -> {
+            final var date = rewardUsdEquivalent.equivalenceSealingDate().orElse(ZonedDateTime.now());
+            return quoteStorage.nearest(rewardUsdEquivalent.rewardCurrencyId(), usd.id(), date)
+                    .map(quote -> new ConvertedAmount(Amount.of(quote.convertToBaseCurrency(rewardUsdEquivalent.rewardAmount())), quote.price()));
+        });
     }
 
     private RewardStatusData upToDateRewardStatus(AccountBookFacade accountBookFacade, RewardStatusData rewardStatusData) {
