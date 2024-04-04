@@ -20,7 +20,7 @@ public class AccountBookEventStorageStub implements AccountBookEventStorage {
     }
 
     @Override
-    public synchronized void save(Currency currency, List<IdentifiedAccountBookEvent> pendingEvents) {
+    public synchronized void insert(Currency currency, List<IdentifiedAccountBookEvent> pendingEvents) {
         final var events = new ArrayList<>(getAll(currency));
         long eventId = events.isEmpty() ? 0 : events.get(events.size() - 1).id();
         for (var event : pendingEvents) {

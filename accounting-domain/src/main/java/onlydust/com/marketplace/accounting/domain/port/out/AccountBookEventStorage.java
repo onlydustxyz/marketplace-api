@@ -11,7 +11,7 @@ public interface AccountBookEventStorage {
 
     List<IdentifiedAccountBookEvent> getSince(Currency currency, long eventId);
 
-    void save(Currency currency, List<IdentifiedAccountBookEvent> pendingEvents);
+    void insert(Currency currency, List<IdentifiedAccountBookEvent> pendingEvents);
 
     Optional<Long> getLastEventId(Currency currency);
 }

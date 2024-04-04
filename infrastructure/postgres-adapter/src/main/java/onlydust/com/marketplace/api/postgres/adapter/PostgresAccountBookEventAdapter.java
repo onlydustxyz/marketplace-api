@@ -42,7 +42,7 @@ public class PostgresAccountBookEventAdapter implements AccountBookEventStorage 
 
     @Override
     @Transactional
-    public void save(final @NonNull Currency currency, final @NonNull List<IdentifiedAccountBookEvent> pendingEvents) {
+    public void insert(final @NonNull Currency currency, final @NonNull List<IdentifiedAccountBookEvent> pendingEvents) {
         final var accountBookEntity = accountBookRepository.findByCurrencyId(currency.id().value())
                 .orElseGet(() -> accountBookRepository.saveAndFlush(AccountBookEntity.of(currency.id().value())));
 

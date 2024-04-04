@@ -53,9 +53,9 @@ public class PostgresAccountBookEventAdapterIT extends AbstractPostgresIT {
                         PositiveAmount.of(100L)))
         );
 
-        postgresAccountBookEventAdapter.save(currency, events1);
+        postgresAccountBookEventAdapter.insert(currency, events1);
         assertThat(postgresAccountBookEventAdapter.getLastEventId(currency).get()).isEqualTo(2L);
-        postgresAccountBookEventAdapter.save(currency, events2);
+        postgresAccountBookEventAdapter.insert(currency, events2);
         assertThat(postgresAccountBookEventAdapter.getLastEventId(currency).get()).isEqualTo(4L);
 
         final var allEvents = Stream.of(events1, events2).flatMap(List::stream).toList();
@@ -80,11 +80,11 @@ public class PostgresAccountBookEventAdapterIT extends AbstractPostgresIT {
                         PositiveAmount.of(100L)))
         );
 
-        postgresAccountBookEventAdapter.save(currency, events1);
+        postgresAccountBookEventAdapter.insert(currency, events1);
         assertThat(postgresAccountBookEventAdapter.getLastEventId(currency).get()).isEqualTo(2L);
         assertThat(postgresAccountBookEventAdapter.getAll(currency)).containsExactlyElementsOf(events1);
 
-        assertThatThrownBy(() -> postgresAccountBookEventAdapter.save(currency, events2))
+        assertThatThrownBy(() -> postgresAccountBookEventAdapter.insert(currency, events2))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessageContaining("constraint [account_books_events_pkey]");
 
