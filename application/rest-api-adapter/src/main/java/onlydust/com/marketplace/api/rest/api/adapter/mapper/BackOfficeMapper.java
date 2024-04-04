@@ -789,7 +789,8 @@ public interface BackOfficeMapper {
             case PENDING_SIGNUP -> RewardStatus.PENDING_SIGNUP;
             case PENDING_BILLING_PROFILE -> RewardStatus.PENDING_BILLING_PROFILE;
             case PENDING_VERIFICATION -> RewardStatus.PENDING_VERIFICATION;
-            case PAYMENT_BLOCKED -> RewardStatus.PAYMENT_BLOCKED;
+            case GEO_BLOCKED -> RewardStatus.GEO_BLOCKED;
+            case INDIVIDUAL_LIMIT_REACHED -> RewardStatus.INDIVIDUAL_LIMIT_REACHED;
             case PAYOUT_INFO_MISSING -> RewardStatus.PAYOUT_INFO_MISSING;
             case LOCKED -> RewardStatus.LOCKED;
             case PENDING_REQUEST -> RewardStatus.PENDING_REQUEST;
@@ -805,7 +806,8 @@ public interface BackOfficeMapper {
             case PENDING_BILLING_PROFILE -> RewardStatusContract.PENDING_BILLING_PROFILE;
             case PENDING_COMPANY -> null;
             case PENDING_VERIFICATION -> RewardStatusContract.PENDING_VERIFICATION;
-            case PAYMENT_BLOCKED -> RewardStatusContract.PAYMENT_BLOCKED;
+            case GEO_BLOCKED -> RewardStatusContract.GEO_BLOCKED;
+            case INDIVIDUAL_LIMIT_REACHED -> RewardStatusContract.INDIVIDUAL_LIMIT_REACHED;
             case PAYOUT_INFO_MISSING -> RewardStatusContract.PAYOUT_INFO_MISSING;
             case LOCKED -> RewardStatusContract.LOCKED;
             case PENDING_REQUEST -> RewardStatusContract.PENDING_REQUEST;
