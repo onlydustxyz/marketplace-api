@@ -77,7 +77,15 @@ public interface BillingProfileUserViewRepository extends JpaRepository<BillingP
                    " UNION " +
                    SELECT_INVITED_COWORKER +
                    " WHERE bpui.billing_profile_id = :billingProfileId and bpui.accepted = false" +
-                   " AND (coalesce(roles) IS NULL OR cast(bpui.role as text) IN (:roles)) ", nativeQuery = true)
+                   " AND (coalesce(roles) IS NULL OR cast(bpui.role as text) IN (:roles)) ",
+            countQuery = """
+                     SELECT count(*) from accounting.billing_profiles_users bpu
+                     join iam.users u on u.id = bpu.user_id
+                     full outer join accounting.billing_profiles_user_invitations bpui on
+                        bpu.billing_profile_id = bpui.billing_profile_id and bpui.github_user_id = u.github_user_id
+                     where coalesce(bpu.billing_profile_id, bpui.billing_profile_id) = :billingProfileId and
+                        (coalesce(:roles) is null or cast(coalesce(bpu.role, bpui.role) as text) in (:roles))
+                    """, nativeQuery = true)
     Page<BillingProfileUserViewEntity> findByBillingProfileId(UUID billingProfileId, List<String> roles, Pageable pageable);
 
     @Query(value = SELECT_INVITED_COWORKER +
