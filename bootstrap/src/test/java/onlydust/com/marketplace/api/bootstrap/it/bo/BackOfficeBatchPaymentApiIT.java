@@ -314,7 +314,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                               "dollarsEquivalent": 1010.00
                             }
                           ],
-                          "csv": "erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,747e663f-4e68-4b42-965b-b5aebedcd4c4.eth,1000\\r\\n",
+                          "csv": "erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,747e663f-4e68-4b42-965b-b5aebedcd4c4.eth,1000,\\r\\n",
                           "transactionHash": null,
                           "rewards": [
                             {
