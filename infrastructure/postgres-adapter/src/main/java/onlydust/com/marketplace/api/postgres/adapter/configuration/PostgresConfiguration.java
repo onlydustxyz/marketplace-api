@@ -281,8 +281,9 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresAccountBookEventStorage postgresAccountBookEventStorage(final AccountBookRepository accountBookRepository) {
-        return new PostgresAccountBookEventStorage(accountBookRepository);
+    public PostgresAccountBookEventAdapter postgresAccountBookEventStorage(final AccountBookRepository accountBookRepository,
+                                                                           final AccountBookEventRepository accountBookEventRepository) {
+        return new PostgresAccountBookEventAdapter(accountBookRepository, accountBookEventRepository);
     }
 
     @Bean

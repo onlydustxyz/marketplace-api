@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.Amount;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.kernel.visitor.Visitable;
 import onlydust.com.marketplace.kernel.visitor.Visitor;
+import org.jetbrains.annotations.NotNull;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.AsSubgraph;
 import org.jgrapht.graph.SimpleDirectedGraph;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 import static onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId.ROOT;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
-public class AccountBookState implements AccountBook, Visitable<AccountBookState> {
+public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, Visitable<AccountBookState> {
     private final Graph<Vertex, Edge> graph = new SimpleDirectedGraph<>(Edge.class);
     private final Map<AccountId, List<Vertex>> accountVertices = new HashMap<>();
 
@@ -42,12 +43,12 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     }
 
     @Override
-    public void mint(@NonNull final AccountId account, @NonNull final PositiveAmount amount) {
+    public synchronized void mint(@NonNull final AccountId account, @NonNull final PositiveAmount amount) {
         createTransaction(root, account, amount);
     }
 
     @Override
-    public List<Transaction> burn(@NonNull final AccountId account, @NonNull final PositiveAmount amount) {
+    public synchronized List<Transaction> burn(@NonNull final AccountId account, @NonNull final PositiveAmount amount) {
         checkAccountsAreNotTheSame(account, ROOT);
         final var unspentVertices = unspentVerticesOf(account);
         try {
@@ -58,7 +59,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     }
 
     @Override
-    public void transfer(@NonNull final AccountId from, @NonNull final AccountId to, @NonNull final PositiveAmount amount) {
+    public synchronized void transfer(@NonNull final AccountId from, @NonNull final AccountId to, @NonNull final PositiveAmount amount) {
         checkAccountsAreNotTheSame(from, to);
         final var unspentVertices = unspentVerticesOf(from);
         try {
@@ -69,7 +70,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     }
 
     @Override
-    public void refund(@NonNull final AccountId from, @NonNull final AccountId to, @NonNull final PositiveAmount amount) {
+    public synchronized void refund(@NonNull final AccountId from, @NonNull final AccountId to, @NonNull final PositiveAmount amount) {
         checkAccountsAreNotTheSame(from, to);
         final var unspentVertices = unspentVerticesOf(from, to);
         try {
@@ -80,7 +81,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     }
 
     @Override
-    public Set<AccountId> refund(@NonNull final AccountId from) {
+    public synchronized Set<AccountId> refund(@NonNull final AccountId from) {
         final var vertices = accountVertices(from);
         if (vertices.stream().anyMatch(v -> !graph.outgoingEdgesOf(v).isEmpty())) {
             throw badRequest("Cannot entirely refund %s because it has outgoing transactions".formatted(from));
@@ -92,32 +93,38 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         }).collect(Collectors.toUnmodifiableSet());
     }
 
-    public @NonNull PositiveAmount balanceOf(@NonNull final AccountId account) {
+    @Override
+    public synchronized @NonNull PositiveAmount balanceOf(@NonNull final AccountId account) {
         final var unspentVertices = unspentVerticesOf(account);
         return unspentVertices.stream().map(VertexWithBalance::balance).reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
-    public @NonNull PositiveAmount amountReceivedBy(@NonNull final AccountId account) {
+    @Override
+    public synchronized @NonNull PositiveAmount amountReceivedBy(@NonNull final AccountId account) {
         return accountVertices(account).stream()
                 .map(v -> incomingEdgeOf(v).amount).reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
-    public @NonNull PositiveAmount refundableBalance(@NonNull AccountId from, @NonNull AccountId to) {
+    @Override
+    public synchronized @NonNull PositiveAmount refundableBalance(@NonNull AccountId from, @NonNull AccountId to) {
         final var unspentVertices = unspentVerticesOf(from, to);
         return unspentVertices.stream().map(VertexWithBalance::balance).reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
-    public @NonNull PositiveAmount transferredAmount(@NonNull AccountId from, @NonNull AccountId to) {
+    @Override
+    public synchronized @NonNull PositiveAmount transferredAmount(@NonNull AccountId from, @NonNull AccountId to) {
         return accountVertices(to).stream()
                 .filter(v -> hasParent(v, from))
                 .map(v -> incomingEdgeOf(v).amount).reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
-    public boolean hasParent(@NonNull AccountId to, @NonNull Collection<AccountId> from) {
+    @Override
+    public synchronized boolean hasParent(@NonNull AccountId to, @NonNull Collection<AccountId> from) {
         return accountVertices(to).stream().anyMatch(v -> from.stream().anyMatch(f -> hasParent(v, f)));
     }
 
-    public @NonNull List<Transaction> transactionsFrom(@NonNull AccountId from) {
+    @Override
+    public synchronized @NonNull List<Transaction> transactionsFrom(@NonNull AccountId from) {
         final var startVertices = accountVertices(from);
         final Map<FromTo, PositiveAmount> aggregatedAmounts = new HashMap<>();
 
@@ -125,7 +132,8 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         return mapAggregatedAmountsToTransactions(aggregatedAmounts);
     }
 
-    public @NonNull List<Transaction> transactionsTo(@NonNull AccountId to) {
+    @Override
+    public synchronized @NonNull List<Transaction> transactionsTo(@NonNull AccountId to) {
         final var startVertices = accountVertices(to);
         final Map<FromTo, PositiveAmount> aggregatedAmounts = new HashMap<>();
 
@@ -133,7 +141,8 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         return mapAggregatedAmountsToTransactions(aggregatedAmounts);
     }
 
-    public @NonNull Map<AccountId, PositiveAmount> transferredAmountPerOrigin(@NonNull AccountId to) {
+    @Override
+    public synchronized @NonNull Map<AccountId, PositiveAmount> transferredAmountPerOrigin(@NonNull AccountId to) {
         return accountVertices(to).stream()
                 .map(v -> new Transaction(source(v).accountId, to, incomingEdgeOf(v).amount))
                 .collect(Collectors.groupingBy(Transaction::from,
@@ -142,7 +151,8 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
                 ));
     }
 
-    public @NonNull Map<AccountId, PositiveAmount> balancePerOrigin(@NonNull AccountId to) {
+    @Override
+    public synchronized @NonNull Map<AccountId, PositiveAmount> balancePerOrigin(@NonNull AccountId to) {
         return accountVertices(to).stream()
                 .map(v -> new Transaction(source(v).accountId, to, balanceOf(v)))
                 .collect(Collectors.groupingBy(Transaction::from,
@@ -239,7 +249,9 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
                 .toList();
     }
 
-    public Map<AccountId, PositiveAmount> unspentChildren(AccountId of) {
+    @Override
+    @NotNull
+    public synchronized Map<AccountId, PositiveAmount> unspentChildren(@NotNull AccountId of) {
         return accountVertices(of).stream()
                 .flatMap(v -> unspentChildren(v).entrySet().stream())
                 .collect(Collectors.groupingBy(e -> e.getKey().accountId,
@@ -248,7 +260,9 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
                 ));
     }
 
-    public Map<AccountId, PositiveAmount> unspentChildren() {
+    @Override
+    @NotNull
+    public synchronized Map<AccountId, PositiveAmount> unspentChildren() {
         return unspentChildren(ROOT);
     }
 
@@ -324,11 +338,12 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     }
 
     @Override
-    public <R> R accept(Visitor<AccountBookState, R> visitor) {
+    public synchronized <R> R accept(Visitor<AccountBookState, R> visitor) {
         return visitor.visit(this);
     }
 
-    public void export(Exporter exporter) {
+    @Override
+    public synchronized void export(@NotNull Exporter exporter) {
         exporter.export(this);
     }
 
@@ -349,14 +364,14 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         private final Vertex source;
         private PositiveAmount amount;
 
-        public static PositiveAmount totalAmountOf(Collection<Edge> edges) {
+        private static PositiveAmount totalAmountOf(Collection<Edge> edges) {
             var acc = PositiveAmount.ZERO;
             for (Edge edge : edges)
                 acc = acc.add(edge.amount);
             return acc;
         }
 
-        public void decreaseAmount(PositiveAmount amount) {
+        private void decreaseAmount(PositiveAmount amount) {
             this.amount = PositiveAmount.of(this.amount.subtract(amount));
         }
     }
@@ -416,7 +431,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
             return String.valueOf(Integer.parseInt(hex, 16));
         }
 
-        Attribute colorOf(Vertex v) {
+        private Attribute colorOf(Vertex v) {
             return DefaultAttribute.createAttribute(v.accountId.type() == null ? "#000000" :
                     switch (v.accountId.type()) {
                         case SPONSOR_ACCOUNT -> "lightcoral";
@@ -426,7 +441,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
                     });
         }
 
-        String idOf(Vertex v) {
+        private String idOf(Vertex v) {
             return v.accountId == ROOT ? String.valueOf(v.hashCode()) : hexToDec(v.accountId.toString().substring(0, 5));
         }
 

@@ -12,7 +12,9 @@ import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePo
 import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
+import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.api.contract.model.CreateRewardResponse;
+import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookEventRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
@@ -53,6 +55,10 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     @Autowired
     private AccountBookRepository accountBookRepository;
     @Autowired
+    private AccountBookEventRepository accountBookEventRepository;
+    @Autowired
+    private CachedAccountBookProvider accountBookProvider;
+    @Autowired
     private BillingProfileFacadePort billingProfileFacadePort;
     @Autowired
     private PayoutPreferenceFacadePort payoutPreferenceFacadePort;
@@ -63,8 +69,10 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
     @BeforeEach
     void setup() {
+        accountBookEventRepository.deleteAll();
         accountBookRepository.deleteAll();
         sponsorAccountRepository.deleteAll();
+        accountBookProvider.evictAll();
     }
 
     @Test
