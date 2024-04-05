@@ -57,7 +57,7 @@ public class AccountBookFacade {
                 .max(Instant::compareTo);
     }
 
-    public PositiveAmount transferredAmount(SponsorAccount.Id sponsorAccountId, ProjectId projectId) {
-        return accountBook.state().transferredAmount(AccountBook.AccountId.of(sponsorAccountId), AccountBook.AccountId.of(projectId));
+    public PositiveAmount unspentBalanceReceivedFrom(SponsorAccount.Id from, ProjectId to) {
+        return accountBook.state().balancePerOrigin(AccountBook.AccountId.of(to)).getOrDefault(AccountBook.AccountId.of(from), PositiveAmount.ZERO);
     }
 }

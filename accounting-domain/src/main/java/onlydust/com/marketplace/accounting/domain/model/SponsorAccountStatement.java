@@ -39,7 +39,7 @@ public class SponsorAccountStatement {
         return initialAllowance().subtract(account().initialBalance());
     }
 
-    public PositiveAmount amountSentTo(ProjectId projectId) {
-        return accountBookFacade.transferredAmount(sponsorAccount.id(), projectId);
+    public PositiveAmount unspentBalanceSentTo(ProjectId projectId) {
+        return accountBookFacade.unspentBalanceReceivedFrom(sponsorAccount.id(), projectId);
     }
 }
