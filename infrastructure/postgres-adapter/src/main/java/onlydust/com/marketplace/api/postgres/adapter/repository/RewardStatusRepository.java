@@ -8,16 +8,19 @@ import java.util.List;
 import java.util.UUID;
 
 public interface RewardStatusRepository extends JpaRepository<RewardStatusDataEntity, UUID> {
-    List<RewardStatusDataEntity> findByPaidAtIsNull();
+    @Query(value = """
+            SELECT rsd FROM RewardStatusDataEntity rsd
+            WHERE rsd.status.status <= 'PENDING_REQUEST'
+            """)
+    List<RewardStatusDataEntity> findNotRequested();
 
     @Query(value = """
             SELECT * FROM accounting.reward_status_data rsd
             JOIN public.rewards r on r.id = rsd.reward_id
+            JOIN accounting.reward_statuses rs on r.id = rs.reward_id AND rs.status <= 'PENDING_REQUEST'
             JOIN iam.users u on r.recipient_id = u.github_user_id
             JOIN accounting.payout_preferences pp ON pp.project_id = r.project_id AND pp.user_id = u.id
-            JOIN accounting.billing_profiles bp ON bp.id = pp.billing_profile_id
-            WHERE bp.id = :billingProfileId AND
-            rsd.paid_at IS NULL
+            JOIN accounting.billing_profiles bp ON bp.id = pp.billing_profile_id AND bp.id = :billingProfileId
             """, nativeQuery = true)
-    List<RewardStatusDataEntity> findNotPaidByBillingProfile(UUID billingProfileId);
+    List<RewardStatusDataEntity> findNotRequestedByBillingProfile(UUID billingProfileId);
 }

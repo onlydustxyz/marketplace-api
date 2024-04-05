@@ -161,7 +161,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
     }
 
     private void refreshRewardsUsdEquivalentOf(BillingProfile.Id billingProfileId) {
-        rewardStatusStorage.notPaid(billingProfileId)
+        rewardStatusStorage.notRequested(billingProfileId)
                 .forEach(rewardStatus -> rewardStatusStorage.save(rewardStatus.usdAmount(usdAmountOf(rewardStatus.rewardId()).orElse(null))));
     }
 
@@ -171,7 +171,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
     }
 
     public void refreshRewardsUsdEquivalents() {
-        rewardStatusStorage.notPaid()
+        rewardStatusStorage.notRequested()
                 .forEach(rewardStatus -> rewardStatusStorage.save(rewardStatus.usdAmount(usdAmountOf(rewardStatus.rewardId()).orElse(null))));
     }
 }
