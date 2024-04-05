@@ -44,16 +44,19 @@ public interface BoProjectRepository extends JpaRepository<BoProjectEntity, UUID
                                          INNER JOIN projects_contributors pc ON c.contributor_id = pc.github_user_id
                                 WHERE c.created_at > CURRENT_DATE - INTERVAL '3 months'
                                 GROUP BY project_id) ac on ac.project_id = p.project_id
-                     LEFT JOIN (SELECT pc.project_id,
-                                       COUNT(DISTINCT c.contributor_id) AS count_new_contributors
-                                FROM indexer_exp.contributions c
-                                         INNER JOIN projects_contributors pc ON c.contributor_id = pc.github_user_id
-                                WHERE c.created_at > CURRENT_DATE - INTERVAL '3 months'
-                                  AND NOT EXISTS (SELECT 1
-                                                  FROM indexer_exp.contributions c2
-                                                  WHERE c2.contributor_id = c.contributor_id
-                                                    AND c2.created_at < CURRENT_DATE - INTERVAL '3 months')
-                                GROUP BY pc.project_id) nc ON p.project_id = nc.project_id
+                     LEFT JOIN (with contributions_stats as (
+                                    select contributor_id, project_id,
+                                           count(distinct id) filter ( where completed_at < CURRENT_DATE - INTERVAL '3 months' )  old_contributions_count,
+                                           count(distinct id) filter ( where completed_at >= CURRENT_DATE - INTERVAL '3 months' ) new_contributions_count
+                                    from indexer_exp.contributions c
+                                    join project_github_repos pgr on pgr.github_repo_id = c.repo_id
+                                    where status = 'COMPLETED'
+                                    group by contributor_id, project_id
+                                )
+                                  select project_id, count(contributor_id) as count_new_contributors
+                                  from contributions_stats
+                                  where old_contributions_count = 0 and new_contributions_count > 0
+                                  group by project_id) nc ON p.project_id = nc.project_id
                      LEFT JOIN (SELECT r.project_id,
                                        COUNT(DISTINCT r.recipient_id) AS count_rewarded_contributors
                                 FROM rewards r
