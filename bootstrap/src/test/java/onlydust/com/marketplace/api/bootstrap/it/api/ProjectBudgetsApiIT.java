@@ -5,12 +5,10 @@ import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
+import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HistoricalQuoteEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.HistoricalQuoteRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
 import onlydust.com.marketplace.project.domain.service.RewardService;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,11 +38,17 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
     SponsorAccountRepository sponsorAccountRepository;
     @Autowired
     AccountBookRepository accountBookRepository;
+    @Autowired
+    private AccountBookEventRepository accountBookEventRepository;
+    @Autowired
+    private CachedAccountBookProvider accountBookProvider;
 
     @BeforeEach
     void setup() {
+        accountBookEventRepository.deleteAll();
         sponsorAccountRepository.deleteAll();
         accountBookRepository.deleteAll();
+        accountBookProvider.evictAll();
     }
 
     @Test

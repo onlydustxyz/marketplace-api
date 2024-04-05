@@ -7,6 +7,7 @@ import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
 import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
 import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
 import onlydust.com.marketplace.api.bootstrap.helper.AccountingHelper;
@@ -133,14 +134,20 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_BILLING_PROFILES_POST_COWORKER_INVITATIONS = "/api/v1/me/billing-profiles/%s/invitations";
     protected static final String BILLING_PROFILES_DELETE_COWORKER = "/api/v1/billing-profiles/%s/coworkers/%s";
 
-    static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:14.3-alpine")
-            .withDatabaseName("marketplace_db")
-            .withUsername("test")
-            .withPassword("test")
-            .withCopyFileToContainer(MountableFile.forClasspathResource("/database/dumps"), "/tmp")
-            .withCopyFileToContainer(MountableFile.forClasspathResource("/database/docker_init"), "/docker-entrypoint-initdb.d")
-            .withCopyFileToContainer(MountableFile.forClasspathResource("/database/scripts"), "/scripts")
-            .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
+    private static PostgreSQLContainer postgresSQLContainer;
+
+    static {
+        postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
+                .withDatabaseName("marketplace_db")
+                .withUsername("test")
+                .withPassword("test")
+                .withCopyFileToContainer(MountableFile.forClasspathResource("/database/dumps"), "/tmp")
+                .withCopyFileToContainer(MountableFile.forClasspathResource("/database/docker_init"), "/docker-entrypoint-initdb.d")
+                .withCopyFileToContainer(MountableFile.forClasspathResource("/database/scripts"), "/scripts")
+                .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
+        postgresSQLContainer.start();
+    }
+
     @InjectWireMock("github")
     protected WireMockServer githubWireMockServer;
     @InjectWireMock("indexer-api")
@@ -202,10 +209,12 @@ public class AbstractMarketplaceApiIT {
 
     @BeforeAll
     static void beforeAll() throws IOException, InterruptedException {
-        if (!postgresSQLContainer.isRunning()) {
-            postgresSQLContainer.start();
-        }
         assertThat(postgresSQLContainer.execInContainer("/scripts/restore_db.sh").getExitCode()).isEqualTo(0);
+    }
+
+    @BeforeEach
+    void beforeEach(@Autowired CachedAccountBookProvider accountBookProvider) {
+        accountBookProvider.evictAll();
     }
 
     @BeforeEach

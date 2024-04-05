@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
+import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
@@ -65,14 +66,20 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         @ConfigureWireMock(name = "make-webhook-send-rewards-paid", property = "infrastructure.make.webhook.sendRewardsPaidMailUrl"),
 })
 public class AbstractMarketplaceBackOfficeApiIT {
-    static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:14.3-alpine")
-            .withDatabaseName("marketplace_db")
-            .withUsername("test")
-            .withPassword("test")
-            .withCopyFileToContainer(MountableFile.forClasspathResource("/database/dumps"), "/tmp")
-            .withCopyFileToContainer(MountableFile.forClasspathResource("/database/docker_init"), "/docker-entrypoint-initdb.d")
-            .withCopyFileToContainer(MountableFile.forClasspathResource("/database/scripts"), "/scripts")
-            .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
+    private static PostgreSQLContainer postgresSQLContainer;
+
+    static {
+        postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
+                .withDatabaseName("marketplace_db")
+                .withUsername("test")
+                .withPassword("test")
+                .withCopyFileToContainer(MountableFile.forClasspathResource("/database/dumps"), "/tmp")
+                .withCopyFileToContainer(MountableFile.forClasspathResource("/database/docker_init"), "/docker-entrypoint-initdb.d")
+                .withCopyFileToContainer(MountableFile.forClasspathResource("/database/scripts"), "/scripts")
+                .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
+        postgresSQLContainer.start();
+    }
+
     @LocalServerPort
     int port;
     @Autowired
@@ -135,10 +142,12 @@ public class AbstractMarketplaceBackOfficeApiIT {
 
     @BeforeAll
     static void beforeAll() throws IOException, InterruptedException {
-        if (!postgresSQLContainer.isRunning()) {
-            postgresSQLContainer.start();
-        }
         assertThat(postgresSQLContainer.execInContainer("/scripts/restore_db.sh").getExitCode()).isEqualTo(0);
+    }
+
+    @BeforeEach
+    void beforeEach(@Autowired CachedAccountBookProvider accountBookProvider) {
+        accountBookProvider.evictAll();
     }
 
     protected static final String GET_ME = "/bo/v1/me";
