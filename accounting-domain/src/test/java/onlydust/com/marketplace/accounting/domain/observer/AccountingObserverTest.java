@@ -541,7 +541,7 @@ public class AccountingObserverTest {
             // Given
             final var rewardId1 = RewardId.random();
             final var rewardId2 = RewardId.random();
-            when(rewardStatusStorage.notPaid()).thenReturn(List.of(
+            when(rewardStatusStorage.notRequested()).thenReturn(List.of(
                     new RewardStatusData(rewardId1),
                     new RewardStatusData(rewardId2)
             ));
@@ -575,7 +575,7 @@ public class AccountingObserverTest {
             accountingObserver.onBillingProfileUpdated(billingProfileVerificationUpdated);
 
             // Then
-            verify(rewardStatusStorage).notPaid(kyc.getBillingProfileId());
+            verify(rewardStatusStorage).notRequested(kyc.getBillingProfileId());
         }
 
         @Test
@@ -625,7 +625,7 @@ public class AccountingObserverTest {
             accountingObserver.onBillingProfileUpdated(billingProfileVerificationUpdated);
 
             // Then
-            verify(rewardStatusStorage).notPaid(kyb.getBillingProfileId());
+            verify(rewardStatusStorage).notRequested(kyb.getBillingProfileId());
         }
 
         @Test
@@ -643,7 +643,7 @@ public class AccountingObserverTest {
             accountingObserver.onBillingProfileUpdated(billingProfileVerificationUpdated);
 
             // Then
-            verify(rewardStatusStorage).notPaid(kyb.getBillingProfileId());
+            verify(rewardStatusStorage).notRequested(kyb.getBillingProfileId());
         }
 
         @Test

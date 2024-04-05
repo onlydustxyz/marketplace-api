@@ -52,16 +52,16 @@ public class PostgresRewardStatusAdapter implements RewardStatusStorage {
     }
 
     @Override
-    public List<RewardStatusData> notPaid() {
-        return rewardStatusRepository.findByPaidAtIsNull()
+    public List<RewardStatusData> notRequested() {
+        return rewardStatusRepository.findNotRequested()
                 .stream()
                 .map(RewardStatusDataEntity::toRewardStatus)
                 .toList();
     }
 
     @Override
-    public List<RewardStatusData> notPaid(BillingProfile.Id billingProfileId) {
-        return rewardStatusRepository.findNotPaidByBillingProfile(billingProfileId.value())
+    public List<RewardStatusData> notRequested(BillingProfile.Id billingProfileId) {
+        return rewardStatusRepository.findNotRequestedByBillingProfile(billingProfileId.value())
                 .stream()
                 .map(RewardStatusDataEntity::toRewardStatus)
                 .toList();

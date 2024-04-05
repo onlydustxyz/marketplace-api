@@ -22,9 +22,9 @@ public interface RewardStatusStorage {
 
     void delete(RewardId rewardId);
 
-    List<RewardStatusData> notPaid();
+    List<RewardStatusData> notRequested();
 
-    List<RewardStatusData> notPaid(BillingProfile.Id billingProfileId);
+    List<RewardStatusData> notRequested(BillingProfile.Id billingProfileId);
 
     void updateBillingProfileForRecipientUserIdAndProjectId(BillingProfile.Id billingProfileId, UserId userId, ProjectId projectId);
 
