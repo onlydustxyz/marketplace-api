@@ -204,7 +204,7 @@ public interface BackOfficeMapper {
                 .name(projectSponsorView.projectName())
                 .logoUrl(projectSponsorView.projectLogoUrl())
                 .remainingBudgets(accountStatements.stream().map(statement -> new MoneyResponse()
-                                .amount(statement.amountSentTo(ProjectId.of(projectSponsorView.projectId())).getValue())
+                                .amount(statement.unspentBalanceSentTo(ProjectId.of(projectSponsorView.projectId())).getValue())
                                 .currency(toShortCurrency(statement.account().currency()))
                         )
                         .filter(money -> money.getAmount().compareTo(BigDecimal.ZERO) > 0)
