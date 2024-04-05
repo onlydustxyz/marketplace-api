@@ -70,7 +70,7 @@ public class CachedAccountBookProvider {
         accountBooks.remove(currency);
     }
 
-    public void evictAll() {
+    public synchronized void evictAll() {
         accountBooks.clear();
     }
 }

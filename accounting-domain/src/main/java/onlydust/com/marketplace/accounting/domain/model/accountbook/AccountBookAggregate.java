@@ -85,7 +85,7 @@ public class AccountBookAggregate implements AccountBook {
         return state.accept(event);
     }
 
-    private synchronized void incrementEventId() {
+    private void incrementEventId() {
         ++lastEventId;
     }
 
