@@ -160,17 +160,17 @@ public class PaymentServiceTest {
                     payableRewards.get(5));
             assertThat(ethereumBatch.invoices()).containsAll(invoices);
             assertThat(ethereumBatch.csv()).hasLineCount(4);
-            assertThat(ethereumBatch.csv()).contains("erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,vitalik.eth,100");
-            assertThat(ethereumBatch.csv()).contains("erc20,0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766,vitalik.eth,300");
-            assertThat(ethereumBatch.csv()).contains("native,,vitalik.eth,500");
-            assertThat(ethereumBatch.csv()).contains("erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,foo.eth,600");
+            assertThat(ethereumBatch.csv()).contains("erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,vitalik.eth,100,");
+            assertThat(ethereumBatch.csv()).contains("erc20,0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766,vitalik.eth,300,");
+            assertThat(ethereumBatch.csv()).contains("native,,vitalik.eth,500,");
+            assertThat(ethereumBatch.csv()).contains("erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,foo.eth,600,");
         }
         {
             final var optimismBatch = batches.stream().filter(batch -> batch.network().equals(Network.OPTIMISM)).findFirst().orElseThrow();
             assertThat(optimismBatch.rewards()).containsExactlyInAnyOrder(payableRewards.get(1));
             assertThat(optimismBatch.invoices()).containsAll(invoices);
             assertThat(optimismBatch.csv()).isEqualToIgnoringWhitespace("""
-                    erc20,0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85,0x0222,200
+                    erc20,0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85,0x0222,200,
                     """);
         }
         {
@@ -178,7 +178,7 @@ public class PaymentServiceTest {
             assertThat(starknetBatch.rewards()).containsExactlyInAnyOrder(payableRewards.get(3));
             assertThat(starknetBatch.invoices()).containsAll(invoices);
             assertThat(starknetBatch.csv()).isEqualToIgnoringWhitespace("""
-                    erc20,0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766,0x0666,400
+                    erc20,0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766,0x0666,400,
                     """);
         }
         final var savedBatches = ArgumentCaptor.forClass(List.class);

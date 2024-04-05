@@ -24,7 +24,8 @@ public class PaymentExporter {
                         reward.currency().standard().map(s -> s.name().toLowerCase()).orElse("native"),
                         reward.currency().address().map(Object::toString).orElse(""),
                         wallets.get(reward.id()).address(),
-                        reward.amount()
+                        reward.amount(),
+                        ""
                 );
             }
         } catch (final Exception e) {
