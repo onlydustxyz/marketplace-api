@@ -202,7 +202,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "processedAt": null,
                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                               "billingProfileId": "20282367-56b0-42d3-81d3-5e4b38f67e3e",
-                              "status": "PAYOUT_INFO_MISSING",
+                              "status": "PROCESSING",
                               "unlockDate": "2024-08-23T00:00:00Z",
                               "amount": {
                                 "total": 30.0,
@@ -459,7 +459,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "processedAt": null,
                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                               "billingProfileId": "20282367-56b0-42d3-81d3-5e4b38f67e3e",
-                              "status": "PENDING_COMPANY",
+                              "status": "PROCESSING",
                               "unlockDate": "2024-08-23T00:00:00Z",
                               "amount": {
                                 "total": 30.0,

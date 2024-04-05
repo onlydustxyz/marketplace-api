@@ -898,7 +898,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                               "id": "5b96ca1e-4ad2-41c1-8819-520b885d9223"
                             },
                             {
-                              "status": "PAYOUT_INFO_MISSING",
+                              "status": "PROCESSING",
                               "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"
                             },
                             {
@@ -950,7 +950,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                               "id": "5b96ca1e-4ad2-41c1-8819-520b885d9223"
                             },
                             {
-                              "status": "PENDING_BILLING_PROFILE",
+                              "status": "PROCESSING",
                               "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"
                             },
                             {
