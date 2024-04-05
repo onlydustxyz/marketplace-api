@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.accounting.domain.port.out;
 
+import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
 
@@ -7,11 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AccountBookEventStorage {
-    List<IdentifiedAccountBookEvent> getAll(Currency currency);
+    @NonNull List<IdentifiedAccountBookEvent> getAll(Currency currency);
 
-    List<IdentifiedAccountBookEvent> getSince(Currency currency, long eventId);
+    @NonNull List<IdentifiedAccountBookEvent> getSince(Currency currency, long eventId);
 
-    void insert(Currency currency, List<IdentifiedAccountBookEvent> pendingEvents);
+    void insert(@NonNull Currency currency, @NonNull List<IdentifiedAccountBookEvent> pendingEvents);
 
-    Optional<Long> getLastEventId(Currency currency);
+    @NonNull Optional<Long> getLastEventId(@NonNull Currency currency);
 }

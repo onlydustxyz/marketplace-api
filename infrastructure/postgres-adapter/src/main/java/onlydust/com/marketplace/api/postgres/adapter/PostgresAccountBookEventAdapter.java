@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountBookEnt
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountBookEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookEventRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class PostgresAccountBookEventAdapter implements AccountBookEventStorage 
 
     @Override
     @Transactional(readOnly = true)
-    public List<IdentifiedAccountBookEvent> getAll(final @NonNull Currency currency) {
+    public @NotNull List<IdentifiedAccountBookEvent> getAll(final @NonNull Currency currency) {
         return accountBookRepository.findByCurrencyId(currency.id().value())
                 .map(accountBookEntity -> accountBookEventRepository.findAllByAccountBookId(accountBookEntity.getId()))
                 .orElse(List.of())
@@ -31,7 +32,7 @@ public class PostgresAccountBookEventAdapter implements AccountBookEventStorage 
 
     @Override
     @Transactional(readOnly = true)
-    public List<IdentifiedAccountBookEvent> getSince(final @NonNull Currency currency, final long eventId) {
+    public @NotNull List<IdentifiedAccountBookEvent> getSince(final @NonNull Currency currency, final long eventId) {
         return accountBookRepository.findByCurrencyId(currency.id().value())
                 .map(accountBookEntity -> accountBookEventRepository.findAllByAccountBookIdAndIdGreaterThanEqualOrderByIdAsc(accountBookEntity.getId(),
                         eventId))
@@ -52,7 +53,8 @@ public class PostgresAccountBookEventAdapter implements AccountBookEventStorage 
     }
 
     @Override
-    public Optional<Long> getLastEventId(Currency currency) {
+    @Transactional(readOnly = true)
+    public @NotNull Optional<Long> getLastEventId(@NotNull Currency currency) {
         return accountBookRepository.findByCurrencyId(currency.id().value())
                 .flatMap(accountBookEntity -> accountBookEventRepository.findFirstByAccountBookIdOrderByIdDesc(accountBookEntity.getId()).map(AccountBookEventEntity::id));
     }

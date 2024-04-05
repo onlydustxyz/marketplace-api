@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.adapters;
 
 import lombok.SneakyThrows;
+import onlydust.com.marketplace.accounting.domain.exception.EventSequenceViolationException;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
@@ -65,7 +66,7 @@ public class PostgresAccountBookEventAdapterIT extends AbstractPostgresIT {
     }
 
     @Test
-    void should_fail_to_save_events_with_same_id() {
+    void should_fail_to_save_events_with_same_id() throws EventSequenceViolationException {
         final var currency = newCurrency("FOOBAR3");
 
         final List<IdentifiedAccountBookEvent> events1 = List.of(
@@ -86,7 +87,7 @@ public class PostgresAccountBookEventAdapterIT extends AbstractPostgresIT {
 
         assertThatThrownBy(() -> postgresAccountBookEventAdapter.insert(currency, events2))
                 .isInstanceOf(DataIntegrityViolationException.class)
-                .hasMessageContaining("constraint [account_books_events_pkey]");
+                .hasStackTraceContaining("constraint [account_books_events_pkey]");
 
         assertThat(postgresAccountBookEventAdapter.getLastEventId(currency).get()).isEqualTo(2L);
         assertThat(postgresAccountBookEventAdapter.getAll(currency)).containsExactlyElementsOf(events1);
