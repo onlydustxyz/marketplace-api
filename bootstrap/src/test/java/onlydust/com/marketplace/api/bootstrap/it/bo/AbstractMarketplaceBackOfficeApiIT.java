@@ -66,19 +66,14 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         @ConfigureWireMock(name = "make-webhook-send-rewards-paid", property = "infrastructure.make.webhook.sendRewardsPaidMailUrl"),
 })
 public class AbstractMarketplaceBackOfficeApiIT {
-    private static PostgreSQLContainer postgresSQLContainer;
-
-    static {
-        postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
-                .withDatabaseName("marketplace_db")
-                .withUsername("test")
-                .withPassword("test")
-                .withCopyFileToContainer(MountableFile.forClasspathResource("/database/dumps"), "/tmp")
-                .withCopyFileToContainer(MountableFile.forClasspathResource("/database/docker_init"), "/docker-entrypoint-initdb.d")
-                .withCopyFileToContainer(MountableFile.forClasspathResource("/database/scripts"), "/scripts")
-                .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
-        postgresSQLContainer.start();
-    }
+    private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
+            .withDatabaseName("marketplace_db")
+            .withUsername("test")
+            .withPassword("test")
+            .withCopyFileToContainer(MountableFile.forClasspathResource("/database/dumps"), "/tmp")
+            .withCopyFileToContainer(MountableFile.forClasspathResource("/database/docker_init"), "/docker-entrypoint-initdb.d")
+            .withCopyFileToContainer(MountableFile.forClasspathResource("/database/scripts"), "/scripts")
+            .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
 
     @LocalServerPort
     int port;
@@ -142,6 +137,9 @@ public class AbstractMarketplaceBackOfficeApiIT {
 
     @BeforeAll
     static void beforeAll() throws IOException, InterruptedException {
+        if (!postgresSQLContainer.isRunning()) {
+            postgresSQLContainer.start();
+        }
         assertThat(postgresSQLContainer.execInContainer("/scripts/restore_db.sh").getExitCode()).isEqualTo(0);
     }
 
