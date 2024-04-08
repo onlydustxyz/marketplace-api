@@ -32,6 +32,11 @@ public class RestApiConfiguration {
     }
 
     @Bean
+    public SponsorsRestApi sponsorsRestApi() {
+        return new SponsorsRestApi();
+    }
+
+    @Bean
     public UsersRestApi usersRestApi(final UserFacadePort userFacadePort,
                                      final ContributorFacadePort contributorFacadePort) {
         return new UsersRestApi(userFacadePort, contributorFacadePort);
