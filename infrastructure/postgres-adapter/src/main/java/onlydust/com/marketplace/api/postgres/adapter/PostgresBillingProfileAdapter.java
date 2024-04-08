@@ -26,6 +26,8 @@ import java.util.stream.Stream;
 
 import static java.time.ZonedDateTime.now;
 import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.reducing;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
@@ -159,6 +161,10 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                             .currentYearPaymentLimit(individualBillingProfile.currentYearPaymentLimit())
                             .currentYearPaymentAmount(PositiveAmount.of(billingProfileCustomData.getStats().currentYearPaymentAmount()))
+                            .currentMonthRewardedAmounts(billingProfileCustomData.getCurrentMonthRewards().stream()
+                                    .map(r -> new TotalMoneyView(r.amount(), r.currency().toDomain(), r.statusData().amountUsdEquivalent()))
+                                    .collect(groupingBy(TotalMoneyView::currency, reducing(null, TotalMoneyView::add)))
+                                    .values().stream().toList())
                             .admins(billingProfileEntity.getUsers().stream().map(BillingProfileUserEntity::toView).toList())
                             .build();
                     final Optional<KycEntity> optionalKycEntity = kycRepository.findByBillingProfileId(billingProfileId.value());
@@ -183,6 +189,10 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                             .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                             .admins(billingProfileEntity.getUsers().stream().map(BillingProfileUserEntity::toView).toList())
+                            .currentMonthRewardedAmounts(billingProfileCustomData.getCurrentMonthRewards().stream()
+                                    .map(r -> new TotalMoneyView(r.amount(), r.currency().toDomain(), r.statusData().amountUsdEquivalent()))
+                                    .collect(groupingBy(TotalMoneyView::currency, reducing(null, TotalMoneyView::add)))
+                                    .values().stream().toList())
                             .build();
                     final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
                     if (optionalKybEntity.isPresent()) {
@@ -206,6 +216,10 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .rewardCount(billingProfileCustomData.getStats().rewardCount())
                             .invoiceableRewardCount(billingProfileCustomData.getStats().invoiceableRewardCount())
                             .admins(billingProfileEntity.getUsers().stream().map(BillingProfileUserEntity::toView).toList())
+                            .currentMonthRewardedAmounts(billingProfileCustomData.getCurrentMonthRewards().stream()
+                                    .map(r -> new TotalMoneyView(r.amount(), r.currency().toDomain(), r.statusData().amountUsdEquivalent()))
+                                    .collect(groupingBy(TotalMoneyView::currency, reducing(null, TotalMoneyView::add)))
+                                    .values().stream().toList())
                             .build();
                     final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
                     if (optionalKybEntity.isPresent()) {

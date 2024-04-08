@@ -2365,7 +2365,6 @@ components:
         - createdAt
         - createdBy
         - totalEquivalent
-        - rewardsPerNetwork
       properties:
         id:
           $ref: '#/components/schemas/InvoiceId'
@@ -2452,28 +2451,6 @@ components:
           type: string
         sumsubUrl:
           type: string
-
-    InvoiceRewardsPerNetwork:
-      type: object
-      required:
-        - network
-        - billingAccountNumber
-        - dollarsEquivalent
-        - totalPerCurrency
-        - rewards
-      properties:
-        network:
-          $ref: '#/components/schemas/TransactionNetwork'
-        billingAccountNumber:
-          type: string
-          description: IBAN, account number, ENS or wallet address
-        totalUsdEquivalent:
-          type: number
-        totalsPerCurrency:
-          type: array
-          items:
-            $ref: '#/components/schemas/TotalMoneyWithUsdEquivalentResponse'
-
 
     InvoicePageV2:
       type: object
@@ -2627,6 +2604,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/UserResponse'
+            currentMonthRewardedAmounts:
+              type: array
+              items:
+                $ref: '#/components/schemas/TotalMoneyWithUsdEquivalentResponse'
 
     GithubUserResponse:
       type: object
