@@ -16,6 +16,7 @@ import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvi
 import onlydust.com.marketplace.api.contract.model.CreateRewardResponse;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookEventRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.RewardStatusRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +29,7 @@ import org.testcontainers.shaded.org.apache.commons.lang3.mutable.MutableObject;
 import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -66,6 +68,8 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     private BillingProfileStoragePort billingProfileStoragePort;
     @Autowired
     PdfStoragePort pdfStoragePort;
+    @Autowired
+    RewardStatusRepository rewardStatusRepository;
 
     @BeforeEach
     void setup() {
@@ -838,7 +842,60 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                               "id": "a0da3c1e-6493-4ea1-8bd0-8c46d653f274",
                               "name": null
                             }
-                          ]
+                          ],
+                          "currentMonthRewardedAmounts": []
+                        }
+                        """);
+    }
+
+
+    @Test
+    void should_get_current_month_rewarded_amounts() {
+        final var billingProfileId = BillingProfile.Id.of("9cae91ac-e70f-426f-af0d-e35c1d3578ed");
+        final var billingProfile = billingProfileStoragePort.findById(billingProfileId).orElseThrow();
+        billingProfileStoragePort.saveKyb(billingProfile.getKyb().toBuilder().externalApplicantId("123456").build());
+
+        final var rewardIds = List.of(
+                RewardId.of("1c56d096-5284-4ae3-af3c-dd2b3211fb73"),
+                RewardId.of("4ccf3463-c77d-42cd-85f3-b393901a89c1"),
+                RewardId.of("3c9064c2-4513-4876-b5dc-eab38f58f3f1"),
+                RewardId.of("b0ceb0cc-294d-49e3-807e-d1a04acea11d")
+        );
+
+        rewardIds.forEach(rewardId -> rewardStatusRepository.findById(rewardId.value()).ifPresent(r -> rewardStatusRepository.save(r.paidAt(new Date()))));
+
+
+        client.get()
+                .uri(getApiURI(BILLING_PROFILE.formatted(billingProfileId)))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "currentMonthRewardedAmounts": [{
+                            "amount": 2000,
+                            "currency": {
+                              "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                              "code": "USD",
+                              "name": "US Dollar",
+                              "logoUrl": null,
+                              "decimals": 2
+                            },
+                            "dollarsEquivalent": 2000
+                          },
+                          {
+                            "amount": 2000.00,
+                            "currency": {
+                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                              "code": "USDC",
+                              "name": "USD Coin",
+                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                              "decimals": 6
+                            },
+                            "dollarsEquivalent": 2020.0000
+                          }]
                         }
                         """);
     }

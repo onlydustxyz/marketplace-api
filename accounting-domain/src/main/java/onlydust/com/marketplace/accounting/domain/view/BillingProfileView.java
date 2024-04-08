@@ -37,6 +37,8 @@ public class BillingProfileView {
     PositiveAmount currentYearPaymentLimit;
     PositiveAmount currentYearPaymentAmount;
 
+    List<TotalMoneyView> currentMonthRewardedAmounts;
+
     public boolean isVerified() {
         return verificationStatus == VerificationStatus.VERIFIED;
     }

@@ -787,6 +787,9 @@ public interface BackOfficeMapper {
                 .kyb(billingProfile.getKyb() == null ? null : map(billingProfile.getKyb()))
                 .kyc(billingProfile.getKyc() == null ? null : map(billingProfile.getKyc()))
                 .admins(billingProfile.getAdmins().stream().map(BackOfficeMapper::map).toList())
+                .currentMonthRewardedAmounts(billingProfile.getCurrentMonthRewardedAmounts().stream()
+                        .map(BackOfficeMapper::totalMoneyViewToResponse)
+                        .toList())
                 ;
     }
 
