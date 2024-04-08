@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ContactInformationEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserProfileInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.AllocatedTimeEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactChanelEnumEntity;
@@ -90,6 +91,7 @@ public interface UserMapper {
                 .createdAt(user.createdAt())
                 .billingProfiles(billingProfiles)
                 .isMissingPayoutPreference(hasAnyRewardPendingBillingProfile)
+                .sponsors(user.sponsors().stream().map(SponsorEntity::toDomain).toList())
                 .build();
     }
 

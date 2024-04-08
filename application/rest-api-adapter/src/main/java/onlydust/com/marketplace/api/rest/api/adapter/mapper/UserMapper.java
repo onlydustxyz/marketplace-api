@@ -271,6 +271,7 @@ public interface UserMapper {
                 })).toList()
         );
         getMeResponse.setMissingPayoutPreference(authenticatedUser.isMissingPayoutPreference());
+        getMeResponse.setSponsors(authenticatedUser.getSponsors().stream().map(SponsorMapper::map).toList());
         return getMeResponse;
     }
 

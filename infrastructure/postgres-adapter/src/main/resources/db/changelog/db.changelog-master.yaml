@@ -225,3 +225,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000200_no_more_sequence_for_account_book_events.sql
   - include:
       file: db/changelog/changelogs/00000201_fix_reward_statuses_processing.sql
+  - include:
+      file: db/changelog/changelogs/00000202_create_sponsors_users_table.sql
