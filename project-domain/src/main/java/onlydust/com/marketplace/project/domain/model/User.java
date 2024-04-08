@@ -29,6 +29,8 @@ public class User {
     @Builder.Default
     List<BillingProfileLinkView> billingProfiles = new ArrayList<>();
     boolean isMissingPayoutPreference;
+    @Builder.Default
+    List<Sponsor> sponsors = new ArrayList<>();
 
     @Getter(AccessLevel.NONE)
     boolean hasAcceptedLatestTermsAndConditions;

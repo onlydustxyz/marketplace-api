@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
+import onlydust.com.marketplace.project.domain.model.Sponsor;
 
 import javax.persistence.*;
 import java.util.List;
@@ -47,4 +48,12 @@ public class SponsorEntity {
                 .build();
     }
 
+    public Sponsor toDomain() {
+        return Sponsor.builder()
+                .id(id)
+                .name(name)
+                .url(url)
+                .logoUrl(logoUrl)
+                .build();
+    }
 }

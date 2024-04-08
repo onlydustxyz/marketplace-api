@@ -5,7 +5,9 @@ import onlydust.com.backoffice.api.contract.model.SponsorPage;
 import onlydust.com.backoffice.api.contract.model.SponsorPageItemResponse;
 import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
+import onlydust.com.marketplace.api.contract.model.SponsorResponse;
 import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.project.domain.model.Sponsor;
 
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
@@ -31,5 +33,13 @@ public interface SponsorMapper {
         return new ProjectLinkResponse()
                 .logoUrl(view.logoUrl())
                 .name(view.name());
+    }
+
+    static SponsorResponse map(Sponsor sponsor) {
+        return new SponsorResponse()
+                .id(sponsor.id())
+                .name(sponsor.name())
+                .url(sponsor.url())
+                .logoUrl(sponsor.logoUrl());
     }
 }

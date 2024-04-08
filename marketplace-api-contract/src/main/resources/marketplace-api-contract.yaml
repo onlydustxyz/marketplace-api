@@ -4528,6 +4528,10 @@ components:
               type: string
             lastName:
               type: string
+            sponsors:
+              type: array
+              items:
+                $ref: '#/components/schemas/SponsorResponse'
 
     BillingProfileType:
       type: string
