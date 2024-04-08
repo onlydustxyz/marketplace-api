@@ -475,37 +475,6 @@ public interface BackOfficeMapper {
                 .name(user.getFirstname() + " " + user.getLastname());
     }
 
-    private static BillingProfileResponse map(Invoice.BillingProfileSnapshot billingProfileSnapshot) {
-        return new BillingProfileResponse()
-                .id(billingProfileSnapshot.id().value())
-                .type(switch (billingProfileSnapshot.type()) {
-                    case COMPANY -> BillingProfileType.COMPANY;
-                    case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
-                    case SELF_EMPLOYED -> BillingProfileType.SELF_EMPLOYED;
-                })
-                .subject(billingProfileSnapshot.subject())
-                .kyc(billingProfileSnapshot.kyc().map(BackOfficeMapper::mapKyc).orElse(null))
-                .kyb(billingProfileSnapshot.kyb().map(BackOfficeMapper::mapKyb).orElse(null));
-    }
-
-    static List<TotalMoneyWithUsdEquivalentResponse> mapNetworkRewardTotals(final List<RewardDetailsView> rewards) {
-        return rewards.stream().collect(groupingBy(r -> r.money().currency()))
-                .entrySet().stream()
-                .map(e -> {
-                            final var currency = e.getKey();
-                            final var total = e.getValue().stream().map(r -> r.money().amount()).reduce(BigDecimal::add)
-                                    .orElseThrow(() -> internalServerError("No reward found for currency %s".formatted(e.getKey())));
-                            final var totalUsdEquivalent = e.getValue().stream()
-                                    .map(r -> r.money().dollarsEquivalent().orElse(BigDecimal.ZERO))
-                                    .reduce(BigDecimal::add)
-                                    .orElseThrow(() -> internalServerError("No reward found for currency %s".formatted(e.getKey())));
-                            return totalMoneyViewToResponse(new TotalMoneyView(total, currency, totalUsdEquivalent));
-                        }
-                )
-                .sorted(comparing(r -> r.getCurrency().getCode()))
-                .toList();
-    }
-
     static RewardDetailsResponse map(RewardDetailsView view) {
         final var response = new RewardDetailsResponse()
                 .id(view.id().value())
@@ -734,13 +703,6 @@ public interface BackOfficeMapper {
                 .decimals(token.getDecimals());
     }
 
-    static CurrencyStandard mapCurrencyStandard(final @NonNull Currency.Standard s) {
-        return switch (s) {
-            case ERC20 -> CurrencyStandard.ERC20;
-            case ISO4217 -> CurrencyStandard.ISO4217;
-        };
-    }
-
     static CurrencyType mapCurrencyType(final @NonNull Currency.Type type) {
         return switch (type) {
             case FIAT -> CurrencyType.FIAT;
@@ -815,7 +777,6 @@ public interface BackOfficeMapper {
             case COMPLETE -> RewardStatusContract.COMPLETE;
         };
     }
-
 
     static BillingProfileResponse map(BillingProfileView billingProfile) {
         return new BillingProfileResponse()
