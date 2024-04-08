@@ -52,7 +52,7 @@ public class RewardsExporter {
                         isNull(reward.invoice()) ? null : reward.invoice().createdBy().githubLogin(),
                         isNull(reward.invoice()) ? null : reward.invoice().createdBy().email(),
                         isNull(reward.invoice()) ? null : reward.invoice().createdBy().name(),
-                        isNull(reward.billingProfile()) ? null : reward.billingProfile().subject(),
+                        isNull(reward.billingProfile()) ? reward.recipient().login() : reward.billingProfile().subject(),
                         reward.money().amount(),
                         reward.money().currency().code(),
                         reward.githubUrls(),
@@ -77,12 +77,5 @@ public class RewardsExporter {
         }
 
         return sw.toString();
-    }
-
-    private record InvoiceCreator(String login, String email, String fullName) {
-        @Override
-        public String toString() {
-            return login + "," + email + "," + fullName;
-        }
     }
 }
