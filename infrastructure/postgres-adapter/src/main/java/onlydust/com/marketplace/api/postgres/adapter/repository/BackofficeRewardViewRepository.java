@@ -94,9 +94,6 @@ public interface BackofficeRewardViewRepository extends JpaRepository<Backoffice
             """;
 
     @Query(value = SELECT + """
-                        
-                     
-                       
             where (coalesce(:statuses) is null or cast(rs.status as text) in (:statuses))
                 and (coalesce(:fromRequestedAt) is null or r.requested_at >= cast(cast(:fromRequestedAt as text) as timestamp))
                 and (coalesce(:toRequestedAt)   is null or r.requested_at <= cast(cast(:toRequestedAt   as text) as timestamp))
