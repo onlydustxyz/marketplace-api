@@ -3,13 +3,14 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoEcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoProjectEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoSponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.EcosystemRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
@@ -29,7 +30,7 @@ import static java.util.Objects.isNull;
 public class PostgresBackofficeAdapter implements BackofficeStoragePort {
 
     private final GithubRepositoryLinkedToProjectRepository githubRepositoryLinkedToProjectRepository;
-    private final BoSponsorRepository boSponsorRepository;
+    private final SponsorRepository sponsorRepository;
     private final ProjectLeadInvitationRepository projectLeadInvitationRepository;
     private final BoUserRepository boUserRepository;
     private final BoProjectRepository boProjectRepository;
@@ -135,34 +136,34 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     @Override
     @Transactional
     public void saveSponsor(Sponsor sponsor) {
-        final var entity = boSponsorRepository.findById(sponsor.id())
+        final var entity = sponsorRepository.findById(sponsor.id())
                 .map(e -> e.toBuilder()
                         .name(sponsor.name())
                         .url(sponsor.url())
                         .logoUrl(sponsor.logoUrl())
                         .build())
-                .orElse(BoSponsorEntity.builder()
+                .orElse(SponsorEntity.builder()
                         .id(sponsor.id())
                         .name(sponsor.name())
                         .url(sponsor.url())
                         .logoUrl(sponsor.logoUrl())
                         .build());
-        boSponsorRepository.saveAndFlush(entity);
+        sponsorRepository.saveAndFlush(entity);
+    }
+
+    @Override
+    @Transactional
+    public Optional<BoSponsorView> getSponsor(UUID sponsorId) {
+        return sponsorRepository.findById(sponsorId).map(SponsorEntity::toBoView);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<SponsorView> getSponsor(UUID sponsorId) {
-        return boSponsorRepository.findById(sponsorId).map(BoSponsorEntity::toView);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<SponsorView> listSponsors(int pageIndex, int pageSize, SponsorView.Filters filters) {
-        final var page = boSponsorRepository.findAll(filters.projects(), filters.sponsors(),
+    public Page<BoSponsorView> listSponsors(int pageIndex, int pageSize, BoSponsorView.Filters filters) {
+        final var page = sponsorRepository.findAll(filters.projects(), filters.sponsors(),
                 PageRequest.of(pageIndex, pageSize, Sort.by("name")));
-        return Page.<SponsorView>builder()
-                .content(page.getContent().stream().map(BoSponsorEntity::toView).toList())
+        return Page.<BoSponsorView>builder()
+                .content(page.getContent().stream().map(SponsorEntity::toBoView).toList())
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();

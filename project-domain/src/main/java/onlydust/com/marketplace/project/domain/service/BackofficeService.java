@@ -56,7 +56,7 @@ public class BackofficeService implements BackofficeFacadePort {
     }
 
     @Override
-    public SponsorView createSponsor(String name, URI url, URI logoUrl) {
+    public BoSponsorView createSponsor(String name, URI url, URI logoUrl) {
         final var sponsorId = UUID.randomUUID();
         backofficeStoragePort.saveSponsor(Sponsor.builder()
                 .id(sponsorId)
@@ -69,7 +69,7 @@ public class BackofficeService implements BackofficeFacadePort {
     }
 
     @Override
-    public SponsorView updateSponsor(UUID sponsorId, String name, URI url, URI logoUrl) {
+    public BoSponsorView updateSponsor(UUID sponsorId, String name, URI url, URI logoUrl) {
         backofficeStoragePort.saveSponsor(Sponsor.builder()
                 .id(sponsorId)
                 .name(name)
@@ -81,12 +81,12 @@ public class BackofficeService implements BackofficeFacadePort {
     }
 
     @Override
-    public Optional<SponsorView> getSponsor(UUID sponsorId) {
+    public Optional<BoSponsorView> getSponsor(UUID sponsorId) {
         return backofficeStoragePort.getSponsor(sponsorId);
     }
 
     @Override
-    public Page<SponsorView> listSponsors(int pageIndex, int pageSize, SponsorView.Filters filters) {
+    public Page<BoSponsorView> listSponsors(int pageIndex, int pageSize, BoSponsorView.Filters filters) {
         return backofficeStoragePort.listSponsors(pageIndex, pageSize, filters);
     }
 }

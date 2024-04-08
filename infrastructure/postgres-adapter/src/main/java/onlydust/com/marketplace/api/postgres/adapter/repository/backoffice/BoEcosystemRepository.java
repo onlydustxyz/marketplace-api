@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository.backoffice;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoEcosystemEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoSponsorEntity;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

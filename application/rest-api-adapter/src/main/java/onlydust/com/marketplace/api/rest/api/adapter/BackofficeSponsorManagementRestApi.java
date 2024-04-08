@@ -11,7 +11,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.SponsorFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SponsorMapper;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
-import onlydust.com.marketplace.project.domain.view.backoffice.SponsorView;
+import onlydust.com.marketplace.project.domain.view.backoffice.BoSponsorView;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -81,7 +81,7 @@ public class BackofficeSponsorManagementRestApi implements BackofficeSponsorMana
     public ResponseEntity<OldSponsorPage> getOldSponsorPage(Integer pageIndex, Integer pageSize, List<UUID> projectIds, List<UUID> sponsorIds) {
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
 
-        final var filters = SponsorView.Filters.builder()
+        final var filters = BoSponsorView.Filters.builder()
                 .projects(Optional.ofNullable(projectIds).orElse(List.of()))
                 .sponsors(Optional.ofNullable(sponsorIds).orElse(List.of()))
                 .build();

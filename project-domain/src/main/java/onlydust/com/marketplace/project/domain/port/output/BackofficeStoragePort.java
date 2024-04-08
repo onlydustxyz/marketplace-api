@@ -26,7 +26,7 @@ public interface BackofficeStoragePort {
 
     void saveSponsor(Sponsor sponsor);
 
-    Optional<SponsorView> getSponsor(UUID sponsorId);
+    Optional<BoSponsorView> getSponsor(UUID sponsorId);
 
-    Page<SponsorView> listSponsors(int pageIndex, int pageSize, SponsorView.Filters filters);
+    Page<BoSponsorView> listSponsors(int pageIndex, int pageSize, BoSponsorView.Filters filters);
 }
