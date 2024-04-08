@@ -604,4 +604,18 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 Project,Invoice Creator Github,Invoice Creator email,Invoice Creator name,Recipient name,Amount,Currency,Contributions,Status,Requested at,Processed at,Transaction Hash,Payout information,Pretty ID,Sponsors,Recipient email,Verification status,Account type,Invoice number,Invoice id,Budget,Conversion rate,Dollar Amount
                 """);
     }
+
+    @Test
+    @Order(8)
+    void should_export_all_rewards_without_status_filter() {
+        // When
+        client.get()
+                .uri(getApiURI(GET_REWARDS_CSV, Map.of("fromProcessedAt", "2023-09-01", "toProcessedAt", "2023-10-01"))
+                )
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk();
+    }
 }
