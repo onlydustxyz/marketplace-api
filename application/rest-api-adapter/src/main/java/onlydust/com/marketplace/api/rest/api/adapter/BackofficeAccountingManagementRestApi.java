@@ -24,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -183,13 +184,11 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                                                    String toRequestedAt,
                                                    String fromProcessedAt,
                                                    String toProcessedAt) {
-        if (statuses == null || statuses.isEmpty())
-            throw badRequest("At least one status must be set in the filter");
         if (fromRequestedAt == null && toRequestedAt == null && fromProcessedAt == null && toProcessedAt == null)
             throw badRequest("At least one of the date filters must be set");
 
         final String csv = accountingRewardPort.exportRewardsCSV(
-                statuses.stream().map(BackOfficeMapper::map).toList(),
+                Optional.ofNullable(statuses).orElse(List.of()).stream().map(BackOfficeMapper::map).toList(),
                 DateMapper.parseNullable(fromRequestedAt),
                 DateMapper.parseNullable(toRequestedAt),
                 DateMapper.parseNullable(fromProcessedAt),
