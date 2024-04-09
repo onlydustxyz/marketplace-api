@@ -7,10 +7,12 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoUs
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.EcosystemRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorViewRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
@@ -31,6 +33,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
 
     private final GithubRepositoryLinkedToProjectRepository githubRepositoryLinkedToProjectRepository;
     private final SponsorRepository sponsorRepository;
+    private final SponsorViewRepository sponsorViewRepository;
     private final ProjectLeadInvitationRepository projectLeadInvitationRepository;
     private final BoUserRepository boUserRepository;
     private final BoProjectRepository boProjectRepository;
@@ -154,16 +157,16 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     @Override
     @Transactional
     public Optional<BoSponsorView> getSponsor(UUID sponsorId) {
-        return sponsorRepository.findById(sponsorId).map(SponsorEntity::toBoView);
+        return sponsorViewRepository.findById(sponsorId).map(SponsorViewEntity::toBoView);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<BoSponsorView> listSponsors(int pageIndex, int pageSize, BoSponsorView.Filters filters) {
-        final var page = sponsorRepository.findAll(filters.projects(), filters.sponsors(),
+        final var page = sponsorViewRepository.findAll(filters.projects(), filters.sponsors(),
                 PageRequest.of(pageIndex, pageSize, Sort.by("name")));
         return Page.<BoSponsorView>builder()
-                .content(page.getContent().stream().map(SponsorEntity::toBoView).toList())
+                .content(page.getContent().stream().map(SponsorViewEntity::toBoView).toList())
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();
