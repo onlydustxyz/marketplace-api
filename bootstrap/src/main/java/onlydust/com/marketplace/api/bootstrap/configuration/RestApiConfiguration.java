@@ -1,8 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
-import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.*;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.project.domain.port.input.*;
@@ -32,8 +30,9 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public SponsorsRestApi sponsorsRestApi() {
-        return new SponsorsRestApi();
+    public SponsorsRestApi sponsorsRestApi(final SponsorFacadePort sponsorFacadePort,
+                                           final AccountingFacadePort accountingFacadePort) {
+        return new SponsorsRestApi(sponsorFacadePort, accountingFacadePort);
     }
 
     @Bean
