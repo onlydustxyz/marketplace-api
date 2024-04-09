@@ -137,6 +137,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_BILLING_PROFILES_POST_COWORKER_INVITATIONS = "/api/v1/me/billing-profiles/%s/invitations";
     protected static final String BILLING_PROFILES_DELETE_COWORKER = "/api/v1/billing-profiles/%s/coworkers/%s";
     protected static final String SPONSOR = "/api/v1/sponsors/%s";
+    protected static final String SPONSOR_TRANSACTIONS = "/api/v1/sponsors/%s/transactions";
 
     private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
             .withDatabaseName("marketplace_db")
@@ -281,6 +282,7 @@ public class AbstractMarketplaceApiIT {
         em.createNativeQuery("""
                         INSERT INTO sponsors_users
                         VALUES (:sponsorId, :userId)
+                        ON CONFLICT DO NOTHING
                         """)
                 .setParameter("userId", user.user().getId())
                 .setParameter("sponsorId", sponsorId.value())

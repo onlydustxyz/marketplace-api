@@ -4,6 +4,7 @@ import lombok.NonNull;
 import onlydust.com.backoffice.api.contract.model.ProjectLinkResponse;
 import onlydust.com.backoffice.api.contract.model.SponsorPage;
 import onlydust.com.backoffice.api.contract.model.SponsorPageItemResponse;
+import onlydust.com.marketplace.accounting.domain.model.HistoricalTransaction;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
@@ -31,7 +32,7 @@ public interface SponsorMapper {
                         .name(sponsor.name())
                         .url(sponsor.url())
                         .logoUrl(sponsor.logoUrl())
-                        .projects(sponsor.projects().stream().map(SponsorMapper::projectToResponse).toList())
+                        .projects(sponsor.projects().stream().map(SponsorMapper::projectToBoResponse).toList())
                 ).toList())
                 .totalPageNumber(sponsorViewPage.getTotalPageNumber())
                 .totalItemNumber(sponsorViewPage.getTotalItemNumber())
@@ -39,8 +40,14 @@ public interface SponsorMapper {
                 .nextPageIndex(nextPageIndex(pageIndex, sponsorViewPage.getTotalPageNumber()));
     }
 
-    static ProjectLinkResponse projectToResponse(final ShortProjectView view) {
+    static ProjectLinkResponse projectToBoResponse(final ShortProjectView view) {
         return new ProjectLinkResponse()
+                .logoUrl(view.logoUrl())
+                .name(view.name());
+    }
+
+    static onlydust.com.marketplace.api.contract.model.ProjectLinkResponse projectToResponse(final ShortProjectView view) {
+        return new onlydust.com.marketplace.api.contract.model.ProjectLinkResponse()
                 .logoUrl(view.logoUrl())
                 .name(view.name());
     }
@@ -97,5 +104,32 @@ public interface SponsorMapper {
                 .currency(right.getCurrency())
                 .currentAllowance(left.getCurrentAllowance().add(right.getCurrentAllowance()))
                 ;
+    }
+
+    static TransactionHistoryPageResponse mapTransactionHistory(Page<HistoricalTransaction> page, int pageIndex) {
+        return new TransactionHistoryPageResponse()
+                .transactions(page.getContent().stream().map(SponsorMapper::mapHistoricalTransaction).toList())
+                .totalPageNumber(page.getTotalPageNumber())
+                .totalItemNumber(page.getTotalItemNumber())
+                .hasMore(hasMore(pageIndex, page.getTotalPageNumber()))
+                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPageNumber()));
+    }
+
+    static TransactionHistoryPageItemResponse mapHistoricalTransaction(HistoricalTransaction historicalTransaction) {
+        return new TransactionHistoryPageItemResponse()
+                .date(historicalTransaction.timestamp())
+                .type(mapTransactionType(historicalTransaction))
+                .project(historicalTransaction.project() == null ? null : projectToResponse(historicalTransaction.project()))
+                .amount(new Money()
+                        .amount(historicalTransaction.amount().getValue())
+                        .currency(mapCurrency(historicalTransaction.sponsorAccount().currency()))
+                );
+    }
+
+    static SponsorAccountTransactionType mapTransactionType(HistoricalTransaction transaction) {
+        return switch (transaction.type()) {
+            case DEPOSIT -> SponsorAccountTransactionType.DEPOSIT;
+            case ALLOCATION -> transaction.amount().isPositive() ? SponsorAccountTransactionType.ALLOCATED : SponsorAccountTransactionType.UNALLOCATED;
+        };
     }
 }

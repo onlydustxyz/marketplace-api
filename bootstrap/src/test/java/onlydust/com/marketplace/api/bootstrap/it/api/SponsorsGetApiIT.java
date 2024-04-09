@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.util.Map;
+
 
 public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
     private final static SponsorId sponsorId = SponsorId.of("0980c5ab-befc-4314-acab-777fbf970cbb");
@@ -165,10 +167,95 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                         """);
     }
 
+    @Test
+    void should_return_sponsor_transactions() {
+        // Given
+        addSponsorFor(user, sponsorId);
+
+        // When
+        getSponsorTransactions(sponsorId, 0, 3)
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 4,
+                          "totalItemNumber": 11,
+                          "hasMore": true,
+                          "nextPageIndex": 1,
+                          "transactions": [
+                            {
+                              "date": "2024-03-13T15:13:21.256797Z",
+                              "type": "ALLOCATED",
+                              "project": {
+                                "name": "Bretzel",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                              },
+                              "amount": {
+                                "amount": 3000,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": null
+                              }
+                            },
+                            {
+                              "date": "2024-03-13T15:13:21.247974Z",
+                              "type": "DEPOSIT",
+                              "project": null,
+                              "amount": {
+                                "amount": 3000,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": null
+                              }
+                            },
+                            {
+                              "date": "2024-03-13T15:13:21.225044Z",
+                              "type": "ALLOCATED",
+                              "project": {
+                                "name": "Aiolia du Lion",
+                                "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c"
+                              },
+                              "amount": {
+                                "amount": 19827190,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": null
+                              }
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+
     @NonNull
     private WebTestClient.ResponseSpec getSponsor(SponsorId id) {
         return client.get()
                 .uri(SPONSOR.formatted(id))
+                .header("Authorization", "Bearer " + user.jwt())
+                .exchange();
+    }
+
+    @NonNull
+    private WebTestClient.ResponseSpec getSponsorTransactions(SponsorId id, Integer pageIndex, Integer pageSize) {
+        return client.get()
+                .uri(getApiURI(SPONSOR_TRANSACTIONS.formatted(id), Map.of("pageIndex", pageIndex.toString(), "pageSize", pageSize.toString())))
                 .header("Authorization", "Bearer " + user.jwt())
                 .exchange();
     }
