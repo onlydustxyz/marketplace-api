@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
+import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
@@ -41,7 +42,7 @@ public class SponsorViewEntity {
 
     public SponsorView toView() {
         return SponsorView.builder()
-                .id(id)
+                .id(SponsorId.of(id))
                 .name(name)
                 .url(url)
                 .logoUrl(logoUrl)

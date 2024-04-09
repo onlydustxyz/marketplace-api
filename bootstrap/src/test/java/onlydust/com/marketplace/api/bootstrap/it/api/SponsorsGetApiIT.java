@@ -24,6 +24,10 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
         getSponsor(sponsorId)
                 .expectStatus()
                 .isForbidden();
+
+        getSponsorTransactions(sponsorId, 0, 1)
+                .expectStatus()
+                .isForbidden();
     }
 
     @Test
@@ -242,7 +246,6 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                         }
                         """);
     }
-
 
     @NonNull
     private WebTestClient.ResponseSpec getSponsor(SponsorId id) {

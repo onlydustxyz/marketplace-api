@@ -51,8 +51,10 @@ public class SponsorsRestApi implements SponsorsApi {
                                                                                        List<UUID> currencies,
                                                                                        List<UUID> projects,
                                                                                        List<SponsorAccountTransactionType> types) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
-        final var page = accountingFacadePort.transactionHistory(SponsorId.of(sponsorId), sanitizedPageIndex, sanitizePageSize(pageSize));
+        final var sponsor = sponsorFacadePort.getSponsor(UserId.of(authenticatedUser.getId()), SponsorId.of(sponsorId));
+        final var page = accountingFacadePort.transactionHistory(sponsor.id(), sanitizedPageIndex, sanitizePageSize(pageSize));
         final var response = SponsorMapper.mapTransactionHistory(page, sanitizedPageIndex);
 
         return response.getTotalPageNumber() > 1 ?

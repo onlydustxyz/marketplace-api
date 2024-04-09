@@ -28,7 +28,7 @@ public interface SponsorMapper {
     static SponsorPage sponsorPageToResponse(final Page<SponsorView> sponsorViewPage, int pageIndex) {
         return new SponsorPage()
                 .sponsors(sponsorViewPage.getContent().stream().map(sponsor -> new SponsorPageItemResponse()
-                        .id(sponsor.id())
+                        .id(sponsor.id().value())
                         .name(sponsor.name())
                         .url(sponsor.url())
                         .logoUrl(sponsor.logoUrl())
@@ -62,7 +62,7 @@ public interface SponsorMapper {
 
     static SponsorDetailsResponse mapToSponsorDetailsResponse(SponsorView sponsor, List<SponsorAccountStatement> accountStatements) {
         return new SponsorDetailsResponse()
-                .id(sponsor.id())
+                .id(sponsor.id().value())
                 .name(sponsor.name())
                 .url(sponsor.url())
                 .logoUrl(sponsor.logoUrl())
