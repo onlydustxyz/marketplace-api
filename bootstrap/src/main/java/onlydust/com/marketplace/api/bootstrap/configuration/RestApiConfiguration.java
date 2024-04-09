@@ -31,8 +31,9 @@ public class RestApiConfiguration {
 
     @Bean
     public SponsorsRestApi sponsorsRestApi(final SponsorFacadePort sponsorFacadePort,
-                                           final AccountingFacadePort accountingFacadePort) {
-        return new SponsorsRestApi(sponsorFacadePort, accountingFacadePort);
+                                           final AccountingFacadePort accountingFacadePort,
+                                           final AuthenticatedAppUserService authenticatedAppUserService) {
+        return new SponsorsRestApi(sponsorFacadePort, accountingFacadePort, authenticatedAppUserService);
     }
 
     @Bean

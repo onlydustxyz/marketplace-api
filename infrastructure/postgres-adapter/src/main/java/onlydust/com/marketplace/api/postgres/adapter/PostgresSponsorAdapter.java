@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorViewEntity;
@@ -33,5 +34,13 @@ public class PostgresSponsorAdapter implements SponsorStoragePort {
     @Transactional
     public Optional<SponsorView> get(SponsorId sponsorId) {
         return sponsorViewRepository.findById(sponsorId.value()).map(SponsorViewEntity::toView);
+    }
+
+    @Override
+    @Transactional
+    public boolean isAdmin(UserId userId, SponsorId sponsorId) {
+        return sponsorViewRepository.findById(sponsorId.value())
+                .map(s -> s.getUsers().stream().anyMatch(u -> u.id().equals(userId.value())))
+                .orElse(false);
     }
 }
