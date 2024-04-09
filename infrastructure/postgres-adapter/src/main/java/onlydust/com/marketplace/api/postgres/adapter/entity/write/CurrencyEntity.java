@@ -39,6 +39,10 @@ public class CurrencyEntity {
     private @NonNull Integer decimals;
     private String description;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id", referencedColumnName = "currency_id", insertable = false, updatable = false)
+    LatestUsdQuoteEntity latestUsdQuote;
+
     @OneToMany(mappedBy = "currencyId", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ERC20Entity> erc20;
 
@@ -64,6 +68,7 @@ public class CurrencyEntity {
                 .metadata(new Currency.Metadata(name, description, logoUrl == null ? null : URI.create(logoUrl)))
                 .decimals(decimals)
                 .erc20(erc20.stream().map(ERC20Entity::toDomain).collect(Collectors.toUnmodifiableSet()))
+                .latestUsdQuote(latestUsdQuote == null ? null : latestUsdQuote.getPrice())
                 .build();
     }
 
