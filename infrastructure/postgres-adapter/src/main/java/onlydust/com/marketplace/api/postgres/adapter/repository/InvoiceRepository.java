@@ -35,7 +35,7 @@ public interface InvoiceRepository extends JpaRepository<InvoiceEntity, UUID> {
               AND (coalesce(:invoiceStatuses) is null or cast(i.status as text) IN (:invoiceStatuses))
               AND (coalesce(:currencyIds) is null or EXISTS(SELECT 1 from rewards r WHERE r.invoice_id = i.id and r.currency_id IN (:currencyIds)))
               AND (coalesce(:billingProfileTypes) is null or cast(bp.type as text) IN (:billingProfileTypes))
-              AND coalesce(kyc.first_name || ' ' || kyc.last_name, kyb.name) ILIKE '%' || :search || '%'
+              AND coalesce(kyb.name, coalesce(kyc.first_name, '') || ' ' || coalesce(kyc.last_name, '')) ILIKE '%' || :search || '%'
               AND i.status != 'DRAFT'
             """, nativeQuery = true)
     Page<InvoiceEntity> findAllExceptDrafts(final @NonNull List<UUID> invoiceIds,
