@@ -77,10 +77,12 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final var page = accountingFacadePort.transactionHistory(
                 SponsorId.of(sponsorId),
-                List.of(HistoricalTransaction.Type.DEPOSIT,
-                        HistoricalTransaction.Type.WITHDRAW,
-                        HistoricalTransaction.Type.TRANSFER,
-                        HistoricalTransaction.Type.REFUND),
+                HistoricalTransaction.Filters.builder()
+                        .types(List.of(HistoricalTransaction.Type.DEPOSIT,
+                                HistoricalTransaction.Type.WITHDRAW,
+                                HistoricalTransaction.Type.TRANSFER,
+                                HistoricalTransaction.Type.REFUND))
+                        .build(),
                 sanitizedPageIndex,
                 sanitizePageSize(pageSize));
         final var response = mapTransactionHistory(page, sanitizedPageIndex);

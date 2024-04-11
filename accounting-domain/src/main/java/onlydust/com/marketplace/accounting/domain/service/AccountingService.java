@@ -393,8 +393,8 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public Page<HistoricalTransaction> transactionHistory(SponsorId sponsorId, List<HistoricalTransaction.Type> types, Integer pageIndex, Integer pageSize) {
-        return sponsorAccountStorage.transactionsOf(sponsorId, types, pageIndex, pageSize);
+    public Page<HistoricalTransaction> transactionHistory(SponsorId sponsorId, HistoricalTransaction.Filters filters, Integer pageIndex, Integer pageSize) {
+        return sponsorAccountStorage.transactionsOf(sponsorId, filters, pageIndex, pageSize);
     }
 
     @Override

@@ -1,9 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.HistoricalTransaction;
-import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
-import onlydust.com.marketplace.accounting.domain.model.SponsorId;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.SponsorAccountEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.SponsorAccountTransactionViewEntity;
@@ -14,11 +12,13 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static java.util.Comparator.comparing;
+import static java.util.Objects.isNull;
 
 @AllArgsConstructor
 public class PostgresSponsorAccountStorageAdapter implements SponsorAccountStorage {
@@ -53,10 +53,23 @@ public class PostgresSponsorAccountStorageAdapter implements SponsorAccountStora
     }
 
     @Override
-    public Page<HistoricalTransaction> transactionsOf(SponsorId sponsorId, List<HistoricalTransaction.Type> types, Integer pageIndex, Integer pageSize) {
-        final var page = sponsorAccountTransactionViewRepository.findAllBySponsorAccountSponsorIdAndTypeIn(
-                sponsorId.value(), types.stream().map(SponsorAccountTransactionViewEntity.TransactionType::of).toList(), PageRequest.of(pageIndex,
-                        pageSize, Sort.by(Sort.Direction.DESC, "timestamp")));
+    public Page<HistoricalTransaction> transactionsOf(SponsorId sponsorId, HistoricalTransaction.Filters filters, Integer pageIndex, Integer pageSize) {
+        final var format = new SimpleDateFormat("yyyy-MM-dd");
+
+        final var currencyIds = filters.getCurrencies().stream().map(Currency.Id::value).toList();
+        final var projectIds = filters.getProjectIds().stream().map(ProjectId::value).toList();
+        final var types = filters.getTypes().stream().map(SponsorAccountTransactionViewEntity.TransactionType::of).map(Enum::name).toList();
+        final var fromDate = isNull(filters.getFrom()) ? null : format.format(filters.getFrom());
+        final var toDate = isNull(filters.getTo()) ? null : format.format(filters.getTo());
+
+        final var page = sponsorAccountTransactionViewRepository.findAll(
+                sponsorId.value(),
+                currencyIds,
+                projectIds,
+                types,
+                fromDate,
+                toDate,
+                PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "timestamp")));
 
         return Page.<HistoricalTransaction>builder()
                 .content(page.getContent().stream().map(SponsorAccountTransactionViewEntity::toDomain).toList())

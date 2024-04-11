@@ -1,9 +1,12 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
+import lombok.Builder;
+import lombok.Data;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
 
 import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.List;
 
 public record HistoricalTransaction(
@@ -22,6 +25,19 @@ public record HistoricalTransaction(
         public boolean isDebit() {
             return List.of(WITHDRAW, SPEND, BURN, TRANSFER).contains(this);
         }
+    }
+
+    @Data
+    @Builder
+    public static class Filters {
+        @Builder.Default
+        List<Currency.Id> currencies = List.of();
+        @Builder.Default
+        List<ProjectId> projectIds = List.of();
+        @Builder.Default
+        List<Type> types = List.of();
+        Date from;
+        Date to;
     }
 }
 

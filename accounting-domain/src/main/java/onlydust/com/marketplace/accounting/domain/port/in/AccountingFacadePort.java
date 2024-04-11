@@ -49,7 +49,7 @@ public interface AccountingFacadePort {
 
     SponsorAccountStatement updateSponsorAccount(final @NonNull SponsorAccount.Id sponsorAccountId, ZonedDateTime lockedUntil);
 
-    Page<HistoricalTransaction> transactionHistory(SponsorId sponsorId, List<HistoricalTransaction.Type> types, Integer pageIndex, Integer pageSize);
+    Page<HistoricalTransaction> transactionHistory(SponsorId sponsorId, HistoricalTransaction.Filters filters, Integer pageIndex, Integer pageSize);
 
     List<Network> networksOf(Currency.Id currencyId, RewardId rewardId);
 

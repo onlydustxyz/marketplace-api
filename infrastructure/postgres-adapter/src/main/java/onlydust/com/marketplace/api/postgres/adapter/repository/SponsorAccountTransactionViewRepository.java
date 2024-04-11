@@ -4,12 +4,29 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.SponsorAccount
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface SponsorAccountTransactionViewRepository extends JpaRepository<SponsorAccountTransactionViewEntity, UUID> {
-    Page<SponsorAccountTransactionViewEntity> findAllBySponsorAccountSponsorIdAndTypeIn(UUID sponsorId,
-                                                                                        List<SponsorAccountTransactionViewEntity.TransactionType> types,
-                                                                                        Pageable pageable);
+    @Query(value = """
+            SELECT t.*
+            FROM accounting.all_sponsor_account_transactions t
+            JOIN accounting.sponsor_accounts sa ON sa.id = t.sponsor_account_id
+            WHERE
+                sa.sponsor_id = :sponsorId AND
+                (coalesce(:currencyIds) IS NULL OR sa.currency_id IN (:currencyIds) ) AND
+                (coalesce(:projectIds) IS NULL OR t.project_id IN (:projectIds) ) AND
+                (coalesce(:types) IS NULL OR CAST(t.type AS TEXT) IN (:types) ) AND
+                (coalesce(:fromDate) IS NULL OR t.timestamp >= TO_DATE(CAST(:fromDate AS TEXT), 'YYYY-MM-DD') ) AND
+                (coalesce(:toDate) IS NULL OR t.timestamp < TO_DATE(CAST(:toDate AS TEXT), 'YYYY-MM-DD') + 1 )
+            """, nativeQuery = true)
+    Page<SponsorAccountTransactionViewEntity> findAll(UUID sponsorId,
+                                                      List<UUID> currencyIds,
+                                                      List<UUID> projectIds,
+                                                      List<String> types,
+                                                      String fromDate,
+                                                      String toDate,
+                                                      Pageable pageable);
 }

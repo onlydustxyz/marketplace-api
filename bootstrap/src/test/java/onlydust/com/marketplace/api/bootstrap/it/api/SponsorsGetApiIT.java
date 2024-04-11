@@ -272,6 +272,55 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
         assertThat(transactions).allMatch(t -> t.getType() == type);
     }
 
+    @Test
+    void should_filter_sponsor_transactions_by_date() {
+        // Given
+        addSponsorFor(user, sponsorId);
+
+        // When
+        getSponsorTransactions(sponsorId, 0, 100, Map.of("fromDate", "2024-03-13", "toDate", "2024-03-13"))
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                // we have at least one correct date
+                .jsonPath("$.transactions[?(@.date >= '2024-03-13')]").exists()
+                .jsonPath("$.transactions[?(@.date < '2024-03-14')]").exists()
+                // we do not have any incorrect date
+                .jsonPath("$.transactions[?(@.date < '2024-03-13')]").doesNotExist()
+                .jsonPath("$.transactions[?(@.date > '2024-03-14')]").doesNotExist();
+    }
+
+    @Test
+    void should_filter_sponsor_transactions_by_currencies() {
+        // Given
+        addSponsorFor(user, sponsorId);
+
+        // When
+        getSponsorTransactions(sponsorId, 0, 100, Map.of("currencies", "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c"))
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                // we have at least one correct date
+                .jsonPath("$.transactions[?(@.amount.currency.code == 'ETH')]").exists()
+                .jsonPath("$.transactions[?(@.amount.currency.code != 'ETH')]").doesNotExist();
+    }
+
+
+    @Test
+    void should_filter_sponsor_transactions_by_projects() {
+        // Given
+        addSponsorFor(user, sponsorId);
+
+        // When
+        getSponsorTransactions(sponsorId, 0, 100, Map.of("projects", "7d04163c-4187-4313-8066-61504d34fc56"))
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                // we have at least one correct date
+                .jsonPath("$.transactions[?(@.project.name == 'Bretzel')]").exists()
+                .jsonPath("$.transactions[?(@.project.name != 'Bretzel')]").doesNotExist();
+    }
+
     @NonNull
     private WebTestClient.ResponseSpec getSponsor(SponsorId id) {
         return client.get()
