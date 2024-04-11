@@ -1,6 +1,3 @@
-ALTER TYPE accounting.transaction_type ADD VALUE 'ALLOCATION';
-ALTER TYPE accounting.transaction_type ADD VALUE 'ALLOWANCE';
-
 create table accounting.sponsor_account_allowance_transactions
 (
     id              UUID                        not null primary key,
