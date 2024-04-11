@@ -34,14 +34,16 @@ public class CachedAccountBookProvider {
     }
 
     @Transactional
-    public synchronized void save(final @NonNull Currency currency, final @NonNull AccountBookAggregate accountBook) {
+    public synchronized List<IdentifiedAccountBookEvent> save(final @NonNull Currency currency, final @NonNull AccountBookAggregate accountBook) {
         try {
             final var pendingEvents = accountBook.getAndClearPendingEvents();
-            if (pendingEvents.isEmpty()) {
-                return;
+            
+            if (!pendingEvents.isEmpty()) {
+                checkEventIdsSequenceIntegrity(currency, pendingEvents);
+                insertEvents(currency, pendingEvents);
             }
-            checkEventIdsSequenceIntegrity(currency, pendingEvents);
-            insertEvents(currency, pendingEvents);
+
+            return pendingEvents;
         } catch (Exception e) {
             evictAccountBook(currency);
             throw internalServerError("Could not save account book", e);

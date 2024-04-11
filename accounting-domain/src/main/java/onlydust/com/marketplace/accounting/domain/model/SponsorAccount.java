@@ -26,6 +26,8 @@ public class SponsorAccount {
 
     @Getter
     final @NonNull List<Transaction> transactions = new ArrayList<>();
+    @Getter
+    final @NonNull List<AllowanceTransaction> allowanceTransactions = new ArrayList<>();
 
     public SponsorAccount(final @NonNull SponsorId sponsorId, final @NonNull Currency currency, ZonedDateTime lockedUntil) {
         this.id = Id.random();
@@ -178,6 +180,24 @@ public class SponsorAccount {
         public enum Type {
             DEPOSIT, // Money received/refunded from the sponsor
             SPEND // Money spent to pay rewards
+        }
+    }
+
+    public record AllowanceTransaction(@NonNull Transaction.Id id,
+                                       @NonNull Type type,
+                                       @NonNull Amount amount,
+                                       ProjectId projectId) {
+        public static AllowanceTransaction allowance(@NonNull Amount amount) {
+            return new AllowanceTransaction(Transaction.Id.random(), Type.ALLOWANCE, amount, null);
+        }
+
+        public static AllowanceTransaction allocation(@NonNull Amount amount, @NonNull ProjectId projectId) {
+            return new AllowanceTransaction(Transaction.Id.random(), Type.ALLOCATION, amount, projectId);
+        }
+
+        public enum Type {
+            ALLOWANCE, // Money the sponsor is allowed to allocate to a project
+            ALLOCATION // Money allocated to a project
         }
     }
 }

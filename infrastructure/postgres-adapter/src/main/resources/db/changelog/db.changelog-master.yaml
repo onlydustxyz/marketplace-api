@@ -227,3 +227,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000201_fix_reward_statuses_processing.sql
   - include:
       file: db/changelog/changelogs/00000202_create_sponsors_users_table.sql
+  - include:
+      file: db/changelog/changelogs/00000203_create_sponsor_account_allowance_transactions_table.sql

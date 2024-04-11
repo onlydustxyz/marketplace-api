@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookObserver;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookProjector;
 import onlydust.com.marketplace.accounting.domain.observers.NotificationOutbox;
 import onlydust.com.marketplace.accounting.domain.port.in.*;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
@@ -23,10 +25,16 @@ public class AccountingConfiguration {
                                                      final @NonNull CurrencyStorage currencyStorage,
                                                      final @NonNull AccountingObserver accountingObserver,
                                                      final @NonNull ProjectAccountingObserver projectAccountingObserver,
-                                                     final @NonNull InvoiceStoragePort invoiceStoragePort
+                                                     final @NonNull InvoiceStoragePort invoiceStoragePort,
+                                                     final @NonNull AccountBookObserver accountBookObserver
     ) {
         return new AccountingService(cachedAccountBookProvider, sponsorAccountStorage, currencyStorage, accountingObserver, projectAccountingObserver,
-                invoiceStoragePort);
+                invoiceStoragePort, accountBookObserver);
+    }
+
+    @Bean
+    public AccountBookProjector accountBookProjector(final @NonNull SponsorAccountStorage sponsorAccountStorage) {
+        return new AccountBookProjector(sponsorAccountStorage);
     }
 
     @Bean

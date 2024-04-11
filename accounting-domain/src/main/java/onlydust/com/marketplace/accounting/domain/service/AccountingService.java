@@ -5,6 +5,7 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookObserver;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.ReadOnlyAccountBookState;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
@@ -32,6 +33,7 @@ public class AccountingService implements AccountingFacadePort {
     private final AccountingObserverPort accountingObserver;
     private final ProjectAccountingObserver projectAccountingObserver;
     private final InvoiceStoragePort invoiceStoragePort;
+    private final AccountBookObserver accountBookObserver;
 
     @Override
     @Transactional
@@ -304,7 +306,8 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     private void saveAccountBook(Currency currency, AccountBookAggregate accountBook) {
-        accountBookProvider.save(currency, accountBook);
+        final var events = accountBookProvider.save(currency, accountBook);
+        events.forEach(accountBookObserver::on);
     }
 
     private AccountBookAggregate getAccountBook(Currency.Id currencyId) {
