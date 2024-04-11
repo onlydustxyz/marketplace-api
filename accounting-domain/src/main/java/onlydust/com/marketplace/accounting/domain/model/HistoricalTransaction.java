@@ -14,8 +14,7 @@ public record HistoricalTransaction(
         ShortProjectView project
 ) {
     public enum Type {
-        DEPOSIT,
-        ALLOCATION
+        DEPOSIT, SPEND, ALLOWANCE, ALLOCATION
     }
 }
 

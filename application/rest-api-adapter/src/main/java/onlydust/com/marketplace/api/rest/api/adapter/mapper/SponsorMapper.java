@@ -10,6 +10,7 @@ import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 
@@ -130,6 +131,7 @@ public interface SponsorMapper {
         return switch (transaction.type()) {
             case DEPOSIT -> SponsorAccountTransactionType.DEPOSIT;
             case ALLOCATION -> transaction.amount().isPositive() ? SponsorAccountTransactionType.ALLOCATED : SponsorAccountTransactionType.UNALLOCATED;
+            default -> throw OnlyDustException.internalServerError("Unexpected transaction type: %s".formatted(transaction.type()));
         };
     }
 }

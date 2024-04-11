@@ -1,58 +1,71 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
-import lombok.ToString;
+import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Amount;
 import onlydust.com.marketplace.accounting.domain.model.ConvertedAmount;
 import onlydust.com.marketplace.accounting.domain.model.HistoricalTransaction;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Entity
+@Value
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
+@NoArgsConstructor(force = true)
 @TypeDef(name = "transaction_type", typeClass = PostgreSQLEnumType.class)
-public class HistoricalTransactionEntity {
+@Table(schema = "accounting", name = "all_sponsor_account_transactions")
+public class SponsorAccountTransactionViewEntity {
     @Id
     @EqualsAndHashCode.Include
-    private @NonNull UUID id;
+    @NonNull UUID id;
+    @NonNull ZonedDateTime timestamp;
 
-    private @NonNull ZonedDateTime timestamp;
-
-    @NonNull String type;
+    @Enumerated(javax.persistence.EnumType.STRING)
+    @Type(type = "transaction_type")
+    @NonNull TransactionType type;
 
     @ManyToOne
-    SponsorAccountEntity sponsorAccount;
-
-    @NonNull BigDecimal amount;
-
-    BigDecimal usdConversionRate;
+    @NonNull SponsorAccountEntity sponsorAccount;
 
     @ManyToOne
     @JoinColumn(name = "project_id")
     ProjectEntity project;
+
+    @NonNull BigDecimal amount;
+
+    public enum TransactionType {
+        DEPOSIT, SPEND, ALLOWANCE, ALLOCATION;
+
+        public HistoricalTransaction.Type toDomain() {
+            return switch (this) {
+                case DEPOSIT -> HistoricalTransaction.Type.DEPOSIT;
+                case SPEND -> HistoricalTransaction.Type.SPEND;
+                case ALLOWANCE -> HistoricalTransaction.Type.ALLOWANCE;
+                case ALLOCATION -> HistoricalTransaction.Type.ALLOCATION;
+            };
+        }
+    }
 
     public HistoricalTransaction toDomain() {
         final var sponsorAccount = this.sponsorAccount.toDomain();
 
         return new HistoricalTransaction(
                 timestamp,
-                HistoricalTransaction.Type.valueOf(type),
+                type.toDomain(),
                 sponsorAccount,
                 Amount.of(amount),
-                usdConversionRate == null ? null : new ConvertedAmount(Amount.of(amount.multiply(usdConversionRate)), usdConversionRate),
+                sponsorAccount.currency().latestUsdQuote()
+                        .map(usdConversionRate -> new ConvertedAmount(Amount.of(amount.multiply(usdConversionRate)), usdConversionRate))
+                        .orElse(null),
                 project == null ? null : ShortProjectView.builder()
                         .id(ProjectId.of(project.getId()))
                         .name(project.getName())

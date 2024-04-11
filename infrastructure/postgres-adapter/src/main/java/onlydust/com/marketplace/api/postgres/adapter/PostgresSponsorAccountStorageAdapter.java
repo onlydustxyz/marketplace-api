@@ -5,10 +5,10 @@ import onlydust.com.marketplace.accounting.domain.model.HistoricalTransaction;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.HistoricalTransactionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.SponsorAccountEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.HistoricalTransactionRepository;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.SponsorAccountTransactionViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountTransactionViewRepository;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,7 +23,7 @@ import static java.util.Comparator.comparing;
 @AllArgsConstructor
 public class PostgresSponsorAccountStorageAdapter implements SponsorAccountStorage {
     private final SponsorAccountRepository sponsorAccountRepository;
-    private final HistoricalTransactionRepository historicalTransactionRepository;
+    private final SponsorAccountTransactionViewRepository sponsorAccountTransactionViewRepository;
 
     @Override
     public Optional<SponsorAccount> get(SponsorAccount.Id id) {
@@ -54,11 +54,15 @@ public class PostgresSponsorAccountStorageAdapter implements SponsorAccountStora
 
     @Override
     public Page<HistoricalTransaction> transactionsOf(SponsorId sponsorId, Integer pageIndex, Integer pageSize) {
-        final var page = historicalTransactionRepository.findAll(sponsorId.value(), PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC,
-                "timestamp")));
+        final var types = List.of(
+                SponsorAccountTransactionViewEntity.TransactionType.DEPOSIT,
+                SponsorAccountTransactionViewEntity.TransactionType.ALLOCATION
+        );
+        final var page = sponsorAccountTransactionViewRepository.findAllBySponsorAccountSponsorIdAndTypeIn(
+                sponsorId.value(), types, PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "timestamp")));
 
         return Page.<HistoricalTransaction>builder()
-                .content(page.getContent().stream().map(HistoricalTransactionEntity::toDomain).toList())
+                .content(page.getContent().stream().map(SponsorAccountTransactionViewEntity::toDomain).toList())
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();

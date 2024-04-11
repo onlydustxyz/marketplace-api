@@ -70,3 +70,20 @@ INTO accounting.sponsor_account_allowance_transactions(id, account_id, amount, t
 SELECT gen_random_uuid(), sponsor_account_id, -amount, 'ALLOWANCE', timestamp
 FROM data
 ;
+
+CREATE VIEW accounting.all_sponsor_account_transactions AS
+SELECT id              AS id,
+       account_id      AS sponsor_account_id,
+       tech_created_at AS timestamp,
+       type            AS type,
+       amount          AS amount,
+       NULL            AS project_id
+FROM accounting.sponsor_account_transactions
+UNION
+SELECT id              AS id,
+       account_id      AS sponsor_account_id,
+       tech_created_at AS timestamp,
+       type            AS type,
+       amount          AS amount,
+       project_id      AS project_id
+FROM accounting.sponsor_account_allowance_transactions;

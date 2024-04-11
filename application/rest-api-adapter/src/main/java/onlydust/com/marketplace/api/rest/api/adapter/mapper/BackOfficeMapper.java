@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.view.*;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
@@ -134,6 +135,7 @@ public interface BackOfficeMapper {
         return switch (type) {
             case DEPOSIT -> HistoricalTransactionType.DEPOSIT;
             case ALLOCATION -> HistoricalTransactionType.ALLOCATION;
+            default -> throw OnlyDustException.internalServerError("Unexpected transaction type: %s".formatted(type));
         };
     }
 
