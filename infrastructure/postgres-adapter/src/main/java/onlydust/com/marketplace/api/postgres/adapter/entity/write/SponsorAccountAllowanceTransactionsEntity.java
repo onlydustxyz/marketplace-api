@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Amount;
+import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -17,13 +18,12 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-@TypeDef(name = "network", typeClass = PostgreSQLEnumType.class)
 @TypeDef(name = "transaction_type", typeClass = PostgreSQLEnumType.class)
 @Value
 @Builder(access = AccessLevel.PRIVATE)
-@Table(name = "sponsor_account_transactions", schema = "accounting")
+@Table(name = "sponsor_account_allowance_transactions", schema = "accounting")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class SponsorAccountTransactionsEntity {
+public class SponsorAccountAllowanceTransactionsEntity {
     @Id
     @EqualsAndHashCode.Include
     @NonNull UUID id;
@@ -33,53 +33,42 @@ public class SponsorAccountTransactionsEntity {
     @Type(type = "transaction_type")
     @NonNull TransactionType type;
 
-    @Enumerated(javax.persistence.EnumType.STRING)
-    @Type(type = "network")
-    @NonNull NetworkEnumEntity network;
-
-    @NonNull String reference;
     @NonNull BigDecimal amount;
-    @NonNull String thirdPartyName;
-    @NonNull String thirdPartyAccountNumber;
 
-    public SponsorAccount.Transaction toDomain() {
-        return new SponsorAccount.Transaction(
+    UUID projectId;
+
+    public SponsorAccount.AllowanceTransaction toDomain() {
+        return new SponsorAccount.AllowanceTransaction(
                 SponsorAccount.Transaction.Id.of(id),
                 type.toDomain(),
-                network.toNetwork(),
-                reference,
                 Amount.of(amount),
-                thirdPartyName,
-                thirdPartyAccountNumber);
+                projectId == null ? null : ProjectId.of(projectId));
     }
 
-    public static SponsorAccountTransactionsEntity of(SponsorAccount.Id sponsorAccountId, SponsorAccount.Transaction transaction) {
-        return SponsorAccountTransactionsEntity.builder()
+    public static SponsorAccountAllowanceTransactionsEntity of(SponsorAccount.Id sponsorAccountId, SponsorAccount.AllowanceTransaction transaction) {
+        return SponsorAccountAllowanceTransactionsEntity.builder()
                 .id(transaction.id().value())
                 .type(TransactionType.of(transaction.type()))
                 .accountId(sponsorAccountId.value())
                 .amount(transaction.amount().getValue())
-                .network(NetworkEnumEntity.of(transaction.network()))
-                .reference(transaction.reference())
-                .thirdPartyAccountNumber(transaction.thirdPartyAccountNumber())
-                .thirdPartyName(transaction.thirdPartyName())
+                .projectId(transaction.projectId() == null ? null : transaction.projectId().value())
                 .build();
     }
 
     public enum TransactionType {
-        DEPOSIT, SPEND;
+        ALLOWANCE, ALLOCATION;
 
-        public SponsorAccount.Transaction.Type toDomain() {
+        public SponsorAccount.AllowanceTransaction.Type toDomain() {
             return switch (this) {
-                case DEPOSIT -> SponsorAccount.Transaction.Type.DEPOSIT;
-                case SPEND -> SponsorAccount.Transaction.Type.SPEND;
+                case ALLOCATION -> SponsorAccount.AllowanceTransaction.Type.ALLOCATION;
+                case ALLOWANCE -> SponsorAccount.AllowanceTransaction.Type.ALLOWANCE;
             };
         }
 
-        public static TransactionType of(SponsorAccount.Transaction.Type type) {
+        public static TransactionType of(SponsorAccount.AllowanceTransaction.Type type) {
             return switch (type) {
-                case DEPOSIT -> DEPOSIT;
-                case SPEND -> SPEND;
+                case ALLOWANCE -> ALLOWANCE;
+                case ALLOCATION -> ALLOCATION;
             };
         }
     }
