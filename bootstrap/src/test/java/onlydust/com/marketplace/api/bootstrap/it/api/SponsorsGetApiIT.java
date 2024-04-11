@@ -1,13 +1,21 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import com.google.common.collect.Streams;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.contract.model.SponsorAccountTransactionType;
+import onlydust.com.marketplace.api.contract.model.TransactionHistoryPageResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Map;
+
+import static java.util.stream.Collectors.toMap;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
@@ -247,6 +255,23 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                         """);
     }
 
+    @ParameterizedTest
+    @EnumSource(value = SponsorAccountTransactionType.class)
+    void should_filter_sponsor_transactions_by_type(@NonNull SponsorAccountTransactionType type) {
+        // Given
+        addSponsorFor(user, sponsorId);
+
+        // When
+        final var transactions = getSponsorTransactions(sponsorId, 0, 3, Map.of("types", type.toString()))
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(TransactionHistoryPageResponse.class)
+                .returnResult()
+                .getResponseBody().getTransactions();
+
+        assertThat(transactions).allMatch(t -> t.getType() == type);
+    }
+
     @NonNull
     private WebTestClient.ResponseSpec getSponsor(SponsorId id) {
         return client.get()
@@ -257,8 +282,18 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
 
     @NonNull
     private WebTestClient.ResponseSpec getSponsorTransactions(SponsorId id, Integer pageIndex, Integer pageSize) {
+        return getSponsorTransactions(id, pageIndex, pageSize, Map.of());
+    }
+
+    @NonNull
+    private WebTestClient.ResponseSpec getSponsorTransactions(SponsorId id, Integer pageIndex, Integer pageSize, Map<String, String> otherParams) {
+        final var params = Streams.concat(
+                Map.of("pageIndex", pageIndex.toString(), "pageSize", pageSize.toString()).entrySet().stream(),
+                otherParams.entrySet().stream()
+        ).collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+
         return client.get()
-                .uri(getApiURI(SPONSOR_TRANSACTIONS.formatted(id), Map.of("pageIndex", pageIndex.toString(), "pageSize", pageSize.toString())))
+                .uri(getApiURI(SPONSOR_TRANSACTIONS.formatted(id), params))
                 .header("Authorization", "Bearer " + user.jwt())
                 .exchange();
     }
