@@ -61,6 +61,15 @@ public interface SponsorMapper {
                 .logoUrl(sponsor.logoUrl());
     }
 
+    static HistoricalTransaction.Type map(SponsorAccountTransactionType type) {
+        return switch (type) {
+            case DEPOSIT -> HistoricalTransaction.Type.MINT; // Sponsor is interested on how much he can actually spend on projects
+            case WITHDRAWAL -> HistoricalTransaction.Type.BURN;
+            case ALLOCATION -> HistoricalTransaction.Type.TRANSFER;
+            case UNALLOCATION -> HistoricalTransaction.Type.REFUND;
+        };
+    }
+
     static SponsorDetailsResponse mapToSponsorDetailsResponse(SponsorView sponsor, List<SponsorAccountStatement> accountStatements) {
         return new SponsorDetailsResponse()
                 .id(sponsor.id().value())
@@ -129,8 +138,10 @@ public interface SponsorMapper {
 
     static SponsorAccountTransactionType mapTransactionType(HistoricalTransaction transaction) {
         return switch (transaction.type()) {
-            case DEPOSIT -> SponsorAccountTransactionType.DEPOSIT;
-            case ALLOCATION -> transaction.amount().isPositive() ? SponsorAccountTransactionType.ALLOCATED : SponsorAccountTransactionType.UNALLOCATED;
+            case MINT -> SponsorAccountTransactionType.DEPOSIT;
+            case BURN -> SponsorAccountTransactionType.WITHDRAWAL;
+            case TRANSFER -> SponsorAccountTransactionType.ALLOCATION;
+            case REFUND -> SponsorAccountTransactionType.UNALLOCATION;
             default -> throw OnlyDustException.internalServerError("Unexpected transaction type: %s".formatted(transaction.type()));
         };
     }

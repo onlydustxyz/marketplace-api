@@ -6120,5 +6120,6 @@ components:
       type: string
       enum:
         - DEPOSIT
-        - ALLOCATED
-        - UNALLOCATED
+        - WITHDRAWAL
+        - ALLOCATION
+        - UNALLOCATION

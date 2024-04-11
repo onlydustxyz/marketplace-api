@@ -82,7 +82,7 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
         final var usdc = currencyRepository.findByCode("USDC").orElseThrow().id();
         final var usdcSponsorAccount = accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
                 Currency.Id.of(usdc), null,
-                new SponsorAccount.Transaction(SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(), Amount.of(200000L),
+                new SponsorAccount.Transaction(SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(), PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
         accountingService.allocate(usdcSponsorAccount.account().id(), projectId, PositiveAmount.of(100000L), Currency.Id.of(usdc));
         sendRewardToRecipient(authenticatedUser.user().getGithubUserId(), 100L, projectId.value());

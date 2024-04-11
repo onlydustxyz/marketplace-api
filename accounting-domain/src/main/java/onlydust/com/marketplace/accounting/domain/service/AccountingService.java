@@ -197,7 +197,7 @@ public class AccountingService implements AccountingFacadePort {
                 .entrySet()
                 .stream().map(e -> Map.entry(
                         mustGetSponsorAccount(e.getKey().sponsorAccountId()),
-                        new SponsorAccount.Transaction(SPEND, paymentReference, e.getValue().negate())
+                        new SponsorAccount.Transaction(SPEND, paymentReference, e.getValue())
                 ))
                 .filter(e -> paymentReference.network().equals(e.getKey().network().orElse(null)))
                 .collect(toMap(Map.Entry::getKey, Map.Entry::getValue))
@@ -365,7 +365,7 @@ public class AccountingService implements AccountingFacadePort {
 
             final var sponsorAccountNetwork = sponsorAccount.network().orElseThrow();
             sponsorAccount.add(new SponsorAccount.Transaction(SPEND, sponsorAccountNetwork, rewardId.toString(),
-                    amount.negate(), "", ""));
+                    amount, "", ""));
         }
 
         private PayableReward createPayableReward(SponsorAccount.Id sponsorAccountId, RewardId rewardId, PositiveAmount amount) {
@@ -393,8 +393,8 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public Page<HistoricalTransaction> transactionHistory(SponsorId sponsorId, Integer pageIndex, Integer pageSize) {
-        return sponsorAccountStorage.transactionsOf(sponsorId, pageIndex, pageSize);
+    public Page<HistoricalTransaction> transactionHistory(SponsorId sponsorId, List<HistoricalTransaction.Type> types, Integer pageIndex, Integer pageSize) {
+        return sponsorAccountStorage.transactionsOf(sponsorId, types, pageIndex, pageSize);
     }
 
     @Override

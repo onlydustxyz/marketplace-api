@@ -14,5 +14,5 @@ public interface SponsorAccountStorage extends SponsorAccountProvider {
 
     List<SponsorAccount> getSponsorAccounts(SponsorId sponsorId);
 
-    Page<HistoricalTransaction> transactionsOf(SponsorId sponsorId, Integer pageIndex, Integer pageSize);
+    Page<HistoricalTransaction> transactionsOf(SponsorId sponsorId, List<HistoricalTransaction.Type> types, Integer pageIndex, Integer pageSize);
 }

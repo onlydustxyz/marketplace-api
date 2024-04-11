@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
@@ -54,7 +55,12 @@ public class SponsorsRestApi implements SponsorsApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final var sponsor = sponsorFacadePort.getSponsor(UserId.of(authenticatedUser.getId()), SponsorId.of(sponsorId));
-        final var page = accountingFacadePort.transactionHistory(sponsor.id(), sanitizedPageIndex, sanitizePageSize(pageSize));
+        final var page = accountingFacadePort.transactionHistory(
+                sponsor.id(),
+                Optional.ofNullable(types).orElse(List.of(SponsorAccountTransactionType.values())).stream().map(SponsorMapper::map).toList(),
+                sanitizedPageIndex,
+                sanitizePageSize(pageSize)
+        );
         final var response = SponsorMapper.mapTransactionHistory(page, sanitizedPageIndex);
 
         return response.getTotalPageNumber() > 1 ?

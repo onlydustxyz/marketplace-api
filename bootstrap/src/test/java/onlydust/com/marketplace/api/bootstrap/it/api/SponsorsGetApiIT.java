@@ -190,7 +190,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                           "transactions": [
                             {
                               "date": "2024-03-13T15:13:21.256797Z",
-                              "type": "ALLOCATED",
+                              "type": "ALLOCATION",
                               "project": {
                                 "name": "Bretzel",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
@@ -225,7 +225,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "date": "2024-03-13T15:13:21.225044Z",
-                              "type": "ALLOCATED",
+                              "type": "ALLOCATION",
                               "project": {
                                 "name": "Aiolia du Lion",
                                 "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c"

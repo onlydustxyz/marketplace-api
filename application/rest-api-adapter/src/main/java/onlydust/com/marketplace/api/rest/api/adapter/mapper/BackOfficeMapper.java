@@ -92,17 +92,20 @@ public interface BackOfficeMapper {
                 .id(transaction.id().value())
                 .reference(transaction.reference())
                 .network(sponsorAccount.network().map(BackOfficeMapper::mapNetwork).orElse(null))
-                .amount(transaction.amount().getValue())
+                .amount(transaction.type().isDebit() ?
+                        transaction.amount().getValue().negate() :
+                        transaction.amount().getValue())
                 .thirdPartyName(transaction.thirdPartyName())
                 .thirdPartyAccountNumber(transaction.thirdPartyAccountNumber());
     }
 
     static SponsorAccount.Transaction mapReceiptToTransaction(final TransactionReceipt transaction) {
+        final var negativeAmount = transaction.getAmount().compareTo(BigDecimal.ZERO) < 0;
         return new SponsorAccount.Transaction(
-                SponsorAccount.Transaction.Type.DEPOSIT,
+                negativeAmount ? SponsorAccount.Transaction.Type.WITHDRAW : SponsorAccount.Transaction.Type.DEPOSIT,
                 mapTransactionNetwork(transaction.getNetwork()),
                 transaction.getReference(),
-                Amount.of(transaction.getAmount()),
+                PositiveAmount.of(negativeAmount ? transaction.getAmount().negate() : transaction.getAmount()),
                 transaction.getThirdPartyName(),
                 transaction.getThirdPartyAccountNumber());
     }
@@ -124,7 +127,8 @@ public interface BackOfficeMapper {
                 .lockedUntil(historicalTransaction.sponsorAccount().lockedUntil().map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
                 .project(mapToProjectLink(historicalTransaction.project()))
                 .amount(new MoneyWithUsdEquivalentResponse()
-                        .amount(historicalTransaction.amount().getValue())
+                        .amount(historicalTransaction.type().isDebit() ? historicalTransaction.amount().getValue().negate() :
+                                historicalTransaction.amount().getValue())
                         .currency(toShortCurrency(historicalTransaction.sponsorAccount().currency()))
                         .dollarsEquivalent(historicalTransaction.usdAmount() == null ? null : historicalTransaction.usdAmount().convertedAmount().getValue())
                         .conversionRate(historicalTransaction.usdAmount() == null ? null : historicalTransaction.usdAmount().conversionRate())
@@ -133,8 +137,8 @@ public interface BackOfficeMapper {
 
     static HistoricalTransactionType mapTransactionType(HistoricalTransaction.Type type) {
         return switch (type) {
-            case DEPOSIT -> HistoricalTransactionType.DEPOSIT;
-            case ALLOCATION -> HistoricalTransactionType.ALLOCATION;
+            case DEPOSIT, WITHDRAW -> HistoricalTransactionType.DEPOSIT;
+            case TRANSFER, REFUND -> HistoricalTransactionType.ALLOCATION;
             default -> throw OnlyDustException.internalServerError("Unexpected transaction type: %s".formatted(type));
         };
     }

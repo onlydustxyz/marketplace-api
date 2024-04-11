@@ -29,7 +29,7 @@ public class SponsorAccountTransactionViewEntity {
     @NonNull UUID id;
     @NonNull ZonedDateTime timestamp;
 
-    @Enumerated(javax.persistence.EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     @Type(type = "transaction_type")
     @NonNull TransactionType type;
 
@@ -43,14 +43,29 @@ public class SponsorAccountTransactionViewEntity {
     @NonNull BigDecimal amount;
 
     public enum TransactionType {
-        DEPOSIT, SPEND, ALLOWANCE, ALLOCATION;
+        DEPOSIT, WITHDRAW, SPEND, MINT, BURN, TRANSFER, REFUND;
 
         public HistoricalTransaction.Type toDomain() {
             return switch (this) {
                 case DEPOSIT -> HistoricalTransaction.Type.DEPOSIT;
+                case WITHDRAW -> HistoricalTransaction.Type.WITHDRAW;
                 case SPEND -> HistoricalTransaction.Type.SPEND;
-                case ALLOWANCE -> HistoricalTransaction.Type.ALLOWANCE;
-                case ALLOCATION -> HistoricalTransaction.Type.ALLOCATION;
+                case MINT -> HistoricalTransaction.Type.MINT;
+                case BURN -> HistoricalTransaction.Type.BURN;
+                case TRANSFER -> HistoricalTransaction.Type.TRANSFER;
+                case REFUND -> HistoricalTransaction.Type.REFUND;
+            };
+        }
+
+        public static TransactionType of(HistoricalTransaction.Type type) {
+            return switch (type) {
+                case DEPOSIT -> DEPOSIT;
+                case WITHDRAW -> WITHDRAW;
+                case SPEND -> SPEND;
+                case MINT -> MINT;
+                case BURN -> BURN;
+                case TRANSFER -> TRANSFER;
+                case REFUND -> REFUND;
             };
         }
     }

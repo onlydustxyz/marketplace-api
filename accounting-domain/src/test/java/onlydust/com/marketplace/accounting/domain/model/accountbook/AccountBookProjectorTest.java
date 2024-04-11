@@ -19,7 +19,6 @@ class AccountBookProjectorTest {
     private final Faker faker = new Faker();
     public final AccountBook.AccountId sponsorAccountId = AccountBook.AccountId.of(SponsorAccount.Id.random());
     private final PositiveAmount amount = PositiveAmount.of(faker.number().randomNumber(3, true));
-    private final Long id = faker.number().randomNumber(3, true);
 
     @BeforeEach
     void setup() {
@@ -34,7 +33,7 @@ class AccountBookProjectorTest {
         observer.onMint(sponsorAccountId, amount);
 
         // Then
-        assertSavedTransaction(id, SponsorAccount.AllowanceTransaction.Type.ALLOWANCE, amount, null);
+        assertSavedTransaction(SponsorAccount.AllowanceTransaction.Type.MINT, amount, null);
     }
 
     @Test
@@ -43,7 +42,7 @@ class AccountBookProjectorTest {
         observer.onBurn(sponsorAccountId, amount);
 
         // Then
-        assertSavedTransaction(id, SponsorAccount.AllowanceTransaction.Type.ALLOWANCE, amount.negate(), null);
+        assertSavedTransaction(SponsorAccount.AllowanceTransaction.Type.BURN, amount, null);
     }
 
     @Test
@@ -55,7 +54,7 @@ class AccountBookProjectorTest {
         observer.onTransfer(sponsorAccountId, projectAccountId, amount);
 
         // Then
-        assertSavedTransaction(id, SponsorAccount.AllowanceTransaction.Type.ALLOCATION, amount, projectAccountId.projectId());
+        assertSavedTransaction(SponsorAccount.AllowanceTransaction.Type.TRANSFER, amount, projectAccountId.projectId());
     }
 
     @Test
@@ -67,17 +66,16 @@ class AccountBookProjectorTest {
         observer.onRefund(projectAccountId, sponsorAccountId, amount);
 
         // Then
-        assertSavedTransaction(id, SponsorAccount.AllowanceTransaction.Type.ALLOCATION, amount.negate(), projectAccountId.projectId());
+        assertSavedTransaction(SponsorAccount.AllowanceTransaction.Type.REFUND, amount, projectAccountId.projectId());
     }
 
-    private void assertSavedTransaction(Long id, SponsorAccount.AllowanceTransaction.Type type, Amount amount, ProjectId projectId) {
+    private void assertSavedTransaction(SponsorAccount.AllowanceTransaction.Type type, Amount amount, ProjectId projectId) {
         final var sponsorAccountCaptor = ArgumentCaptor.forClass(SponsorAccount.class);
         verify(storage).save(sponsorAccountCaptor.capture());
         final var sponsorAccount = sponsorAccountCaptor.getValue();
 
         assertThat(sponsorAccount.getAllowanceTransactions()).hasSize(1);
         final var transaction = sponsorAccount.getAllowanceTransactions().get(0);
-        assertThat(transaction.id()).isEqualTo(id);
         assertThat(transaction.type()).isEqualTo(type);
         assertThat(transaction.amount()).isEqualTo(amount);
         assertThat(transaction.projectId()).isEqualTo(projectId);

@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
-import onlydust.com.marketplace.accounting.domain.model.Amount;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import org.hibernate.annotations.Type;
@@ -41,7 +41,7 @@ public class SponsorAccountAllowanceTransactionsEntity {
         return new SponsorAccount.AllowanceTransaction(
                 SponsorAccount.Transaction.Id.of(id),
                 type.toDomain(),
-                Amount.of(amount),
+                PositiveAmount.of(amount),
                 projectId == null ? null : ProjectId.of(projectId));
     }
 
@@ -56,19 +56,23 @@ public class SponsorAccountAllowanceTransactionsEntity {
     }
 
     public enum TransactionType {
-        ALLOWANCE, ALLOCATION;
+        MINT, BURN, TRANSFER, REFUND;
 
         public SponsorAccount.AllowanceTransaction.Type toDomain() {
             return switch (this) {
-                case ALLOCATION -> SponsorAccount.AllowanceTransaction.Type.ALLOCATION;
-                case ALLOWANCE -> SponsorAccount.AllowanceTransaction.Type.ALLOWANCE;
+                case MINT -> SponsorAccount.AllowanceTransaction.Type.MINT;
+                case BURN -> SponsorAccount.AllowanceTransaction.Type.BURN;
+                case TRANSFER -> SponsorAccount.AllowanceTransaction.Type.TRANSFER;
+                case REFUND -> SponsorAccount.AllowanceTransaction.Type.REFUND;
             };
         }
 
         public static TransactionType of(SponsorAccount.AllowanceTransaction.Type type) {
             return switch (type) {
-                case ALLOWANCE -> ALLOWANCE;
-                case ALLOCATION -> ALLOCATION;
+                case MINT -> MINT;
+                case BURN -> BURN;
+                case TRANSFER -> TRANSFER;
+                case REFUND -> REFUND;
             };
         }
     }

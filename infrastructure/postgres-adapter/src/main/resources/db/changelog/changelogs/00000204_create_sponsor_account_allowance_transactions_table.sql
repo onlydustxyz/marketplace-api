@@ -25,7 +25,7 @@ WITH data AS (SELECT tech_created_at                                       AS ti
                 AND payload #>> '{event, to, type}' = 'PROJECT')
 INSERT
 INTO accounting.sponsor_account_allowance_transactions(id, account_id, amount, type, tech_created_at, project_id)
-SELECT gen_random_uuid(), sponsor_account_id, amount, 'ALLOCATION', timestamp, project_id
+SELECT gen_random_uuid(), sponsor_account_id, amount, 'TRANSFER', timestamp, project_id
 FROM data
 ;
 
@@ -39,7 +39,7 @@ WITH data AS (SELECT tech_created_at                                       AS ti
                 AND payload #>> '{event, to, type}' = 'SPONSOR_ACCOUNT')
 INSERT
 INTO accounting.sponsor_account_allowance_transactions(id, account_id, amount, type, tech_created_at, project_id)
-SELECT gen_random_uuid(), sponsor_account_id, -amount, 'ALLOCATION', timestamp, project_id
+SELECT gen_random_uuid(), sponsor_account_id, amount, 'REFUND', timestamp, project_id
 FROM data
 ;
 
@@ -51,7 +51,7 @@ WITH data AS (SELECT tech_created_at                                       AS ti
                 AND payload #>> '{event, account, type}' = 'SPONSOR_ACCOUNT')
 INSERT
 INTO accounting.sponsor_account_allowance_transactions(id, account_id, amount, type, tech_created_at)
-SELECT gen_random_uuid(), sponsor_account_id, amount, 'ALLOWANCE', timestamp
+SELECT gen_random_uuid(), sponsor_account_id, amount, 'MINT', timestamp
 FROM data
 ;
 
@@ -64,7 +64,7 @@ WITH data AS (SELECT tech_created_at                                       AS ti
                 AND payload #>> '{event, account, type}' = 'SPONSOR_ACCOUNT')
 INSERT
 INTO accounting.sponsor_account_allowance_transactions(id, account_id, amount, type, tech_created_at)
-SELECT gen_random_uuid(), sponsor_account_id, -amount, 'ALLOWANCE', timestamp
+SELECT gen_random_uuid(), sponsor_account_id, amount, 'BURN', timestamp
 FROM data
 ;
 
@@ -84,3 +84,12 @@ SELECT id              AS id,
        amount          AS amount,
        project_id      AS project_id
 FROM accounting.sponsor_account_allowance_transactions;
+
+UPDATE accounting.sponsor_account_transactions
+SET type = 'WITHDRAW'
+WHERE type = 'DEPOSIT'
+  AND amount < 0;
+
+UPDATE accounting.sponsor_account_transactions
+SET amount = -amount
+WHERE type IN ('SPEND', 'WITHDRAW');

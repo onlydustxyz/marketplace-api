@@ -75,7 +75,14 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     @Override
     public ResponseEntity<TransactionHistoryPageResponse> getSponsorTransactionHistory(UUID sponsorId, Integer pageIndex, Integer pageSize) {
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
-        final var page = accountingFacadePort.transactionHistory(SponsorId.of(sponsorId), sanitizedPageIndex, sanitizePageSize(pageSize));
+        final var page = accountingFacadePort.transactionHistory(
+                SponsorId.of(sponsorId),
+                List.of(HistoricalTransaction.Type.DEPOSIT,
+                        HistoricalTransaction.Type.WITHDRAW,
+                        HistoricalTransaction.Type.TRANSFER,
+                        HistoricalTransaction.Type.REFUND),
+                sanitizedPageIndex,
+                sanitizePageSize(pageSize));
         final var response = mapTransactionHistory(page, sanitizedPageIndex);
 
         return response.getTotalPageNumber() > 1 ?

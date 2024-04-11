@@ -18,7 +18,7 @@ public class AccountBookProjector implements AccountBookObserver {
         if (!to.isSponsorAccount()) return;
 
         final var account = getSponsorAccount(to);
-        account.getAllowanceTransactions().add(AllowanceTransaction.allowance(amount));
+        account.getAllowanceTransactions().add(AllowanceTransaction.mint(amount));
         sponsorAccountStorage.save(account);
     }
 
@@ -27,7 +27,7 @@ public class AccountBookProjector implements AccountBookObserver {
         if (!from.isSponsorAccount()) return;
 
         final var account = getSponsorAccount(from);
-        account.getAllowanceTransactions().add(AllowanceTransaction.allowance(amount.negate()));
+        account.getAllowanceTransactions().add(AllowanceTransaction.burn(amount));
         sponsorAccountStorage.save(account);
     }
 
@@ -37,7 +37,7 @@ public class AccountBookProjector implements AccountBookObserver {
         if (!to.isProject()) return;
 
         final var account = getSponsorAccount(from);
-        account.getAllowanceTransactions().add(AllowanceTransaction.allocation(amount, to.projectId()));
+        account.getAllowanceTransactions().add(AllowanceTransaction.transfer(amount, to.projectId()));
         sponsorAccountStorage.save(account);
     }
 
@@ -47,7 +47,7 @@ public class AccountBookProjector implements AccountBookObserver {
         if (!to.isSponsorAccount()) return;
 
         final var account = getSponsorAccount(to);
-        account.getAllowanceTransactions().add(AllowanceTransaction.allocation(amount.negate(), from.projectId()));
+        account.getAllowanceTransactions().add(AllowanceTransaction.refund(amount, from.projectId()));
         sponsorAccountStorage.save(account);
     }
 

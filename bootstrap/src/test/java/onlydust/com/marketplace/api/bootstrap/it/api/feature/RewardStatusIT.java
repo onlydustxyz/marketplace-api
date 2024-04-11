@@ -208,7 +208,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         final UUID strkId = currencyRepository.findByCode("STRK").orElseThrow().id();
         final SponsorAccountStatement strkSponsorAccount = accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
                 Currency.Id.of(strkId), null,
-                new SponsorAccount.Transaction(SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(), Amount.of(200000L),
+                new SponsorAccount.Transaction(SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(), PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
         accountingService.allocate(strkSponsorAccount.account().id(), ProjectId.of(projectId1), PositiveAmount.of(100000L), Currency.Id.of(strkId));
         accountingService.allocate(strkSponsorAccount.account().id(), ProjectId.of(projectId2), PositiveAmount.of(100000L), Currency.Id.of(strkId));

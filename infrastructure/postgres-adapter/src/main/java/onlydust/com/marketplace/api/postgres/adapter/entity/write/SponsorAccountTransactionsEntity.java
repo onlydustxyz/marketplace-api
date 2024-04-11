@@ -2,15 +2,12 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
-import onlydust.com.marketplace.accounting.domain.model.Amount;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -29,11 +26,11 @@ public class SponsorAccountTransactionsEntity {
     @NonNull UUID id;
     @NonNull UUID accountId;
 
-    @Enumerated(javax.persistence.EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     @Type(type = "transaction_type")
     @NonNull TransactionType type;
 
-    @Enumerated(javax.persistence.EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     @Type(type = "network")
     @NonNull NetworkEnumEntity network;
 
@@ -48,7 +45,7 @@ public class SponsorAccountTransactionsEntity {
                 type.toDomain(),
                 network.toNetwork(),
                 reference,
-                Amount.of(amount),
+                PositiveAmount.of(amount),
                 thirdPartyName,
                 thirdPartyAccountNumber);
     }
@@ -67,11 +64,12 @@ public class SponsorAccountTransactionsEntity {
     }
 
     public enum TransactionType {
-        DEPOSIT, SPEND;
+        DEPOSIT, WITHDRAW, SPEND;
 
         public SponsorAccount.Transaction.Type toDomain() {
             return switch (this) {
                 case DEPOSIT -> SponsorAccount.Transaction.Type.DEPOSIT;
+                case WITHDRAW -> SponsorAccount.Transaction.Type.WITHDRAW;
                 case SPEND -> SponsorAccount.Transaction.Type.SPEND;
             };
         }
@@ -79,6 +77,7 @@ public class SponsorAccountTransactionsEntity {
         public static TransactionType of(SponsorAccount.Transaction.Type type) {
             return switch (type) {
                 case DEPOSIT -> DEPOSIT;
+                case WITHDRAW -> WITHDRAW;
                 case SPEND -> SPEND;
             };
         }

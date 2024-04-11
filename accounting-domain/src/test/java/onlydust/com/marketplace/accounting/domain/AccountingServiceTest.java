@@ -67,7 +67,9 @@ public class AccountingServiceTest {
     }
 
     private Transaction fakeTransaction(Network network, Amount amount) {
-        return new Transaction(Transaction.Type.DEPOSIT, fakePaymentReference(network), amount);
+        return amount.isPositive() ?
+                new Transaction(Transaction.Type.DEPOSIT, fakePaymentReference(network), PositiveAmount.of(amount)) :
+                new Transaction(Transaction.Type.WITHDRAW, fakePaymentReference(network), PositiveAmount.of(amount.negate()));
     }
 
     private void assertOnRewardCreated(RewardId rewardId, boolean isFunded, ZonedDateTime unlockDate, Set<Network> networks) {

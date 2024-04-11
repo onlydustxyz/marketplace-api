@@ -65,16 +65,18 @@ public class SponsorAccount {
     }
 
     public Amount balance() {
-        return transactions.stream()
-                .map(Transaction::amount)
-                .reduce(Amount.ZERO, Amount::add);
+        return initialBalance().subtract(total(Transaction.Type.SPEND));
     }
 
     public Amount initialBalance() {
+        return total(Transaction.Type.DEPOSIT).subtract(total(Transaction.Type.WITHDRAW));
+    }
+
+    private PositiveAmount total(Transaction.Type... types) {
         return transactions.stream()
-                .filter(transaction -> transaction.type() == Transaction.Type.DEPOSIT)
+                .filter(transaction -> List.of(types).contains(transaction.type))
                 .map(Transaction::amount)
-                .reduce(Amount.ZERO, Amount::add);
+                .reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
     public Optional<Network> network() {
@@ -124,14 +126,14 @@ public class SponsorAccount {
     @Accessors(fluent = true)
     @Getter
     public static class Transaction extends Payment.Reference {
-        private final @NonNull Amount amount;
+        private final @NonNull PositiveAmount amount;
         private final @NonNull Id id;
         final @NonNull Type type;
 
         public Transaction(
                 final @NonNull Type type,
                 final @NonNull Payment.Reference paymentReference,
-                final @NonNull Amount amount
+                final @NonNull PositiveAmount amount
         ) {
             this(type, paymentReference.network(), paymentReference.reference(), amount, paymentReference.thirdPartyName(),
                     paymentReference.thirdPartyAccountNumber());
@@ -141,7 +143,7 @@ public class SponsorAccount {
                 final @NonNull Type type,
                 final @NonNull Network network,
                 final @NonNull String reference,
-                final @NonNull Amount amount,
+                final @NonNull PositiveAmount amount,
                 final @NonNull String thirdPartyName,
                 final @NonNull String thirdPartyAccountNumber
         ) {
@@ -153,7 +155,7 @@ public class SponsorAccount {
                 final @NonNull Type type,
                 final @NonNull Network network,
                 final @NonNull String reference,
-                final @NonNull Amount amount,
+                final @NonNull PositiveAmount amount,
                 final @NonNull String thirdPartyName,
                 final @NonNull String thirdPartyAccountNumber
         ) {
@@ -178,26 +180,41 @@ public class SponsorAccount {
         }
 
         public enum Type {
-            DEPOSIT, // Money received/refunded from the sponsor
-            SPEND // Money spent to pay rewards
+            DEPOSIT, // Money received from the sponsor
+            WITHDRAW, // Money refunded to the sponsor
+            SPEND; // Money spent to pay rewards
+
+            public boolean isDebit() {
+                return List.of(WITHDRAW, SPEND).contains(this);
+            }
         }
     }
 
     public record AllowanceTransaction(@NonNull Transaction.Id id,
                                        @NonNull Type type,
-                                       @NonNull Amount amount,
+                                       @NonNull PositiveAmount amount,
                                        ProjectId projectId) {
-        public static AllowanceTransaction allowance(@NonNull Amount amount) {
-            return new AllowanceTransaction(Transaction.Id.random(), Type.ALLOWANCE, amount, null);
+        public static AllowanceTransaction mint(@NonNull PositiveAmount amount) {
+            return new AllowanceTransaction(Transaction.Id.random(), Type.MINT, amount, null);
         }
 
-        public static AllowanceTransaction allocation(@NonNull Amount amount, @NonNull ProjectId projectId) {
-            return new AllowanceTransaction(Transaction.Id.random(), Type.ALLOCATION, amount, projectId);
+        public static AllowanceTransaction burn(@NonNull PositiveAmount amount) {
+            return new AllowanceTransaction(Transaction.Id.random(), Type.BURN, amount, null);
+        }
+
+        public static AllowanceTransaction transfer(@NonNull PositiveAmount amount, @NonNull ProjectId projectId) {
+            return new AllowanceTransaction(Transaction.Id.random(), Type.TRANSFER, amount, projectId);
+        }
+
+        public static AllowanceTransaction refund(@NonNull PositiveAmount amount, @NonNull ProjectId projectId) {
+            return new AllowanceTransaction(Transaction.Id.random(), Type.REFUND, amount, projectId);
         }
 
         public enum Type {
-            ALLOWANCE, // Money the sponsor is allowed to allocate to a project
-            ALLOCATION // Money allocated to a project
+            MINT, // Money the sponsor is allowed to allocate to a project
+            BURN, // Allowance removed from sponsor
+            TRANSFER, // Money allocated to a project
+            REFUND // Money unallocated to project
         }
     }
 }

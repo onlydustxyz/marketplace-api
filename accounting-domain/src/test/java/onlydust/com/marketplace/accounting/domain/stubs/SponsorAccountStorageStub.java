@@ -38,7 +38,8 @@ public class SponsorAccountStorageStub implements SponsorAccountStorage {
     }
 
     @Override
-    public Page<HistoricalTransaction> transactionsOf(SponsorId sponsorId, Integer pageIndex, Integer pageSize) {
+    public Page<HistoricalTransaction> transactionsOf(SponsorId sponsorId, List<HistoricalTransaction.Type> types, Integer pageIndex, Integer pageSize) {
         return null;
     }
+
 }

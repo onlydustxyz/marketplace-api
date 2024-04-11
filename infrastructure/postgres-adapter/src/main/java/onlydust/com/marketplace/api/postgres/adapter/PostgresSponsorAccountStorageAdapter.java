@@ -53,13 +53,10 @@ public class PostgresSponsorAccountStorageAdapter implements SponsorAccountStora
     }
 
     @Override
-    public Page<HistoricalTransaction> transactionsOf(SponsorId sponsorId, Integer pageIndex, Integer pageSize) {
-        final var types = List.of(
-                SponsorAccountTransactionViewEntity.TransactionType.DEPOSIT,
-                SponsorAccountTransactionViewEntity.TransactionType.ALLOCATION
-        );
+    public Page<HistoricalTransaction> transactionsOf(SponsorId sponsorId, List<HistoricalTransaction.Type> types, Integer pageIndex, Integer pageSize) {
         final var page = sponsorAccountTransactionViewRepository.findAllBySponsorAccountSponsorIdAndTypeIn(
-                sponsorId.value(), types, PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "timestamp")));
+                sponsorId.value(), types.stream().map(SponsorAccountTransactionViewEntity.TransactionType::of).toList(), PageRequest.of(pageIndex,
+                        pageSize, Sort.by(Sort.Direction.DESC, "timestamp")));
 
         return Page.<HistoricalTransaction>builder()
                 .content(page.getContent().stream().map(SponsorAccountTransactionViewEntity::toDomain).toList())
