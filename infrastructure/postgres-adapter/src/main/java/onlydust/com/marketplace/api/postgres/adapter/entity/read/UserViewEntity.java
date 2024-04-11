@@ -6,7 +6,7 @@ import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserProfileInfoEntity;
 import onlydust.com.marketplace.project.domain.model.UserRole;
 import org.hibernate.annotations.Parameter;
@@ -76,7 +76,7 @@ public class UserViewEntity implements Serializable {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "sponsor_id")
     )
-    List<SponsorEntity> sponsors;
+    List<SponsorViewEntity> sponsors;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

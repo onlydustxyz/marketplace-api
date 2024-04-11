@@ -24,11 +24,11 @@ public interface BackofficeFacadePort {
 
     Ecosystem createEcosystem(final Ecosystem ecosystem);
 
-    SponsorView createSponsor(String name, URI url, URI logoUrl);
+    BoSponsorView createSponsor(String name, URI url, URI logoUrl);
 
-    SponsorView updateSponsor(UUID sponsorId, String name, URI url, URI logoUrl);
+    BoSponsorView updateSponsor(UUID sponsorId, String name, URI url, URI logoUrl);
 
-    Optional<SponsorView> getSponsor(UUID sponsorId);
+    Optional<BoSponsorView> getSponsor(UUID sponsorId);
 
-    Page<SponsorView> listSponsors(int pageIndex, int pageSize, SponsorView.Filters filters);
+    Page<BoSponsorView> listSponsors(int pageIndex, int pageSize, BoSponsorView.Filters filters);
 }

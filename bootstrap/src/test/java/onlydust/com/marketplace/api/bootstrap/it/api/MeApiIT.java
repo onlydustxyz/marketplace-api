@@ -30,8 +30,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -58,8 +56,6 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     BillingProfileService billingProfileService;
     @Autowired
     AccountingService accountingService;
-    @Autowired
-    EntityManagerFactory entityManagerFactory;
 
     @Test
     void should_update_onboarding_state() {
@@ -701,20 +697,9 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                         }
                         """);
 
-        final EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-        em.createNativeQuery("""
-                        INSERT INTO sponsors_users
-                        SELECT id, :userId
-                        FROM sponsors
-                        ORDER BY name
-                        LIMIT 3
-                        """)
-                .setParameter("userId", authenticatedUser.user().getId())
-                .executeUpdate();
-        em.flush();
-        em.getTransaction().commit();
-        em.close();
+        addSponsorFor(authenticatedUser, SponsorId.of("58a0a05c-c81e-447c-910f-629817a987b8"));
+        addSponsorFor(authenticatedUser, SponsorId.of("85435c9b-da7f-4670-bf65-02b84c5da7f0"));
+        addSponsorFor(authenticatedUser, SponsorId.of("4202fd03-f316-458f-a642-421c7b3c7026"));
 
         // When user no sponsors
         client.get()

@@ -16,7 +16,6 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.view.ProjectSponsorView;
-import onlydust.com.marketplace.project.domain.view.backoffice.SponsorView;
 import onlydust.com.marketplace.project.domain.view.backoffice.UserView;
 import onlydust.com.marketplace.project.domain.view.backoffice.*;
 
@@ -138,7 +137,7 @@ public interface BackOfficeMapper {
         };
     }
 
-    static OldSponsorPage mapSponsorPageToContract(final Page<SponsorView> sponsorPage, int pageIndex) {
+    static OldSponsorPage mapSponsorPageToContract(final Page<BoSponsorView> sponsorPage, int pageIndex) {
         return new OldSponsorPage()
                 .sponsors(sponsorPage.getContent().stream().map(sponsor -> new OldSponsorPageItemResponse()
                         .id(sponsor.id())
@@ -153,7 +152,7 @@ public interface BackOfficeMapper {
                 .nextPageIndex(nextPageIndex(pageIndex, sponsorPage.getTotalPageNumber()));
     }
 
-    static SponsorResponse mapSponsorToResponse(final SponsorView sponsor) {
+    static SponsorResponse mapSponsorToResponse(final BoSponsorView sponsor) {
         return new SponsorResponse()
                 .id(sponsor.id())
                 .name(sponsor.name())
@@ -161,7 +160,7 @@ public interface BackOfficeMapper {
                 .logoUrl(sponsor.logoUrl());
     }
 
-    static SponsorDetailsResponse mapSponsorToDetailsResponse(final SponsorView sponsor, List<SponsorAccountStatement> accountStatements) {
+    static SponsorDetailsResponse mapSponsorToDetailsResponse(final BoSponsorView sponsor, List<SponsorAccountStatement> accountStatements) {
         final var emptyBudget = new SponsorBudgetResponse()
                 .initialBalance(BigDecimal.ZERO)
                 .currentBalance(BigDecimal.ZERO)

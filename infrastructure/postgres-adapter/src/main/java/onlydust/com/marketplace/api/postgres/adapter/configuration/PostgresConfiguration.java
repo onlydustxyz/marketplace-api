@@ -224,15 +224,16 @@ public class PostgresConfiguration {
 
     @Bean
     public PostgresBackofficeAdapter postgresBackofficeAdapter(final GithubRepositoryLinkedToProjectRepository githubRepositoryLinkedToProjectRepository,
-                                                               final BoSponsorRepository boSponsorRepository,
+                                                               final SponsorRepository sponsorRepository,
+                                                               final SponsorViewRepository sponsorViewRepository,
                                                                final ProjectLeadInvitationRepository projectLeadInvitationRepository,
                                                                final BoUserRepository boUserRepository,
                                                                final BoProjectRepository boProjectRepository,
                                                                final BoEcosystemRepository boEcosystemRepository,
                                                                final EcosystemRepository ecosystemRepository,
                                                                final ProjectRepository projectRepository) {
-        return new PostgresBackofficeAdapter(githubRepositoryLinkedToProjectRepository, boSponsorRepository, projectLeadInvitationRepository,
-                boUserRepository, boProjectRepository, boEcosystemRepository, ecosystemRepository, projectRepository);
+        return new PostgresBackofficeAdapter(githubRepositoryLinkedToProjectRepository, sponsorRepository, sponsorViewRepository,
+                projectLeadInvitationRepository, boUserRepository, boProjectRepository, boEcosystemRepository, ecosystemRepository, projectRepository);
     }
 
     @Bean
@@ -368,7 +369,7 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    PostgresSponsorAdapter postgresSponsorAdapter(final SponsorRepository sponsorRepository) {
-        return new PostgresSponsorAdapter(sponsorRepository);
+    PostgresSponsorAdapter postgresSponsorAdapter(final SponsorViewRepository sponsorViewRepository) {
+        return new PostgresSponsorAdapter(sponsorViewRepository);
     }
 }

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 @Value
 @EqualsAndHashCode
 @Accessors(fluent = true)
-public class SponsorView {
+public class BoSponsorView {
     UUID id;
     String name;
     String url;
@@ -21,7 +21,7 @@ public class SponsorView {
     @Getter(AccessLevel.NONE)
     Set<ProjectSponsorView> projects;
 
-    public SponsorView(UUID id, String name, String url, String logoUrl, Set<ProjectSponsorView> projects) {
+    public BoSponsorView(UUID id, String name, String url, String logoUrl, Set<ProjectSponsorView> projects) {
         this.id = id;
         this.name = name;
         this.url = url;

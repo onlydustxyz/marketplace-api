@@ -2716,6 +2716,34 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/sponsors/{sponsorId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Sponsors
+      summary: Get sponsor data
+      operationId: getSponsor
+      description: |
+        Get sponsor data
+      parameters:
+        - in: path
+          name: sponsorId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorId'
+      responses:
+        "200":
+          description: 'Sponsor data'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SponsorDetailsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -3419,6 +3447,25 @@ components:
           format: url
           description: Direct URL to sponsor's logo image
           example: 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png'
+
+    SponsorDetailsResponse:
+      allOf:
+        - $ref: '#/components/schemas/SponsorResponse'
+        - type: object
+          required:
+            - availableBudgets
+            - projects
+          properties:
+            availableBudgets:
+              type: array
+              items:
+                $ref: '#/components/schemas/SponsorBudgetResponse'
+            projects:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectWithBudgetResponse'
+
+
     EcosystemResponse:
       type: object
       required:
@@ -3662,6 +3709,17 @@ components:
         hasApplied:
           type: boolean
           description: Has the user applied to the project?
+
+    ProjectLinkResponse:
+      type: object
+      required:
+        - name
+        - logoUrl
+      properties:
+        name:
+          type: string
+        logoUrl:
+          type: string
 
     ShortProjectResponse:
       type: object
@@ -5923,3 +5981,28 @@ components:
       properties:
         hasAcceptedInvoiceMandate:
           type: boolean
+
+    SponsorBudgetResponse:
+      type: object
+      required:
+        - currency
+        - currentAllowance
+      properties:
+        currency:
+          $ref: '#/components/schemas/ShortCurrencyResponse'
+        currentAllowance:
+          type: number
+          description: This is the remaining amount of funds available for internal transactions between the sponsor and projects (and eventually contributors)
+
+    ProjectWithBudgetResponse:
+      allOf:
+        - $ref: '#/components/schemas/ProjectLinkResponse'
+        - type: object
+          required:
+            - remainingBudgets
+            - remainingBudgetUsdEquivalent
+          properties:
+            remainingBudgets:
+              type: array
+              items:
+                $ref: '#/components/schemas/Money'

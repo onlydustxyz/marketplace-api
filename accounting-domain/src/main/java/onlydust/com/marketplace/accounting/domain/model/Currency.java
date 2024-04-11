@@ -5,6 +5,7 @@ import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.*;
 import java.util.stream.Stream;
@@ -26,6 +27,7 @@ public class Currency implements Cloneable {
     @NonNull
     private Integer decimals;
     private final Metadata metadata;
+    private BigDecimal latestUsdQuote;
     @Builder.Default
     private final Set<ERC20> erc20 = Set.of();
 
@@ -102,6 +104,10 @@ public class Currency implements Cloneable {
 
     public Set<ERC20> erc20() {
         return erc20;
+    }
+
+    public Optional<BigDecimal> latestUsdQuote() {
+        return Optional.ofNullable(latestUsdQuote);
     }
 
     public List<Network> supportedNetworks() {

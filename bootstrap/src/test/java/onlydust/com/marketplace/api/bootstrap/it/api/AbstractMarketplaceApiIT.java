@@ -7,6 +7,7 @@ import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
 import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
 import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
@@ -32,6 +33,8 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.MountableFile;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
@@ -133,6 +136,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String BILLING_PROFILES_POST_COWORKER_INVITATIONS = "/api/v1/billing-profiles/%s/coworkers";
     protected static final String ME_BILLING_PROFILES_POST_COWORKER_INVITATIONS = "/api/v1/me/billing-profiles/%s/invitations";
     protected static final String BILLING_PROFILES_DELETE_COWORKER = "/api/v1/billing-profiles/%s/coworkers/%s";
+    protected static final String SPONSOR = "/api/v1/sponsors/%s";
 
     private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
             .withDatabaseName("marketplace_db")
@@ -201,6 +205,8 @@ public class AbstractMarketplaceApiIT {
 
     @Autowired
     AccountingHelper accountingHelper;
+    @Autowired
+    EntityManagerFactory entityManagerFactory;
 
     @BeforeAll
     static void beforeAll() throws IOException, InterruptedException {
@@ -269,5 +275,18 @@ public class AbstractMarketplaceApiIT {
                 .toUri();
     }
 
-
+    protected void addSponsorFor(UserAuthHelper.AuthenticatedUser user, SponsorId sponsorId) {
+        final EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+        em.createNativeQuery("""
+                        INSERT INTO sponsors_users
+                        VALUES (:sponsorId, :userId)
+                        """)
+                .setParameter("userId", user.user().getId())
+                .setParameter("sponsorId", sponsorId.value())
+                .executeUpdate();
+        em.flush();
+        em.getTransaction().commit();
+        em.close();
+    }
 }
