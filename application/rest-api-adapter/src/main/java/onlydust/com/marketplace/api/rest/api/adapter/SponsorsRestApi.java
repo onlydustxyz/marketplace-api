@@ -14,7 +14,6 @@ import onlydust.com.marketplace.api.contract.model.SponsorDetailsResponse;
 import onlydust.com.marketplace.api.contract.model.TransactionHistoryPageResponse;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SponsorMapper;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,8 +36,7 @@ public class SponsorsRestApi implements SponsorsApi {
     @Override
     public ResponseEntity<SponsorDetailsResponse> getSponsor(UUID sponsorId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var sponsor = sponsorFacadePort.getSponsor(UserId.of(authenticatedUser.getId()), SponsorId.of(sponsorId))
-                .orElseThrow(() -> OnlyDustException.notFound("Sponsor %s not found".formatted(sponsorId)));
+        final var sponsor = sponsorFacadePort.getSponsor(UserId.of(authenticatedUser.getId()), SponsorId.of(sponsorId));
         final var sponsorAccountStatements = accountingFacadePort.getSponsorAccounts(SponsorId.of(sponsorId));
         return ResponseEntity.ok(SponsorMapper.mapToSponsorDetailsResponse(sponsor, sponsorAccountStatements));
 

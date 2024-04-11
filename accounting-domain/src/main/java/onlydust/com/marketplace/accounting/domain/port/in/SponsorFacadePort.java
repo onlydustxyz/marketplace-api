@@ -7,10 +7,9 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Optional;
 
 public interface SponsorFacadePort {
-    Optional<SponsorView> getSponsor(UserId userId, SponsorId sponsorId);
+    SponsorView getSponsor(UserId userId, SponsorId sponsorId);
 
     Page<SponsorView> listSponsors(String search, int sanitizedPageIndex, int sanitizedPageSize);
 

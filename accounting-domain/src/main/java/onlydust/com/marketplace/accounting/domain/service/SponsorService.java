@@ -12,7 +12,6 @@ import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Optional;
 
 @AllArgsConstructor
 public class SponsorService implements SponsorFacadePort {
@@ -20,11 +19,12 @@ public class SponsorService implements SponsorFacadePort {
     private final ImageStoragePort imageStoragePort;
 
     @Override
-    public Optional<SponsorView> getSponsor(UserId userId, SponsorId sponsorId) {
+    public SponsorView getSponsor(UserId userId, SponsorId sponsorId) {
         if (!sponsorStoragePort.isAdmin(userId, sponsorId))
             throw OnlyDustException.forbidden("User %s is not admin of sponsor %s".formatted(userId, sponsorId));
 
-        return sponsorStoragePort.get(sponsorId);
+        return sponsorStoragePort.get(sponsorId)
+                .orElseThrow(() -> OnlyDustException.notFound("Sponsor %s not found".formatted(sponsorId)));
     }
 
     @Override
