@@ -5,6 +5,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
+import java.time.ZonedDateTime;
 import java.util.*;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
@@ -54,7 +55,7 @@ public class Payment {
         final var wallet = invoice.billingProfileSnapshot().wallet(network)
                 .orElseThrow(() -> internalServerError("Wallet not found for invoice %s on network %s".formatted(invoice.id(), network)));
 
-        return new Reference(network, transactionHash, invoice.billingProfileSnapshot().subject(), wallet.address());
+        return new Reference(ZonedDateTime.now(), network, transactionHash, invoice.billingProfileSnapshot().subject(), wallet.address());
     }
 
     public void referenceFor(@NonNull RewardId rewardId, Reference reference) {
@@ -81,6 +82,7 @@ public class Payment {
     @EqualsAndHashCode
     @ToString
     public static class Reference {
+        private final @NonNull ZonedDateTime timestamp;
         private final @NonNull Network network;
         private final @NonNull String reference;
         private final @NonNull String thirdPartyName;

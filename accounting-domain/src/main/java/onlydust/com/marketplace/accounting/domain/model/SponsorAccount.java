@@ -26,6 +26,8 @@ public class SponsorAccount {
 
     @Getter
     final @NonNull List<Transaction> transactions = new ArrayList<>();
+    @Getter
+    final @NonNull List<AllowanceTransaction> allowanceTransactions = new ArrayList<>();
 
     public SponsorAccount(final @NonNull SponsorId sponsorId, final @NonNull Currency currency, ZonedDateTime lockedUntil) {
         this.id = Id.random();
@@ -63,16 +65,18 @@ public class SponsorAccount {
     }
 
     public Amount balance() {
-        return transactions.stream()
-                .map(Transaction::amount)
-                .reduce(Amount.ZERO, Amount::add);
+        return initialBalance().subtract(total(Transaction.Type.SPEND));
     }
 
     public Amount initialBalance() {
+        return total(Transaction.Type.DEPOSIT).subtract(total(Transaction.Type.WITHDRAW));
+    }
+
+    private PositiveAmount total(Transaction.Type... types) {
         return transactions.stream()
-                .filter(transaction -> transaction.type() == Transaction.Type.DEPOSIT)
+                .filter(transaction -> List.of(types).contains(transaction.type))
                 .map(Transaction::amount)
-                .reduce(Amount.ZERO, Amount::add);
+                .reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
     public Optional<Network> network() {
@@ -122,40 +126,42 @@ public class SponsorAccount {
     @Accessors(fluent = true)
     @Getter
     public static class Transaction extends Payment.Reference {
-        private final @NonNull Amount amount;
+        private final @NonNull PositiveAmount amount;
         private final @NonNull Id id;
         final @NonNull Type type;
 
         public Transaction(
                 final @NonNull Type type,
                 final @NonNull Payment.Reference paymentReference,
-                final @NonNull Amount amount
+                final @NonNull PositiveAmount amount
         ) {
-            this(type, paymentReference.network(), paymentReference.reference(), amount, paymentReference.thirdPartyName(),
+            this(paymentReference.timestamp(), type, paymentReference.network(), paymentReference.reference(), amount, paymentReference.thirdPartyName(),
                     paymentReference.thirdPartyAccountNumber());
         }
 
         public Transaction(
+                final @NonNull ZonedDateTime timestamp,
                 final @NonNull Type type,
                 final @NonNull Network network,
                 final @NonNull String reference,
-                final @NonNull Amount amount,
+                final @NonNull PositiveAmount amount,
                 final @NonNull String thirdPartyName,
                 final @NonNull String thirdPartyAccountNumber
         ) {
-            this(Id.random(), type, network, reference, amount, thirdPartyName, thirdPartyAccountNumber);
+            this(Id.random(), timestamp, type, network, reference, amount, thirdPartyName, thirdPartyAccountNumber);
         }
 
         public Transaction(
                 final @NonNull Id id,
+                final @NonNull ZonedDateTime timestamp,
                 final @NonNull Type type,
                 final @NonNull Network network,
                 final @NonNull String reference,
-                final @NonNull Amount amount,
+                final @NonNull PositiveAmount amount,
                 final @NonNull String thirdPartyName,
                 final @NonNull String thirdPartyAccountNumber
         ) {
-            super(network, reference, thirdPartyName, thirdPartyAccountNumber);
+            super(timestamp, network, reference, thirdPartyName, thirdPartyAccountNumber);
             this.amount = amount;
             this.id = id;
             this.type = type;
@@ -176,8 +182,42 @@ public class SponsorAccount {
         }
 
         public enum Type {
-            DEPOSIT, // Money received/refunded from the sponsor
-            SPEND // Money spent to pay rewards
+            DEPOSIT, // Money received from the sponsor
+            WITHDRAW, // Money refunded to the sponsor
+            SPEND; // Money spent to pay rewards
+
+            public boolean isDebit() {
+                return List.of(WITHDRAW, SPEND).contains(this);
+            }
+        }
+    }
+
+    public record AllowanceTransaction(@NonNull Transaction.Id id,
+                                       @NonNull ZonedDateTime timestamp,
+                                       @NonNull Type type,
+                                       @NonNull PositiveAmount amount,
+                                       ProjectId projectId) {
+        public static AllowanceTransaction mint(@NonNull ZonedDateTime timestamp, @NonNull PositiveAmount amount) {
+            return new AllowanceTransaction(Transaction.Id.random(), timestamp, Type.MINT, amount, null);
+        }
+
+        public static AllowanceTransaction burn(@NonNull ZonedDateTime timestamp, @NonNull PositiveAmount amount) {
+            return new AllowanceTransaction(Transaction.Id.random(), timestamp, Type.BURN, amount, null);
+        }
+
+        public static AllowanceTransaction transfer(@NonNull ZonedDateTime timestamp, @NonNull PositiveAmount amount, @NonNull ProjectId projectId) {
+            return new AllowanceTransaction(Transaction.Id.random(), timestamp, Type.TRANSFER, amount, projectId);
+        }
+
+        public static AllowanceTransaction refund(@NonNull ZonedDateTime timestamp, @NonNull PositiveAmount amount, @NonNull ProjectId projectId) {
+            return new AllowanceTransaction(Transaction.Id.random(), timestamp, Type.REFUND, amount, projectId);
+        }
+
+        public enum Type {
+            MINT, // Money the sponsor is allowed to allocate to a project
+            BURN, // Allowance removed from sponsor
+            TRANSFER, // Money allocated to a project
+            REFUND // Money unallocated to project
         }
     }
 }

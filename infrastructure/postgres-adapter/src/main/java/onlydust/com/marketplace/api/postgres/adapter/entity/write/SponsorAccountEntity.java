@@ -9,7 +9,8 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toUnmodifiableSet;
 
 @Entity
 @AllArgsConstructor
@@ -32,10 +33,16 @@ public class SponsorAccountEntity {
     @Builder.Default
     Set<SponsorAccountTransactionsEntity> transactions = new HashSet<>();
 
+
+    @OneToMany(mappedBy = "accountId", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @Builder.Default
+    Set<SponsorAccountAllowanceTransactionsEntity> allowanceTransactions = new HashSet<>();
+
     public SponsorAccount toDomain() {
-        final var ledger = new SponsorAccount(SponsorAccount.Id.of(id), SponsorId.of(sponsorId), currency.toDomain(), lockedUntil);
-        ledger.getTransactions().addAll(transactions.stream().map(SponsorAccountTransactionsEntity::toTransaction).toList());
-        return ledger;
+        final var sponsorAccount = new SponsorAccount(SponsorAccount.Id.of(id), SponsorId.of(sponsorId), currency.toDomain(), lockedUntil);
+        sponsorAccount.getTransactions().addAll(transactions.stream().map(SponsorAccountTransactionsEntity::toDomain).toList());
+        sponsorAccount.getAllowanceTransactions().addAll(allowanceTransactions.stream().map(SponsorAccountAllowanceTransactionsEntity::toDomain).toList());
+        return sponsorAccount;
     }
 
     public static SponsorAccountEntity of(SponsorAccount sponsorAccount) {
@@ -44,7 +51,12 @@ public class SponsorAccountEntity {
                 .currency(CurrencyEntity.of(sponsorAccount.currency()))
                 .lockedUntil(sponsorAccount.lockedUntil().orElse(null))
                 .sponsorId(sponsorAccount.sponsorId().value())
-                .transactions(sponsorAccount.getTransactions().stream().map(t -> SponsorAccountTransactionsEntity.of(sponsorAccount.id(), t)).collect(Collectors.toUnmodifiableSet()))
+                .transactions(sponsorAccount.getTransactions().stream()
+                        .map(t -> SponsorAccountTransactionsEntity.of(sponsorAccount.id(), t))
+                        .collect(toUnmodifiableSet()))
+                .allowanceTransactions(sponsorAccount.getAllowanceTransactions().stream()
+                        .map(t -> SponsorAccountAllowanceTransactionsEntity.of(sponsorAccount.id(), t))
+                        .collect(toUnmodifiableSet()))
                 .build();
     }
 }

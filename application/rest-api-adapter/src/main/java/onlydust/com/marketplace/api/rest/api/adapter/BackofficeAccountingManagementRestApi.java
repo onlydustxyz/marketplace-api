@@ -17,12 +17,14 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.BatchPaymentMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
+import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -75,7 +77,18 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     @Override
     public ResponseEntity<TransactionHistoryPageResponse> getSponsorTransactionHistory(UUID sponsorId, Integer pageIndex, Integer pageSize) {
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
-        final var page = accountingFacadePort.transactionHistory(SponsorId.of(sponsorId), sanitizedPageIndex, sanitizePageSize(pageSize));
+        final var page = accountingFacadePort.transactionHistory(
+                SponsorId.of(sponsorId),
+                HistoricalTransaction.Filters.builder()
+                        .types(List.of(HistoricalTransaction.Type.DEPOSIT,
+                                HistoricalTransaction.Type.WITHDRAW,
+                                HistoricalTransaction.Type.TRANSFER,
+                                HistoricalTransaction.Type.REFUND))
+                        .build(),
+                sanitizedPageIndex,
+                sanitizePageSize(pageSize),
+                HistoricalTransaction.Sort.DATE,
+                SortDirection.desc);
         final var response = mapTransactionHistory(page, sanitizedPageIndex);
 
         return response.getTotalPageNumber() > 1 ?
@@ -146,7 +159,9 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
         final var recipient = userFacadePort.getProfileById(reward.recipientId());
 
-        final var paymentReference = new Payment.Reference(mapTransactionNetwork(payRewardRequest.getNetwork()),
+        final var paymentReference = new Payment.Reference(
+                ZonedDateTime.now(),
+                mapTransactionNetwork(payRewardRequest.getNetwork()),
                 payRewardRequest.getReference(),
                 recipient.getLogin(),
                 payRewardRequest.getRecipientAccount());

@@ -5,10 +5,12 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookObserver;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.ReadOnlyAccountBookState;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
@@ -32,6 +34,7 @@ public class AccountingService implements AccountingFacadePort {
     private final AccountingObserverPort accountingObserver;
     private final ProjectAccountingObserver projectAccountingObserver;
     private final InvoiceStoragePort invoiceStoragePort;
+    private final AccountBookObserver accountBookObserver;
 
     @Override
     @Transactional
@@ -195,7 +198,7 @@ public class AccountingService implements AccountingFacadePort {
                 .entrySet()
                 .stream().map(e -> Map.entry(
                         mustGetSponsorAccount(e.getKey().sponsorAccountId()),
-                        new SponsorAccount.Transaction(SPEND, paymentReference, e.getValue().negate())
+                        new SponsorAccount.Transaction(SPEND, paymentReference, e.getValue())
                 ))
                 .filter(e -> paymentReference.network().equals(e.getKey().network().orElse(null)))
                 .collect(toMap(Map.Entry::getKey, Map.Entry::getValue))
@@ -304,7 +307,8 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     private void saveAccountBook(Currency currency, AccountBookAggregate accountBook) {
-        accountBookProvider.save(currency, accountBook);
+        final var events = accountBookProvider.save(currency, accountBook);
+        events.forEach(accountBookObserver::on);
     }
 
     private AccountBookAggregate getAccountBook(Currency.Id currencyId) {
@@ -361,8 +365,8 @@ public class AccountingService implements AccountingFacadePort {
             final var sponsorAccount = sponsorAccount(sponsorAccountId);
 
             final var sponsorAccountNetwork = sponsorAccount.network().orElseThrow();
-            sponsorAccount.add(new SponsorAccount.Transaction(SPEND, sponsorAccountNetwork, rewardId.toString(),
-                    amount.negate(), "", ""));
+            sponsorAccount.add(new SponsorAccount.Transaction(ZonedDateTime.now(), SPEND, sponsorAccountNetwork, rewardId.toString(),
+                    amount, "", ""));
         }
 
         private PayableReward createPayableReward(SponsorAccount.Id sponsorAccountId, RewardId rewardId, PositiveAmount amount) {
@@ -390,8 +394,13 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public Page<HistoricalTransaction> transactionHistory(SponsorId sponsorId, Integer pageIndex, Integer pageSize) {
-        return sponsorAccountStorage.transactionsOf(sponsorId, pageIndex, pageSize);
+    public Page<HistoricalTransaction> transactionHistory(@NonNull SponsorId sponsorId,
+                                                          @NonNull HistoricalTransaction.Filters filters,
+                                                          @NonNull Integer pageIndex,
+                                                          @NonNull Integer pageSize,
+                                                          @NonNull HistoricalTransaction.Sort sort,
+                                                          @NonNull SortDirection direction) {
+        return sponsorAccountStorage.transactionsOf(sponsorId, filters, pageIndex, pageSize, sort, direction);
     }
 
     @Override

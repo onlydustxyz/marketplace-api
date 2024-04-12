@@ -1,11 +1,13 @@
 package onlydust.com.marketplace.accounting.domain.stubs;
 
+import lombok.NonNull;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.HistoricalTransaction;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
 import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.SortDirection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +40,9 @@ public class SponsorAccountStorageStub implements SponsorAccountStorage {
     }
 
     @Override
-    public Page<HistoricalTransaction> transactionsOf(SponsorId sponsorId, Integer pageIndex, Integer pageSize) {
+    public Page<HistoricalTransaction> transactionsOf(@NonNull SponsorId sponsorId, HistoricalTransaction.@NonNull Filters filters,
+                                                      @NonNull Integer pageIndex, @NonNull Integer pageSize, HistoricalTransaction.@NonNull Sort sort,
+                                                      @NonNull SortDirection direction) {
         return null;
     }
 }

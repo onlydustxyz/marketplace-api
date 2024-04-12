@@ -5,6 +5,7 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount.Transaction;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.*;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookObserver;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
@@ -16,8 +17,8 @@ import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.ProjectAccountingObserver;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
-import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
+import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.accounting.domain.stubs.AccountBookEventStorageStub;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.stubs.ERC20Tokens;
@@ -47,6 +48,7 @@ public class AccountingServiceTest {
     final AccountingObserverPort accountingObserver = mock(AccountingObserverPort.class);
     final ProjectAccountingObserver projectAccountingObserver = mock(ProjectAccountingObserver.class);
     final InvoiceStoragePort invoiceStoragePort = mock(InvoiceStoragePort.class);
+    AccountBookObserver accountBookObserver = mock(AccountBookObserver.class);
     AccountBookEventStorageStub accountBookEventStorage;
     AccountingService accountingService;
     final Faker faker = new Faker();
@@ -61,11 +63,13 @@ public class AccountingServiceTest {
             .rewards(List.of());
 
     private Payment.Reference fakePaymentReference(Network network) {
-        return new Payment.Reference(network, faker.random().hex(), faker.rickAndMorty().character(), faker.internet().slug() + ".eth");
+        return new Payment.Reference(ZonedDateTime.now(), network, faker.random().hex(), faker.rickAndMorty().character(), faker.internet().slug() + ".eth");
     }
 
     private Transaction fakeTransaction(Network network, Amount amount) {
-        return new Transaction(Transaction.Type.DEPOSIT, fakePaymentReference(network), amount);
+        return amount.isPositive() ?
+                new Transaction(Transaction.Type.DEPOSIT, fakePaymentReference(network), PositiveAmount.of(amount)) :
+                new Transaction(Transaction.Type.WITHDRAW, fakePaymentReference(network), PositiveAmount.of(amount.negate()));
     }
 
     private void assertOnRewardCreated(RewardId rewardId, boolean isFunded, ZonedDateTime unlockDate, Set<Network> networks) {
@@ -85,8 +89,8 @@ public class AccountingServiceTest {
 
     private void setupAccountingService() {
         accountBookEventStorage = new AccountBookEventStorageStub();
-        accountingService = new AccountingService(new CachedAccountBookProvider(accountBookEventStorage), sponsorAccountStorage, currencyStorage, accountingObserver,
-                projectAccountingObserver, invoiceStoragePort);
+        accountingService = new AccountingService(new CachedAccountBookProvider(accountBookEventStorage), sponsorAccountStorage, currencyStorage,
+                accountingObserver, projectAccountingObserver, invoiceStoragePort, accountBookObserver);
     }
 
     @BeforeEach
@@ -164,14 +168,16 @@ public class AccountingServiceTest {
             final var sponsorAccount = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, currency.id(), null, amountToMint);
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(IdentifiedAccountBookEvent.of(1,
-                    new MintEvent(AccountId.of(sponsorAccount.account().id()), amountToMint)));
+            final var event = IdentifiedAccountBookEvent.of(1, new MintEvent(AccountId.of(sponsorAccount.account().id()), amountToMint));
+            assertThat(accountBookEventStorage.events.get(currency)).contains(event);
             assertThat(sponsorAccount.account().unlockedBalance()).isEqualTo(Amount.ZERO);
             assertThat(sponsorAccount.account().currency()).isEqualTo(currency);
             assertThat(sponsorAccount.account().sponsorId()).isEqualTo(sponsorId);
             assertThat(sponsorAccount.account().network()).isEmpty();
             assertThat(sponsorAccount.account().lockedUntil()).isEmpty();
             assertThat(sponsorAccount.allowance()).isEqualTo(amountToMint);
+
+            verify(accountBookObserver).on(event);
         }
 
         /*
@@ -190,8 +196,8 @@ public class AccountingServiceTest {
             verify(accountingObserver).onSponsorAccountBalanceChanged(sponsorAccount);
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(
-                    IdentifiedAccountBookEvent.of(1, new MintEvent(AccountId.of(sponsorAccount.account().id()), PositiveAmount.of(amount))));
+            final var event = IdentifiedAccountBookEvent.of(1, new MintEvent(AccountId.of(sponsorAccount.account().id()), PositiveAmount.of(amount)));
+            assertThat(accountBookEventStorage.events.get(currency)).contains(event);
             assertThat(sponsorAccount.account().unlockedBalance()).isEqualTo(amount);
             assertThat(sponsorAccount.account().currency()).isEqualTo(currency);
             assertThat(sponsorAccount.account().sponsorId()).isEqualTo(sponsorId);
@@ -207,6 +213,8 @@ public class AccountingServiceTest {
             assertThat(savedAccount.network()).isEqualTo(sponsorAccount.account().network());
             assertThat(savedAccount.getTransactions()).isEqualTo(sponsorAccount.account().getTransactions());
             assertThat(savedAccount.lockedUntil()).isEqualTo(sponsorAccount.account().lockedUntil());
+
+            verify(accountBookObserver).on(event);
         }
 
         /*
@@ -311,10 +319,12 @@ public class AccountingServiceTest {
             }
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(
+            final var events = List.of(
                     IdentifiedAccountBookEvent.of(2, new MintEvent(AccountId.of(sponsorAccount.id()), amount)),
                     IdentifiedAccountBookEvent.of(3, new RefundEvent(AccountId.of(sponsorAccount.id()), AccountId.ROOT, amount))
             );
+            assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
+            events.forEach(e -> verify(accountBookObserver).on(e));
         }
 
         /*
@@ -345,10 +355,12 @@ public class AccountingServiceTest {
             accountingService.unallocate(projectId1, sponsorAccount.id(), amount, currency.id());
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(
+            final var events = List.of(
                     IdentifiedAccountBookEvent.of(2, new TransferEvent(AccountId.of(sponsorAccount.id()), AccountId.of(projectId1), amount)),
                     IdentifiedAccountBookEvent.of(3, new RefundEvent(AccountId.of(projectId1), AccountId.of(sponsorAccount.id()), amount))
             );
+            assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
+            events.forEach(e -> verify(accountBookObserver).on(e));
         }
 
         /*
@@ -453,10 +465,12 @@ public class AccountingServiceTest {
             accountingService.pay(rewardId2, fakePaymentReference(Network.ETHEREUM));
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(
+            final var events = List.of(
                     IdentifiedAccountBookEvent.of(2, new TransferEvent(AccountId.of(sponsorAccount.id()), AccountId.of(projectId2), PositiveAmount.of(100L))),
                     IdentifiedAccountBookEvent.of(3, new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(100L)))
             );
+            assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
+            events.forEach(e -> verify(accountBookObserver).on(e));
 
             assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
         }
@@ -533,11 +547,13 @@ public class AccountingServiceTest {
 
             // Then
             verify(projectAccountingObserver).onAllowanceUpdated(projectId1, currency.id(), PositiveAmount.of(100L), PositiveAmount.of(100L));
-            assertThat(accountBookEventStorage.events.get(currency)).contains(
+            final var events = List.of(
                     IdentifiedAccountBookEvent.of(2, new TransferEvent(AccountId.of(sponsorAccount.id()), AccountId.of(projectId1), PositiveAmount.of(100L))),
                     IdentifiedAccountBookEvent.of(3, new TransferEvent(AccountId.of(projectId1), AccountId.of(rewardId1), PositiveAmount.of(40L))),
                     IdentifiedAccountBookEvent.of(4, new FullRefundEvent(AccountId.of(rewardId1)))
             );
+            assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
+            events.forEach(e -> verify(accountBookObserver).on(e));
         }
 
         @Test
@@ -606,10 +622,12 @@ public class AccountingServiceTest {
             accountingService.increaseAllowance(sponsorAccount.id(), amount.negate());
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(
+            final var events = List.of(
                     IdentifiedAccountBookEvent.of(2, new MintEvent(AccountId.of(sponsorAccount.id()), amount)),
                     IdentifiedAccountBookEvent.of(3, new RefundEvent(AccountId.of(sponsorAccount.id()), AccountId.ROOT, amount))
             );
+            assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
+            events.forEach(e -> verify(accountBookObserver).on(e));
         }
 
         /*
@@ -627,10 +645,12 @@ public class AccountingServiceTest {
             accountingService.unallocate(projectId1, sponsorAccount.id(), amount, currency.id());
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(
+            final var events = List.of(
                     IdentifiedAccountBookEvent.of(2, new TransferEvent(AccountId.of(sponsorAccount.id()), AccountId.of(projectId1), amount)),
                     IdentifiedAccountBookEvent.of(3, new RefundEvent(AccountId.of(projectId1), AccountId.of(sponsorAccount.id()), amount))
             );
+            assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
+            events.forEach(e -> verify(accountBookObserver).on(e));
         }
 
         /*
@@ -685,10 +705,12 @@ public class AccountingServiceTest {
             assertOnRewardCreated(rewardId2, true, unlockDate, Set.of(network));
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(
+            final var events = List.of(
                     IdentifiedAccountBookEvent.of(2, new TransferEvent(AccountId.of(sponsorAccount.id()), AccountId.of(projectId2), PositiveAmount.of(100L))),
                     IdentifiedAccountBookEvent.of(3, new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(100L)))
             );
+            assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
+            events.forEach(e -> verify(accountBookObserver).on(e));
 
             assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
         }
@@ -946,7 +968,7 @@ public class AccountingServiceTest {
 
             // Then
             verify(projectAccountingObserver).onAllowanceUpdated(projectId, currency.id(), PositiveAmount.of(300L), PositiveAmount.of(300L));
-            assertThat(accountBookEventStorage.events.get(currency)).contains(
+            final var events = List.of(
                     IdentifiedAccountBookEvent.of(6, new TransferEvent(AccountId.of(unlockedSponsorSponsorAccount1.id()), AccountId.of(projectId),
                             PositiveAmount.of(200L))),
                     IdentifiedAccountBookEvent.of(7, new TransferEvent(AccountId.of(unlockedSponsorSponsorAccount2.id()), AccountId.of(projectId),
@@ -954,6 +976,8 @@ public class AccountingServiceTest {
                     IdentifiedAccountBookEvent.of(8, new TransferEvent(AccountId.of(projectId), AccountId.of(rewardId), PositiveAmount.of(250L))),
                     IdentifiedAccountBookEvent.of(9, new FullRefundEvent(AccountId.of(rewardId)))
             );
+            assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
+            events.forEach(e -> verify(accountBookObserver).on(e));
         }
     }
 
@@ -1432,7 +1456,6 @@ public class AccountingServiceTest {
         assertAccount(sponsor2Account1, 0L, 500L, 500L);
         assertAccount(sponsor2Account2, 15_000L, 48_500L, 48_500L);
 
-        int i = 1;
         assertThat(accountBookEventStorage.events.get(currency).stream().map(IdentifiedAccountBookEvent::data)).containsExactlyInAnyOrder(
                 new MintEvent(AccountId.of(sponsor1Account1), PositiveAmount.of(10_000L)),
                 new MintEvent(AccountId.of(sponsor2Account1), PositiveAmount.of(3_000L)),
@@ -1453,6 +1476,8 @@ public class AccountingServiceTest {
                 new BurnEvent(AccountId.of(payment1.id()), PositiveAmount.of(6_000L)),
                 new BurnEvent(AccountId.of(payment2.id()), PositiveAmount.of(1_500L))
         );
+
+        verify(accountBookObserver, times(18)).on(any());
     }
 
     private void assertAccount(SponsorAccount.Id sponsorAccountId, Long expectedAllowance, Long expectedBalance, Long expectedUnlockedBalance) {

@@ -5,6 +5,7 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookObserver;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
@@ -42,6 +43,7 @@ public class AccountingServiceConcurrencyTest {
     final AccountingObserverPort accountingObserver = mock(AccountingObserverPort.class);
     final ProjectAccountingObserver projectAccountingObserver = mock(ProjectAccountingObserver.class);
     final InvoiceStoragePort invoiceStoragePort = mock(InvoiceStoragePort.class);
+    final AccountBookObserver accountBookObserver = mock(AccountBookObserver.class);
     SponsorAccount sponsorAccount;
     final Currency currency = Currencies.USDC;
     final SponsorId sponsorId = SponsorId.random();
@@ -67,7 +69,7 @@ public class AccountingServiceConcurrencyTest {
             accountBookEventStorage = new AccountBookEventStorageStub();
             cachedAccountBookProvider = new CachedAccountBookProvider(accountBookEventStorage);
             accountingService = new AccountingService(cachedAccountBookProvider, sponsorAccountStorage, currencyStorage, accountingObserver,
-                    projectAccountingObserver, invoiceStoragePort);
+                    projectAccountingObserver, invoiceStoragePort, accountBookObserver);
         }
 
         @BeforeEach
@@ -130,7 +132,7 @@ public class AccountingServiceConcurrencyTest {
             for (int i = 0; i < INSTANCE_COUNT; i++) {
                 accountBookProviders.add(new CachedAccountBookProvider(accountBookEventStorage));
                 accountingServices.add(new AccountingService(accountBookProviders.get(i), sponsorAccountStorage, currencyStorage, accountingObserver,
-                        projectAccountingObserver, invoiceStoragePort));
+                        projectAccountingObserver, invoiceStoragePort, accountBookObserver));
             }
         }
 

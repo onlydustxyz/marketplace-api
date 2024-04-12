@@ -14,6 +14,7 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,7 @@ public class AccountBookTest {
     public static AccountBookAggregate accountBookFromEvents(final @NonNull List<AccountBookEvent> events) {
         List<IdentifiedAccountBookEvent> identifiedAccountBookEvents = new ArrayList<>();
         for (int i = 0; i < events.size(); i++) {
-            identifiedAccountBookEvents.add(new IdentifiedAccountBookEvent<>(i + 1, events.get(i)));
+            identifiedAccountBookEvents.add(new IdentifiedAccountBookEvent<>(i + 1, ZonedDateTime.now().minusMinutes(10).plusSeconds(i), events.get(i)));
         }
         return AccountBookAggregate.fromEvents(identifiedAccountBookEvents);
     }
@@ -393,8 +394,8 @@ public class AccountBookTest {
         assertThat(accountBook.state().balanceOf(account3)).isEqualTo(PositiveAmount.of(80L));
 
         assertThat(accountBook.pendingEvents()).containsExactly(
-                new IdentifiedAccountBookEvent<>(3, new TransferEvent(account1, account3, PositiveAmount.of(50L))),
-                new IdentifiedAccountBookEvent<>(4, new TransferEvent(account2, account3, PositiveAmount.of(30L)))
+                new IdentifiedAccountBookEvent<>(3, ZonedDateTime.now(), new TransferEvent(account1, account3, PositiveAmount.of(50L))),
+                new IdentifiedAccountBookEvent<>(4, ZonedDateTime.now(), new TransferEvent(account2, account3, PositiveAmount.of(30L)))
         );
     }
 
@@ -418,8 +419,8 @@ public class AccountBookTest {
         assertThat(accountBook.state().balanceOf(account3)).isEqualTo(PositiveAmount.of(30L));
 
         assertThat(accountBook.pendingEvents()).containsExactly(
-                new IdentifiedAccountBookEvent<>(2, new TransferEvent(account1, account2, PositiveAmount.of(50L))),
-                new IdentifiedAccountBookEvent<>(3, new TransferEvent(account1, account3, PositiveAmount.of(30L)))
+                new IdentifiedAccountBookEvent<>(2, ZonedDateTime.now(), new TransferEvent(account1, account2, PositiveAmount.of(50L))),
+                new IdentifiedAccountBookEvent<>(3, ZonedDateTime.now(), new TransferEvent(account1, account3, PositiveAmount.of(30L)))
         );
     }
 
@@ -482,7 +483,7 @@ public class AccountBookTest {
         assertThat(accountBook.state().balanceOf(contributor)).isEqualTo(PositiveAmount.of(3_600L));
 
         assertThat(accountBook.pendingEvents()).containsExactly(
-                new IdentifiedAccountBookEvent<>(19, new RefundEvent(project2, committee2, PositiveAmount.of(700L)))
+                new IdentifiedAccountBookEvent<>(19, ZonedDateTime.now(), new RefundEvent(project2, committee2, PositiveAmount.of(700L)))
         );
     }
 

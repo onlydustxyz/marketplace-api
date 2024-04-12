@@ -2744,6 +2744,88 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/sponsors/{sponsorId}/transactions:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - Sponsors
+      summary: Get the list of all transactions related to this sponsor
+      operationId: getSponsorTransactionHistory
+      parameters:
+        - in: path
+          name: sponsorId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorId'
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: fromDate
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: toDate
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: currencies
+          description: Currency filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/CurrencyId'
+        - in: query
+          name: projects
+          description: Project filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: types
+          description: Transaction type filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/SponsorAccountTransactionType'
+        - in: query
+          name: sort
+          description: Sort order
+          schema:
+            enum:
+              - DATE
+              - TYPE
+              - AMOUNT
+              - PROJECT
+        - in: query
+          name: direction
+          schema:
+            enum:
+              - ASC
+              - DESC
+      responses:
+        "200":
+          description: 'The sponsor transaction history'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionHistoryPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -5106,7 +5188,7 @@ components:
         githubBody:
           type: string
           description: The body of the contribution.
-    
+
     RewardableItemsPageResponse:
       type: object
       required:
@@ -6006,3 +6088,52 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Money'
+
+    TransactionHistoryPageResponse:
+      type: object
+      required:
+        - transactions
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionHistoryPageItemResponse'
+
+    TransactionHistoryPageItemResponse:
+      type: object
+      required:
+        - date
+        - type
+        - amount
+        - currency
+      properties:
+        date:
+          type: string
+          format: date-time
+        type:
+          $ref: '#/components/schemas/SponsorAccountTransactionType'
+        project:
+          $ref: '#/components/schemas/ProjectLinkResponse'
+        amount:
+          $ref: '#/components/schemas/Money'
+
+    SponsorAccountTransactionType:
+      type: string
+      enum:
+        - DEPOSIT
+        - WITHDRAWAL
+        - ALLOCATION
+        - UNALLOCATION

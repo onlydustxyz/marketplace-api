@@ -70,10 +70,10 @@ public class AccountBookEventEntity {
     }
 
     public static AccountBookEventEntity of(UUID accountBookId, IdentifiedAccountBookEvent<?> event) {
-        return new AccountBookEventEntity(event.id(), accountBookId, ZonedDateTime.now(), new Payload(event.data()));
+        return new AccountBookEventEntity(event.id(), accountBookId, event.timestamp(), new Payload(event.data()));
     }
 
     public IdentifiedAccountBookEvent toIdentifiedAccountBookEvent() {
-        return new IdentifiedAccountBookEvent(id, payload.event);
+        return new IdentifiedAccountBookEvent(id, timestamp, payload.event);
     }
 }
