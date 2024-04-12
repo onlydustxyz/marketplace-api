@@ -3541,12 +3541,11 @@ components:
             availableBudgets:
               type: array
               items:
-                $ref: '#/components/schemas/SponsorBudgetResponse'
+                $ref: '#/components/schemas/Money'
             projects:
               type: array
               items:
                 $ref: '#/components/schemas/ProjectWithBudgetResponse'
-
 
     EcosystemResponse:
       type: object
@@ -6064,25 +6063,12 @@ components:
         hasAcceptedInvoiceMandate:
           type: boolean
 
-    SponsorBudgetResponse:
-      type: object
-      required:
-        - currency
-        - currentAllowance
-      properties:
-        currency:
-          $ref: '#/components/schemas/ShortCurrencyResponse'
-        currentAllowance:
-          type: number
-          description: This is the remaining amount of funds available for internal transactions between the sponsor and projects (and eventually contributors)
-
     ProjectWithBudgetResponse:
       allOf:
         - $ref: '#/components/schemas/ProjectLinkResponse'
         - type: object
           required:
             - remainingBudgets
-            - remainingBudgetUsdEquivalent
           properties:
             remainingBudgets:
               type: array

@@ -58,6 +58,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                           "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
                           "availableBudgets": [
                             {
+                              "amount": 0,
                               "currency": {
                                 "id": "48388edb-fda2-4a32-b228-28152a147500",
                                 "code": "APT",
@@ -65,9 +66,10 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": null,
                                 "decimals": 8
                               },
-                              "currentAllowance": 0
+                              "usdEquivalent": null
                             },
                             {
+                              "amount": 0,
                               "currency": {
                                 "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                 "code": "ETH",
@@ -75,9 +77,10 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": null,
                                 "decimals": 18
                               },
-                              "currentAllowance": 0
+                              "usdEquivalent": 0.00
                             },
                             {
+                              "amount": 0,
                               "currency": {
                                 "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
                                 "code": "OP",
@@ -85,9 +88,10 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": null,
                                 "decimals": 18
                               },
-                              "currentAllowance": 0
+                              "usdEquivalent": null
                             },
                             {
+                              "amount": 0,
                               "currency": {
                                 "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                 "code": "USD",
@@ -95,9 +99,10 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": null,
                                 "decimals": 2
                               },
-                              "currentAllowance": 0
+                              "usdEquivalent": 0
                             },
                             {
+                              "amount": 0,
                               "currency": {
                                 "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                 "code": "USDC",
@@ -105,7 +110,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                 "decimals": 6
                               },
-                              "currentAllowance": 0
+                              "usdEquivalent": 0.00
                             }
                           ],
                           "projects": [
