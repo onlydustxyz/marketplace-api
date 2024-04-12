@@ -49,6 +49,8 @@ public interface SponsorMapper {
 
     static onlydust.com.marketplace.api.contract.model.ProjectLinkResponse projectToResponse(final ShortProjectView view) {
         return new onlydust.com.marketplace.api.contract.model.ProjectLinkResponse()
+                .id(view.id().value())
+                .slug(view.slug())
                 .logoUrl(view.logoUrl())
                 .name(view.name());
     }
@@ -87,6 +89,8 @@ public interface SponsorMapper {
 
     private static ProjectWithBudgetResponse mapToProjectWithBudget(ShortProjectView project, List<SponsorAccountStatement> accountStatements) {
         return new ProjectWithBudgetResponse()
+                .id(project.id().value())
+                .slug(project.slug())
                 .name(project.name())
                 .logoUrl(project.logoUrl())
                 .remainingBudgets(accountStatements.stream().map(statement -> {
