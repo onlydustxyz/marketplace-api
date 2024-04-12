@@ -49,6 +49,8 @@ public interface SponsorMapper {
 
     static onlydust.com.marketplace.api.contract.model.ProjectLinkResponse projectToResponse(final ShortProjectView view) {
         return new onlydust.com.marketplace.api.contract.model.ProjectLinkResponse()
+                .id(view.id().value())
+                .slug(view.slug())
                 .logoUrl(view.logoUrl())
                 .name(view.name());
     }
@@ -78,8 +80,8 @@ public interface SponsorMapper {
                 .logoUrl(sponsor.logoUrl())
                 .projects(sponsor.projects().stream().map(p -> mapToProjectWithBudget(p, accountStatements)).toList())
                 .availableBudgets(accountStatements.stream()
-                        .map(SponsorMapper::mapSponsorBudgetResponse)
-                        .collect(groupingBy(SponsorBudgetResponse::getCurrency, reducing(null, SponsorMapper::merge)))
+                        .map(SponsorMapper::mapAllowanceToMoney)
+                        .collect(groupingBy(Money::getCurrency, reducing(null, SponsorMapper::merge)))
                         .values().stream()
                         .sorted(comparing(b -> b.getCurrency().getCode()))
                         .toList());
@@ -87,6 +89,8 @@ public interface SponsorMapper {
 
     private static ProjectWithBudgetResponse mapToProjectWithBudget(ShortProjectView project, List<SponsorAccountStatement> accountStatements) {
         return new ProjectWithBudgetResponse()
+                .id(project.id().value())
+                .slug(project.slug())
                 .name(project.name())
                 .logoUrl(project.logoUrl())
                 .remainingBudgets(accountStatements.stream().map(statement -> {
@@ -103,16 +107,18 @@ public interface SponsorMapper {
                 ;
     }
 
-    private static @NonNull SponsorBudgetResponse mapSponsorBudgetResponse(SponsorAccountStatement accountStatement) {
-        return new SponsorBudgetResponse()
+    private static @NonNull Money mapAllowanceToMoney(SponsorAccountStatement accountStatement) {
+        return new Money()
                 .currency(mapCurrency(accountStatement.account().currency()))
-                .currentAllowance(accountStatement.allowance().getValue());
+                .amount(accountStatement.allowance().getValue())
+                .usdEquivalent(accountStatement.account().currency().latestUsdQuote().map(q -> q.multiply(accountStatement.allowance().getValue())).orElse(null));
     }
 
-    private static @NonNull SponsorBudgetResponse merge(SponsorBudgetResponse left, @NonNull SponsorBudgetResponse right) {
-        return left == null ? right : new SponsorBudgetResponse()
+    private static @NonNull Money merge(Money left, @NonNull Money right) {
+        return left == null ? right : new Money()
                 .currency(right.getCurrency())
-                .currentAllowance(left.getCurrentAllowance().add(right.getCurrentAllowance()))
+                .amount(left.getAmount().add(right.getAmount()))
+                .usdEquivalent(left.getUsdEquivalent() == null ? null : left.getUsdEquivalent().add(right.getUsdEquivalent()))
                 ;
     }
 

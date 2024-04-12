@@ -58,6 +58,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                           "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
                           "availableBudgets": [
                             {
+                              "amount": 0,
                               "currency": {
                                 "id": "48388edb-fda2-4a32-b228-28152a147500",
                                 "code": "APT",
@@ -65,9 +66,10 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": null,
                                 "decimals": 8
                               },
-                              "currentAllowance": 0
+                              "usdEquivalent": null
                             },
                             {
+                              "amount": 0,
                               "currency": {
                                 "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                 "code": "ETH",
@@ -75,9 +77,10 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": null,
                                 "decimals": 18
                               },
-                              "currentAllowance": 0
+                              "usdEquivalent": 0.00
                             },
                             {
+                              "amount": 0,
                               "currency": {
                                 "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
                                 "code": "OP",
@@ -85,9 +88,10 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": null,
                                 "decimals": 18
                               },
-                              "currentAllowance": 0
+                              "usdEquivalent": null
                             },
                             {
+                              "amount": 0,
                               "currency": {
                                 "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                 "code": "USD",
@@ -95,9 +99,10 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": null,
                                 "decimals": 2
                               },
-                              "currentAllowance": 0
+                              "usdEquivalent": 0
                             },
                             {
+                              "amount": 0,
                               "currency": {
                                 "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                 "code": "USDC",
@@ -105,11 +110,13 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                 "decimals": 6
                               },
-                              "currentAllowance": 0
+                              "usdEquivalent": 0.00
                             }
                           ],
                           "projects": [
                             {
+                              "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                              "slug": "bretzel",
                               "name": "Bretzel",
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
                               "remainingBudgets": [
@@ -160,6 +167,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               ]
                             },
                             {
+                              "id": "98873240-31df-431a-81dc-7d6fe01143a0",
+                              "slug": "aiolia-du-lion",
                               "name": "Aiolia du Lion",
                               "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c",
                               "remainingBudgets": [
@@ -187,13 +196,13 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
         addSponsorFor(user, sponsorId);
 
         // When
-        getSponsorTransactions(sponsorId, 0, 3)
+        getSponsorTransactions(sponsorId, 0, 6)
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 4,
+                          "totalPageNumber": 2,
                           "totalItemNumber": 11,
                           "hasMore": true,
                           "nextPageIndex": 1,
@@ -240,6 +249,59 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                   "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                   "code": "ETH",
                                   "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": null
+                              }
+                            },
+                            {
+                              "date": "2023-09-28T14:33:13.489288Z",
+                              "type": "DEPOSIT",
+                              "project": null,
+                              "amount": {
+                                "amount": 17000,
+                                "currency": {
+                                  "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
+                                  "code": "OP",
+                                  "name": "Optimism",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": null
+                              }
+                            },
+                            {
+                              "date": "2023-09-28T14:34:37.110547Z",
+                              "type": "DEPOSIT",
+                              "project": null,
+                              "amount": {
+                                "amount": 400000,
+                                "currency": {
+                                  "id": "48388edb-fda2-4a32-b228-28152a147500",
+                                  "code": "APT",
+                                  "name": "Aptos Coin",
+                                  "logoUrl": null,
+                                  "decimals": 8
+                                },
+                                "usdEquivalent": null
+                              }
+                            },
+                            {
+                              "date": "2024-03-13T14:13:21.135944Z",
+                              "type": "ALLOCATION",
+                              "project": {
+                                "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                                "slug": "bretzel",
+                                "name": "Bretzel",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                              },
+                              "amount": {
+                                "amount": 17000,
+                                "currency": {
+                                  "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
+                                  "code": "OP",
+                                  "name": "Optimism",
                                   "logoUrl": null,
                                   "decimals": 18
                                 },

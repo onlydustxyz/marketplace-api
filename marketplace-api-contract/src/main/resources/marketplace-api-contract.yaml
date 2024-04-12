@@ -3541,12 +3541,11 @@ components:
             availableBudgets:
               type: array
               items:
-                $ref: '#/components/schemas/SponsorBudgetResponse'
+                $ref: '#/components/schemas/Money'
             projects:
               type: array
               items:
                 $ref: '#/components/schemas/ProjectWithBudgetResponse'
-
 
     EcosystemResponse:
       type: object
@@ -3795,23 +3794,10 @@ components:
     ProjectLinkResponse:
       type: object
       required:
-        - name
-        - logoUrl
-      properties:
-        name:
-          type: string
-        logoUrl:
-          type: string
-
-    ShortProjectResponse:
-      type: object
-      required:
         - id
         - slug
         - name
-        - shortDescription
         - logoUrl
-        - visibility
       properties:
         id:
           $ref: '#/components/schemas/ProjectId'
@@ -3819,17 +3805,35 @@ components:
           $ref: '#/components/schemas/ProjectSlug'
         name:
           type: string
-          example: Verkle Tries
-        shortDescription:
-          type: string
-          example: A short project description
         logoUrl:
           type: string
-          format: url
-          description: Direct URL to project's logo image
-          example: 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2529199823275297272.jpg'
-        visibility:
-          $ref: '#/components/schemas/ProjectVisibility'
+
+    ShortProjectResponse:
+      allOf:
+        - $ref: '#/components/schemas/ProjectLinkResponse'
+        - type: object
+          required:
+            - shortDescription
+            - logoUrl
+            - visibility
+          properties:
+            id:
+              $ref: '#/components/schemas/ProjectId'
+            slug:
+              $ref: '#/components/schemas/ProjectSlug'
+            name:
+              type: string
+              example: Verkle Tries
+            shortDescription:
+              type: string
+              example: A short project description
+            logoUrl:
+              type: string
+              format: url
+              description: Direct URL to project's logo image
+              example: 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2529199823275297272.jpg'
+            visibility:
+              $ref: '#/components/schemas/ProjectVisibility'
 
     ProjectVisibility:
       type: string
@@ -6064,25 +6068,12 @@ components:
         hasAcceptedInvoiceMandate:
           type: boolean
 
-    SponsorBudgetResponse:
-      type: object
-      required:
-        - currency
-        - currentAllowance
-      properties:
-        currency:
-          $ref: '#/components/schemas/ShortCurrencyResponse'
-        currentAllowance:
-          type: number
-          description: This is the remaining amount of funds available for internal transactions between the sponsor and projects (and eventually contributors)
-
     ProjectWithBudgetResponse:
       allOf:
         - $ref: '#/components/schemas/ProjectLinkResponse'
         - type: object
           required:
             - remainingBudgets
-            - remainingBudgetUsdEquivalent
           properties:
             remainingBudgets:
               type: array
