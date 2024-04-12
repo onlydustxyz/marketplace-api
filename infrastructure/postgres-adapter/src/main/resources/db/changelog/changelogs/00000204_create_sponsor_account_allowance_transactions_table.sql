@@ -24,7 +24,8 @@ from budget_created bc
 where abe.account_book_id = ab.id
   and CAST(abe.payload #>> '{event,account,id}' AS UUID) = sa.id
   and abe.payload #>> '{event,account,type}' = 'SPONSOR_ACCOUNT'
-  and abe.payload #>> '{event, @type}' = 'Mint';
+  and abe.payload #>> '{event, @type}' = 'Mint'
+  and abe.timestamp < (select min(timestamp) + interval '1 day' from accounting.account_books_events);
 
 -- Transfer from sponsor account to project = first budget allocated linked to this project
 -- Look for budget linked event on the correct currency to the correct project that has at least an allocation with the same sponsor
@@ -52,7 +53,8 @@ where abe.account_book_id = ab.id
   and CAST(abe.payload #>> '{event,to,id}' AS UUID) = bl.project_id
   and abe.payload #>> '{event,from,type}' = 'SPONSOR_ACCOUNT'
   and abe.payload #>> '{event,to,type}' = 'PROJECT'
-  and abe.payload #>> '{event, @type}' = 'Transfer';
+  and abe.payload #>> '{event, @type}' = 'Transfer'
+  and abe.timestamp < (select min(timestamp) + interval '1 day' from accounting.account_books_events);
 
 -- Transfer from project to reward = reward creation date
 update accounting.account_books_events abe
@@ -64,7 +66,8 @@ where abe.account_book_id = ab.id
   and CAST(abe.payload #>> '{event,to,id}' AS UUID) = r.id
   and abe.payload #>> '{event,from,type}' = 'PROJECT'
   and abe.payload #>> '{event,to,type}' = 'REWARD'
-  and abe.payload #>> '{event, @type}' = 'Transfer';
+  and abe.payload #>> '{event, @type}' = 'Transfer'
+  and abe.timestamp < (select min(timestamp) + interval '1 day' from accounting.account_books_events);
 
 -- Burn of reward = reward process date
 update accounting.account_books_events abe
@@ -75,7 +78,8 @@ from rewards r
 where abe.account_book_id = ab.id
   and CAST(abe.payload #>> '{event,account,id}' AS UUID) = r.id
   and abe.payload #>> '{event,account,type}' = 'REWARD'
-  and abe.payload #>> '{event, @type}' = 'Burn';
+  and abe.payload #>> '{event, @type}' = 'Burn'
+  and abe.timestamp < (select min(timestamp) + interval '1 day' from accounting.account_books_events);
 
 -- Transfer from reward to payment = avg(reward creation date, reward process date)
 update accounting.account_books_events abe
@@ -87,7 +91,8 @@ where abe.account_book_id = ab.id
   and CAST(abe.payload #>> '{event,from,id}' AS UUID) = r.id
   and abe.payload #>> '{event,from,type}' = 'REWARD'
   and abe.payload #>> '{event,to,type}' = 'PAYMENT'
-  and abe.payload #>> '{event, @type}' = 'Transfer';
+  and abe.payload #>> '{event, @type}' = 'Transfer'
+  and abe.timestamp < (select min(timestamp) + interval '1 day' from accounting.account_books_events);
 
 -- Burn of payment = reward process date
 update accounting.account_books_events abe
@@ -100,7 +105,8 @@ from accounting.batch_payments p
 where abe.account_book_id = ab.id
   and CAST(abe.payload #>> '{event,account,id}' AS UUID) = p.id
   and abe.payload #>> '{event,account,type}' = 'PAYMENT'
-  and abe.payload #>> '{event, @type}' = 'Burn';
+  and abe.payload #>> '{event, @type}' = 'Burn'
+  and abe.timestamp < (select min(timestamp) + interval '1 day' from accounting.account_books_events);
 
 
 -- ------------------------------------------------------------------------

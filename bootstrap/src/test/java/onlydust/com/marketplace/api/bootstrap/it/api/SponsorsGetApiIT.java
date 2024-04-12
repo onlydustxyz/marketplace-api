@@ -199,7 +199,23 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                           "nextPageIndex": 1,
                           "transactions": [
                             {
-                              "date": "2023-02-21T09:15:09.603701Z",
+                              "date": "2023-02-21T09:15:10.603693Z",
+                              "type": "DEPOSIT",
+                              "project": null,
+                              "amount": {
+                                "amount": 3000,
+                                "currency": {
+                                  "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                  "code": "USD",
+                                  "name": "US Dollar",
+                                  "logoUrl": null,
+                                  "decimals": 2
+                                },
+                                "usdEquivalent": null
+                              }
+                            },
+                            {
+                              "date": "2023-02-22T12:23:03.403824Z",
                               "type": "DEPOSIT",
                               "project": null,
                               "amount": {
@@ -215,36 +231,17 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               }
                             },
                             {
-                              "date": "2023-02-21T09:15:09.603701Z",
-                              "type": "ALLOCATION",
-                              "project": {
-                                "name": "Bretzel",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
-                              },
-                              "amount": {
-                                "amount": 106250,
-                                "currency": {
-                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                  "code": "USDC",
-                                  "name": "USD Coin",
-                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                  "decimals": 6
-                                },
-                                "usdEquivalent": null
-                              }
-                            },
-                            {
-                              "date": "2023-02-21T09:15:10.603693Z",
+                              "date": "2023-09-28T14:20:35.595046Z",
                               "type": "DEPOSIT",
                               "project": null,
                               "amount": {
                                 "amount": 3000,
                                 "currency": {
-                                  "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                                  "code": "USD",
-                                  "name": "US Dollar",
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
                                   "logoUrl": null,
-                                  "decimals": 2
+                                  "decimals": 18
                                 },
                                 "usdEquivalent": null
                               }
