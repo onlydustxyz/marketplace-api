@@ -2799,7 +2799,21 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/SponsorAccountTransactionType'
-
+        - in: query
+          name: sort
+          description: Sort order
+          schema:
+            enum:
+              - DATE
+              - TYPE
+              - AMOUNT
+              - PROJECT
+        - in: query
+          name: direction
+          schema:
+            enum:
+              - ASC
+              - DESC
       responses:
         "200":
           description: 'The sponsor transaction history'
@@ -5174,7 +5188,7 @@ components:
         githubBody:
           type: string
           description: The body of the contribution.
-    
+
     RewardableItemsPageResponse:
       type: object
       required:

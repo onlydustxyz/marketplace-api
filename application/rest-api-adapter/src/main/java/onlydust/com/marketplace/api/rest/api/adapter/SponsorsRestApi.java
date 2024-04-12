@@ -17,6 +17,7 @@ import onlydust.com.marketplace.api.contract.model.SponsorDetailsResponse;
 import onlydust.com.marketplace.api.contract.model.TransactionHistoryPageResponse;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SponsorMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,7 +57,9 @@ public class SponsorsRestApi implements SponsorsApi {
                                                                                        String toDate,
                                                                                        List<UUID> currencies,
                                                                                        List<UUID> projects,
-                                                                                       List<SponsorAccountTransactionType> types) {
+                                                                                       List<SponsorAccountTransactionType> types,
+                                                                                       String sort,
+                                                                                       String direction) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final var sponsor = sponsorFacadePort.getSponsor(UserId.of(authenticatedUser.getId()), SponsorId.of(sponsorId));
@@ -69,11 +72,16 @@ public class SponsorsRestApi implements SponsorsApi {
                 .to(isNull(toDate) ? null : DateMapper.parse(toDate))
                 .build();
 
+        final var sortBy = Optional.ofNullable(sort).map(SponsorMapper::parseTransactionSort).orElse(HistoricalTransaction.Sort.DATE);
+        final var sortDirection = SortDirectionMapper.requestToDomain(direction);
+
         final var page = accountingFacadePort.transactionHistory(
                 sponsor.id(),
                 filters,
                 sanitizedPageIndex,
-                sanitizePageSize(pageSize)
+                sanitizePageSize(pageSize),
+                sortBy,
+                sortDirection
         );
         final var response = SponsorMapper.mapTransactionHistory(page, sanitizedPageIndex);
 

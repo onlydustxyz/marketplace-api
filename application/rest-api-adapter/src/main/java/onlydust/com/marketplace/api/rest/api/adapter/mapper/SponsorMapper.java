@@ -145,4 +145,14 @@ public interface SponsorMapper {
             default -> throw OnlyDustException.internalServerError("Unexpected transaction type: %s".formatted(transaction.type()));
         };
     }
+
+    static HistoricalTransaction.Sort parseTransactionSort(@NonNull String sort) {
+        return switch (sort) {
+            case "DATE" -> HistoricalTransaction.Sort.DATE;
+            case "TYPE" -> HistoricalTransaction.Sort.TYPE;
+            case "AMOUNT" -> HistoricalTransaction.Sort.AMOUNT;
+            case "PROJECT" -> HistoricalTransaction.Sort.PROJECT;
+            default -> throw OnlyDustException.badRequest("Invalid sort parameter: %s".formatted(sort));
+        };
+    }
 }

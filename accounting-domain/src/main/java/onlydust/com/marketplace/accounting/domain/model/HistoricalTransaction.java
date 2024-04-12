@@ -39,5 +39,9 @@ public record HistoricalTransaction(
         Date from;
         Date to;
     }
+
+    public enum Sort {
+        DATE, TYPE, AMOUNT, PROJECT
+    }
 }
 

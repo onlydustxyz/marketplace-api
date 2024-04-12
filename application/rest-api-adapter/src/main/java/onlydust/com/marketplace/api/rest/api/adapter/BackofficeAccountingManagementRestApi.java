@@ -17,6 +17,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.BatchPaymentMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
+import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import org.springframework.http.HttpStatus;
@@ -85,7 +86,9 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                                 HistoricalTransaction.Type.REFUND))
                         .build(),
                 sanitizedPageIndex,
-                sanitizePageSize(pageSize));
+                sanitizePageSize(pageSize),
+                HistoricalTransaction.Sort.DATE,
+                SortDirection.desc);
         final var response = mapTransactionHistory(page, sanitizedPageIndex);
 
         return response.getTotalPageNumber() > 1 ?

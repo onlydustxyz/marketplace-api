@@ -9,11 +9,13 @@ import onlydust.com.marketplace.api.contract.model.TransactionHistoryPageRespons
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Map;
 
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -197,52 +199,52 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                           "nextPageIndex": 1,
                           "transactions": [
                             {
-                              "date": "2023-09-28T14:34:37.110547Z",
+                              "date": "2023-02-21T09:15:09.603701Z",
                               "type": "DEPOSIT",
                               "project": null,
                               "amount": {
-                                "amount": 400000,
+                                "amount": 19933440,
                                 "currency": {
-                                  "id": "48388edb-fda2-4a32-b228-28152a147500",
-                                  "code": "APT",
-                                  "name": "Aptos Coin",
-                                  "logoUrl": null,
-                                  "decimals": 8
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 },
                                 "usdEquivalent": null
                               }
                             },
                             {
-                              "date": "2023-09-28T14:34:37.110544Z",
+                              "date": "2023-02-21T09:15:09.603701Z",
                               "type": "ALLOCATION",
                               "project": {
                                 "name": "Bretzel",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                               },
                               "amount": {
-                                "amount": 400000,
+                                "amount": 106250,
                                 "currency": {
-                                  "id": "48388edb-fda2-4a32-b228-28152a147500",
-                                  "code": "APT",
-                                  "name": "Aptos Coin",
-                                  "logoUrl": null,
-                                  "decimals": 8
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 },
                                 "usdEquivalent": null
                               }
                             },
                             {
-                              "date": "2023-09-28T14:33:13.489288Z",
+                              "date": "2023-02-21T09:15:10.603693Z",
                               "type": "DEPOSIT",
                               "project": null,
                               "amount": {
-                                "amount": 17000,
+                                "amount": 3000,
                                 "currency": {
-                                  "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
-                                  "code": "OP",
-                                  "name": "Optimism",
+                                  "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                  "code": "USD",
+                                  "name": "US Dollar",
                                   "logoUrl": null,
-                                  "decimals": 18
+                                  "decimals": 2
                                 },
                                 "usdEquivalent": null
                               }
@@ -315,6 +317,62 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                 // we have at least one correct date
                 .jsonPath("$.transactions[?(@.project.name == 'Bretzel')]").exists()
                 .jsonPath("$.transactions[?(@.project.name != 'Bretzel')]").doesNotExist();
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "DATE, DESC",
+            "DATE, ASC",
+            "TYPE, DESC",
+            "TYPE, ASC",
+            "AMOUNT, DESC",
+            "AMOUNT, ASC",
+            "PROJECT, DESC",
+            "PROJECT, ASC"
+    })
+    void should_order_sponsor_transactions(String sort, String direction) {
+        // Given
+        addSponsorFor(user, sponsorId);
+
+        // When
+        final var transactions = getSponsorTransactions(sponsorId, 0, 100, Map.of("sort", sort, "direction", direction))
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(TransactionHistoryPageResponse.class)
+                .returnResult()
+                .getResponseBody().getTransactions();
+
+        final var first = direction.equals("ASC") ? transactions.get(0) : transactions.get(transactions.size() - 1);
+        final var last = direction.equals("ASC") ? transactions.get(transactions.size() - 1) : transactions.get(0);
+
+        switch (sort) {
+            case "DATE":
+                assertThat(first.getDate()).isBeforeOrEqualTo(last.getDate());
+                break;
+            case "TYPE":
+                assertThat(first.getType()).isLessThanOrEqualTo(last.getType());
+                break;
+            case "AMOUNT":
+                assertThat(first.getAmount().getCurrency().getCode().compareTo(last.getAmount().getCurrency().getCode())).isLessThanOrEqualTo(0);
+                // amounts are ordered within the same currency
+                transactions.stream().collect(groupingBy(t -> t.getAmount().getCurrency()))
+                        .forEach((currency, currencyTransactions) -> {
+                            final var firstAmount = direction.equals("ASC") ? currencyTransactions.get(0).getAmount().getAmount() :
+                                    currencyTransactions.get(currencyTransactions.size() - 1).getAmount().getAmount();
+                            final var lastAmount = direction.equals("ASC") ? currencyTransactions.get(currencyTransactions.size() - 1).getAmount().getAmount() :
+                                    currencyTransactions.get(0).getAmount().getAmount();
+                            assertThat(firstAmount).isLessThanOrEqualTo(lastAmount);
+                        });
+                break;
+            case "PROJECT":
+                final var transactionsWithProjects = transactions.stream().filter(t -> t.getProject() != null).toList();
+                final var firstWithProject = direction.equals("ASC") ? transactionsWithProjects.get(0) :
+                        transactionsWithProjects.get(transactionsWithProjects.size() - 1);
+                final var lastWithProject = direction.equals("ASC") ? transactionsWithProjects.get(transactionsWithProjects.size() - 1) :
+                        transactionsWithProjects.get(0);
+                assertThat(firstWithProject.getProject().getName().compareTo(lastWithProject.getProject().getName())).isLessThanOrEqualTo(0);
+                break;
+        }
     }
 
     @NonNull

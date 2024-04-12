@@ -10,6 +10,7 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.ReadOnlyAcco
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
@@ -393,8 +394,13 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public Page<HistoricalTransaction> transactionHistory(SponsorId sponsorId, HistoricalTransaction.Filters filters, Integer pageIndex, Integer pageSize) {
-        return sponsorAccountStorage.transactionsOf(sponsorId, filters, pageIndex, pageSize);
+    public Page<HistoricalTransaction> transactionHistory(@NonNull SponsorId sponsorId,
+                                                          @NonNull HistoricalTransaction.Filters filters,
+                                                          @NonNull Integer pageIndex,
+                                                          @NonNull Integer pageSize,
+                                                          @NonNull HistoricalTransaction.Sort sort,
+                                                          @NonNull SortDirection direction) {
+        return sponsorAccountStorage.transactionsOf(sponsorId, filters, pageIndex, pageSize, sort, direction);
     }
 
     @Override

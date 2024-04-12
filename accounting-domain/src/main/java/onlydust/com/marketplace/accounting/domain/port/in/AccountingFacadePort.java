@@ -3,6 +3,7 @@ package onlydust.com.marketplace.accounting.domain.port.in;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.SortDirection;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -49,7 +50,12 @@ public interface AccountingFacadePort {
 
     SponsorAccountStatement updateSponsorAccount(final @NonNull SponsorAccount.Id sponsorAccountId, ZonedDateTime lockedUntil);
 
-    Page<HistoricalTransaction> transactionHistory(SponsorId sponsorId, HistoricalTransaction.Filters filters, Integer pageIndex, Integer pageSize);
+    Page<HistoricalTransaction> transactionHistory(@NonNull SponsorId sponsorId,
+                                                   @NonNull HistoricalTransaction.Filters filters,
+                                                   @NonNull Integer pageIndex,
+                                                   @NonNull Integer pageSize,
+                                                   @NonNull HistoricalTransaction.Sort sort,
+                                                   @NonNull SortDirection direction);
 
     List<Network> networksOf(Currency.Id currencyId, RewardId rewardId);
 
