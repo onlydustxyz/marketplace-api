@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -155,7 +156,9 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
         final var recipient = userFacadePort.getProfileById(reward.recipientId());
 
-        final var paymentReference = new Payment.Reference(mapTransactionNetwork(payRewardRequest.getNetwork()),
+        final var paymentReference = new Payment.Reference(
+                ZonedDateTime.now(),
+                mapTransactionNetwork(payRewardRequest.getNetwork()),
                 payRewardRequest.getReference(),
                 recipient.getLogin(),
                 payRewardRequest.getRecipientAccount());

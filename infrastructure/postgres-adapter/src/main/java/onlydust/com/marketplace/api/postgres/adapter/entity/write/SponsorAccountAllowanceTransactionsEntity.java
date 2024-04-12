@@ -13,6 +13,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Entity
@@ -28,6 +29,7 @@ public class SponsorAccountAllowanceTransactionsEntity {
     @EqualsAndHashCode.Include
     @NonNull UUID id;
     @NonNull UUID accountId;
+    @NonNull ZonedDateTime timestamp;
 
     @Enumerated(javax.persistence.EnumType.STRING)
     @Type(type = "transaction_type")
@@ -40,6 +42,7 @@ public class SponsorAccountAllowanceTransactionsEntity {
     public SponsorAccount.AllowanceTransaction toDomain() {
         return new SponsorAccount.AllowanceTransaction(
                 SponsorAccount.Transaction.Id.of(id),
+                timestamp,
                 type.toDomain(),
                 PositiveAmount.of(amount),
                 projectId == null ? null : ProjectId.of(projectId));
@@ -50,6 +53,7 @@ public class SponsorAccountAllowanceTransactionsEntity {
                 .id(transaction.id().value())
                 .type(TransactionType.of(transaction.type()))
                 .accountId(sponsorAccountId.value())
+                .timestamp(transaction.timestamp())
                 .amount(transaction.amount().getValue())
                 .projectId(transaction.projectId() == null ? null : transaction.projectId().value())
                 .build();

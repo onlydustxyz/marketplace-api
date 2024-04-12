@@ -9,6 +9,7 @@ import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Entity
@@ -26,6 +27,8 @@ public class SponsorAccountTransactionsEntity {
     @NonNull UUID id;
     @NonNull UUID accountId;
 
+    @NonNull ZonedDateTime timestamp;
+
     @Enumerated(EnumType.STRING)
     @Type(type = "transaction_type")
     @NonNull TransactionType type;
@@ -42,6 +45,7 @@ public class SponsorAccountTransactionsEntity {
     public SponsorAccount.Transaction toDomain() {
         return new SponsorAccount.Transaction(
                 SponsorAccount.Transaction.Id.of(id),
+                timestamp,
                 type.toDomain(),
                 network.toNetwork(),
                 reference,
@@ -53,6 +57,7 @@ public class SponsorAccountTransactionsEntity {
     public static SponsorAccountTransactionsEntity of(SponsorAccount.Id sponsorAccountId, SponsorAccount.Transaction transaction) {
         return SponsorAccountTransactionsEntity.builder()
                 .id(transaction.id().value())
+                .timestamp(transaction.timestamp())
                 .type(TransactionType.of(transaction.type()))
                 .accountId(sponsorAccountId.value())
                 .amount(transaction.amount().getValue())

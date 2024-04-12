@@ -364,7 +364,7 @@ public class AccountingService implements AccountingFacadePort {
             final var sponsorAccount = sponsorAccount(sponsorAccountId);
 
             final var sponsorAccountNetwork = sponsorAccount.network().orElseThrow();
-            sponsorAccount.add(new SponsorAccount.Transaction(SPEND, sponsorAccountNetwork, rewardId.toString(),
+            sponsorAccount.add(new SponsorAccount.Transaction(ZonedDateTime.now(), SPEND, sponsorAccountNetwork, rewardId.toString(),
                     amount, "", ""));
         }
 

@@ -63,7 +63,7 @@ public class AccountingServiceTest {
             .rewards(List.of());
 
     private Payment.Reference fakePaymentReference(Network network) {
-        return new Payment.Reference(network, faker.random().hex(), faker.rickAndMorty().character(), faker.internet().slug() + ".eth");
+        return new Payment.Reference(ZonedDateTime.now(), network, faker.random().hex(), faker.rickAndMorty().character(), faker.internet().slug() + ".eth");
     }
 
     private Transaction fakeTransaction(Network network, Amount amount) {

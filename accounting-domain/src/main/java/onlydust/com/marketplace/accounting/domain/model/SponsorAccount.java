@@ -135,11 +135,12 @@ public class SponsorAccount {
                 final @NonNull Payment.Reference paymentReference,
                 final @NonNull PositiveAmount amount
         ) {
-            this(type, paymentReference.network(), paymentReference.reference(), amount, paymentReference.thirdPartyName(),
+            this(paymentReference.timestamp(), type, paymentReference.network(), paymentReference.reference(), amount, paymentReference.thirdPartyName(),
                     paymentReference.thirdPartyAccountNumber());
         }
 
         public Transaction(
+                final @NonNull ZonedDateTime timestamp,
                 final @NonNull Type type,
                 final @NonNull Network network,
                 final @NonNull String reference,
@@ -147,11 +148,12 @@ public class SponsorAccount {
                 final @NonNull String thirdPartyName,
                 final @NonNull String thirdPartyAccountNumber
         ) {
-            this(Id.random(), type, network, reference, amount, thirdPartyName, thirdPartyAccountNumber);
+            this(Id.random(), timestamp, type, network, reference, amount, thirdPartyName, thirdPartyAccountNumber);
         }
 
         public Transaction(
                 final @NonNull Id id,
+                final @NonNull ZonedDateTime timestamp,
                 final @NonNull Type type,
                 final @NonNull Network network,
                 final @NonNull String reference,
@@ -159,7 +161,7 @@ public class SponsorAccount {
                 final @NonNull String thirdPartyName,
                 final @NonNull String thirdPartyAccountNumber
         ) {
-            super(network, reference, thirdPartyName, thirdPartyAccountNumber);
+            super(timestamp, network, reference, thirdPartyName, thirdPartyAccountNumber);
             this.amount = amount;
             this.id = id;
             this.type = type;
@@ -191,23 +193,24 @@ public class SponsorAccount {
     }
 
     public record AllowanceTransaction(@NonNull Transaction.Id id,
+                                       @NonNull ZonedDateTime timestamp,
                                        @NonNull Type type,
                                        @NonNull PositiveAmount amount,
                                        ProjectId projectId) {
-        public static AllowanceTransaction mint(@NonNull PositiveAmount amount) {
-            return new AllowanceTransaction(Transaction.Id.random(), Type.MINT, amount, null);
+        public static AllowanceTransaction mint(@NonNull ZonedDateTime timestamp, @NonNull PositiveAmount amount) {
+            return new AllowanceTransaction(Transaction.Id.random(), timestamp, Type.MINT, amount, null);
         }
 
-        public static AllowanceTransaction burn(@NonNull PositiveAmount amount) {
-            return new AllowanceTransaction(Transaction.Id.random(), Type.BURN, amount, null);
+        public static AllowanceTransaction burn(@NonNull ZonedDateTime timestamp, @NonNull PositiveAmount amount) {
+            return new AllowanceTransaction(Transaction.Id.random(), timestamp, Type.BURN, amount, null);
         }
 
-        public static AllowanceTransaction transfer(@NonNull PositiveAmount amount, @NonNull ProjectId projectId) {
-            return new AllowanceTransaction(Transaction.Id.random(), Type.TRANSFER, amount, projectId);
+        public static AllowanceTransaction transfer(@NonNull ZonedDateTime timestamp, @NonNull PositiveAmount amount, @NonNull ProjectId projectId) {
+            return new AllowanceTransaction(Transaction.Id.random(), timestamp, Type.TRANSFER, amount, projectId);
         }
 
-        public static AllowanceTransaction refund(@NonNull PositiveAmount amount, @NonNull ProjectId projectId) {
-            return new AllowanceTransaction(Transaction.Id.random(), Type.REFUND, amount, projectId);
+        public static AllowanceTransaction refund(@NonNull ZonedDateTime timestamp, @NonNull PositiveAmount amount, @NonNull ProjectId projectId) {
+            return new AllowanceTransaction(Transaction.Id.random(), timestamp, Type.REFUND, amount, projectId);
         }
 
         public enum Type {

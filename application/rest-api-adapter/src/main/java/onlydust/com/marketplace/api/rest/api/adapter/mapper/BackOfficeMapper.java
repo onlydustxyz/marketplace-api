@@ -23,6 +23,7 @@ import onlydust.com.marketplace.project.domain.view.backoffice.*;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -102,6 +103,7 @@ public interface BackOfficeMapper {
     static SponsorAccount.Transaction mapReceiptToTransaction(final TransactionReceipt transaction) {
         final var negativeAmount = transaction.getAmount().compareTo(BigDecimal.ZERO) < 0;
         return new SponsorAccount.Transaction(
+                ZonedDateTime.now(), // TODO add field in BO
                 negativeAmount ? SponsorAccount.Transaction.Type.WITHDRAW : SponsorAccount.Transaction.Type.DEPOSIT,
                 mapTransactionNetwork(transaction.getNetwork()),
                 transaction.getReference(),

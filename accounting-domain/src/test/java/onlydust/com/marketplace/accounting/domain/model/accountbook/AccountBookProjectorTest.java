@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,6 +20,7 @@ class AccountBookProjectorTest {
     private final Faker faker = new Faker();
     public final AccountBook.AccountId sponsorAccountId = AccountBook.AccountId.of(SponsorAccount.Id.random());
     private final PositiveAmount amount = PositiveAmount.of(faker.number().randomNumber(3, true));
+    private final ZonedDateTime timestamp = ZonedDateTime.now();
 
     @BeforeEach
     void setup() {
@@ -30,19 +32,19 @@ class AccountBookProjectorTest {
     @Test
     void onMint() {
         // When
-        observer.onMint(sponsorAccountId, amount);
+        observer.onMint(timestamp, sponsorAccountId, amount);
 
         // Then
-        assertSavedTransaction(SponsorAccount.AllowanceTransaction.Type.MINT, amount, null);
+        assertSavedTransaction(timestamp, SponsorAccount.AllowanceTransaction.Type.MINT, amount, null);
     }
 
     @Test
     void onBurn() {
         // When
-        observer.onBurn(sponsorAccountId, amount);
+        observer.onBurn(timestamp, sponsorAccountId, amount);
 
         // Then
-        assertSavedTransaction(SponsorAccount.AllowanceTransaction.Type.BURN, amount, null);
+        assertSavedTransaction(timestamp, SponsorAccount.AllowanceTransaction.Type.BURN, amount, null);
     }
 
     @Test
@@ -51,10 +53,10 @@ class AccountBookProjectorTest {
         final var projectAccountId = AccountBook.AccountId.of(ProjectId.random());
 
         // When
-        observer.onTransfer(sponsorAccountId, projectAccountId, amount);
+        observer.onTransfer(timestamp, sponsorAccountId, projectAccountId, amount);
 
         // Then
-        assertSavedTransaction(SponsorAccount.AllowanceTransaction.Type.TRANSFER, amount, projectAccountId.projectId());
+        assertSavedTransaction(timestamp, SponsorAccount.AllowanceTransaction.Type.TRANSFER, amount, projectAccountId.projectId());
     }
 
     @Test
@@ -63,19 +65,20 @@ class AccountBookProjectorTest {
         final var projectAccountId = AccountBook.AccountId.of(ProjectId.random());
 
         // When
-        observer.onRefund(projectAccountId, sponsorAccountId, amount);
+        observer.onRefund(timestamp, projectAccountId, sponsorAccountId, amount);
 
         // Then
-        assertSavedTransaction(SponsorAccount.AllowanceTransaction.Type.REFUND, amount, projectAccountId.projectId());
+        assertSavedTransaction(timestamp, SponsorAccount.AllowanceTransaction.Type.REFUND, amount, projectAccountId.projectId());
     }
 
-    private void assertSavedTransaction(SponsorAccount.AllowanceTransaction.Type type, Amount amount, ProjectId projectId) {
+    private void assertSavedTransaction(ZonedDateTime timestamp, SponsorAccount.AllowanceTransaction.Type type, Amount amount, ProjectId projectId) {
         final var sponsorAccountCaptor = ArgumentCaptor.forClass(SponsorAccount.class);
         verify(storage).save(sponsorAccountCaptor.capture());
         final var sponsorAccount = sponsorAccountCaptor.getValue();
 
         assertThat(sponsorAccount.getAllowanceTransactions()).hasSize(1);
         final var transaction = sponsorAccount.getAllowanceTransactions().get(0);
+        assertThat(transaction.timestamp()).isEqualTo(timestamp);
         assertThat(transaction.type()).isEqualTo(type);
         assertThat(transaction.amount()).isEqualTo(amount);
         assertThat(transaction.projectId()).isEqualTo(projectId);

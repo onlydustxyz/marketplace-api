@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.kernel.model.EventType;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -80,7 +81,7 @@ public class AccountBookAggregate implements AccountBook {
     }
 
     private <R> R emit(AccountBookEvent<R> event) {
-        pendingEvents.add(new IdentifiedAccountBookEvent<>(nextEventId(), event));
+        pendingEvents.add(new IdentifiedAccountBookEvent<>(nextEventId(), ZonedDateTime.now(), event));
         incrementEventId();
         return state.accept(event);
     }

@@ -197,55 +197,52 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                           "nextPageIndex": 1,
                           "transactions": [
                             {
-                              "date": "2024-03-13T15:13:21.256797Z",
+                              "date": "2023-09-28T14:34:37.110547Z",
+                              "type": "DEPOSIT",
+                              "project": null,
+                              "amount": {
+                                "amount": 400000,
+                                "currency": {
+                                  "id": "48388edb-fda2-4a32-b228-28152a147500",
+                                  "code": "APT",
+                                  "name": "Aptos Coin",
+                                  "logoUrl": null,
+                                  "decimals": 8
+                                },
+                                "usdEquivalent": null
+                              }
+                            },
+                            {
+                              "date": "2023-09-28T14:34:37.110544Z",
                               "type": "ALLOCATION",
                               "project": {
                                 "name": "Bretzel",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                               },
                               "amount": {
-                                "amount": 3000,
+                                "amount": 400000,
                                 "currency": {
-                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                                  "code": "ETH",
-                                  "name": "Ether",
+                                  "id": "48388edb-fda2-4a32-b228-28152a147500",
+                                  "code": "APT",
+                                  "name": "Aptos Coin",
                                   "logoUrl": null,
-                                  "decimals": 18
+                                  "decimals": 8
                                 },
                                 "usdEquivalent": null
                               }
                             },
                             {
-                              "date": "2024-03-13T15:13:21.247974Z",
+                              "date": "2023-09-28T14:33:13.489288Z",
                               "type": "DEPOSIT",
                               "project": null,
                               "amount": {
-                                "amount": 3000,
+                                "amount": 17000,
                                 "currency": {
-                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                                  "code": "ETH",
-                                  "name": "Ether",
+                                  "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
+                                  "code": "OP",
+                                  "name": "Optimism",
                                   "logoUrl": null,
                                   "decimals": 18
-                                },
-                                "usdEquivalent": null
-                              }
-                            },
-                            {
-                              "date": "2024-03-13T15:13:21.225044Z",
-                              "type": "ALLOCATION",
-                              "project": {
-                                "name": "Aiolia du Lion",
-                                "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c"
-                              },
-                              "amount": {
-                                "amount": 19827190,
-                                "currency": {
-                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                  "code": "USDC",
-                                  "name": "USD Coin",
-                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                  "decimals": 6
                                 },
                                 "usdEquivalent": null
                               }
@@ -278,16 +275,16 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
         addSponsorFor(user, sponsorId);
 
         // When
-        getSponsorTransactions(sponsorId, 0, 100, Map.of("fromDate", "2024-03-13", "toDate", "2024-03-13"))
+        getSponsorTransactions(sponsorId, 0, 100, Map.of("fromDate", "2023-09-28", "toDate", "2023-09-28"))
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
                 // we have at least one correct date
-                .jsonPath("$.transactions[?(@.date >= '2024-03-13')]").exists()
-                .jsonPath("$.transactions[?(@.date < '2024-03-14')]").exists()
+                .jsonPath("$.transactions[?(@.date >= '2023-09-28')]").exists()
+                .jsonPath("$.transactions[?(@.date < '2023-09-29')]").exists()
                 // we do not have any incorrect date
-                .jsonPath("$.transactions[?(@.date < '2024-03-13')]").doesNotExist()
-                .jsonPath("$.transactions[?(@.date > '2024-03-14')]").doesNotExist();
+                .jsonPath("$.transactions[?(@.date < '2023-09-28')]").doesNotExist()
+                .jsonPath("$.transactions[?(@.date > '2023-09-29')]").doesNotExist();
     }
 
     @Test
@@ -304,7 +301,6 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.transactions[?(@.amount.currency.code == 'ETH')]").exists()
                 .jsonPath("$.transactions[?(@.amount.currency.code != 'ETH')]").doesNotExist();
     }
-
 
     @Test
     void should_filter_sponsor_transactions_by_projects() {
