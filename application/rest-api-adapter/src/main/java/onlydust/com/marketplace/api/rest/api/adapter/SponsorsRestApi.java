@@ -4,14 +4,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.HistoricalTransaction;
-import onlydust.com.marketplace.accounting.domain.model.ProjectId;
-import onlydust.com.marketplace.accounting.domain.model.SponsorId;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.SponsorFacadePort;
 import onlydust.com.marketplace.api.contract.SponsorsApi;
+import onlydust.com.marketplace.api.contract.model.AllocateRequest;
 import onlydust.com.marketplace.api.contract.model.SponsorAccountTransactionType;
 import onlydust.com.marketplace.api.contract.model.SponsorDetailsResponse;
 import onlydust.com.marketplace.api.contract.model.TransactionHistoryPageResponse;
@@ -88,5 +86,35 @@ public class SponsorsRestApi implements SponsorsApi {
         return response.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
                 ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<Void> allocateBudgetToProject(UUID sponsorId, AllocateRequest allocateRequest) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var sponsor = sponsorFacadePort.getSponsor(UserId.of(authenticatedUser.getId()), SponsorId.of(sponsorId));
+
+        accountingFacadePort.allocate(
+                sponsor.id(),
+                ProjectId.of(allocateRequest.getProjectId()),
+                PositiveAmount.of(allocateRequest.getAmount()),
+                Currency.Id.of(allocateRequest.getCurrencyId())
+        );
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> unallocateBudgetFromProject(UUID sponsorId, AllocateRequest allocateRequest) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var sponsor = sponsorFacadePort.getSponsor(UserId.of(authenticatedUser.getId()), SponsorId.of(sponsorId));
+
+        accountingFacadePort.unallocate(
+                ProjectId.of(allocateRequest.getProjectId()),
+                sponsor.id(),
+                PositiveAmount.of(allocateRequest.getAmount()),
+                Currency.Id.of(allocateRequest.getCurrencyId())
+        );
+
+        return ResponseEntity.noContent().build();
     }
 }

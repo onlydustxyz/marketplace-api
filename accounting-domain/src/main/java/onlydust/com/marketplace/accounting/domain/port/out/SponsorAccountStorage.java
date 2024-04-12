@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.port.out;
 
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.HistoricalTransaction;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
@@ -8,6 +9,7 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface SponsorAccountStorage extends SponsorAccountProvider {
     void save(SponsorAccount... sponsorAccounts);
@@ -22,4 +24,6 @@ public interface SponsorAccountStorage extends SponsorAccountProvider {
                                                @NonNull Integer pageSize,
                                                @NonNull HistoricalTransaction.Sort sort,
                                                @NonNull SortDirection direction);
+
+    Optional<SponsorAccount> find(SponsorId sponsorId, Currency.Id currencyId);
 }

@@ -31,6 +31,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_return_forbidden_if_not_admin() {
+        removeSponsorFor(user, sponsorId);
+
         getSponsor(sponsorId)
                 .expectStatus()
                 .isForbidden();
