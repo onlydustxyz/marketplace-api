@@ -1205,7 +1205,43 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-
+  /api/v1/projects/{projectId}/good-first-issues:
+    get:
+      security:
+        - { }
+      tags:
+        - Projects
+      summary: Get project good first issues
+      operationId: getProjectGoodFirstIssues
+      description: |
+        Get paginated list of project good first issues
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'List of project good first issues'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoodFirstIssuesPageResponse'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
   /api/v1/projects/{projectId}/contributors:
     get:
@@ -2968,20 +3004,11 @@ components:
       description: Github repo ID (databaseId)
       example: 650626566
 
-    PullRequestId:
-      type: string
-      description: Github pull request ID (databaseId)
-      example: 27218542
-
     IssueId:
-      type: string
+      type: integer
+      format: int64
       description: Github issue ID (databaseId)
       example: 1678794252
-
-    CodeReviewId:
-      type: string
-      description: Code review ID
-      example: 2189e8dc91876fa1686e81b09de33ca7bdca08e80854d4cada02c8288cf03739
 
     ProjectId:
       type: string
@@ -3504,6 +3531,29 @@ components:
             hidden:
               type: boolean
               description: Whether the contributor is hidden to the user
+
+    GoodFirstIssuesPageResponse:
+      type: object
+      required:
+        - issues
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/GithubIssue'
 
     SponsorResponse:
       type: object
@@ -4190,63 +4240,6 @@ components:
           type: integer
           format: int64
 
-    GithubPullRequest:
-      type: object
-      required:
-        - id
-        - number
-        - title
-        - status
-        - createdAt
-        - htmlUrl
-        - author
-        - repository
-        - commentCount
-        - closingIssues
-      properties:
-        id:
-          $ref: '#/components/schemas/PullRequestId'
-        number:
-          type: integer
-          format: int64
-          description: Issue number
-          example: 6
-        title:
-          type: string
-          description: Issue or pull request title on Github
-        status:
-          $ref: '#/components/schemas/GithubPullRequestStatus'
-        createdAt:
-          type: string
-          format: date-time
-          description: When the issue was created.
-        mergedAt:
-          type: string
-          format: date-time
-          description: When the pull request was merged.
-        closedAt:
-          type: string
-          format: date-time
-          description: When the issue was cancelled or closed.
-        htmlUrl:
-          type: string
-          format: url
-          description: The public Github URL of the issue.
-        body:
-          type: string
-          description: The body of the pull request.
-        author:
-          $ref: '#/components/schemas/GithubUserResponse'
-        repository:
-          $ref: '#/components/schemas/ShortGithubRepoResponse'
-        commentCount:
-          type: integer
-        closingIssues:
-          type: array
-          description: The list of issues resolved by this pull request.
-          items:
-            $ref: '#/components/schemas/GithubIssue'
-
     GithubIssue:
       type: object
       description: Github issue
@@ -4260,7 +4253,7 @@ components:
         - author
         - repository
         - commentCount
-        - closedPullRequests
+        - labels
       properties:
         id:
           $ref: '#/components/schemas/IssueId'
@@ -4290,42 +4283,19 @@ components:
           type: string
           description: The body of the issue.
         author:
-          $ref: '#/components/schemas/GithubUserResponse'
+          $ref: '#/components/schemas/ContributorResponse'
         repository:
           $ref: '#/components/schemas/ShortGithubRepoResponse'
         commentCount:
           type: integer
-        closingPullRequests:
+        labels:
           type: array
-          description: The list of pull requests resolving this issue.
+          description: The list of labels assigned to this issue
           items:
-            $ref: '#/components/schemas/GithubPullRequest'
+            $ref: '#/components/schemas/GithubLabel'
 
-    GithubCodeReview:
-      type: object
-      required:
-        - id
-        - pullRequest
-        - state
-        - author
-        - requestedAt
-      properties:
-        id:
-          $ref: '#/components/schemas/CodeReviewId'
-        pullRequest:
-          $ref: '#/components/schemas/GithubPullRequest'
-        state:
-          $ref: '#/components/schemas/GithubCodeReviewState'
-        requestedAt:
-          type: string
-          format: date-time
-          description: When the code review was requested.
-        submittedAt:
-          type: string
-          format: date-time
-          description: When the code review was submitted.
-        author:
-          $ref: '#/components/schemas/GithubUserResponse'
+    GithubLabel:
+      type: string
 
     ContributionType:
       type: string
@@ -4359,13 +4329,6 @@ components:
         - OPEN
         - COMPLETED
         - CANCELLED
-
-    GithubPullRequestStatus:
-      type: string
-      enum:
-        - OPEN
-        - CLOSED
-        - MERGED
 
     GithubCodeReviewState:
       type: string

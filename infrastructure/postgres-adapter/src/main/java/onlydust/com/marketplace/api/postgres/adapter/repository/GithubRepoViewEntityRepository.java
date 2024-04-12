@@ -13,7 +13,7 @@ public interface GithubRepoViewEntityRepository extends JpaRepository<GithubRepo
     @Query(value = """
             SELECT
                 r.id,
-                owner.login as owner,
+                owner.login as owner_login,
                 r.name,
                 r.html_url,
                 r.updated_at,
@@ -46,7 +46,7 @@ public interface GithubRepoViewEntityRepository extends JpaRepository<GithubRepo
     @Query(value = """
             SELECT
                 r.id,
-                owner.login as owner,
+                owner.login as owner_login,
                 r.name,
                 r.html_url,
                 r.updated_at,

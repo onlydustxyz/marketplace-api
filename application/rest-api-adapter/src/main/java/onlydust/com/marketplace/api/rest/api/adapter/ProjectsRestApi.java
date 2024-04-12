@@ -492,4 +492,18 @@ public class ProjectsRestApi implements ProjectsApi {
         projectFacadePort.showContributorForProjectLead(projectId, authenticatedUser.getId(), githubUserId);
         return ResponseEntity.noContent().build();
     }
+
+    @Override
+    public ResponseEntity<GoodFirstIssuesPageResponse> getProjectGoodFirstIssues(UUID projectId, Integer pageIndex, Integer pageSize) {
+        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
+
+        final var page = projectFacadePort.findGoodFirstIssues(projectId, sanitizedPageIndex, sanitizedPageSize);
+
+        final var response = GithubIssueMapper.map(page, sanitizedPageIndex);
+
+        return response.getTotalPageNumber() > 1 ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response)
+                : ResponseEntity.ok(response);
+    }
 }
