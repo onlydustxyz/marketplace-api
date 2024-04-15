@@ -1,13 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.adapters;
 
-import onlydust.com.marketplace.project.domain.model.User;
-import onlydust.com.marketplace.project.domain.model.UserRole;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.project.domain.model.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -36,7 +36,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
                 .githubEmail(faker.internet().emailAddress())
-                .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
+                .roles(new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN})
                 .lastSeenAt(new Date())
                 .build();
         userRepository.save(user);
@@ -56,7 +56,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         assertThat(result.getGithubUserId()).isEqualTo(user.getGithubUserId());
         assertThat(result.getGithubLogin()).isEqualTo(user.getGithubLogin());
         assertThat(result.getGithubAvatarUrl()).isEqualTo(user.getGithubAvatarUrl());
-        assertThat(result.getRoles()).containsExactlyInAnyOrder(UserRole.USER, UserRole.ADMIN);
+        assertThat(result.getRoles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN);
         assertThat(result.hasSeenOnboardingWizard()).isTrue();
         assertThat(result.hasAcceptedLatestTermsAndConditions()).isTrue();
     }
@@ -70,7 +70,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
                 .githubEmail(faker.internet().emailAddress())
-                .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
+                .roles(new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN})
                 .lastSeenAt(new Date())
                 .build();
         userRepository.save(user);
@@ -90,7 +90,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         assertThat(result.getGithubUserId()).isEqualTo(user.getGithubUserId());
         assertThat(result.getGithubLogin()).isEqualTo(user.getGithubLogin());
         assertThat(result.getGithubAvatarUrl()).isEqualTo(user.getGithubAvatarUrl());
-        assertThat(result.getRoles()).containsExactlyInAnyOrder(UserRole.USER, UserRole.ADMIN);
+        assertThat(result.getRoles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN);
         assertThat(result.hasSeenOnboardingWizard()).isTrue();
         assertThat(result.hasAcceptedLatestTermsAndConditions()).isFalse();
     }
@@ -104,7 +104,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
                 .githubEmail(faker.internet().emailAddress())
-                .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
+                .roles(new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN})
                 .lastSeenAt(new Date())
                 .build();
         userRepository.save(user);
@@ -117,7 +117,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         assertThat(result.getGithubUserId()).isEqualTo(user.getGithubUserId());
         assertThat(result.getGithubLogin()).isEqualTo(user.getGithubLogin());
         assertThat(result.getGithubAvatarUrl()).isEqualTo(user.getGithubAvatarUrl());
-        assertThat(result.getRoles()).containsExactlyInAnyOrder(UserRole.USER, UserRole.ADMIN);
+        assertThat(result.getRoles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN);
         assertThat(result.hasSeenOnboardingWizard()).isFalse();
         assertThat(result.hasAcceptedLatestTermsAndConditions()).isFalse();
     }

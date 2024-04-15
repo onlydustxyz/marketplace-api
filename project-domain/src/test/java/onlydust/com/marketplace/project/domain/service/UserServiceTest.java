@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.service;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.mocks.DeterministicDateProvider;
@@ -153,7 +154,7 @@ public class UserServiceTest {
                 .githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl())
                 .githubUserId(githubUserIdentity.getGithubUserId())
                 .githubLogin(githubUserIdentity.getGithubLogin())
-                .roles(List.of(UserRole.USER))
+                .roles(List.of(AuthenticatedUser.Role.USER))
                 .hasAcceptedLatestTermsAndConditions(false)
                 .createdAt(createdAt)
                 .hasSeenOnboardingWizard(false)

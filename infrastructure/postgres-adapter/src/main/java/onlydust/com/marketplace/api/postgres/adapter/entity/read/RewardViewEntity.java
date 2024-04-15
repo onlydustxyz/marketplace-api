@@ -10,6 +10,7 @@ import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.RewardShortView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 
@@ -72,7 +73,7 @@ public class RewardViewEntity {
     public RewardShortView toShortView() {
         return RewardShortView.builder()
                 .id(RewardId.of(id))
-                .status(status.toDomain())
+                .status(status())
                 .project(project.toView())
                 .money(new MoneyView(amount, currency.toDomain(), statusData.usdConversionRate(), statusData.amountUsdEquivalent()))
                 .build();
@@ -86,7 +87,7 @@ public class RewardViewEntity {
                 .processedAt(statusData.paidAt())
                 .rewardedOnProjectName(project.getName())
                 .rewardedOnProjectLogoUrl(project.getLogoUrl())
-                .status(status.toDomain())
+                .status(status())
                 .unlockDate(statusData.unlockDate())
                 .amount(BillingProfileRewardView.Amount.builder()
                         .total(amount)
@@ -128,12 +129,21 @@ public class RewardViewEntity {
                 .processedAt(statusData.paidAt())
                 .currency(currency.toView())
                 .dollarsEquivalent(statusData.amountUsdEquivalent())
-                .status(status.toDomain())
+                .status(status())
                 .unlockDate(statusData.unlockDate())
                 .from(from())
                 .project(project.toDomain())
                 .receipt(receipts.stream().findFirst().map(ReceiptEntity::toView).orElse(null))
                 .billingProfileId(billingProfile == null ? null : billingProfile.getId())
+                .build();
+    }
+
+    public RewardStatus status() {
+        return RewardStatus.builder()
+                .projectId(project.getId())
+                .billingProfileId(billingProfile == null ? null : billingProfile.getId())
+                .recipientId(recipient.githubUserId())
+                .status(this.status.toDomain())
                 .build();
     }
 }

@@ -125,8 +125,7 @@ public class MeRestApi implements MeApi {
         final var page = userFacadePort.getRewardsForUserId(authenticatedUser.getGithubUserId(), filters, sanitizedPageIndex,
                 sanitizedPageSize, sortBy, SortDirectionMapper.requestToDomain(direction));
 
-        final var myRewardsPageResponse = mapMyRewardsToResponse(sanitizedPageIndex, page, authenticatedUser.getGithubUserId(),
-                authenticatedUser.getBillingProfiles());
+        final var myRewardsPageResponse = mapMyRewardsToResponse(sanitizedPageIndex, page, authenticatedUser.asAuthenticatedUser());
 
         return myRewardsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(myRewardsPageResponse) :
@@ -225,8 +224,7 @@ public class MeRestApi implements MeApi {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final RewardDetailsView rewardDetailsView = userFacadePort.getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId,
                 authenticatedUser.getGithubUserId(), authenticatedUser.getAdministratedBillingProfile().stream().map(BillingProfileLinkView::id).toList());
-        return ResponseEntity.ok(RewardMapper.myRewardDetailsToResponse(rewardDetailsView, authenticatedUser.getGithubUserId(),
-                authenticatedUser.getBillingProfiles()));
+        return ResponseEntity.ok(RewardMapper.myRewardDetailsToResponse(rewardDetailsView, authenticatedUser.asAuthenticatedUser()));
     }
 
     @Override

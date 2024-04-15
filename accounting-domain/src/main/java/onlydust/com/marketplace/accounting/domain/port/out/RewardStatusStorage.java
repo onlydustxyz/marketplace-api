@@ -6,7 +6,6 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardStatusData;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.kernel.model.RewardStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,8 +16,6 @@ public interface RewardStatusStorage {
     Optional<RewardStatusData> get(final @NonNull RewardId rewardId);
 
     List<RewardStatusData> get(final @NonNull List<RewardId> rewardIds);
-
-    List<RewardStatus> getStatuses(final @NonNull List<RewardId> rewardIds);
 
     void delete(RewardId rewardId);
 

@@ -2,15 +2,18 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.project.domain.model.Reward;
-import onlydust.com.marketplace.project.domain.view.*;
+import onlydust.com.marketplace.project.domain.view.ContributionRewardView;
+import onlydust.com.marketplace.project.domain.view.ReceiptView;
+import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.project.domain.view.RewardItemView;
 
-import java.util.List;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -66,20 +69,17 @@ public interface RewardMapper {
                 .billingProfileId(rewardDetailsView.getBillingProfileId());
     }
 
-    static RewardDetailsResponse projectRewardDetailsToResponse(RewardDetailsView rewardDetailsView) {
+    static RewardDetailsResponse projectRewardDetailsToResponse(RewardDetailsView rewardDetailsView, AuthenticatedUser authenticatedUser) {
         return commonRewardDetailsToResponse(rewardDetailsView)
-                .status(map(rewardDetailsView.getStatus().asProjectLead()));
+                .status(map(rewardDetailsView.getStatus().as(authenticatedUser)));
     }
 
-    static RewardDetailsResponse myRewardDetailsToResponse(RewardDetailsView rewardDetailsView, Long githubUserId,
-                                                           List<BillingProfileLinkView> billingProfiles) {
+    static RewardDetailsResponse myRewardDetailsToResponse(RewardDetailsView rewardDetailsView, AuthenticatedUser authenticatedUser) {
         return commonRewardDetailsToResponse(rewardDetailsView)
-                .status(map(rewardDetailsView.getStatus().getRewardStatusForUser(rewardDetailsView.getId(),
-                        rewardDetailsView.getTo().getGithubUserId(), rewardDetailsView.getBillingProfileId(), githubUserId,
-                        billingProfiles.stream().map(BillingProfileLinkView::toUserBillingProfile).toList())));
+                .status(map(rewardDetailsView.getStatus().as(authenticatedUser)));
     }
 
-    static RewardStatusContract map(RewardStatus status) {
+    static RewardStatusContract map(RewardStatus.Output status) {
         return switch (status) {
             case PENDING_SIGNUP -> RewardStatusContract.PENDING_SIGNUP;
             case PENDING_CONTRIBUTOR -> RewardStatusContract.PENDING_CONTRIBUTOR;
@@ -96,8 +96,7 @@ public interface RewardMapper {
         };
     }
 
-    static RewardResponse rewardToResponse(ContributionRewardView rewardView, Long githubUserId,
-                                           List<BillingProfileLinkView> billingProfiles) {
+    static RewardResponse rewardToResponse(ContributionRewardView rewardView, AuthenticatedUser authenticatedUser) {
         final var response = new RewardResponse()
                 .from(new ContributorResponse()
                         .githubUserId(rewardView.getFrom().getGithubUserId())
@@ -116,9 +115,7 @@ public interface RewardMapper {
                 .currency(mapCurrency(rewardView.getCurrency()))
                 .dollarsEquivalent(rewardView.getDollarsEquivalent())
                 .id(rewardView.getId());
-        response.status(map(rewardView.getStatus().getRewardStatusForUser(rewardView.getId(),
-                rewardView.getTo().getGithubUserId(), rewardView.getBillingProfileId(), githubUserId,
-                billingProfiles.stream().map(BillingProfileLinkView::toUserBillingProfile).toList())));
+        response.status(map(rewardView.getStatus().as(authenticatedUser)));
         return response;
     }
 

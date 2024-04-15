@@ -72,7 +72,11 @@ public class RewardServiceTest {
     private RewardDetailsView generateRewardStubForCurrencyAndEmail(final Currency currency, final String email) {
         return RewardDetailsView.builder()
                 .id(RewardId.random())
-                .status(RewardStatus.PROCESSING)
+                .status(RewardStatus.builder()
+                        .projectId(ProjectId.random().value())
+                        .recipientId(faker.number().randomNumber(4, true))
+                        .status(RewardStatus.Input.PROCESSING)
+                        .build())
                 .billingProfile(new CompanyBillingProfile(faker.gameOfThrones().character(), UserId.random()))
                 .requestedAt(ZonedDateTime.now())
                 .githubUrls(List.of())

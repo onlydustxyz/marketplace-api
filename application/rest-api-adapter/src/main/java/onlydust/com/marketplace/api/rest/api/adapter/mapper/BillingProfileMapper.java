@@ -12,7 +12,7 @@ import onlydust.com.marketplace.accounting.domain.view.BillingProfileRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.kernel.model.RewardStatus;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
@@ -305,12 +305,13 @@ public interface BillingProfileMapper {
     }
 
 
-    static BillingProfileInvoiceableRewardsResponse mapToInvoiceableRewardsResponse(List<BillingProfileRewardView> invoiceableRewards) {
+    static BillingProfileInvoiceableRewardsResponse mapToInvoiceableRewardsResponse(List<BillingProfileRewardView> invoiceableRewards,
+                                                                                    AuthenticatedUser authenticatedUser) {
         return new BillingProfileInvoiceableRewardsResponse()
-                .rewards(invoiceableRewards.stream().map(BillingProfileMapper::mapInvoiceableReward).toList());
+                .rewards(invoiceableRewards.stream().map(r -> mapInvoiceableReward(r, authenticatedUser)).toList());
     }
 
-    static MyRewardPageItemResponse mapInvoiceableReward(BillingProfileRewardView view) {
+    static MyRewardPageItemResponse mapInvoiceableReward(BillingProfileRewardView view, AuthenticatedUser authenticatedUser) {
         return new MyRewardPageItemResponse()
                 .id(view.getId())
                 .projectId(view.getProjectId())
@@ -321,7 +322,7 @@ public interface BillingProfileMapper {
                         .currency(mapCurrency(view.getAmount().getCurrency()))
                         .dollarsEquivalent(view.getAmount().getDollarsEquivalent())
                         .total(view.getAmount().getTotal()))
-                .status(RewardMapper.map(RewardStatus.PENDING_REQUEST))
+                .status(RewardMapper.map(view.getStatus().as(authenticatedUser)))
                 .requestedAt(DateMapper.toZoneDateTime(view.getRequestedAt()))
                 .processedAt(DateMapper.toZoneDateTime(view.getProcessedAt()))
                 .unlockDate(DateMapper.toZoneDateTime(view.getUnlockDate()))

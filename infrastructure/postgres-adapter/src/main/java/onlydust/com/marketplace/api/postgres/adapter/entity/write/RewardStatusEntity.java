@@ -31,10 +31,9 @@ public class RewardStatusEntity {
         PROCESSING, COMPLETE;
     }
 
-    public static Status from(RewardStatus rewardStatus) {
+    public static Status from(RewardStatus.Input rewardStatus) {
         return switch (rewardStatus) {
             case PENDING_SIGNUP -> Status.PENDING_SIGNUP;
-            case PENDING_CONTRIBUTOR, PENDING_COMPANY -> null;
             case PENDING_BILLING_PROFILE -> Status.PENDING_BILLING_PROFILE;
             case PENDING_VERIFICATION -> Status.PENDING_VERIFICATION;
             case GEO_BLOCKED -> Status.GEO_BLOCKED;
@@ -47,18 +46,18 @@ public class RewardStatusEntity {
         };
     }
 
-    public RewardStatus toDomain() {
+    public RewardStatus.Input toDomain() {
         return switch (status) {
-            case PENDING_SIGNUP -> RewardStatus.PENDING_SIGNUP;
-            case PENDING_BILLING_PROFILE -> RewardStatus.PENDING_BILLING_PROFILE;
-            case PENDING_VERIFICATION -> RewardStatus.PENDING_VERIFICATION;
-            case GEO_BLOCKED -> RewardStatus.GEO_BLOCKED;
-            case INDIVIDUAL_LIMIT_REACHED -> RewardStatus.INDIVIDUAL_LIMIT_REACHED;
-            case PAYOUT_INFO_MISSING -> RewardStatus.PAYOUT_INFO_MISSING;
-            case LOCKED -> RewardStatus.LOCKED;
-            case PENDING_REQUEST -> RewardStatus.PENDING_REQUEST;
-            case PROCESSING -> RewardStatus.PROCESSING;
-            case COMPLETE -> RewardStatus.COMPLETE;
+            case PENDING_SIGNUP -> RewardStatus.Input.PENDING_SIGNUP;
+            case PENDING_BILLING_PROFILE -> RewardStatus.Input.PENDING_BILLING_PROFILE;
+            case PENDING_VERIFICATION -> RewardStatus.Input.PENDING_VERIFICATION;
+            case GEO_BLOCKED -> RewardStatus.Input.GEO_BLOCKED;
+            case INDIVIDUAL_LIMIT_REACHED -> RewardStatus.Input.INDIVIDUAL_LIMIT_REACHED;
+            case PAYOUT_INFO_MISSING -> RewardStatus.Input.PAYOUT_INFO_MISSING;
+            case LOCKED -> RewardStatus.Input.LOCKED;
+            case PENDING_REQUEST -> RewardStatus.Input.PENDING_REQUEST;
+            case PROCESSING -> RewardStatus.Input.PROCESSING;
+            case COMPLETE -> RewardStatus.Input.COMPLETE;
         };
     }
 }

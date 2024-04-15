@@ -5,6 +5,7 @@ import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.view.ContributionRewardView;
 
@@ -33,6 +34,7 @@ public class ContributionRewardViewEntity {
     String requestorLogin;
     String requestorAvatarUrl;
     Long requestorId;
+    @NonNull UUID projectId;
 
     String recipientLogin;
     String recipientAvatarUrl;
@@ -57,12 +59,21 @@ public class ContributionRewardViewEntity {
                 .currency(currency.toView())
                 .amount(amount)
                 .dollarsEquivalent(statusData.amountUsdEquivalent())
-                .status(status.toDomain())
+                .status(status())
                 .from(requestor)
                 .to(recipient)
                 .createdAt(requestedAt)
                 .processedAt(statusData.paidAt())
                 .billingProfileId(billingProfileId)
+                .build();
+    }
+
+    private RewardStatus status() {
+        return RewardStatus.builder()
+                .projectId(projectId)
+                .billingProfileId(billingProfileId)
+                .recipientId(recipientId)
+                .status(this.status.toDomain())
                 .build();
     }
 }

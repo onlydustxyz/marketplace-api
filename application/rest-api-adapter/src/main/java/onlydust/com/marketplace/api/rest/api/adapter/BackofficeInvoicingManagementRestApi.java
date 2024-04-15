@@ -7,8 +7,8 @@ import onlydust.com.backoffice.api.contract.BackofficeInvoicingManagementApi;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import org.springframework.core.io.InputStreamResource;
@@ -32,8 +32,8 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 @AllArgsConstructor
 public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicingManagementApi {
     private final InvoiceFacadePort invoiceFacadePort;
-    private final AccountingRewardPort accountingRewardPort;
     private final QueryParamTokenAuthenticationService.Config queryParamTokenAuthenticationConfig;
+    private final AuthenticatedBackofficeUserService authenticatedBackofficeUserService;
     final static Integer MAX_PAGE_SIZE = Integer.MAX_VALUE;
 
     @Override
@@ -83,10 +83,12 @@ public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicing
 
     @Override
     public ResponseEntity<InvoiceDetailsResponse> getInvoice(UUID invoiceId) {
+        final var authenticatedUser = authenticatedBackofficeUserService.getAuthenticatedBackofficeUser().asAuthenticatedUser();
+
         final var invoice = invoiceFacadePort.find(Invoice.Id.of(invoiceId))
                 .orElseThrow(() -> notFound("Invoice %s not found".formatted(invoiceId)));
 
-        final var response = mapInvoiceToContract(invoice);
+        final var response = mapInvoiceToContract(invoice, authenticatedUser);
         return ResponseEntity.ok(response);
     }
 

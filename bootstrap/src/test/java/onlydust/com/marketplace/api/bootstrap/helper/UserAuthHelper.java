@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
-import onlydust.com.marketplace.project.domain.model.UserRole;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 
 import java.util.Date;
@@ -35,7 +34,10 @@ public class UserAuthHelper {
                 .githubLogin(login)
                 .githubAvatarUrl(avatarUrl)
                 .githubEmail("%d@foo.org".formatted(githubUserId))
-                .roles(isAdmin ? new UserRole[]{UserRole.USER, UserRole.ADMIN} : new UserRole[]{UserRole.USER})
+                .roles(isAdmin ?
+                        new onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role[]{onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.USER,
+                                onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.ADMIN} :
+                        new onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role[]{onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.USER})
                 .createdAt(new Date())
                 .lastSeenAt(new Date())
                 .build();

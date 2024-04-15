@@ -10,6 +10,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
@@ -419,7 +420,7 @@ public interface BackOfficeMapper {
     }
 
     @SneakyThrows
-    static InvoiceDetailsResponse mapInvoiceToContract(final InvoiceView invoice) {
+    static InvoiceDetailsResponse mapInvoiceToContract(final InvoiceView invoice, AuthenticatedUser authenticatedUser) {
         return new InvoiceDetailsResponse()
                 .id(invoice.id().value())
                 .number(invoice.number().toString())
@@ -432,13 +433,13 @@ public interface BackOfficeMapper {
                         .amount(invoice.totalAfterTax().getValue())
                         .currency(toShortCurrency(invoice.totalAfterTax().getCurrency()))
                 )
-                .rewards(invoice.rewards().stream().map(BackOfficeMapper::mapToShortResponse).toList());
+                .rewards(invoice.rewards().stream().map(r -> mapToShortResponse(r, authenticatedUser)).toList());
     }
 
-    static ShortRewardResponse mapToShortResponse(RewardShortView reward) {
+    static ShortRewardResponse mapToShortResponse(RewardShortView reward, AuthenticatedUser authenticatedUser) {
         return new ShortRewardResponse()
                 .id(reward.id().value())
-                .status(map(reward.status().asBackofficeUser()))
+                .status(map(reward.status().as(authenticatedUser)))
                 .project(new ProjectLinkResponse()
                         .id(reward.project().id().value())
                         .slug(reward.project().slug())
@@ -448,10 +449,10 @@ public interface BackOfficeMapper {
                 .money(moneyViewToResponse(reward.money()));
     }
 
-    static ShortRewardResponse mapToShortResponse(RewardDetailsView reward) {
+    static ShortRewardResponse mapToShortResponse(RewardDetailsView reward, AuthenticatedUser authenticatedUser) {
         return new ShortRewardResponse()
                 .id(reward.id().value())
-                .status(map(reward.status().asBackofficeUser()))
+                .status(map(reward.status().as(authenticatedUser)))
                 .project(new ProjectLinkResponse()
                         .id(reward.project().id().value())
                         .slug(reward.project().slug())
@@ -490,7 +491,7 @@ public interface BackOfficeMapper {
                 .name(user.getFirstname() + " " + user.getLastname());
     }
 
-    static RewardDetailsResponse map(RewardDetailsView view) {
+    static RewardDetailsResponse map(RewardDetailsView view, AuthenticatedUser authenticatedUser) {
         final var response = new RewardDetailsResponse()
                 .id(view.id().value())
                 .paymentId(view.paymentId() == null ? null : view.paymentId().value())
@@ -499,7 +500,7 @@ public interface BackOfficeMapper {
                 .requestedAt(view.requestedAt())
                 .money(moneyViewToResponse(view.money())
                 )
-                .status(BackOfficeMapper.map(view.status().asBackofficeUser()))
+                .status(BackOfficeMapper.map(view.status().as(authenticatedUser)))
                 .project(new ProjectLinkResponse()
                         .id(view.project().id().value())
                         .slug(view.project().slug())
@@ -564,7 +565,7 @@ public interface BackOfficeMapper {
                 .dollarsEquivalent(view.dollarsEquivalent());
     }
 
-    static RewardPageResponse rewardPageToResponse(int pageIndex, Page<RewardDetailsView> page) {
+    static RewardPageResponse rewardPageToResponse(int pageIndex, Page<RewardDetailsView> page, AuthenticatedUser authenticatedUser) {
         final RewardPageResponse response = new RewardPageResponse();
         response.setTotalPageNumber(page.getTotalPageNumber());
         response.setTotalItemNumber(page.getTotalItemNumber());
@@ -572,7 +573,7 @@ public interface BackOfficeMapper {
         response.setNextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()));
         page.getContent().forEach(rewardDetailsView -> response.addRewardsItem(new RewardPageItemResponse()
                 .id(rewardDetailsView.id().value())
-                .status(BackOfficeMapper.map(rewardDetailsView.status().asBackofficeUser()))
+                .status(BackOfficeMapper.map(rewardDetailsView.status().as(authenticatedUser)))
                 .requestedAt(rewardDetailsView.requestedAt())
                 .project(new ProjectLinkResponse()
                         .id(rewardDetailsView.project().id().value())
@@ -765,23 +766,23 @@ public interface BackOfficeMapper {
         };
     }
 
-    static RewardStatus map(RewardStatusContract rewardStatus) {
+    static RewardStatus.Input map(RewardStatusContract rewardStatus) {
         return switch (rewardStatus) {
-            case PENDING_SIGNUP -> RewardStatus.PENDING_SIGNUP;
-            case PENDING_BILLING_PROFILE -> RewardStatus.PENDING_BILLING_PROFILE;
-            case PENDING_VERIFICATION -> RewardStatus.PENDING_VERIFICATION;
-            case GEO_BLOCKED -> RewardStatus.GEO_BLOCKED;
-            case INDIVIDUAL_LIMIT_REACHED -> RewardStatus.INDIVIDUAL_LIMIT_REACHED;
-            case PAYOUT_INFO_MISSING -> RewardStatus.PAYOUT_INFO_MISSING;
-            case LOCKED -> RewardStatus.LOCKED;
-            case PENDING_REQUEST -> RewardStatus.PENDING_REQUEST;
-            case PROCESSING -> RewardStatus.PROCESSING;
-            case COMPLETE -> RewardStatus.COMPLETE;
+            case PENDING_SIGNUP -> RewardStatus.Input.PENDING_SIGNUP;
+            case PENDING_BILLING_PROFILE -> RewardStatus.Input.PENDING_BILLING_PROFILE;
+            case PENDING_VERIFICATION -> RewardStatus.Input.PENDING_VERIFICATION;
+            case GEO_BLOCKED -> RewardStatus.Input.GEO_BLOCKED;
+            case INDIVIDUAL_LIMIT_REACHED -> RewardStatus.Input.INDIVIDUAL_LIMIT_REACHED;
+            case PAYOUT_INFO_MISSING -> RewardStatus.Input.PAYOUT_INFO_MISSING;
+            case LOCKED -> RewardStatus.Input.LOCKED;
+            case PENDING_REQUEST -> RewardStatus.Input.PENDING_REQUEST;
+            case PROCESSING -> RewardStatus.Input.PROCESSING;
+            case COMPLETE -> RewardStatus.Input.COMPLETE;
         };
     }
 
-    static RewardStatusContract map(RewardStatus rewardStatus) {
-        return switch (rewardStatus.asBackofficeUser()) {
+    static RewardStatusContract map(RewardStatus.Output rewardStatus) {
+        return switch (rewardStatus) {
             case PENDING_SIGNUP -> RewardStatusContract.PENDING_SIGNUP;
             case PENDING_CONTRIBUTOR -> null;
             case PENDING_BILLING_PROFILE -> RewardStatusContract.PENDING_BILLING_PROFILE;

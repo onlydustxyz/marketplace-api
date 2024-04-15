@@ -4,8 +4,8 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.Auth0OnlyDustAppAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.OnlyDustAppGrantedAuthority;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.User;
-import onlydust.com.marketplace.project.domain.model.UserRole;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
@@ -29,12 +29,12 @@ public class AuthenticatedAppUserServiceTest {
         final AuthenticatedAppUserService authenticatedAppUserService = new AuthenticatedAppUserService(authenticationContext);
         final UUID userId = UUID.randomUUID();
         final long githubUserId = faker.number().randomNumber();
-        final List<UserRole> allowedRoles = List.of(UserRole.USER);
+        final List<AuthenticatedUser.Role> allowedRoles = List.of(AuthenticatedUser.Role.USER);
         final User user = User.builder()
                 .githubUserId(githubUserId)
                 .id(userId)
                 .githubLogin(faker.name().username())
-                .roles(List.of(UserRole.USER))
+                .roles(List.of(AuthenticatedUser.Role.USER))
                 .build();
 
         // When

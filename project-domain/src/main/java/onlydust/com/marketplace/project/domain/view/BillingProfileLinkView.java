@@ -3,7 +3,6 @@ package onlydust.com.marketplace.project.domain.view;
 import lombok.Builder;
 import lombok.Value;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.kernel.model.RewardStatus;
 
 import java.util.UUID;
 
@@ -36,15 +35,5 @@ public class BillingProfileLinkView {
 
     public boolean isVerificationBlocked() {
         return verificationStatus.isBlocked();
-    }
-
-    public RewardStatus.UserBillingProfile toUserBillingProfile() {
-        return RewardStatus.UserBillingProfile.builder()
-                .id(this.id)
-                .role(switch (this.role) {
-                    case ADMIN -> RewardStatus.UserBillingProfile.Role.ADMIN;
-                    case MEMBER -> RewardStatus.UserBillingProfile.Role.MEMBER;
-                })
-                .build();
     }
 }

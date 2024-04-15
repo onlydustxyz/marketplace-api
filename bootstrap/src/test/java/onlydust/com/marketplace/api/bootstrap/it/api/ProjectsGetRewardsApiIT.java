@@ -112,13 +112,13 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[3].requestedAt").isEqualTo("2023-09-19T07:39:54.45638Z")
 
                 .jsonPath("$.rewards[4].id").isEqualTo("85f8358c-5339-42ac-a577-16d7760d1e28")
-                .jsonPath("$.rewards[4].status").isEqualTo("PENDING_CONTRIBUTOR")
+                .jsonPath("$.rewards[4].status").isEqualTo("PAYOUT_INFO_MISSING")
                 .jsonPath("$.rewards[4].amount.currency.code").isEqualTo("USDC")
                 .jsonPath("$.rewards[4].amount.dollarsEquivalent").isEqualTo("1010.0")
                 .jsonPath("$.rewards[4].requestedAt").isEqualTo("2023-09-19T07:38:52.590518Z")
 
                 .jsonPath("$.rewards[5].id").isEqualTo("5b96ca1e-4ad2-41c1-8819-520b885d9223")
-                .jsonPath("$.rewards[5].status").isEqualTo("PENDING_CONTRIBUTOR")
+                .jsonPath("$.rewards[5].status").isEqualTo("PAYOUT_INFO_MISSING")
                 .jsonPath("$.rewards[5].amount.currency.code").isEqualTo("STRK")
                 .jsonPath("$.rewards[5].amount.dollarsEquivalent").doesNotExist()
                 .jsonPath("$.rewards[5].requestedAt").isEqualTo("2023-09-19T07:39:23.730967Z")

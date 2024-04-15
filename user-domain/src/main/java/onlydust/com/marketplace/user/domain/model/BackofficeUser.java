@@ -5,8 +5,10 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -31,5 +33,12 @@ public record BackofficeUser(@NonNull Id id, @NonNull String email, @NonNull Str
 
     @Builder
     public record Identity(@NonNull String email, @NonNull String name, String avatarUrl) {
+    }
+
+    public AuthenticatedUser asAuthenticatedUser() {
+        return AuthenticatedUser.builder()
+                .id(id.value())
+                .roles(List.of(AuthenticatedUser.Role.INTERNAL_SERVICE))
+                .build();
     }
 }
