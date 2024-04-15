@@ -90,11 +90,15 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           ],
                           "projects": [
                             {
+                              "id": "98873240-31df-431a-81dc-7d6fe01143a0",
+                              "slug": "aiolia-du-lion",
                               "name": "Aiolia du Lion",
                               "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c",
                               "remainingBudgets": []
                             },
                             {
+                              "id": "a0c91aee-9770-4000-a893-953ddcbd62a7",
+                              "slug": "aldbaran-du-taureau",
                               "name": "Aldébaran du Taureau",
                               "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aldebaran_taureau.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=ab78704b124d2de9525a8af91ef7c4ed",
                               "remainingBudgets": [

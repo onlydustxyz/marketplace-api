@@ -43,6 +43,8 @@ public interface SponsorMapper {
 
     static ProjectLinkResponse projectToBoResponse(final ShortProjectView view) {
         return new ProjectLinkResponse()
+                .id(view.id().value())
+                .slug(view.slug())
                 .logoUrl(view.logoUrl())
                 .name(view.name());
     }

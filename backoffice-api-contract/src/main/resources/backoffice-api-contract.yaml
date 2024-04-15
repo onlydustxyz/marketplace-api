@@ -3121,9 +3121,15 @@ components:
     ProjectLinkResponse:
       type: object
       required:
+        - id
+        - slug
         - name
         - logoUrl
       properties:
+        id:
+          $ref: '#/components/schemas/ProjectId'
+        slug:
+          type: string
         name:
           type: string
         logoUrl:

@@ -17,8 +17,7 @@ public interface SponsorMapper {
                 .sponsorUrl(sponsor.getUrl())
                 .sponsorName(sponsor.getName())
                 .sponsorLogoUrl(sponsor.getLogoUrl())
-                .projectName(project.getName())
-                .projectLogoUrl(project.getLogoUrl())
+                .project(project.toDomain())
                 .lastAllocationDate(entity.lastAllocationDate() != null ?
                         ZonedDateTime.ofInstant(entity.lastAllocationDate().toInstant(), ZoneOffset.UTC) :
                         null)

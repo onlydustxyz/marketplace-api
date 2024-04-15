@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.view;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.project.domain.model.Project;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -19,8 +20,7 @@ public class ProjectSponsorView {
     String sponsorName;
     String sponsorUrl;
     ZonedDateTime lastAllocationDate;
-    String projectName;
-    String projectLogoUrl;
+    Project project;
 
     public boolean isActive() {
         return lastAllocationDate == null || lastAllocationDate.isAfter(ZonedDateTime.now().minusMonths(MONTHS_SINCE_LAST_ALLOCATION_TO_BE_A_SPONSOR));
