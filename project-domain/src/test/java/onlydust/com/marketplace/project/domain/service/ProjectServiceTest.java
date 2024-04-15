@@ -159,8 +159,6 @@ public class ProjectServiceTest {
         assertThat(projectIdentity.getRight()).isEqualTo("slug");
         verify(indexerPort, times(1)).indexUsers(usersToInviteAsProjectLeaders);
         verify(projectObserverPort).onProjectCreated(expectedProjectId);
-        verify(projectObserverPort).onLeaderAssigned(expectedProjectId, command.getFirstProjectLeaderId());
-        verify(projectObserverPort).onLeaderInvited(expectedProjectId, usersToInviteAsProjectLeaders.get(0));
         verify(projectObserverPort).onLinkedReposChanged(expectedProjectId,
                 command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of());
     }
@@ -211,7 +209,6 @@ public class ProjectServiceTest {
                 command.getRewardSettings(),
                 command.getEcosystemIds()
         );
-        verify(projectObserverPort).onProjectDetailsUpdated(projectId);
         verify(projectObserverPort).onLinkedReposChanged(projectId,
                 command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of(1L, 2L, 3L));
         verify(projectObserverPort).onRewardSettingsChanged(projectId);

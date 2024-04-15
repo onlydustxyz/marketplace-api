@@ -104,11 +104,6 @@ public class ProjectService implements ProjectFacadePort {
                 ProjectRewardSettings.defaultSettings(dateProvider.now()), command.getEcosystemIds());
 
         projectObserverPort.onProjectCreated(projectId);
-        projectObserverPort.onLeaderAssigned(projectId, command.getFirstProjectLeaderId());
-        if (nonNull(command.getGithubUserIdsAsProjectLeadersToInvite())) {
-            command.getGithubUserIdsAsProjectLeadersToInvite().forEach(githubUserId ->
-                    projectObserverPort.onLeaderInvited(projectId, githubUserId));
-        }
         if (nonNull(command.getGithubRepoIds())) {
             projectObserverPort.onLinkedReposChanged(projectId, Set.copyOf(command.getGithubRepoIds()), Set.of());
         }
@@ -144,11 +139,6 @@ public class ProjectService implements ProjectFacadePort {
                 command.getProjectLeadersToKeep(), command.getImageUrl(),
                 command.getRewardSettings(), command.getEcosystemIds());
 
-        projectObserverPort.onProjectDetailsUpdated(command.getId());
-        invitedLeaderGithubIds.forEach(leaderId -> projectObserverPort.onLeaderInvited(command.getId(), leaderId));
-        invitationCancelledLeaderGithubIds.forEach(leaderId ->
-                projectObserverPort.onLeaderInvitationCancelled(command.getId(), leaderId));
-        unassignedLeaderIds.forEach(leaderId -> projectObserverPort.onLeaderUnassigned(command.getId(), leaderId));
         if (!isNull(command.getGithubRepoIds())) {
             projectObserverPort.onLinkedReposChanged(command.getId(), linkedRepoIds, unlinkedRepoIds);
         }

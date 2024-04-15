@@ -2,7 +2,9 @@ package onlydust.com.marketplace.project.domain.observer;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
-import onlydust.com.marketplace.project.domain.model.notification.*;
+import onlydust.com.marketplace.project.domain.model.notification.ProjectCreated;
+import onlydust.com.marketplace.project.domain.model.notification.ProjectLinkedReposChanged;
+import onlydust.com.marketplace.project.domain.model.notification.UserAppliedOnProject;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.ContributionStoragePort;
 
@@ -20,31 +22,6 @@ public class ProjectObserver implements ProjectObserverPort {
     @Override
     public void onProjectCreated(UUID projectId) {
         notificationOutbox.push(new ProjectCreated(projectId, new Date()));
-    }
-
-    @Override
-    public void onProjectDetailsUpdated(UUID projectId) {
-        notificationOutbox.push(new ProjectUpdated(projectId, new Date()));
-    }
-
-    @Override
-    public void onLeaderAssigned(UUID projectId, UUID leaderId) {
-        notificationOutbox.push(new ProjectLeaderAssigned(projectId, leaderId, new Date()));
-    }
-
-    @Override
-    public void onLeaderUnassigned(UUID projectId, UUID leaderId) {
-        notificationOutbox.push(new ProjectLeaderUnassigned(projectId, leaderId, new Date()));
-    }
-
-    @Override
-    public void onLeaderInvited(UUID projectId, Long githubUserId) {
-        notificationOutbox.push(new ProjectLeaderInvited(projectId, githubUserId, new Date()));
-    }
-
-    @Override
-    public void onLeaderInvitationCancelled(UUID projectId, Long githubUserId) {
-        notificationOutbox.push(new ProjectLeaderInvitationCancelled(projectId, githubUserId, new Date()));
     }
 
     @Override

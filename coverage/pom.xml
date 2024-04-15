@@ -85,11 +85,6 @@
         </dependency>
         <dependency>
             <groupId>onlydust.com.marketplace.api</groupId>
-            <artifactId>make-adapter</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>onlydust.com.marketplace.api</groupId>
             <artifactId>kernel</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>

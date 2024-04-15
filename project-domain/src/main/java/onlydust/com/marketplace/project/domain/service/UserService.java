@@ -140,8 +140,7 @@ public class UserService implements UserFacadePort {
 
     @Override
     public void acceptInvitationToLeadProject(Long githubUserId, UUID projectId) {
-        final var leaderId = userStoragePort.acceptProjectLeaderInvitation(githubUserId, projectId);
-        projectObserverPort.onLeaderAssigned(projectId, leaderId);
+        userStoragePort.acceptProjectLeaderInvitation(githubUserId, projectId);
     }
 
     @Override
@@ -198,7 +197,6 @@ public class UserService implements UserFacadePort {
 
         }
         userStoragePort.saveProjectLead(user.getId(), projectId);
-        projectObserverPort.onLeaderAssigned(projectId, user.getId());
     }
 
     @Override
