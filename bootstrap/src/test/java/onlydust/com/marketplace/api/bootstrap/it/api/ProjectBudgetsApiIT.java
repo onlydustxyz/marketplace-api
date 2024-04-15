@@ -1,14 +1,14 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
-import onlydust.com.marketplace.accounting.domain.model.ProjectId;
-import onlydust.com.marketplace.accounting.domain.model.SponsorId;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.HistoricalQuoteEntity;
+import onlydust.com.marketplace.api.bootstrap.helper.AccountingHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookEventRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
 import onlydust.com.marketplace.project.domain.service.RewardService;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +25,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 
 public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
-    HistoricalQuoteRepository historicalQuoteRepository;
+    AccountingHelper accountingHelper;
     @Autowired
     CurrencyRepository currencyRepository;
     @Autowired
@@ -77,20 +77,10 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
         final var usd = currencyRepository.findByCode("USD").orElseThrow();
         final var eth = currencyRepository.findByCode("ETH").orElseThrow();
         final var usdc = currencyRepository.findByCode("USDC").orElseThrow();
-        historicalQuoteRepository.deleteAll();
-        ;
-        historicalQuoteRepository.save(HistoricalQuoteEntity.builder()
-                .price(BigDecimal.valueOf(1.10))
-                .baseId(eth.id())
-                .targetId(usd.id())
-                .timestamp(Instant.EPOCH)
-                .build());
-        historicalQuoteRepository.save(HistoricalQuoteEntity.builder()
-                .price(BigDecimal.valueOf(1.27))
-                .baseId(usdc.id())
-                .targetId(usd.id())
-                .timestamp(Instant.EPOCH)
-                .build());
+        accountingHelper.clearAllQuotes();
+
+        accountingHelper.saveQuote(new Quote(Currency.Id.of(eth.id()), Currency.Id.of(usd.id()), BigDecimal.valueOf(1.10), Instant.EPOCH));
+        accountingHelper.saveQuote(new Quote(Currency.Id.of(usdc.id()), Currency.Id.of(usd.id()), BigDecimal.valueOf(1.27), Instant.EPOCH));
 
         final var sponsorId = SponsorId.of(UUID.randomUUID());
         sponsorRepository.save(SponsorEntity.builder()

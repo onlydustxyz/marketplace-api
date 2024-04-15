@@ -513,7 +513,7 @@ public class CurrencyServiceTest {
         // Given
         when(currencyStorage.findByCode(Currency.Code.USD)).thenReturn(Optional.of(Currencies.USD));
         when(currencyStorage.findByCode(Currency.Code.EUR)).thenReturn(Optional.of(Currencies.EUR));
-        when(quoteStorage.nearest(eq(Currencies.USD.id()), eq(Currencies.EUR.id()), any()))
+        when(quoteStorage.latest(eq(Currencies.USD.id()), eq(Currencies.EUR.id())))
                 .thenReturn(Optional.of(new Quote(Currencies.USD.id(), Currencies.EUR.id(), BigDecimal.valueOf(0.85), TIMESTAMP)));
 
         // When
