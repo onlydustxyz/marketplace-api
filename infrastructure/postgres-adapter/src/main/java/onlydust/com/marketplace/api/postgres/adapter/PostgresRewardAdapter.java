@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
@@ -122,10 +123,12 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     @Transactional
     public Page<RewardDetailsView> findRewards(int pageIndex, int pageSize,
                                                @NonNull Set<RewardStatus> statuses,
+                                               @NonNull List<BillingProfile.Id> billingProfileIds,
                                                Date fromRequestedAt, Date toRequestedAt,
                                                Date fromProcessedAt, Date toProcessedAt) {
         final var page = backofficeRewardViewRepository.findAllByStatusesAndDates(
                 statuses.stream().map(rewardStatus -> RewardStatusEntity.from(rewardStatus.asBackofficeUser())).map(RewardStatusEntity.Status::toString).toList(),
+                billingProfileIds.stream().map(BillingProfile.Id::value).toList(),
                 fromRequestedAt, toRequestedAt,
                 fromProcessedAt, toProcessedAt,
                 PageRequest.of(pageIndex, pageSize, Sort.by("requested_at").descending())

@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import com.github.javafaker.Faker;
 import onlydust.com.backoffice.api.contract.model.PayRewardRequest;
+import onlydust.com.backoffice.api.contract.model.RewardPageResponse;
 import onlydust.com.backoffice.api.contract.model.TransactionNetwork;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
@@ -495,6 +496,30 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectBody()
                 .jsonPath("$.rewards[?(@.status == 'PENDING_VERIFICATION')]").isArray()
                 .jsonPath("$.rewards[?(@.status != 'PENDING_VERIFICATION')]").doesNotExist();
+    }
+
+    @Test
+    @Order(3)
+    void should_get_all_rewards_with_billing_profile_id() {
+        // Given
+        anthony = UserId.of(userAuthHelper.authenticateAnthony().user().getId());
+        final var billingProfile = billingProfileService.getBillingProfilesForUser(anthony).stream()
+                .filter(b -> b.getType() == BillingProfile.Type.SELF_EMPLOYED)
+                .findFirst().orElseThrow();
+
+        // When
+        final var rewards = client.get()
+                .uri(getApiURI(REWARDS, Map.of("pageIndex", "0", "pageSize", "5", "billingProfiles", billingProfile.getId().toString())))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(RewardPageResponse.class)
+                .returnResult().getResponseBody().getRewards();
+
+        assertThat(rewards.size()).isGreaterThan(0);
+        assertThat(rewards).allMatch(reward -> reward.getBillingProfile().getId().equals(billingProfile.getId().value()));
     }
 
     @Test

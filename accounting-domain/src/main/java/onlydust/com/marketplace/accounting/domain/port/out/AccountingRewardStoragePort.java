@@ -3,6 +3,7 @@ package onlydust.com.marketplace.accounting.domain.port.out;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
@@ -27,6 +28,7 @@ public interface AccountingRewardStoragePort {
 
     Page<RewardDetailsView> findRewards(int pageIndex, int pageSize,
                                         @NonNull Set<RewardStatus> statuses,
+                                        @NonNull List<BillingProfile.Id> billingProfileIds,
                                         Date fromRequestedAt, Date toRequestedAt,
                                         Date fromProcessedAt, Date toProcessedAt);
 

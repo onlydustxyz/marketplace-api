@@ -174,6 +174,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     @Override
     public ResponseEntity<RewardPageResponse> getRewards(Integer pageIndex, Integer pageSize,
                                                          List<RewardStatusContract> statuses,
+                                                         List<UUID> billingProfiles,
                                                          String fromRequestedAt,
                                                          String toRequestedAt,
                                                          String fromProcessedAt,
@@ -185,6 +186,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                 sanitizedPageIndex,
                 sanitizedPageSize,
                 statuses != null ? statuses.stream().map(BackOfficeMapper::map).toList() : null,
+                billingProfiles != null ? billingProfiles.stream().map(BillingProfile.Id::of).toList() : null,
                 DateMapper.parseNullable(fromRequestedAt),
                 DateMapper.parseNullable(toRequestedAt),
                 DateMapper.parseNullable(fromProcessedAt),
