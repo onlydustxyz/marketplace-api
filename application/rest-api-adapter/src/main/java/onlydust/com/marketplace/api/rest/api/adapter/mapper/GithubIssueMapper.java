@@ -1,12 +1,10 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import onlydust.com.marketplace.api.contract.model.ContributorResponse;
-import onlydust.com.marketplace.api.contract.model.GithubIssue;
-import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
-import onlydust.com.marketplace.api.contract.model.GoodFirstIssuesPageResponse;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.GithubIssueView;
+import onlydust.com.marketplace.project.domain.view.GithubLabelView;
 
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
@@ -34,7 +32,7 @@ public interface GithubIssueMapper {
                 .status(map(issue.status()))
                 .author(map(issue.author()))
                 .commentCount(issue.commentsCount())
-                .labels(issue.labels());
+                .labels(issue.labels().stream().map(GithubIssueMapper::map).toList());
     }
 
     static GithubIssueStatus map(GithubIssueView.Status status) {
@@ -43,6 +41,12 @@ public interface GithubIssueMapper {
             case CANCELLED -> GithubIssueStatus.CANCELLED;
             case COMPLETED -> GithubIssueStatus.COMPLETED;
         };
+    }
+
+    static GithubLabel map(GithubLabelView label) {
+        return new GithubLabel()
+                .name(label.name())
+                .description(label.description());
     }
 
     static ContributorResponse map(ContributorLinkView user) {
