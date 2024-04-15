@@ -13,6 +13,7 @@ import org.hibernate.annotations.TypeDef;
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
@@ -51,6 +52,15 @@ public class GithubIssueViewEntity {
     @NonNull String authorHtmlUrl;
     @NonNull String authorAvatarUrl;
 
+    @ManyToMany
+    @JoinTable(
+            schema = "indexer_exp",
+            name = "github_issues_labels",
+            joinColumns = @JoinColumn(name = "issue_id"),
+            inverseJoinColumns = @JoinColumn(name = "label_id")
+    )
+    List<GithubLabelViewEntity> labels;
+
     public enum Status {
         OPEN, CANCELLED, COMPLETED;
 
@@ -76,7 +86,12 @@ public class GithubIssueViewEntity {
                 author.toContributorLinkView(),
                 repo.toShortView(),
                 commentsCount,
-                List.of()
+                labels().stream().map(GithubLabelViewEntity::getName).toList()
         );
+    }
+
+    @NonNull
+    private List<GithubLabelViewEntity> labels() {
+        return Optional.ofNullable(labels).orElse(List.of());
     }
 }
