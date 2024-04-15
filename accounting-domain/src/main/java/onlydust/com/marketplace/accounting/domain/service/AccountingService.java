@@ -77,9 +77,27 @@ public class AccountingService implements AccountingFacadePort {
 
     @Override
     @Transactional
+    public void allocate(SponsorId from, ProjectId to, PositiveAmount amount, Currency.Id currencyId) {
+        final var sponsorAccount = sponsorAccountStorage.find(from, currencyId)
+                .orElseThrow(() -> notFound("Sponsor account for sponsor %s and currency %s not found".formatted(from, currencyId)));
+
+        allocate(sponsorAccount.id(), to, amount, currencyId);
+    }
+
+    @Override
+    @Transactional
     public void unallocate(ProjectId from, SponsorAccount.Id to, PositiveAmount amount, Currency.Id currencyId) {
         final var accountBookState = refund(from, to, amount, currencyId);
         onAllowanceUpdated(from, currencyId, accountBookState);
+    }
+
+    @Override
+    @Transactional
+    public void unallocate(ProjectId from, SponsorId to, PositiveAmount amount, Currency.Id currencyId) {
+        final var sponsorAccount = sponsorAccountStorage.find(to, currencyId)
+                .orElseThrow(() -> notFound("Sponsor account for sponsor %s and currency %s not found".formatted(from, currencyId)));
+
+        unallocate(from, sponsorAccount.id(), amount, currencyId);
     }
 
     @Override

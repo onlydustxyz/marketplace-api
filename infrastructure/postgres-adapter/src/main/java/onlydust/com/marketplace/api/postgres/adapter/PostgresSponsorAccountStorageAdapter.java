@@ -85,4 +85,10 @@ public class PostgresSponsorAccountStorageAdapter implements SponsorAccountStora
                 .totalPageNumber(page.getTotalPages())
                 .build();
     }
+
+    @Override
+    public Optional<SponsorAccount> find(SponsorId sponsorId, Currency.Id currencyId) {
+        return sponsorAccountRepository.findBySponsorIdAndCurrencyId(sponsorId.value(), currencyId.value())
+                .map(SponsorAccountEntity::toDomain);
+    }
 }

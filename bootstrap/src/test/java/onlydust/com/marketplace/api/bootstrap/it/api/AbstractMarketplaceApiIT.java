@@ -138,6 +138,8 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_BILLING_PROFILES_POST_COWORKER_INVITATIONS = "/api/v1/me/billing-profiles/%s/invitations";
     protected static final String BILLING_PROFILES_DELETE_COWORKER = "/api/v1/billing-profiles/%s/coworkers/%s";
     protected static final String SPONSOR = "/api/v1/sponsors/%s";
+    protected static final String SPONSOR_ALLOCATE = "/api/v1/sponsors/%s/allocate";
+    protected static final String SPONSOR_UNALLOCATE = "/api/v1/sponsors/%s/unallocate";
     protected static final String SPONSOR_TRANSACTIONS = "/api/v1/sponsors/%s/transactions";
 
     private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
@@ -284,6 +286,21 @@ public class AbstractMarketplaceApiIT {
                         INSERT INTO sponsors_users
                         VALUES (:sponsorId, :userId)
                         ON CONFLICT DO NOTHING
+                        """)
+                .setParameter("userId", user.user().getId())
+                .setParameter("sponsorId", sponsorId.value())
+                .executeUpdate();
+        em.flush();
+        em.getTransaction().commit();
+        em.close();
+    }
+
+    protected void removeSponsorFor(UserAuthHelper.AuthenticatedUser user, SponsorId sponsorId) {
+        final EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+        em.createNativeQuery("""
+                        DELETE FROM sponsors_users
+                        WHERE user_id = :userId AND sponsor_id = :sponsorId
                         """)
                 .setParameter("userId", user.user().getId())
                 .setParameter("sponsorId", sponsorId.value())

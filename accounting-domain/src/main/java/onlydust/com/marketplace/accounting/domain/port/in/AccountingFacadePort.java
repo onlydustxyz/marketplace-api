@@ -38,9 +38,13 @@ public interface AccountingFacadePort {
 
     SponsorAccountStatement delete(SponsorAccount.Id sponsorAccountId, SponsorAccount.Transaction.Id receiptId);
 
+    void allocate(SponsorId from, ProjectId to, PositiveAmount amount, Currency.Id currencyId);
+
     void allocate(SponsorAccount.Id from, ProjectId to, PositiveAmount amount, Currency.Id currencyId);
 
     void unallocate(ProjectId from, SponsorAccount.Id to, PositiveAmount amount, Currency.Id currencyId);
+
+    void unallocate(ProjectId from, SponsorId to, PositiveAmount amount, Currency.Id currencyId);
 
     Optional<SponsorAccountStatement> getSponsorAccountStatement(SponsorAccount.Id sponsorAccountId);
 

@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain.stubs;
 
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.HistoricalTransaction;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
@@ -44,5 +45,10 @@ public class SponsorAccountStorageStub implements SponsorAccountStorage {
                                                       @NonNull Integer pageIndex, @NonNull Integer pageSize, HistoricalTransaction.@NonNull Sort sort,
                                                       @NonNull SortDirection direction) {
         return null;
+    }
+
+    @Override
+    public Optional<SponsorAccount> find(SponsorId sponsorId, Currency.Id currencyId) {
+        return Optional.empty();
     }
 }

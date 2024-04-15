@@ -2783,7 +2783,7 @@ paths:
   /api/v1/sponsors/{sponsorId}/transactions:
     get:
       security:
-        - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - Sponsors
       summary: Get the list of all transactions related to this sponsor
@@ -2857,6 +2857,66 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TransactionHistoryPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/sponsors/{sponsorId}/allocate:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Sponsors
+      summary: Allocate a budget to a project
+      operationId: allocateBudgetToProject
+      description: Allocate a budget to a project
+      parameters:
+        - in: path
+          name: sponsorId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorId'
+      requestBody:
+        description: Budget to allocate
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AllocateRequest'
+      responses:
+        "204":
+          description: 'The funds have been allocated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/sponsors/{sponsorId}/unallocate:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Sponsors
+      summary: Allocate a budget to a project
+      operationId: unallocateBudgetFromProject
+      description: Unallocate some budget from a project
+      parameters:
+        - in: path
+          name: sponsorId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorId'
+      requestBody:
+        description: Budget to unallocate
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AllocateRequest'
+      responses:
+        "204":
+          description: 'The funds have been allocated'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -6091,3 +6151,17 @@ components:
         - WITHDRAWAL
         - ALLOCATION
         - UNALLOCATION
+
+    AllocateRequest:
+      type: object
+      required:
+        - projectId
+        - amount
+        - currencyId
+      properties:
+        projectId:
+          $ref: '#/components/schemas/ProjectId'
+        amount:
+          type: number
+        currencyId:
+          $ref: '#/components/schemas/CurrencyId'
