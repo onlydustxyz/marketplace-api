@@ -268,8 +268,10 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresQuoteAdapter postgresQuoteAdapter(final HistoricalQuoteRepository historicalQuoteRepository) {
-        return new PostgresQuoteAdapter(historicalQuoteRepository);
+    public PostgresQuoteAdapter postgresQuoteAdapter(final HistoricalQuoteRepository historicalQuoteRepository,
+                                                     final LatestQuoteRepository latestQuoteRepository,
+                                                     final OldestQuoteRepository oldestQuoteRepository) {
+        return new PostgresQuoteAdapter(historicalQuoteRepository, latestQuoteRepository, oldestQuoteRepository);
     }
 
     @Bean

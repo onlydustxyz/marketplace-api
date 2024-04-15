@@ -16,7 +16,6 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.time.ZonedDateTime;
 import java.util.*;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
@@ -134,7 +133,7 @@ public class CurrencyService implements CurrencyFacadePort {
         final var from = currencyStorage.findByCode(fromCode).orElseThrow(() -> notFound("Currency %s not found".formatted(fromCode)));
         final var to = currencyStorage.findByCode(toCode).orElseThrow(() -> notFound("Currency %s not found".formatted(toCode)));
 
-        return quoteStorage.nearest(from.id(), to.id(), ZonedDateTime.now())
+        return quoteStorage.latest(from.id(), to.id())
                 .stream()
                 .findFirst()
                 .map(Quote::price)

@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import onlydust.com.backoffice.api.contract.model.CurrencyResponse;
 import onlydust.com.backoffice.api.contract.model.CurrencyType;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
+import onlydust.com.marketplace.api.bootstrap.helper.AccountingHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import org.junit.jupiter.api.MethodOrderer;
@@ -24,7 +25,16 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Autowired
+    private AccountingHelper accountingHelper;
+
+    @Autowired
     private HistoricalQuoteRepository historicalQuoteRepository;
+
+    @Autowired
+    private LatestQuoteRepository latestQuoteRepository;
+
+    @Autowired
+    private OldestQuoteRepository oldestQuoteRepository;
 
     @Autowired
     private ImageStoragePort imageStoragePort;
@@ -56,7 +66,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
     @Test
     @Order(0)
     void cleanup() {
-        historicalQuoteRepository.deleteAll();
+        accountingHelper.clearAllQuotes();
         rewardStatusRepository.deleteAll();
         rewardRepository.deleteAll();
         accountBookEventRepository.deleteAll();
@@ -292,7 +302,17 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
         currencyFacadePort.refreshQuotes();
 
         // Then
-        assertThat(historicalQuoteRepository.findAll()).allMatch(q -> q.getPrice().compareTo(BigDecimal.ZERO) > 0);
+        final var historicalQuotes = historicalQuoteRepository.findAll();
+        assertThat(historicalQuotes).isNotEmpty();
+        assertThat(historicalQuotes).allMatch(q -> q.getPrice().compareTo(BigDecimal.ZERO) > 0);
+
+        final var latestQuotes = latestQuoteRepository.findAll();
+        assertThat(latestQuotes).hasSize(9);
+        assertThat(latestQuotes).allMatch(q -> q.price().compareTo(BigDecimal.ZERO) > 0);
+
+        final var oldestQuotes = oldestQuoteRepository.findAll();
+        assertThat(oldestQuotes).hasSize(9);
+        assertThat(oldestQuotes).allMatch(q -> q.price().compareTo(BigDecimal.ZERO) > 0);
     }
 
     @Test

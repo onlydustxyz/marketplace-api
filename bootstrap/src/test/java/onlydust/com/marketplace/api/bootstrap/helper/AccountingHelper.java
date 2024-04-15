@@ -5,8 +5,10 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.Quote;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
+import onlydust.com.marketplace.accounting.domain.port.out.QuoteStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,14 @@ public class AccountingHelper {
     KybRepository kybRepository;
     @Autowired
     KycRepository kycRepository;
+    @Autowired
+    HistoricalQuoteRepository historicalQuoteRepository;
+    @Autowired
+    LatestQuoteRepository latestQuoteRepository;
+    @Autowired
+    OldestQuoteRepository oldestQuoteRepository;
+    @Autowired
+    QuoteStorage quoteStorage;
 
     public CurrencyEntity strk() {
         return currencyRepository.findByCode("STRK").orElseThrow();
@@ -165,5 +175,15 @@ public class AccountingHelper {
         }
 
         billingProfileRepository.save(billingProfile);
+    }
+
+    public void clearAllQuotes() {
+        historicalQuoteRepository.deleteAll();
+        latestQuoteRepository.deleteAll();
+        oldestQuoteRepository.deleteAll();
+    }
+
+    public void saveQuote(Quote quote) {
+        quoteStorage.save(List.of(quote));
     }
 }

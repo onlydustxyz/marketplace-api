@@ -10,5 +10,7 @@ import java.util.Optional;
 public interface QuoteStorage {
     void save(Collection<Quote> quotes);
 
-    Optional<Quote> nearest(Currency.Id currencyId, Currency.Id baseId, ZonedDateTime date);
+    Optional<Quote> nearest(Currency.Id baseId, Currency.Id targetId, ZonedDateTime date);
+
+    Optional<Quote> latest(Currency.Id baseId, Currency.Id targetId);
 }
