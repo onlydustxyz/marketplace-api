@@ -208,8 +208,10 @@ public interface BackOfficeMapper {
 
     static ProjectWithBudgetResponse mapToProjectWithBudget(final ProjectSponsorView projectSponsorView, List<SponsorAccountStatement> accountStatements) {
         return new ProjectWithBudgetResponse()
-                .name(projectSponsorView.projectName())
-                .logoUrl(projectSponsorView.projectLogoUrl())
+                .id(projectSponsorView.project().getId())
+                .slug(projectSponsorView.project().getSlug())
+                .name(projectSponsorView.project().getName())
+                .logoUrl(projectSponsorView.project().getLogoUrl())
                 .remainingBudgets(accountStatements.stream().map(statement -> new MoneyResponse()
                                 .amount(statement.unspentBalanceSentTo(ProjectId.of(projectSponsorView.projectId())).getValue())
                                 .currency(toShortCurrency(statement.account().currency()))
@@ -223,6 +225,8 @@ public interface BackOfficeMapper {
         if (project == null) return null;
 
         return new ProjectLinkResponse()
+                .id(project.id().value())
+                .slug(project.slug())
                 .name(project.name())
                 .logoUrl(project.logoUrl())
                 ;
@@ -436,6 +440,8 @@ public interface BackOfficeMapper {
                 .id(reward.id().value())
                 .status(map(reward.status().asBackofficeUser()))
                 .project(new ProjectLinkResponse()
+                        .id(reward.project().id().value())
+                        .slug(reward.project().slug())
                         .name(reward.project().name())
                         .logoUrl(reward.project().logoUrl())
                 )
@@ -447,6 +453,8 @@ public interface BackOfficeMapper {
                 .id(reward.id().value())
                 .status(map(reward.status().asBackofficeUser()))
                 .project(new ProjectLinkResponse()
+                        .id(reward.project().id().value())
+                        .slug(reward.project().slug())
                         .name(reward.project().name())
                         .logoUrl(reward.project().logoUrl()))
                 .money(moneyViewToResponse(reward.money()));
@@ -493,6 +501,8 @@ public interface BackOfficeMapper {
                 )
                 .status(BackOfficeMapper.map(view.status().asBackofficeUser()))
                 .project(new ProjectLinkResponse()
+                        .id(view.project().id().value())
+                        .slug(view.project().slug())
                         .name(view.project().name())
                         .logoUrl(view.project().logoUrl()))
                 .sponsors(view.sponsors().stream()
@@ -565,6 +575,8 @@ public interface BackOfficeMapper {
                 .status(BackOfficeMapper.map(rewardDetailsView.status().asBackofficeUser()))
                 .requestedAt(rewardDetailsView.requestedAt())
                 .project(new ProjectLinkResponse()
+                        .id(rewardDetailsView.project().id().value())
+                        .slug(rewardDetailsView.project().slug())
                         .name(rewardDetailsView.project().name())
                         .logoUrl(rewardDetailsView.project().logoUrl()))
                 .money(moneyViewToResponse(rewardDetailsView.money()))
