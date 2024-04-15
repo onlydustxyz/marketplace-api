@@ -1,6 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition;
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
+import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import org.hibernate.annotations.Immutable;
 
 import javax.persistence.*;
@@ -24,4 +27,16 @@ public class GithubAccountEntity {
     Set<GithubRepoEntity> repos;
     @OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
     GithubAppInstallationEntity installation;
+
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "githubUser")
+    UserViewEntity user;
+
+    public ContributorLinkView toContributorLinkView() {
+        return ContributorLinkView.builder()
+                .githubUserId(id)
+                .login(login)
+                .avatarUrl(avatarUrl)
+                .isRegistered(user != null)
+                .build();
+    }
 }

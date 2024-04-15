@@ -83,4 +83,6 @@ public interface ProjectFacadePort {
     void showContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId);
 
     void updateProjectsTags();
+
+    Page<GithubIssueView> findGoodFirstIssues(UUID projectId, Integer page, Integer pageSize);
 }

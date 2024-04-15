@@ -5,6 +5,7 @@ import com.vladmihalcea.hibernate.type.array.EnumArrayType;
 import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
 import lombok.*;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserProfileInfoEntity;
@@ -46,6 +47,10 @@ public class UserViewEntity implements Serializable {
     @Column(name = "id", nullable = false)
     UUID id;
     Long githubUserId;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "githubUserId", referencedColumnName = "id", insertable = false, updatable = false)
+    GithubAccountEntity githubUser;
 
     @Getter(AccessLevel.NONE)
     String githubLogin;
