@@ -59,6 +59,7 @@ public class GithubIssueViewEntity {
             joinColumns = @JoinColumn(name = "issue_id"),
             inverseJoinColumns = @JoinColumn(name = "label_id")
     )
+    @OrderBy("name")
     List<GithubLabelViewEntity> labels;
 
     public enum Status {
@@ -86,7 +87,7 @@ public class GithubIssueViewEntity {
                 author.toContributorLinkView(),
                 repo.toShortView(),
                 commentsCount,
-                labels().stream().map(GithubLabelViewEntity::getName).toList()
+                labels().stream().map(GithubLabelViewEntity::toView).toList()
         );
     }
 

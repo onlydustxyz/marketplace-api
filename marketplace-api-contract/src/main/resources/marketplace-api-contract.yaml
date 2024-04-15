@@ -4355,7 +4355,14 @@ components:
             $ref: '#/components/schemas/GithubLabel'
 
     GithubLabel:
-      type: string
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        description:
+          type: string
 
     ContributionType:
       type: string

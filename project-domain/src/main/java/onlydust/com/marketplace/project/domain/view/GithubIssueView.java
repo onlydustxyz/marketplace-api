@@ -17,7 +17,7 @@ public record GithubIssueView(
         @NonNull ContributorLinkView author,
         @NonNull ShortRepoView repository,
         @NonNull Integer commentsCount,
-        @NonNull List<String> labels
+        @NonNull List<GithubLabelView> labels
 ) {
     public enum Status {
         OPEN, COMPLETED, CANCELLED

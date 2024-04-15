@@ -52,9 +52,18 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                               },
                               "commentCount": 1,
                               "labels": [
-                                "✅ good first issue",
-                                "Low priority",
-                                "api"
+                                {
+                                  "name": "Low priority",
+                                  "description": "Created by Linear-GitHub Sync"
+                                },
+                                {
+                                  "name": "api",
+                                  "description": "area: API, enterprise API, access token, OAuth"
+                                },
+                                {
+                                  "name": "✅ good first issue",
+                                  "description": "Good for newcomers"
+                                }
                               ]
                             },
                             {
@@ -81,8 +90,14 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                               },
                               "commentCount": 5,
                               "labels": [
-                                "✅ good first issue",
-                                "Low priority"
+                                {
+                                  "name": "Low priority",
+                                  "description": "Created by Linear-GitHub Sync"
+                                },
+                                {
+                                  "name": "✅ good first issue",
+                                  "description": "Good for newcomers"
+                                }
                               ]
                             },
                             {
@@ -109,9 +124,18 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                               },
                               "commentCount": 6,
                               "labels": [
-                                "✅ good first issue",
-                                "Low priority",
-                                "✨ feature"
+                                {
+                                  "name": "Low priority",
+                                  "description": "Created by Linear-GitHub Sync"
+                                },
+                                {
+                                  "name": "✅ good first issue",
+                                  "description": "Good for newcomers"
+                                },
+                                {
+                                  "name": "✨ feature",
+                                  "description": "New feature or request"
+                                }
                               ]
                             },
                             {
@@ -138,10 +162,22 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                               },
                               "commentCount": 5,
                               "labels": [
-                                "\\uD83D\\uDC1B bug",
-                                "Low priority",
-                                "insights",
-                                "good first issue"
+                                {
+                                  "name": "Low priority",
+                                  "description": "Created by Linear-GitHub Sync"
+                                },
+                                {
+                                  "name": "good first issue",
+                                  "description": null
+                                },
+                                {
+                                  "name": "insights",
+                                  "description": "area: insights, analytics"
+                                },
+                                {
+                                  "name": "\\uD83D\\uDC1B bug",
+                                  "description": "Something isn't working"
+                                }
                               ]
                             },
                             {
@@ -168,10 +204,22 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                               },
                               "commentCount": 9,
                               "labels": [
-                                "✅ good first issue",
-                                "Low priority",
-                                "✨ feature",
-                                "booking-page"
+                                {
+                                  "name": "Low priority",
+                                  "description": "Created by Linear-GitHub Sync"
+                                },
+                                {
+                                  "name": "booking-page",
+                                  "description": "area: booking page, public booking page, booker"
+                                },
+                                {
+                                  "name": "✅ good first issue",
+                                  "description": "Good for newcomers"
+                                },
+                                {
+                                  "name": "✨ feature",
+                                  "description": "New feature or request"
+                                }
                               ]
                             }
                           ]

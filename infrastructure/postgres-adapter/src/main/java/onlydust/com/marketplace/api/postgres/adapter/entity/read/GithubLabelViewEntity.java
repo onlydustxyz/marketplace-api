@@ -4,6 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
+import onlydust.com.marketplace.project.domain.view.GithubLabelView;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -22,4 +23,8 @@ public class GithubLabelViewEntity {
     @NonNull String name;
 
     String description;
+
+    public GithubLabelView toView() {
+        return new GithubLabelView(id, name, description);
+    }
 }
