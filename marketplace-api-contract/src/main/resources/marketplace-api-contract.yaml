@@ -728,6 +728,30 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/me/hackathons/{hackathonId}/registrations:
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Register to an hackathon as a participant
+      operationId: registerToHackathon
+      description: |
+        Register to an hackathon as a participant
+      parameters:
+        - in: path
+          name: hackathonSlug
+          required: true
+          schema:
+            $ref: '#/components/schemas/HackathonSlug'
+      responses:
+        "204":
+          description: 'Successfully register.'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/technologies:
     get:
       tags:
@@ -2922,6 +2946,56 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/hackathons:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Hackathons
+      summary: Get hackathons list
+      operationId: getHackathons
+      description: |
+        Get hackathons list
+      responses:
+        "200":
+          description: 'hackathons list'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HackathonsListResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/hackathons/slug/{hackathonSlug}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Hackathons
+      summary: Get hackathon by slug
+      operationId: getHackathonBySlug
+      description: |
+        Get hackathon by slug
+      parameters:
+        - in: path
+          name: hackathonSlug
+          required: true
+          schema:
+            $ref: '#/components/schemas/HackathonSlug'
+      responses:
+        "200":
+          description: 'hackathon response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HackathonsDetailsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -3079,6 +3153,16 @@ components:
       type: string
       description: OnlyDust project pretty ID that is computed from its name. This ID CAN change over time.
       example: my-awesome-project
+
+    HackathonId:
+      type: string
+      format: uuid
+      description: OnlyDust hackathon ID
+
+    HackathonSlug:
+      type: string
+      description: OnlyDust hackathon pretty ID that is computed from its name. This ID CAN change over time.
+      example: my-awesome-hackathon
 
     CurrencyId:
       type: string
@@ -3826,7 +3910,7 @@ components:
         moreInfos:
           type: array
           items:
-            $ref: '#/components/schemas/MoreInfo'
+            $ref: '#/components/schemas/SimpleLink'
         hiring:
           type: boolean
           description: Is the project currently hiring?
@@ -4878,7 +4962,7 @@ components:
         moreInfos:
           type: array
           items:
-            $ref: '#/components/schemas/MoreInfo'
+            $ref: '#/components/schemas/SimpleLink'
         isLookingForContributors:
           type: boolean
         inviteGithubUserIdsAsProjectLeads:
@@ -4928,7 +5012,7 @@ components:
         moreInfos:
           type: array
           items:
-            $ref: '#/components/schemas/MoreInfo'
+            $ref: '#/components/schemas/SimpleLink'
         isLookingForContributors:
           type: boolean
         inviteGithubUserIdsAsProjectLeads:
@@ -5013,7 +5097,7 @@ components:
           format: uuid
         projectSlug:
           type: string
-    MoreInfo:
+    SimpleLink:
       type: object
       required:
         - url
@@ -6172,3 +6256,122 @@ components:
           type: number
         currencyId:
           $ref: '#/components/schemas/CurrencyId'
+
+    HackathonsListItemResponse:
+      type: object
+      required:
+        - slug
+        - id
+        - title
+        - location
+        - startDate
+        - endDate
+      properties:
+        id:
+          $ref: '#/components/schemas/HackathonId'
+        slug:
+          $ref: '#/components/schemas/HackathonSlug'
+        title:
+          type: string
+        location:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+
+    HackathonsListResponse:
+      type: object
+      required:
+        - hackathons
+      properties:
+        hackathons:
+          type: array
+          items:
+            $ref: '#/components/schemas/HackathonsListItemResponse'
+
+    HackathonsTrackResponse:
+      type: object
+      required:
+        - name
+        - subtitle
+        - description
+        - iconSlug
+        - projects
+      properties:
+        name:
+          type: string
+        subtitle:
+          type: string
+        description:
+          type: string
+        iconSlug:
+          type: string
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortProjectResponse'
+
+    HackathonsDetailsResponse:
+      type: object
+      required:
+        - slug
+        - id
+        - title
+        - subtitle
+        - description
+        - location
+        - startDate
+        - endDate
+        - totalBudget
+        - me
+        - links
+        - sponsors
+        - projects
+        - tracks
+      properties:
+        id:
+          $ref: '#/components/schemas/HackathonId'
+        slug:
+          $ref: '#/components/schemas/HackathonSlug'
+        title:
+          type: string
+        subtitle:
+          type: string
+        description:
+          type: string
+        location:
+          type: string
+        totalBudget:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        me:
+          type: object
+          required:
+            - hasRegistered
+          properties:
+            hasRegistered:
+              type: boolean
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/SimpleLink'
+        sponsors:
+          type: array
+          items:
+            $ref: '#/components/schemas/SponsorResponse'
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectLinkResponse'
+        tracks:
+          type: array
+          items:
+            $ref: '#/components/schemas/HackathonsTrackResponse'

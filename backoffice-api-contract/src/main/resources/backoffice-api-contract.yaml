@@ -1580,6 +1580,111 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/hackathons:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Hackathons
+      summary: Get hackathons pages
+      operationId: getHackathons
+      description: |
+        Get hackathons pages
+      responses:
+        "200":
+          description: 'hackathons pages'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HackathonsPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Hackathons
+      summary: create hackathon
+      operationId: createHackathon
+      description: |
+        create hackathon
+      requestBody:
+        description: Hackathon
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateHackathonRequest'
+      responses:
+        "204":
+          description: 'The hackathon has been created'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/hackathons/slug/{hackathonSlug}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Hackathons
+      summary: Get hackathon by slug
+      operationId: getHackathonBySlug
+      description: |
+        Get hackathon by slug
+      parameters:
+        - in: path
+          name: hackathonSlug
+          required: true
+          schema:
+            $ref: '#/components/schemas/HackathonSlug'
+      responses:
+        "200":
+          description: 'hackathon response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HackathonsDetailsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/hackathons/id/{hackathonId}:
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Hackathons
+      summary: update hackathon by id
+      operationId: updateHackathonById
+      description: |
+        update hackathon by id
+      parameters:
+        - in: path
+          name: hackathonId
+          required: true
+          schema:
+            $ref: '#/components/schemas/HackathonId'
+      requestBody:
+        description: Hackathon
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateHackathonRequest'
+      responses:
+        "204":
+          description: 'The hackathon has been updated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+
 components:
   securitySchemes:
     bearerAuth:
@@ -2079,6 +2184,30 @@ components:
     ProjectId:
       type: string
       format: uuid
+
+    HackathonId:
+      type: string
+      format: uuid
+
+    HackathonSlug:
+      type: string
+
+    HackathonStatus:
+      type: string
+      enum:
+        - DRAFT
+        - PUBLISHED
+        - CANCELED
+
+    SimpleLink:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+        value:
+          type: string
 
     TransactionReceiptId:
       type: string
@@ -3287,3 +3416,197 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ShortRewardResponse'
+
+    HackathonsPageItemResponse:
+      type: object
+      required:
+        - slug
+        - id
+        - status
+        - title
+        - location
+        - startDate
+        - endDate
+      properties:
+        id:
+          $ref: '#/components/schemas/HackathonId'
+        slug:
+          $ref: '#/components/schemas/HackathonSlug'
+        status:
+          $ref: '#/components/schemas/HackathonStatus'
+        title:
+          type: string
+        location:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+
+    HackathonsPageResponse:
+      type: object
+      required:
+        - hackathons
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        hackathons:
+          type: array
+          items:
+            $ref: '#/components/schemas/HackathonsPageItemResponse'
+
+    HackathonsTrackResponse:
+      type: object
+      required:
+        - name
+        - subtitle
+        - description
+        - iconSlug
+        - projects
+      properties:
+        name:
+          type: string
+        subtitle:
+          type: string
+        description:
+          type: string
+        iconSlug:
+          type: string
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectLinkResponse'
+
+    HackathonsDetailsResponse:
+      type: object
+      required:
+        - slug
+        - id
+        - status
+        - title
+        - subtitle
+        - description
+        - location
+        - startDate
+        - endDate
+        - totalBudget
+        - links
+        - sponsors
+        - tracks
+      properties:
+        id:
+          $ref: '#/components/schemas/HackathonId'
+        slug:
+          $ref: '#/components/schemas/HackathonSlug'
+        status:
+          $ref: '#/components/schemas/HackathonStatus'
+        title:
+          type: string
+        subtitle:
+          type: string
+        description:
+          type: string
+        location:
+          type: string
+        totalBudget:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/SimpleLink'
+        sponsors:
+          type: array
+          items:
+            $ref: '#/components/schemas/SponsorResponse'
+        tracks:
+          type: array
+          items:
+            $ref: '#/components/schemas/HackathonsTrackResponse'
+
+    UpdateTracksRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        subtitle:
+          type: string
+        description:
+          type: string
+        iconSlug:
+          type: string
+        projectIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectId'
+
+    UpdateHackathonRequest:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/HackathonStatus'
+        title:
+          type: string
+        subtitle:
+          type: string
+        description:
+          type: string
+        location:
+          type: string
+        totalBudget:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/SimpleLink'
+        sponsorIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/SponsorId'
+        tracks:
+          type: array
+          items:
+            $ref: '#/components/schemas/UpdateTracksRequest'
+
+    CreateHackathonRequest:
+      type: object
+      required:
+        - title
+        - subtitle
+        - startDate
+        - endDate
+      properties:
+        title:
+          type: string
+        subtitle:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
