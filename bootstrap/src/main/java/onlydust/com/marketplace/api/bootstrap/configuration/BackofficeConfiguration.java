@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
+import onlydust.com.backoffice.api.contract.HackathonsApi;
 import onlydust.com.marketplace.accounting.domain.port.in.*;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
@@ -84,5 +85,10 @@ public class BackofficeConfiguration {
                                         final AccountingFacadePort accountingFacadePort) {
         return new PaymentService(accountingRewardStoragePort, invoiceStoragePort,
                 accountingFacadePort);
+    }
+
+    @Bean
+    HackathonsApi hackathonsApi() {
+        return new BackofficeHackathonRestApi();
     }
 }

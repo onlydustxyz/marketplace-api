@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.accounting.domain.port.in.*;
+import onlydust.com.marketplace.api.contract.HackathonsApi;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.project.domain.port.input.*;
@@ -76,4 +77,8 @@ public class RestApiConfiguration {
         return new EcosystemsRestApi(ecosystemFacadePort);
     }
 
+    @Bean
+    public HackathonsApi hackathonsApi() {
+        return new HackathonRestApi();
+    }
 }
