@@ -68,6 +68,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     private final Faker faker = new Faker();
 
     UserId antho;
+    UserAuthHelper.AuthenticatedBackofficeUser camille;
     CompanyBillingProfile companyBillingProfile;
 
     static final List<Invoice.Id> companyBillingProfileToReviewInvoices = new ArrayList<>();
@@ -75,6 +76,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     @BeforeEach
     void setupAll() {
         antho = UserId.of(userAuthHelper.authenticateAnthony().user().getId());
+        camille = userAuthHelper.authenticateCamille();
     }
 
     void setUp() throws IOException {
@@ -380,7 +382,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
         client
                 .get()
                 .uri(getApiURI(INVOICE.formatted(companyBillingProfileToReviewInvoices.get(0))))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -558,7 +560,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
         client
                 .get()
                 .uri(getApiURI(INVOICE.formatted(companyBillingProfileToReviewInvoices.get(1))))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()

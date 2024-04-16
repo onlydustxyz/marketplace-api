@@ -175,6 +175,8 @@ public class AbstractMarketplaceApiIT {
     @Autowired
     UserRepository userRepository;
     @Autowired
+    BackofficeUserRepository backofficeUserRepository;
+    @Autowired
     JWTVerifier jwtVerifier;
     @Autowired
     GithubAuthenticationPort githubAuthenticationPort;
@@ -227,7 +229,7 @@ public class AbstractMarketplaceApiIT {
 
     @BeforeEach
     void setupUserAuthHelper() {
-        userAuthHelper = new UserAuthHelper(userRepository, jwtVerifier, githubAuthenticationPort, auth0WireMockServer);
+        userAuthHelper = new UserAuthHelper(userRepository, backofficeUserRepository, jwtVerifier, githubAuthenticationPort, auth0WireMockServer);
 
         userAuthHelper.mockAuth0UserInfo(134486697L, "axelbconseil");
         userAuthHelper.mockAuth0UserInfo(43467246L, "AnthonyBuisset", "abuisset@gmail.com");
