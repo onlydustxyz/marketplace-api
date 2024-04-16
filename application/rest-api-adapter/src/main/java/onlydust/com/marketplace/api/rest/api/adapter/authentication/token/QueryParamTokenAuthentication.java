@@ -2,8 +2,8 @@ package onlydust.com.marketplace.api.rest.api.adapter.authentication.token;
 
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.OnlyDustAppAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.OnlyDustAppGrantedAuthority;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.User;
-import onlydust.com.marketplace.project.domain.model.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
@@ -13,7 +13,7 @@ public record QueryParamTokenAuthentication(String token) implements OnlyDustApp
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new OnlyDustAppGrantedAuthority(UserRole.UNSAFE_INTERNAL_SERVICE));
+        return List.of(new OnlyDustAppGrantedAuthority(AuthenticatedUser.Role.UNSAFE_INTERNAL_SERVICE));
     }
 
     @Override

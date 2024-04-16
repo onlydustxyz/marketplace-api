@@ -5,9 +5,9 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.Auth0Onl
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.OnlyDustAppAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.backoffice.Auth0OnlyDustBackofficeAuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.backoffice.OnlyDustBackofficeAuthentication;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.model.User;
-import onlydust.com.marketplace.project.domain.model.UserRole;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import onlydust.com.marketplace.user.domain.port.input.BackofficeUserFacadePort;
@@ -79,7 +79,7 @@ class Auth0JwtServiceTest {
                 .githubLogin("pixelfact")
                 .githubAvatarUrl("https://avatars.githubusercontent.com/u/143011364?v=4")
                 .githubUserId(143011364L)
-                .roles(List.of(UserRole.USER))
+                .roles(List.of(AuthenticatedUser.Role.USER))
                 .hasSeenOnboardingWizard(true)
                 .hasAcceptedLatestTermsAndConditions(true)
                 .build());
@@ -97,7 +97,7 @@ class Auth0JwtServiceTest {
         final User user = authentication.getUser();
         assertThat(user.getGithubLogin()).isEqualTo("pixelfact");
         assertThat(user.getGithubUserId()).isEqualTo(143011364L);
-        assertThat(user.getRoles()).containsExactlyInAnyOrder(UserRole.USER);
+        assertThat(user.getRoles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER);
         assertThat(user.hasSeenOnboardingWizard()).isTrue();
         assertThat(user.hasAcceptedLatestTermsAndConditions()).isTrue();
     }
@@ -171,7 +171,7 @@ class Auth0JwtServiceTest {
                 .githubLogin("pixelfact")
                 .githubAvatarUrl("https://avatars.githubusercontent.com/u/143011364?v=4")
                 .githubUserId(143011364L)
-                .roles(List.of(UserRole.USER, UserRole.ADMIN))
+                .roles(List.of(AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN))
                 .hasSeenOnboardingWizard(true)
                 .hasAcceptedLatestTermsAndConditions(true)
                 .build());
@@ -190,7 +190,7 @@ class Auth0JwtServiceTest {
                 .githubLogin("ofux")
                 .githubAvatarUrl("https://avatars.githubusercontent.com/u/595505?v=4")
                 .githubUserId(595505L)
-                .roles(List.of(UserRole.USER))
+                .roles(List.of(AuthenticatedUser.Role.USER))
                 .build());
 
         // When
@@ -206,7 +206,7 @@ class Auth0JwtServiceTest {
         final User user = authentication.getUser();
         assertThat(user.getGithubLogin()).isEqualTo("ofux");
         assertThat(user.getGithubUserId()).isEqualTo(595505L);
-        assertThat(user.getRoles()).containsExactlyInAnyOrder(UserRole.USER);
+        assertThat(user.getRoles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER);
 
         final User impersonator = authentication.getImpersonator();
         assertThat(impersonator.getGithubLogin()).isEqualTo("pixelfact");
@@ -235,7 +235,7 @@ class Auth0JwtServiceTest {
                 .githubLogin("kaelsky")
                 .githubAvatarUrl("https://avatars.githubusercontent.com/u/31901905?v=4")
                 .githubUserId(31901905L)
-                .roles(List.of(UserRole.USER))
+                .roles(List.of(AuthenticatedUser.Role.USER))
                 .build());
 
         final String impersonationHeader = """
@@ -252,7 +252,7 @@ class Auth0JwtServiceTest {
                 .githubLogin("ofux")
                 .githubAvatarUrl("https://avatars.githubusercontent.com/u/595505?v=4")
                 .githubUserId(595505L)
-                .roles(List.of(UserRole.USER))
+                .roles(List.of(AuthenticatedUser.Role.USER))
                 .build());
 
         // When

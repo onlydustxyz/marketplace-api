@@ -245,6 +245,6 @@ public class BillingProfileRestApi implements BillingProfilesApi {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var invoiceableRewards = billingProfileFacadePort.getInvoiceableRewardsForBillingProfile(UserId.of(authenticatedUser.getId()),
                 BillingProfile.Id.of(billingProfileId));
-        return ok(BillingProfileMapper.mapToInvoiceableRewardsResponse(invoiceableRewards));
+        return ok(BillingProfileMapper.mapToInvoiceableRewardsResponse(invoiceableRewards, authenticatedUser.asAuthenticatedUser()));
     }
 }

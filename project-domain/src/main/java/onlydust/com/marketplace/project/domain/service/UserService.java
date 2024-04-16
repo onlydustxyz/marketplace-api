@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
@@ -55,7 +56,7 @@ public class UserService implements UserFacadePort {
                     }
                     var user = User.builder()
                             .id(UUID.randomUUID())
-                            .roles(List.of(UserRole.USER))
+                            .roles(List.of(AuthenticatedUser.Role.USER))
                             .githubUserId(githubUserIdentity.getGithubUserId())
                             .githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl())
                             .githubLogin(githubUserIdentity.getGithubLogin())

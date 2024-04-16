@@ -176,7 +176,7 @@ public class ProjectsRestApi implements ProjectsApi {
                 sanitizedPageIndex, sanitizedPageSize,
                 sortBy, SortDirectionMapper.requestToDomain(direction));
 
-        final RewardsPageResponse rewardsPageResponse = mapProjectRewardPageToResponse(sanitizedPageIndex, page);
+        final RewardsPageResponse rewardsPageResponse = mapProjectRewardPageToResponse(sanitizedPageIndex, page, authenticatedUser.asAuthenticatedUser());
 
         return rewardsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardsPageResponse) :
@@ -213,7 +213,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final RewardDetailsView rewardDetailsView = projectRewardFacadePort.getRewardByIdForProjectLead(projectId, rewardId,
                 authenticatedUser.getId());
-        return ResponseEntity.ok(RewardMapper.projectRewardDetailsToResponse(rewardDetailsView));
+        return ResponseEntity.ok(RewardMapper.projectRewardDetailsToResponse(rewardDetailsView, authenticatedUser.asAuthenticatedUser()));
     }
 
     @Override
@@ -282,11 +282,9 @@ public class ProjectsRestApi implements ProjectsApi {
     public ResponseEntity<ContributionDetailsResponse> getContribution(UUID projectId, String contributionId) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        final var contribution = contributionsFacadePort.getContribution(projectId, contributionId,
-                authenticatedUser);
+        final var contribution = contributionsFacadePort.getContribution(projectId, contributionId, authenticatedUser);
 
-        return ResponseEntity.ok(ContributionMapper.mapContributionDetails(contribution,
-                authenticatedUser.getGithubUserId(), authenticatedUser.getAdministratedBillingProfile()));
+        return ResponseEntity.ok(ContributionMapper.mapContributionDetails(contribution, authenticatedUser.asAuthenticatedUser()));
     }
 
     @Override

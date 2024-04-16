@@ -6,9 +6,11 @@ import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.view.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.AllUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.InvoiceViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -32,8 +34,9 @@ public class BackofficeRewardViewEntity {
     @NonNull UUID id;
     @NonNull Date requestedAt;
 
-    String recipientLogin;
-    String recipientAvatarUrl;
+    @ManyToOne
+    @JoinColumn(name = "recipientId", referencedColumnName = "githubUserId")
+    AllUserViewEntity recipient;
 
     @Type(type = "jsonb")
     List<String> githubUrls;
@@ -89,7 +92,7 @@ public class BackofficeRewardViewEntity {
         return RewardDetailsView.builder()
                 .id(RewardId.of(this.id))
                 .paymentId(batchPaymentId == null ? null : Payment.Id.of(batchPaymentId))
-                .status(status.toDomain())
+                .status(status())
                 .requestedAt(DateMapper.ofNullable(this.requestedAt))
                 .processedAt(DateMapper.ofNullable(this.statusData.paidAt()))
                 .githubUrls(isNull(this.githubUrls) ? List.of() : this.githubUrls.stream().sorted().toList())
@@ -101,7 +104,7 @@ public class BackofficeRewardViewEntity {
                         .slug(this.projectSlug)
                         .build())
                 .billingProfile(isNull(this.billingProfile) ? null : this.billingProfile.toDomain())
-                .recipient(this.recipientLogin == null ? null : new ShortContributorView(this.recipientLogin, this.recipientAvatarUrl))
+                .recipient(new ShortContributorView(recipient.login(), recipient.avatarUrl()))
                 .sponsors(isNull(this.sponsors) ? List.of() : this.sponsors.stream()
                         .map(SponsorLinkView::toDomain)
                         .sorted(comparing(ShortSponsorView::name))
@@ -109,6 +112,15 @@ public class BackofficeRewardViewEntity {
                 .money(new MoneyView(this.amount, this.currency.toDomain(), this.statusData.usdConversionRate(), this.statusData.amountUsdEquivalent()))
                 .invoice(isNull(this.invoice) ? null : invoice.toView())
                 .receipts(isNull(this.receipts) ? List.of() : this.receipts.stream().map(r -> r.toDomain(RewardId.of(this.id))).toList())
+                .build();
+    }
+
+    private RewardStatus status() {
+        return RewardStatus.builder()
+                .projectId(projectId)
+                .billingProfileId(billingProfile == null ? null : billingProfile.getId())
+                .recipientId(recipient.githubUserId())
+                .status(this.status.toDomain())
                 .build();
     }
 }

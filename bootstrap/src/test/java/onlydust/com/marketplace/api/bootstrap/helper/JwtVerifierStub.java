@@ -62,6 +62,10 @@ public class JwtVerifierStub implements JWTVerifier {
         return tokenFor("github|%d".formatted(githubUserId));
     }
 
+    public String googleTokenFor(String email) {
+        return tokenFor("google-oauth2|%s".formatted(email));
+    }
+
     public String tokenFor(Long githubUserId, long expiresInMilliseconds) {
         return tokenFor("github|%d".formatted(githubUserId), expiresInMilliseconds);
     }

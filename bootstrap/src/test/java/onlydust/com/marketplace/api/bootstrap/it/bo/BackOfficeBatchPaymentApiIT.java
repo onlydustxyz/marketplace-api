@@ -24,10 +24,7 @@ import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import org.apache.commons.lang3.mutable.MutableObject;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
@@ -57,6 +54,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
     EntityManagerFactory entityManagerFactory;
     @Autowired
     BackofficeAccountingManagementRestApi backofficeAccountingManagementRestApi;
+    UserAuthHelper.AuthenticatedBackofficeUser camille;
 
     private final Faker faker = new Faker();
 
@@ -69,6 +67,11 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
     static final List<Invoice.Id> olivierInvoiceIds = new ArrayList<>();
     static Payment.Id sepaBatchPaymentId;
     static Payment.Id ethBatchPaymentId;
+
+    @BeforeEach
+    void login() {
+        camille = userAuthHelper.authenticateCamille();
+    }
 
     void setUp() throws IOException {
         // Given
@@ -174,7 +177,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                             }
                         """.formatted(
                         anthonyInvoiceIds.get(1)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -198,7 +201,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
         client
                 .put()
                 .uri(getApiURI(PUT_INVOICES_STATUS.formatted(olivierInvoiceIds.get(0))))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -220,7 +223,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                         """.formatted(
                         olivierInvoiceIds.get(0),
                         anthonyInvoiceIds.get(0)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -286,7 +289,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
         final var csv = new MutableObject<String>();
         client.get()
                 .uri(getApiURI(GET_REWARDS_BATCH_PAYMENTS_BY_ID.formatted(ethBatchPaymentId)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -347,7 +350,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
     void should_get_batch_payments() {
         client.get()
                 .uri(getApiURI(GET_REWARDS_BATCH_PAYMENTS, Map.of("pageIndex", "0", "pageSize", "10")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -414,7 +417,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                             "transactionHash": "0xfoobar"
                         }
                         """)
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -432,7 +435,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                             "transactionHash": "0x313d09b7aa7d113ebd99cd58a59741d9e547813989d94ece7725b841a776b47e"
                         }
                         """)
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -440,7 +443,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
 
         client.get()
                 .uri(getApiURI(GET_REWARDS_BATCH_PAYMENTS_BY_ID.formatted(ethBatchPaymentId)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -459,7 +462,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
 
         client.get()
                 .uri(getApiURI(GET_REWARDS_BATCH_PAYMENTS, Map.of("pageIndex", "0", "pageSize", "10", "statuses", "PAID")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -507,7 +510,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                             "transactionHash": "0x313d09b7aa7d113ebd99cd58a59741d9e547813989d94ece7725b841a776b47e"
                         }
                         """)
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -519,7 +522,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
     void should_fail_to_delete_batch_payment_when_it_is_already_paid() {
         client.delete()
                 .uri(getApiURI(REWARDS_BATCH_PAYMENTS.formatted(ethBatchPaymentId)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -531,7 +534,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
     void should_delete_batch_payment_when_it_is_not_already_paid() {
         client.delete()
                 .uri(getApiURI(REWARDS_BATCH_PAYMENTS.formatted(sepaBatchPaymentId)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -539,7 +542,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
 
         client.get()
                 .uri(getApiURI(GET_REWARDS_BATCH_PAYMENTS_BY_ID.formatted(sepaBatchPaymentId)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()

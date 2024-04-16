@@ -27,14 +27,14 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeAccountingManagementRestApi;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.service.RewardService;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import onlydust.com.marketplace.user.domain.model.BackofficeUser;
+import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -54,10 +54,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RewardStatusIT extends AbstractMarketplaceApiIT {
-
     @Autowired
     RewardService rewardService;
     @Autowired
@@ -84,6 +85,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     AccountingObserver accountingObserver;
     @Autowired
     InvoiceService invoiceService;
+    final AuthenticatedBackofficeUserService authenticatedBackofficeUserService = mock(AuthenticatedBackofficeUserService.class);
 
     private final Double strkToUsd1 = 2.5;
     private final Double strkToUsd2 = 3.4;
@@ -119,6 +121,13 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     private UUID individualBPId;
     private UUID companyBPId;
     private UUID selfEmployedBPId;
+
+    @BeforeEach
+    void setupAuthenticationMock() {
+        Mockito.reset(authenticatedBackofficeUserService);
+        when(authenticatedBackofficeUserService.getAuthenticatedBackofficeUser()).thenReturn(new BackofficeUser(BackofficeUser.Id.random(),
+                faker.internet().emailAddress(), faker.internet().slug(), Set.of(BackofficeUser.Role.BO_ADMIN), faker.internet().avatar()));
+    }
 
     public void resetAuth0Mock() {
         userRepository.findByGithubUserId(individualBPAdminGithubId).ifPresent(userAuthHelper::mockAuth0UserInfo);
@@ -260,7 +269,6 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         userAuthHelper.signUpUser(UUID.randomUUID(), 4L, "acomminos", "https://avatars.githubusercontent.com/u/628035?v=4", false);
         userAuthHelper.signUpUser(UUID.randomUUID(), 5L, "yanns", "https://avatars.githubusercontent.com/u/51669?v=4", false);
     }
-
 
     private void updatePayoutPreferences(final Long githubUserId, BillingProfile.Id billingProfileId, final UUID projectId) {
         final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.authenticateUser(githubUserId);
@@ -3845,7 +3853,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, mailNotificationPort, accountingService,
                         sponsorStoragePort),
                 new PaymentService(accountingRewardStoragePort, invoiceStoragePort, accountingService),
-                billingProfileService);
+                billingProfileService,
+                authenticatedBackofficeUserService);
         backofficeAccountingManagementRestApi.payReward(individualBPAdminRewardId1,
                 new PayRewardRequest().network(TransactionNetwork.ETHEREUM).recipientAccount("0xa11c0edBa8924280Df7f258B370371bD985C8B0B").reference(
                         "0xb1c3579ffbe3eabe6f88c58a037367dee7de6c06262cfecc3bd2e8c013cc5156"));

@@ -12,12 +12,12 @@ import java.util.List;
 public interface AccountingRewardPort {
 
     Page<RewardDetailsView> getRewards(int pageIndex, int pageSize,
-                                       List<RewardStatus> statuses,
+                                       List<RewardStatus.Input> statuses,
                                        List<BillingProfile.Id> billingProfileIds,
                                        Date fromRequestedAt, Date toRequestedAt,
                                        Date fromProcessedAt, Date toProcessedAt);
 
-    String exportRewardsCSV(List<RewardStatus> statuses,
+    String exportRewardsCSV(List<RewardStatus.Input> statuses,
                             Date fromRequestedAt, Date toRequestedAt,
                             Date fromProcessedAt, Date toProcessedAt);
 

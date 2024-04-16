@@ -149,7 +149,9 @@ class BillingProfileServiceTest {
             when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
-                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, null, null, billingProfileId)).toList());
+                    .map(r -> new RewardAssociations(r.id(),
+                            RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), null, null,
+                            billingProfileId)).toList());
             when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
                     companyBillingProfile)
             );
@@ -235,7 +237,7 @@ class BillingProfileServiceTest {
             );
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(42);
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(List.of(new RewardAssociations(rewardIds.get(0),
-                    RewardStatus.PENDING_REQUEST, null, null, billingProfileId)));
+                    RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), null, null, billingProfileId)));
 
             // When
             assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))
@@ -270,7 +272,9 @@ class BillingProfileServiceTest {
             );
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(42);
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
-                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, Invoice.Id.random(), TO_REVIEW, BillingProfile.Id.random())).toList());
+                    .map(r -> new RewardAssociations(r.id(),
+                            RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), Invoice.Id.random(),
+                            TO_REVIEW, BillingProfile.Id.random())).toList());
 
             // When
             assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))
@@ -281,7 +285,9 @@ class BillingProfileServiceTest {
 
             // Should not reject when rewards are associated with an invoice in DRAFT
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
-                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, Invoice.Id.random(), DRAFT, BillingProfile.Id.random())).toList());
+                    .map(r -> new RewardAssociations(r.id(),
+                            RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), Invoice.Id.random(),
+                            DRAFT, BillingProfile.Id.random())).toList());
 
             assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))
                     // Then
@@ -290,7 +296,9 @@ class BillingProfileServiceTest {
 
             // Should not reject when rewards are associated with an invoice in REJECTED
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
-                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, Invoice.Id.random(), REJECTED, BillingProfile.Id.random())).toList());
+                    .map(r -> new RewardAssociations(r.id(),
+                            RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), Invoice.Id.random(),
+                            REJECTED, BillingProfile.Id.random())).toList());
 
             assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))
                     // Then
@@ -323,7 +331,11 @@ class BillingProfileServiceTest {
             );
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(42);
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
-                    .map(r -> new RewardAssociations(r.id(), RewardStatus.INDIVIDUAL_LIMIT_REACHED, Invoice.Id.random(), Invoice.Status.DRAFT,
+                    .map(r -> new RewardAssociations(r.id(), RewardStatus.builder()
+                            .projectId(ProjectId.random().value())
+                            .recipientId(faker.number().randomNumber(4, true))
+                            .status(RewardStatus.Input.INDIVIDUAL_LIMIT_REACHED).build(),
+                            Invoice.Id.random(), Invoice.Status.DRAFT,
                             billingProfileId)).toList());
 
             // When
@@ -357,14 +369,21 @@ class BillingProfileServiceTest {
                             .build())
             );
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(42);
+
+            final var billingProfileId = BillingProfile.Id.random();
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
-                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, null, null, BillingProfile.Id.random())).toList());
+                    .map(r -> new RewardAssociations(r.id(), RewardStatus.builder()
+                            .projectId(ProjectId.random().value())
+                            .recipientId(faker.number().randomNumber(4, true))
+                            .billingProfileId(billingProfileId.value())
+                            .status(RewardStatus.Input.PENDING_REQUEST)
+                            .build(), null, null, billingProfileId)).toList());
 
             // When
-            assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))
+            assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, BillingProfileServiceTest.this.billingProfileId, rewardIds))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("Some rewards are not associated with billing profile %s".formatted(billingProfileId));
+                    .hasMessage("Some rewards are not associated with billing profile %s".formatted(BillingProfileServiceTest.this.billingProfileId));
         }
 
         @Test
@@ -437,7 +456,7 @@ class BillingProfileServiceTest {
                     .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).invoiceMandateAcceptedAt(ZonedDateTime.now().minusDays(1)).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(List.of(new RewardAssociations(rewardIds.get(0),
-                    RewardStatus.PENDING_REQUEST, invoice.id(), Invoice.Status.DRAFT, billingProfileId)));
+                    RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), invoice.id(), Invoice.Status.DRAFT, billingProfileId)));
 
             // When
             assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
@@ -454,7 +473,9 @@ class BillingProfileServiceTest {
                     .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).invoiceMandateAcceptedAt(ZonedDateTime.now().minusDays(1)).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
-                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, Invoice.Id.random(), Invoice.Status.DRAFT, billingProfileId)).toList());
+                    .map(r -> new RewardAssociations(r.id(),
+                            RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), Invoice.Id.random(),
+                            Invoice.Status.DRAFT, billingProfileId)).toList());
 
             // When
             assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
@@ -471,7 +492,9 @@ class BillingProfileServiceTest {
                     .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).invoiceMandateAcceptedAt(ZonedDateTime.now().minusDays(1)).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
-                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, invoice.id(), Invoice.Status.DRAFT, BillingProfile.Id.random())).toList());
+                    .map(r -> new RewardAssociations(r.id(),
+                            RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), invoice.id(),
+                            Invoice.Status.DRAFT, BillingProfile.Id.random())).toList());
 
             // When
             assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
@@ -536,7 +559,7 @@ class BillingProfileServiceTest {
                     .id(billingProfileId).type(BillingProfile.Type.SELF_EMPLOYED).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(List.of(new RewardAssociations(rewardIds.get(0),
-                    RewardStatus.PENDING_REQUEST, invoice.id(), Invoice.Status.DRAFT, billingProfileId)));
+                    RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), invoice.id(), Invoice.Status.DRAFT, billingProfileId)));
 
             // When
             assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf))
@@ -553,7 +576,9 @@ class BillingProfileServiceTest {
                     .id(billingProfileId).type(BillingProfile.Type.SELF_EMPLOYED).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
-                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, Invoice.Id.random(), Invoice.Status.DRAFT, billingProfileId)).toList());
+                    .map(r -> new RewardAssociations(r.id(),
+                            RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), Invoice.Id.random(),
+                            Invoice.Status.DRAFT, billingProfileId)).toList());
 
             // When
             assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf))
@@ -570,7 +595,9 @@ class BillingProfileServiceTest {
                     .id(billingProfileId).type(BillingProfile.Type.SELF_EMPLOYED).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
-                    .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, invoice.id(), Invoice.Status.DRAFT, BillingProfile.Id.random())).toList());
+                    .map(r -> new RewardAssociations(r.id(),
+                            RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), invoice.id(),
+                            Invoice.Status.DRAFT, BillingProfile.Id.random())).toList());
 
             // When
             assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf))
@@ -680,7 +707,9 @@ class BillingProfileServiceTest {
                 when(pdfStoragePort.upload(invoice.id() + ".pdf", pdf)).thenReturn(url);
                 when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
                 when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
-                        .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, invoice.id(), Invoice.Status.DRAFT, billingProfileId)).toList());
+                        .map(r -> new RewardAssociations(r.id(),
+                                RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), invoice.id(),
+                                Invoice.Status.DRAFT, billingProfileId)).toList());
 
                 // When
                 billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf);
@@ -723,7 +752,9 @@ class BillingProfileServiceTest {
                 when(pdfStoragePort.upload(invoice.id() + ".pdf", pdf)).thenReturn(url);
                 when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
                 when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
-                        .map(r -> new RewardAssociations(r.id(), RewardStatus.PENDING_REQUEST, invoice.id(), Invoice.Status.DRAFT, billingProfileId)).toList());
+                        .map(r -> new RewardAssociations(r.id(),
+                                RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), invoice.id(),
+                                Invoice.Status.DRAFT, billingProfileId)).toList());
 
                 // When
                 billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf);

@@ -4,7 +4,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import com.vladmihalcea.hibernate.type.array.EnumArrayType;
 import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
 import lombok.*;
-import onlydust.com.marketplace.project.domain.model.UserRole;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -26,7 +26,7 @@ import java.util.UUID;
 @TypeDef(
         name = "user_role[]",
         typeClass = EnumArrayType.class,
-        defaultForType = UserRole[].class,
+        defaultForType = AuthenticatedUser.Role[].class,
         parameters = {
                 @Parameter(
                         name = AbstractArrayType.SQL_ARRAY_TYPE,
@@ -45,7 +45,7 @@ public class UserEntity {
     String githubEmail;
     @Type(type = "user_role[]")
     @Column(nullable = false, columnDefinition = "iam.user_role[]")
-    UserRole[] roles;
+    AuthenticatedUser.Role[] roles;
     private Date lastSeenAt;
 
     @CreationTimestamp

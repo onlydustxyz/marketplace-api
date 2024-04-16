@@ -27,7 +27,7 @@ public interface AccountingRewardStoragePort {
     List<RewardDetailsView> findRewardsById(Set<RewardId> rewardIds);
 
     Page<RewardDetailsView> findRewards(int pageIndex, int pageSize,
-                                        @NonNull Set<RewardStatus> statuses,
+                                        @NonNull Set<RewardStatus.Input> statuses,
                                         @NonNull List<BillingProfile.Id> billingProfileIds,
                                         Date fromRequestedAt, Date toRequestedAt,
                                         Date fromProcessedAt, Date toProcessedAt);

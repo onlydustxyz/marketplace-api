@@ -10,11 +10,12 @@ import java.util.UUID;
 public interface ContributionRewardViewEntityRepository extends JpaRepository<ContributionRewardViewEntity, UUID> {
 
     @Query(value = """
-            SELECT r.id,
-                   r.requested_at,
-                   r.amount,
-                   r.currency_id,
-                   r.billing_profile_id,
+            SELECT r.id                                                AS id,
+                   r.requested_at                                      AS requested_at,
+                   r.amount                                            AS amount,
+                   r.currency_id                                       AS currency_id,
+                   r.billing_profile_id                                AS billing_profile_id,
+                   r.project_id                                        AS project_id,
                    requestor.login                                     AS requestor_login,
                    user_avatar_url(requestor.id, requestor.avatar_url) AS requestor_avatar_url,
                    requestor.id                                        AS requestor_id,

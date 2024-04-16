@@ -9,7 +9,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposit
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserProfileInfoEntity;
-import onlydust.com.marketplace.project.domain.model.UserRole;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -33,7 +33,7 @@ import java.util.UUID;
 @TypeDef(
         name = "user_role[]",
         typeClass = EnumArrayType.class,
-        defaultForType = UserRole[].class,
+        defaultForType = AuthenticatedUser.Role[].class,
         parameters = {
                 @Parameter(
                         name = AbstractArrayType.SQL_ARRAY_TYPE,
@@ -61,7 +61,7 @@ public class UserViewEntity implements Serializable {
     String githubEmail;
     @Type(type = "user_role[]")
     @Column(name = "roles", nullable = false, columnDefinition = "iam.user_role[]")
-    UserRole[] roles;
+    AuthenticatedUser.Role[] roles;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id", referencedColumnName = "user_id", insertable = false, updatable = false)

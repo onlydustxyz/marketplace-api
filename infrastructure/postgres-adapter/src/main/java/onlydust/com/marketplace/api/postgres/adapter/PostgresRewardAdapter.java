@@ -122,12 +122,12 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     @Override
     @Transactional
     public Page<RewardDetailsView> findRewards(int pageIndex, int pageSize,
-                                               @NonNull Set<RewardStatus> statuses,
+                                               @NonNull Set<RewardStatus.Input> statuses,
                                                @NonNull List<BillingProfile.Id> billingProfileIds,
                                                Date fromRequestedAt, Date toRequestedAt,
                                                Date fromProcessedAt, Date toProcessedAt) {
         final var page = backofficeRewardViewRepository.findAllByStatusesAndDates(
-                statuses.stream().map(rewardStatus -> RewardStatusEntity.from(rewardStatus.asBackofficeUser())).map(RewardStatusEntity.Status::toString).toList(),
+                statuses.stream().map(rewardStatus -> RewardStatusEntity.from(rewardStatus)).map(RewardStatusEntity.Status::toString).toList(),
                 billingProfileIds.stream().map(BillingProfile.Id::value).toList(),
                 fromRequestedAt, toRequestedAt,
                 fromProcessedAt, toProcessedAt,

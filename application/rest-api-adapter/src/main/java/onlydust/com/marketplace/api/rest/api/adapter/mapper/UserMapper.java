@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.contract.model.ProjectVisibility;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.view.TotalEarnedPerCurrency;
 import onlydust.com.marketplace.project.domain.view.TotalsEarned;
@@ -242,7 +243,7 @@ public interface UserMapper {
                 )
                 .toList());
         getMeResponse.setProjectsAppliedTo(authenticatedUser.getProjectsAppliedTo());
-        getMeResponse.setIsAdmin(authenticatedUser.hasRole(UserRole.ADMIN));
+        getMeResponse.setIsAdmin(authenticatedUser.hasRole(AuthenticatedUser.Role.ADMIN));
         getMeResponse.setCreatedAt(toZoneDateTime(authenticatedUser.getCreatedAt()));
         getMeResponse.setEmail(authenticatedUser.getGithubEmail());
         getMeResponse.setFirstName(authenticatedUser.getFirstName());

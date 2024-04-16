@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.ReceiptEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.Money;
 import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
@@ -33,7 +34,7 @@ public class RewardDetailsViewEntity {
     @ManyToOne
     @NonNull CurrencyEntity currency;
     Integer contributionCount;
-    Long recipientId;
+    @NonNull Long recipientId;
     UUID invoiceId;
     UUID billingProfileId;
     String recipientLogin;
@@ -83,7 +84,7 @@ public class RewardDetailsViewEntity {
                 .processedAt(statusData.paidAt())
                 .rewardedOnProjectName(project.getName())
                 .rewardedOnProjectLogoUrl(project.getLogoUrl())
-                .status(status.toDomain())
+                .status(status())
                 .unlockDate(statusData.unlockDate())
                 .amount(amount())
                 .numberOfRewardedContributions(contributionCount)
@@ -99,7 +100,7 @@ public class RewardDetailsViewEntity {
                 .requestedAt(requestedAt)
                 .processedAt(statusData.paidAt())
                 .rewardedUser(to())
-                .status(status.toDomain())
+                .status(status())
                 .unlockDate(statusData.unlockDate())
                 .amount(amount())
                 .numberOfRewardedContributions(contributionCount)
@@ -111,6 +112,15 @@ public class RewardDetailsViewEntity {
                 .amount(amount)
                 .currency(currency.toView())
                 .usdEquivalent(statusData.amountUsdEquivalent())
+                .build();
+    }
+
+    private RewardStatus status() {
+        return RewardStatus.builder()
+                .projectId(project.getId())
+                .billingProfileId(billingProfileId)
+                .recipientId(recipientId)
+                .status(status.toDomain())
                 .build();
     }
 }

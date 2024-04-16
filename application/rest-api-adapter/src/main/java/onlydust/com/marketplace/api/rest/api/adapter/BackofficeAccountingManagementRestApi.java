@@ -12,6 +12,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.PaymentPort;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BatchPaymentMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
@@ -46,6 +47,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     private final AccountingRewardPort accountingRewardPort;
     private final PaymentPort paymentPort;
     private final BillingProfileFacadePort billingProfileFacadePort;
+    private final AuthenticatedBackofficeUserService authenticatedBackofficeUserService;
 
     @Override
     public ResponseEntity<AccountResponse> createSponsorAccount(UUID sponsorUuid, CreateAccountRequest createAccountRequest) {
@@ -179,6 +181,8 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                                                          String toRequestedAt,
                                                          String fromProcessedAt,
                                                          String toProcessedAt) {
+        final var authenticatedUser = authenticatedBackofficeUserService.getAuthenticatedBackofficeUser().asAuthenticatedUser();
+
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
 
@@ -192,7 +196,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                 DateMapper.parseNullable(fromProcessedAt),
                 DateMapper.parseNullable(toProcessedAt)
         );
-        return ResponseEntity.ok(rewardPageToResponse(sanitizedPageIndex, rewards));
+        return ResponseEntity.ok(rewardPageToResponse(sanitizedPageIndex, rewards, authenticatedUser));
     }
 
     @Override
@@ -216,8 +220,9 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
     @Override
     public ResponseEntity<RewardDetailsResponse> getReward(UUID rewardId) {
+        final var authenticatedUser = authenticatedBackofficeUserService.getAuthenticatedBackofficeUser().asAuthenticatedUser();
         final var reward = accountingRewardPort.getReward(RewardId.of(rewardId));
-        return ResponseEntity.ok(map(reward));
+        return ResponseEntity.ok(map(reward, authenticatedUser));
     }
 
     @Override
@@ -235,7 +240,8 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
     @Override
     public ResponseEntity<BatchPaymentDetailsResponse> getBatchPayment(UUID batchPaymentId) {
-        return ResponseEntity.ok(BatchPaymentMapper.domainToDetailedResponse(paymentPort.findPaymentById(Payment.Id.of(batchPaymentId))));
+        final var authenticatedUser = authenticatedBackofficeUserService.getAuthenticatedBackofficeUser().asAuthenticatedUser();
+        return ResponseEntity.ok(BatchPaymentMapper.domainToDetailedResponse(paymentPort.findPaymentById(Payment.Id.of(batchPaymentId)), authenticatedUser));
     }
 
     @Override

@@ -6,9 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtClaims;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.AuthenticationService;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.model.User;
-import onlydust.com.marketplace.project.domain.model.UserRole;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.Authentication;
@@ -55,7 +55,7 @@ public class Auth0OnlyDustAppAuthenticationService implements AuthenticationServ
     private Optional<Authentication> getAuthenticationFromImpersonationHeader(final String credentials,
                                                                               final User impersonator,
                                                                               final String impersonationHeader) {
-        if (!impersonator.getRoles().contains(UserRole.ADMIN)) {
+        if (!impersonator.getRoles().contains(AuthenticatedUser.Role.ADMIN)) {
             LOGGER.warn("User {} is not allowed to impersonate", impersonator.getGithubLogin());
             return Optional.empty();
         }

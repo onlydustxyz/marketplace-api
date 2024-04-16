@@ -33,17 +33,17 @@ public class RewardService implements AccountingRewardPort {
 
     @Override
     public Page<RewardDetailsView> getRewards(int pageIndex, int pageSize,
-                                              List<RewardStatus> statuses,
+                                              List<RewardStatus.Input> statuses,
                                               List<BillingProfile.Id> billingProfileIds,
                                               Date fromRequestedAt, Date toRequestedAt,
                                               Date fromProcessedAt, Date toProcessedAt) {
-        final Set<RewardStatus> sanitizedStatuses = isNull(statuses) ? Set.of() : statuses.stream().collect(Collectors.toUnmodifiableSet());
+        final Set<RewardStatus.Input> sanitizedStatuses = isNull(statuses) ? Set.of() : statuses.stream().collect(Collectors.toUnmodifiableSet());
         return accountingRewardStoragePort.findRewards(pageIndex, pageSize, sanitizedStatuses, Optional.ofNullable(billingProfileIds).orElse(List.of()),
                 fromRequestedAt, toRequestedAt, fromProcessedAt, toProcessedAt);
     }
 
     @Override
-    public String exportRewardsCSV(List<RewardStatus> statuses,
+    public String exportRewardsCSV(List<RewardStatus.Input> statuses,
                                    Date fromRequestedAt, Date toRequestedAt,
                                    Date fromProcessedAt, Date toProcessedAt) {
         final var rewards = accountingRewardStoragePort.findRewards(0, 1_000_000,

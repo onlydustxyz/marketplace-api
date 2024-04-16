@@ -11,7 +11,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
-import onlydust.com.marketplace.project.domain.model.UserRole;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -57,7 +57,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
                 .githubEmail(faker.internet().emailAddress())
-                .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
+                .roles(new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN})
                 .lastSeenAt(new Date())
                 .build();
 
@@ -74,7 +74,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
                 .githubEmail(faker.internet().emailAddress())
-                .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
+                .roles(new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN})
                 .lastSeenAt(new Date())
                 .build();
         final OnboardingEntity onboarding = OnboardingEntity.builder().id(user.getId())

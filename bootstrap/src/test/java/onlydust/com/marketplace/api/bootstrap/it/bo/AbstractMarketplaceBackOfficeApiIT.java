@@ -16,6 +16,7 @@ import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvi
 import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.repository.BackofficeUserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
@@ -107,6 +108,8 @@ public class AbstractMarketplaceBackOfficeApiIT {
     @Autowired
     UserRepository userRepository;
     @Autowired
+    BackofficeUserRepository backofficeUserRepository;
+    @Autowired
     JWTVerifier jwtVerifier;
     @Autowired
     GithubAuthenticationPort githubAuthenticationPort;
@@ -117,7 +120,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
 
     @BeforeEach
     void setupUserAuthHelper() {
-        userAuthHelper = new UserAuthHelper(userRepository, jwtVerifier, githubAuthenticationPort, auth0WireMockServer);
+        userAuthHelper = new UserAuthHelper(userRepository, backofficeUserRepository, jwtVerifier, githubAuthenticationPort, auth0WireMockServer);
 
         userAuthHelper.mockAuth0UserInfo(134486697L, "axelbconseil");
         userAuthHelper.mockAuth0UserInfo(43467246L, "AnthonyBuisset", "abuisset@gmail.com");

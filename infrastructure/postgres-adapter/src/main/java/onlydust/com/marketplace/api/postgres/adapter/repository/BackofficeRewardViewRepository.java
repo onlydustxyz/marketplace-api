@@ -19,11 +19,7 @@ public interface BackofficeRewardViewRepository extends JpaRepository<Backoffice
                 select r.id                                             id,
                                r.requested_at                           requested_at,
                                rsd.paid_at                              processed_at,
-
-                               github_recipient.id                      recipient_id,
-                               github_recipient.login                   recipient_login,
-                               user_avatar_url(r.recipient_id, github_recipient.avatar_url) recipient_avatar_url,
-
+                               r.recipient_id                           recipient_id,
                                g_urls.urls                              github_urls,
 
                                pd.project_id                            project_id,
@@ -58,7 +54,6 @@ public interface BackofficeRewardViewRepository extends JpaRepository<Backoffice
                                  join accounting.reward_status_data rsd on rsd.reward_id = r.id
                                  join currencies c on c.id = r.currency_id
                                  join project_details pd on r.project_id = pd.project_id
-                                 left join indexer_exp.github_accounts github_recipient ON github_recipient.id = r.recipient_id
 
                                  left join accounting.invoices i on i.id = r.invoice_id and i.status != 'DRAFT'
                                  left join accounting.billing_profiles bp on bp.id = i.billing_profile_id

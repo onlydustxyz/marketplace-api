@@ -13,6 +13,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.Alloc
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactChanelEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactInformationIdEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.view.BillingProfileLinkView;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
@@ -114,7 +115,7 @@ public interface UserMapper {
                 .githubLogin(user.getGithubLogin())
                 .githubAvatarUrl(user.getGithubAvatarUrl())
                 .githubEmail(user.getGithubEmail())
-                .roles(user.getRoles() != null ? user.getRoles().toArray(UserRole[]::new) : new UserRole[0])
+                .roles(user.getRoles() != null ? user.getRoles().toArray(AuthenticatedUser.Role[]::new) : new AuthenticatedUser.Role[0])
                 .lastSeenAt(new Date())
                 .build();
     }

@@ -12,7 +12,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
 import onlydust.com.marketplace.api.posthog.properties.PosthogProperties;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter;
-import onlydust.com.marketplace.project.domain.model.UserRole;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -161,7 +161,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         assertThat(userEntity.getGithubLogin()).isEqualTo(login);
         assertThat(userEntity.getGithubAvatarUrl()).isEqualTo(avatarUrl);
         assertThat(userEntity.getGithubEmail()).isEqualTo(email);
-        assertThat(userEntity.getRoles()).containsExactly(UserRole.USER);
+        assertThat(userEntity.getRoles()).containsExactly(AuthenticatedUser.Role.USER);
         em.close();
     }
 
@@ -190,7 +190,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .githubEmail(email)
                 .lastSeenAt(new Date())
                 .createdAt(createdAt)
-                .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
+                .roles(new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN})
                 .build();
         userRepository.save(user);
 
@@ -228,7 +228,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .githubAvatarUrl(avatarUrl)
                 .githubEmail(email)
                 .lastSeenAt(new Date())
-                .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
+                .roles(new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN})
                 .build();
         userRepository.save(impersonatorUser);
 
@@ -239,7 +239,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .githubAvatarUrl(faker.internet().avatar())
                 .githubEmail(faker.internet().emailAddress())
                 .lastSeenAt(new Date())
-                .roles(new UserRole[]{UserRole.USER})
+                .roles(new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER})
                 .build();
         userRepository.save(impersonatedUser);
 
@@ -273,7 +273,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .githubAvatarUrl(avatarUrl)
                 .githubEmail(email)
                 .lastSeenAt(new Date())
-                .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
+                .roles(new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN})
                 .build();
         userRepository.save(impersonatorUser);
 
@@ -301,7 +301,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .githubAvatarUrl(avatarUrl)
                 .githubEmail(email)
                 .lastSeenAt(new Date())
-                .roles(new UserRole[]{UserRole.USER})
+                .roles(new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER})
                 .build();
         userRepository.save(impersonatorUser);
 
@@ -312,7 +312,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .githubAvatarUrl(faker.internet().avatar())
                 .githubEmail(faker.internet().emailAddress())
                 .lastSeenAt(new Date())
-                .roles(new UserRole[]{UserRole.USER})
+                .roles(new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER})
                 .build();
         userRepository.save(impersonatedUser);
 

@@ -4,9 +4,10 @@ import com.auth0.jwt.interfaces.JWTVerifier;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.write.BackofficeUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.BackofficeUserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
-import onlydust.com.marketplace.project.domain.model.UserRole;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 
 import java.util.Date;
@@ -17,6 +18,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 @AllArgsConstructor
 public class UserAuthHelper {
     UserRepository userRepository;
+    BackofficeUserRepository backofficeUserRepository;
     JWTVerifier jwtVerifier;
     GithubAuthenticationPort githubAuthenticationPort;
     WireMockServer auth0WireMockServer;
@@ -35,7 +37,10 @@ public class UserAuthHelper {
                 .githubLogin(login)
                 .githubAvatarUrl(avatarUrl)
                 .githubEmail("%d@foo.org".formatted(githubUserId))
-                .roles(isAdmin ? new UserRole[]{UserRole.USER, UserRole.ADMIN} : new UserRole[]{UserRole.USER})
+                .roles(isAdmin ?
+                        new onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role[]{onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.USER,
+                                onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.ADMIN} :
+                        new onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role[]{onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.USER})
                 .createdAt(new Date())
                 .lastSeenAt(new Date())
                 .build();
@@ -48,6 +53,10 @@ public class UserAuthHelper {
     public void mockAuth0UserInfo(UserEntity user) {
         mockAuth0UserInfo(user.getGithubUserId(), user.getGithubLogin(), user.getGithubLogin(),
                 user.getGithubAvatarUrl(), user.getGithubEmail());
+    }
+
+    public void mockAuth0UserInfo(BackofficeUserEntity user) {
+        mockAuth0UserInfo("google-oauth2|" + user.getEmail(), user.getName(), user.getName(), user.getAvatarUrl(), user.getEmail());
     }
 
     public void mockAuth0UserInfo(Long githubUserId, String login) {
@@ -80,11 +89,6 @@ public class UserAuthHelper {
                                         }
                                         """.formatted(sub, nickname, name, avatarUrl, email)
                                 )));
-    }
-
-    @NonNull
-    public String getImpersonationHeaderToImpersonatePierre() {
-        return "{\"sub\":\"github|%d\"}".formatted(16590657L);
     }
 
     @NonNull
@@ -129,6 +133,18 @@ public class UserAuthHelper {
         return authenticateUser(user, githubPAT);
     }
 
+    @NonNull
+    public AuthenticatedBackofficeUser authenticateCamille() {
+        return authenticateBackofficeUser("admin@onlydust.xyz");
+    }
+
+    @NonNull
+    public AuthenticatedBackofficeUser authenticateBackofficeUser(String email) {
+        final var user = backofficeUserRepository.findByEmail(email).orElseThrow();
+        final var token = ((JwtVerifierStub) jwtVerifier).googleTokenFor(email);
+        mockAuth0UserInfo(user);
+        return new AuthenticatedBackofficeUser(token, user);
+    }
 
     @NonNull
     public AuthenticatedUser authenticateUser(UserEntity user) {
@@ -147,5 +163,8 @@ public class UserAuthHelper {
 
 
     public record AuthenticatedUser(String jwt, UserEntity user) {
+    }
+
+    public record AuthenticatedBackofficeUser(String jwt, BackofficeUserEntity user) {
     }
 }

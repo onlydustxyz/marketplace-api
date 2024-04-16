@@ -1,14 +1,14 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.adapters;
 
-import onlydust.com.marketplace.project.domain.model.MoreInfoLink;
-import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
-import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
-import onlydust.com.marketplace.project.domain.model.UserRole;
-import onlydust.com.marketplace.project.domain.view.ProjectDetailsView;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.project.domain.model.MoreInfoLink;
+import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
+import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
+import onlydust.com.marketplace.project.domain.view.ProjectDetailsView;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,7 +31,7 @@ public class PostgresProjectAdapterIT extends AbstractPostgresIT {
         // Given
         final UUID userId = UUID.randomUUID();
         userRepository.save(new UserEntity(userId, 1L, faker.rickAndMorty().character(),
-                faker.rickAndMorty().location(), faker.internet().emailAddress(), new UserRole[]{UserRole.ADMIN},
+                faker.rickAndMorty().location(), faker.internet().emailAddress(), new AuthenticatedUser.Role[]{AuthenticatedUser.Role.ADMIN},
                 new Date(), new Date(), new Date()));
         final List<MoreInfoLink> moreInfoLinks = List.of(
                 MoreInfoLink.builder()

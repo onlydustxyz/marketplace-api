@@ -12,7 +12,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardStatusRepository;
-import onlydust.com.marketplace.kernel.model.RewardStatus;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -38,12 +37,6 @@ public class PostgresRewardStatusAdapter implements RewardStatusStorage {
     public List<RewardStatusData> get(@NonNull List<RewardId> rewardIds) {
         return rewardStatusRepository.findAllById(rewardIds.stream().map(RewardId::value).toList())
                 .stream().map(RewardStatusDataEntity::toRewardStatus).toList();
-    }
-
-    @Override
-    public List<RewardStatus> getStatuses(@NonNull List<RewardId> rewardIds) {
-        return rewardStatusRepository.findAllById(rewardIds.stream().map(RewardId::value).toList())
-                .stream().map(r -> r.status().toDomain()).toList();
     }
 
     @Override

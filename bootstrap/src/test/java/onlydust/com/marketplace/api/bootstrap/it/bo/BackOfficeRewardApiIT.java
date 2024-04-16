@@ -20,10 +20,7 @@ import onlydust.com.marketplace.api.webhook.Config;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
@@ -53,6 +50,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Autowired
     BackofficeAccountingManagementRestApi backofficeAccountingManagementRestApi;
     private final Faker faker = new Faker();
+    UserAuthHelper.AuthenticatedBackofficeUser camille;
 
     UserId anthony;
     UserId olivier;
@@ -155,6 +153,11 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
         });
     }
 
+    @BeforeEach
+    void login() {
+        camille = userAuthHelper.authenticateCamille();
+    }
+
     private void newOlivierInvoiceToReview(List<RewardId> rewardIds) throws IOException {
         final Invoice.Id invoiceId = billingProfileService.previewInvoice(olivier, olivierBillingProfile.id(), rewardIds).id();
         billingProfileService.uploadExternalInvoice(olivier, olivierBillingProfile.id(), invoiceId, "foo.pdf",
@@ -225,7 +228,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(REWARDS, Map.of("pageIndex", "0", "pageSize", "5")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -391,7 +394,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(BO_REWARD.formatted("5c668b61-e42c-4f0e-b31f-44c4e50dc2f4")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -448,7 +451,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(BO_REWARD.formatted("fab7aaf4-9b0c-4e52-bc9b-72ce08131617")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -488,7 +491,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(REWARDS, Map.of("pageIndex", "0", "pageSize", "5", "statuses", "PENDING_VERIFICATION")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -510,7 +513,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         final var rewards = client.get()
                 .uri(getApiURI(REWARDS, Map.of("pageIndex", "0", "pageSize", "5", "billingProfiles", billingProfile.getId().toString())))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -535,7 +538,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         "fromRequestedAt", "2023-02-08",
                         "toRequestedAt", "2023-02-10"))
                 )
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -556,7 +559,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .uri(getApiURI(GET_REWARDS_CSV, Map.of("statuses", "COMPLETE",
                         "fromRequestedAt", "2023-09-18", "toRequestedAt", "2023-09-21"))
                 )
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -587,7 +590,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .uri(getApiURI(GET_REWARDS_CSV, Map.of("statuses", "COMPLETE",
                         "fromProcessedAt", "2023-09-01", "toProcessedAt", "2023-10-01"))
                 )
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -617,7 +620,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .uri(getApiURI(GET_REWARDS_CSV, Map.of("statuses", "COMPLETE",
                         "fromProcessedAt", "2099-01-01", "toProcessedAt", "2099-01-02"))
                 )
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -637,7 +640,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
         client.get()
                 .uri(getApiURI(GET_REWARDS_CSV, Map.of("fromProcessedAt", "2023-09-01", "toProcessedAt", "2023-10-01"))
                 )
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
