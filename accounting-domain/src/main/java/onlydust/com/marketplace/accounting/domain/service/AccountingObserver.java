@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.model.*;
@@ -9,6 +10,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
+import org.springframework.util.StopWatch;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -19,6 +21,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.intern
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
+@Slf4j
 public class AccountingObserver implements AccountingObserverPort, RewardStatusFacadePort, BillingProfileObserver {
     // TODO migrate rewards to accounting schema and merge all those storages as onetone dependencies of reward
     private final RewardStatusStorage rewardStatusStorage;
@@ -31,7 +34,11 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
 
     @Override
     public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         refreshRelatedRewardsStatuses(sponsorAccount);
+        stopWatch.stop();
+        LOGGER.info("Sponsor account balance changed [{} seconds]", stopWatch.getTotalTimeSeconds());
     }
 
     @Override
@@ -60,8 +67,11 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
 
     @Override
     public void onRewardPaid(RewardId rewardId) {
-        final var rewardStatus =
-                rewardStatusStorage.get(rewardId).orElseThrow(() -> internalServerError("RewardStatus not found for reward %s".formatted(rewardId)));
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
+        final var rewardStatus = rewardStatusStorage.get(rewardId)
+                .orElseThrow(() -> internalServerError("RewardStatus not found for reward %s".formatted(rewardId)));
         rewardStatusStorage.save(rewardStatus.paidAt(ZonedDateTime.now()));
 
         invoiceStorage.invoiceOf(rewardId).ifPresent(invoice -> {
@@ -69,11 +79,18 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
                 invoiceStorage.update(invoice.status(Invoice.Status.PAID));
             }
         });
+        stopWatch.stop();
+        LOGGER.info("Reward paid {} [{} seconds]", rewardId, stopWatch.getTotalTimeSeconds());
     }
 
     @Override
     public void onPaymentReceived(RewardId rewardId, Payment.Reference reference) {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
         receiptStorage.save(Receipt.of(rewardId, reference));
+        stopWatch.stop();
+        LOGGER.info("Payment received for reward {} [{} seconds]", rewardId, stopWatch.getTotalTimeSeconds());
     }
 
     public void updateUsdEquivalent(RewardId rewardId) {

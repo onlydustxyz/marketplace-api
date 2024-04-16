@@ -2,6 +2,8 @@ package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
@@ -12,6 +14,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StopWatch;
 
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -24,6 +27,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badReq
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
+@Slf4j
 public class AccountingService implements AccountingFacadePort {
     private final CachedAccountBookProvider accountBookProvider;
     private final SponsorAccountStorage sponsorAccountStorage;
@@ -201,6 +205,8 @@ public class AccountingService implements AccountingFacadePort {
 
     private void confirm(Payment payment, Currency.Id currencyId, List<PayableReward> rewards) {
         final var currency = getCurrency(currencyId);
+        LOGGER.info("Confirming payment {} for {} rewards (Total: {} {})", payment.id(), rewards.size(),
+                rewards.stream().map(PayableReward::amount).reduce(PositiveAmount::add).orElse(PositiveAmount.ZERO), currency.code());
         final var accountBook = getAccountBook(currency);
 
         accountBook.burn(AccountId.of(payment.id()), rewards.stream().map(PayableReward::amount).reduce(PositiveAmount::add).orElse(PositiveAmount.ZERO));
@@ -214,6 +220,9 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     private Set<SponsorAccountStatement> confirm(ReadOnlyAccountBookState accountBookState, PayableReward reward, Payment.Reference paymentReference) {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
         final var modifiedSponsorAccounts = new HashSet<SponsorAccountStatement>();
 
         accountBookState.transferredAmountPerOrigin(AccountId.of(reward.id()))
@@ -232,6 +241,9 @@ public class AccountingService implements AccountingFacadePort {
         accountingObserver.onPaymentReceived(reward.id(), paymentReference);
         if (isPaid(accountBookState, reward.id()))
             accountingObserver.onRewardPaid(reward.id());
+
+        stopWatch.stop();
+        LOGGER.info("Confirming reward {} [{} seconds]", reward.id(), stopWatch.getTotalTimeSeconds());
 
         return modifiedSponsorAccounts;
     }
