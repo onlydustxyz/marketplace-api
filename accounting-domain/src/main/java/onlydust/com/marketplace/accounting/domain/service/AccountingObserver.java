@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
@@ -20,7 +19,6 @@ import java.util.Optional;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
-@AllArgsConstructor
 @Slf4j
 public class AccountingObserver implements AccountingObserverPort, RewardStatusFacadePort, BillingProfileObserver {
     // TODO migrate rewards to accounting schema and merge all those storages as onetone dependencies of reward
@@ -31,6 +29,20 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
     private final InvoiceStoragePort invoiceStorage;
     private final ReceiptStoragePort receiptStorage;
     private final BillingProfileStoragePort billingProfileStoragePort;
+    private final Currency usd;
+
+    public AccountingObserver(RewardStatusStorage rewardStatusStorage, RewardUsdEquivalentStorage rewardUsdEquivalentStorage, QuoteStorage quoteStorage,
+                              CurrencyStorage currencyStorage, InvoiceStoragePort invoiceStorage, ReceiptStoragePort receiptStorage,
+                              BillingProfileStoragePort billingProfileStoragePort) {
+        this.rewardStatusStorage = rewardStatusStorage;
+        this.rewardUsdEquivalentStorage = rewardUsdEquivalentStorage;
+        this.quoteStorage = quoteStorage;
+        this.currencyStorage = currencyStorage;
+        this.invoiceStorage = invoiceStorage;
+        this.receiptStorage = receiptStorage;
+        this.billingProfileStoragePort = billingProfileStoragePort;
+        this.usd = currencyStorage.findByCode(Currency.Code.USD).orElseThrow(() -> internalServerError("Currency USD not found"));
+    }
 
     @Override
     public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
@@ -38,7 +50,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
         stopWatch.start();
         refreshRelatedRewardsStatuses(sponsorAccount);
         stopWatch.stop();
-        LOGGER.info("Sponsor account balance changed [{} seconds]", stopWatch.getTotalTimeSeconds());
+        LOGGER.info("Sponsor account {} balance changed [{} seconds]", sponsorAccount.account().id(), stopWatch.getTotalTimeSeconds());
     }
 
     @Override
@@ -85,12 +97,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
 
     @Override
     public void onPaymentReceived(RewardId rewardId, Payment.Reference reference) {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-
         receiptStorage.save(Receipt.of(rewardId, reference));
-        stopWatch.stop();
-        LOGGER.info("Payment received for reward {} [{} seconds]", rewardId, stopWatch.getTotalTimeSeconds());
     }
 
     public void updateUsdEquivalent(RewardId rewardId) {
@@ -102,8 +109,6 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
 
     @Override
     public Optional<ConvertedAmount> usdAmountOf(RewardId rewardId) {
-        final var usd = currencyStorage.findByCode(Currency.Code.USD).orElseThrow(() -> internalServerError("Currency USD not found"));
-
         return rewardUsdEquivalentStorage.get(rewardId).flatMap(rewardUsdEquivalent -> {
             final var date = rewardUsdEquivalent.equivalenceSealingDate().orElse(ZonedDateTime.now());
             return quoteStorage.nearest(rewardUsdEquivalent.rewardCurrencyId(), usd.id(), date)

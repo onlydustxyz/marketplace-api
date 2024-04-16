@@ -25,7 +25,7 @@ public class PostgresRewardStatusAdapter implements RewardStatusStorage {
 
     @Override
     public void save(RewardStatusData rewardStatusData) {
-        rewardStatusRepository.saveAndFlush(RewardStatusDataEntity.of(rewardStatusData));
+        rewardStatusRepository.save(RewardStatusDataEntity.of(rewardStatusData));
     }
 
     @Override

@@ -1,13 +1,16 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
 
 import java.util.Map;
 
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class SponsorAccountStatement {
+    @EqualsAndHashCode.Include
     private final @NonNull SponsorAccount sponsorAccount;
     private final @NonNull AccountBookFacade accountBookFacade;
 
