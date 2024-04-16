@@ -10,9 +10,12 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAc
 import onlydust.com.marketplace.accounting.domain.stubs.AccountBookEventStorageStub;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +28,16 @@ class CachedAccountBookProviderTest {
     final Currency currency = Currencies.USDC;
     AccountBookEventStorageStub accountBookEventStorage;
     CachedAccountBookProvider cachedAccountBookProvider;
+
+    @BeforeAll
+    public static void init() {
+        TransactionSynchronizationManager.initSynchronization();
+    }
+
+    @AfterAll
+    public static void cleanUp() {
+        TransactionSynchronizationManager.clear();
+    }
 
     @BeforeEach
     void setUp() {
