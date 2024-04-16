@@ -53,6 +53,7 @@ public class WebSecurityAdapter extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/v1/users/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/github/**").hasAuthority(AuthenticatedUser.Role.USER.name())
                 .antMatchers(HttpMethod.GET, "/api/v1/technologies").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/hackathons/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/v3/api-docs").permitAll()
                 .antMatchers(HttpMethod.GET, "/swagger-resources/**").permitAll()
