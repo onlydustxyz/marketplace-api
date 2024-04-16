@@ -1653,7 +1653,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/hackathons/id/{hackathonId}:
+  /bo/v1/hackathons/{hackathonId}:
     put:
       security:
         - bearerAuth: [ ]
@@ -1679,6 +1679,28 @@ paths:
       responses:
         "204":
           description: 'The hackathon has been updated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Hackathons
+      summary: delete hackathon by id
+      operationId: deleteHackathonById
+      description: |
+        delete hackathon by id
+      parameters:
+        - in: path
+          name: hackathonId
+          required: true
+          schema:
+            $ref: '#/components/schemas/HackathonId'
+      responses:
+        "204":
+          description: 'The hackathon has been deleted'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -2197,7 +2219,6 @@ components:
       enum:
         - DRAFT
         - PUBLISHED
-        - CANCELED
 
     SimpleLink:
       type: object
