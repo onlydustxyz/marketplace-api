@@ -3075,6 +3075,11 @@ components:
       format: uuid
       description: OnlyDust project ID
 
+    TransactionId:
+      type: string
+      format: uuid
+      description: Sponsor account transaction ID
+
     ProjectSlug:
       type: string
       description: OnlyDust project pretty ID that is computed from its name. This ID CAN change over time.
@@ -6141,6 +6146,8 @@ components:
         - amount
         - currency
       properties:
+        id:
+          $ref: '#/components/schemas/TransactionId'
         date:
           type: string
           format: date-time

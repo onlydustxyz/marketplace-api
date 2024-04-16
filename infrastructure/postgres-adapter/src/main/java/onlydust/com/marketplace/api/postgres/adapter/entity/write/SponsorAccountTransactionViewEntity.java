@@ -74,6 +74,7 @@ public class SponsorAccountTransactionViewEntity {
         final var sponsorAccount = this.sponsorAccount.toDomain();
 
         return new HistoricalTransaction(
+                id,
                 timestamp,
                 type.toDomain(),
                 sponsorAccount,
