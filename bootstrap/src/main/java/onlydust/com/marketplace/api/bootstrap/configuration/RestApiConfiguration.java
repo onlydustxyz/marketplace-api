@@ -78,7 +78,7 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public HackathonsApi hackathonsApi() {
+    public HackathonRestApi hackathonsApi() {
         return new HackathonRestApi();
     }
 }

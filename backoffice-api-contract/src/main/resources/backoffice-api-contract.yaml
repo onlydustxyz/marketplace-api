@@ -1585,7 +1585,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Hackathons
+        - BackofficeHackathonManagement
       summary: Get hackathons pages
       operationId: getHackathons
       description: |
@@ -1605,7 +1605,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Hackathons
+        - BackofficeHackathonManagement
       summary: create hackathon
       operationId: createHackathon
       description: |
@@ -1630,7 +1630,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Hackathons
+        - BackofficeHackathonManagement
       summary: Get hackathon by slug
       operationId: getHackathonBySlug
       description: |
@@ -1658,7 +1658,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Hackathons
+        - BackofficeHackathonManagement
       summary: update hackathon by id
       operationId: updateHackathonById
       description: |
@@ -1687,7 +1687,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Hackathons
+        - BackofficeHackathonManagement
       summary: delete hackathon by id
       operationId: deleteHackathonById
       description: |
@@ -2695,7 +2695,7 @@ components:
       enum:
         - DEPOSIT
         - ALLOCATION
-    
+
     TotalMoneyWithUsdEquivalentResponse:
       description: |
         Represents a total amount with its currency and the total equivalent in USD.
@@ -3092,7 +3092,7 @@ components:
     ContractAddress:
       type: string
       format: hex
-    
+
     RewardDetailsResponse:
       allOf:
         - $ref: '#/components/schemas/ShortRewardResponse'
@@ -3148,7 +3148,7 @@ components:
           description: IBAN, account number, ENS or wallet address
         amount:
           type: number
-    
+
     TransactionHistoryPageResponse:
       type: object
       required:

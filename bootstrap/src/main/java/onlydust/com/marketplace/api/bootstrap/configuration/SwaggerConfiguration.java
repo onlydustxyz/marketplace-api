@@ -29,9 +29,9 @@ public class SwaggerConfiguration {
                                 .version("1.0.0-SNAPSHOT")
                                 .contact(
                                         new Contact(
-                                                "Pierre Oucif",
+                                                "OnlyDust tech team",
                                                 "http://www.onlydust.com",
-                                                "pierre@onlydust.xyz"
+                                                "tech@onlydust.xyz"
                                         )
                                 ).build()
                 )
