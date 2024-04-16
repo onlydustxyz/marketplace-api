@@ -26,7 +26,7 @@ public record BatchPaymentDetailsView(
                 .stream()
                 .map(e -> new TotalMoneyView(
                         e.getValue().stream().map(r -> r.money().amount()).reduce(BigDecimal::add).orElseThrow(),
-                        e.getKey(),
+                        e.getKey().toView(),
                         e.getValue().stream()
                                 .map(r -> r.money().dollarsEquivalent().orElseThrow(() -> internalServerError("Dollars equivalent not found for reward %s".formatted(r.id().value()))))
                                 .reduce(BigDecimal::add).orElseThrow()

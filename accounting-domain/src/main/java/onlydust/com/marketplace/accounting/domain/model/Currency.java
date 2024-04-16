@@ -3,6 +3,7 @@ package onlydust.com.marketplace.accounting.domain.model;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.math.BigDecimal;
@@ -174,6 +175,16 @@ public class Currency implements Cloneable {
     public Currency clone() {
         return toBuilder().id(Id.random())
                 .erc20(new HashSet<>(erc20))
+                .build();
+    }
+
+    public CurrencyView toView() {
+        return CurrencyView.builder()
+                .id(CurrencyView.Id.of(id.value()))
+                .name(name)
+                .code(code.toString())
+                .decimals(decimals)
+                .logoUrl(logoUri().orElse(null))
                 .build();
     }
 

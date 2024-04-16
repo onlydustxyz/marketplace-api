@@ -11,6 +11,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
@@ -275,6 +276,15 @@ public interface BackOfficeMapper {
                 .code(currency.code().toString())
                 .name(currency.name())
                 .logoUrl(currency.logoUri().orElse(null))
+                .decimals(currency.decimals());
+    }
+
+    static ShortCurrencyResponse toShortCurrency(final CurrencyView currency) {
+        return new ShortCurrencyResponse()
+                .id(currency.id().value())
+                .code(currency.code())
+                .name(currency.name())
+                .logoUrl(currency.logoUrl())
                 .decimals(currency.decimals());
     }
 

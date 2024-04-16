@@ -1,13 +1,17 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.Payment;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.PaymentPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
+import onlydust.com.marketplace.accounting.domain.view.BatchPaymentShortView;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,7 +20,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
@@ -58,8 +61,13 @@ public class PaymentService implements PaymentPort {
     }
 
     @Override
-    public Page<BatchPaymentDetailsView> findPayments(int pageIndex, int pageSize, Set<Payment.Status> statuses) {
-        return accountingRewardStoragePort.findPaymentDetails(pageIndex, pageSize, statuses);
+    public Page<BatchPaymentShortView> findPayments(int pageIndex, int pageSize, Set<Payment.Status> statuses) {
+        return accountingRewardStoragePort.findPayments(pageIndex, pageSize, statuses);
+    }
+
+    @Override
+    public List<BatchPaymentShortView> findPaymentsByIds(Set<Payment.Id> ids) {
+        return accountingRewardStoragePort.findPaymentsByIds(ids);
     }
 
     @Override
@@ -69,7 +77,7 @@ public class PaymentService implements PaymentPort {
     }
 
     @Override
-    public List<BatchPaymentDetailsView> createPaymentsForInvoices(List<Invoice.Id> invoiceIds) {
+    public List<Payment> createPaymentsForInvoices(List<Invoice.Id> invoiceIds) {
 
         final var invoices = invoiceStoragePort.getAll(invoiceIds);
         final var rewardInvoices = invoices.stream()
@@ -87,14 +95,7 @@ public class PaymentService implements PaymentPort {
         });
 
         accountingRewardStoragePort.saveAll(payments);
-
-        return payments.stream().map(payment -> {
-            final var rewards = accountingRewardStoragePort.findRewardsById(payment.rewards().stream().map(PayableReward::id).collect(Collectors.toSet()));
-            return BatchPaymentDetailsView.builder()
-                    .payment(payment)
-                    .rewardViews(rewards)
-                    .build();
-        }).toList();
+        return payments;
     }
 
     @Override

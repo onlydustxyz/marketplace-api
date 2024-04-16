@@ -101,9 +101,9 @@ class InvoiceTest {
             assertThat(invoice.totalAfterTax()).isEqualTo(Money.of(BigDecimal.valueOf(31643.5), USD));
 
             assertThat(invoice.totals()).containsExactly(
-                    new TotalMoneyView(BigDecimal.valueOf(11), ETH, BigDecimal.valueOf(29712L)),
-                    new TotalMoneyView(BigDecimal.valueOf(10), OP, BigDecimal.valueOf(31.5)),
-                    new TotalMoneyView(BigDecimal.valueOf(100), STRK, BigDecimal.valueOf(1900L))
+                    new TotalMoneyView(BigDecimal.valueOf(11), ETH.toView(), BigDecimal.valueOf(29712L)),
+                    new TotalMoneyView(BigDecimal.valueOf(10), OP.toView(), BigDecimal.valueOf(31.5)),
+                    new TotalMoneyView(BigDecimal.valueOf(100), STRK.toView(), BigDecimal.valueOf(1900L))
             );
         }
     }
@@ -178,7 +178,7 @@ class InvoiceTest {
             assertThat(invoice.totalAfterTax()).isEqualTo(Money.of(BigDecimal.valueOf(5400), USD));
 
             assertThat(invoice.totals()).containsExactly(
-                    new TotalMoneyView(BigDecimal.valueOf(2), ETH, BigDecimal.valueOf(5400))
+                    new TotalMoneyView(BigDecimal.valueOf(2), ETH.toView(), BigDecimal.valueOf(5400))
             );
         }
     }
@@ -254,7 +254,7 @@ class InvoiceTest {
             assertThat(invoice.totalAfterTax()).isEqualTo(Money.of(BigDecimal.valueOf(6480.0), USD));
 
             assertThat(invoice.totals()).containsExactly(
-                    new TotalMoneyView(BigDecimal.valueOf(2), ETH, BigDecimal.valueOf(5400))
+                    new TotalMoneyView(BigDecimal.valueOf(2), ETH.toView(), BigDecimal.valueOf(5400))
             );
         }
     }
@@ -330,7 +330,7 @@ class InvoiceTest {
             assertThat(invoice.totalAfterTax()).isEqualTo(Money.of(BigDecimal.valueOf(5400), USD));
 
             assertThat(invoice.totals()).containsExactly(
-                    new TotalMoneyView(BigDecimal.valueOf(2), ETH, BigDecimal.valueOf(5400))
+                    new TotalMoneyView(BigDecimal.valueOf(2), ETH.toView(), BigDecimal.valueOf(5400))
             );
         }
     }
@@ -406,7 +406,7 @@ class InvoiceTest {
             assertThat(invoice.totalAfterTax()).isEqualTo(Money.of(BigDecimal.valueOf(5400), USD));
 
             assertThat(invoice.totals()).containsExactly(
-                    new TotalMoneyView(BigDecimal.valueOf(2), ETH, BigDecimal.valueOf(5400))
+                    new TotalMoneyView(BigDecimal.valueOf(2), ETH.toView(), BigDecimal.valueOf(5400))
             );
         }
     }
