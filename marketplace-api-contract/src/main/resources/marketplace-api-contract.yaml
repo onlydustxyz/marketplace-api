@@ -740,10 +740,10 @@ paths:
         Register to an hackathon as a participant
       parameters:
         - in: path
-          name: hackathonSlug
+          name: hackathonId
           required: true
           schema:
-            $ref: '#/components/schemas/HackathonSlug'
+            $ref: '#/components/schemas/HackathonId'
       responses:
         "204":
           description: 'Successfully register.'
