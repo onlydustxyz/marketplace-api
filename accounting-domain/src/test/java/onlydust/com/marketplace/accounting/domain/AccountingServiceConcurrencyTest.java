@@ -109,17 +109,18 @@ public class AccountingServiceConcurrencyTest {
             for (int t = 0; t < numberOfThreads; t++) {
                 service.execute(() -> {
                     TransactionSynchronizationManager.initSynchronization();
-
-                    System.out.println("Thread " + Thread.currentThread().getName() + " started");
-                    for (int i = 0; i < numberOfIterationPerThread; i++) {
-                        accountingService.allocate(sponsorAccount.id(), projectId1, amount, currency.id());
-                        accountingService.unallocate(projectId1, sponsorAccount.id(), amount, currency.id());
-                        accountingService.allocate(sponsorAccount.id(), projectId1, amount, currency.id());
+                    try {
+                        System.out.println("Thread " + Thread.currentThread().getName() + " started");
+                        for (int i = 0; i < numberOfIterationPerThread; i++) {
+                            accountingService.allocate(sponsorAccount.id(), projectId1, amount, currency.id());
+                            accountingService.unallocate(projectId1, sponsorAccount.id(), amount, currency.id());
+                            accountingService.allocate(sponsorAccount.id(), projectId1, amount, currency.id());
+                        }
+                        latch.countDown();
+                        System.out.println("Thread " + Thread.currentThread().getName() + " ended");
+                    } finally {
+                        TransactionSynchronizationManager.clear();
                     }
-                    latch.countDown();
-                    System.out.println("Thread " + Thread.currentThread().getName() + " ended");
-
-                    TransactionSynchronizationManager.clear();
                 });
             }
             latch.await();
@@ -188,17 +189,22 @@ public class AccountingServiceConcurrencyTest {
             for (int t = 0; t < numberOfThreads; t++) {
                 final int threadId = t;
                 service.execute(() -> {
-                    System.out.println("Instance " + Thread.currentThread().getName() + " started");
-                    final var accountingService = accountingServices.get(threadId);
-                    for (int i = 0; i < numberOfIterationPerThread; i++) {
-                        try {
-                            accountingService.allocate(sponsorAccount.id(), projectId1, amount, currency.id());
-                        } catch (Exception e) {
-                            thrown.add(e);
+                    TransactionSynchronizationManager.initSynchronization();
+                    try {
+                        System.out.println("Instance " + Thread.currentThread().getName() + " started");
+                        final var accountingService = accountingServices.get(threadId);
+                        for (int i = 0; i < numberOfIterationPerThread; i++) {
+                            try {
+                                accountingService.allocate(sponsorAccount.id(), projectId1, amount, currency.id());
+                            } catch (Exception e) {
+                                thrown.add(e);
+                            }
                         }
+                        latch.countDown();
+                        System.out.println("Instance " + Thread.currentThread().getName() + " ended");
+                    } finally {
+                        TransactionSynchronizationManager.clear();
                     }
-                    latch.countDown();
-                    System.out.println("Instance " + Thread.currentThread().getName() + " ended");
                 });
             }
             latch.await();
@@ -235,17 +241,22 @@ public class AccountingServiceConcurrencyTest {
             for (int t = 0; t < numberOfThreads; t++) {
                 final int threadId = t;
                 service.execute(() -> {
-                    System.out.println("Instance " + Thread.currentThread().getName() + " started");
-                    final var accountingService = accountingServices.get(threadId);
-                    for (int i = 0; i < numberOfIterationPerThread; i++) {
-                        try {
-                            accountingService.createReward(projectId1, RewardId.random(), amount, currency.id());
-                        } catch (Exception e) {
-                            thrown.add(e);
+                    TransactionSynchronizationManager.initSynchronization();
+                    try {
+                        System.out.println("Instance " + Thread.currentThread().getName() + " started");
+                        final var accountingService = accountingServices.get(threadId);
+                        for (int i = 0; i < numberOfIterationPerThread; i++) {
+                            try {
+                                accountingService.createReward(projectId1, RewardId.random(), amount, currency.id());
+                            } catch (Exception e) {
+                                thrown.add(e);
+                            }
                         }
+                        latch.countDown();
+                        System.out.println("Instance " + Thread.currentThread().getName() + " ended");
+                    } finally {
+                        TransactionSynchronizationManager.clear();
                     }
-                    latch.countDown();
-                    System.out.println("Instance " + Thread.currentThread().getName() + " ended");
                 });
             }
             latch.await();
