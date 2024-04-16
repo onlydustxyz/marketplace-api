@@ -132,7 +132,7 @@ public interface ProjectMapper {
         project.setLogoUrl(projectDetailsView.getLogoUrl());
         project.setMoreInfos(isNull(projectDetailsView.getMoreInfos()) ? null :
                 projectDetailsView.getMoreInfos().stream()
-                        .map(moreInfo -> new MoreInfo().url(moreInfo.getUrl()).value(moreInfo.getValue())).collect(Collectors.toList()));
+                        .map(moreInfo -> new SimpleLink().url(moreInfo.getUrl()).value(moreInfo.getValue())).collect(Collectors.toList()));
         project.setHiring(projectDetailsView.getHiring());
         project.setVisibility(mapProjectVisibility(projectDetailsView.getVisibility()));
         project.setContributorCount(projectDetailsView.getContributorCount());
