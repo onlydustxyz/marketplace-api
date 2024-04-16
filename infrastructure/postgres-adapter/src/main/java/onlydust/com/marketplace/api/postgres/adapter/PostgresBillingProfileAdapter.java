@@ -162,7 +162,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .currentYearPaymentLimit(individualBillingProfile.currentYearPaymentLimit())
                             .currentYearPaymentAmount(PositiveAmount.of(billingProfileCustomData.getStats().currentYearPaymentAmount()))
                             .currentMonthRewardedAmounts(billingProfileCustomData.getCurrentMonthRewards().stream()
-                                    .map(r -> new TotalMoneyView(r.amount(), r.currency().toDomain(), r.statusData().amountUsdEquivalent()))
+                                    .map(r -> new TotalMoneyView(r.amount(), r.currency().toDomain().toView(), r.statusData().amountUsdEquivalent()))
                                     .collect(groupingBy(TotalMoneyView::currency, reducing(null, TotalMoneyView::add)))
                                     .values().stream().toList())
                             .admins(billingProfileEntity.getUsers().stream().map(BillingProfileUserEntity::toView).toList())
@@ -190,7 +190,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                             .admins(billingProfileEntity.getUsers().stream().map(BillingProfileUserEntity::toView).toList())
                             .currentMonthRewardedAmounts(billingProfileCustomData.getCurrentMonthRewards().stream()
-                                    .map(r -> new TotalMoneyView(r.amount(), r.currency().toDomain(), r.statusData().amountUsdEquivalent()))
+                                    .map(r -> new TotalMoneyView(r.amount(), r.currency().toDomain().toView(), r.statusData().amountUsdEquivalent()))
                                     .collect(groupingBy(TotalMoneyView::currency, reducing(null, TotalMoneyView::add)))
                                     .values().stream().toList())
                             .build();
@@ -217,7 +217,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .invoiceableRewardCount(billingProfileCustomData.getStats().invoiceableRewardCount())
                             .admins(billingProfileEntity.getUsers().stream().map(BillingProfileUserEntity::toView).toList())
                             .currentMonthRewardedAmounts(billingProfileCustomData.getCurrentMonthRewards().stream()
-                                    .map(r -> new TotalMoneyView(r.amount(), r.currency().toDomain(), r.statusData().amountUsdEquivalent()))
+                                    .map(r -> new TotalMoneyView(r.amount(), r.currency().toDomain().toView(), r.statusData().amountUsdEquivalent()))
                                     .collect(groupingBy(TotalMoneyView::currency, reducing(null, TotalMoneyView::add)))
                                     .values().stream().toList())
                             .build();

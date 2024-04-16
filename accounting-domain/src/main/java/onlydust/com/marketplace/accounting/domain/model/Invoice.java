@@ -62,7 +62,7 @@ public class Invoice {
     public Collection<TotalMoneyView> totals() {
         return rewards.stream()
                 .collect(groupingBy(r -> r.amount.currency,
-                        mapping(r -> new TotalMoneyView(r.amount.value, r.amount.currency, r.target.value),
+                        mapping(r -> new TotalMoneyView(r.amount.value, r.amount.currency.toView(), r.target.value),
                                 reducing(null, TotalMoneyView::add))))
                 .values().stream()
                 .sorted(Comparator.comparing(r -> r.currency().code().toString()))

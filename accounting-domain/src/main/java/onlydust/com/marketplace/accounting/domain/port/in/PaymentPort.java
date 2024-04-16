@@ -3,6 +3,7 @@ package onlydust.com.marketplace.accounting.domain.port.in;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
+import onlydust.com.marketplace.accounting.domain.view.BatchPaymentShortView;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
 import java.util.List;
@@ -10,11 +11,13 @@ import java.util.Set;
 
 public interface PaymentPort {
 
-    List<BatchPaymentDetailsView> createPaymentsForInvoices(List<Invoice.Id> invoiceIds);
+    List<Payment> createPaymentsForInvoices(List<Invoice.Id> invoiceIds);
 
     void markPaymentAsPaid(Payment.Id batchPaymentId, String transactionHash);
 
-    Page<BatchPaymentDetailsView> findPayments(int pageIndex, int pageSize, Set<Payment.Status> statuses);
+    Page<BatchPaymentShortView> findPayments(int pageIndex, int pageSize, Set<Payment.Status> statuses);
+
+    List<BatchPaymentShortView> findPaymentsByIds(Set<Payment.Id> ids);
 
     BatchPaymentDetailsView findPaymentById(Payment.Id batchPaymentId);
 

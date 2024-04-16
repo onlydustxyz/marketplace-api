@@ -7,17 +7,16 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
+import onlydust.com.marketplace.accounting.domain.view.BatchPaymentShortView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BackofficeRewardViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.PaymentShortViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentRewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
-import onlydust.com.marketplace.api.postgres.adapter.repository.BackofficeRewardViewRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.RewardDetailsViewRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.ShortProjectViewEntityRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
@@ -39,6 +38,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     private final RewardDetailsViewRepository rewardDetailsViewRepository;
     private final BackofficeRewardViewRepository backofficeRewardViewRepository;
     private final RewardRepository rewardRepository;
+    private final PaymentShortViewRepository paymentShortViewRepository;
 
     @Override
     @Transactional
@@ -81,17 +81,24 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
 
     @Override
     @Transactional(readOnly = true)
-    public Page<BatchPaymentDetailsView> findPaymentDetails(int pageIndex, int pageSize, Set<Payment.Status> statuses) {
+    public Page<BatchPaymentShortView> findPayments(int pageIndex, int pageSize, Set<Payment.Status> statuses) {
         if (statuses == null || statuses.isEmpty()) {
             statuses = EnumSet.allOf(Payment.Status.class);
         }
-        final var page = batchPaymentRepository.findAllByStatusIsIn(statuses.stream().map(BatchPaymentEntity.Status::of).collect(Collectors.toSet()),
-                PageRequest.of(pageIndex, pageSize, Sort.by("createdAt").descending()));
-        return Page.<BatchPaymentDetailsView>builder()
-                .content(page.getContent().stream().map(this::getBatchPaymentDetailsView).toList())
+        final var page = paymentShortViewRepository.findByStatuses(statuses.stream().map(Enum::name).collect(Collectors.toSet()),
+                PageRequest.of(pageIndex, pageSize, Sort.by("created_at").descending()));
+        return Page.<BatchPaymentShortView>builder()
+                .content(page.getContent().stream().map(PaymentShortViewEntity::toDomain).toList())
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())
                 .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BatchPaymentShortView> findPaymentsByIds(Set<Payment.Id> paymentIds) {
+        return paymentShortViewRepository.findByIds(paymentIds.stream().map(UuidWrapper::value).collect(Collectors.toSet()))
+                .stream().map(PaymentShortViewEntity::toDomain).toList();
     }
 
     @Override
@@ -112,22 +119,13 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
 
     @Override
     @Transactional
-    public List<RewardDetailsView> findRewardsById(Set<RewardId> rewardIds) {
-        return backofficeRewardViewRepository.findAllByRewardIds(rewardIds.stream().map(UuidWrapper::value).toList())
-                .stream()
-                .map(BackofficeRewardViewEntity::toDomain)
-                .toList();
-    }
-
-    @Override
-    @Transactional
     public Page<RewardDetailsView> findRewards(int pageIndex, int pageSize,
                                                @NonNull Set<RewardStatus.Input> statuses,
                                                @NonNull List<BillingProfile.Id> billingProfileIds,
                                                Date fromRequestedAt, Date toRequestedAt,
                                                Date fromProcessedAt, Date toProcessedAt) {
         final var page = backofficeRewardViewRepository.findAllByStatusesAndDates(
-                statuses.stream().map(rewardStatus -> RewardStatusEntity.from(rewardStatus)).map(RewardStatusEntity.Status::toString).toList(),
+                statuses.stream().map(RewardStatusEntity::from).map(RewardStatusEntity.Status::toString).toList(),
                 billingProfileIds.stream().map(BillingProfile.Id::value).toList(),
                 fromRequestedAt, toRequestedAt,
                 fromProcessedAt, toProcessedAt,

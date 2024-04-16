@@ -9,7 +9,6 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.ERC20Tokens;
-import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
@@ -149,7 +148,7 @@ public class PaymentServiceTest {
         ));
 
         // When
-        final var batches = rewardService.createPaymentsForInvoices(invoiceIds).stream().map(BatchPaymentDetailsView::payment).toList();
+        final var batches = rewardService.createPaymentsForInvoices(invoiceIds);
 
         // Then
         assertThat(batches).hasSize(3);
