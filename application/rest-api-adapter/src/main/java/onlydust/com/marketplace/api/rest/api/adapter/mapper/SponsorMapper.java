@@ -135,6 +135,7 @@ public interface SponsorMapper {
 
     static TransactionHistoryPageItemResponse mapHistoricalTransaction(HistoricalTransaction historicalTransaction) {
         return new TransactionHistoryPageItemResponse()
+                .id(historicalTransaction.id())
                 .date(historicalTransaction.timestamp())
                 .type(mapTransactionType(historicalTransaction))
                 .project(historicalTransaction.project() == null ? null : projectToResponse(historicalTransaction.project()))

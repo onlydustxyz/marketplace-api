@@ -8,8 +8,10 @@ import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 public record HistoricalTransaction(
+        @NonNull UUID id,
         @NonNull ZonedDateTime timestamp,
         @NonNull Type type,
         @NonNull SponsorAccount sponsorAccount,

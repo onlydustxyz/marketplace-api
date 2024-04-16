@@ -210,6 +210,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                           "nextPageIndex": 1,
                           "transactions": [
                             {
+                              "id": "2c8d1803-3e2e-49c9-9e41-30f59ab6b5cd",
                               "date": "2023-02-21T09:15:10.603693Z",
                               "type": "DEPOSIT",
                               "project": null,
@@ -226,6 +227,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               }
                             },
                             {
+                              "id": "8039a520-648b-4eee-84ae-9d46049d56ba",
                               "date": "2023-02-22T12:23:03.403824Z",
                               "type": "DEPOSIT",
                               "project": null,
@@ -242,6 +244,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               }
                             },
                             {
+                              "id": "0efb0d6d-9f23-4692-b723-cba724800b90",
                               "date": "2023-09-28T14:20:35.595046Z",
                               "type": "DEPOSIT",
                               "project": null,
@@ -258,6 +261,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               }
                             },
                             {
+                              "id": "f5ee6afd-3e76-4754-a7ca-b30719c3cce8",
                               "date": "2023-09-28T14:33:13.489288Z",
                               "type": "DEPOSIT",
                               "project": null,
@@ -274,6 +278,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               }
                             },
                             {
+                              "id": "c7f8bc49-7d86-4111-ba41-f8789fcc9354",
                               "date": "2023-09-28T14:34:37.110547Z",
                               "type": "DEPOSIT",
                               "project": null,
@@ -290,6 +295,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               }
                             },
                             {
+                              "id": "7ef01cf9-a1c1-45c6-bff6-b9e39a0b47b4",
                               "date": "2024-03-13T14:13:21.135944Z",
                               "type": "ALLOCATION",
                               "project": {
