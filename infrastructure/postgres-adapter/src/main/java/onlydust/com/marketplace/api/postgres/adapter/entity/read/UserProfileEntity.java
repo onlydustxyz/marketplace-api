@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.Alloc
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactChanelEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.project.domain.view.Money;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -138,10 +139,10 @@ public class UserProfileEntity {
         @JsonProperty("currency_logo_url")
         String logoUrl;
 
-        public onlydust.com.marketplace.project.domain.view.TotalEarnedPerCurrency toDomain() {
-            return onlydust.com.marketplace.project.domain.view.TotalEarnedPerCurrency.builder()
-                    .totalDollarsEquivalent(totalDollarsEquivalent)
-                    .totalAmount(totalAmount)
+        public Money toDomain() {
+            return Money.builder()
+                    .usdEquivalent(totalDollarsEquivalent)
+                    .amount(totalAmount)
                     .currency(CurrencyView.builder()
                             .id(CurrencyView.Id.of(currencyId))
                             .name(currencyName)

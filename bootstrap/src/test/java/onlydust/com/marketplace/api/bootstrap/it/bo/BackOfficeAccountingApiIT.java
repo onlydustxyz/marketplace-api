@@ -726,9 +726,18 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectBody()
                 .json("""
                         {
-                           "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
-                           "amount": 30,
-                           "dollarsEquivalent": 30.3,
+                           "amount": {
+                             "amount": 30,
+                             "prettyAmount": 30,
+                             "currency": {
+                               "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                               "code": "USDC",
+                               "name": "USD Coin",
+                               "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                               "decimals": 6
+                             },
+                             "usdEquivalent": 30.30
+                           },
                            "status": "COMPLETE",
                            "from": {
                              "login": "AnthonyBuisset"

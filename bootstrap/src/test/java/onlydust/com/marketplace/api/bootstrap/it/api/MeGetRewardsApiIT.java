@@ -90,7 +90,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "status": "PENDING_REQUEST",
                               "unlockDate": null,
                               "amount": {
-                                "total": 500.0,
+                                "amount": 500.0,
                                 "currency": {
                                   "id": "48388edb-fda2-4a32-b228-28152a147500",
                                   "code": "APT",
@@ -98,7 +98,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 8
                                 },
-                                "dollarsEquivalent": 100000.0
+                                "usdEquivalent": 100000.0
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -119,7 +119,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "status": "COMPLETE",
                               "unlockDate": null,
                               "amount": {
-                                "total": 50.0,
+                                "amount": 50.0,
                                 "currency": {
                                   "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                   "code": "ETH",
@@ -127,7 +127,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "dollarsEquivalent": 75000.0
+                                "usdEquivalent": 75000.0
                               },
                               "numberOfRewardedContributions": 1,
                               "rewardedOnProjectName": "QA new contributions",
@@ -147,7 +147,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "status": "COMPLETE",
                               "unlockDate": null,
                               "amount": {
-                                "total": 10.0,
+                                "amount": 10.0,
                                 "currency": {
                                   "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                   "code": "ETH",
@@ -155,7 +155,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "dollarsEquivalent": 15000.0
+                                "usdEquivalent": 15000.0
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -176,7 +176,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "status": "PENDING_REQUEST",
                               "unlockDate": null,
                               "amount": {
-                                "total": 1000,
+                                "amount": 1000,
                                 "currency": {
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
@@ -184,7 +184,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                   "decimals": 6
                                 },
-                                "dollarsEquivalent": 1010.00
+                                "usdEquivalent": 1010.00
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -205,7 +205,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "status": "PROCESSING",
                               "unlockDate": "2024-08-23T00:00:00Z",
                               "amount": {
-                                "total": 30.0,
+                                "amount": 30.0,
                                 "currency": {
                                   "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
                                   "code": "OP",
@@ -213,7 +213,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "dollarsEquivalent": null
+                                "usdEquivalent": null
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -234,7 +234,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "status": "PAYOUT_INFO_MISSING",
                               "unlockDate": null,
                               "amount": {
-                                "total": 9511147.0,
+                                "amount": 9511147.0,
                                 "currency": {
                                   "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
                                   "code": "STRK",
@@ -242,7 +242,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "dollarsEquivalent": null
+                                "usdEquivalent": null
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -347,7 +347,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "status": "PENDING_COMPANY",
                               "unlockDate": null,
                               "amount": {
-                                "total": 500.0,
+                                "amount": 500.0,
                                 "currency": {
                                   "id": "48388edb-fda2-4a32-b228-28152a147500",
                                   "code": "APT",
@@ -355,7 +355,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 8
                                 },
-                                "dollarsEquivalent": 100000.0
+                                "usdEquivalent": 100000.0
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -376,7 +376,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "status": "COMPLETE",
                               "unlockDate": null,
                               "amount": {
-                                "total": 50.0,
+                                "amount": 50.0,
                                 "currency": {
                                   "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                   "code": "ETH",
@@ -384,7 +384,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "dollarsEquivalent": 75000.0
+                                "usdEquivalent": 75000.0
                               },
                               "numberOfRewardedContributions": 1,
                               "rewardedOnProjectName": "QA new contributions",
@@ -404,7 +404,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "status": "COMPLETE",
                               "unlockDate": null,
                               "amount": {
-                                "total": 10.0,
+                                "amount": 10.0,
                                 "currency": {
                                   "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                   "code": "ETH",
@@ -412,7 +412,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "dollarsEquivalent": 15000.0
+                                "usdEquivalent": 15000.0
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -433,7 +433,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "status": "PENDING_COMPANY",
                               "unlockDate": null,
                               "amount": {
-                                "total": 1000,
+                                "amount": 1000,
                                 "currency": {
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
@@ -441,7 +441,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                   "decimals": 6
                                 },
-                                "dollarsEquivalent": 1010.00
+                                "usdEquivalent": 1010.00
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -462,7 +462,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "status": "PROCESSING",
                               "unlockDate": "2024-08-23T00:00:00Z",
                               "amount": {
-                                "total": 30.0,
+                                "amount": 30.0,
                                 "currency": {
                                   "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
                                   "code": "OP",
@@ -470,7 +470,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "dollarsEquivalent": null
+                                "usdEquivalent": null
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -491,7 +491,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "status": "PENDING_COMPANY",
                               "unlockDate": null,
                               "amount": {
-                                "total": 9511147.0,
+                                "amount": 9511147.0,
                                 "currency": {
                                   "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
                                   "code": "STRK",
@@ -499,7 +499,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "dollarsEquivalent": null
+                                "usdEquivalent": null
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -568,8 +568,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
         switch (sort) {
             case "AMOUNT":
-                assertThat(Optional.ofNullable(first.getAmount().getDollarsEquivalent()).orElse(BigDecimal.ZERO))
-                        .isLessThanOrEqualTo(Optional.ofNullable(last.getAmount().getDollarsEquivalent()).orElse(BigDecimal.ZERO));
+                assertThat(Optional.ofNullable(first.getAmount().getUsdEquivalent()).orElse(BigDecimal.ZERO))
+                        .isLessThanOrEqualTo(Optional.ofNullable(last.getAmount().getUsdEquivalent()).orElse(BigDecimal.ZERO));
                 break;
             case "CONTRIBUTION":
                 assertThat(first.getNumberOfRewardedContributions()).isLessThanOrEqualTo(last.getNumberOfRewardedContributions());
@@ -705,8 +705,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.rewards[?(@.amount.currency.code == 'STRK' && @.amount.dollarsEquivalent == null)]").exists()
-                .jsonPath("$.rewards[?(@.amount.currency.code == 'STRK' && @.amount.dollarsEquivalent != null)]").doesNotExist()
+                .jsonPath("$.rewards[?(@.amount.currency.code == 'STRK' && @.amount.usdEquivalent == null)]").exists()
+                .jsonPath("$.rewards[?(@.amount.currency.code == 'STRK' && @.amount.usdEquivalent != null)]").doesNotExist()
                 .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(191010)
                 .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(101010)
         ;

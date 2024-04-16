@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEn
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.view.ContributionRewardView;
+import onlydust.com.marketplace.project.domain.view.Money;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -56,9 +57,7 @@ public class ContributionRewardViewEntity {
 
         return ContributionRewardView.builder()
                 .id(id)
-                .currency(currency.toView())
-                .amount(amount)
-                .dollarsEquivalent(statusData.amountUsdEquivalent())
+                .amount(new Money(amount, currency.toView(), statusData.amountUsdEquivalent()))
                 .status(status())
                 .from(requestor)
                 .to(recipient)

@@ -9,6 +9,6 @@ public interface AmountMapper {
     static BigDecimal pretty(BigDecimal amount, int decimals, BigDecimal usdRate) {
         final var optimumScale = usdRate == null ? decimals : max(0, (int) round(-log10(0.01 / usdRate.longValue())));
 
-        return amount.setScale(min(amount.scale(), optimumScale), RoundingMode.HALF_EVEN);
+        return amount.setScale(min(decimals, min(amount.scale(), optimumScale)), RoundingMode.HALF_EVEN);
     }
 }

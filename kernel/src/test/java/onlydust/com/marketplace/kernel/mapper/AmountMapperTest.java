@@ -36,6 +36,10 @@ class AmountMapperTest {
         assertThat(pretty(BigDecimal.valueOf(100.123456789012345678), 18, BigDecimal.valueOf(63336.80))).isEqualTo(BigDecimal.valueOf(100.1234568));
         assertThat(pretty(BigDecimal.valueOf(100.123456789012345678), 18, BigDecimal.valueOf(63336.80))).isEqualTo(BigDecimal.valueOf(100.1234568));
 
+        // Few decimals
+        assertThat(pretty(BigDecimal.valueOf(100.123456789012345678), 2, BigDecimal.valueOf(63336.80))).isEqualTo(BigDecimal.valueOf(100.12));
+        assertThat(pretty(BigDecimal.valueOf(100.127456789012345678), 2, BigDecimal.valueOf(63336.80))).isEqualTo(BigDecimal.valueOf(100.13));
+
         // No USD rate
         assertThat(pretty(BigDecimal.valueOf(100.123456789012345678), 18, null)).isEqualTo(BigDecimal.valueOf(100.123456789012345678));
         assertThat(pretty(BigDecimal.valueOf(100.123456789012345678), 6, null)).isEqualTo(BigDecimal.valueOf(100.123457));
