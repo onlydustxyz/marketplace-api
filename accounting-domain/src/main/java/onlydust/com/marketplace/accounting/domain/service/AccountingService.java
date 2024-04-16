@@ -14,10 +14,7 @@ import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.*;
@@ -106,6 +103,7 @@ public class AccountingService implements AccountingFacadePort {
         final var sponsorAccount = mustGetSponsorAccount(sponsorAccountId);
         final var accountBookState = getAccountBook(sponsorAccount.currency()).state();
         final var accountStatement = registerSponsorAccountTransaction(accountBookState, sponsorAccount, transaction);
+        accountingObserver.onSponsorAccountBalanceChanged(accountStatement);
 
         final var allowanceToAdd = min(transaction.amount(), max(accountStatement.debt().negate(), ZERO));
         if (allowanceToAdd.isStrictlyPositive()) increaseAllowance(sponsorAccountId, allowanceToAdd);
@@ -208,10 +206,16 @@ public class AccountingService implements AccountingFacadePort {
         accountBook.burn(AccountId.of(payment.id()), rewards.stream().map(PayableReward::amount).reduce(PositiveAmount::add).orElse(PositiveAmount.ZERO));
         saveAccountBook(currency, accountBook);
 
-        rewards.forEach(r -> confirm(accountBook.state(), r, payment.referenceFor(r.id())));
+        final var modifiedSponsorAccounts = rewards.stream()
+                .flatMap(r -> confirm(accountBook.state(), r, payment.referenceFor(r.id())).stream())
+                .collect(toSet());
+
+        modifiedSponsorAccounts.forEach(accountingObserver::onSponsorAccountBalanceChanged);
     }
 
-    private void confirm(ReadOnlyAccountBookState accountBookState, PayableReward reward, Payment.Reference paymentReference) {
+    private Set<SponsorAccountStatement> confirm(ReadOnlyAccountBookState accountBookState, PayableReward reward, Payment.Reference paymentReference) {
+        final var modifiedSponsorAccounts = new HashSet<SponsorAccountStatement>();
+
         accountBookState.transferredAmountPerOrigin(AccountId.of(reward.id()))
                 .entrySet()
                 .stream().map(e -> Map.entry(
@@ -220,11 +224,16 @@ public class AccountingService implements AccountingFacadePort {
                 ))
                 .filter(e -> paymentReference.network().equals(e.getKey().network().orElse(null)))
                 .collect(toMap(Map.Entry::getKey, Map.Entry::getValue))
-                .forEach((account, transaction) -> registerSponsorAccountTransaction(accountBookState, account, transaction));
+                .forEach((account, transaction) -> {
+                    registerSponsorAccountTransaction(accountBookState, account, transaction);
+                    modifiedSponsorAccounts.add(sponsorAccountStatement(account, accountBookState));
+                });
 
         accountingObserver.onPaymentReceived(reward.id(), paymentReference);
         if (isPaid(accountBookState, reward.id()))
             accountingObserver.onRewardPaid(reward.id());
+
+        return modifiedSponsorAccounts;
     }
 
     private static boolean isPaid(ReadOnlyAccountBookState accountBookState, RewardId rewardId) {
@@ -311,9 +320,7 @@ public class AccountingService implements AccountingFacadePort {
                                                                       SponsorAccount.Transaction transaction) {
         sponsorAccount.add(transaction);
         sponsorAccountStorage.save(sponsorAccount);
-        final var statement = sponsorAccountStatement(sponsorAccount, accountBookState);
-        accountingObserver.onSponsorAccountBalanceChanged(statement);
-        return statement;
+        return sponsorAccountStatement(sponsorAccount, accountBookState);
     }
 
     private SponsorAccount mustGetSponsorAccount(SponsorAccount.Id sponsorAccountId) {
