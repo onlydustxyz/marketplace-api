@@ -28,7 +28,7 @@ public class SlackApiAdapter implements NotificationPort {
     }
 
     @Override
-    public void notifyNewEvent(Event event) {
+    public void notify(Event event) {
         if (event instanceof BillingProfileVerificationUpdated billingProfileVerificationUpdated) {
             notifyNewVerificationEvent(billingProfileVerificationUpdated);
         } else {

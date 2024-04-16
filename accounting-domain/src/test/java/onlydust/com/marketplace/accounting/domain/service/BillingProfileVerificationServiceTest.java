@@ -127,7 +127,7 @@ public class BillingProfileVerificationServiceTest {
             verify(billingProfileStoragePort).updateBillingProfileStatus(kycWithDataFromExternalSource.getBillingProfileId(),
                     billingProfileVerificationUpdated.getVerificationStatus());
             verify(billingProfileObserver).onBillingProfileUpdated(updatedEvent);
-            verify(notificationPort).notifyNewEvent(updatedEvent);
+            verify(notificationPort).notify(updatedEvent);
             verify(webhookPort).send(updatedEvent);
         }
     }
@@ -206,7 +206,7 @@ public class BillingProfileVerificationServiceTest {
             // Then
             verify(billingProfileStoragePort).saveKyb(updateKyb);
             verify(billingProfileStoragePort).updateBillingProfileStatus(updateKyb.getBillingProfileId(), updateKyb.getStatus());
-            verify(notificationPort).notifyNewEvent(updatedEvent);
+            verify(notificationPort).notify(updatedEvent);
             verify(webhookPort).send(updatedEvent);
             verify(billingProfileObserver).onBillingProfileUpdated(updatedEvent);
         }
@@ -254,7 +254,7 @@ public class BillingProfileVerificationServiceTest {
             // Then
             verify(billingProfileStoragePort).saveKyb(updateKyb);
             verify(billingProfileStoragePort).updateBillingProfileStatus(updateKyb.getBillingProfileId(), VerificationStatus.CLOSED);
-            verify(notificationPort).notifyNewEvent(updatedEvent);
+            verify(notificationPort).notify(updatedEvent);
             verify(webhookPort).send(updatedEvent);
             verify(billingProfileObserver).onBillingProfileUpdated(updatedEvent);
         }
@@ -326,7 +326,7 @@ public class BillingProfileVerificationServiceTest {
             verify(billingProfileStoragePort).saveChildrenKyc(billingProfileVerificationUpdated.getExternalApplicantId(),
                     billingProfileVerificationUpdated.getParentExternalApplicantId(), billingProfileVerificationUpdated.getVerificationStatus());
             verify(billingProfileStoragePort).updateBillingProfileStatus(initialKyb.getBillingProfileId(), VerificationStatus.REJECTED);
-            verify(notificationPort).notifyNewEvent(updatedEvent);
+            verify(notificationPort).notify(updatedEvent);
             verify(webhookPort).send(updatedEvent);
             billingProfileObserver.onBillingProfileUpdated(updatedEvent);
         }

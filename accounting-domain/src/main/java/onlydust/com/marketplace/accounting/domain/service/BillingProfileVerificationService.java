@@ -52,7 +52,7 @@ public class BillingProfileVerificationService implements BillingProfileVerifica
         }
         billingProfileObserver.onBillingProfileUpdated(billingProfileVerificationUpdated);
         webhookPort.send(billingProfileVerificationUpdated);
-        notificationPort.notifyNewEvent(billingProfileVerificationUpdated);
+        notificationPort.notify(billingProfileVerificationUpdated);
     }
 
     private BillingProfileVerificationUpdated processParentBillingProfileVerification(final BillingProfileVerificationUpdated billingProfileVerificationUpdated) {

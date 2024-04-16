@@ -6,6 +6,7 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
@@ -36,7 +37,6 @@ public class ProjectService implements ProjectFacadePort {
 
     private final ProjectObserverPort projectObserverPort;
     private final ProjectStoragePort projectStoragePort;
-    private final ProjectRewardStoragePort projectRewardStoragePort;
     private final ImageStoragePort imageStoragePort;
     private final UUIDGeneratorPort uuidGeneratorPort;
     private final PermissionService permissionService;
@@ -45,6 +45,7 @@ public class ProjectService implements ProjectFacadePort {
     private final ContributionStoragePort contributionStoragePort;
     private final DustyBotStoragePort dustyBotStoragePort;
     private final GithubStoragePort githubStoragePort;
+    private final NotificationPort notificationPort;
 
     @Override
     public ProjectDetailsView getById(UUID projectId, User caller) {
@@ -103,7 +104,7 @@ public class ProjectService implements ProjectFacadePort {
                 command.getImageUrl(),
                 ProjectRewardSettings.defaultSettings(dateProvider.now()), command.getEcosystemIds());
 
-        projectObserverPort.onProjectCreated(projectId);
+        notificationPort.notify(null);
         if (nonNull(command.getGithubRepoIds())) {
             projectObserverPort.onLinkedReposChanged(projectId, Set.copyOf(command.getGithubRepoIds()), Set.of());
         }

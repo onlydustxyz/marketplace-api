@@ -6,8 +6,10 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.mocks.DeterministicDateProvider;
 import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.notification.ProjectCreated;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
@@ -43,11 +45,11 @@ public class ProjectServiceTest {
     private final GithubStoragePort githubStoragePort = mock(GithubStoragePort.class);
     private final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
     private final ProjectObserverPort projectObserverPort = mock(ProjectObserverPort.class);
-    private final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
-    private final ProjectService projectService = new ProjectService(projectObserverPort, projectStoragePort, projectRewardStoragePort,
+    private final NotificationPort notificationPort = mock(NotificationPort.class);
+    private final ProjectService projectService = new ProjectService(projectObserverPort, projectStoragePort,
             imageStoragePort,
             uuidGeneratorPort, permissionService, indexerPort, dateProvider,
-            contributionStoragePort, dustyBotStoragePort, githubStoragePort);
+            contributionStoragePort, dustyBotStoragePort, githubStoragePort, notificationPort);
 
     @BeforeEach
     void setUp() {
@@ -158,7 +160,7 @@ public class ProjectServiceTest {
         assertNotNull(projectIdentity.getLeft());
         assertThat(projectIdentity.getRight()).isEqualTo("slug");
         verify(indexerPort, times(1)).indexUsers(usersToInviteAsProjectLeaders);
-        verify(projectObserverPort).onProjectCreated(expectedProjectId);
+        verify(notificationPort).notify(new ProjectCreated());
         verify(projectObserverPort).onLinkedReposChanged(expectedProjectId,
                 command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of());
     }
