@@ -35,6 +35,7 @@ public class ProjectService implements ProjectFacadePort {
     private static final Pattern PULL_REQUEST_URL_REGEX = Pattern.compile(
             "https://github\\.com/([^/]+)/([^/]+)/pull/([0-9]+)/?");
     private static final int STALE_CONTRIBUTION_THRESHOLD_IN_DAYS = 10;
+    private static final int NEWCOMER_THRESHOLD_IN_MONTHS = 1;
 
     private final ProjectObserverPort projectObserverPort;
     private final ProjectStoragePort projectStoragePort;
@@ -332,8 +333,7 @@ public class ProjectService implements ProjectFacadePort {
                 .to(Date.from(ZonedDateTime.now().minusDays(STALE_CONTRIBUTION_THRESHOLD_IN_DAYS).toInstant()))
                 .build();
 
-        return contributions(projectId, caller, filters, ContributionView.Sort.CREATED_AT, SortDirection.desc, page,
-                pageSize);
+        return contributions(projectId, caller, filters, ContributionView.Sort.CREATED_AT, SortDirection.desc, page, pageSize);
     }
 
     @Override
@@ -350,7 +350,7 @@ public class ProjectService implements ProjectFacadePort {
         if (!permissionService.isUserProjectLead(projectId, caller.getId())) {
             throw OnlyDustException.forbidden("Only project leads can view project insights");
         }
-        return projectStoragePort.getNewcomers(projectId, page, pageSize);
+        return projectStoragePort.getNewcomers(projectId, ZonedDateTime.now().minusMonths(NEWCOMER_THRESHOLD_IN_MONTHS), page, pageSize);
     }
 
     @Override

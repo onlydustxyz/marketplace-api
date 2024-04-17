@@ -5,6 +5,7 @@ import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.view.*;
 
+import java.time.ZonedDateTime;
 import java.util.*;
 
 public interface ProjectStoragePort {
@@ -72,7 +73,7 @@ public interface ProjectStoragePort {
 
     Page<ChurnedContributorView> getChurnedContributors(UUID projectId, Integer pageIndex, Integer pageSize);
 
-    Page<NewcomerView> getNewcomers(UUID projectId, Integer pageIndex, Integer pageSize);
+    Page<NewcomerView> getNewcomers(UUID projectId, ZonedDateTime since, Integer pageIndex, Integer pageSize);
 
     Page<ContributorActivityView> getMostActivesContributors(UUID projectId, Integer pageIndex, Integer pageSize);
 
