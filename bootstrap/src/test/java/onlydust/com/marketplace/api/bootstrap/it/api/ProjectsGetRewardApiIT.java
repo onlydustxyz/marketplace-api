@@ -56,15 +56,18 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "id": "85f8358c-5339-42ac-a577-16d7760d1e28",
-                          "currency": {
-                            "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                            "code": "USDC",
-                            "name": "USD Coin",
-                            "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                            "decimals": 6
+                          "amount": {
+                            "amount": 1000,
+                            "prettyAmount": 1000,
+                            "currency": {
+                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                              "code": "USDC",
+                              "name": "USD Coin",
+                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                              "decimals": 6
+                            },
+                            "usdEquivalent": 1010.00
                           },
-                          "amount": 1000,
-                          "dollarsEquivalent": 1010.00,
                           "status": "PENDING_VERIFICATION",
                           "unlockDate": null,
                           "from": {

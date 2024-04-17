@@ -186,14 +186,28 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                   "totalAmount": 2692632.50,
                   "details": [
                     {
-                      "totalAmount": 3250,
-                      "totalDollarsEquivalent": 3250,
-                      "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2}
+                      "amount": 3250,
+                      "prettyAmount": 3250,
+                      "currency": {
+                        "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                        "code": "USD",
+                        "name": "US Dollar",
+                        "logoUrl": null,
+                        "decimals": 2
+                      },
+                      "usdEquivalent": 3250
                     },
                     {
-                      "totalAmount": 19750,
-                      "totalDollarsEquivalent": 2689382.50,
-                      "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6}
+                      "amount": 19750,
+                      "prettyAmount": 19750,
+                      "currency": {
+                        "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                        "code": "USDC",
+                        "name": "USD Coin",
+                        "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                        "decimals": 6
+                      },
+                      "usdEquivalent": 2689382.50
                     }
                   ]
                 },
@@ -997,14 +1011,28 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                   "totalAmount": 2692632.50,
                   "details": [
                     {
-                      "totalAmount": 3250,
-                      "totalDollarsEquivalent": 3250,
-                      "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2}
+                      "amount": 3250,
+                      "prettyAmount": 3250,
+                      "currency": {
+                        "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                        "code": "USD",
+                        "name": "US Dollar",
+                        "logoUrl": null,
+                        "decimals": 2
+                      },
+                      "usdEquivalent": 3250
                     },
                     {
-                      "totalAmount": 19750,
-                      "totalDollarsEquivalent": 2689382.50,
-                      "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6}
+                      "amount": 19750,
+                      "prettyAmount": 19750,
+                      "currency": {
+                        "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                        "code": "USDC",
+                        "name": "USD Coin",
+                        "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                        "decimals": 6
+                      },
+                      "usdEquivalent": 2689382.50
                     }
                   ]
                 },

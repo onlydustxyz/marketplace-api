@@ -3205,6 +3205,7 @@ components:
       description: Money value object
       required:
         - amount
+        - prettyAmount
         - currency
         - usdEquivalent
       properties:
@@ -3212,6 +3213,8 @@ components:
           type: number
           description: Amount of money
           example: 100
+        prettyAmount:
+          type: number
         currency:
           $ref: '#/components/schemas/ShortCurrencyResponse'
         usdEquivalent:
@@ -4260,7 +4263,7 @@ components:
           format: date-time
           example: 2023-07-21T12:45:04.750174
         amount:
-          $ref: '#/components/schemas/RewardAmountResponse'
+          $ref: '#/components/schemas/Money'
         numberOfRewardedContributions:
           type: integer
           example: 11
@@ -4301,7 +4304,7 @@ components:
           format: date-time
           example: 2023-07-21T12:45:04.750174
         amount:
-          $ref: '#/components/schemas/RewardAmountResponse'
+          $ref: '#/components/schemas/Money'
         numberOfRewardedContributions:
           type: integer
           example: 11
@@ -4335,24 +4338,13 @@ components:
         - PENDING_REQUEST
         - PROCESSING
         - COMPLETE
-    RewardAmountResponse:
-      type: object
-      required:
-        - total
-        - currency
-      properties:
-        total:
-          type: number
-        currency:
-          $ref: '#/components/schemas/ShortCurrencyResponse'
-        dollarsEquivalent:
-          type: number
+
     RewardRequest:
       type: object
       required:
         - amount
         - recipientId
-        - currency
+        - currencyId
         - items
       properties:
         recipientId:
@@ -5168,27 +5160,13 @@ components:
         details:
           type: array
           items:
-            $ref: '#/components/schemas/MyRewardAmountResponse'
-
-    MyRewardAmountResponse:
-      type: object
-      required:
-        - totalAmount
-        - currency
-      properties:
-        totalAmount:
-          type: number
-        totalDollarsEquivalent:
-          type: number
-        currency:
-          $ref: '#/components/schemas/ShortCurrencyResponse'
+            $ref: '#/components/schemas/Money'
 
     RewardResponse:
       type: object
       required:
         - status
         - amount
-        - currency
         - from
         - to
         - createdAt
@@ -5197,12 +5175,8 @@ components:
         id:
           type: string
           format: uuid
-        currency:
-          $ref: '#/components/schemas/ShortCurrencyResponse'
         amount:
-          type: number
-        dollarsEquivalent:
-          type: number
+          $ref: '#/components/schemas/Money'
         status:
           $ref: '#/components/schemas/RewardStatusContract'
         unlockDate:
@@ -6051,7 +6025,10 @@ components:
         - type: object
           required:
             - target
+            - prettyAmount
           properties:
+            prettyAmount:
+              type: number
             target:
               $ref: '#/components/schemas/BaseMoney'
 

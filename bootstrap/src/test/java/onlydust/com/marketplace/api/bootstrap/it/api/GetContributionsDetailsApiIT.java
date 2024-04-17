@@ -70,12 +70,6 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "type": "PULL_REQUEST",
-                          "contributor": {
-                            "githubUserId": 43467246,
-                            "login": "AnthonyBuisset",
-                            "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                            "isRegistered": true
-                          },
                           "repo": {
                             "id": 498695724,
                             "owner": "onlydustxyz",
@@ -114,9 +108,18 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                           "rewards": [
                             {
                               "id": "6587511b-3791-47c6-8430-8f793606c63a",
-                              "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
-                              "amount": 1000,
-                              "dollarsEquivalent": 1010,
+                              "amount": {
+                                "amount": 1000,
+                                "prettyAmount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 1010.00
+                              },
                               "status": "PENDING_REQUEST",
                               "from": {
                                 "githubUserId": 43467246,
@@ -135,9 +138,18 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "id": "0b275f04-bdb1-4d4f-8cd1-76fe135ccbdf",
-                              "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
-                              "amount": 1000,
-                              "dollarsEquivalent": 1010,
+                              "amount": {
+                                "amount": 1000,
+                                "prettyAmount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 1010.00
+                              },
                               "status": "PENDING_REQUEST",
                               "from": {
                                 "githubUserId": 43467246,
@@ -156,9 +168,18 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "id": "335e45a5-7f59-4519-8a12-1addc530214c",
-                              "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
-                              "amount": 1000,
-                              "dollarsEquivalent": 1010,
+                              "amount": {
+                                "amount": 1000,
+                                "prettyAmount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 1010.00
+                              },
                               "status": "PENDING_REQUEST",
                               "from": {
                                 "githubUserId": 43467246,
@@ -177,9 +198,18 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "id": "e9ebbe59-fb74-4a6c-9a51-6d9050412977",
-                              "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
-                              "amount": 1000,
-                              "dollarsEquivalent": 1010,
+                              "amount": {
+                                "amount": 1000,
+                                "prettyAmount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 1010.00
+                              },
                               "status": "PENDING_REQUEST",
                               "from": {
                                 "githubUserId": 43467246,
@@ -198,9 +228,18 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "id": "e33ea956-d2f5-496b-acf9-e2350faddb16",
-                              "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
-                              "amount": 1000,
-                              "dollarsEquivalent": 1010,
+                              "amount": {
+                                "amount": 1000,
+                                "prettyAmount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 1010.00
+                              },
                               "status": "PENDING_REQUEST",
                               "from": {
                                 "githubUserId": 43467246,
@@ -219,9 +258,18 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "id": "dd7d445f-6915-4955-9bae-078173627b05",
-                              "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
-                              "amount": 1000,
-                              "dollarsEquivalent": 1010,
+                              "amount": {
+                                "amount": 1000,
+                                "prettyAmount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 1010.00
+                              },
                               "status": "PENDING_REQUEST",
                               "from": {
                                 "githubUserId": 43467246,
@@ -240,9 +288,18 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "id": "d22f75ab-d9f5-4dc6-9a85-60dcd7452028",
-                              "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
-                              "amount": 1000,
-                              "dollarsEquivalent": 1010,
+                              "amount": {
+                                "amount": 1000,
+                                "prettyAmount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 1010.00
+                              },
                               "status": "PENDING_REQUEST",
                               "from": {
                                 "githubUserId": 43467246,
@@ -261,9 +318,18 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "id": "95e079c9-609c-4531-8c5c-13217306b299",
-                              "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
-                              "amount": 1000,
-                              "dollarsEquivalent": 1010,
+                              "amount": {
+                                "amount": 1000,
+                                "prettyAmount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 1010.00
+                              },
                               "status": "PENDING_REQUEST",
                               "from": {
                                 "githubUserId": 43467246,
@@ -282,7 +348,6 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                             }
                           ]
                         }
-                                                
                         """);
     }
 

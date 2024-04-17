@@ -7,6 +7,8 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import static onlydust.com.marketplace.kernel.mapper.AmountMapper.pretty;
+
 @Value
 public class MoneyView {
     @NonNull BigDecimal amount;
@@ -28,5 +30,9 @@ public class MoneyView {
 
     public Optional<BigDecimal> dollarsEquivalent() {
         return Optional.ofNullable(dollarsEquivalentValue);
+    }
+
+    public BigDecimal prettyAmount() {
+        return pretty(amount, currency.decimals(), usdConversionRateValue);
     }
 }

@@ -4064,9 +4064,9 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 bodyContentSpec
                         .jsonPath("$.rewards[?(@.id == '%s')].status".formatted(rewardDatum.rewardId.toString()))
                         .isEqualTo(rewardDatum.status)
-                        .jsonPath("$.rewards[?(@.id == '%s')].amount.total".formatted(rewardDatum.rewardId.toString()))
+                        .jsonPath("$.rewards[?(@.id == '%s')].amount.amount".formatted(rewardDatum.rewardId.toString()))
                         .value(rewardAmountAsList::setValue)
-                        .jsonPath("$.rewards[?(@.id == '%s')].amount.dollarsEquivalent".formatted(rewardDatum.rewardId.toString()))
+                        .jsonPath("$.rewards[?(@.id == '%s')].amount.usdEquivalent".formatted(rewardDatum.rewardId.toString()))
                         .value(rewardUsdEquivalentAsList::setValue);
                 assertThat(rewardAmountAsList.getValue().get(0).longValue()).isEqualTo(rewardDatum.rewardedAmount);
                 assertThat(rewardUsdEquivalentAsList.getValue().get(0)).isEqualTo(rewardDatum.usdEquivalent().map(BigDecimal::doubleValue).orElse(null));
@@ -4092,8 +4092,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                         .is2xxSuccessful()
                         .expectBody()
                         .jsonPath("$.status").isEqualTo(rewardDatum.status)
-                        .jsonPath("$.amount").value(rewardAmount::setValue, Long.class)
-                        .jsonPath("$.dollarsEquivalent").value(rewardUsdEquivalent::setValue, BigDecimal.class);
+                        .jsonPath("$.amount.amount").value(rewardAmount::setValue, Long.class)
+                        .jsonPath("$.amount.usdEquivalent").value(rewardUsdEquivalent::setValue, BigDecimal.class);
                 assertThat(rewardAmount.getValue()).isEqualTo(rewardDatum.rewardedAmount);
                 assertThat(rewardUsdEquivalent.getValue().doubleValue()).isEqualTo(rewardDatum.usdEquivalent().map(BigDecimal::doubleValue).orElse(null));
             }
@@ -4199,15 +4199,16 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
     private static final String GET_PROJECT_1_INDIVIDUAL_REWARD_JSON_RESPONSE = """
             {
-              "currency": {
-                "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                "code": "STRK",
-                "name": "StarkNet Token",
-                "logoUrl": null,
-                "decimals": 18
+              "amount": {
+                "currency": {
+                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                  "code": "STRK",
+                  "name": "StarkNet Token",
+                  "logoUrl": null,
+                  "decimals": 18
+                },
+                "amount": 10
               },
-              "amount": 10,
-              
               "unlockDate": null,
               "from": {
                 "githubUserId": 16590657,
@@ -4220,7 +4221,6 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 "login": "mmaderic",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/39437117?v=4"
               },
-              
               "project": {
                 "slug": "super-project-1",
                 "name": "Super Project 1",
@@ -4232,15 +4232,16 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
             """;
     private static final String GET_PROJECT_2_INDIVIDUAL_REWARD_JSON_RESPONSE = """
             {
-              "currency": {
-                "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                "code": "STRK",
-                "name": "StarkNet Token",
-                "logoUrl": null,
-                "decimals": 18
+              "amount": {
+                "currency": {
+                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                  "code": "STRK",
+                  "name": "StarkNet Token",
+                  "logoUrl": null,
+                  "decimals": 18
+                },
+                "amount": 100
               },
-              "amount": 100,
-              
               "unlockDate": null,
               "from": {
                 "githubUserId": 16590657,
@@ -4267,15 +4268,16 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
     private static final String GET_PROJECT_1_COMPANY_ADMIN_1_REWARD_JSON_RESPONSE = """
             {
-               "currency": {
-                 "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                 "code": "STRK",
-                 "name": "StarkNet Token",
-                 "logoUrl": null,
-                 "decimals": 18
+               "amount": {
+                 "currency": {
+                   "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                   "code": "STRK",
+                   "name": "StarkNet Token",
+                   "logoUrl": null,
+                   "decimals": 18
+                 },
+                 "amount": 20
                },
-               "amount": 20,
-               
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -4301,14 +4303,16 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
     private static final String GET_PROJECT_2_COMPANY_ADMIN_1_REWARD_JSON_RESPONSE = """
             {
-               "currency": {
-                 "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                 "code": "STRK",
-                 "name": "StarkNet Token",
-                 "logoUrl": null,
-                 "decimals": 18
+               "amount": {
+                 "currency": {
+                   "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                   "code": "STRK",
+                   "name": "StarkNet Token",
+                   "logoUrl": null,
+                   "decimals": 18
+                 },
+                 "amount": 200
                },
-               "amount": 200,
                
                "unlockDate": null,
                "from": {
@@ -4335,14 +4339,16 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
     private static final String GET_PROJECT_1_COMPANY_ADMIN_2_REWARD_JSON_RESPONSE = """
              {
-               "currency": {
-                 "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                 "code": "STRK",
-                 "name": "StarkNet Token",
-                 "logoUrl": null,
-                 "decimals": 18
+               "amount": {
+                 "currency": {
+                   "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                   "code": "STRK",
+                   "name": "StarkNet Token",
+                   "logoUrl": null,
+                   "decimals": 18
+                 },
+                 "amount": 30
                },
-               "amount": 30,
                
                "unlockDate": null,
                "from": {
@@ -4369,14 +4375,16 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
     private static final String GET_PROJECT_2_COMPANY_ADMIN_2_REWARD_JSON_RESPONSE = """
              {
-               "currency": {
-                 "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                 "code": "STRK",
-                 "name": "StarkNet Token",
-                 "logoUrl": null,
-                 "decimals": 18
+               "amount": {
+                 "currency": {
+                   "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                   "code": "STRK",
+                   "name": "StarkNet Token",
+                   "logoUrl": null,
+                   "decimals": 18
+                 },
+                 "amount": 300
                },
-               "amount": 300,
                
                "unlockDate": null,
                "from": {
@@ -4403,14 +4411,16 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
     private static final String GET_PROJECT_11_SELF_EMPLOYED_REWARD_JSON_RESPONSE = """
             {
-               "currency": {
-                 "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                 "code": "STRK",
-                 "name": "StarkNet Token",
-                 "logoUrl": null,
-                 "decimals": 18
+               "amount": {
+                 "currency": {
+                   "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                   "code": "STRK",
+                   "name": "StarkNet Token",
+                   "logoUrl": null,
+                   "decimals": 18
+                 },
+                 "amount": 50
                },
-               "amount": 50,
                
                "unlockDate": null,
                "from": {
@@ -4437,14 +4447,16 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
     private static final String GET_PROJECT_12_SELF_EMPLOYED_REWARD_JSON_RESPONSE = """
             {
-               "currency": {
-                 "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                 "code": "STRK",
-                 "name": "StarkNet Token",
-                 "logoUrl": null,
-                 "decimals": 18
+               "amount": {
+                 "currency": {
+                   "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                   "code": "STRK",
+                   "name": "StarkNet Token",
+                   "logoUrl": null,
+                   "decimals": 18
+                 },
+                 "amount": 55
                },
-               "amount": 55,
                
                "unlockDate": null,
                "from": {
@@ -4471,14 +4483,16 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
     private static final String GET_PROJECT_2_SELF_EMPLOYED_REWARD_JSON_RESPONSE = """
             {
-               "currency": {
-                 "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                 "code": "STRK",
-                 "name": "StarkNet Token",
-                 "logoUrl": null,
-                 "decimals": 18
+               "amount": {
+                 "currency": {
+                   "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                   "code": "STRK",
+                   "name": "StarkNet Token",
+                   "logoUrl": null,
+                   "decimals": 18
+                 },
+                 "amount": 500
                },
-               "amount": 500,
                
                "unlockDate": null,
                "from": {
@@ -4506,14 +4520,16 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
     private static final String GET_PROJECT_1_COMPANY_MEMBER_REWARD_JSON_RESPONSE = """
             {
-              "currency": {
-                "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                "code": "STRK",
-                "name": "StarkNet Token",
-                "logoUrl": null,
-                "decimals": 18
+              "amount": {
+                "currency": {
+                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                  "code": "STRK",
+                  "name": "StarkNet Token",
+                  "logoUrl": null,
+                  "decimals": 18
+                },
+                "amount": 40
               },
-              "amount": 40,
               
               "unlockDate": null,
               "from": {
@@ -4540,14 +4556,16 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
     private static final String GET_PROJECT_2_COMPANY_MEMBER_REWARD_JSON_RESPONSE = """
             {
-              "currency": {
-                "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                "code": "STRK",
-                "name": "StarkNet Token",
-                "logoUrl": null,
-                "decimals": 18
+              "amount": {
+                "currency": {
+                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                  "code": "STRK",
+                  "name": "StarkNet Token",
+                  "logoUrl": null,
+                  "decimals": 18
+                },
+                "amount": 400
               },
-              "amount": 400,
               "unlockDate": null,
               "from": {
                 "githubUserId": 16590657,

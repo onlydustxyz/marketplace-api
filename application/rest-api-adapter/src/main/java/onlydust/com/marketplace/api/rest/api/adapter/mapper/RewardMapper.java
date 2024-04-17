@@ -17,6 +17,7 @@ import onlydust.com.marketplace.project.domain.view.RewardItemView;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MoneyMapper.toMoney;
 
 public interface RewardMapper {
 
@@ -59,10 +60,8 @@ public interface RewardMapper {
                 )
                 .createdAt(DateMapper.toZoneDateTime(rewardDetailsView.getCreatedAt()))
                 .processedAt(DateMapper.toZoneDateTime(rewardDetailsView.getProcessedAt()))
-                .amount(rewardDetailsView.getAmount())
-                .currency(mapCurrency(rewardDetailsView.getCurrency()))
+                .amount(toMoney(rewardDetailsView.getAmount()))
                 .unlockDate(DateMapper.toZoneDateTime(rewardDetailsView.getUnlockDate()))
-                .dollarsEquivalent(rewardDetailsView.getDollarsEquivalent())
                 .id(rewardDetailsView.getId())
                 .receipt(receiptToResponse(rewardDetailsView.getReceipt()))
                 .project(ProjectMapper.mapShortProjectResponse(rewardDetailsView.getProject()))
@@ -97,7 +96,7 @@ public interface RewardMapper {
     }
 
     static RewardResponse rewardToResponse(ContributionRewardView rewardView, AuthenticatedUser authenticatedUser) {
-        final var response = new RewardResponse()
+        return new RewardResponse()
                 .from(new ContributorResponse()
                         .githubUserId(rewardView.getFrom().getGithubUserId())
                         .avatarUrl(rewardView.getFrom().getGithubAvatarUrl())
@@ -111,12 +110,9 @@ public interface RewardMapper {
                 )
                 .createdAt(DateMapper.toZoneDateTime(rewardView.getCreatedAt()))
                 .processedAt(DateMapper.toZoneDateTime(rewardView.getProcessedAt()))
-                .amount(rewardView.getAmount())
-                .currency(mapCurrency(rewardView.getCurrency()))
-                .dollarsEquivalent(rewardView.getDollarsEquivalent())
-                .id(rewardView.getId());
-        response.status(map(rewardView.getStatus().as(authenticatedUser)));
-        return response;
+                .amount(toMoney(rewardView.getAmount()))
+                .id(rewardView.getId())
+                .status(map(rewardView.getStatus().as(authenticatedUser)));
     }
 
     static ReceiptResponse receiptToResponse(final ReceiptView receiptView) {
@@ -188,6 +184,8 @@ public interface RewardMapper {
     }
 
     static ShortCurrencyResponse mapCurrency(CurrencyView currency) {
+        if (currency == null) return null;
+
         return new ShortCurrencyResponse()
                 .id(currency.id().value())
                 .code(currency.code())
@@ -197,6 +195,8 @@ public interface RewardMapper {
     }
 
     static ShortCurrencyResponse mapCurrency(Currency currency) {
+        if (currency == null) return null;
+
         return new ShortCurrencyResponse()
                 .id(currency.id().value())
                 .code(currency.code().toString())

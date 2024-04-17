@@ -5,7 +5,7 @@ import onlydust.com.marketplace.api.contract.model.ProjectVisibility;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.view.TotalEarnedPerCurrency;
+import onlydust.com.marketplace.project.domain.view.Money;
 import onlydust.com.marketplace.project.domain.view.TotalsEarned;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
 import org.springframework.beans.BeanUtils;
@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.mapCurrency;
 
 public interface UserMapper {
 
@@ -171,19 +170,9 @@ public interface UserMapper {
     }
 
     static RewardTotalAmountsResponse totalsEarnedToResponse(TotalsEarned totalsEarned) {
-        final RewardTotalAmountsResponse response = new RewardTotalAmountsResponse();
-        response.setTotalAmount(totalsEarned.getTotalDollarsEquivalent());
-        for (TotalEarnedPerCurrency totalEarnedPerCurrency :
-                totalsEarned.getDetails().stream().sorted(comparing(TotalEarnedPerCurrency::getTotalAmount)).toList()) {
-            final MyRewardAmountResponse myRewardAmountResponse = new MyRewardAmountResponse();
-            myRewardAmountResponse.setTotalAmount(totalEarnedPerCurrency.getTotalAmount());
-            myRewardAmountResponse.totalDollarsEquivalent(totalEarnedPerCurrency.getTotalDollarsEquivalent());
-            if (totalEarnedPerCurrency.getCurrency() != null) {
-                myRewardAmountResponse.setCurrency(mapCurrency(totalEarnedPerCurrency.getCurrency()));
-            }
-            response.addDetailsItem(myRewardAmountResponse);
-        }
-        return response;
+        return new RewardTotalAmountsResponse()
+                .totalAmount(totalsEarned.getTotalDollarsEquivalent())
+                .details(totalsEarned.getDetails().stream().sorted(comparing(Money::getAmount)).map(MoneyMapper::toMoney).toList());
     }
 
     static List<ContactInformation> contactToResponse(final Set<Contact> contacts) {

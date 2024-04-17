@@ -21,6 +21,7 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.reducing;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.mapCurrency;
+import static onlydust.com.marketplace.kernel.mapper.AmountMapper.pretty;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
 
@@ -83,7 +84,7 @@ public interface SponsorMapper {
                 .projects(sponsor.projects().stream().map(p -> mapToProjectWithBudget(p, accountStatements)).toList())
                 .availableBudgets(accountStatements.stream()
                         .map(SponsorMapper::mapAllowanceToMoney)
-                        .collect(groupingBy(Money::getCurrency, reducing(null, SponsorMapper::merge)))
+                        .collect(groupingBy(Money::getCurrency, reducing(null, MoneyMapper::add)))
                         .values().stream()
                         .sorted(comparing(b -> b.getCurrency().getCode()))
                         .toList());
@@ -100,6 +101,7 @@ public interface SponsorMapper {
                                     final var currency = statement.account().currency();
                                     return new Money()
                                             .amount(budget)
+                                            .prettyAmount(pretty(budget, currency.decimals(), currency.latestUsdQuote().orElse(null)))
                                             .currency(mapCurrency(currency))
                                             .usdEquivalent(currency.latestUsdQuote().map(r -> r.multiply(budget)).orElse(null));
                                 }
@@ -113,15 +115,12 @@ public interface SponsorMapper {
         return new Money()
                 .currency(mapCurrency(accountStatement.account().currency()))
                 .amount(accountStatement.allowance().getValue())
-                .usdEquivalent(accountStatement.account().currency().latestUsdQuote().map(q -> q.multiply(accountStatement.allowance().getValue())).orElse(null));
-    }
-
-    private static @NonNull Money merge(Money left, @NonNull Money right) {
-        return left == null ? right : new Money()
-                .currency(right.getCurrency())
-                .amount(left.getAmount().add(right.getAmount()))
-                .usdEquivalent(left.getUsdEquivalent() == null ? null : left.getUsdEquivalent().add(right.getUsdEquivalent()))
-                ;
+                .prettyAmount(pretty(accountStatement.allowance().getValue(),
+                        accountStatement.account().currency().decimals(),
+                        accountStatement.account().currency().latestUsdQuote().orElse(null)))
+                .usdEquivalent(accountStatement.account().currency().latestUsdQuote()
+                        .map(q -> q.multiply(accountStatement.allowance().getValue()))
+                        .orElse(null));
     }
 
     static TransactionHistoryPageResponse mapTransactionHistory(Page<HistoricalTransaction> page, int pageIndex) {

@@ -8,12 +8,12 @@ import java.util.List;
 @Value
 public class TotalsEarned {
     BigDecimal totalDollarsEquivalent;
-    List<TotalEarnedPerCurrency> details;
+    List<Money> details;
 
-    public TotalsEarned(List<TotalEarnedPerCurrency> totalEarnedPerCurrencies) {
+    public TotalsEarned(List<Money> totalEarnedPerCurrencies) {
         this.details = totalEarnedPerCurrencies;
         totalDollarsEquivalent = totalEarnedPerCurrencies.stream()
-                .map(TotalEarnedPerCurrency::getTotalDollarsEquivalent)
+                .map(Money::getUsdEquivalent)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

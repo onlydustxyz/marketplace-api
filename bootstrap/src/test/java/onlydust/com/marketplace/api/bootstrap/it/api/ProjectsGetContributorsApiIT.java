@@ -36,7 +36,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -53,7 +53,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -70,7 +70,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -89,15 +89,16 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                     "totalAmount": 1010.00,
                     "details": [
                       {
-                        "totalAmount": 1000,
-                        "totalDollarsEquivalent": 1010.00,
+                        "amount": 1000,
+                        "prettyAmount": 1000,
                         "currency": {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
                           "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
-                        }
+                        },
+                        "usdEquivalent": 1010.00
                       }
                     ]
                   },
@@ -127,7 +128,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -144,7 +145,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -161,7 +162,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -178,7 +179,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -206,7 +207,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 1,
                   "pullRequestToReward": 0,
@@ -223,7 +224,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 1,
                   "pullRequestToReward": 1,
@@ -240,7 +241,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 1,
                   "pullRequestToReward": 0,
@@ -257,7 +258,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 1,
                   "pullRequestToReward": 1,
@@ -274,7 +275,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 2,
                   "pullRequestToReward": 0,
@@ -291,7 +292,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 2,
                   "pullRequestToReward": 1,
@@ -308,7 +309,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 20,
                   "pullRequestToReward": 7,
@@ -327,15 +328,16 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                     "totalAmount": 1515.00,
                     "details": [
                       {
-                        "totalAmount": 1500,
-                        "totalDollarsEquivalent": 1515.00,
+                        "amount": 1500,
+                        "prettyAmount": 1500,
                         "currency": {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
                           "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
-                        }
+                        },
+                        "usdEquivalent": 1515.00
                       }
                     ]
                   },
@@ -354,7 +356,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 36,
                   "pullRequestToReward": 25,
@@ -371,7 +373,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 46,
                   "pullRequestToReward": 34,
@@ -388,7 +390,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 102,
                   "pullRequestToReward": 55,
@@ -405,7 +407,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 104,
                   "pullRequestToReward": 78,
@@ -422,7 +424,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 127,
                   "pullRequestToReward": 88,
@@ -439,7 +441,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 140,
                   "pullRequestToReward": 57,
@@ -456,7 +458,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 146,
                   "pullRequestToReward": 107,
@@ -473,7 +475,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 123,
                   "pullRequestToReward": 5,
@@ -492,15 +494,16 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                     "totalAmount": 1010.00,
                     "details": [
                       {
-                        "totalAmount": 1000,
-                        "totalDollarsEquivalent": 1010.00,
+                        "amount": 1000,
+                        "prettyAmount": 1000,
                         "currency": {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
                           "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
-                        }
+                        },
+                        "usdEquivalent": 1010.00
                       }
                     ]
                   },
@@ -519,7 +522,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 379,
                   "pullRequestToReward": 119,
@@ -536,7 +539,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 573,
                   "pullRequestToReward": 250,
@@ -553,7 +556,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 800,
                   "pullRequestToReward": 417,
@@ -582,7 +585,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 36,
                   "pullRequestToReward": 25,
@@ -599,7 +602,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 46,
                   "pullRequestToReward": 34,
@@ -616,7 +619,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 104,
                   "pullRequestToReward": 78,
@@ -633,7 +636,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 140,
                   "pullRequestToReward": 57,
@@ -661,7 +664,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -678,7 +681,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -695,7 +698,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -712,7 +715,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -729,7 +732,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -746,7 +749,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -763,7 +766,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -782,15 +785,16 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                     "totalAmount": 1515.00,
                     "details": [
                       {
-                        "totalAmount": 1500,
-                        "totalDollarsEquivalent": 1515.00,
+                        "amount": 1500,
+                        "prettyAmount": 1500,
                         "currency": {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
                           "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
-                        }
+                        },
+                        "usdEquivalent": 1515.00
                       }
                     ]
                   },
@@ -809,7 +813,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -826,7 +830,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -843,7 +847,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -860,7 +864,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -877,7 +881,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -894,7 +898,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -911,7 +915,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -928,7 +932,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -947,15 +951,16 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                     "totalAmount": 1010.00,
                     "details": [
                       {
-                        "totalAmount": 1000,
-                        "totalDollarsEquivalent": 1010.00,
+                        "amount": 1000,
+                        "prettyAmount": 1000,
                         "currency": {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
                           "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
-                        }
+                        },
+                        "usdEquivalent": 1010.00
                       }
                     ]
                   },
@@ -974,7 +979,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -991,7 +996,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -1008,7 +1013,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -1037,7 +1042,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -1054,7 +1059,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -1071,7 +1076,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -1088,7 +1093,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": null,
                   "pullRequestToReward": null,
@@ -1118,59 +1123,64 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                     "totalAmount": 35210.00,
                     "details": [
                       {
-                        "totalAmount": 20.5,
-                        "totalDollarsEquivalent": 31426.5,
+                        "amount": 20.5,
+                        "prettyAmount": 20.5,
                         "currency": {
                           "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                           "code": "ETH",
                           "name": "Ether",
                           "logoUrl": null,
                           "decimals": 18
-                        }
+                        },
+                        "usdEquivalent": 31426.5
                       },
                       {
-                        "totalAmount": 450,
-                        "totalDollarsEquivalent": 643.5,
+                        "amount": 450,
+                        "prettyAmount": 450,
                         "currency": {
                           "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
                           "code": "OP",
                           "name": "Optimism",
                           "logoUrl": null,
                           "decimals": 18
-                        }
+                        },
+                        "usdEquivalent": 643.5
                       },
                       {
-                        "totalAmount": 2000,
-                        "totalDollarsEquivalent": 1120,
+                        "amount": 2000,
+                        "prettyAmount": 2000,
                         "currency": {
                           "id": "48388edb-fda2-4a32-b228-28152a147500",
                           "code": "APT",
                           "name": "Aptos Coin",
                           "logoUrl": null,
                           "decimals": 8
-                        }
+                        },
+                        "usdEquivalent": 1120
                       },
                       {
-                        "totalAmount": 2000,
-                        "totalDollarsEquivalent": 2020.00,
+                        "amount": 2000,
+                        "prettyAmount": 2000,
                         "currency": {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
                           "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
-                        }
+                        },
+                        "usdEquivalent": 2020.00
                       },
                       {
-                        "totalAmount": 500000,
-                        "totalDollarsEquivalent": 0,
+                        "amount": 500000,
+                        "prettyAmount": 500000,
                         "currency": {
                           "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
                           "code": "STRK",
                           "name": "StarkNet Token",
                           "logoUrl": null,
                           "decimals": 18
-                        }
+                        },
+                        "usdEquivalent": 0
                       }
                     ]
                   },
@@ -1189,7 +1199,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 797,
                   "pullRequestToReward": 416,
@@ -1220,15 +1230,16 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                     "totalAmount": 6060.00,
                     "details": [
                       {
-                        "totalAmount": 6000,
-                        "totalDollarsEquivalent": 6060.00,
+                        "amount": 6000,
+                        "prettyAmount": 6000,
                         "currency": {
                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                           "code": "USDC",
                           "name": "USD Coin",
                           "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
-                        }
+                        },
+                        "usdEquivalent": 6060.00
                       }
                     ]
                   },
@@ -1247,7 +1258,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
-                    "details": null
+                    "details": []
                   },
                   "contributionToRewardCount": 797,
                   "pullRequestToReward": 416,

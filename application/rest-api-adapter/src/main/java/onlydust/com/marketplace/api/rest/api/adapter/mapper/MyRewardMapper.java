@@ -2,14 +2,12 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.MyRewardPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.MyRewardsPageResponse;
-import onlydust.com.marketplace.api.contract.model.RewardAmountResponse;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.view.UserRewardView;
 import onlydust.com.marketplace.project.domain.view.UserRewardsPageView;
 
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectRewardMapper.mapMoney;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.mapCurrency;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MoneyMapper.toMoney;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 
 public interface MyRewardMapper {
@@ -22,8 +20,8 @@ public interface MyRewardMapper {
                 .totalItemNumber(page.getRewards().getTotalItemNumber())
                 .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getRewards().getTotalPageNumber()))
                 .rewards(page.getRewards().getContent().stream().map((UserRewardView view) -> mapMyRewardViewToResponse(view, authenticatedUser)).toList())
-                .pendingAmount(mapMoney(page.getPendingAmount()))
-                .rewardedAmount(mapMoney(page.getRewardedAmount()))
+                .pendingAmount(toMoney(page.getPendingAmount()))
+                .rewardedAmount(toMoney(page.getRewardedAmount()))
                 .receivedRewardsCount(page.getReceivedRewardsCount())
                 .rewardedContributionsCount(page.getRewardedContributionsCount())
                 .rewardingProjectsCount(page.getRewardingProjectsCount())
@@ -38,7 +36,7 @@ public interface MyRewardMapper {
                 .numberOfRewardedContributions(view.getNumberOfRewardedContributions())
                 .rewardedOnProjectLogoUrl(view.getRewardedOnProjectLogoUrl())
                 .rewardedOnProjectName(view.getRewardedOnProjectName())
-                .amount(mapRewardAmountToResponse(view))
+                .amount(toMoney(view.getAmount()))
                 .rewardedUser(ContributorMapper.of(view.getRewardedUser()))
                 .status(RewardMapper.map(view.getStatus().as(authenticatedUser)))
                 .requestedAt(DateMapper.toZoneDateTime(view.getRequestedAt()))
@@ -47,12 +45,4 @@ public interface MyRewardMapper {
                 .billingProfileId(view.getBillingProfileId())
                 ;
     }
-
-    private static RewardAmountResponse mapRewardAmountToResponse(UserRewardView view) {
-        return new RewardAmountResponse()
-                .currency(mapCurrency(view.getAmount().getCurrency()))
-                .dollarsEquivalent(view.getAmount().getUsdEquivalent())
-                .total(view.getAmount().getAmount());
-    }
-
 }

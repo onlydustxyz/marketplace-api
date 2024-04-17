@@ -18,7 +18,6 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import org.jetbrains.annotations.NotNull;
 
-import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +25,7 @@ import java.util.stream.Collectors;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsLast;
 import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MoneyMapper.toMoney;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.mapCurrency;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
@@ -112,7 +112,7 @@ public interface BillingProfileMapper {
                 .id(reward.id().value())
                 .date(reward.createdAt())
                 .projectName(reward.projectName())
-                .amount(toConvertibleMoney(reward.amount(), reward.target()))
+                .amount(MoneyMapper.toConvertibleMoney(reward.amount(), reward.target()))
                 ;
     }
 
@@ -182,17 +182,6 @@ public interface BillingProfileMapper {
             case PAID -> InvoiceStatus.COMPLETE;
             case REJECTED -> InvoiceStatus.REJECTED;
         };
-    }
-
-    static ConvertibleMoney toConvertibleMoney(Money money, Money base) {
-        return new ConvertibleMoney()
-                .amount(money.getValue())
-                .currency(mapCurrency(money.getCurrency()))
-                .target(new BaseMoney()
-                        .amount(base.getValue())
-                        .currency(mapCurrency(base.getCurrency()))
-                        .conversionRate(base.getValue().divide(money.getValue(), 2, RoundingMode.HALF_EVEN))
-                );
     }
 
     static BillingProfileType map(BillingProfile.Type type) {
@@ -318,10 +307,7 @@ public interface BillingProfileMapper {
                 .numberOfRewardedContributions(view.getNumberOfRewardedContributions())
                 .rewardedOnProjectLogoUrl(view.getRewardedOnProjectLogoUrl())
                 .rewardedOnProjectName(view.getRewardedOnProjectName())
-                .amount(new RewardAmountResponse()
-                        .currency(mapCurrency(view.getAmount().getCurrency()))
-                        .dollarsEquivalent(view.getAmount().getDollarsEquivalent())
-                        .total(view.getAmount().getTotal()))
+                .amount(toMoney(view.getAmount()))
                 .status(RewardMapper.map(view.getStatus().as(authenticatedUser)))
                 .requestedAt(DateMapper.toZoneDateTime(view.getRequestedAt()))
                 .processedAt(DateMapper.toZoneDateTime(view.getProcessedAt()))

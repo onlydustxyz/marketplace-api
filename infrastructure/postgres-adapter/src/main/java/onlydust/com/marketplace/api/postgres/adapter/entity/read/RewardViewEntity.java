@@ -12,6 +12,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
+import onlydust.com.marketplace.project.domain.view.Money;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 
 import javax.persistence.*;
@@ -89,16 +90,12 @@ public class RewardViewEntity {
                 .rewardedOnProjectLogoUrl(project.getLogoUrl())
                 .status(status())
                 .unlockDate(statusData.unlockDate())
-                .amount(BillingProfileRewardView.Amount.builder()
-                        .total(amount)
-                        .currency(currency.toView())
-                        .dollarsEquivalent(statusData.amountUsdEquivalent())
-                        .build())
+                .amount(new MoneyView(amount, currency.toDomain(), statusData.usdConversionRate(), statusData.amountUsdEquivalent()))
                 .numberOfRewardedContributions(rewardItems.size())
                 .recipientAvatarUrl(recipient.avatarUrl())
                 .recipientId(recipient.githubUserId())
                 .recipientLogin(recipient.login())
-                .billingProfileId(billingProfile.getId())
+                .billingProfileId(billingProfile == null ? null : billingProfile.getId())
                 .build();
     }
 
@@ -124,11 +121,9 @@ public class RewardViewEntity {
         return RewardDetailsView.builder()
                 .id(id)
                 .to(to())
-                .amount(amount)
+                .amount(new Money(amount, currency.toView(), statusData.amountUsdEquivalent()))
                 .createdAt(requestedAt)
                 .processedAt(statusData.paidAt())
-                .currency(currency.toView())
-                .dollarsEquivalent(statusData.amountUsdEquivalent())
                 .status(status())
                 .unlockDate(statusData.unlockDate())
                 .from(from())
