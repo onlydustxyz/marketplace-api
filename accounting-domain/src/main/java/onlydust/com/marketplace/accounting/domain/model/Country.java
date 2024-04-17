@@ -18,7 +18,7 @@ public class Country {
     private static final Set<String> EU_COUNTRIES = Set.of("AUT", "BEL", "BGR", "HRV", "CYP", "CZE", "DNK", "EST", "FIN", "FRA", "DEU", "GRC", "HUN", "IRL",
             "ITA", "LVA", "LTU", "LUX", "MLT", "NLD", "POL", "PRT", "ROU", "SVK", "SVN", "ESP", "SWE", "GBR");
 
-    final @NonNull String iso3Code;
+    private final @NonNull String iso3Code;
 
     public Optional<String> display() {
         return Optional.ofNullable(COUNTRY_NAME_MAPPED_TO_ISO3_CODE.get(iso3Code));
@@ -30,5 +30,9 @@ public class Country {
 
     public boolean isFrance() {
         return "FRA".equals(iso3Code);
+    }
+
+    public boolean isUsa() {
+        return "USA".equals(iso3Code);
     }
 }

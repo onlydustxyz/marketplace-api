@@ -931,7 +931,13 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     private Invoice.Id invoiceReward(UserId userId, ProjectId projectId, RewardId rewardId) {
         final var billingProfile = billingProfileFacadePort.createIndividualBillingProfile(userId, "Personal", null);
         billingProfileStoragePort.updateBillingProfileStatus(billingProfile.id(), VerificationStatus.VERIFIED);
-        billingProfileStoragePort.saveKyc(billingProfile.kyc().toBuilder().firstName(faker.name().firstName()).address(faker.address().fullAddress()).usCitizen(false).country(Country.fromIso3("FRA")).build());
+        billingProfileStoragePort.saveKyc(billingProfile.kyc().toBuilder()
+                .firstName(faker.name().firstName())
+                .address(faker.address().fullAddress())
+                .consideredUsPersonQuestionnaire(false)
+                .idDocumentCountry(Country.fromIso3("FRA"))
+                .country(Country.fromIso3("FRA"))
+                .build());
         billingProfileFacadePort.updatePayoutInfo(billingProfile.id(), userId, PayoutInfo.builder().ethWallet(Ethereum.wallet("ofux.eth")).build());
         payoutPreferenceFacadePort.setPayoutPreference(projectId, billingProfile.id(), userId);
 

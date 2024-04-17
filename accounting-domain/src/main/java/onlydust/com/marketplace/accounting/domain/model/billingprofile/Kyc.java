@@ -1,12 +1,11 @@
 package onlydust.com.marketplace.accounting.domain.model.billingprofile;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 @Data
@@ -23,11 +22,13 @@ public class Kyc {
     String lastName;
     Date birthdate;
     String address;
+    @Getter(AccessLevel.NONE)
     Country country;
-    Boolean usCitizen;
+    Boolean consideredUsPersonQuestionnaire;
     IdDocumentTypeEnum idDocumentType;
     String idDocumentNumber;
-    String idDocumentCountryCode;
+    @Getter(AccessLevel.NONE)
+    Country idDocumentCountry;
     Date validUntil;
     String reviewMessageForApplicant;
     String externalApplicantId;
@@ -48,6 +49,19 @@ public class Kyc {
 
     public String fullName() {
         return firstName == null ? lastName : firstName + " " + lastName;
+    }
+
+    public Boolean isUsCitizen() {
+        if (consideredUsPersonQuestionnaire == null || country == null || idDocumentCountry == null) return null;
+        return consideredUsPersonQuestionnaire || country.isUsa() || idDocumentCountry.isUsa();
+    }
+
+    public Optional<Country> getCountry() {
+        return Optional.ofNullable(country);
+    }
+
+    public Optional<Country> getIdDocumentCountry() {
+        return Optional.ofNullable(idDocumentCountry);
     }
 
     public enum IdDocumentTypeEnum {

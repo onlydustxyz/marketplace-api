@@ -73,7 +73,7 @@ public class SumsubResponseMapper {
                             })
                             .idDocumentNumber(idDocumentDTO.getNumber())
                             .validUntil(mapDate(idDocumentDTO.getValidUntil()))
-                            .idDocumentCountryCode(idDocumentDTO.getCountry())
+                            .idDocumentCountry(Country.fromIso3(idDocumentDTO.getCountry()))
                             .build();
                 }
             }
@@ -90,7 +90,8 @@ public class SumsubResponseMapper {
                         if (personalStatusVerification.has("items") && personalStatusVerification.get("items").has("areYouConsideredAUsP") &&
                             personalStatusVerification.get("items").get("areYouConsideredAUsP").has("value")) {
                             updatedKyc = updatedKyc.toBuilder()
-                                    .usCitizen(mapBoolean(personalStatusVerification.get("items").get("areYouConsideredAUsP").get("value").textValue()))
+                                    .consideredUsPersonQuestionnaire(mapBoolean(personalStatusVerification.get("items").get("areYouConsideredAUsP").get(
+                                            "value").textValue()))
                                     .build();
                         }
                     }
