@@ -25,12 +25,11 @@ import onlydust.com.marketplace.accounting.domain.stubs.ERC20Tokens;
 import onlydust.com.marketplace.accounting.domain.stubs.SponsorAccountStorageStub;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -91,6 +90,16 @@ public class AccountingServiceTest {
         accountBookEventStorage = new AccountBookEventStorageStub();
         accountingService = new AccountingService(new CachedAccountBookProvider(accountBookEventStorage), sponsorAccountStorage, currencyStorage,
                 accountingObserver, projectAccountingObserver, invoiceStoragePort, accountBookObserver);
+    }
+
+    @BeforeAll
+    public static void init() {
+        TransactionSynchronizationManager.initSynchronization();
+    }
+
+    @AfterAll
+    public static void cleanUp() {
+        TransactionSynchronizationManager.clear();
     }
 
     @BeforeEach

@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
@@ -18,16 +17,27 @@ import java.util.Optional;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
-@AllArgsConstructor
 public class AccountingObserver implements AccountingObserverPort, RewardStatusFacadePort, BillingProfileObserver {
     // TODO migrate rewards to accounting schema and merge all those storages as onetone dependencies of reward
     private final RewardStatusStorage rewardStatusStorage;
     private final RewardUsdEquivalentStorage rewardUsdEquivalentStorage;
     private final QuoteStorage quoteStorage;
-    private final CurrencyStorage currencyStorage;
     private final InvoiceStoragePort invoiceStorage;
     private final ReceiptStoragePort receiptStorage;
     private final BillingProfileStoragePort billingProfileStoragePort;
+    private final Currency usd;
+
+    public AccountingObserver(RewardStatusStorage rewardStatusStorage, RewardUsdEquivalentStorage rewardUsdEquivalentStorage, QuoteStorage quoteStorage,
+                              CurrencyStorage currencyStorage, InvoiceStoragePort invoiceStorage, ReceiptStoragePort receiptStorage,
+                              BillingProfileStoragePort billingProfileStoragePort) {
+        this.rewardStatusStorage = rewardStatusStorage;
+        this.rewardUsdEquivalentStorage = rewardUsdEquivalentStorage;
+        this.quoteStorage = quoteStorage;
+        this.invoiceStorage = invoiceStorage;
+        this.receiptStorage = receiptStorage;
+        this.billingProfileStoragePort = billingProfileStoragePort;
+        this.usd = currencyStorage.findByCode(Currency.Code.USD).orElseThrow(() -> internalServerError("Currency USD not found"));
+    }
 
     @Override
     public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
@@ -60,8 +70,8 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
 
     @Override
     public void onRewardPaid(RewardId rewardId) {
-        final var rewardStatus =
-                rewardStatusStorage.get(rewardId).orElseThrow(() -> internalServerError("RewardStatus not found for reward %s".formatted(rewardId)));
+        final var rewardStatus = rewardStatusStorage.get(rewardId)
+                .orElseThrow(() -> internalServerError("RewardStatus not found for reward %s".formatted(rewardId)));
         rewardStatusStorage.save(rewardStatus.paidAt(ZonedDateTime.now()));
 
         invoiceStorage.invoiceOf(rewardId).ifPresent(invoice -> {
@@ -85,8 +95,6 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
 
     @Override
     public Optional<ConvertedAmount> usdAmountOf(RewardId rewardId) {
-        final var usd = currencyStorage.findByCode(Currency.Code.USD).orElseThrow(() -> internalServerError("Currency USD not found"));
-
         return rewardUsdEquivalentStorage.get(rewardId).flatMap(rewardUsdEquivalent -> {
             final var date = rewardUsdEquivalent.equivalenceSealingDate().orElse(ZonedDateTime.now());
             return quoteStorage.nearest(rewardUsdEquivalent.rewardCurrencyId(), usd.id(), date)

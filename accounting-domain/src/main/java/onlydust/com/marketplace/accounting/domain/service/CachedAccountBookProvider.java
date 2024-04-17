@@ -10,12 +10,14 @@ import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStora
 import org.jetbrains.annotations.NotNull;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
+import static org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization;
 
 @RequiredArgsConstructor
 public class CachedAccountBookProvider {
@@ -30,6 +32,11 @@ public class CachedAccountBookProvider {
     public synchronized AccountBookAggregate get(final @NonNull Currency currency) {
         final var accountBookAggregate = getOrDefault(currency);
         accountBookAggregate.receive(accountBookEventStorage.getSince(currency, accountBookAggregate.nextEventId()));
+        registerSynchronization(new TransactionSynchronization() {
+            public void afterCompletion(int status) {
+                if (status != STATUS_COMMITTED) evictAccountBook(currency);
+            }
+        });
         return accountBookAggregate;
     }
 
@@ -37,7 +44,7 @@ public class CachedAccountBookProvider {
     public synchronized List<IdentifiedAccountBookEvent> save(final @NonNull Currency currency, final @NonNull AccountBookAggregate accountBook) {
         try {
             final var pendingEvents = accountBook.getAndClearPendingEvents();
-            
+
             if (!pendingEvents.isEmpty()) {
                 checkEventIdsSequenceIntegrity(currency, pendingEvents);
                 insertEvents(currency, pendingEvents);
@@ -68,7 +75,7 @@ public class CachedAccountBookProvider {
         }
     }
 
-    private void evictAccountBook(@NonNull Currency currency) {
+    private synchronized void evictAccountBook(@NonNull Currency currency) {
         accountBooks.remove(currency);
     }
 

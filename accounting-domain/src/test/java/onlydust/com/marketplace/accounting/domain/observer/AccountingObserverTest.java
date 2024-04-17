@@ -62,9 +62,9 @@ public class AccountingObserverTest {
         invoiceStorage = mock(InvoiceStoragePort.class);
         receiptStorage = mock(ReceiptStoragePort.class);
         billingProfileStoragePort = mock(BillingProfileStoragePort.class);
+        when(currencyStorage.findByCode(usd.code())).thenReturn(Optional.of(usd));
         accountingObserver = new AccountingObserver(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage, invoiceStorage,
                 receiptStorage, billingProfileStoragePort);
-        when(currencyStorage.findByCode(usd.code())).thenReturn(Optional.of(usd));
 
         when(rewardStatusStorage.get(any(RewardId.class))).then(invocation -> {
             final var rewardId = invocation.getArgument(0, RewardId.class);
