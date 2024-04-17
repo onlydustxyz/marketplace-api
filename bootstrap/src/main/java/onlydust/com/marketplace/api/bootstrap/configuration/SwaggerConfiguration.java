@@ -1,61 +1,31 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.ExternalDocumentation;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.service.ApiKey;
-import springfox.documentation.service.AuthorizationScope;
-import springfox.documentation.service.Contact;
-import springfox.documentation.service.SecurityReference;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spi.service.contexts.SecurityContext;
-import springfox.documentation.spring.web.plugins.Docket;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 @Configuration
 public class SwaggerConfiguration {
 
     @Bean
-    public Docket api() {
-        // http://localhost:9999/swagger-ui/#/
-        return new Docket(DocumentationType.OAS_30)
-                .apiInfo(
-                        new ApiInfoBuilder()
-                                .title("Marketplace backend REST API")
-                                .version("1.0.0-SNAPSHOT")
-                                .contact(
-                                        new Contact(
-                                                "OnlyDust tech team",
-                                                "http://www.onlydust.com",
-                                                "tech@onlydust.xyz"
-                                        )
-                                ).build()
+    public OpenAPI springShopOpenAPI() {
+        return new OpenAPI()
+                .info(new Info().title("Marketplace backend REST API")
+                        .version("1.0.0-SNAPSHOT")
+                        .contact(new Contact().name("OnlyDust tech team")
+                                .email("tech@onlydust.xyz")
+                                .url("http://www.onlydust.com"))
                 )
-                .securityContexts(Collections.singletonList(securityContext()))
-                .securitySchemes(List.of(apiKey()))
-                .select()
-                .paths(PathSelectors.regex("(/api/.*|/bo/.*)"))
-                .build()
-                .pathMapping("/");
-    }
-
-
-    private ApiKey apiKey() {
-        return new ApiKey("Api-Key", "Api-Key", "header");
-    }
-
-    private SecurityContext securityContext() {
-        return SecurityContext.builder().securityReferences(defaultAuth()).build();
-    }
-
-    private List<SecurityReference> defaultAuth() {
-        AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
-        AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
-        authorizationScopes[0] = authorizationScope;
-        return Arrays.asList(new SecurityReference("Api-Key", authorizationScopes));
+                .externalDocs(new ExternalDocumentation()
+                        .description("Github repo")
+                        .url("https://github.com/onlydustxyz/marketplace-api"))
+                .components(new Components()
+                        .addSecuritySchemes("apiKey",
+                                new SecurityScheme().type(SecurityScheme.Type.APIKEY).in(SecurityScheme.In.HEADER).name("Api-Key")));
     }
 }

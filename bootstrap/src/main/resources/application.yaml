@@ -77,6 +77,11 @@ spring:
 server:
   port: ${PORT}
 
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    pathsToMatch: /bo/**, /api/**
+
 infrastructure:
   aws:
     image-bucket: ${IMAGE_BUCKET_NAME}
