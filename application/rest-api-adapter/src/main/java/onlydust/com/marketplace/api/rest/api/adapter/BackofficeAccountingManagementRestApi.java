@@ -201,6 +201,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
     @Override
     public ResponseEntity<String> exportRewardsCSV(List<RewardStatusContract> statuses,
+                                                   List<UUID> billingProfiles,
                                                    String fromRequestedAt,
                                                    String toRequestedAt,
                                                    String fromProcessedAt,
@@ -210,6 +211,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
         final String csv = accountingRewardPort.exportRewardsCSV(
                 Optional.ofNullable(statuses).orElse(List.of()).stream().map(BackOfficeMapper::map).toList(),
+                billingProfiles != null ? billingProfiles.stream().map(BillingProfile.Id::of).toList() : null,
                 DateMapper.parseNullable(fromRequestedAt),
                 DateMapper.parseNullable(toRequestedAt),
                 DateMapper.parseNullable(fromProcessedAt),

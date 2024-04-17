@@ -44,10 +44,12 @@ public class RewardService implements AccountingRewardPort {
 
     @Override
     public String exportRewardsCSV(List<RewardStatus.Input> statuses,
+                                   List<BillingProfile.Id> billingProfileIds,
                                    Date fromRequestedAt, Date toRequestedAt,
                                    Date fromProcessedAt, Date toProcessedAt) {
         final var rewards = accountingRewardStoragePort.findRewards(0, 1_000_000,
-                statuses.stream().collect(Collectors.toUnmodifiableSet()), List.of(), fromRequestedAt, toRequestedAt, fromProcessedAt, toProcessedAt);
+                statuses.stream().collect(Collectors.toUnmodifiableSet()), Optional.ofNullable(billingProfileIds).orElse(List.of()), fromRequestedAt,
+                toRequestedAt, fromProcessedAt, toProcessedAt);
 
         if (rewards.getTotalPageNumber() > 1) {
             throw badRequest("Too many rewards to export");
