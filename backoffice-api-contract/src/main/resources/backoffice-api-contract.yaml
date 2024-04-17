@@ -1598,6 +1598,17 @@ paths:
       operationId: getHackathons
       description: |
         Get hackathons pages
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
       responses:
         "200":
           description: 'hackathons pages'
