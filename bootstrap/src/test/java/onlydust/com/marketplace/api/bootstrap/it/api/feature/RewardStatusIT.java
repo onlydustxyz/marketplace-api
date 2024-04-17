@@ -3856,20 +3856,15 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 billingProfileService,
                 authenticatedBackofficeUserService);
         backofficeAccountingManagementRestApi.payReward(individualBPAdminRewardId1,
-                new PayRewardRequest().network(TransactionNetwork.ETHEREUM).recipientAccount("0xa11c0edBa8924280Df7f258B370371bD985C8B0B").reference(
-                        "0xb1c3579ffbe3eabe6f88c58a037367dee7de6c06262cfecc3bd2e8c013cc5156"));
+                new PayRewardRequest().network(TransactionNetwork.ETHEREUM).reference("0xb1c3579ffbe3eabe6f88c58a037367dee7de6c06262cfecc3bd2e8c013cc5156"));
         backofficeAccountingManagementRestApi.payReward(companyBPAdmin1RewardId1,
-                new PayRewardRequest().network(TransactionNetwork.ETHEREUM).recipientAccount("0x12919307dd40A2f5DEf83cE598A5b042a83D23E0").reference(
-                        "0xccd727561376b00898b2a163d66d08d16b0ec2590ada079f5353568c04460523"));
+                new PayRewardRequest().network(TransactionNetwork.ETHEREUM).reference("0xccd727561376b00898b2a163d66d08d16b0ec2590ada079f5353568c04460523"));
         backofficeAccountingManagementRestApi.payReward(companyBPAdmin2RewardId1,
-                new PayRewardRequest().network(TransactionNetwork.ETHEREUM).recipientAccount("0x12919307dd40A2f5DEf83cE598A5b042a83D23E0").reference(
-                        "0xccd727561376b00898b2a163d66d08d16b0ec2590ada079f5353568c04460523"));
+                new PayRewardRequest().network(TransactionNetwork.ETHEREUM).reference("0xccd727561376b00898b2a163d66d08d16b0ec2590ada079f5353568c04460523"));
         backofficeAccountingManagementRestApi.payReward(companyBPMember1RewardId1,
-                new PayRewardRequest().network(TransactionNetwork.ETHEREUM).recipientAccount("0x12919307dd40A2f5DEf83cE598A5b042a83D23E0").reference(
-                        "0xf27dc84666851b0b140c5190eb706d80821966f857b5fbf510f283ad6c8d283e"));
+                new PayRewardRequest().network(TransactionNetwork.ETHEREUM).reference("0xf27dc84666851b0b140c5190eb706d80821966f857b5fbf510f283ad6c8d283e"));
         backofficeAccountingManagementRestApi.payReward(selfEmployedBPAdminRewardId11,
-                new PayRewardRequest().network(TransactionNetwork.ETHEREUM).recipientAccount("0x5b8a9A23c729010FB1DBFcC0e8e5eCeB4CC81cD9").reference(
-                        "0x9da1b9ded266895e097a18378789c3f09bb0a541d8c17c0d9c7a95bb3072ffa0"));
+                new PayRewardRequest().network(TransactionNetwork.ETHEREUM).reference("0x9da1b9ded266895e097a18378789c3f09bb0a541d8c17c0d9c7a95bb3072ffa0"));
 
         // Then
         assertGetProjectRewardsStatusOnProject(
