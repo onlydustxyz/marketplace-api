@@ -583,6 +583,35 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
     }
 
     @Test
+    @Order(5)
+    void should_export_all_rewards_for_a_given_billing_profile() {
+        // Given
+        olivier = UserId.of(userAuthHelper.authenticateOlivier().user().getId());
+        final var billingProfile = billingProfileService.getBillingProfilesForUser(olivier).stream()
+                .filter(b -> b.getType() == BillingProfile.Type.COMPANY)
+                .findFirst().orElseThrow();
+
+        // When
+        final var csv = client.get()
+                .uri(getApiURI(GET_REWARDS_CSV, Map.of(
+                                "billingProfiles", billingProfile.getId().toString(),
+                                "fromRequestedAt", "2023-03-20",
+                                "toRequestedAt", "2023-03-21"
+                        ))
+                )
+                .header("Authorization", "Bearer " + camille.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(String.class)
+                .returnResult().getResponseBody();
+
+        final var rows = Arrays.stream(csv.split("\n")).skip(1).toList();
+        assertThat(rows).allMatch(row -> row.contains("Olivier Inc."));
+    }
+
+    @Test
     @Order(6)
     void should_export_all_rewards_between_processed_dates() {
         // When

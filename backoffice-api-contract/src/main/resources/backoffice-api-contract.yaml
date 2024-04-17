@@ -701,6 +701,14 @@ paths:
               $ref: '#/components/schemas/RewardStatusContract'
           style: form
         - in: query
+          name: billingProfiles
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/BillingProfileId'
+          style: form
+        - in: query
           name: fromRequestedAt
           required: false
           schema:

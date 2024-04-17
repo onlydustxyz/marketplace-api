@@ -18,6 +18,7 @@ public interface AccountingRewardPort {
                                        Date fromProcessedAt, Date toProcessedAt);
 
     String exportRewardsCSV(List<RewardStatus.Input> statuses,
+                            List<BillingProfile.Id> billingProfileIds,
                             Date fromRequestedAt, Date toRequestedAt,
                             Date fromProcessedAt, Date toProcessedAt);
 
