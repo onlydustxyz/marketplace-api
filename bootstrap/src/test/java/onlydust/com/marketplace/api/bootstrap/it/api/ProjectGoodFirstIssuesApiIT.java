@@ -23,8 +23,8 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 4,
-                          "totalItemNumber": 16,
+                          "totalPageNumber": 3,
+                          "totalItemNumber": 11,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "issues": [
