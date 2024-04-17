@@ -19,11 +19,27 @@ import onlydust.com.marketplace.user.domain.port.input.BackofficeUserFacadePort;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.net.http.HttpClient;
 
+import static onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.*;
+import static onlydust.com.marketplace.user.domain.model.BackofficeUser.Role.BO_ADMIN;
+import static onlydust.com.marketplace.user.domain.model.BackofficeUser.Role.BO_READER;
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
 @Configuration
+@EnableWebSecurity
 public class WebSecurityConfiguration {
 
     @Bean
@@ -32,14 +48,54 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public WebSecurityAdapter apiSecurityConfiguration(final AuthenticationFilter authenticationFilter,
-                                                       final ApiKeyAuthenticationFilter indexerApiKeyAuthenticationFilter,
-                                                       final ApiKeyAuthenticationFilter backOfficeApiKeyAuthenticationFilter,
-                                                       final QueryParamTokenAuthenticationFilter queryParamTokenAuthenticationFilter,
-                                                       final DelegatedAuthenticationEntryPoint delegatedAuthenticationEntryPoint) {
-        return new WebSecurityAdapter(authenticationFilter, indexerApiKeyAuthenticationFilter, backOfficeApiKeyAuthenticationFilter,
-                queryParamTokenAuthenticationFilter,
-                delegatedAuthenticationEntryPoint);
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    public SecurityFilterChain filterChain(HttpSecurity http, final AuthenticationFilter authenticationFilter,
+                                           final ApiKeyAuthenticationFilter indexerApiKeyAuthenticationFilter,
+                                           final ApiKeyAuthenticationFilter backOfficeApiKeyAuthenticationFilter,
+                                           final QueryParamTokenAuthenticationFilter queryParamTokenAuthenticationFilter,
+                                           final DelegatedAuthenticationEntryPoint delegatedAuthenticationEntryPoint) throws Exception {
+        http
+                .sessionManagement(sessionManagementConfigurer -> sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests((authorize) ->
+                        authorize
+                                .requestMatchers(antMatcher("/bo/v1/external/**")).hasAnyAuthority(UNSAFE_INTERNAL_SERVICE.name(), BO_READER.name())
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/bo/v1/**")).hasAnyAuthority(INTERNAL_SERVICE.name(), BO_READER.name())
+                                .requestMatchers(antMatcher(HttpMethod.OPTIONS, "/bo/v1/**")).hasAnyAuthority(INTERNAL_SERVICE.name(), BO_READER.name())
+                                .requestMatchers(antMatcher(HttpMethod.HEAD, "/bo/v1/**")).hasAnyAuthority(INTERNAL_SERVICE.name(), BO_READER.name())
+                                .requestMatchers(antMatcher(HttpMethod.POST, "/bo/v1/**")).hasAnyAuthority(INTERNAL_SERVICE.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.PUT, "/bo/v1/**")).hasAnyAuthority(INTERNAL_SERVICE.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.PATCH, "/bo/v1/**")).hasAnyAuthority(INTERNAL_SERVICE.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.DELETE, "/bo/v1/**")).hasAnyAuthority(INTERNAL_SERVICE.name(), BO_ADMIN.name())
+
+                                .requestMatchers(antMatcher("/api/v1/me/**")).hasAuthority(USER.name())
+                                .requestMatchers(antMatcher("/api/v1/billing-profiles/**")).hasAuthority(USER.name())
+                                .requestMatchers(antMatcher("/api/v1/events/**")).hasAuthority(INTERNAL_SERVICE.name())
+                                .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/projects/**")).hasAuthority(USER.name())
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/users/search")).hasAuthority(USER.name())
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/projects/**")).permitAll()
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/users/**")).permitAll()
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/github/**")).hasAuthority(USER.name())
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/technologies")).permitAll()
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/hackathons/**")).permitAll()
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/swagger-ui/**")).permitAll()
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/v3/api-docs")).permitAll()
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/swagger-resources/**")).permitAll()
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/")).permitAll()
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/actuator/health")).permitAll()
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/version")).permitAll()
+                                .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/sumsub/webhook")).permitAll()
+                                .anyRequest().authenticated())
+
+                .addFilterBefore(authenticationFilter, AnonymousAuthenticationFilter.class)
+                .addFilterAfter(indexerApiKeyAuthenticationFilter, AuthenticationFilter.class)
+                .addFilterAfter(backOfficeApiKeyAuthenticationFilter, AuthenticationFilter.class)
+                .addFilterAfter(queryParamTokenAuthenticationFilter, AuthenticationFilter.class)
+                .exceptionHandling(
+                        (exceptionHandling) -> exceptionHandling.authenticationEntryPoint(delegatedAuthenticationEntryPoint)
+                );
+        return http.build();
     }
 
     @Bean

@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.github.javafaker.Faker;
 import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import com.github.tomakehurst.wiremock.recording.RecordingStatus;
 import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
 import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
@@ -262,7 +261,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
             final var wireMockServer = new WireMockServer(
                     options()
                             .dynamicPort()
-                            .extensions(new ResponseTemplateTransformer(true))
+                            .globalTemplating(true)
                             .usingFilesUnderClasspath("wiremock/" + stubLocation)
             );
 
