@@ -31,4 +31,8 @@ public class Country {
     public boolean isFrance() {
         return "FRA".equals(iso3Code);
     }
+
+    public boolean isUsa() {
+        return "USA".equals(iso3Code);
+    }
 }

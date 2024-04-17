@@ -90,7 +90,8 @@ public class SumsubResponseMapper {
                         if (personalStatusVerification.has("items") && personalStatusVerification.get("items").has("areYouConsideredAUsP") &&
                             personalStatusVerification.get("items").get("areYouConsideredAUsP").has("value")) {
                             updatedKyc = updatedKyc.toBuilder()
-                                    .usCitizen(mapBoolean(personalStatusVerification.get("items").get("areYouConsideredAUsP").get("value").textValue()))
+                                    .consideredUsPersonQuestionnaire(mapBoolean(personalStatusVerification.get("items").get("areYouConsideredAUsP").get(
+                                            "value").textValue()))
                                     .build();
                         }
                     }

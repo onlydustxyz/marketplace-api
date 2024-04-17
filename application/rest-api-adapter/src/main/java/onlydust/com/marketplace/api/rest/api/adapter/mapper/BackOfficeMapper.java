@@ -841,7 +841,7 @@ public interface BackOfficeMapper {
                 .address(kyc.getAddress())
                 .country(kyc.getCountry().map(c -> c.display().orElse(c.iso3Code())).orElse(null))
                 .countryCode(kyc.getCountry().map(Country::iso3Code).orElse(null))
-                .usCitizen(kyc.getUsCitizen())
+                .usCitizen(kyc.isUsCitizen())
                 .idDocumentType(kyc.getIdDocumentType() == null ? null : map(kyc.getIdDocumentType()))
                 .idDocumentNumber(kyc.getIdDocumentNumber())
                 .validUntil(kyc.getValidUntil() == null ? null : kyc.getValidUntil().toInstant().atZone(ZoneOffset.UTC))

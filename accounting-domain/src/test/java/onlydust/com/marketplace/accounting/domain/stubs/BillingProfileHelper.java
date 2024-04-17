@@ -47,7 +47,8 @@ public interface BillingProfileHelper {
                 .lastName("Doe")
                 .address("1 rue de la paix")
                 .birthdate(Date.from(ZonedDateTime.of(1990, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC).toInstant()))
-                .usCitizen(false)
+                .consideredUsPersonQuestionnaire(false)
+                .idDocumentCountry(Country.fromIso3("FRA"))
                 .build();
     }
 

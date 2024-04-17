@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -979,7 +978,11 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
         final var ownerId = UserId.of(antho.user().getId());
         final var individualBillingProfileId = billingProfileStoragePort.findIndividualBillingProfileForUser(ownerId).orElseThrow().getId();
         final var individualBillingProfile = billingProfileStoragePort.findById(individualBillingProfileId).orElseThrow();
-        billingProfileStoragePort.saveKyc(individualBillingProfile.getKyc().toBuilder().usCitizen(false).build());
+        billingProfileStoragePort.saveKyc(individualBillingProfile.getKyc().toBuilder()
+                .consideredUsPersonQuestionnaire(false)
+                .country(Country.fromIso3("FRA"))
+                .idDocumentCountry(Country.fromIso3("FRA"))
+                .build());
         billingProfileStoragePort.updateBillingProfileStatus(individualBillingProfileId, VerificationStatus.VERIFIED);
         billingProfileStoragePort.savePayoutInfoForBillingProfile(PayoutInfo.builder()
                 .ethWallet(Ethereum.wallet("abuisset.eth"))

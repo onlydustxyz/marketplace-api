@@ -53,7 +53,7 @@ public interface BillingProfileMapper {
             case RESIDENCE_PERMIT -> KYCResponse.IdDocumentTypeEnum.RESIDENCE_PERMIT;
         });
         response.setId(kyc.getId());
-        response.setUsCitizen(kyc.getUsCitizen());
+        response.setUsCitizen(kyc.isUsCitizen());
         response.setValidUntil(DateMapper.toZoneDateTime(kyc.getValidUntil()));
         return response;
     }

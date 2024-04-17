@@ -24,7 +24,7 @@ public class Kyc {
     String address;
     @Getter(AccessLevel.NONE)
     Country country;
-    Boolean usCitizen;
+    Boolean consideredUsPersonQuestionnaire;
     IdDocumentTypeEnum idDocumentType;
     String idDocumentNumber;
     @Getter(AccessLevel.NONE)
@@ -49,6 +49,11 @@ public class Kyc {
 
     public String fullName() {
         return firstName == null ? lastName : firstName + " " + lastName;
+    }
+
+    public Boolean isUsCitizen() {
+        if (consideredUsPersonQuestionnaire == null || country == null || idDocumentCountry == null) return null;
+        return consideredUsPersonQuestionnaire || country.isUsa() || idDocumentCountry.isUsa();
     }
 
     public Optional<Country> getCountry() {
