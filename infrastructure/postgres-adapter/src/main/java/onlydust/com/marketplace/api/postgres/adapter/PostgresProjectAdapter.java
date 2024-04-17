@@ -455,9 +455,9 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     @Override
-    public Page<NewcomerView> getNewcomers(UUID projectId, Integer pageIndex, Integer pageSize) {
+    public Page<NewcomerView> getNewcomers(UUID projectId, ZonedDateTime since, Integer pageIndex, Integer pageSize) {
         final var page = newcomerViewEntityRepository.findAllByProjectId(
-                projectId, PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC,
+                projectId, since, PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC,
                         "first_contribution_created_at")));
         return Page.<NewcomerView>builder()
                 .content(page.getContent().stream().map(NewcomerViewEntity::toDomain).toList())

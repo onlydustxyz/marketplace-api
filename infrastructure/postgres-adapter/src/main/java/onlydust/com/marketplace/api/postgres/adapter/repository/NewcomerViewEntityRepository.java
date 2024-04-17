@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 public interface NewcomerViewEntityRepository extends JpaRepository<NewcomerViewEntity, Long> {
@@ -24,7 +25,8 @@ public interface NewcomerViewEntityRepository extends JpaRepository<NewcomerView
                      LEFT JOIN iam.users u ON u.github_user_id = c.contributor_id
                      LEFT JOIN user_profile_info upi ON upi.id = u.id
                      LEFT JOIN indexer_exp.github_accounts ga ON ga.id = c.contributor_id
-            WHERE pgr.project_id = :projectId
+            WHERE pgr.project_id = :projectId AND
+                  c.created_at >= :since
             GROUP BY c.contributor_id,
                      c.contributor_login,
                      c.contributor_html_url,
@@ -36,5 +38,5 @@ public interface NewcomerViewEntityRepository extends JpaRepository<NewcomerView
                      upi.bio,
                      ga.bio
             """, nativeQuery = true)
-    Page<NewcomerViewEntity> findAllByProjectId(UUID projectId, Pageable pageable);
+    Page<NewcomerViewEntity> findAllByProjectId(UUID projectId, ZonedDateTime since, Pageable pageable);
 }

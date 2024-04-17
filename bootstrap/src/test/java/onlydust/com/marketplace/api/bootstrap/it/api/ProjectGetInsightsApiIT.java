@@ -1,16 +1,21 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 
 public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
-
-
     private final static String KAAPER = "298a547f-ecb6-4ab2-8975-68f4e9bf7b39";
+
+    @Autowired
+    private EntityManagerFactory entityManagerFactory;
 
     @Test
     void should_get_staled_contributions() {
@@ -158,6 +163,23 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                         """);
     }
 
+    private void patchPullRequestContribution(long githubRepoId, long prNumber, ZonedDateTime createdAt) {
+        final EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+        em.createNativeQuery("""
+                        UPDATE indexer_exp.contributions
+                        SET created_at = :createdAt
+                        WHERE repo_id = :repoId AND github_number = :prNumber AND type = 'PULL_REQUEST'
+                        """)
+                .setParameter("createdAt", createdAt)
+                .setParameter("repoId", githubRepoId)
+                .setParameter("prNumber", prNumber)
+                .executeUpdate();
+        em.flush();
+        em.getTransaction().commit();
+        em.close();
+    }
+
     @Test
     void should_get_churned_contributors() {
         // Given
@@ -279,6 +301,10 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
         // Given
         final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
+        patchPullRequestContribution(498695724, 1459, ZonedDateTime.now().minusDays(1)); // A newcomer
+        patchPullRequestContribution(498695724, 2, ZonedDateTime.now().minusDays(29)); // Still a newcomer
+        patchPullRequestContribution(498695724, 37, ZonedDateTime.now().minusDays(31)); // No longer a newcomer
+
         // When
         client.get()
                 .uri(getApiURI(PROJECTS_INSIGHTS_NEWCOMERS.formatted(KAAPER)))
@@ -290,66 +316,33 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                           "contributors": [
-                             {
-                               "githubUserId": 17259618,
-                               "login": "alexbeno",
-                               "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
-                               "isRegistered": false,
-                               "cover": "BLUE",
-                               "location": null,
-                               "bio": null,
-                               "firstContributedAt": "2023-10-19T12:13:47Z"
-                             },
-                             {
-                               "githubUserId": 143011364,
-                               "login": "pixelfact",
-                               "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
-                               "isRegistered": false,
-                               "cover": "MAGENTA",
-                               "location": null,
-                               "bio": "Frontend Dev",
-                               "firstContributedAt": "2023-09-25T15:49:00Z"
-                             },
-                             {
-                               "githubUserId": 5160414,
-                               "login": "haydencleary",
-                               "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
-                               "isRegistered": true,
-                               "cover": "BLUE",
-                               "location": "Limoges, France",
-                               "bio": "Freelance web developer focused on Typescript and React.js",
-                               "firstContributedAt": "2023-09-18T14:41:40Z"
-                             },
-                             {
-                               "githubUserId": 31901905,
-                               "login": "kaelsky",
-                               "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
-                               "isRegistered": true,
-                               "cover": "CYAN",
-                               "location": null,
-                               "bio": null,
-                               "firstContributedAt": "2023-09-05T09:12:08Z"
-                             },
-                             {
-                               "githubUserId": 16590657,
-                               "login": "PierreOucif",
-                               "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                               "isRegistered": true,
-                               "cover": "CYAN",
-                               "location": "Paris",
-                               "bio": "Je me lève très tôt et mange à midi pile, n'en déplaise aux grincheux",
-                               "firstContributedAt": "2023-07-12T11:54:35Z"
-                             }
-                           ],
-                           "hasMore": true,
-                           "totalPageNumber": 5,
-                           "totalItemNumber": 5,
-                           "nextPageIndex": 1
-                         }
+                          "contributors": [
+                            {
+                              "githubUserId": 143011364,
+                              "login": "pixelfact",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
+                              "isRegistered": false,
+                              "cover": "MAGENTA",
+                              "location": null,
+                              "bio": "Frontend Dev"
+                            },
+                            {
+                              "githubUserId": 45264458,
+                              "login": "abdelhamidbakhta",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
+                              "isRegistered": false,
+                              "cover": "BLUE",
+                              "location": "Genesis",
+                              "bio": "Starknet Exploration Lead\\r\\n.\\r\\nΞthereum Core Developer\\r\\n.\\r\\nΞIP-1559 Champion\\r\\n.\\r\\nBitcoin lover"
+                            }
+                          ],
+                          "hasMore": false,
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "nextPageIndex": 0
+                        }
                         """);
     }
-
 
     @Test
     void should_get_project_most_active_contributors() {
