@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 
@@ -156,19 +155,11 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
     @Override
     public ResponseEntity<Void> payReward(UUID rewardId, PayRewardRequest payRewardRequest) {
-        final var reward = rewardFacadePort.getReward(rewardId)
-                .orElseThrow(() -> notFound("Reward %s not found".formatted(rewardId)));
-
-        final var recipient = userFacadePort.getProfileById(reward.recipientId());
-
-        final var paymentReference = new Payment.Reference(
+        accountingFacadePort.pay(
+                RewardId.of(rewardId),
                 ZonedDateTime.now(),
                 mapTransactionNetwork(payRewardRequest.getNetwork()),
-                payRewardRequest.getReference(),
-                recipient.getLogin(),
-                payRewardRequest.getRecipientAccount());
-
-        accountingFacadePort.pay(RewardId.of(rewardId), paymentReference);
+                payRewardRequest.getReference());
 
         return ResponseEntity.noContent().build();
     }

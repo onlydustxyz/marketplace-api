@@ -122,15 +122,16 @@ public class AccountingService implements AccountingFacadePort {
 
     @Override
     @Transactional
-    public void pay(final @NonNull RewardId rewardId, final @NonNull Payment.Reference paymentReference) {
-        final var network = paymentReference.network();
+    public void pay(final @NonNull RewardId rewardId,
+                    final @NonNull ZonedDateTime confirmedAt,
+                    final @NonNull Network network,
+                    final @NonNull String transactionHash) {
         final var payableRewards = filterPayableRewards(network, Set.of(rewardId));
 
         if (payableRewards.isEmpty()) throw badRequest("Reward %s is not payable on %s".formatted(rewardId, network));
 
         final var payment = pay(network, payableRewards);
-        payment.referenceFor(rewardId, paymentReference);
-        confirm(payment);
+        confirm(payment.confirmedAt(confirmedAt).transactionHash(transactionHash));
     }
 
     @Override

@@ -30,7 +30,6 @@ import java.util.UUID;
 @TypeDef(name = "network", typeClass = PostgreSQLEnumType.class)
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class BatchPaymentEntity {
-
     @Id
     UUID id;
     String csv;
@@ -43,14 +42,7 @@ public class BatchPaymentEntity {
     Status status;
     @OneToMany(mappedBy = "batchPayment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     List<BatchPaymentRewardEntity> rewards;
-    @ManyToMany
-    @JoinTable(
-            name = "batch_payment_invoices",
-            schema = "accounting",
-            joinColumns = @JoinColumn(name = "batch_payment_id"),
-            inverseJoinColumns = @JoinColumn(name = "invoice_id")
-    )
-    List<InvoiceEntity> invoices;
+
     @CreationTimestamp
     @Column(name = "tech_created_at", nullable = false, updatable = false)
     @EqualsAndHashCode.Exclude
@@ -70,7 +62,6 @@ public class BatchPaymentEntity {
                     case PAID -> Status.PAID;
                     case TO_PAY -> Status.TO_PAY;
                 })
-                .invoices(payment.invoices().stream().map(InvoiceEntity::fromDomain).toList())
                 .rewards(payment.rewards().stream().map(r -> BatchPaymentRewardEntity.from(payment.id(), r)).toList())
                 .build();
     }
@@ -106,7 +97,6 @@ public class BatchPaymentEntity {
                                 PositiveAmount.of(r.amount()),
                                 r.reward().invoice().toDomain()
                         )).toList())
-                .invoices(this.invoices.stream().map(InvoiceEntity::toDomain).toList())
                 .status(this.status.toDomain())
                 .createdAt(this.createdAt)
                 .build();
