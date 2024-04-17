@@ -61,6 +61,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                           "availableBudgets": [
                             {
                               "amount": 0,
+                              "prettyAmount": 0,
                               "currency": {
                                 "id": "48388edb-fda2-4a32-b228-28152a147500",
                                 "code": "APT",
@@ -72,6 +73,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "amount": 0,
+                              "prettyAmount": 0,
                               "currency": {
                                 "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                 "code": "ETH",
@@ -83,6 +85,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "amount": 0,
+                              "prettyAmount": 0,
                               "currency": {
                                 "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
                                 "code": "OP",
@@ -94,6 +97,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "amount": 0,
+                              "prettyAmount": 0,
                               "currency": {
                                 "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                 "code": "USD",
@@ -105,6 +109,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "amount": 0,
+                              "prettyAmount": 0,
                               "currency": {
                                 "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                 "code": "USDC",
@@ -121,9 +126,11 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               "slug": "bretzel",
                               "name": "Bretzel",
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
+                              "totalUsdBudget": 5446182.5000,
                               "remainingBudgets": [
                                 {
                                   "amount": 400000,
+                                  "prettyAmount": 400000,
                                   "currency": {
                                     "id": "48388edb-fda2-4a32-b228-28152a147500",
                                     "code": "APT",
@@ -135,6 +142,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 },
                                 {
                                   "amount": 3000,
+                                  "prettyAmount": 3000,
                                   "currency": {
                                     "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                     "code": "ETH",
@@ -146,6 +154,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 },
                                 {
                                   "amount": 17000,
+                                  "prettyAmount": 17000,
                                   "currency": {
                                     "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
                                     "code": "OP",
@@ -157,6 +166,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 },
                                 {
                                   "amount": 99250.00,
+                                  "prettyAmount": 99250.00,
                                   "currency": {
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
@@ -173,9 +183,11 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               "slug": "aiolia-du-lion",
                               "name": "Aiolia du Lion",
                               "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c",
+                              "totalUsdBudget": 20025335.65,
                               "remainingBudgets": [
                                 {
                                   "amount": 19827065,
+                                  "prettyAmount": 19827065,
                                   "currency": {
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",

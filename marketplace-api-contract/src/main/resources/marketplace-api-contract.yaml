@@ -6169,8 +6169,11 @@ components:
         - $ref: '#/components/schemas/ProjectLinkResponse'
         - type: object
           required:
+            - totalUsdBudget
             - remainingBudgets
           properties:
+            totalUsdBudget:
+              type: number
             remainingBudgets:
               type: array
               items:
