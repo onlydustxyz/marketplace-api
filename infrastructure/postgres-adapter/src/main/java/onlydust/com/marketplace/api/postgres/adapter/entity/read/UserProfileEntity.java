@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,10 +13,10 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.Profi
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.project.domain.view.Money;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.type.SqlTypes;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.Date;
@@ -28,10 +28,6 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity
-@TypeDef(name = "contact_channel", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "allocated_time", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "profile_cover", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class UserProfileEntity {
     @Id
     @Column(name = "github_user_id", nullable = false)
@@ -56,8 +52,8 @@ public class UserProfileEntity {
     @Column(name = "languages")
     String languages;
     @Enumerated(EnumType.STRING)
-    @Type(type = "profile_cover")
-    @Column(name = "cover")
+    @Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "profile_cover")
     ProfileCoverEnumEntity cover;
     @Column(name = "last_seen_at")
     Date lastSeenAt;
@@ -77,20 +73,20 @@ public class UserProfileEntity {
     String lastName;
 
     @Enumerated(EnumType.STRING)
-    @Type(type = "allocated_time")
-    @Column(name = "weekly_allocated_time")
+    @Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "allocated_time", name = "weekly_allocated_time")
     AllocatedTimeEnumEntity allocatedTimeToContribute;
 
 
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", name = "contacts")
     private List<Contact> contacts;
 
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", name = "counts")
     private List<WeekCount> counts;
 
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", name = "totals_earned")
     private List<TotalEarnedPerCurrency> totalEarnedPerCurrencies;
 

@@ -1,14 +1,14 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.AllocatedTimeEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.type.SqlTypes;
 
-import javax.persistence.*;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -20,9 +20,6 @@ import java.util.UUID;
 @Data
 @Builder
 @Table(name = "user_profile_info", schema = "public")
-@TypeDef(name = "profile_cover", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "weekly_allocated", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class UserProfileInfoEntity {
 
     @Id
@@ -38,15 +35,15 @@ public class UserProfileInfoEntity {
     Boolean isLookingForAJob;
     @Column(name = "avatar_url")
     String avatarUrl;
-    @Column(name = "weekly_allocated_time", nullable = false)
-    @Type(type = "weekly_allocated")
     @Enumerated(EnumType.STRING)
+    @Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "weekly_allocated", name = "weekly_allocated_time", nullable = false)
     AllocatedTimeEnumEntity allocatedTime;
-    @Type(type = "profile_cover")
-    @Column(name = "cover")
     @Enumerated(EnumType.STRING)
+    @Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "profile_cover")
     ProfileCoverEnumEntity cover;
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "languages", columnDefinition = "jsonb")
     Map<String, Long> languages;
 

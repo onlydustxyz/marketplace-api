@@ -9,7 +9,8 @@ import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.view.ProjectContributorsLinkView;
 import org.intellij.lang.annotations.Language;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
+
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;

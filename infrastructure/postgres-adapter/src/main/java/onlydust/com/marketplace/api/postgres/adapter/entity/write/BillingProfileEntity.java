@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
@@ -9,11 +10,9 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmplo
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileStatsViewEntity;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -31,19 +30,19 @@ import static java.util.stream.Collectors.toSet;
 @Builder(toBuilder = true)
 @Table(name = "billing_profiles", schema = "accounting")
 @EntityListeners(AuditingEntityListener.class)
-@TypeDef(name = "billing_profile_type", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "verification_status", typeClass = PostgreSQLEnumType.class)
 public class BillingProfileEntity {
     @Id
     @EqualsAndHashCode.Include
     UUID id;
     String name;
-    @org.hibernate.annotations.Type(type = "billing_profile_type")
     @Enumerated(EnumType.STRING)
+    @org.hibernate.annotations.Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "billing_profile_type")
     Type type;
     Date invoiceMandateAcceptedAt;
-    @org.hibernate.annotations.Type(type = "verification_status")
     @Enumerated(EnumType.STRING)
+    @org.hibernate.annotations.Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "verification_status")
     VerificationStatusEntity verificationStatus;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "billingProfileId")

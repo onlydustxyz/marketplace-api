@@ -2,19 +2,19 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
-import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.view.EcosystemView;
 import onlydust.com.marketplace.project.domain.view.ProjectCardView;
 import onlydust.com.marketplace.project.domain.view.ProjectLeaderLinkView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.type.SqlTypes;
 
-import javax.persistence.*;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -24,8 +24,6 @@ import static java.util.Objects.nonNull;
 
 @Entity
 @Table(name = "project_details", schema = "public")
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-@TypeDef(name = "project_visibility", typeClass = PostgreSQLEnumType.class)
 public class ProjectPageItemViewEntity {
     @Id
     @Column(name = "project_id")
@@ -37,20 +35,21 @@ public class ProjectPageItemViewEntity {
     String name;
     @Column(name = "short_description")
     String shortDescription;
-    @Type(type = "project_visibility")
     @Enumerated(EnumType.STRING)
+    @Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "project_visibility")
     ProjectVisibilityEnumEntity visibility;
     Integer repoCount;
     Integer contributorsCount;
     Boolean isPendingProjectLead;
     Boolean isMissingGithubAppInstallation;
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     List<Ecosystem> ecosystems;
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     List<ProjectLead> projectLeads;
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     List<Map<String, Long>> technologies;
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     List<Tag> tags;
 
     public static String getEcosystemsJsonPath(List<UUID> ecosystemIds) {

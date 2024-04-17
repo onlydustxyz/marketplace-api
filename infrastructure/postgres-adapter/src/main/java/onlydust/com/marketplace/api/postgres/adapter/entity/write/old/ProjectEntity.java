@@ -1,6 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
@@ -10,10 +13,6 @@ import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.view.backoffice.ProjectView;
 import org.hibernate.annotations.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.*;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Set;
@@ -27,7 +26,6 @@ import java.util.UUID;
 @Data
 @Builder
 @Table(name = "project_details", schema = "public")
-@TypeDef(name = "project_visibility", typeClass = PostgreSQLEnumType.class)
 @DynamicUpdate
 @SelectBeforeUpdate
 public class ProjectEntity {
@@ -52,7 +50,7 @@ public class ProjectEntity {
     @EqualsAndHashCode.Exclude
     String key;
     @Enumerated(EnumType.STRING)
-    @Type(type = "project_visibility")
+    @Type(PostgreSQLEnumType.class)
     @Column(columnDefinition = "visibility", updatable = false)
     ProjectVisibilityEnumEntity visibility;
     @Column(name = "reward_ignore_pull_requests_by_default")

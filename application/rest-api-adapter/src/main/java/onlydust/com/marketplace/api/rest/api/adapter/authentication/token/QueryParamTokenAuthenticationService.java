@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication.token;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.security.core.Authentication;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @AllArgsConstructor

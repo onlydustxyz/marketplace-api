@@ -15,7 +15,8 @@ import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.Money;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -26,17 +27,22 @@ import java.util.*;
 @Accessors(fluent = true)
 public class RewardViewEntity {
     @Id
-    @NonNull UUID id;
-    @NonNull BigDecimal amount;
-    @NonNull Date requestedAt;
+    @NonNull
+    UUID id;
+    @NonNull
+    BigDecimal amount;
+    @NonNull
+    Date requestedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requestorId")
-    @NonNull UserViewEntity requestor;
+    @NonNull
+    UserViewEntity requestor;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipientId", referencedColumnName = "githubUserId")
-    @NonNull AllUserViewEntity recipient;
+    @NonNull
+    AllUserViewEntity recipient;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "billingProfileId")
@@ -44,14 +50,17 @@ public class RewardViewEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "currencyId")
-    @NonNull CurrencyEntity currency;
+    @NonNull
+    CurrencyEntity currency;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "projectId")
-    @NonNull ProjectEntity project;
+    @NonNull
+    ProjectEntity project;
 
     @OneToMany(mappedBy = "rewardId", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @NonNull List<RewardItemEntity> rewardItems;
+    @NonNull
+    List<RewardItemEntity> rewardItems;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "invoiceId")
@@ -65,11 +74,13 @@ public class RewardViewEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
-    @NonNull RewardStatusEntity status;
+    @NonNull
+    RewardStatusEntity status;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
-    @NonNull RewardStatusDataEntity statusData;
+    @NonNull
+    RewardStatusDataEntity statusData;
 
     public RewardShortView toShortView() {
         return RewardShortView.builder()

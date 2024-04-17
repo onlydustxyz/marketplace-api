@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.vladmihalcea.hibernate.type.array.EnumArrayType;
 import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountEntity;
@@ -10,13 +11,12 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.Onboarding
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserProfileInfoEntity;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Parameter;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -30,17 +30,6 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 @Table(name = "users", schema = "iam")
 @EntityListeners(AuditingEntityListener.class)
-@TypeDef(
-        name = "user_role[]",
-        typeClass = EnumArrayType.class,
-        defaultForType = AuthenticatedUser.Role[].class,
-        parameters = {
-                @Parameter(
-                        name = AbstractArrayType.SQL_ARRAY_TYPE,
-                        value = "iam.user_role"
-                )
-        }
-)
 @Accessors(fluent = true)
 public class UserViewEntity implements Serializable {
     @Id
@@ -59,7 +48,13 @@ public class UserViewEntity implements Serializable {
 
     @Column(name = "email", nullable = false)
     String githubEmail;
-    @Type(type = "user_role[]")
+    @Type(
+            value = EnumArrayType.class,
+            parameters = @Parameter(
+                    name = AbstractArrayType.SQL_ARRAY_TYPE,
+                    value = "iam.user_role"
+            )
+    )
     @Column(name = "roles", nullable = false, columnDefinition = "iam.user_role[]")
     AuthenticatedUser.Role[] roles;
 
@@ -73,7 +68,8 @@ public class UserViewEntity implements Serializable {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "githubUserId", referencedColumnName = "githubUserId", insertable = false, updatable = false)
-    @NonNull AllUserViewEntity allUserView;
+    @NonNull
+    AllUserViewEntity allUserView;
 
     @ManyToMany
     @JoinTable(

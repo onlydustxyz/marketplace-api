@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -8,9 +9,7 @@ import lombok.Value;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountEntity;
 import onlydust.com.marketplace.project.domain.view.GithubIssueView;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -20,37 +19,52 @@ import java.util.Optional;
 @Value
 @NoArgsConstructor(force = true)
 @Table(schema = "indexer_exp", name = "github_issues")
-@TypeDef(name = "github_issue_status", typeClass = PostgreSQLEnumType.class)
 public class GithubIssueViewEntity {
     @Id
     @EqualsAndHashCode.Include
-    @NonNull Long id;
+    @NonNull
+    Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @NonNull GithubRepoViewEntity repo;
+    @NonNull
+    GithubRepoViewEntity repo;
 
-    @NonNull Long number;
-    @NonNull String title;
+    @NonNull
+    Long number;
+    @NonNull
+    String title;
 
     @Enumerated(EnumType.STRING)
-    @Type(type = "github_issue_status")
-    @NonNull Status status;
+    @Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "github_issue_status")
+    @NonNull
+    Status status;
 
-    @NonNull ZonedDateTime createdAt;
+    @NonNull
+    ZonedDateTime createdAt;
     ZonedDateTime closedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @NonNull GithubAccountEntity author;
+    @NonNull
+    GithubAccountEntity author;
 
-    @NonNull String htmlUrl;
+    @NonNull
+    String htmlUrl;
     String body;
-    @NonNull Integer commentsCount;
-    @NonNull String repoOwnerLogin;
-    @NonNull String repoName;
-    @NonNull String repoHtmlUrl;
-    @NonNull String authorLogin;
-    @NonNull String authorHtmlUrl;
-    @NonNull String authorAvatarUrl;
+    @NonNull
+    Integer commentsCount;
+    @NonNull
+    String repoOwnerLogin;
+    @NonNull
+    String repoName;
+    @NonNull
+    String repoHtmlUrl;
+    @NonNull
+    String authorLogin;
+    @NonNull
+    String authorHtmlUrl;
+    @NonNull
+    String authorAvatarUrl;
 
     @ManyToMany
     @JoinTable(

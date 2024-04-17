@@ -3,15 +3,15 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.vladmihalcea.hibernate.type.array.EnumArrayType;
 import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Parameter;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
 
@@ -23,17 +23,6 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 @Table(name = "users", schema = "iam")
 @EntityListeners(AuditingEntityListener.class)
-@TypeDef(
-        name = "user_role[]",
-        typeClass = EnumArrayType.class,
-        defaultForType = AuthenticatedUser.Role[].class,
-        parameters = {
-                @Parameter(
-                        name = AbstractArrayType.SQL_ARRAY_TYPE,
-                        value = "iam.user_role"
-                )
-        }
-)
 public class UserEntity {
 
     @Id
@@ -43,7 +32,14 @@ public class UserEntity {
     String githubAvatarUrl;
     @Column(name = "email", nullable = false)
     String githubEmail;
-    @Type(type = "user_role[]")
+
+    @Type(
+            value = EnumArrayType.class,
+            parameters = @Parameter(
+                    name = AbstractArrayType.SQL_ARRAY_TYPE,
+                    value = "iam.user_role"
+            )
+    )
     @Column(nullable = false, columnDefinition = "iam.user_role[]")
     AuthenticatedUser.Role[] roles;
     private Date lastSeenAt;

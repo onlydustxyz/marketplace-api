@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it.api.feature;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import jakarta.persistence.EntityManagerFactory;
 import lombok.Builder;
 import lombok.NonNull;
 import onlydust.com.backoffice.api.contract.model.PayRewardRequest;
@@ -42,7 +43,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.testcontainers.shaded.org.apache.commons.lang3.mutable.MutableObject;
 
-import javax.persistence.EntityManagerFactory;
 import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
 import java.time.Instant;

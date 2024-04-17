@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.vladmihalcea.hibernate.type.array.EnumArrayType;
 import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Amount;
@@ -10,9 +11,7 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardStatusData;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -31,27 +30,23 @@ import static java.util.Objects.isNull;
 @Builder(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
 @Accessors(fluent = true, chain = true)
-@TypeDef(
-        name = "accounting.network[]",
-        typeClass = EnumArrayType.class,
-        defaultForType = NetworkEnumEntity[].class,
-        parameters = {
-                @Parameter(
-                        name = AbstractArrayType.SQL_ARRAY_TYPE,
-                        value = "accounting.network"
-                )
-        }
-)
 public class RewardStatusDataEntity {
     @Id
-    @NonNull UUID rewardId;
+    @NonNull
+    UUID rewardId;
 
     Boolean sponsorHasEnoughFund;
     Date unlockDate;
     Date invoiceReceivedAt;
     Date paidAt;
-    @Type(type = "accounting.network[]")
-    @Column(columnDefinition = "accounting.network[]")
+    @Type(
+            value = EnumArrayType.class,
+            parameters = @Parameter(
+                    name = AbstractArrayType.SQL_ARRAY_TYPE,
+                    value = "accounting.network"
+            )
+    )
+    @Column(name = "networks", columnDefinition = "accounting.network[]")
     NetworkEnumEntity[] networks;
     BigDecimal amountUsdEquivalent;
     BigDecimal usdConversionRate;

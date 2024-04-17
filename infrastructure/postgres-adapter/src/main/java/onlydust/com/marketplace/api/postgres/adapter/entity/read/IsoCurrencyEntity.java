@@ -7,9 +7,9 @@ import lombok.Value;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import org.hibernate.annotations.Immutable;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "iso_currencies", schema = "rfd")
@@ -20,10 +20,14 @@ import javax.persistence.Table;
 public class IsoCurrencyEntity {
     @Id
     @EqualsAndHashCode.Include
-    @NonNull String alphaCode;
-    @NonNull String name;
-    @NonNull Integer numericCode;
-    @NonNull Integer minorUnit;
+    @NonNull
+    String alphaCode;
+    @NonNull
+    String name;
+    @NonNull
+    Integer numericCode;
+    @NonNull
+    Integer minorUnit;
 
     public Currency toCurrency() {
         return Currency.fiat(name, Currency.Code.of(alphaCode), minorUnit);

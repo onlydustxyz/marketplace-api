@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import jakarta.persistence.EntityManagerFactory;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
@@ -27,7 +28,6 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.MediaType;
 
-import javax.persistence.EntityManagerFactory;
 import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.Date;

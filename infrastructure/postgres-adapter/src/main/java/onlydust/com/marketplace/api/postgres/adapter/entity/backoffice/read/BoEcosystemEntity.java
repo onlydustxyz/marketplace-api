@@ -1,16 +1,15 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
 
-import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.project.domain.view.backoffice.EcosystemView;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,14 +18,13 @@ import java.util.UUID;
 @EqualsAndHashCode
 @Data
 @Entity
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class BoEcosystemEntity {
     @Id
     UUID id;
     String name;
     String url;
     String logoUrl;
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     List<UUID> projectIds;
 
     public EcosystemView toView() {

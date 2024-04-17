@@ -1,17 +1,16 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.*;
 import onlydust.com.marketplace.project.domain.view.EcosystemView;
 import onlydust.com.marketplace.project.domain.view.ProjectCardView;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,14 +22,13 @@ import static java.util.Objects.nonNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class ProjectPageItemFiltersViewEntity {
     @Id
     @Column(name = "project_id")
     UUID projectId;
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     List<Ecosystem> ecosystems;
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     List<Map<String, Long>> technologies;
 
     @EqualsAndHashCode

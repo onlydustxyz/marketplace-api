@@ -12,8 +12,9 @@ import onlydust.com.marketplace.project.domain.model.UserAllocatedTimeToContribu
 import onlydust.com.marketplace.project.domain.view.TotalsEarned;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
 
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
+
 import java.util.*;
 import java.util.stream.Collectors;
 

@@ -1,11 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
+import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
 
@@ -15,7 +14,6 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity
-@TypeDef(name = "contribution_type", typeClass = PostgreSQLEnumType.class)
 public class RewardItemViewEntity {
 
     @Id
@@ -28,7 +26,8 @@ public class RewardItemViewEntity {
     @Column(name = "end_date")
     Date completedAt;
     @Enumerated(EnumType.STRING)
-    @Type(type = "contribution_type")
+    @Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "contribution_type")
     ContributionType type;
     @Column(name = "status")
     String status;

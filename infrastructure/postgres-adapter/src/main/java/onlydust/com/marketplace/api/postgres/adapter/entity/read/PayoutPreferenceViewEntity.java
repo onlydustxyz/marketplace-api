@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,9 +11,8 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.view.PayoutPreferenceView;
 import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -23,7 +23,6 @@ import static java.util.Objects.isNull;
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
-@TypeDef(name = "billing_profile_type", typeClass = PostgreSQLEnumType.class)
 @IdClass(value = PayoutPreferenceViewEntity.PrimaryKey.class)
 public class PayoutPreferenceViewEntity {
 
@@ -37,8 +36,9 @@ public class PayoutPreferenceViewEntity {
     String projectShortDescription;
     UUID billingProfileId;
     String billingProfileName;
-    @org.hibernate.annotations.Type(type = "billing_profile_type")
     @Enumerated(EnumType.STRING)
+    @Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "billing_profile_type")
     BillingProfileEntity.Type billingProfileType;
 
     @EqualsAndHashCode

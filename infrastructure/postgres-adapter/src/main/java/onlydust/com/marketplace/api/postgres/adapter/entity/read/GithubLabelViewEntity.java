@@ -6,9 +6,9 @@ import lombok.NonNull;
 import lombok.Value;
 import onlydust.com.marketplace.project.domain.view.GithubLabelView;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
@@ -18,9 +18,11 @@ import javax.persistence.Table;
 public class GithubLabelViewEntity {
     @Id
     @EqualsAndHashCode.Include
-    @NonNull Long id;
+    @NonNull
+    Long id;
 
-    @NonNull String name;
+    @NonNull
+    String name;
 
     String description;
 

@@ -1,18 +1,16 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
+import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
 @Value
 @Table(name = "reward_statuses", schema = "accounting")
-@TypeDef(name = "reward_status", typeClass = PostgreSQLEnumType.class)
 @NoArgsConstructor(force = true)
 public class RewardStatusEntity {
     @Id
@@ -22,7 +20,8 @@ public class RewardStatusEntity {
 
     @Getter(AccessLevel.NONE)
     @Enumerated(EnumType.STRING)
-    @Type(type = "reward_status")
+    @Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "reward_status")
     @NonNull
     Status status;
 

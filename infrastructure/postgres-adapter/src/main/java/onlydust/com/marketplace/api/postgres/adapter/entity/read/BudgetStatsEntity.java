@@ -1,17 +1,16 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Value;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import java.math.BigDecimal;
 import java.util.Set;
 import java.util.UUID;
@@ -20,7 +19,6 @@ import java.util.UUID;
 @Value
 @EqualsAndHashCode
 @NoArgsConstructor(force = true)
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class BudgetStatsEntity {
     @Id
     UUID currencyId;
@@ -31,10 +29,10 @@ public class BudgetStatsEntity {
     BigDecimal spentUsdAmount;
     BigDecimal remainingAmount;
     BigDecimal remainingUsdAmount;
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     Set<UUID> rewardIds;
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     Set<Set<String>> rewardItemIds;
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     Set<Integer> rewardRecipientIds;
 }

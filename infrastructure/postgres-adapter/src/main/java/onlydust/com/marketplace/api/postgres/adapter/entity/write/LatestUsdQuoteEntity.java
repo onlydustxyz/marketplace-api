@@ -4,9 +4,10 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
@@ -17,7 +18,10 @@ import java.util.UUID;
 @NoArgsConstructor(force = true)
 public class LatestUsdQuoteEntity {
     @Id
-    @NonNull UUID currencyId;
-    @NonNull BigDecimal price;
-    @NonNull Instant timestamp;
+    @NonNull
+    UUID currencyId;
+    @NonNull
+    BigDecimal price;
+    @NonNull
+    Instant timestamp;
 }

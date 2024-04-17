@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap;
 
 import com.onlydust.marketplace.api.cron.JobScheduler;
+import jakarta.annotation.PostConstruct;
 import onlydust.com.marketplace.api.postgres.adapter.configuration.PostgresConfiguration;
 import onlydust.com.marketplace.api.rest.api.adapter.AppRestApi;
 import onlydust.com.marketplace.api.rest.api.adapter.VersionRestApi;
@@ -13,7 +14,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;

@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,9 +11,7 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileUserEntity;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.net.URI;
 import java.time.ZoneOffset;
@@ -26,7 +25,6 @@ import java.util.UUID;
 @EqualsAndHashCode
 @Data
 @IdClass(BillingProfileUserViewEntity.PrimaryKey.class)
-@TypeDef(name = "billing_profile_role", typeClass = PostgreSQLEnumType.class)
 public class BillingProfileUserViewEntity {
 
     @Id
@@ -34,8 +32,9 @@ public class BillingProfileUserViewEntity {
     @Id
     Long githubUserId;
 
-    @Type(type = "billing_profile_role")
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "billing_profile_role")
+    @Type(PostgreSQLEnumType.class)
     BillingProfileUserEntity.Role role;
 
     UUID userId;

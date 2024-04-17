@@ -1,17 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import onlydust.com.marketplace.project.domain.view.NewcomerView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
+import onlydust.com.marketplace.project.domain.view.NewcomerView;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
 import java.time.ZonedDateTime;
 
 import static java.util.Objects.nonNull;
@@ -19,7 +15,6 @@ import static java.util.Objects.nonNull;
 @EqualsAndHashCode
 @Data
 @Entity
-@TypeDef(name = "profile_cover", typeClass = PostgreSQLEnumType.class)
 public class NewcomerViewEntity {
     @Id
     Long id;
@@ -28,7 +23,8 @@ public class NewcomerViewEntity {
     String avatarUrl;
     Boolean isRegistered;
     @Enumerated(EnumType.STRING)
-    @Type(type = "profile_cover")
+    @Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "profile_cover")
     ProfileCoverEnumEntity cover;
     String location;
     String bio;

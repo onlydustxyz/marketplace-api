@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 @AllArgsConstructor
 @Slf4j

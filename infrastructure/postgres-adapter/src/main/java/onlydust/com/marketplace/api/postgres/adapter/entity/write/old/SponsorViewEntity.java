@@ -11,7 +11,8 @@ import onlydust.com.marketplace.api.postgres.adapter.mapper.SponsorMapper;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 import onlydust.com.marketplace.project.domain.view.backoffice.BoSponsorView;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -24,9 +25,12 @@ import static java.util.stream.Collectors.toSet;
 @Table(name = "sponsors", schema = "public")
 public class SponsorViewEntity {
     @Id
-    @NonNull UUID id;
-    @NonNull String name;
-    @NonNull String logoUrl;
+    @NonNull
+    UUID id;
+    @NonNull
+    String name;
+    @NonNull
+    String logoUrl;
     String url;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "sponsorId")

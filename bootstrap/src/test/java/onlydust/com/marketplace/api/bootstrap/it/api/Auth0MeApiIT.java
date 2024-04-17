@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import jakarta.persistence.EntityManagerFactory;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.bootstrap.helper.JwtVerifierStub;
 import onlydust.com.marketplace.api.contract.model.GetMeResponse;
@@ -18,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 
-import javax.persistence.EntityManagerFactory;
 import java.util.Date;
 import java.util.UUID;
 

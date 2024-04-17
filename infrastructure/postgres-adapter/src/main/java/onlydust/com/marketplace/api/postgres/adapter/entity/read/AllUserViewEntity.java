@@ -6,9 +6,10 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.Accessors;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import java.util.UUID;
 
 @Entity
@@ -18,10 +19,13 @@ import java.util.UUID;
 @Accessors(fluent = true)
 public class AllUserViewEntity {
     @Id
-    @NonNull Long githubUserId;
+    @NonNull
+    Long githubUserId;
     UUID userId;
-    @NonNull String login;
-    @NonNull String avatarUrl;
+    @NonNull
+    String login;
+    @NonNull
+    String avatarUrl;
 
     public Boolean isRegistered() {
         return userId != null;

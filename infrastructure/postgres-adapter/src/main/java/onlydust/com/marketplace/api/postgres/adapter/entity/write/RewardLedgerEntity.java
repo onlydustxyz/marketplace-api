@@ -6,7 +6,8 @@ import lombok.NonNull;
 import lombok.Value;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.util.UUID;
 
 @Entity
@@ -16,13 +17,16 @@ import java.util.UUID;
 @Table(name = "reward_ledgers", schema = "accounting")
 public class RewardLedgerEntity {
     @Id
-    @NonNull UUID ledgerId;
+    @NonNull
+    UUID ledgerId;
 
     @OneToOne
     @JoinColumn(insertable = false, updatable = false, name = "ledger_id")
-    @NonNull SponsorAccountEntity ledger;
+    @NonNull
+    SponsorAccountEntity ledger;
 
-    @NonNull UUID rewardId;
+    @NonNull
+    UUID rewardId;
 
     public static RewardLedgerEntity of(SponsorAccountEntity ledger, RewardId rewardId) {
         return new RewardLedgerEntity(ledger.id, ledger, rewardId.value());

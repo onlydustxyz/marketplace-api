@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
@@ -9,10 +10,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmContractAddress;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.UUID;
@@ -24,13 +22,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @IdClass(ERC20Entity.PrimaryKey.class)
-@TypeDef(name = "network", typeClass = PostgreSQLEnumType.class)
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class ERC20Entity {
     @Id
     @EqualsAndHashCode.Include
-    @Type(type = "network")
     @Enumerated(EnumType.STRING)
+    @org.hibernate.annotations.Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "network")
     private @NonNull NetworkEnumEntity blockchain;
     @Id
     @EqualsAndHashCode.Include

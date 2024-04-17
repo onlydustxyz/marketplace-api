@@ -2,8 +2,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
+import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,11 +12,11 @@ import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.EventIdResolver;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -24,19 +24,18 @@ import java.time.Instant;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Data
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-@TypeDef(name = "outbox_event_status", typeClass = PostgreSQLEnumType.class)
 public abstract class EventEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", nullable = false)
     Payload payload;
 
     @Enumerated(EnumType.STRING)
-    @Type(type = "outbox_event_status")
+    @Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "outbox_event_status")
     Status status;
 
     @Column(name = "group_key")

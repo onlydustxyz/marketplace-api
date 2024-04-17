@@ -1,12 +1,11 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
+import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
@@ -19,22 +18,29 @@ import java.util.UUID;
 @Builder(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
 @IdClass(RewardItemEntity.PrimaryKey.class)
-@TypeDef(name = "contribution_type", typeClass = PostgreSQLEnumType.class)
 public class RewardItemEntity {
 
     @Id
-    @NonNull UUID rewardId;
+    @NonNull
+    UUID rewardId;
     @Id
-    @NonNull Long number;
+    @NonNull
+    Long number;
     @Id
-    @NonNull Long repoId;
+    @NonNull
+    Long repoId;
 
-    @NonNull String id;
+    @NonNull
+    String id;
     @Enumerated(EnumType.STRING)
-    @Type(type = "contribution_type")
-    @NonNull ContributionType type;
-    @NonNull UUID projectId;
-    @NonNull Long recipientId;
+    @Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "contribution_type")
+    @NonNull
+    ContributionType type;
+    @NonNull
+    UUID projectId;
+    @NonNull
+    Long recipientId;
 
     public enum ContributionType {
         ISSUE, PULL_REQUEST, CODE_REVIEW

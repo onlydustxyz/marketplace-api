@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
-import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentShortView;
@@ -9,13 +9,10 @@ import onlydust.com.marketplace.accounting.domain.view.TotalMoneyView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.type.SqlTypes;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.ZoneOffset;
@@ -31,9 +28,6 @@ import static java.util.Objects.isNull;
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
-@TypeDef(name = "batch_payment_status", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "network", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class PaymentShortViewEntity {
 
     @Id
@@ -41,17 +35,19 @@ public class PaymentShortViewEntity {
 
     Date createdAt;
 
-    @Type(type = "batch_payment_status")
     @Enumerated(EnumType.STRING)
+    @Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "batch_payment_status")
     BatchPaymentEntity.Status status;
 
     @Enumerated(EnumType.STRING)
-    @Type(type = "network")
+    @Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "network")
     NetworkEnumEntity network;
 
     Long rewardCount;
 
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     List<TotalMoneyViewEntity> totalsPerCurrency;
 
     public BatchPaymentShortView toDomain() {

@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.Data;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
@@ -8,10 +9,8 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfile
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.Where;
 
-import javax.persistence.*;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -22,23 +21,23 @@ import static java.util.Objects.isNull;
 
 @Entity
 @Data
-@TypeDef(name = "billing_profile_type", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "verification_status", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "billing_profile_role", typeClass = PostgreSQLEnumType.class)
 public class ShortBillingProfileViewEntity {
     @Id
     UUID id;
 
-    @Type(type = "billing_profile_type")
     @Enumerated(EnumType.STRING)
+    @Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "billing_profile_type")
     BillingProfileEntity.Type type;
 
-    @Type(type = "billing_profile_role")
     @Enumerated(EnumType.STRING)
+    @Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "billing_profile_role")
     BillingProfileUserEntity.Role role;
 
-    @Type(type = "verification_status")
     @Enumerated(EnumType.STRING)
+    @Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "verification_status")
     VerificationStatusEntity verificationStatus;
 
     String name;

@@ -1,14 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -19,13 +18,13 @@ import java.util.Date;
 @Builder(toBuilder = true)
 @Table(name = "children_kyc", schema = "accounting")
 @EntityListeners(AuditingEntityListener.class)
-@TypeDef(name = "verification_status", typeClass = PostgreSQLEnumType.class)
 public class ChildrenKycEntity {
     @Id
     String applicantId;
     String parentApplicantId;
-    @Type(type = "verification_status")
     @Enumerated(EnumType.STRING)
+    @Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "verification_status")
     VerificationStatusEntity verificationStatus;
     @CreationTimestamp
     @Column(name = "tech_created_at", nullable = false, updatable = false)

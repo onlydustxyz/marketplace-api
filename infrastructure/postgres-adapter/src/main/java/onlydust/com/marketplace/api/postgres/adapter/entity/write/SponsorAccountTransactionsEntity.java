@@ -1,13 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
+import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -15,8 +14,6 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-@TypeDef(name = "network", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "transaction_type", typeClass = PostgreSQLEnumType.class)
 @Value
 @Builder(access = AccessLevel.PRIVATE)
 @Table(name = "sponsor_account_transactions", schema = "accounting")
@@ -24,23 +21,34 @@ import java.util.UUID;
 public class SponsorAccountTransactionsEntity {
     @Id
     @EqualsAndHashCode.Include
-    @NonNull UUID id;
-    @NonNull UUID accountId;
+    @NonNull
+    UUID id;
+    @NonNull
+    UUID accountId;
 
-    @NonNull ZonedDateTime timestamp;
+    @NonNull
+    ZonedDateTime timestamp;
 
     @Enumerated(EnumType.STRING)
-    @Type(type = "transaction_type")
-    @NonNull TransactionType type;
+    @Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "transaction_type")
+    @NonNull
+    TransactionType type;
 
     @Enumerated(EnumType.STRING)
-    @Type(type = "network")
-    @NonNull NetworkEnumEntity network;
+    @Type(PostgreSQLEnumType.class)
+    @Column(columnDefinition = "network")
+    @NonNull
+    NetworkEnumEntity network;
 
-    @NonNull String reference;
-    @NonNull BigDecimal amount;
-    @NonNull String thirdPartyName;
-    @NonNull String thirdPartyAccountNumber;
+    @NonNull
+    String reference;
+    @NonNull
+    BigDecimal amount;
+    @NonNull
+    String thirdPartyName;
+    @NonNull
+    String thirdPartyAccountNumber;
 
     public SponsorAccount.Transaction toDomain() {
         return new SponsorAccount.Transaction(

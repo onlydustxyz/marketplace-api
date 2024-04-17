@@ -4,7 +4,8 @@ import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,10 +21,12 @@ import static java.util.stream.Collectors.toUnmodifiableSet;
 @Builder(access = AccessLevel.PRIVATE)
 public class SponsorAccountEntity {
     @Id
-    @NonNull UUID id;
+    @NonNull
+    UUID id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @NonNull CurrencyEntity currency;
+    @NonNull
+    CurrencyEntity currency;
 
     UUID sponsorId;
 
