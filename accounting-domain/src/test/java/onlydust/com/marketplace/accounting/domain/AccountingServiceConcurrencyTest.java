@@ -191,7 +191,6 @@ public class AccountingServiceConcurrencyTest {
                 service.execute(() -> {
                     TransactionSynchronizationManager.initSynchronization();
                     try {
-                        System.out.println("Instance " + Thread.currentThread().getName() + " started");
                         final var accountingService = accountingServices.get(threadId);
                         for (int i = 0; i < numberOfIterationPerThread; i++) {
                             try {
@@ -201,7 +200,6 @@ public class AccountingServiceConcurrencyTest {
                             }
                         }
                         latch.countDown();
-                        System.out.println("Instance " + Thread.currentThread().getName() + " ended");
                     } finally {
                         TransactionSynchronizationManager.clear();
                     }
@@ -243,7 +241,6 @@ public class AccountingServiceConcurrencyTest {
                 service.execute(() -> {
                     TransactionSynchronizationManager.initSynchronization();
                     try {
-                        System.out.println("Instance " + Thread.currentThread().getName() + " started");
                         final var accountingService = accountingServices.get(threadId);
                         for (int i = 0; i < numberOfIterationPerThread; i++) {
                             try {
@@ -253,7 +250,6 @@ public class AccountingServiceConcurrencyTest {
                             }
                         }
                         latch.countDown();
-                        System.out.println("Instance " + Thread.currentThread().getName() + " ended");
                     } finally {
                         TransactionSynchronizationManager.clear();
                     }

@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.model.*;
@@ -9,7 +8,6 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
-import org.springframework.util.StopWatch;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -19,13 +17,11 @@ import java.util.Optional;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
-@Slf4j
 public class AccountingObserver implements AccountingObserverPort, RewardStatusFacadePort, BillingProfileObserver {
     // TODO migrate rewards to accounting schema and merge all those storages as onetone dependencies of reward
     private final RewardStatusStorage rewardStatusStorage;
     private final RewardUsdEquivalentStorage rewardUsdEquivalentStorage;
     private final QuoteStorage quoteStorage;
-    private final CurrencyStorage currencyStorage;
     private final InvoiceStoragePort invoiceStorage;
     private final ReceiptStoragePort receiptStorage;
     private final BillingProfileStoragePort billingProfileStoragePort;
@@ -37,7 +33,6 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
         this.rewardStatusStorage = rewardStatusStorage;
         this.rewardUsdEquivalentStorage = rewardUsdEquivalentStorage;
         this.quoteStorage = quoteStorage;
-        this.currencyStorage = currencyStorage;
         this.invoiceStorage = invoiceStorage;
         this.receiptStorage = receiptStorage;
         this.billingProfileStoragePort = billingProfileStoragePort;
@@ -46,11 +41,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
 
     @Override
     public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
         refreshRelatedRewardsStatuses(sponsorAccount);
-        stopWatch.stop();
-        LOGGER.info("Sponsor account {} balance changed [{} seconds]", sponsorAccount.account().id(), stopWatch.getTotalTimeSeconds());
     }
 
     @Override
@@ -79,9 +70,6 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
 
     @Override
     public void onRewardPaid(RewardId rewardId) {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-
         final var rewardStatus = rewardStatusStorage.get(rewardId)
                 .orElseThrow(() -> internalServerError("RewardStatus not found for reward %s".formatted(rewardId)));
         rewardStatusStorage.save(rewardStatus.paidAt(ZonedDateTime.now()));
@@ -91,8 +79,6 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
                 invoiceStorage.update(invoice.status(Invoice.Status.PAID));
             }
         });
-        stopWatch.stop();
-        LOGGER.info("Reward paid {} [{} seconds]", rewardId, stopWatch.getTotalTimeSeconds());
     }
 
     @Override
