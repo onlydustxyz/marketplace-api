@@ -6,9 +6,9 @@ import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.time.ZonedDateTime;
-import java.util.*;
-
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 @Builder(toBuilder = true)
 @Accessors(chain = true, fluent = true)
@@ -23,45 +23,25 @@ public class Payment {
     @Builder.Default
     Status status = Status.TO_PAY;
     String transactionHash;
-    @NonNull
-    List<Invoice> invoices;
+    @EqualsAndHashCode.Exclude
+    ZonedDateTime confirmedAt;
     @NonNull
     List<PayableReward> rewards;
     Date createdAt;
-
-    @Builder.Default
-    final @NonNull Map<RewardId, Reference> references = new HashMap<>();
 
     public static Payment of(@NonNull Network network, @NonNull List<PayableReward> rewards) {
         return Payment.builder()
                 .id(Id.random())
                 .network(network)
                 .rewards(rewards)
-                .invoices(List.of())
                 .createdAt(new Date())
                 .build();
     }
 
     public Reference referenceFor(@NonNull RewardId rewardId) {
-        return references.computeIfAbsent(rewardId, this::computeReference);
+        final var reward = rewards().stream().filter(r -> r.id().equals(rewardId)).findFirst().orElseThrow();
+        return new Reference(confirmedAt, network, transactionHash, reward.recipientName(), reward.recipientWallet().address());
     }
-
-    private Reference computeReference(RewardId rewardId) {
-        final var invoice = invoices.stream()
-                .filter(i -> i.rewards().stream().anyMatch(reward -> reward.id().equals(rewardId)))
-                .findFirst()
-                .orElseThrow(() -> internalServerError("Reward %s not found in batch payment %s".formatted(rewardId, id)));
-
-        final var wallet = invoice.billingProfileSnapshot().wallet(network)
-                .orElseThrow(() -> internalServerError("Wallet not found for invoice %s on network %s".formatted(invoice.id(), network)));
-
-        return new Reference(ZonedDateTime.now(), network, transactionHash, invoice.billingProfileSnapshot().subject(), wallet.address());
-    }
-
-    public void referenceFor(@NonNull RewardId rewardId, Reference reference) {
-        references.put(rewardId, reference);
-    }
-
 
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)

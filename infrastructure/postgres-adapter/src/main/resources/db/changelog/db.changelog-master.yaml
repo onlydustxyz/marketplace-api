@@ -233,3 +233,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000204_create_sponsor_account_allowance_transactions_table.sql
   - include:
       file: db/changelog/changelogs/00000205_improve_perf.sql
+  - include:
+      file: db/changelog/changelogs/00000206_remove_batch_payment_invoices.sql

@@ -122,15 +122,16 @@ public class AccountingService implements AccountingFacadePort {
 
     @Override
     @Transactional
-    public void pay(final @NonNull RewardId rewardId, final @NonNull Payment.Reference paymentReference) {
-        final var network = paymentReference.network();
+    public void pay(final @NonNull RewardId rewardId,
+                    final @NonNull ZonedDateTime confirmedAt,
+                    final @NonNull Network network,
+                    final @NonNull String transactionHash) {
         final var payableRewards = filterPayableRewards(network, Set.of(rewardId));
 
         if (payableRewards.isEmpty()) throw badRequest("Reward %s is not payable on %s".formatted(rewardId, network));
 
         final var payment = pay(network, payableRewards);
-        payment.referenceFor(rewardId, paymentReference);
-        confirm(payment);
+        confirm(payment.confirmedAt(confirmedAt).transactionHash(transactionHash));
     }
 
     @Override
@@ -279,7 +280,6 @@ public class AccountingService implements AccountingFacadePort {
     public List<PayableReward> getPayableRewards(Set<RewardId> rewardIds) {
         return currencyStorage.all().stream()
                 .flatMap(currency -> new PayableRewardAggregator(sponsorAccountStorage, currency).getPayableRewards(rewardIds))
-                .filter(r -> invoiceStoragePort.invoiceOf(r.id()).map(i -> i.status() == Invoice.Status.APPROVED).orElse(false))
                 .toList();
     }
 
@@ -368,13 +368,12 @@ public class AccountingService implements AccountingFacadePort {
         }
 
         public Stream<PayableReward> getPayableRewards(Set<RewardId> rewardIds) {
-            final var distinctPayableRewards =
-                    accountBookState.unspentChildren().keySet().stream()
-                            .filter(AccountId::isReward)
-                            .filter(rewardAccountId -> rewardIds == null || rewardIds.contains(rewardAccountId.rewardId()))
-                            .filter(rewardAccountId -> isPayable(rewardAccountId.rewardId()))
-                            .flatMap(this::trySpend)
-                            .collect(groupingBy(PayableReward::key, reducing(PayableReward::add)));
+            final var distinctPayableRewards = accountBookState.unspentChildren().keySet().stream()
+                    .filter(AccountId::isReward)
+                    .filter(rewardAccountId -> rewardIds == null || rewardIds.contains(rewardAccountId.rewardId()))
+                    .filter(rewardAccountId -> isPayable(rewardAccountId.rewardId()))
+                    .flatMap(this::trySpend)
+                    .collect(groupingBy(PayableReward::key, reducing(PayableReward::add)));
 
             return distinctPayableRewards.values().stream().filter(Optional::isPresent).map(Optional::get);
         }
@@ -383,21 +382,26 @@ public class AccountingService implements AccountingFacadePort {
             return accountBookState.balancePerOrigin(rewardAccountId).entrySet().stream()
                     .filter(e -> e.getValue().isStrictlyPositive())
                     .filter(e -> stillEnoughBalance(e.getKey().sponsorAccountId(), e.getValue()))
-                    .peek(e -> spend(e.getKey().sponsorAccountId(), rewardAccountId.rewardId(), e.getValue()))
-                    .map(e -> createPayableReward(e.getKey().sponsorAccountId(), rewardAccountId.rewardId(), e.getValue()));
+                    .map(e -> {
+                        final var sponsorAccountId = e.getKey().sponsorAccountId();
+                        final var reward = createPayableReward(sponsorAccountId, rewardAccountId.rewardId(), e.getValue());
+                        spend(sponsorAccountId, reward);
+                        return reward;
+                    });
         }
 
-        private void spend(SponsorAccount.Id sponsorAccountId, RewardId rewardId, PositiveAmount amount) {
+        private void spend(SponsorAccount.Id sponsorAccountId, PayableReward reward) {
             final var sponsorAccount = sponsorAccount(sponsorAccountId);
 
             final var sponsorAccountNetwork = sponsorAccount.network().orElseThrow();
-            sponsorAccount.add(new SponsorAccount.Transaction(ZonedDateTime.now(), SPEND, sponsorAccountNetwork, rewardId.toString(),
-                    amount, "", ""));
+            sponsorAccount.add(new SponsorAccount.Transaction(ZonedDateTime.now(), SPEND, sponsorAccountNetwork, reward.id().toString(),
+                    reward.amount(), reward.recipientName(), reward.recipientWallet().toString()));
         }
 
         private PayableReward createPayableReward(SponsorAccount.Id sponsorAccountId, RewardId rewardId, PositiveAmount amount) {
             final var sponsorAccountNetwork = sponsorAccount(sponsorAccountId).network().orElseThrow();
-            return new PayableReward(rewardId, currency.forNetwork(sponsorAccountNetwork), amount);
+            final var invoice = invoiceStoragePort.invoiceOf(rewardId).orElseThrow();
+            return PayableReward.of(rewardId, currency.forNetwork(sponsorAccountNetwork), amount, invoice);
         }
 
         private boolean stillEnoughBalance(SponsorAccount.Id sponsorAccountId, PositiveAmount amount) {
@@ -410,6 +414,7 @@ public class AccountingService implements AccountingFacadePort {
 
         private boolean isPayable(RewardId rewardId) {
             if (accountBookState.balanceOf(AccountId.of(rewardId)).isZero()) return false;
+            if (!invoiceStoragePort.invoiceOf(rewardId).map(i -> i.status() == Invoice.Status.APPROVED).orElse(false)) return false;
 
             return accountBookState.balancePerOrigin(AccountId.of(rewardId)).entrySet().stream().allMatch(entry -> {
                 final var sponsorAccount = sponsorAccountProvider.get(entry.getKey().sponsorAccountId())

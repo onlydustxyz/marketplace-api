@@ -123,7 +123,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
         final var paidRewardId = RewardId.of("79209029-c488-4284-aa3f-bce8870d3a66");
         newAnthonyApprovedInvoice(List.of(paidRewardId));
         backofficeAccountingManagementRestApi.payReward(paidRewardId.value(),
-                new PayRewardRequest().network(TransactionNetwork.ETHEREUM).recipientAccount("0xa11c0edBa8924280Df7f258B370371bD985C8B0B").reference(
+                new PayRewardRequest().network(TransactionNetwork.ETHEREUM).reference(
                         "0xb1c3579ffbe3eabe6f88c58a037367dee7de6c06262cfecc3bd2e8c013cc5156"));
     }
 

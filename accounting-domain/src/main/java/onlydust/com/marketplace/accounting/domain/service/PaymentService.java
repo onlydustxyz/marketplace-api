@@ -16,6 +16,7 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import org.jetbrains.annotations.NotNull;
 
 import javax.transaction.Transactional;
+import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,7 @@ public class PaymentService implements PaymentPort {
         final Payment updatedPayment = payment.toBuilder()
                 .status(Payment.Status.PAID)
                 .transactionHash(transactionReference)
+                .confirmedAt(ZonedDateTime.now()) // TODO use the transaction timestamp
                 .build();
 
         accountingFacadePort.confirm(updatedPayment);
@@ -89,9 +91,7 @@ public class PaymentService implements PaymentPort {
         payments.forEach(payment -> {
             final Map<RewardId, Wallet> wallets = walletsPerRewardForNetwork(rewardInvoices, payment.network());
             final var rewards = payment.rewards().stream().sorted(Comparator.comparing(r -> r.id().value())).toList();
-            payment
-                    .invoices(invoices)
-                    .csv(PaymentExporter.csv(rewards, wallets));
+            payment.csv(PaymentExporter.csv(rewards, wallets));
         });
 
         accountingRewardStoragePort.saveAll(payments);

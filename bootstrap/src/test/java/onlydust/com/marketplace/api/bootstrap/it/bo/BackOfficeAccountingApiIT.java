@@ -683,8 +683,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .bodyValue("""
                         {
                             "network": "ETHEREUM",
-                            "reference": "0x14",
-                            "recipientAccount": "ofux.eth"
+                            "reference": "0x14"
                         }
                         """)
                 .exchange()
@@ -708,8 +707,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .bodyValue("""
                         {
                             "network": "ETHEREUM",
-                            "reference": "0x14",
-                            "recipientAccount": "ofux.eth"
+                            "reference": "0x14"
                         }
                         """)
                 .exchange()

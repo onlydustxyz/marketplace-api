@@ -2269,13 +2269,10 @@ components:
       required:
         - network
         - reference
-        - recipientAccount
       properties:
         network:
           $ref: '#/components/schemas/TransactionNetwork'
         reference:
-          type: string
-        recipientAccount:
           type: string
 
     Technologies:

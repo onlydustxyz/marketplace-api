@@ -112,12 +112,12 @@ public class PaymentServiceTest {
                         ))
         );
         payableRewards = List.of(
-                new PayableReward(rewardIds.get(0), USDC.forNetwork(Network.ETHEREUM), PositiveAmount.of(100L)),
-                new PayableReward(rewardIds.get(1), USDC.forNetwork(Network.OPTIMISM), PositiveAmount.of(200L)),
-                new PayableReward(rewardIds.get(2), STRK.forNetwork(Network.ETHEREUM), PositiveAmount.of(300L)),
-                new PayableReward(rewardIds.get(3), STRK.forNetwork(Network.STARKNET), PositiveAmount.of(400L)),
-                new PayableReward(rewardIds.get(4), ETH.forNetwork(Network.ETHEREUM), PositiveAmount.of(500L)),
-                new PayableReward(rewardIds.get(5), USDC.forNetwork(Network.ETHEREUM), PositiveAmount.of(600L))
+                PayableReward.of(rewardIds.get(0), USDC.forNetwork(Network.ETHEREUM), PositiveAmount.of(100L), invoices.get(0)),
+                PayableReward.of(rewardIds.get(1), USDC.forNetwork(Network.OPTIMISM), PositiveAmount.of(200L), invoices.get(1)),
+                PayableReward.of(rewardIds.get(2), STRK.forNetwork(Network.ETHEREUM), PositiveAmount.of(300L), invoices.get(0)),
+                PayableReward.of(rewardIds.get(3), STRK.forNetwork(Network.STARKNET), PositiveAmount.of(400L), invoices.get(1)),
+                PayableReward.of(rewardIds.get(4), ETH.forNetwork(Network.ETHEREUM), PositiveAmount.of(500L), invoices.get(0)),
+                PayableReward.of(rewardIds.get(5), USDC.forNetwork(Network.ETHEREUM), PositiveAmount.of(600L), invoices.get(1))
         );
         rewardIdsSet = new HashSet<>(rewardIds);
         reset(accountingRewardStoragePort, invoiceStoragePort, accountingService);
@@ -157,7 +157,6 @@ public class PaymentServiceTest {
             final var ethereumBatch = batches.stream().filter(batch -> batch.network().equals(Network.ETHEREUM)).findFirst().orElseThrow();
             assertThat(ethereumBatch.rewards()).containsExactlyInAnyOrder(payableRewards.get(0), payableRewards.get(2), payableRewards.get(4),
                     payableRewards.get(5));
-            assertThat(ethereumBatch.invoices()).containsAll(invoices);
             assertThat(ethereumBatch.csv()).hasLineCount(4);
             assertThat(ethereumBatch.csv()).contains("erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,vitalik.eth,100,");
             assertThat(ethereumBatch.csv()).contains("erc20,0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766,vitalik.eth,300,");
@@ -167,7 +166,6 @@ public class PaymentServiceTest {
         {
             final var optimismBatch = batches.stream().filter(batch -> batch.network().equals(Network.OPTIMISM)).findFirst().orElseThrow();
             assertThat(optimismBatch.rewards()).containsExactlyInAnyOrder(payableRewards.get(1));
-            assertThat(optimismBatch.invoices()).containsAll(invoices);
             assertThat(optimismBatch.csv()).isEqualToIgnoringWhitespace("""
                     erc20,0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85,0x0222,200,
                     """);
@@ -175,7 +173,6 @@ public class PaymentServiceTest {
         {
             final var starknetBatch = batches.stream().filter(batch -> batch.network().equals(Network.STARKNET)).findFirst().orElseThrow();
             assertThat(starknetBatch.rewards()).containsExactlyInAnyOrder(payableRewards.get(3));
-            assertThat(starknetBatch.invoices()).containsAll(invoices);
             assertThat(starknetBatch.csv()).isEqualToIgnoringWhitespace("""
                     erc20,0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766,0x0666,400,
                     """);
@@ -214,7 +211,6 @@ public class PaymentServiceTest {
                         .id(Payment.Id.random())
                         .network(Network.STARKNET)
                         .rewards(List.of())
-                        .invoices(List.of())
                         .build()));
         Exception exception = null;
         try {
@@ -239,7 +235,6 @@ public class PaymentServiceTest {
                 .network(Network.ETHEREUM)
                 .csv(faker.gameOfThrones().character())
                 .rewards(payableRewards.stream().filter(pr -> pr.currency().network().equals(Network.ETHEREUM)).toList())
-                .invoices(invoices)
                 .build();
         final Payment updatedPayment = payment.toBuilder()
                 .status(Payment.Status.PAID)
