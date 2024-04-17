@@ -16,6 +16,7 @@ import onlydust.com.marketplace.project.domain.model.Sponsor;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
@@ -91,23 +92,26 @@ public interface SponsorMapper {
     }
 
     private static ProjectWithBudgetResponse mapToProjectWithBudget(ShortProjectView project, List<SponsorAccountStatement> accountStatements) {
+        final var budgets = accountStatements.stream().map(statement -> {
+                            final var budget = statement.unspentBalanceSentTo(ProjectId.of(project.id().value())).getValue();
+                            final var currency = statement.account().currency();
+                            return new Money()
+                                    .amount(budget)
+                                    .prettyAmount(pretty(budget, currency.decimals(), currency.latestUsdQuote().orElse(null)))
+                                    .currency(mapCurrency(currency))
+                                    .usdEquivalent(currency.latestUsdQuote().map(r -> r.multiply(budget)).orElse(null));
+                        }
+                )
+                .filter(money -> money.getAmount().compareTo(BigDecimal.ZERO) > 0)
+                .toList();
+
         return new ProjectWithBudgetResponse()
                 .id(project.id().value())
                 .slug(project.slug())
                 .name(project.name())
                 .logoUrl(project.logoUrl())
-                .remainingBudgets(accountStatements.stream().map(statement -> {
-                                    final var budget = statement.unspentBalanceSentTo(ProjectId.of(project.id().value())).getValue();
-                                    final var currency = statement.account().currency();
-                                    return new Money()
-                                            .amount(budget)
-                                            .prettyAmount(pretty(budget, currency.decimals(), currency.latestUsdQuote().orElse(null)))
-                                            .currency(mapCurrency(currency))
-                                            .usdEquivalent(currency.latestUsdQuote().map(r -> r.multiply(budget)).orElse(null));
-                                }
-                        )
-                        .filter(money -> money.getAmount().compareTo(BigDecimal.ZERO) > 0)
-                        .toList())
+                .totalUsdBudget(budgets.stream().map(Money::getUsdEquivalent).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add))
+                .remainingBudgets(budgets)
                 ;
     }
 
