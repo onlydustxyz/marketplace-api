@@ -16,6 +16,7 @@ public interface GithubIssueViewEntityRepository extends JpaRepository<GithubIss
                  indexer_exp.github_issues i
             JOIN indexer_exp.github_repos r ON i.repo_id = r.id
             JOIN project_github_repos pgr ON pgr.github_repo_id = r.id
+            LEFT JOIN indexer_exp.github_issues_assignees gia ON gia.issue_id = i.id
             JOIN LATERAL (
                 SELECT issue_id
                 FROM indexer_exp.github_issues_labels gil
@@ -27,7 +28,8 @@ public interface GithubIssueViewEntityRepository extends JpaRepository<GithubIss
             ) gfi ON gfi.issue_id = i.id
             WHERE
                 i.status = 'OPEN' AND
-                pgr.project_id = :projectId
+                pgr.project_id = :projectId AND
+                gia.user_id IS NULL
             """, nativeQuery = true)
     Page<GithubIssueViewEntity> findProjectGoodFirstIssues(UUID projectId, Pageable pageable);
 }
