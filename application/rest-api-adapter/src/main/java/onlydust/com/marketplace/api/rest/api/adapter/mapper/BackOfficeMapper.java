@@ -839,13 +839,13 @@ public interface BackOfficeMapper {
                 .lastName(kyc.getLastName())
                 .birthdate(kyc.getBirthdate() == null ? null : kyc.getBirthdate().toInstant().atZone(ZoneOffset.UTC))
                 .address(kyc.getAddress())
-                .country(kyc.getCountry() == null ? null : kyc.getCountry().display().orElse(kyc.getCountry().iso3Code()))
-                .countryCode(kyc.getCountry() == null ? null : kyc.getCountry().iso3Code())
+                .country(kyc.getCountry().map(c -> c.display().orElse(c.iso3Code())).orElse(null))
+                .countryCode(kyc.getCountry().map(Country::iso3Code).orElse(null))
                 .usCitizen(kyc.getUsCitizen())
                 .idDocumentType(kyc.getIdDocumentType() == null ? null : map(kyc.getIdDocumentType()))
                 .idDocumentNumber(kyc.getIdDocumentNumber())
                 .validUntil(kyc.getValidUntil() == null ? null : kyc.getValidUntil().toInstant().atZone(ZoneOffset.UTC))
-                .idDocumentCountryCode(kyc.getIdDocumentCountryCode())
+                .idDocumentCountryCode(kyc.getIdDocumentCountry().map(Country::iso3Code).orElse(null))
                 .sumsubUrl(kyc.sumsubUrl())
                 ;
     }

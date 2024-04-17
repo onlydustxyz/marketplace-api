@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
+import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
 import onlydust.com.marketplace.accounting.domain.model.Money;
@@ -40,10 +41,10 @@ public interface BillingProfileMapper {
         }
         response.address(kyc.getAddress());
         response.birthdate(DateMapper.toZoneDateTime(kyc.getBirthdate()));
-        response.country(isNull(kyc.getCountry()) ? null : kyc.getCountry().display().orElse(null));
+        response.country(kyc.getCountry().map(c -> c.display().orElse(c.iso3Code())).orElse(null));
         response.setFirstName(kyc.getFirstName());
         response.setLastName(kyc.getLastName());
-        response.setIdDocumentCountryCode(kyc.getIdDocumentCountryCode());
+        response.setIdDocumentCountryCode(kyc.getIdDocumentCountry().map(Country::iso3Code).orElse(null));
         response.setIdDocumentNumber(kyc.getIdDocumentNumber());
         response.setIdDocumentType(isNull(kyc.getIdDocumentType()) ? null : switch (kyc.getIdDocumentType()) {
             case ID_CARD -> KYCResponse.IdDocumentTypeEnum.ID_CARD;

@@ -73,7 +73,7 @@ public class SumsubResponseMapper {
                             })
                             .idDocumentNumber(idDocumentDTO.getNumber())
                             .validUntil(mapDate(idDocumentDTO.getValidUntil()))
-                            .idDocumentCountryCode(idDocumentDTO.getCountry())
+                            .idDocumentCountry(Country.fromIso3(idDocumentDTO.getCountry()))
                             .build();
                 }
             }

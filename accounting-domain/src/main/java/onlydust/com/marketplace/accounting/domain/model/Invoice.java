@@ -212,7 +212,7 @@ public class Invoice {
         public record KycSnapshot(@NonNull String firstName, String lastName, @NonNull String address, @NonNull String countryCode,
                                   @NonNull Boolean usCitizen) {
             public static KycSnapshot of(Kyc kyc) {
-                return new KycSnapshot(kyc.getFirstName(), kyc.getLastName(), kyc.getAddress(), kyc.getCountry().iso3Code(), kyc.getUsCitizen());
+                return new KycSnapshot(kyc.getFirstName(), kyc.getLastName(), kyc.getAddress(), kyc.getCountry().orElseThrow().iso3Code(), kyc.getUsCitizen());
             }
 
             @Deprecated
