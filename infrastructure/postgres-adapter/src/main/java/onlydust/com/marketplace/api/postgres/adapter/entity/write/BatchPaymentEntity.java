@@ -3,8 +3,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import lombok.*;
-import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.PayableReward;
+import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import org.hibernate.annotations.CreationTimestamp;
@@ -100,10 +100,11 @@ public class BatchPaymentEntity {
                 .id(Payment.Id.of(this.id))
                 .transactionHash(this.transactionHash)
                 .rewards(this.rewards.stream().map(r ->
-                        new PayableReward(
+                        PayableReward.of(
                                 RewardId.of(r.rewardId()),
                                 r.reward().currency().toDomain().forNetwork(this.network.toNetwork()),
-                                PositiveAmount.of(r.amount())
+                                PositiveAmount.of(r.amount()),
+                                r.reward().invoice().toDomain()
                         )).toList())
                 .invoices(this.invoices.stream().map(InvoiceEntity::toDomain).toList())
                 .status(this.status.toDomain())

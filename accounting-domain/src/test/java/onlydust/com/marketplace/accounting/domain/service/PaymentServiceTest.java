@@ -112,12 +112,12 @@ public class PaymentServiceTest {
                         ))
         );
         payableRewards = List.of(
-                new PayableReward(rewardIds.get(0), USDC.forNetwork(Network.ETHEREUM), PositiveAmount.of(100L)),
-                new PayableReward(rewardIds.get(1), USDC.forNetwork(Network.OPTIMISM), PositiveAmount.of(200L)),
-                new PayableReward(rewardIds.get(2), STRK.forNetwork(Network.ETHEREUM), PositiveAmount.of(300L)),
-                new PayableReward(rewardIds.get(3), STRK.forNetwork(Network.STARKNET), PositiveAmount.of(400L)),
-                new PayableReward(rewardIds.get(4), ETH.forNetwork(Network.ETHEREUM), PositiveAmount.of(500L)),
-                new PayableReward(rewardIds.get(5), USDC.forNetwork(Network.ETHEREUM), PositiveAmount.of(600L))
+                PayableReward.of(rewardIds.get(0), USDC.forNetwork(Network.ETHEREUM), PositiveAmount.of(100L), invoices.get(0)),
+                PayableReward.of(rewardIds.get(1), USDC.forNetwork(Network.OPTIMISM), PositiveAmount.of(200L), invoices.get(1)),
+                PayableReward.of(rewardIds.get(2), STRK.forNetwork(Network.ETHEREUM), PositiveAmount.of(300L), invoices.get(0)),
+                PayableReward.of(rewardIds.get(3), STRK.forNetwork(Network.STARKNET), PositiveAmount.of(400L), invoices.get(1)),
+                PayableReward.of(rewardIds.get(4), ETH.forNetwork(Network.ETHEREUM), PositiveAmount.of(500L), invoices.get(0)),
+                PayableReward.of(rewardIds.get(5), USDC.forNetwork(Network.ETHEREUM), PositiveAmount.of(600L), invoices.get(1))
         );
         rewardIdsSet = new HashSet<>(rewardIds);
         reset(accountingRewardStoragePort, invoiceStoragePort, accountingService);

@@ -25,6 +25,9 @@ import onlydust.com.marketplace.accounting.domain.stubs.ERC20Tokens;
 import onlydust.com.marketplace.accounting.domain.stubs.SponsorAccountStorageStub;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
+import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
+import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -55,7 +58,7 @@ public class AccountingServiceTest {
                     .id(BillingProfile.Id.random())
                     .type(BillingProfile.Type.INDIVIDUAL)
                     .kyc(Kyc.builder().id(UUID.randomUUID()).ownerId(UserId.random()).status(VerificationStatus.VERIFIED).country(Country.fromIso3("FRA")).firstName(faker.name().firstName()).address(faker.address().fullAddress()).usCitizen(false).build())
-                    .payoutInfo(PayoutInfo.builder().build())
+                    .payoutInfo(PayoutInfo.builder().ethWallet(Ethereum.wallet("vitalik.eth")).optimismAddress(Optimism.accountAddress("0x1234")).starknetAddress(StarkNet.accountAddress("0x123456")).build())
                     .name("OnlyDust")
                     .build(), 1, UserId.random())
             .status(Invoice.Status.APPROVED)
@@ -1082,8 +1085,8 @@ public class AccountingServiceTest {
 
                 // Then
                 assertThat(payableRewards).containsExactlyInAnyOrder(
-                        new PayableReward(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
-                        new PayableReward(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L))
+                        PayableReward.of(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice),
+                        PayableReward.of(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice)
                 );
             }
             {
@@ -1094,14 +1097,14 @@ public class AccountingServiceTest {
 
                 // Then
                 assertThat(payableRewards).containsExactlyInAnyOrder(
-                        new PayableReward(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
-                        new PayableReward(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L))
+                        PayableReward.of(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice),
+                        PayableReward.of(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice)
                 );
                 assertThat(payableRewards1).containsExactlyInAnyOrder(
-                        new PayableReward(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L))
+                        PayableReward.of(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice)
                 );
                 assertThat(payableRewards2).containsExactlyInAnyOrder(
-                        new PayableReward(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L))
+                        PayableReward.of(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice)
                 );
             }
         }
@@ -1117,9 +1120,9 @@ public class AccountingServiceTest {
 
                 // Then
                 assertThat(payableRewards).containsExactlyInAnyOrder(
-                        new PayableReward(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
-                        new PayableReward(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
-                        new PayableReward(rewardId5, op.forNetwork(Network.OPTIMISM), PositiveAmount.of(90L))
+                        PayableReward.of(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice),
+                        PayableReward.of(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice),
+                        PayableReward.of(rewardId5, op.forNetwork(Network.OPTIMISM), PositiveAmount.of(90L), invoice)
                 );
             }
             {
@@ -1129,12 +1132,12 @@ public class AccountingServiceTest {
 
                 // Then
                 assertThat(payableRewards).containsExactlyInAnyOrder(
-                        new PayableReward(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
-                        new PayableReward(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
-                        new PayableReward(rewardId5, op.forNetwork(Network.OPTIMISM), PositiveAmount.of(90L))
+                        PayableReward.of(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice),
+                        PayableReward.of(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice),
+                        PayableReward.of(rewardId5, op.forNetwork(Network.OPTIMISM), PositiveAmount.of(90L), invoice)
                 );
                 assertThat(payableRewards5).containsExactlyInAnyOrder(
-                        new PayableReward(rewardId5, op.forNetwork(Network.OPTIMISM), PositiveAmount.of(90L))
+                        PayableReward.of(rewardId5, op.forNetwork(Network.OPTIMISM), PositiveAmount.of(90L), invoice)
                 );
             }
         }
@@ -1150,10 +1153,10 @@ public class AccountingServiceTest {
 
                 // Then
                 assertThat(payableRewards).containsExactlyInAnyOrder(
-                        new PayableReward(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
-                        new PayableReward(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
-                        new PayableReward(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(50L)),
-                        new PayableReward(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L))
+                        PayableReward.of(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice),
+                        PayableReward.of(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice),
+                        PayableReward.of(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(50L), invoice),
+                        PayableReward.of(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L), invoice)
                 );
             }
             {
@@ -1163,14 +1166,14 @@ public class AccountingServiceTest {
 
                 // Then
                 assertThat(payableRewards).containsExactlyInAnyOrder(
-                        new PayableReward(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
-                        new PayableReward(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
-                        new PayableReward(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(50L)),
-                        new PayableReward(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L))
+                        PayableReward.of(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice),
+                        PayableReward.of(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice),
+                        PayableReward.of(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(50L), invoice),
+                        PayableReward.of(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L), invoice)
                 );
                 assertThat(payableRewards3).containsExactlyInAnyOrder(
-                        new PayableReward(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(50L)),
-                        new PayableReward(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L))
+                        PayableReward.of(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(50L), invoice),
+                        PayableReward.of(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L), invoice)
                 );
             }
         }
@@ -1193,16 +1196,16 @@ public class AccountingServiceTest {
                 // rewardId5 is payable because it is entirely funded on network OPTIMISM (for currency OP)
                 assertThat(payableRewards).hasSize(4);
                 assertThat(payableRewards).containsOnlyOnce(
-                        new PayableReward(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(50L)),
-                        new PayableReward(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L)),
-                        new PayableReward(rewardId5, op.forNetwork(Network.OPTIMISM), PositiveAmount.of(90L))
+                        PayableReward.of(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(50L), invoice),
+                        PayableReward.of(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L), invoice),
+                        PayableReward.of(rewardId5, op.forNetwork(Network.OPTIMISM), PositiveAmount.of(90L), invoice)
                 );
                 assertThat(List.of(
-                        new PayableReward(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
-                        new PayableReward(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
-                        new PayableReward(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(50L)),
-                        new PayableReward(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L)),
-                        new PayableReward(rewardId5, op.forNetwork(Network.OPTIMISM), PositiveAmount.of(90L)))).containsAll(payableRewards);
+                        PayableReward.of(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice),
+                        PayableReward.of(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice),
+                        PayableReward.of(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(50L), invoice),
+                        PayableReward.of(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L), invoice),
+                        PayableReward.of(rewardId5, op.forNetwork(Network.OPTIMISM), PositiveAmount.of(90L), invoice))).containsAll(payableRewards);
             }
             {
                 // When
@@ -1211,13 +1214,13 @@ public class AccountingServiceTest {
                 // Then
                 assertThat(payableRewards).hasSize(3);
                 assertThat(payableRewards).containsOnlyOnce(
-                        new PayableReward(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(50L)),
-                        new PayableReward(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L))
+                        PayableReward.of(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(50L), invoice),
+                        PayableReward.of(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L), invoice)
                 );
                 assertThat(List.of(
-                        new PayableReward(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
-                        new PayableReward(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(50L)),
-                        new PayableReward(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L)))).containsAll(payableRewards);
+                        PayableReward.of(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice),
+                        PayableReward.of(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(50L), invoice),
+                        PayableReward.of(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L), invoice))).containsAll(payableRewards);
             }
         }
 
@@ -1234,11 +1237,11 @@ public class AccountingServiceTest {
 
                 // Then
                 assertThat(payableRewards).containsExactlyInAnyOrder(
-                        new PayableReward(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
-                        new PayableReward(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
-                        new PayableReward(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
-                        new PayableReward(rewardId4, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
-                        new PayableReward(rewardId5, op.forNetwork(Network.OPTIMISM), PositiveAmount.of(90L))
+                        PayableReward.of(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice),
+                        PayableReward.of(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice),
+                        PayableReward.of(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice),
+                        PayableReward.of(rewardId4, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice),
+                        PayableReward.of(rewardId5, op.forNetwork(Network.OPTIMISM), PositiveAmount.of(90L), invoice)
                 );
             }
             {
@@ -1247,9 +1250,9 @@ public class AccountingServiceTest {
 
                 // Then
                 assertThat(payableRewards).containsExactlyInAnyOrder(
-                        new PayableReward(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
-                        new PayableReward(rewardId4, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
-                        new PayableReward(rewardId5, op.forNetwork(Network.OPTIMISM), PositiveAmount.of(90L))
+                        PayableReward.of(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice),
+                        PayableReward.of(rewardId4, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice),
+                        PayableReward.of(rewardId5, op.forNetwork(Network.OPTIMISM), PositiveAmount.of(90L), invoice)
                 );
             }
         }
@@ -1271,8 +1274,8 @@ public class AccountingServiceTest {
                 // Then
                 assertThat(payableRewards).hasSize(1);
                 assertThat(List.of(
-                        new PayableReward(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
-                        new PayableReward(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)))
+                        PayableReward.of(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice),
+                        PayableReward.of(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice))
                 ).contains(payableRewards.get(0));
             }
             {
@@ -1281,8 +1284,8 @@ public class AccountingServiceTest {
                 final var payableRewards2 = accountingService.getPayableRewards(Set.of(rewardId2));
 
                 // Then
-                assertThat(payableRewards1).containsExactly(new PayableReward(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)));
-                assertThat(payableRewards2).containsExactly(new PayableReward(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)));
+                assertThat(payableRewards1).containsExactly(PayableReward.of(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice));
+                assertThat(payableRewards2).containsExactly(PayableReward.of(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), invoice));
             }
         }
 
@@ -1297,8 +1300,8 @@ public class AccountingServiceTest {
             verify(accountingObserver).onSponsorAccountBalanceChanged(any());
 
             assertThat(accountingService.getPayableRewards(Set.of(rewardId1, rewardId2, rewardId3, rewardId4, rewardId5, rewardId6))).containsExactlyInAnyOrder(
-                    new PayableReward(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(50L)),
-                    new PayableReward(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L))
+                    PayableReward.of(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(50L), invoice),
+                    PayableReward.of(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L), invoice)
             );
 
             reset(accountingObserver);
@@ -1312,7 +1315,7 @@ public class AccountingServiceTest {
                 final var payableRewards = accountingService.getPayableRewards(Set.of(rewardId1, rewardId2, rewardId3, rewardId4, rewardId5, rewardId6));
 
                 // Then
-                assertThat(payableRewards).containsExactly(new PayableReward(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L)));
+                assertThat(payableRewards).containsExactly(PayableReward.of(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L), invoice));
             }
             {
                 // When
@@ -1320,7 +1323,7 @@ public class AccountingServiceTest {
                 final var payableRewards1 = accountingService.getPayableRewards(Set.of(rewardId1));
 
                 // Then
-                assertThat(payableRewards).containsExactly(new PayableReward(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L)));
+                assertThat(payableRewards).containsExactly(PayableReward.of(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L), invoice));
                 assertThat(payableRewards1).isEmpty();
             }
         }
