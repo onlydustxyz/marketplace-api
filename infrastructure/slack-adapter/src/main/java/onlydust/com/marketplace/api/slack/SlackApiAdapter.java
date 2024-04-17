@@ -50,7 +50,7 @@ public class SlackApiAdapter implements NotificationPort {
     }
 
     private void sendProjectCreatedNotification(ProjectCreated projectCreated) {
-        final User user = userStoragePort.getUserById(projectCreated.getProjectId())
+        final User user = userStoragePort.getUserById(projectCreated.getUserId())
                 .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(projectCreated.getUserId())));
         final ProjectDetailsView projectDetailsView = projectStoragePort.getById(projectCreated.getProjectId(), user);
         sendNotification(slackProperties.getDevRelChannel(), "New project created", ProjectCreatedEventMapper.mapToSlackBlock(user,
