@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class EventIdResolver extends TypeIdResolverBase {
+    private static final ThreadLocal<Reflections> reflections = ThreadLocal.withInitial(() -> new Reflections("onlydust.com"));
 
     private final Map<String, Class<?>> typeMap = new HashMap<>();
     private JavaType baseType;
@@ -22,8 +23,7 @@ public class EventIdResolver extends TypeIdResolverBase {
         record EventAnnotatedClass(Class<?> aClass, EventType eventType) {
         }
 
-        final var reflections = new Reflections("onlydust.com");
-        reflections.getSubTypesOf(baseType.getRawClass()).stream()
+        reflections.get().getSubTypesOf(baseType.getRawClass()).stream()
                 .map(aClass -> new EventAnnotatedClass(aClass, aClass.getAnnotation(EventType.class)))
                 .filter(annotatedClass -> Objects.nonNull(annotatedClass.eventType()))
                 .forEach(annotatedClass -> {
