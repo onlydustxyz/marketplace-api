@@ -53,7 +53,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         @ConfigureWireMock(name = "github", stubLocation = "", property = "infrastructure.github.baseUri"),
         @ConfigureWireMock(name = "dustyBot", stubLocation = "", property = "infrastructure.dustyBot.baseUri"),
         @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri"),
-        @ConfigureWireMock(name = "webhook", property = "infrastructure.make.webhook.url"),
         @ConfigureWireMock(name = "linear", property = "infrastructure.linear.base-uri"),
         @ConfigureWireMock(name = "auth0", property = "application.web.auth0.user-info-url"),
         @ConfigureWireMock(name = "posthog", property = "infrastructure.posthog.base-uri"),
@@ -157,8 +156,6 @@ public class AbstractMarketplaceApiIT {
     protected WireMockServer indexerApiWireMockServer;
     @InjectWireMock("dustyBot")
     protected WireMockServer dustyBotApiWireMockServer;
-    @InjectWireMock("webhook")
-    protected WireMockServer webhookWireMockServer;
     @InjectWireMock("linear")
     protected WireMockServer linearWireMockServer;
     @InjectWireMock("auth0")
@@ -182,9 +179,6 @@ public class AbstractMarketplaceApiIT {
     GithubAuthenticationPort githubAuthenticationPort;
 
     protected UserAuthHelper userAuthHelper;
-
-    @Autowired
-    OutboxConsumerJob notificationOutboxJob;
     @Autowired
     OutboxConsumerJob indexerOutboxJob;
     @Autowired

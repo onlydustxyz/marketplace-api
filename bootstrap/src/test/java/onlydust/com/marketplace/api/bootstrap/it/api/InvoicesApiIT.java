@@ -353,18 +353,6 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                         }
                         """);
 
-        notificationOutboxJob.run();
-        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("BillingProfile")))
-                .withRequestBody(matchingJsonPath("$.event_name", equalTo("InvoiceUploaded")))
-                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
-                .withRequestBody(matchingJsonPath("$.payload.billing_profile_id", equalTo(companyBillingProfileId.toString())))
-                .withRequestBody(matchingJsonPath("$.payload.invoice_id", equalTo(invoiceId.getValue())))
-                .withRequestBody(matchingJsonPath("$.payload.is_external", equalTo("true")))
-        );
-
-
         // When
         final var pdfData = faker.lorem().paragraph().getBytes();
         when(pdfStoragePort.download(eq(invoiceId.getValue() + ".pdf"))).then(invocation -> new ByteArrayInputStream(pdfData));
@@ -576,17 +564,6 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                           ]
                         }
                         """);
-
-        notificationOutboxJob.run();
-        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("BillingProfile")))
-                .withRequestBody(matchingJsonPath("$.event_name", equalTo("InvoiceUploaded")))
-                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
-                .withRequestBody(matchingJsonPath("$.payload.billing_profile_id", equalTo(companyBillingProfileId.toString())))
-                .withRequestBody(matchingJsonPath("$.payload.invoice_id", equalTo(invoiceId.getValue())))
-                .withRequestBody(matchingJsonPath("$.payload.is_external", equalTo("false")))
-        );
 
         // When
         final var pdfData = faker.lorem().paragraph().getBytes();

@@ -17,5 +17,5 @@ import java.util.UUID;
 @EventType("ProjectCreated")
 public class ProjectCreated extends Event {
     UUID projectId;
-    Date createdAt;
+    UUID userId;
 }

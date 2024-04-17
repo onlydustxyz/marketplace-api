@@ -62,23 +62,12 @@ public class AccountingConfiguration {
     }
 
     @Bean
-    public NotificationOutbox notificationOutboxObserver(final @NonNull OutboxPort notificationOutbox) {
-        return new NotificationOutbox(notificationOutbox);
-    }
-
-    @Bean
     public InvoiceFacadePort invoiceFacadePort(final @NonNull InvoiceStoragePort invoiceStoragePort,
                                                final @NonNull PdfStoragePort pdfStoragePort,
                                                final @NonNull BillingProfileObserver billingProfileObservers,
                                                final @NonNull BillingProfileStoragePort billingProfileStoragePort
     ) {
         return new InvoiceService(invoiceStoragePort, pdfStoragePort, billingProfileStoragePort, billingProfileObservers);
-    }
-
-    @Bean
-    public BillingProfileObserverComposite billingProfileObservers(final @NonNull NotificationOutbox notificationOutbox,
-                                                                   final @NonNull AccountingObserver accountingObserver) {
-        return new BillingProfileObserverComposite(notificationOutbox, accountingObserver);
     }
 
     @Bean

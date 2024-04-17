@@ -154,40 +154,6 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.ecosystems.length()").isEqualTo(2)
                 .jsonPath("$.ecosystems[0].name").isEqualTo("Starknet")
                 .jsonPath("$.ecosystems[1].name").isEqualTo("Zama");
-
-        runJobs();
-        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
-                .withRequestBody(matchingJsonPath("$.event_name", equalTo("Created")))
-                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
-                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
-        );
-        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
-                .withRequestBody(matchingJsonPath("$.event_name", equalTo("LeaderAssigned")))
-                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
-                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
-                .withRequestBody(matchingJsonPath("$.payload.leader_id",
-                        equalTo("fc92397c-3431-4a84-8054-845376b630a0"))) // PierreOucif
-        );
-        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
-                .withRequestBody(matchingJsonPath("$.event_name", equalTo("LeaderInvited")))
-                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
-                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
-                .withRequestBody(matchingJsonPath("$.payload.github_user_id", equalTo("595505")))
-        );
-        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
-                .withRequestBody(matchingJsonPath("$.event_name", equalTo("LeaderInvited")))
-                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
-                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
-                .withRequestBody(matchingJsonPath("$.payload.github_user_id", equalTo("43467246")))
-        );
     }
 
     @SneakyThrows
@@ -211,17 +177,6 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath(format("$.leaders[?(@.githubUserId==%d)]", 595505L)).exists()
                 .jsonPath(format("$.leaders[?(@.githubUserId==%d)]", 16590657L)).exists();
-
-        runJobs();
-        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
-                .withRequestBody(matchingJsonPath("$.event_name", equalTo("LeaderAssigned")))
-                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
-                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
-                .withRequestBody(matchingJsonPath("$.payload.leader_id",
-                        equalTo("e461c019-ba23-4671-9b6c-3a5a18748af9"))) // ofux
-        );
     }
 
     @Test
@@ -326,42 +281,9 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                         }
                         """))
         );
-        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
-                .withRequestBody(matchingJsonPath("$.event_name", equalTo("Updated")))
-                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
-                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
-        );
-        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
-                .withRequestBody(matchingJsonPath("$.event_name", equalTo("LeaderUnassigned")))
-                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
-                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
-                .withRequestBody(matchingJsonPath("$.payload.leader_id",
-                        equalTo("fc92397c-3431-4a84-8054-845376b630a0"))) // PierreOucif
-        );
-        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
-                .withRequestBody(matchingJsonPath("$.event_name", equalTo("LeaderInvited")))
-                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
-                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
-                .withRequestBody(matchingJsonPath("$.payload.github_user_id", equalTo("16590657")))
-        );
-        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
-                .withRequestBody(matchingJsonPath("$.event_name", equalTo("LeaderInvitationCancelled")))
-                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
-                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
-                .withRequestBody(matchingJsonPath("$.payload.github_user_id", equalTo("5160414")))
-        );
     }
 
     private void runJobs() {
-        notificationOutboxJob.run();
         indexerOutboxJob.run();
     }
 

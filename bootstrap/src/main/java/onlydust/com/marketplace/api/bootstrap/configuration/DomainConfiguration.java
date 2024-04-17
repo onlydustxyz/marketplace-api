@@ -7,7 +7,10 @@ import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.CurrencyService;
 import onlydust.com.marketplace.api.infrastructure.accounting.AccountingServiceAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.*;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresRewardAdapter;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.port.output.*;
@@ -44,7 +47,6 @@ public class DomainConfiguration {
     @Bean
     public ProjectFacadePort projectFacadePort(final ProjectObserverPort projectObserverPort,
                                                final ProjectStoragePort projectStoragePort,
-                                               final PostgresProjectRewardAdapter postgresProjectRewardAdapter,
                                                final ImageStoragePort imageStoragePort,
                                                final UUIDGeneratorPort uuidGeneratorPort,
                                                final PermissionService permissionService,
@@ -55,7 +57,6 @@ public class DomainConfiguration {
                                                final GithubStoragePort githubStoragePort) {
         return new ProjectService(projectObserverPort,
                 projectStoragePort,
-                postgresProjectRewardAdapter,
                 imageStoragePort,
                 uuidGeneratorPort,
                 permissionService,
@@ -89,20 +90,21 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public UserFacadePort userFacadePort(final ProjectObserverPort projectObserverPort,
-                                         final UserObserverPort userObserverPort,
+    public UserFacadePort userFacadePort(final UserObserverPort userObserverPort,
                                          final PostgresUserAdapter postgresUserAdapter,
                                          final DateProvider dateProvider,
                                          final ProjectStoragePort projectStoragePort,
                                          final GithubSearchPort githubSearchPort,
-                                         final ImageStoragePort imageStoragePort) {
-        return new UserService(projectObserverPort,
+                                         final ImageStoragePort imageStoragePort,
+                                         final ProjectObserverPort projectObserverPort) {
+        return new UserService(
                 userObserverPort,
                 postgresUserAdapter,
                 dateProvider,
                 projectStoragePort,
                 githubSearchPort,
-                imageStoragePort);
+                imageStoragePort,
+                projectObserverPort);
     }
 
     @Bean
@@ -143,12 +145,6 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public OutboxConsumerJob notificationOutboxJob(final OutboxPort notificationOutbox,
-                                                   final OutboxConsumer webhookNotificationOutboxConsumer) {
-        return new OutboxConsumerJob(notificationOutbox, webhookNotificationOutboxConsumer);
-    }
-
-    @Bean
     public OutboxConsumerJob indexerOutboxJob(final OutboxPort indexerOutbox,
                                               final OutboxConsumer indexerApiOutboxConsumer) {
         return new OutboxConsumerJob(indexerOutbox, indexerApiOutboxConsumer);
@@ -182,10 +178,10 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public ProjectObserverPort projectObserverPort(final OutboxPort notificationOutbox,
-                                                   final ContributionStoragePort contributionStoragePort,
-                                                   final OutboxPort indexerOutbox) {
-        return new ProjectObserver(notificationOutbox, contributionStoragePort, indexerOutbox);
+    public ProjectObserverPort projectObserverPort(final ContributionStoragePort contributionStoragePort,
+                                                   final OutboxPort indexerOutbox,
+                                                   final NotificationPort notificationPort) {
+        return new ProjectObserver(contributionStoragePort, indexerOutbox, notificationPort);
     }
 
 
@@ -195,8 +191,8 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public UserObserverPort userObserverPort(final OutboxPort indexerOutbox, final OutboxPort notificationOutbox, final OutboxPort trackingOutbox) {
-        return new UserObserver(indexerOutbox, notificationOutbox, trackingOutbox);
+    public UserObserverPort userObserverPort(final OutboxPort indexerOutbox, final OutboxPort trackingOutbox) {
+        return new UserObserver(indexerOutbox, trackingOutbox);
     }
 
     @Bean

@@ -16,6 +16,7 @@ import onlydust.com.marketplace.project.domain.view.ProjectDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardableItemView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -43,8 +44,7 @@ public class ProjectServiceTest {
     private final GithubStoragePort githubStoragePort = mock(GithubStoragePort.class);
     private final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
     private final ProjectObserverPort projectObserverPort = mock(ProjectObserverPort.class);
-    private final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
-    private final ProjectService projectService = new ProjectService(projectObserverPort, projectStoragePort, projectRewardStoragePort,
+    private final ProjectService projectService = new ProjectService(projectObserverPort, projectStoragePort,
             imageStoragePort,
             uuidGeneratorPort, permissionService, indexerPort, dateProvider,
             contributionStoragePort, dustyBotStoragePort, githubStoragePort);
@@ -138,6 +138,7 @@ public class ProjectServiceTest {
                 .ecosystemIds(ecosystemIds)
                 .build();
         final UUID expectedProjectId = UUID.randomUUID();
+        final UUID projectLeadId = UUID.randomUUID();
 
         // When
         when(uuidGeneratorPort.generate()).thenReturn(expectedProjectId);
@@ -151,18 +152,19 @@ public class ProjectServiceTest {
                 imageUrl,
                 ProjectRewardSettings.defaultSettings(dateProvider.now()), ecosystemIds
         )).thenReturn("slug");
-        final var projectIdentity = projectService.createProject(command);
+        final var projectIdentity = projectService.createProject(projectLeadId, command);
 
         // Then
         assertNotNull(projectIdentity);
         assertNotNull(projectIdentity.getLeft());
         assertThat(projectIdentity.getRight()).isEqualTo("slug");
         verify(indexerPort, times(1)).indexUsers(usersToInviteAsProjectLeaders);
-        verify(projectObserverPort).onProjectCreated(expectedProjectId);
-        verify(projectObserverPort).onLeaderAssigned(expectedProjectId, command.getFirstProjectLeaderId());
-        verify(projectObserverPort).onLeaderInvited(expectedProjectId, usersToInviteAsProjectLeaders.get(0));
+        final ArgumentCaptor<UUID> uuidArgumentCaptor = ArgumentCaptor.forClass(UUID.class);
+        verify(projectObserverPort).onProjectCreated(uuidArgumentCaptor.capture(), uuidArgumentCaptor.capture());
         verify(projectObserverPort).onLinkedReposChanged(expectedProjectId,
                 command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of());
+        assertEquals(expectedProjectId, uuidArgumentCaptor.getAllValues().get(0));
+        assertEquals(projectLeadId, uuidArgumentCaptor.getAllValues().get(1));
     }
 
 
@@ -211,7 +213,6 @@ public class ProjectServiceTest {
                 command.getRewardSettings(),
                 command.getEcosystemIds()
         );
-        verify(projectObserverPort).onProjectDetailsUpdated(projectId);
         verify(projectObserverPort).onLinkedReposChanged(projectId,
                 command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of(1L, 2L, 3L));
         verify(projectObserverPort).onRewardSettingsChanged(projectId);
@@ -514,7 +515,7 @@ public class ProjectServiceTest {
         final PermissionService permissionService = new PermissionService(projectStoragePort,
                 mock(ContributionStoragePort.class));
         final IndexerPort indexerPort = mock(IndexerPort.class);
-        final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort, mock(ProjectRewardStoragePort.class),
+        final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort,
                 mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, indexerPort, dateProvider,
                 mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class), mock(GithubStoragePort.class));
@@ -586,7 +587,7 @@ public class ProjectServiceTest {
         final PermissionService permissionService = new PermissionService(projectStoragePort,
                 mock(ContributionStoragePort.class));
         final IndexerPort indexerPort = mock(IndexerPort.class);
-        final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort, mock(ProjectRewardStoragePort.class),
+        final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort,
                 mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, indexerPort, dateProvider,
                 mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class), mock(GithubStoragePort.class));

@@ -18,7 +18,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationSt
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserProfileInfoRepository;
-import onlydust.com.marketplace.api.webhook.Config;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
@@ -52,10 +51,6 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     AccountingHelper accountingHelper;
     @Autowired
     UserService userService;
-    @Autowired
-    OutboxConsumerJob notificationOutboxJob;
-    @Autowired
-    Config webhookHttpClientProperties;
     @Autowired
     InvoiceStoragePort invoiceStoragePort;
     @Autowired
@@ -533,29 +528,22 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .isNoContent()
         ;
 
-        // To avoid error on post InvoiceUploaded event to old BO
-        makeWebhookWireMockServer.stubFor(post("/").willReturn(ok()));
-        makeWebhookSendRejectedInvoiceMailWireMockServer.stubFor(
-                post("/?api-key=%s".formatted(webhookHttpClientProperties.getApiKey()))
-                        .willReturn(ok()));
-
-        notificationOutboxJob.run();
-
+        // TODO : migrate to new notification and mail system
         final Invoice invoice = invoiceStoragePort.get(companyBillingProfileToReviewInvoices.get(1)).orElseThrow();
-        makeWebhookSendRejectedInvoiceMailWireMockServer.verify(1,
-                postRequestedFor(urlEqualTo("/?api-key=%s".formatted(webhookHttpClientProperties.getApiKey())))
-                        .withHeader("Content-Type", equalTo("application/json"))
-                        .withRequestBody(matchingJsonPath("$.recipientEmail", equalTo("abuisset@gmail.com")))
-                        .withRequestBody(matchingJsonPath("$.recipientName", equalTo("AnthonyBuisset")))
-                        .withRequestBody(matchingJsonPath("$.rewardCount", equalTo(String.valueOf(invoice.rewards().size()))))
-                        .withRequestBody(matchingJsonPath("$.invoiceName", equalTo(invoice.number().value())))
-                        .withRequestBody(matchingJsonPath("$.totalUsdAmount", equalTo("2020.0")))
-                        .withRequestBody(
-                                matchingJsonPath("$.rejectionReason", equalTo(rejectionReason))
-                        )
-                        .withRequestBody(matchingJsonPath("$.rewardNames", containing("#303F2 - kaaper - USDC - 1000")))
-                        .withRequestBody(matchingJsonPath("$.rewardNames", containing("#79209 - kaaper - USDC - 1000")))
-        );
+//        makeWebhookSendRejectedInvoiceMailWireMockServer.verify(1,
+//                postRequestedFor(urlEqualTo("/?api-key=%s".formatted(webhookHttpClientProperties.getApiKey())))
+//                        .withHeader("Content-Type", equalTo("application/json"))
+//                        .withRequestBody(matchingJsonPath("$.recipientEmail", equalTo("abuisset@gmail.com")))
+//                        .withRequestBody(matchingJsonPath("$.recipientName", equalTo("AnthonyBuisset")))
+//                        .withRequestBody(matchingJsonPath("$.rewardCount", equalTo(String.valueOf(invoice.rewards().size()))))
+//                        .withRequestBody(matchingJsonPath("$.invoiceName", equalTo(invoice.number().value())))
+//                        .withRequestBody(matchingJsonPath("$.totalUsdAmount", equalTo("2020.0")))
+//                        .withRequestBody(
+//                                matchingJsonPath("$.rejectionReason", equalTo(rejectionReason))
+//                        )
+//                        .withRequestBody(matchingJsonPath("$.rewardNames", containing("#303F2 - kaaper - USDC - 1000")))
+//                        .withRequestBody(matchingJsonPath("$.rewardNames", containing("#79209 - kaaper - USDC - 1000")))
+//        );
 
         client
                 .get()

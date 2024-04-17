@@ -20,7 +20,6 @@
         <module>github-api-adapter</module>
         <module>indexer-api-client-adapter</module>
         <module>aws-s3-adapter</module>
-        <module>make-adapter</module>
         <module>linear-adapter</module>
         <module>auth0-api-client-adapter</module>
         <module>infura-adapter</module>

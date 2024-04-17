@@ -38,20 +38,20 @@ public class UserServiceTest {
     private GithubSearchPort githubSearchPort;
     private ImageStoragePort imageStoragePort;
     private UserService userService;
-    private ProjectObserverPort projectObserverPort;
     private UserObserverPort userObserverPort;
+    private ProjectObserverPort projectObserverPort;
 
     @BeforeEach
     void setUp() {
-        projectObserverPort = mock(ProjectObserverPort.class);
         userObserverPort = mock(UserObserverPort.class);
         userStoragePort = mock(UserStoragePort.class);
         projectStoragePort = mock(ProjectStoragePort.class);
         githubSearchPort = mock(GithubSearchPort.class);
         imageStoragePort = mock(ImageStoragePort.class);
+        projectObserverPort = mock(ProjectObserverPort.class);
 
-        userService = new UserService(projectObserverPort, userObserverPort, userStoragePort, dateProvider,
-                projectStoragePort, githubSearchPort, imageStoragePort);
+        userService = new UserService(userObserverPort, userStoragePort, dateProvider,
+                projectStoragePort, githubSearchPort, imageStoragePort, projectObserverPort);
     }
 
     @Test
@@ -270,12 +270,15 @@ public class UserServiceTest {
         // Given
         final UUID projectId = UUID.randomUUID();
         final UUID userId = UUID.randomUUID();
+        final UUID applicationId = UUID.randomUUID();
 
         // When
+        when(userStoragePort.createApplicationOnProject(userId, projectId)).thenReturn(applicationId);
         userService.applyOnProject(userId, projectId);
 
         // Then
         verify(userStoragePort, times(1)).createApplicationOnProject(userId, projectId);
+        verify(projectObserverPort, times(1)).onUserApplied(projectId, userId, applicationId);
     }
 
     @Test

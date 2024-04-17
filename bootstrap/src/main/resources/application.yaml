@@ -112,13 +112,6 @@ infrastructure:
         states:
           backlog:
             id: "35c07f98-74f2-4b43-bfd1-d394addf337b"
-  make:
-    webhook:
-      url: ${BACKOFFICE_WEBHOOK_URL}
-      environment: ${ENV}
-      send-rejected-invoice-mail-url: ${MAKE_SEND_REJECTED_INVOICE_MAIL_WEBHOOK_URL}
-      send-rewards-paid-mail-url: ${MAKE_SEND_REWARD_PAID_MAIL_WEBHOOK_URL}
-      api-key: ${MAKE_WEBHOOK_API_KEY}
   auth0:
     api:
       client:
@@ -158,4 +151,5 @@ infrastructure:
     environment: ${ENV}
     token: ${SLACK_TOKEN}
     kyc-kyb-channel: '#kyc-kyb'
+    dev-rel-channel: '#dev-rel'
     tag-all-channel: ${SLACK_PING_ALL_CHANNEL_FOR_CLOSED_BILLING_PROFILE}

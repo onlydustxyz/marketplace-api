@@ -19,7 +19,6 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @Profile("jobs")
 public class JobScheduler {
-    private final OutboxConsumerJob notificationOutboxJob;
     private final OutboxConsumerJob indexerOutboxJob;
     private final OutboxConsumerJob trackingOutboxJob;
     private final ProjectFacadePort projectFacadePort;
@@ -28,12 +27,6 @@ public class JobScheduler {
     private final Properties cronProperties;
     private final OutboxConsumerJob billingProfileVerificationOutboxJob;
     private final AccountingObserver accountingObserver;
-
-    @Scheduled(fixedDelayString = "${application.cron.notification-job-delay}")
-    public void processPendingNotifications() {
-        LOGGER.info("Sending pending notifications");
-        notificationOutboxJob.run();
-    }
 
     @Scheduled(fixedDelayString = "${application.cron.indexer-sync-job-delay}")
     public void processPendingIndexerApiCalls() {

@@ -31,13 +31,13 @@ import static java.util.Objects.isNull;
 @Slf4j
 public class UserService implements UserFacadePort {
 
-    private final ProjectObserverPort projectObserverPort;
     private final UserObserverPort userObserverPort;
     private final UserStoragePort userStoragePort;
     private final DateProvider dateProvider;
     private final ProjectStoragePort projectStoragePort;
     private final GithubSearchPort githubSearchPort;
     private final ImageStoragePort imageStoragePort;
+    private final ProjectObserverPort projectObserverPort;
 
     @Override
     @Transactional
@@ -140,8 +140,7 @@ public class UserService implements UserFacadePort {
 
     @Override
     public void acceptInvitationToLeadProject(Long githubUserId, UUID projectId) {
-        final var leaderId = userStoragePort.acceptProjectLeaderInvitation(githubUserId, projectId);
-        projectObserverPort.onLeaderAssigned(projectId, leaderId);
+        userStoragePort.acceptProjectLeaderInvitation(githubUserId, projectId);
     }
 
     @Override
@@ -198,7 +197,6 @@ public class UserService implements UserFacadePort {
 
         }
         userStoragePort.saveProjectLead(user.getId(), projectId);
-        projectObserverPort.onLeaderAssigned(projectId, user.getId());
     }
 
     @Override

@@ -6,8 +6,10 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.notification.ProjectCreated;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.*;
@@ -36,7 +38,6 @@ public class ProjectService implements ProjectFacadePort {
 
     private final ProjectObserverPort projectObserverPort;
     private final ProjectStoragePort projectStoragePort;
-    private final ProjectRewardStoragePort projectRewardStoragePort;
     private final ImageStoragePort imageStoragePort;
     private final UUIDGeneratorPort uuidGeneratorPort;
     private final PermissionService permissionService;
@@ -87,7 +88,7 @@ public class ProjectService implements ProjectFacadePort {
 
     @Override
     @Transactional
-    public Pair<UUID, String> createProject(CreateProjectCommand command) {
+    public Pair<UUID, String> createProject(final UUID projectLeadId, final CreateProjectCommand command) {
         if (command.getGithubUserIdsAsProjectLeadersToInvite() != null) {
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
         }
@@ -103,12 +104,7 @@ public class ProjectService implements ProjectFacadePort {
                 command.getImageUrl(),
                 ProjectRewardSettings.defaultSettings(dateProvider.now()), command.getEcosystemIds());
 
-        projectObserverPort.onProjectCreated(projectId);
-        projectObserverPort.onLeaderAssigned(projectId, command.getFirstProjectLeaderId());
-        if (nonNull(command.getGithubUserIdsAsProjectLeadersToInvite())) {
-            command.getGithubUserIdsAsProjectLeadersToInvite().forEach(githubUserId ->
-                    projectObserverPort.onLeaderInvited(projectId, githubUserId));
-        }
+        projectObserverPort.onProjectCreated(projectId, projectLeadId);
         if (nonNull(command.getGithubRepoIds())) {
             projectObserverPort.onLinkedReposChanged(projectId, Set.copyOf(command.getGithubRepoIds()), Set.of());
         }
@@ -124,7 +120,6 @@ public class ProjectService implements ProjectFacadePort {
         if (command.getGithubUserIdsAsProjectLeadersToInvite() != null) {
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
         }
-
         final Set<UUID> unassignedLeaderIds = getUnassignedLeaderIds(command);
 
         final Set<Long> invitedLeaderGithubIds = new HashSet<>();
@@ -144,11 +139,6 @@ public class ProjectService implements ProjectFacadePort {
                 command.getProjectLeadersToKeep(), command.getImageUrl(),
                 command.getRewardSettings(), command.getEcosystemIds());
 
-        projectObserverPort.onProjectDetailsUpdated(command.getId());
-        invitedLeaderGithubIds.forEach(leaderId -> projectObserverPort.onLeaderInvited(command.getId(), leaderId));
-        invitationCancelledLeaderGithubIds.forEach(leaderId ->
-                projectObserverPort.onLeaderInvitationCancelled(command.getId(), leaderId));
-        unassignedLeaderIds.forEach(leaderId -> projectObserverPort.onLeaderUnassigned(command.getId(), leaderId));
         if (!isNull(command.getGithubRepoIds())) {
             projectObserverPort.onLinkedReposChanged(command.getId(), linkedRepoIds, unlinkedRepoIds);
         }
@@ -157,6 +147,23 @@ public class ProjectService implements ProjectFacadePort {
         }
         final String slug = this.projectStoragePort.getProjectSlugById(command.getId());
         return Pair.of(command.getId(), slug);
+    }
+
+    private Set<UUID> getUnassignedLeaderIds(UpdateProjectCommand command) {
+        if (command.getProjectLeadersToKeep() == null) {
+            return Set.of();
+        }
+
+        final var projectLeadIds = projectStoragePort.getProjectLeadIds(command.getId());
+        if (command.getProjectLeadersToKeep().stream()
+                .anyMatch(userId -> projectLeadIds.stream()
+                        .noneMatch(projectLeaderId -> projectLeaderId.equals(userId)))) {
+            throw OnlyDustException.badRequest("Project leaders to keep must be a subset of current project " +
+                                               "leaders");
+        }
+        return projectLeadIds.stream()
+                .filter(leaderId -> !command.getProjectLeadersToKeep().contains(leaderId))
+                .collect(Collectors.toSet());
     }
 
     private void getLinkedReposChanges(UpdateProjectCommand command, Set<Long> linkedRepoIds,
@@ -184,23 +191,6 @@ public class ProjectService implements ProjectFacadePort {
             invitedLeaderGithubIds.addAll(command.getGithubUserIdsAsProjectLeadersToInvite().stream()
                     .filter(leaderId -> !projectInvitedLeadIds.contains(leaderId)).toList());
         }
-    }
-
-    private Set<UUID> getUnassignedLeaderIds(UpdateProjectCommand command) {
-        if (command.getProjectLeadersToKeep() == null) {
-            return Set.of();
-        }
-
-        final var projectLeadIds = projectStoragePort.getProjectLeadIds(command.getId());
-        if (command.getProjectLeadersToKeep().stream()
-                .anyMatch(userId -> projectLeadIds.stream()
-                        .noneMatch(projectLeaderId -> projectLeaderId.equals(userId)))) {
-            throw OnlyDustException.badRequest("Project leaders to keep must be a subset of current project " +
-                                               "leaders");
-        }
-        return projectLeadIds.stream()
-                .filter(leaderId -> !command.getProjectLeadersToKeep().contains(leaderId))
-                .collect(Collectors.toSet());
     }
 
     @Override

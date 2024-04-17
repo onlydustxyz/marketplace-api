@@ -19,5 +19,4 @@ public class UserAppliedOnProject extends Event {
     UUID applicationId;
     UUID projectId;
     UUID userId;
-    Date appliedAt;
 }
