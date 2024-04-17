@@ -121,6 +121,7 @@ public class ProjectService implements ProjectFacadePort {
         if (command.getGithubUserIdsAsProjectLeadersToInvite() != null) {
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
         }
+        final Set<UUID> unassignedLeaderIds = getUnassignedLeaderIds(command);
 
         final Set<Long> invitedLeaderGithubIds = new HashSet<>();
         final Set<Long> invitationCancelledLeaderGithubIds = new HashSet<>();
@@ -147,6 +148,23 @@ public class ProjectService implements ProjectFacadePort {
         }
         final String slug = this.projectStoragePort.getProjectSlugById(command.getId());
         return Pair.of(command.getId(), slug);
+    }
+
+    private Set<UUID> getUnassignedLeaderIds(UpdateProjectCommand command) {
+        if (command.getProjectLeadersToKeep() == null) {
+            return Set.of();
+        }
+
+        final var projectLeadIds = projectStoragePort.getProjectLeadIds(command.getId());
+        if (command.getProjectLeadersToKeep().stream()
+                .anyMatch(userId -> projectLeadIds.stream()
+                        .noneMatch(projectLeaderId -> projectLeaderId.equals(userId)))) {
+            throw OnlyDustException.badRequest("Project leaders to keep must be a subset of current project " +
+                                               "leaders");
+        }
+        return projectLeadIds.stream()
+                .filter(leaderId -> !command.getProjectLeadersToKeep().contains(leaderId))
+                .collect(Collectors.toSet());
     }
 
     private void getLinkedReposChanges(UpdateProjectCommand command, Set<Long> linkedRepoIds,

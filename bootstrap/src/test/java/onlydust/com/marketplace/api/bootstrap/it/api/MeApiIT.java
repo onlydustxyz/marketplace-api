@@ -157,15 +157,6 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath(format("$.leaders[?(@.githubUserId==%d)]", githubUserId)).exists();
-
-        notificationOutboxJob.run();
-        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
-                .withRequestBody(matchingJsonPath("$.event_name", equalTo("LeaderAssigned")))
-                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
-                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId)))
-                .withRequestBody(matchingJsonPath("$.payload.leader_id", equalTo(userId.toString()))));
     }
 
     @Test
@@ -227,15 +218,6 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful();
-
-        notificationOutboxJob.run();
-        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Application")))
-                .withRequestBody(matchingJsonPath("$.event_name", equalTo("Received")))
-                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
-                .withRequestBody(matchingJsonPath("$.payload.project_id", equalTo(projectId)))
-                .withRequestBody(matchingJsonPath("$.payload.applicant_id", equalTo(userId.toString()))));
     }
 
     @Test

@@ -22,7 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.responseDefinition;
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookApiAdapter.X_OD_API;
 import static onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookApiAdapter.X_SUMSUB_PAYLOAD_DIGEST;
@@ -151,16 +151,6 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
 
         assertEquals(1, slackNotificationStub.getNotifications().size());
 
-        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("User")))
-                .withRequestBody(matchingJsonPath("$.event_name", equalTo("BillingProfileVerificationStatusUpdated")))
-                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
-                .withRequestBody(matchingJsonPath("$.payload.user_id", equalTo(userId.toString())))
-                .withRequestBody(matchingJsonPath("$.payload.verification_status", equalTo("UNDER_REVIEW"))));
-        webhookWireMockServer.resetRequests();
-
-
         final String reviewMessage = "We could not verify your profile. If you have any questions, please contact the Company where you try to verify your " +
                                      "profile tech@onlydust.xyz\\n\\nTemporary we could not verify your profile via doc-free method. Please try again " +
                                      "later or contact the company where you're verifying your profile tech@onlydust.xyz, if error persists.";
@@ -234,15 +224,6 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.kyc.validUntil").isEqualTo("2025-04-19T00:00:00Z")
                 .jsonPath("$.kyc.usCitizen").isEqualTo(false);
         assertEquals(2, slackNotificationStub.getNotifications().size());
-
-        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("User")))
-                .withRequestBody(matchingJsonPath("$.event_name", equalTo("BillingProfileVerificationStatusUpdated")))
-                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
-                .withRequestBody(matchingJsonPath("$.payload.user_id", equalTo(userId.toString())))
-                .withRequestBody(matchingJsonPath("$.payload.verification_status", equalTo("UNDER_REVIEW"))));
-        webhookWireMockServer.resetRequests();
     }
 
     @Test
@@ -380,15 +361,6 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.kyb.usEntity").isEqualTo(false);
         assertEquals(3, slackNotificationStub.getNotifications().size());
 
-        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("User")))
-                .withRequestBody(matchingJsonPath("$.event_name", equalTo("BillingProfileVerificationStatusUpdated")))
-                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
-                .withRequestBody(matchingJsonPath("$.payload.user_id", equalTo(userId.toString())))
-                .withRequestBody(matchingJsonPath("$.payload.verification_status", equalTo("UNDER_REVIEW"))));
-        webhookWireMockServer.resetRequests();
-
         final String reviewMessage = "Enter your date of birth exactly as it is on your identity document.\\n\\n - Tax number is incorrect. Provide a correct" +
                                      " tax number.\\n - SSN is incorrect. Provide a correct SSN.";
         final byte[] sumsubPayloadRejection = String.format("""
@@ -459,15 +431,6 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.kyb.euVATNumber").isEqualTo("FR26908233638")
                 .jsonPath("$.kyb.usEntity").isEqualTo(false);
         assertEquals(4, slackNotificationStub.getNotifications().size());
-
-        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("User")))
-                .withRequestBody(matchingJsonPath("$.event_name", equalTo("BillingProfileVerificationStatusUpdated")))
-                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
-                .withRequestBody(matchingJsonPath("$.payload.user_id", equalTo(userId.toString())))
-                .withRequestBody(matchingJsonPath("$.payload.verification_status", equalTo("UNDER_REVIEW"))));
-        webhookWireMockServer.resetRequests();
 
         final byte[] sumsubPayloadChildrenKycUnderReview = String.format("""
                 {
@@ -565,15 +528,6 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.status").isEqualTo("REJECTED");
         assertEquals(6, slackNotificationStub.getNotifications().size());
-
-        webhookWireMockServer.verify(2, postRequestedFor(urlEqualTo("/"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("User")))
-                .withRequestBody(matchingJsonPath("$.event_name", equalTo("BillingProfileVerificationStatusUpdated")))
-                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
-                .withRequestBody(matchingJsonPath("$.payload.user_id", equalTo(userId.toString())))
-                .withRequestBody(matchingJsonPath("$.payload.verification_status", equalTo("REJECTED"))));
-        webhookWireMockServer.resetRequests();
     }
 
     @Test

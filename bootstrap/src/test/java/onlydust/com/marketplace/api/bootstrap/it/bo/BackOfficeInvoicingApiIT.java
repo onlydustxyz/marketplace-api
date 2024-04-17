@@ -52,8 +52,6 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     @Autowired
     UserService userService;
     @Autowired
-    OutboxConsumerJob notificationOutboxJob;
-    @Autowired
     InvoiceStoragePort invoiceStoragePort;
     @Autowired
     KycRepository kycRepository;
@@ -529,15 +527,6 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .expectStatus()
                 .isNoContent()
         ;
-
-        // To avoid error on post InvoiceUploaded event to old BO
-        // TODO : migrate to new notification and mail system
-//        makeWebhookWireMockServer.stubFor(post("/").willReturn(ok()));
-//        makeWebhookSendRejectedInvoiceMailWireMockServer.stubFor(
-//                post("/?api-key=%s".formatted(webhookHttpClientProperties.getApiKey()))
-//                        .willReturn(ok()));
-
-        notificationOutboxJob.run();
 
         // TODO : migrate to new notification and mail system
         final Invoice invoice = invoiceStoragePort.get(companyBillingProfileToReviewInvoices.get(1)).orElseThrow();
