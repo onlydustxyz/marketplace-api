@@ -8,4 +8,7 @@ public interface ProjectObserverPort {
 
     void onRewardSettingsChanged(UUID projectId);
 
+    void onUserApplied(UUID projectId, UUID userId, UUID applicationId);
+
+    void onProjectCreated(UUID projectId, UUID projectLeadId);
 }

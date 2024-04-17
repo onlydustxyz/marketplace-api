@@ -6,10 +6,8 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
-import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.mocks.DeterministicDateProvider;
 import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.model.notification.ProjectCreated;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
@@ -46,11 +44,10 @@ public class ProjectServiceTest {
     private final GithubStoragePort githubStoragePort = mock(GithubStoragePort.class);
     private final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
     private final ProjectObserverPort projectObserverPort = mock(ProjectObserverPort.class);
-    private final NotificationPort notificationPort = mock(NotificationPort.class);
     private final ProjectService projectService = new ProjectService(projectObserverPort, projectStoragePort,
             imageStoragePort,
             uuidGeneratorPort, permissionService, indexerPort, dateProvider,
-            contributionStoragePort, dustyBotStoragePort, githubStoragePort, notificationPort);
+            contributionStoragePort, dustyBotStoragePort, githubStoragePort);
 
     @BeforeEach
     void setUp() {
@@ -162,12 +159,12 @@ public class ProjectServiceTest {
         assertNotNull(projectIdentity.getLeft());
         assertThat(projectIdentity.getRight()).isEqualTo("slug");
         verify(indexerPort, times(1)).indexUsers(usersToInviteAsProjectLeaders);
-        final ArgumentCaptor<ProjectCreated> projectCreatedArgumentCaptor = ArgumentCaptor.forClass(ProjectCreated.class);
-        verify(notificationPort).notify(projectCreatedArgumentCaptor.capture());
+        final ArgumentCaptor<UUID> uuidArgumentCaptor = ArgumentCaptor.forClass(UUID.class);
+        verify(projectObserverPort).onProjectCreated(uuidArgumentCaptor.capture(), uuidArgumentCaptor.capture());
         verify(projectObserverPort).onLinkedReposChanged(expectedProjectId,
                 command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of());
-        assertEquals(expectedProjectId, projectCreatedArgumentCaptor.getValue().getProjectId());
-        assertEquals(projectLeadId, projectCreatedArgumentCaptor.getValue().getUserId());
+        assertEquals(expectedProjectId, uuidArgumentCaptor.getAllValues().get(0));
+        assertEquals(projectLeadId, uuidArgumentCaptor.getAllValues().get(1));
     }
 
 
@@ -521,7 +518,7 @@ public class ProjectServiceTest {
         final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort,
                 mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, indexerPort, dateProvider,
-                mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class), mock(GithubStoragePort.class), mock(NotificationPort.class));
+                mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class), mock(GithubStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final UUID projectLeadId = UUID.randomUUID();
         final String githubRepoOwner = faker.name().username();
@@ -593,7 +590,7 @@ public class ProjectServiceTest {
         final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort,
                 mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, indexerPort, dateProvider,
-                mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class), mock(GithubStoragePort.class), mock(NotificationPort.class));
+                mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class), mock(GithubStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final UUID projectLeadId = UUID.randomUUID();
         final String githubRepoOwner = faker.name().username();

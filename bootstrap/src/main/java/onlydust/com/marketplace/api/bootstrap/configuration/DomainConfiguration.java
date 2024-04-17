@@ -54,8 +54,7 @@ public class DomainConfiguration {
                                                final DateProvider dateProvider,
                                                final ContributionStoragePort contributionStoragePort,
                                                final DustyBotStoragePort dustyBotStoragePort,
-                                               final GithubStoragePort githubStoragePort,
-                                               final NotificationPort notificationPort) {
+                                               final GithubStoragePort githubStoragePort) {
         return new ProjectService(projectObserverPort,
                 projectStoragePort,
                 imageStoragePort,
@@ -65,8 +64,7 @@ public class DomainConfiguration {
                 dateProvider,
                 contributionStoragePort,
                 dustyBotStoragePort,
-                githubStoragePort,
-                notificationPort);
+                githubStoragePort);
     }
 
     @Bean
@@ -98,7 +96,7 @@ public class DomainConfiguration {
                                          final ProjectStoragePort projectStoragePort,
                                          final GithubSearchPort githubSearchPort,
                                          final ImageStoragePort imageStoragePort,
-                                         final NotificationPort notificationPort) {
+                                         final ProjectObserverPort projectObserverPort) {
         return new UserService(
                 userObserverPort,
                 postgresUserAdapter,
@@ -106,7 +104,7 @@ public class DomainConfiguration {
                 projectStoragePort,
                 githubSearchPort,
                 imageStoragePort,
-                notificationPort);
+                projectObserverPort);
     }
 
     @Bean
@@ -181,8 +179,9 @@ public class DomainConfiguration {
 
     @Bean
     public ProjectObserverPort projectObserverPort(final ContributionStoragePort contributionStoragePort,
-                                                   final OutboxPort indexerOutbox) {
-        return new ProjectObserver(contributionStoragePort, indexerOutbox);
+                                                   final OutboxPort indexerOutbox,
+                                                   final NotificationPort notificationPort) {
+        return new ProjectObserver(contributionStoragePort, indexerOutbox, notificationPort);
     }
 
 

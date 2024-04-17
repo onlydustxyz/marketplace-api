@@ -46,7 +46,6 @@ public class ProjectService implements ProjectFacadePort {
     private final ContributionStoragePort contributionStoragePort;
     private final DustyBotStoragePort dustyBotStoragePort;
     private final GithubStoragePort githubStoragePort;
-    private final NotificationPort notificationPort;
 
     @Override
     public ProjectDetailsView getById(UUID projectId, User caller) {
@@ -105,7 +104,7 @@ public class ProjectService implements ProjectFacadePort {
                 command.getImageUrl(),
                 ProjectRewardSettings.defaultSettings(dateProvider.now()), command.getEcosystemIds());
 
-        notificationPort.notify(new ProjectCreated(projectId, projectLeadId, dateProvider.now()));
+        projectObserverPort.onProjectCreated(projectId, projectLeadId);
         if (nonNull(command.getGithubRepoIds())) {
             projectObserverPort.onLinkedReposChanged(projectId, Set.copyOf(command.getGithubRepoIds()), Set.of());
         }

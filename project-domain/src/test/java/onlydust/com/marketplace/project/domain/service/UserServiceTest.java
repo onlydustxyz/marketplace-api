@@ -5,7 +5,6 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
-import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.mocks.DeterministicDateProvider;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
@@ -40,7 +39,7 @@ public class UserServiceTest {
     private ImageStoragePort imageStoragePort;
     private UserService userService;
     private UserObserverPort userObserverPort;
-    private NotificationPort notificationPort;
+    private ProjectObserverPort projectObserverPort;
 
     @BeforeEach
     void setUp() {
@@ -49,10 +48,10 @@ public class UserServiceTest {
         projectStoragePort = mock(ProjectStoragePort.class);
         githubSearchPort = mock(GithubSearchPort.class);
         imageStoragePort = mock(ImageStoragePort.class);
-        notificationPort = mock(NotificationPort.class);
+        projectObserverPort = mock(ProjectObserverPort.class);
 
         userService = new UserService(userObserverPort, userStoragePort, dateProvider,
-                projectStoragePort, githubSearchPort, imageStoragePort, notificationPort);
+                projectStoragePort, githubSearchPort, imageStoragePort, projectObserverPort);
     }
 
     @Test
@@ -271,12 +270,15 @@ public class UserServiceTest {
         // Given
         final UUID projectId = UUID.randomUUID();
         final UUID userId = UUID.randomUUID();
+        final UUID applicationId = UUID.randomUUID();
 
         // When
+        when(userStoragePort.createApplicationOnProject(userId, projectId)).thenReturn(applicationId);
         userService.applyOnProject(userId, projectId);
 
         // Then
         verify(userStoragePort, times(1)).createApplicationOnProject(userId, projectId);
+        verify(projectObserverPort, times(1)).onUserApplied(projectId, userId, applicationId);
     }
 
     @Test

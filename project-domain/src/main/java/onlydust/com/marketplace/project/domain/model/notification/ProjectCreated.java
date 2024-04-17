@@ -18,5 +18,4 @@ import java.util.UUID;
 public class ProjectCreated extends Event {
     UUID projectId;
     UUID userId;
-    Date createdAt;
 }

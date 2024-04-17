@@ -60,11 +60,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @ContextConfiguration(initializers = AbstractMarketplaceBackOfficeApiIT.WireMockInitializer.class)
 @EnableWireMock({
         @ConfigureWireMock(name = "auth0", property = "application.web.auth0.user-info-url"),
-        @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri"),
-        @ConfigureWireMock(name = "rust-api", property = "infrastructure.od.api.client.baseUri"),
-        @ConfigureWireMock(name = "make-webhook-send-rejected-invoice-mail", property = "infrastructure.make.webhook.sendRejectedInvoiceMailUrl"),
-        @ConfigureWireMock(name = "make-webhook", property = "infrastructure.make.webhook.url"),
-        @ConfigureWireMock(name = "make-webhook-send-rewards-paid", property = "infrastructure.make.webhook.sendRewardsPaidMailUrl"),
+        @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri")
 })
 public class AbstractMarketplaceBackOfficeApiIT {
     private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
@@ -93,15 +89,6 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected WireMockServer auth0WireMockServer;
     @InjectWireMock("indexer-api")
     protected WireMockServer indexerApiWireMockServer;
-    @InjectWireMock("rust-api")
-    protected WireMockServer rustApiWireMockServer;
-    @InjectWireMock("make-webhook-send-rejected-invoice-mail")
-    protected WireMockServer makeWebhookSendRejectedInvoiceMailWireMockServer;
-    @InjectWireMock("make-webhook-send-rewards-paid")
-    protected WireMockServer makeWebhookSendRewardsPaidMailWireMockServer;
-    @InjectWireMock("make-webhook")
-    protected WireMockServer makeWebhookWireMockServer;
-
     @Autowired
     ApiKeyAuthenticationService.Config backOfficeApiKeyAuthenticationConfig;
 
