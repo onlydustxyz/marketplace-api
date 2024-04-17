@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
@@ -11,8 +10,9 @@ import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.view.EcosystemView;
 import onlydust.com.marketplace.project.domain.view.ProjectCardView;
 import onlydust.com.marketplace.project.domain.view.ProjectLeaderLinkView;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public class ProjectPageItemViewEntity {
     @Column(name = "short_description")
     String shortDescription;
     @Enumerated(EnumType.STRING)
-    @Type(PostgreSQLEnumType.class)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "project_visibility")
     ProjectVisibilityEnumEntity visibility;
     Integer repoCount;

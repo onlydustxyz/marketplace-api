@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
@@ -10,7 +9,9 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmplo
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileStatsViewEntity;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.ZoneOffset;
@@ -36,12 +37,12 @@ public class BillingProfileEntity {
     UUID id;
     String name;
     @Enumerated(EnumType.STRING)
-    @org.hibernate.annotations.Type(PostgreSQLEnumType.class)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "billing_profile_type")
     Type type;
     Date invoiceMandateAcceptedAt;
     @Enumerated(EnumType.STRING)
-    @org.hibernate.annotations.Type(PostgreSQLEnumType.class)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "verification_status")
     VerificationStatusEntity verificationStatus;
 

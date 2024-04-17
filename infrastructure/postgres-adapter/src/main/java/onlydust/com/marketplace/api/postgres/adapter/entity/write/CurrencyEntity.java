@@ -1,12 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.net.URI;
 import java.util.Objects;
@@ -29,7 +30,7 @@ public class CurrencyEntity {
     @EqualsAndHashCode.Include
     private @NonNull UUID id;
     @Enumerated(EnumType.STRING)
-    @org.hibernate.annotations.Type(PostgreSQLEnumType.class)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "currency_type")
     private @NonNull Type type;
     private @NonNull String name;

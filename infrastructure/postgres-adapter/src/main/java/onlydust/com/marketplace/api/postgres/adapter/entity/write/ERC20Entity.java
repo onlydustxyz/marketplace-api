@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
@@ -10,6 +9,8 @@ import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmContractAddress;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -27,7 +28,7 @@ public class ERC20Entity {
     @Id
     @EqualsAndHashCode.Include
     @Enumerated(EnumType.STRING)
-    @org.hibernate.annotations.Type(PostgreSQLEnumType.class)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "network")
     private @NonNull NetworkEnumEntity blockchain;
     @Id

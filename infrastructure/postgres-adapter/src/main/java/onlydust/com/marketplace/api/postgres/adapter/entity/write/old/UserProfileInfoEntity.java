@@ -1,12 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.AllocatedTimeEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 
 import java.util.List;
@@ -36,11 +36,11 @@ public class UserProfileInfoEntity {
     @Column(name = "avatar_url")
     String avatarUrl;
     @Enumerated(EnumType.STRING)
-    @Type(PostgreSQLEnumType.class)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "weekly_allocated", name = "weekly_allocated_time", nullable = false)
     AllocatedTimeEnumEntity allocatedTime;
     @Enumerated(EnumType.STRING)
-    @Type(PostgreSQLEnumType.class)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "profile_cover")
     ProfileCoverEnumEntity cover;
     @JdbcTypeCode(SqlTypes.JSON)

@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.contract.model.InlineResponse200;
+import onlydust.com.marketplace.api.contract.model.GetAPIVersion200Response;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ public class VersionApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_server_starting_date() {
         // Given
-        final InlineResponse200 inlineResponse200 = new InlineResponse200()
+        final var response = new GetAPIVersion200Response()
                 .releaseDate(DateMapper.toZoneDateTime(startingDate));
 
         // When
@@ -27,6 +27,6 @@ public class VersionApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .equals(inlineResponse200);
+                .equals(response);
     }
 }

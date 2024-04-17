@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
@@ -11,7 +10,9 @@ import onlydust.com.marketplace.project.domain.model.GithubRepo;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.view.ContributionDetailsView;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 
 import java.io.Serializable;
@@ -30,11 +31,11 @@ public class ContributionDetailsViewEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "contribution_status")
-    @org.hibernate.annotations.Type(PostgreSQLEnumType.class)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     Type type;
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "contribution_status")
-    @org.hibernate.annotations.Type(PostgreSQLEnumType.class)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     Status status;
 
     Long githubNumber;
@@ -57,7 +58,7 @@ public class ContributionDetailsViewEntity {
     String projectLogoUrl;
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "project_visibility")
-    @org.hibernate.annotations.Type(com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType.class)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     ProjectVisibilityEnumEntity projectVisibility;
 
     Long repoId;
@@ -75,7 +76,7 @@ public class ContributionDetailsViewEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "github_pull_request_review_state")
-    @org.hibernate.annotations.Type(com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType.class)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     GithubPullRequestReviewState prReviewState;
 
     @EqualsAndHashCode

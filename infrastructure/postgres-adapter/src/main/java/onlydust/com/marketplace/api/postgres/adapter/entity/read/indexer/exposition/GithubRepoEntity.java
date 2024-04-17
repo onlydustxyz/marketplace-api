@@ -1,12 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.util.Date;
 import java.util.List;
@@ -46,7 +46,7 @@ public class GithubRepoEntity {
             inverseJoinColumns = @JoinColumn(name = "project_id"))
     ProjectEntity project;
     @Enumerated(EnumType.STRING)
-    @Type(PostgreSQLEnumType.class)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "github_repo_visibility")
     Visibility visibility;
 

@@ -31,5 +31,9 @@
             <artifactId>commons-cli</artifactId>
             <version>1.6.0</version>
         </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>accounting-domain</artifactId>
+        </dependency>
     </dependencies>
 </project>

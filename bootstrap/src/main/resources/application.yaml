@@ -50,8 +50,9 @@ spring:
       initial-size: 1
       minimumIdle: 1
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
+      '[hypersistence.utils.enable_types_contributor]': false
       hibernate:
         query:
           in_clause_parameter_padding: true

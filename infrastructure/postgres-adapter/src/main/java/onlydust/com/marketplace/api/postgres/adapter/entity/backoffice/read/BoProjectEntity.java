@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,8 +7,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.view.backoffice.OldProjectView;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
@@ -35,7 +35,7 @@ public class BoProjectEntity {
     Integer rank;
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "visibility")
-    @Type(PostgreSQLEnumType.class)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     ProjectVisibility visibility;
     @JdbcTypeCode(SqlTypes.JSON)
     List<UUID> projectLeadIds;

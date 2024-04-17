@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
@@ -28,7 +28,7 @@ public class BillingProfileUserInvitationEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "billing_profile_role")
-    @Type(PostgreSQLEnumType.class)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     BillingProfileUserEntity.Role role;
 
     Date invitedAt;
