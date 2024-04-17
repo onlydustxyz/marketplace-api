@@ -94,7 +94,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         final var projectIdentity =
-                projectFacadePort.createProject(mapCreateProjectCommandToDomain(createProjectRequest,
+                projectFacadePort.createProject(authenticatedUser.getId(), mapCreateProjectCommandToDomain(createProjectRequest,
                         authenticatedUser.getId()));
 
         final CreateProjectResponse createProjectResponse = new CreateProjectResponse();

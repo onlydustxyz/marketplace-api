@@ -26,7 +26,7 @@ public interface ProjectFacadePort {
                                                                       Integer pageIndex, Integer pageSize);
 
 
-    Pair<UUID, String> createProject(CreateProjectCommand createProjectCommand);
+    Pair<UUID, String> createProject(UUID projectLeadId, CreateProjectCommand createProjectCommand);
 
     Pair<UUID, String> updateProject(UUID projectLeadId, UpdateProjectCommand updateProjectCommand);
 

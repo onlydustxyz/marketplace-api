@@ -9,6 +9,7 @@ import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.notification.ProjectCreated;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.*;
@@ -88,7 +89,7 @@ public class ProjectService implements ProjectFacadePort {
 
     @Override
     @Transactional
-    public Pair<UUID, String> createProject(CreateProjectCommand command) {
+    public Pair<UUID, String> createProject(final UUID projectLeadId, final CreateProjectCommand command) {
         if (command.getGithubUserIdsAsProjectLeadersToInvite() != null) {
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
         }
@@ -104,7 +105,7 @@ public class ProjectService implements ProjectFacadePort {
                 command.getImageUrl(),
                 ProjectRewardSettings.defaultSettings(dateProvider.now()), command.getEcosystemIds());
 
-        notificationPort.notify(null);
+        notificationPort.notify(new ProjectCreated(projectId, projectLeadId, dateProvider.now()));
         if (nonNull(command.getGithubRepoIds())) {
             projectObserverPort.onLinkedReposChanged(projectId, Set.copyOf(command.getGithubRepoIds()), Set.of());
         }
@@ -120,8 +121,6 @@ public class ProjectService implements ProjectFacadePort {
         if (command.getGithubUserIdsAsProjectLeadersToInvite() != null) {
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
         }
-
-        final Set<UUID> unassignedLeaderIds = getUnassignedLeaderIds(command);
 
         final Set<Long> invitedLeaderGithubIds = new HashSet<>();
         final Set<Long> invitationCancelledLeaderGithubIds = new HashSet<>();
@@ -175,23 +174,6 @@ public class ProjectService implements ProjectFacadePort {
             invitedLeaderGithubIds.addAll(command.getGithubUserIdsAsProjectLeadersToInvite().stream()
                     .filter(leaderId -> !projectInvitedLeadIds.contains(leaderId)).toList());
         }
-    }
-
-    private Set<UUID> getUnassignedLeaderIds(UpdateProjectCommand command) {
-        if (command.getProjectLeadersToKeep() == null) {
-            return Set.of();
-        }
-
-        final var projectLeadIds = projectStoragePort.getProjectLeadIds(command.getId());
-        if (command.getProjectLeadersToKeep().stream()
-                .anyMatch(userId -> projectLeadIds.stream()
-                        .noneMatch(projectLeaderId -> projectLeaderId.equals(userId)))) {
-            throw OnlyDustException.badRequest("Project leaders to keep must be a subset of current project " +
-                                               "leaders");
-        }
-        return projectLeadIds.stream()
-                .filter(leaderId -> !command.getProjectLeadersToKeep().contains(leaderId))
-                .collect(Collectors.toSet());
     }
 
     @Override

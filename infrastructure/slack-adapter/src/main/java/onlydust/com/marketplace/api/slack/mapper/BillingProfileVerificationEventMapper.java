@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.slack;
+package onlydust.com.marketplace.api.slack.mapper;
 
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
@@ -45,9 +45,9 @@ public interface BillingProfileVerificationEventMapper {
                     	]""";
 
 
-    static String billingProfileUpdatedToSlackNotification(final BillingProfileVerificationUpdated billingProfileVerificationUpdated,
-                                                           final User user,
-                                                           final Boolean tagAllChannel) {
+    static String mapToSlackBlock(final BillingProfileVerificationUpdated billingProfileVerificationUpdated,
+                                  final User user,
+                                  final Boolean tagAllChannel) {
         String mainMessage = "*New %s event : <%s|Check on Sumsub>*".formatted(billingProfileVerificationUpdated.getType().name(),
                 "https://cockpit.sumsub.com/checkus/#/applicant/%s/basicInfo?clientId=onlydust".formatted(billingProfileVerificationUpdated.getExternalApplicantId()));
         // Enabling notifications pinging all the channel only for closed KYC/KYB

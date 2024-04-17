@@ -16,7 +16,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationSt
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeAccountingManagementRestApi;
-import onlydust.com.marketplace.api.webhook.Config;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
@@ -39,8 +38,6 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
     BillingProfileService billingProfileService;
     @Autowired
     AccountingHelper accountingHelper;
-    @Autowired
-    Config webhookHttpClientProperties;
     @Autowired
     KycRepository kycRepository;
     @Autowired

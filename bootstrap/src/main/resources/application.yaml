@@ -151,4 +151,5 @@ infrastructure:
     environment: ${ENV}
     token: ${SLACK_TOKEN}
     kyc-kyb-channel: '#kyc-kyb'
+    dev-rel-channel: '#dev-rel'
     tag-all-channel: ${SLACK_PING_ALL_CHANNEL_FOR_CLOSED_BILLING_PROFILE}

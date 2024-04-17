@@ -5,6 +5,7 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.mocks.DeterministicDateProvider;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
@@ -38,20 +39,20 @@ public class UserServiceTest {
     private GithubSearchPort githubSearchPort;
     private ImageStoragePort imageStoragePort;
     private UserService userService;
-    private ProjectObserverPort projectObserverPort;
     private UserObserverPort userObserverPort;
+    private NotificationPort notificationPort;
 
     @BeforeEach
     void setUp() {
-        projectObserverPort = mock(ProjectObserverPort.class);
         userObserverPort = mock(UserObserverPort.class);
         userStoragePort = mock(UserStoragePort.class);
         projectStoragePort = mock(ProjectStoragePort.class);
         githubSearchPort = mock(GithubSearchPort.class);
         imageStoragePort = mock(ImageStoragePort.class);
+        notificationPort = mock(NotificationPort.class);
 
-        userService = new UserService(projectObserverPort, userObserverPort, userStoragePort, dateProvider,
-                projectStoragePort, githubSearchPort, imageStoragePort);
+        userService = new UserService(userObserverPort, userStoragePort, dateProvider,
+                projectStoragePort, githubSearchPort, imageStoragePort, notificationPort);
     }
 
     @Test

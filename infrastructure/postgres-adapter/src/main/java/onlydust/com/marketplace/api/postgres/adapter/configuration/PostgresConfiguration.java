@@ -238,11 +238,6 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresOutboxAdapter<NotificationEventEntity> notificationOutbox(final NotificationEventRepository notificationEventRepository) {
-        return new PostgresOutboxAdapter<>(notificationEventRepository);
-    }
-
-    @Bean
     public PostgresOutboxAdapter<IndexerEventEntity> indexerOutbox(final IndexerEventRepository indexerEventRepository) {
         return new PostgresOutboxAdapter<>(indexerEventRepository);
     }

@@ -7,5 +7,6 @@ public class SlackProperties {
     String token;
     String environment;
     String kycKybChannel;
+    String devRelChannel;
     Boolean tagAllChannel;
 }

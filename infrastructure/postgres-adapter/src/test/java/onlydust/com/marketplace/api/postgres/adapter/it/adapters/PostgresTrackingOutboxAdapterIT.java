@@ -3,8 +3,9 @@ package onlydust.com.marketplace.api.postgres.adapter.it.adapters;
 import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEventEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.TrackingEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
-import onlydust.com.marketplace.api.postgres.adapter.repository.NotificationEventRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.TrackingEventRepository;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.EventType;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,12 +17,12 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class PostgresNotificationOutboxAdapterIT extends AbstractPostgresIT {
+class PostgresTrackingOutboxAdapterIT extends AbstractPostgresIT {
 
     @Autowired
-    PostgresOutboxAdapter<NotificationEventEntity> postgresOutboxAdapter;
+    PostgresOutboxAdapter<TrackingEventEntity> postgresOutboxAdapter;
     @Autowired
-    NotificationEventRepository notificationEventRepository;
+    TrackingEventRepository trackingEventRepository;
 
     @Data
     @NoArgsConstructor
@@ -49,11 +50,11 @@ class PostgresNotificationOutboxAdapterIT extends AbstractPostgresIT {
 
     @BeforeEach
     void setUp() {
-        notificationEventRepository.deleteAll();
+        trackingEventRepository.deleteAll();
     }
 
     @Test
-    void should_save_and_get_notification() {
+    void should_save_and_get_tracking_event() {
         // Given
         final Event event = new TestEvent(UUID.randomUUID());
 
@@ -206,7 +207,7 @@ class PostgresNotificationOutboxAdapterIT extends AbstractPostgresIT {
         postgresOutboxAdapter.ack(notificationPeeked.get(0).id());
         assertThat(postgresOutboxAdapter.peek()).isEmpty();
 
-        final var entity = notificationEventRepository.findAll().get(0);
+        final var entity = trackingEventRepository.findAll().get(0);
         assertThat(entity.getStatus()).isEqualTo(NotificationEventEntity.Status.PROCESSED);
         assertThat(entity.getError()).isNull();
     }
@@ -231,7 +232,7 @@ class PostgresNotificationOutboxAdapterIT extends AbstractPostgresIT {
         assertThat(notificationPeeked.get(0).id()).isNotNull();
         assertThat(notificationPeeked.get(0).event()).isEqualTo(event);
 
-        final var entity = notificationEventRepository.findAll().get(0);
+        final var entity = trackingEventRepository.findAll().get(0);
         assertThat(entity.getStatus()).isEqualTo(NotificationEventEntity.Status.FAILED);
         assertThat(entity.getError()).isEqualTo("Some error");
     }
@@ -251,7 +252,7 @@ class PostgresNotificationOutboxAdapterIT extends AbstractPostgresIT {
         postgresOutboxAdapter.skip(notificationPeeked.get(0).id(), "Some reason to skip");
 
         // Then
-        final var entity = notificationEventRepository.findAll().get(0);
+        final var entity = trackingEventRepository.findAll().get(0);
         assertThat(entity.getStatus()).isEqualTo(NotificationEventEntity.Status.SKIPPED);
         assertThat(entity.getError()).isEqualTo("Some reason to skip");
     }

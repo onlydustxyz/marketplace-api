@@ -18,6 +18,7 @@ import onlydust.com.marketplace.project.domain.view.ProjectDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardableItemView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -140,6 +141,7 @@ public class ProjectServiceTest {
                 .ecosystemIds(ecosystemIds)
                 .build();
         final UUID expectedProjectId = UUID.randomUUID();
+        final UUID projectLeadId = UUID.randomUUID();
 
         // When
         when(uuidGeneratorPort.generate()).thenReturn(expectedProjectId);
@@ -153,16 +155,19 @@ public class ProjectServiceTest {
                 imageUrl,
                 ProjectRewardSettings.defaultSettings(dateProvider.now()), ecosystemIds
         )).thenReturn("slug");
-        final var projectIdentity = projectService.createProject(command);
+        final var projectIdentity = projectService.createProject(projectLeadId, command);
 
         // Then
         assertNotNull(projectIdentity);
         assertNotNull(projectIdentity.getLeft());
         assertThat(projectIdentity.getRight()).isEqualTo("slug");
         verify(indexerPort, times(1)).indexUsers(usersToInviteAsProjectLeaders);
-        verify(notificationPort).notify(new ProjectCreated());
+        final ArgumentCaptor<ProjectCreated> projectCreatedArgumentCaptor = ArgumentCaptor.forClass(ProjectCreated.class);
+        verify(notificationPort).notify(projectCreatedArgumentCaptor.capture());
         verify(projectObserverPort).onLinkedReposChanged(expectedProjectId,
                 command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of());
+        assertEquals(expectedProjectId, projectCreatedArgumentCaptor.getValue().getProjectId());
+        assertEquals(projectLeadId, projectCreatedArgumentCaptor.getValue().getUserId());
     }
 
 
@@ -513,10 +518,10 @@ public class ProjectServiceTest {
         final PermissionService permissionService = new PermissionService(projectStoragePort,
                 mock(ContributionStoragePort.class));
         final IndexerPort indexerPort = mock(IndexerPort.class);
-        final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort, mock(ProjectRewardStoragePort.class),
+        final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort,
                 mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, indexerPort, dateProvider,
-                mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class), mock(GithubStoragePort.class));
+                mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class), mock(GithubStoragePort.class), mock(NotificationPort.class));
         final UUID projectId = UUID.randomUUID();
         final UUID projectLeadId = UUID.randomUUID();
         final String githubRepoOwner = faker.name().username();
@@ -585,10 +590,10 @@ public class ProjectServiceTest {
         final PermissionService permissionService = new PermissionService(projectStoragePort,
                 mock(ContributionStoragePort.class));
         final IndexerPort indexerPort = mock(IndexerPort.class);
-        final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort, mock(ProjectRewardStoragePort.class),
+        final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort,
                 mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, indexerPort, dateProvider,
-                mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class), mock(GithubStoragePort.class));
+                mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class), mock(GithubStoragePort.class), mock(NotificationPort.class));
         final UUID projectId = UUID.randomUUID();
         final UUID projectLeadId = UUID.randomUUID();
         final String githubRepoOwner = faker.name().username();

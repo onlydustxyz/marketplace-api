@@ -10,7 +10,7 @@ import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
+import onlydust.com.marketplace.project.domain.model.notification.UserAppliedOnProject;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
@@ -147,7 +147,7 @@ public class UserService implements UserFacadePort {
     @Override
     public void applyOnProject(UUID userId, UUID projectId) {
         final var applicationId = userStoragePort.createApplicationOnProject(userId, projectId);
-        notificationPort.notify(null);
+        notificationPort.notify(new UserAppliedOnProject(applicationId, projectId, userId, dateProvider.now()));
     }
 
     @Override
