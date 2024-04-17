@@ -11,7 +11,8 @@ import java.util.UUID;
 
 public interface NewcomerViewEntityRepository extends JpaRepository<NewcomerViewEntity, Long> {
     @Query(value = """
-            SELECT c.contributor_id                    AS id,
+            SELECT DISTINCT
+                   c.contributor_id                    AS id,
                    c.contributor_login                 AS login,
                    c.contributor_html_url              AS html_url,
                    c.contributor_avatar_url            AS avatar_url,

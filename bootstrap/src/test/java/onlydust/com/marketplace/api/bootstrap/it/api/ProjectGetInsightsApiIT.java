@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
@@ -168,7 +169,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                         """);
     }
 
-    private void patchPullRequestContributionsForNewcomer(long githubRepoId, long prNumber, ZonedDateTime createdAt) {
+    private void patchPullRequestContributionsForNewcomer(long githubRepoId, List<Long> prNumbers, ZonedDateTime createdAt) {
         final EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("""
@@ -176,27 +177,27 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                         SET created_at = :createdAt
                         WHERE
                             repo_id = :repoId AND
-                            github_number = :prNumber AND
+                            github_number in :prNumbers AND
                             type = 'PULL_REQUEST'
                         """)
                 .setParameter("createdAt", createdAt)
                 .setParameter("repoId", githubRepoId)
-                .setParameter("prNumber", prNumber)
+                .setParameter("prNumbers", prNumbers)
                 .executeUpdate();
 
         em.createNativeQuery("""
                         DELETE FROM indexer_exp.contributions
                         WHERE
                             repo_id = :repoId AND
-                            ((github_number != :prNumber AND type = 'PULL_REQUEST') OR type != 'PULL_REQUEST') AND
-                            contributor_id = (
+                            ((github_number not in :prNumbers AND type = 'PULL_REQUEST') OR type != 'PULL_REQUEST') AND
+                            contributor_id IN (
                                 SELECT contributor_id
                                 FROM indexer_exp.contributions
-                                WHERE repo_id = :repoId AND github_number = :prNumber AND type = 'PULL_REQUEST'
+                                WHERE repo_id = :repoId AND github_number in :prNumbers AND type = 'PULL_REQUEST'
                             )
                         """)
                 .setParameter("repoId", githubRepoId)
-                .setParameter("prNumber", prNumber)
+                .setParameter("prNumbers", prNumbers)
                 .executeUpdate();
 
         em.flush();
@@ -327,9 +328,9 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
         // Given
         final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
-        patchPullRequestContributionsForNewcomer(498695724, 1459, ZonedDateTime.now().minusDays(1)); // A newcomer
-        patchPullRequestContributionsForNewcomer(498695724, 2, ZonedDateTime.now().minusDays(29)); // Still a newcomer
-        patchPullRequestContributionsForNewcomer(498695724, 37, ZonedDateTime.now().minusDays(31)); // No longer a newcomer
+        patchPullRequestContributionsForNewcomer(498695724, List.of(1459L, 1497L, 1500L), ZonedDateTime.now().minusDays(1)); // A newcomer
+        patchPullRequestContributionsForNewcomer(498695724, List.of(2L), ZonedDateTime.now().minusDays(29)); // Still a newcomer
+        patchPullRequestContributionsForNewcomer(498695724, List.of(37L), ZonedDateTime.now().minusDays(31)); // No longer a newcomer
 
         // When
         client.get()
