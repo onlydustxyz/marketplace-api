@@ -546,7 +546,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectBody(AccountResponse.class)
                 .returnResult().getResponseBody();
 
-        assertThat(response.getLockedUntil().toString()).isEqualTo("2024-01-31T00:00Z[UTC]");
+        assertThat(response.getLockedUntil().toString()).isEqualTo("2024-01-31T00:00Z");
 
         // When
         client.patch()

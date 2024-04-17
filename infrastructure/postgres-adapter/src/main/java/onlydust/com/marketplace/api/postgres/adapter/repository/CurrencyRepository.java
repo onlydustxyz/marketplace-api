@@ -14,7 +14,7 @@ public interface CurrencyRepository extends JpaRepository<CurrencyEntity, UUID> 
     Optional<CurrencyEntity> findByCode(String code);
 
     @Query(value = """
-            SELECT *
+            SELECT c.*
             FROM currencies c
             JOIN rewards r on r.currency_id = c.id
             WHERE r.recipient_id = :githubUserId
