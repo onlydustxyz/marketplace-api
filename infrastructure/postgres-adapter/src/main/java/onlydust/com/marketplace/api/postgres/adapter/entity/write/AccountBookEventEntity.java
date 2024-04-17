@@ -55,7 +55,7 @@ public class AccountBookEventEntity {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Payload implements Serializable {
+    public static class Payload {
         @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "@type")
         @JsonTypeIdResolver(EventIdResolver.class)
         private AccountBookEvent event;
