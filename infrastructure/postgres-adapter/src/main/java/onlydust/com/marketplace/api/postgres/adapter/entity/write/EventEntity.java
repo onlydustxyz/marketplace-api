@@ -17,7 +17,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 
-import java.io.Serializable;
 import java.time.Instant;
 
 @MappedSuperclass
@@ -30,7 +29,7 @@ public abstract class EventEntity {
     Long id;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb", nullable = false)
+    @Column(nullable = false)
     Payload payload;
 
     @Enumerated(EnumType.STRING)
@@ -66,7 +65,7 @@ public abstract class EventEntity {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Payload implements Serializable {
+    public static class Payload {
 
         @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "@type")
         @JsonTypeIdResolver(EventIdResolver.class)
