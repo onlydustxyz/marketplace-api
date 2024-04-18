@@ -35,7 +35,7 @@
         <spring-boot-starter-web.version>3.2.4</spring-boot-starter-web.version>
         <start-class>onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplication</start-class>
         <jackson.version>2.15.4</jackson.version>
-        <aws-java-sdk-s3.version>1.12.322</aws-java-sdk-s3.version>
+        <aws-java-sdk-s3.version>1.12.701</aws-java-sdk-s3.version>
         <liquibase-core.version>4.24.0</liquibase-core.version>
         <logback.version>1.3.7</logback.version>
         <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
