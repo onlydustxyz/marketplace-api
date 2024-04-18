@@ -47,8 +47,6 @@
         <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
         <spring-boot-starter-security.version>3.2.4</spring-boot-starter-security.version>
         <spring-boot-starter-validation.version>3.2.4</spring-boot-starter-validation.version>
-        <jjwt.version>0.9.1</jjwt.version>
-        <jjwt-impl.version>0.11.5</jjwt-impl.version>
         <slack-api-client.version>1.38.1</slack-api-client.version>
         <kotlin.version>1.9.20</kotlin.version>
     </properties>
@@ -135,28 +133,6 @@
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-core</artifactId>
                 <version>${liquibase-core.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt-api</artifactId>
-                <version>${jjwt-impl.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt-impl</artifactId>
-                <version>${jjwt-impl.version}</version>
-                <scope>runtime</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt-jackson</artifactId>
-                <version>${jjwt-impl.version}</version>
-                <scope>runtime</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt</artifactId>
-                <version>${jjwt.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.auth0</groupId>
