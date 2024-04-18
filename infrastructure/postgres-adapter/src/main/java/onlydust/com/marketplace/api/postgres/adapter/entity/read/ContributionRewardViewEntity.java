@@ -10,7 +10,8 @@ import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.view.ContributionRewardView;
 import onlydust.com.marketplace.project.domain.view.Money;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
@@ -27,15 +28,18 @@ public class ContributionRewardViewEntity {
     CurrencyEntity currency;
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
-    @NonNull RewardStatusEntity status;
+    @NonNull
+    RewardStatusEntity status;
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
-    @NonNull RewardStatusDataEntity statusData;
+    @NonNull
+    RewardStatusDataEntity statusData;
 
     String requestorLogin;
     String requestorAvatarUrl;
     Long requestorId;
-    @NonNull UUID projectId;
+    @NonNull
+    UUID projectId;
 
     String recipientLogin;
     String recipientAvatarUrl;

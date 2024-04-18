@@ -1,18 +1,17 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
 
@@ -26,8 +25,6 @@ import static java.util.Objects.isNull;
 @Builder(toBuilder = true)
 @Table(name = "kyc", schema = "accounting")
 @EntityListeners(AuditingEntityListener.class)
-@TypeDef(name = "verification_status", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "id_document_type", typeClass = PostgreSQLEnumType.class)
 public class KycEntity {
     @Id
     UUID id;
@@ -37,8 +34,9 @@ public class KycEntity {
     BillingProfileEntity billingProfile;
 
     UUID ownerId;
-    @Type(type = "verification_status")
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "verification_status")
     VerificationStatusEntity verificationStatus;
     String firstName;
     String lastName;
@@ -46,8 +44,9 @@ public class KycEntity {
     String address;
     String country;
     Boolean usCitizen;
-    @Type(type = "id_document_type")
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "id_document_type")
     IdDocumentTypeEnumEntity idDocumentType;
     String idDocumentNumber;
     String idDocumentCountryCode;

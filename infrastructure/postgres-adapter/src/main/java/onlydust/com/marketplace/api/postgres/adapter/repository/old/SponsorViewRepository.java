@@ -15,15 +15,15 @@ public interface SponsorViewRepository extends JpaRepository<SponsorViewEntity, 
 
     @Query(value = """
             SELECT
-            	s
+            	s.*
             FROM
-            	SponsorViewEntity s
-            	LEFT JOIN s.projects p
+            	sponsors s
+            	LEFT JOIN projects_sponsors p ON s.id = p.sponsor_id
             WHERE
                 (COALESCE(:sponsorIds) IS NULL OR s.id IN (:sponsorIds))
-                AND (COALESCE(:projectIds) IS NULL OR p.projectId IN (:projectIds))
+                AND (COALESCE(:projectIds) IS NULL OR p.project_id IN (:projectIds))
             GROUP BY s.id
-            """)
+            """, nativeQuery = true)
     @NotNull
     Page<SponsorViewEntity> findAll(final List<UUID> projectIds, final List<UUID> sponsorIds, final @NotNull Pageable pageable);
 

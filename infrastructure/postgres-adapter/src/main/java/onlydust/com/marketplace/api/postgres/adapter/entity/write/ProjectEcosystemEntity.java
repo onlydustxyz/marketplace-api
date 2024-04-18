@@ -3,7 +3,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRepoEntity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.util.UUID;
 

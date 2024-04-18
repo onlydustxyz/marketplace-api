@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
@@ -9,12 +9,11 @@ import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.project.domain.view.BillingProfileLinkView;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.Date;
@@ -29,7 +28,6 @@ import java.util.UUID;
 @Table(name = "billing_profiles_users", schema = "accounting")
 @EntityListeners(AuditingEntityListener.class)
 @IdClass(BillingProfileUserEntity.PrimaryKey.class)
-@TypeDef(name = "billing_profile_role", typeClass = PostgreSQLEnumType.class)
 public class BillingProfileUserEntity {
 
     @Id
@@ -48,8 +46,9 @@ public class BillingProfileUserEntity {
     @OneToOne
     UserViewEntity user;
 
-    @Type(type = "billing_profile_role")
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "billing_profile_role")
     Role role;
 
     Date joinedAt;

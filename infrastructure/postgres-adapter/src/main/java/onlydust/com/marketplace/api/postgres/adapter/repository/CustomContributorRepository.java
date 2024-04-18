@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
+import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorViewEntity;
@@ -9,8 +10,6 @@ import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.view.ProjectContributorsLinkView;
 import org.intellij.lang.annotations.Language;
 
-import javax.persistence.EntityManager;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -241,6 +240,6 @@ public class CustomContributorRepository {
                 .setParameter("contributionId", contributionId)
                 .getResultList();
 
-        return result.isEmpty() ? Optional.empty() : Optional.of(((BigInteger) result.get(0)).longValue());
+        return result.isEmpty() ? Optional.empty() : Optional.of((Long) result.get(0));
     }
 }

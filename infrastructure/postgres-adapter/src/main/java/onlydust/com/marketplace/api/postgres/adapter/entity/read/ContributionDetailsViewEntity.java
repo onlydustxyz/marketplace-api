@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
-import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
@@ -11,9 +10,11 @@ import onlydust.com.marketplace.project.domain.model.GithubRepo;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.view.ContributionDetailsView;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+import org.hibernate.type.SqlTypes;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -22,10 +23,6 @@ import java.util.UUID;
 
 @Entity
 @IdClass(ContributionDetailsViewEntity.PrimaryKey.class)
-@TypeDef(name = "contribution_type", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "contribution_status", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "github_pull_request_review_state", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class ContributionDetailsViewEntity {
     @Id
     String id;
@@ -33,10 +30,12 @@ public class ContributionDetailsViewEntity {
     Date completedAt;
 
     @Enumerated(EnumType.STRING)
-    @org.hibernate.annotations.Type(type = "contribution_type")
+    @Column(columnDefinition = "contribution_status")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     Type type;
     @Enumerated(EnumType.STRING)
-    @org.hibernate.annotations.Type(type = "contribution_status")
+    @Column(columnDefinition = "contribution_status")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     Status status;
 
     Long githubNumber;
@@ -58,7 +57,8 @@ public class ContributionDetailsViewEntity {
     String projectShortDescription;
     String projectLogoUrl;
     @Enumerated(EnumType.STRING)
-    @org.hibernate.annotations.Type(type = "project_visibility")
+    @Column(columnDefinition = "project_visibility")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     ProjectVisibilityEnumEntity projectVisibility;
 
     Long repoId;
@@ -71,11 +71,12 @@ public class ContributionDetailsViewEntity {
     Long contributorId;
     Boolean contributorIsRegistered;
 
-    @org.hibernate.annotations.Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     List<ContributionLinkViewEntity> links;
 
     @Enumerated(EnumType.STRING)
-    @org.hibernate.annotations.Type(type = "github_pull_request_review_state")
+    @Column(columnDefinition = "github_pull_request_review_state")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     GithubPullRequestReviewState prReviewState;
 
     @EqualsAndHashCode

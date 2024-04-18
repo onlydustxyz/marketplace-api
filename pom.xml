@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.5.3</version>
+        <version>3.2.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -32,25 +32,20 @@
 
     <properties>
         <java.version>17</java.version>
-        <spring-boot-starter-web.version>2.7.3</spring-boot-starter-web.version>
+        <spring-boot-starter-web.version>3.2.4</spring-boot-starter-web.version>
         <start-class>onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplication</start-class>
-        <jackson.version>2.12.7</jackson.version>
+        <jackson.version>2.15.4</jackson.version>
         <aws-java-sdk-s3.version>1.12.322</aws-java-sdk-s3.version>
-        <liquibase-core.version>4.10.0</liquibase-core.version>
-        <auth0-spring-security-api.version>1.5.1</auth0-spring-security-api.version>
-        <logback-classic.version>1.2.9</logback-classic.version>
-        <logstash-logback-encoder.version>6.6</logstash-logback-encoder.version>
-        <hibernate-types.version>2.21.1</hibernate-types.version>
-        <hypersistence-utils.version>3.6.0</hypersistence-utils.version>
+        <liquibase-core.version>4.24.0</liquibase-core.version>
+        <logback.version>1.3.7</logback.version>
+        <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
+        <hypersistence-utils.version>3.7.3</hypersistence-utils.version>
         <javafaker.version>1.0.2</javafaker.version>
-        <wiremock-jre8.version>2.35.0</wiremock-jre8.version>
-        <reactor-netty.version>1.0.21</reactor-netty.version>
-        <test-container.version>1.17.3</test-container.version>
-        <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
-        <spring-boot-starter-security.version>2.7.3</spring-boot-starter-security.version>
-        <spring-boot-starter-validation.version>2.7.3</spring-boot-starter-validation.version>
-        <jjwt.version>0.9.1</jjwt.version>
-        <jjwt-impl.version>0.11.5</jjwt-impl.version>
+        <reactor-netty.version>1.1.18</reactor-netty.version>
+        <test-container.version>1.19.7</test-container.version>
+        <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+        <spring-boot-starter-security.version>3.2.4</spring-boot-starter-security.version>
+        <spring-boot-starter-validation.version>3.2.4</spring-boot-starter-validation.version>
         <slack-api-client.version>1.38.1</slack-api-client.version>
         <kotlin.version>1.9.20</kotlin.version>
     </properties>
@@ -115,6 +110,11 @@
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
@@ -124,31 +124,14 @@
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.fasterxml.jackson.module</groupId>
+                <artifactId>jackson-module-jakarta-xmlbind-annotations</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-core</artifactId>
                 <version>${liquibase-core.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt-api</artifactId>
-                <version>${jjwt-impl.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt-impl</artifactId>
-                <version>${jjwt-impl.version}</version>
-                <scope>runtime</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt-jackson</artifactId>
-                <version>${jjwt-impl.version}</version>
-                <scope>runtime</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt</artifactId>
-                <version>${jjwt.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.auth0</groupId>
@@ -190,8 +173,18 @@
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>${logback-classic.version}</version>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-access</artifactId>
+                <version>${logback.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.logstash.logback</groupId>
@@ -199,13 +192,8 @@
                 <version>${logstash-logback-encoder.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.vladmihalcea</groupId>
-                <artifactId>hibernate-types-55</artifactId>
-                <version>${hibernate-types.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>io.hypersistence</groupId>
-                <artifactId>hypersistence-utils-hibernate-55</artifactId>
+                <artifactId>hypersistence-utils-hibernate-63</artifactId>
                 <version>${hypersistence-utils.version}</version>
             </dependency>
             <dependency>
@@ -236,12 +224,6 @@
                 <artifactId>spring-boot-starter-test</artifactId>
                 <scope>test</scope>
                 <version>${spring-boot-starter-web.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.tomakehurst</groupId>
-                <artifactId>wiremock-jre8</artifactId>
-                <version>${wiremock-jre8.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>io.projectreactor.netty</groupId>
@@ -289,11 +271,10 @@
             <artifactId>spring-aspects</artifactId>
             <version>6.1.1</version>
         </dependency>
-        <!--  Needed to avoid conflict with OkHttp being used in auth0-java and okhttp3 being used by spring -->
         <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>4.9.0</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.14.0</version>
         </dependency>
 
         <!-- Test -->
@@ -316,6 +297,7 @@
             <groupId>com.github.javafaker</groupId>
             <artifactId>javafaker</artifactId>
             <version>${javafaker.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

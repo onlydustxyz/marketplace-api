@@ -1,19 +1,17 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
-import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.PayableReward;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -26,19 +24,18 @@ import java.util.UUID;
 @Data
 @Table(name = "batch_payments", schema = "accounting")
 @EntityListeners(AuditingEntityListener.class)
-@TypeDef(name = "batch_payment_status", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "network", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class BatchPaymentEntity {
     @Id
     UUID id;
     String csv;
     String transactionHash;
     @Enumerated(EnumType.STRING)
-    @Type(type = "network")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "network")
     NetworkEnumEntity network;
-    @Type(type = "batch_payment_status")
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "batch_payment_status")
     Status status;
     @OneToMany(mappedBy = "batchPayment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     List<BatchPaymentRewardEntity> rewards;

@@ -1,14 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Value;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Set;
 import java.util.UUID;
@@ -17,7 +16,6 @@ import java.util.UUID;
 @Value
 @EqualsAndHashCode
 @NoArgsConstructor(force = true)
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class RewardStatsEntity {
     @Id
     @Column(name = "currency_id")
@@ -30,10 +28,10 @@ public class RewardStatsEntity {
     BigDecimal pendingAmount;
     BigDecimal pendingUsdAmount;
     Integer pendingRequestCount;
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     Set<UUID> rewardIds;
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     Set<Set<String>> rewardItemIds;
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     Set<UUID> projectIds;
 }

@@ -1,14 +1,14 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
-import javax.persistence.*;
 import java.net.URI;
 import java.util.Objects;
 import java.util.Set;
@@ -23,15 +23,15 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @Accessors(fluent = true)
-@TypeDef(name = "currency_type", typeClass = PostgreSQLEnumType.class)
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @ToString
 public class CurrencyEntity {
     @Id
     @EqualsAndHashCode.Include
     private @NonNull UUID id;
-    @org.hibernate.annotations.Type(type = "currency_type")
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "currency_type")
     private @NonNull Type type;
     private @NonNull String name;
     private @NonNull String code;

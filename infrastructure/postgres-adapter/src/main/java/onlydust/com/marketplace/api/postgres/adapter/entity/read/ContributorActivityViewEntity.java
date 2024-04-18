@@ -1,20 +1,18 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import onlydust.com.marketplace.project.domain.view.ContributorActivityView;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import java.util.List;
 
 @EqualsAndHashCode
 @Data
 @Entity
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class ContributorActivityViewEntity {
     @Id
     Long id;
@@ -25,7 +23,7 @@ public class ContributorActivityViewEntity {
     Integer completedPullRequestCount;
     Integer completedIssueCount;
     Integer completedCodeReviewCount;
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     List<UserProfileEntity.WeekCount> counts;
 
     public ContributorActivityView toDomain() {

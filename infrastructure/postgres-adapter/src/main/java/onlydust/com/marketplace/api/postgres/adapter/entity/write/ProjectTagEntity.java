@@ -1,14 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
@@ -20,7 +19,6 @@ import java.util.UUID;
 @EqualsAndHashCode
 @Table(name = "projects_tags", schema = "public")
 @Getter
-@TypeDef(name = "project_tag", typeClass = PostgreSQLEnumType.class)
 @EntityListeners(AuditingEntityListener.class)
 public class ProjectTagEntity {
 
@@ -35,8 +33,9 @@ public class ProjectTagEntity {
     @EqualsAndHashCode
     public static class Id implements Serializable {
         UUID projectId;
-        @Type(type = "project_tag")
         @Enumerated(EnumType.STRING)
+        @JdbcType(PostgreSQLEnumJdbcType.class)
+        @Column(columnDefinition = "project_tag")
         ProjectTagEnumEntity tag;
     }
 

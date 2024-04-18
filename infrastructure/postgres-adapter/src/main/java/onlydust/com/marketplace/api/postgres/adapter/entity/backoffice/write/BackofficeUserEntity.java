@@ -1,16 +1,16 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.write;
 
-import com.vladmihalcea.hibernate.type.array.EnumArrayType;
-import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
+import io.hypersistence.utils.hibernate.type.array.EnumArrayType;
+import io.hypersistence.utils.hibernate.type.array.internal.AbstractArrayType;
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Parameter;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.*;
 import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
@@ -23,17 +23,6 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 @Table(name = "backoffice_users", schema = "iam")
 @EntityListeners(AuditingEntityListener.class)
-@TypeDef(
-        name = "backoffice_user_role[]",
-        typeClass = EnumArrayType.class,
-        defaultForType = BackofficeUser.Role[].class,
-        parameters = {
-                @Parameter(
-                        name = AbstractArrayType.SQL_ARRAY_TYPE,
-                        value = "iam.backoffice_user_role"
-                )
-        }
-)
 public class BackofficeUserEntity {
     @Id
     @Column(name = "id", nullable = false)
@@ -44,7 +33,13 @@ public class BackofficeUserEntity {
     String name;
     @Column(name = "avatarUrl", nullable = false)
     String avatarUrl;
-    @Type(type = "backoffice_user_role[]")
+    @Type(
+            value = EnumArrayType.class,
+            parameters = @Parameter(
+                    name = AbstractArrayType.SQL_ARRAY_TYPE,
+                    value = "iam.backoffice_user_role"
+            )
+    )
     @Column(name = "roles", nullable = false, columnDefinition = "iam.backoffice_user_role[]")
     BackofficeUser.Role[] roles;
 

@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.github.javafaker.Faker;
 import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import com.github.tomakehurst.wiremock.recording.RecordingStatus;
 import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
 import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
@@ -26,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.TestPropertyValues;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Import;
@@ -262,7 +261,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
             final var wireMockServer = new WireMockServer(
                     options()
                             .dynamicPort()
-                            .extensions(new ResponseTemplateTransformer(true))
+                            .globalTemplating(true)
                             .usingFilesUnderClasspath("wiremock/" + stubLocation)
             );
 

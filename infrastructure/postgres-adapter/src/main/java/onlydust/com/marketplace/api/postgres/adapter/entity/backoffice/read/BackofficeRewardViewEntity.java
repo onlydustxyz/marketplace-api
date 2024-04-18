@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
 
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
@@ -11,10 +11,9 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.InvoiceViewEnti
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -28,29 +27,35 @@ import static java.util.Objects.isNull;
 @EqualsAndHashCode
 @Data
 @Entity
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class BackofficeRewardViewEntity {
     @Id
-    @NonNull UUID id;
-    @NonNull Date requestedAt;
+    @NonNull
+    UUID id;
+    @NonNull
+    Date requestedAt;
 
     @ManyToOne
     @JoinColumn(name = "recipientId", referencedColumnName = "githubUserId")
     AllUserViewEntity recipient;
 
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     List<String> githubUrls;
 
-    @NonNull UUID projectId;
-    @NonNull String projectName;
+    @NonNull
+    UUID projectId;
+    @NonNull
+    String projectName;
     String projectLogoUrl;
-    @NonNull String projectShortDescription;
-    @NonNull String projectSlug;
+    @NonNull
+    String projectShortDescription;
+    @NonNull
+    String projectSlug;
 
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     List<SponsorLinkView> sponsors;
 
-    @NonNull BigDecimal amount;
+    @NonNull
+    BigDecimal amount;
     @ManyToOne
     CurrencyEntity currency;
 
@@ -70,10 +75,12 @@ public class BackofficeRewardViewEntity {
 
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
-    @NonNull RewardStatusEntity status;
+    @NonNull
+    RewardStatusEntity status;
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
-    @NonNull RewardStatusDataEntity statusData;
+    @NonNull
+    RewardStatusDataEntity statusData;
 
     @Data
     public static class SponsorLinkView {

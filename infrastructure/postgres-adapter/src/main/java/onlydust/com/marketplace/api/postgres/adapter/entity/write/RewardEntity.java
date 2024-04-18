@@ -5,7 +5,8 @@ import lombok.experimental.Accessors;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.project.domain.model.Reward;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -19,17 +20,25 @@ import java.util.*;
 @Accessors(fluent = true, chain = true)
 public class RewardEntity {
     @Id
-    @NonNull UUID id;
-    @NonNull UUID projectId;
-    @NonNull UUID requestorId;
-    @NonNull Long recipientId;
-    @NonNull UUID currencyId;
-    @NonNull BigDecimal amount;
-    @NonNull Date requestedAt;
+    @NonNull
+    UUID id;
+    @NonNull
+    UUID projectId;
+    @NonNull
+    UUID requestorId;
+    @NonNull
+    Long recipientId;
+    @NonNull
+    UUID currencyId;
+    @NonNull
+    BigDecimal amount;
+    @NonNull
+    Date requestedAt;
     UUID invoiceId;
 
     @OneToMany(mappedBy = "rewardId", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @NonNull List<RewardItemEntity> rewardItems;
+    @NonNull
+    List<RewardItemEntity> rewardItems;
 
     @Column(name = "billingProfileId", insertable = false, updatable = false)
     UUID billingProfileId;

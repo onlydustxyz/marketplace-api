@@ -1,7 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import com.vladmihalcea.hibernate.type.array.EnumArrayType;
-import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
+import io.hypersistence.utils.hibernate.type.array.EnumArrayType;
+import io.hypersistence.utils.hibernate.type.array.internal.AbstractArrayType;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,10 +14,9 @@ import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
+import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,22 +28,17 @@ import static java.util.Objects.nonNull;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 @Entity
-@TypeDef(
-        name = "network[]",
-        typeClass = EnumArrayType.class,
-        defaultForType = NetworkEnumEntity[].class,
-        parameters = {
-                @org.hibernate.annotations.Parameter(
-                        name = AbstractArrayType.SQL_ARRAY_TYPE,
-                        value = "public.network"
-                )
-        }
-)
 public class PayoutInfoViewEntity {
     @Id
     UUID billingProfileId;
 
-    @Type(type = "network[]")
+    @Type(
+            value = EnumArrayType.class,
+            parameters = @Parameter(
+                    name = AbstractArrayType.SQL_ARRAY_TYPE,
+                    value = "public.network"
+            )
+    )
     @Column(name = "networks", columnDefinition = "public.network[]")
     NetworkEnumEntity[] networks;
 

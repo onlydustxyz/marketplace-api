@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import com.github.javafaker.Faker;
+import jakarta.persistence.EntityManagerFactory;
 import onlydust.com.backoffice.api.contract.model.PayRewardRequest;
 import onlydust.com.backoffice.api.contract.model.TransactionNetwork;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
@@ -28,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 
-import javax.persistence.EntityManagerFactory;
 import java.io.IOException;
 import java.util.*;
 

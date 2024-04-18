@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.rest.api.adapter.exception;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.contract.model.OnlyDustError;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import javax.validation.ConstraintViolationException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;

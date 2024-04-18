@@ -3,7 +3,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposi
 import lombok.*;
 import org.hibernate.annotations.Immutable;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.time.ZonedDateTime;
 import java.util.Set;
 

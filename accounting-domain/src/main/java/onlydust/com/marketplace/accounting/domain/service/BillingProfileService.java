@@ -14,9 +14,8 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
-import org.jetbrains.annotations.NotNull;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -38,7 +37,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
 
     @Override
-    public IndividualBillingProfile createIndividualBillingProfile(@NotNull UserId ownerId, @NotNull String name, Set<ProjectId> selectForProjects) {
+    public IndividualBillingProfile createIndividualBillingProfile(@NonNull UserId ownerId, @NonNull String name, Set<ProjectId> selectForProjects) {
         billingProfileStoragePort.findIndividualBillingProfileForUser(ownerId).ifPresent(billingProfile -> {
             throw OnlyDustException.forbidden("Individual billing profile already existing for user %s".formatted(ownerId.value()));
         });
@@ -49,7 +48,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     }
 
     @Override
-    public SelfEmployedBillingProfile createSelfEmployedBillingProfile(@NotNull UserId ownerId, @NotNull String name, Set<ProjectId> selectForProjects) {
+    public SelfEmployedBillingProfile createSelfEmployedBillingProfile(@NonNull UserId ownerId, @NonNull String name, Set<ProjectId> selectForProjects) {
         final var billingProfile = new SelfEmployedBillingProfile(name, ownerId);
         billingProfileStoragePort.save(billingProfile);
         selectBillingProfileForUserAndProjects(billingProfile.id(), ownerId, selectForProjects);

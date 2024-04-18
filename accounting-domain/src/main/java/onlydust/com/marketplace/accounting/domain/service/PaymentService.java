@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
@@ -13,9 +14,8 @@ import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentShortView;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import org.jetbrains.annotations.NotNull;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -32,7 +32,7 @@ public class PaymentService implements PaymentPort {
     private final InvoiceStoragePort invoiceStoragePort;
     private final AccountingFacadePort accountingFacadePort;
 
-    @NotNull
+    @NonNull
     private static Map<RewardId, Wallet> walletsPerRewardForNetwork(Map<RewardId, Invoice> rewardInvoices, Network network) {
         return rewardInvoices.entrySet().stream()
                 .map(e -> Map.entry(e.getKey(), e.getValue().billingProfileSnapshot().wallet(network)))

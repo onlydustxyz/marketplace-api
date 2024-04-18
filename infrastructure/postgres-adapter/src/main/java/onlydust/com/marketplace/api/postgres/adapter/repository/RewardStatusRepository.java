@@ -15,7 +15,7 @@ public interface RewardStatusRepository extends JpaRepository<RewardStatusDataEn
     List<RewardStatusDataEntity> findNotRequested();
 
     @Query(value = """
-            SELECT * FROM accounting.reward_status_data rsd
+            SELECT rsd.* FROM accounting.reward_status_data rsd
             JOIN public.rewards r on r.id = rsd.reward_id
             JOIN accounting.reward_statuses rs on r.id = rs.reward_id AND rs.status <= 'PENDING_REQUEST'
             JOIN iam.users u on r.recipient_id = u.github_user_id

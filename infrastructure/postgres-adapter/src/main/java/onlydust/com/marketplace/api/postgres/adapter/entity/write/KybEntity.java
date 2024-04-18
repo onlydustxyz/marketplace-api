@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Country;
@@ -8,12 +8,11 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
 
@@ -26,8 +25,6 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 @Table(name = "kyb", schema = "accounting")
 @EntityListeners(AuditingEntityListener.class)
-@TypeDef(name = "verification_status", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "id_document_type", typeClass = PostgreSQLEnumType.class)
 public class KybEntity {
     @Id
     UUID id;
@@ -35,8 +32,9 @@ public class KybEntity {
     @OneToOne
     @JoinColumn(name = "billingProfileId", insertable = false, updatable = false)
     BillingProfileEntity billingProfile;
-    @Type(type = "verification_status")
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "verification_status")
     VerificationStatusEntity verificationStatus;
     UUID ownerId;
     String name;

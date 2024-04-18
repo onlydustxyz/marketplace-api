@@ -5,9 +5,9 @@ import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.kernel.model.Event;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Table;
 
 @Entity
 @NoArgsConstructor

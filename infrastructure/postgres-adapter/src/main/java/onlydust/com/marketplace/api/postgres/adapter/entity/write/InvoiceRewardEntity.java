@@ -1,8 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.vladmihalcea.hibernate.type.array.EnumArrayType;
-import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
+import io.hypersistence.utils.hibernate.type.array.EnumArrayType;
+import io.hypersistence.utils.hibernate.type.array.internal.AbstractArrayType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
@@ -10,12 +14,7 @@ import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -28,30 +27,31 @@ import java.util.UUID;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @Accessors(fluent = true)
 @Getter
-@TypeDef(
-        name = "accounting.network[]",
-        typeClass = EnumArrayType.class,
-        defaultForType = NetworkEnumEntity[].class,
-        parameters = {
-                @Parameter(
-                        name = AbstractArrayType.SQL_ARRAY_TYPE,
-                        value = "accounting.network"
-                )
-        }
-)
 public class InvoiceRewardEntity {
     @Id
     @Getter
-    @NonNull UUID id;
-    @NonNull String projectName;
-    @NonNull ZonedDateTime requestedAt;
-    @NonNull BigDecimal amount;
+    @NonNull
+    UUID id;
+    @NonNull
+    String projectName;
+    @NonNull
+    ZonedDateTime requestedAt;
+    @NonNull
+    BigDecimal amount;
     @ManyToOne
-    @NonNull CurrencyEntity currency;
+    @NonNull
+    CurrencyEntity currency;
     @ManyToOne
-    @NonNull CurrencyEntity targetCurrency;
+    @NonNull
+    CurrencyEntity targetCurrency;
     BigDecimal targetAmount;
-    @Type(type = "accounting.network[]")
+    @Type(
+            value = EnumArrayType.class,
+            parameters = @Parameter(
+                    name = AbstractArrayType.SQL_ARRAY_TYPE,
+                    value = "accounting.network"
+            )
+    )
     @Column(columnDefinition = "accounting.network[]")
     NetworkEnumEntity[] networks;
     UUID invoiceId;

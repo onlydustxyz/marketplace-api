@@ -2,8 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,31 +11,30 @@ import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.EventIdResolver;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+import org.hibernate.type.SqlTypes;
 
-import javax.persistence.*;
-import java.io.Serializable;
 import java.time.Instant;
 
 @MappedSuperclass
 @NoArgsConstructor
 @EqualsAndHashCode
 @Data
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-@TypeDef(name = "outbox_event_status", typeClass = PostgreSQLEnumType.class)
 public abstract class EventEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Type(type = "jsonb")
-    @Column(columnDefinition = "jsonb", nullable = false)
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(nullable = false)
     Payload payload;
 
     @Enumerated(EnumType.STRING)
-    @Type(type = "outbox_event_status")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "outbox_event_status")
     Status status;
 
     @Column(name = "group_key")
@@ -67,7 +65,7 @@ public abstract class EventEntity {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Payload implements Serializable {
+    public static class Payload {
 
         @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "@type")
         @JsonTypeIdResolver(EventIdResolver.class)

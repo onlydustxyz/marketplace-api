@@ -1,16 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileUserRightsView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileUserEntity;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.UUID;
@@ -18,17 +14,18 @@ import java.util.UUID;
 import static java.util.Objects.isNull;
 
 @Entity
-@TypeDef(name = "billing_profile_role", typeClass = PostgreSQLEnumType.class)
 public class BillingProfileUserRightsViewEntity {
     @Id
     UUID userId;
-    @Type(type = "billing_profile_role")
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "billing_profile_role")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     BillingProfileUserEntity.Role userRole;
     Long billingProfileProcessingRewardsCount;
     Long userProcessingRewardsCount;
-    @Type(type = "billing_profile_role")
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "billing_profile_role")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     BillingProfileUserEntity.Role invitedRole;
     ZonedDateTime invitedAt;
     Long invitedByGithubUserId;

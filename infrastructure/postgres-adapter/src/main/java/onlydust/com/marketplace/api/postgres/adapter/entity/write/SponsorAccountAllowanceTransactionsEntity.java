@@ -1,17 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -19,7 +15,6 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-@TypeDef(name = "transaction_type", typeClass = PostgreSQLEnumType.class)
 @Value
 @Builder(access = AccessLevel.PRIVATE)
 @Table(name = "sponsor_account_allowance_transactions", schema = "accounting")
@@ -27,15 +22,21 @@ import java.util.UUID;
 public class SponsorAccountAllowanceTransactionsEntity {
     @Id
     @EqualsAndHashCode.Include
-    @NonNull UUID id;
-    @NonNull UUID accountId;
-    @NonNull ZonedDateTime timestamp;
+    @NonNull
+    UUID id;
+    @NonNull
+    UUID accountId;
+    @NonNull
+    ZonedDateTime timestamp;
 
-    @Enumerated(javax.persistence.EnumType.STRING)
-    @Type(type = "transaction_type")
-    @NonNull TransactionType type;
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "transaction_type")
+    @NonNull
+    TransactionType type;
 
-    @NonNull BigDecimal amount;
+    @NonNull
+    BigDecimal amount;
 
     UUID projectId;
 

@@ -1,14 +1,14 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
-import lombok.*;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
 import onlydust.com.marketplace.project.domain.view.ChurnedContributorView;
 import onlydust.com.marketplace.project.domain.view.ShortRepoView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
-import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 import static java.util.Objects.nonNull;
@@ -16,7 +16,6 @@ import static java.util.Objects.nonNull;
 @EqualsAndHashCode
 @Data
 @Entity
-@TypeDef(name = "profile_cover", typeClass = PostgreSQLEnumType.class)
 public class ChurnedContributorViewEntity {
     @Id
     Long id;
@@ -25,7 +24,8 @@ public class ChurnedContributorViewEntity {
     String avatarUrl;
     Boolean isRegistered;
     @Enumerated(EnumType.STRING)
-    @Type(type = "profile_cover")
+    @Column(columnDefinition = "profile_cover")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     ProfileCoverEnumEntity cover;
     String lastContributionId;
     ZonedDateTime lastContributionCompletedAt;

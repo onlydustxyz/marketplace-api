@@ -19,7 +19,7 @@ public interface AccountBookEventRepository extends JpaRepository<AccountBookEve
     @Modifying
     @Query(value = """
             insert into accounting.account_books_events (id, account_book_id, timestamp, payload)
-            values (:#{#accountBookEventEntity.id}, :#{#accountBookEventEntity.accountBookId}, :#{#accountBookEventEntity.timestamp}, cast(:#{#accountBookEventEntity.payloadAsJsonString} as jsonb))
+            values (:#{#accountBookEventEntity.id()}, :#{#accountBookEventEntity.accountBookId()}, :#{#accountBookEventEntity.timestamp()}, cast(:#{#accountBookEventEntity.payloadAsJsonString()} as jsonb))
             """, nativeQuery = true)
     void insert(AccountBookEventEntity accountBookEventEntity);
 }

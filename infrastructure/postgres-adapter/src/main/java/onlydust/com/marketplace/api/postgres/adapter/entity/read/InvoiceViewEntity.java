@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
+import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
@@ -11,9 +12,11 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.UserView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+import org.hibernate.type.SqlTypes;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URL;
@@ -28,33 +31,44 @@ import java.util.UUID;
 @Accessors(fluent = true)
 public class InvoiceViewEntity {
     @Id
-    @NonNull UUID id;
-    @NonNull UUID billingProfileId;
-    @NonNull String number;
-    @NonNull ZonedDateTime createdAt;
+    @NonNull
+    UUID id;
+    @NonNull
+    UUID billingProfileId;
+    @NonNull
+    String number;
+    @NonNull
+    ZonedDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
-    @Type(type = "invoice_status")
-    @NonNull InvoiceEntity.Status status;
-    @NonNull BigDecimal amount;
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "invoice_status")
+    @NonNull
+    InvoiceEntity.Status status;
+    @NonNull
+    BigDecimal amount;
     URL url;
     String originalFileName;
     String rejectionReason;
 
-    @Type(type = "jsonb")
-    @NonNull InvoiceEntity.Data data;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @NonNull
+    InvoiceEntity.Data data;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "createdBy")
-    @NonNull UserViewEntity createdBy;
+    @NonNull
+    UserViewEntity createdBy;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "currencyId")
-    @NonNull CurrencyEntity currency;
+    @NonNull
+    CurrencyEntity currency;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "invoiceId")
-    @NonNull List<RewardViewEntity> rewards;
+    @NonNull
+    List<RewardViewEntity> rewards;
 
     @NonNull
     private UserView getCreatedBy() {

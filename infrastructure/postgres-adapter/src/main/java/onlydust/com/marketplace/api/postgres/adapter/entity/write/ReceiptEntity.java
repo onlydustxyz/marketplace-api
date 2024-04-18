@@ -1,16 +1,15 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Receipt;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.project.domain.view.ReceiptView;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
-import javax.persistence.*;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.UUID;
@@ -22,20 +21,26 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Accessors(fluent = true, chain = true)
-@TypeDef(name = "network", typeClass = PostgreSQLEnumType.class)
 public class ReceiptEntity {
     @Id
     @EqualsAndHashCode.Include
-    @NonNull UUID id;
-    @NonNull Date createdAt;
+    @NonNull
+    UUID id;
+    @NonNull
+    Date createdAt;
 
-    @Type(type = "network")
     @Enumerated(EnumType.STRING)
-    @NonNull NetworkEnumEntity network;
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "network")
+    @NonNull
+    NetworkEnumEntity network;
 
-    @NonNull String thirdPartyName;
-    @NonNull String thirdPartyAccountNumber;
-    @NonNull String transactionReference;
+    @NonNull
+    String thirdPartyName;
+    @NonNull
+    String thirdPartyAccountNumber;
+    @NonNull
+    String transactionReference;
 
     public static ReceiptEntity of(Receipt receipt) {
         return new ReceiptEntity(

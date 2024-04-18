@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,10 +8,11 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+import org.hibernate.type.SqlTypes;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -22,30 +22,37 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "invoices", schema = "accounting")
-@TypeDef(name = "invoice_status", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 @Data
 @Accessors(chain = true, fluent = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class InvoiceEntity {
     @Id
-    @NonNull UUID id;
-    @NonNull UUID billingProfileId;
-    @NonNull String number;
-    @NonNull UUID createdBy;
+    @NonNull
+    UUID id;
+    @NonNull
+    UUID billingProfileId;
+    @NonNull
+    String number;
+    @NonNull
+    UUID createdBy;
 
-    @NonNull ZonedDateTime createdAt;
+    @NonNull
+    ZonedDateTime createdAt;
     @Enumerated(EnumType.STRING)
-    @Type(type = "invoice_status")
-    @NonNull Status status;
-    @NonNull BigDecimal amount;
-    @NonNull UUID currencyId;
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "invoice_status")
+    @NonNull
+    Status status;
+    @NonNull
+    BigDecimal amount;
+    @NonNull
+    UUID currencyId;
     URL url;
     String originalFileName;
     String rejectionReason;
 
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     Data data;
 
     public Invoice toDomain() {

@@ -10,8 +10,8 @@ import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.UUID;
 
@@ -142,7 +142,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         // Then
         final OnboardingEntity updatedOnboardingEntity = onboardingRepository.getById(userId);
         assertThat(updatedOnboardingEntity.getProfileWizardDisplayDate()).isEqualTo(newDate);
-        assertThat(updatedOnboardingEntity.getTermsAndConditionsAcceptanceDate()).isEqualTo(onboarding.getTermsAndConditionsAcceptanceDate());
+        assertThat(updatedOnboardingEntity.getTermsAndConditionsAcceptanceDate().toInstant()).isEqualTo(onboarding.getTermsAndConditionsAcceptanceDate().toInstant());
     }
 
     @Test
@@ -164,7 +164,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
 
         // Then
         final OnboardingEntity updatedOnboardingEntity = onboardingRepository.getById(userId);
-        assertThat(updatedOnboardingEntity.getProfileWizardDisplayDate()).isEqualTo(onboarding.getProfileWizardDisplayDate());
+        assertThat(updatedOnboardingEntity.getProfileWizardDisplayDate().toInstant()).isEqualTo(onboarding.getProfileWizardDisplayDate().toInstant());
         assertThat(updatedOnboardingEntity.getTermsAndConditionsAcceptanceDate()).isEqualTo(newDate);
     }
 }

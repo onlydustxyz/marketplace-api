@@ -28,9 +28,8 @@
 
         <jackson-databind-nullable.version>0.2.3</jackson-databind-nullable.version>
 
-        <openapi-generator-version>4.3.1</openapi-generator-version>
-        <openapi-diff.version>2.0.0-SNAPSHOT</openapi-diff.version>
-
+        <openapi-generator-version>7.4.0</openapi-generator-version>
+        <openapi-diff.version>2.0.1</openapi-diff.version>
     </properties>
 
     <dependencies>
@@ -40,25 +39,23 @@
             <version>${jackson-databind-nullable.version}</version>
         </dependency>
         <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>2.2.21</version>
         </dependency>
+
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
         </dependency>
+
         <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-boot-starter</artifactId>
-            <version>3.0.0</version>
         </dependency>
     </dependencies>
 
@@ -116,7 +113,7 @@
                             <apiPackage>onlydust.com.backoffice.api.contract</apiPackage>
                             <modelPackage>onlydust.com.backoffice.api.contract.model</modelPackage>
                             <configOptions>
-                                <java8>true</java8>
+                                <useSpringBoot3>true</useSpringBoot3>
                                 <library>spring-boot</library>
                                 <interfaceOnly>true</interfaceOnly>
                                 <useTags>true</useTags>

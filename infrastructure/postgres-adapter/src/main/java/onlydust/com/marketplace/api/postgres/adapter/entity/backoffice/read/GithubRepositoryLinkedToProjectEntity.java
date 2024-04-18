@@ -1,13 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
 
-import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
 import lombok.*;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-import javax.persistence.Embeddable;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.UUID;
@@ -17,13 +16,12 @@ import java.util.UUID;
 @EqualsAndHashCode
 @Data
 @Entity
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class GithubRepositoryLinkedToProjectEntity {
     @EmbeddedId
     Id id;
     String name;
     String owner;
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     Map<String, Long> technologies;
 
     @Embeddable

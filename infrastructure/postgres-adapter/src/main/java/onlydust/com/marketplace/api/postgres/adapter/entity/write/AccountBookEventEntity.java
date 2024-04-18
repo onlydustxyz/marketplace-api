@@ -4,16 +4,15 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
 import onlydust.com.marketplace.kernel.model.EventIdResolver;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -23,7 +22,6 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 @Getter
 @Accessors(fluent = true)
 @IdClass(AccountBookEventEntity.PrimaryKey.class)
@@ -39,7 +37,7 @@ public class AccountBookEventEntity {
 
     ZonedDateTime timestamp;
 
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", nullable = false)
     @NonNull
     private final Payload payload;
@@ -57,7 +55,7 @@ public class AccountBookEventEntity {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Payload implements Serializable {
+    public static class Payload {
         @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "@type")
         @JsonTypeIdResolver(EventIdResolver.class)
         private AccountBookEvent event;

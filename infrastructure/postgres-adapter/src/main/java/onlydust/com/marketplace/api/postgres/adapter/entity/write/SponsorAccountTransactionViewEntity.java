@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Amount;
 import onlydust.com.marketplace.accounting.domain.model.ConvertedAmount;
@@ -8,10 +8,9 @@ import onlydust.com.marketplace.accounting.domain.model.HistoricalTransaction;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -21,26 +20,31 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
 @NoArgsConstructor(force = true)
-@TypeDef(name = "transaction_type", typeClass = PostgreSQLEnumType.class)
 @Table(schema = "accounting", name = "all_sponsor_account_transactions")
 public class SponsorAccountTransactionViewEntity {
     @Id
     @EqualsAndHashCode.Include
-    @NonNull UUID id;
-    @NonNull ZonedDateTime timestamp;
+    @NonNull
+    UUID id;
+    @NonNull
+    ZonedDateTime timestamp;
 
     @Enumerated(EnumType.STRING)
-    @Type(type = "transaction_type")
-    @NonNull TransactionType type;
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "transaction_type")
+    @NonNull
+    TransactionType type;
 
     @ManyToOne
-    @NonNull SponsorAccountEntity sponsorAccount;
+    @NonNull
+    SponsorAccountEntity sponsorAccount;
 
     @ManyToOne
     @JoinColumn(name = "project_id")
     ProjectEntity project;
 
-    @NonNull BigDecimal amount;
+    @NonNull
+    BigDecimal amount;
 
     public enum TransactionType {
         DEPOSIT, WITHDRAW, SPEND, MINT, BURN, TRANSFER, REFUND;

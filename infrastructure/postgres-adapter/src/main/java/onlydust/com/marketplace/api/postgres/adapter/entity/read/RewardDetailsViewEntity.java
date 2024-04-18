@@ -14,7 +14,8 @@ import onlydust.com.marketplace.project.domain.view.Money;
 import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.project.domain.view.UserRewardView;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Set;
@@ -25,16 +26,22 @@ import java.util.UUID;
 @Entity
 public class RewardDetailsViewEntity {
     @Id
-    @NonNull UUID id;
-    @NonNull Date requestedAt;
+    @NonNull
+    UUID id;
+    @NonNull
+    Date requestedAt;
     @ManyToOne
     @JoinColumn(name = "project_id", referencedColumnName = "project_id")
-    @NonNull ProjectEntity project;
-    @NonNull BigDecimal amount;
+    @NonNull
+    ProjectEntity project;
+    @NonNull
+    BigDecimal amount;
     @ManyToOne
-    @NonNull CurrencyEntity currency;
+    @NonNull
+    CurrencyEntity currency;
     Integer contributionCount;
-    @NonNull Long recipientId;
+    @NonNull
+    Long recipientId;
     UUID invoiceId;
     UUID billingProfileId;
     String recipientLogin;
@@ -45,10 +52,12 @@ public class RewardDetailsViewEntity {
     String requestorAvatarUrl;
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
-    @NonNull RewardStatusEntity status;
+    @NonNull
+    RewardStatusEntity status;
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
-    @NonNull RewardStatusDataEntity statusData;
+    @NonNull
+    RewardStatusDataEntity statusData;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(

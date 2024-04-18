@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
+import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardItemViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.UUID;
 
@@ -76,7 +76,6 @@ public class CustomRewardRepository {
                             coalesce(pull_request.author_login, issue.author_login, code_review.author_login) author_login,
                             user_avatar_url(coalesce(pull_request.author_id, issue.author_id, code_review.author_id),
                                             coalesce(pull_request.author_avatar_url, issue.author_avatar_url, code_review.author_avatar_url))       author_avatar_url,
-                            coalesce(pull_request.html_url, issue.html_url, code_review.html_url)             html_url,
                             coalesce(pull_request.author_github_url, issue.author_github_url, code_review.author_github_url) author_github_url,
                             coalesce(pull_request.github_body, issue.github_body, code_review.github_body) github_body,
                             pull_request.commits_count,

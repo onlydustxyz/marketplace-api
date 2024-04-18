@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
@@ -9,10 +9,9 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectTagEnti
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectMoreInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
-import javax.persistence.*;
 import java.time.Instant;
 import java.util.*;
 
@@ -24,7 +23,6 @@ import java.util.*;
 @Data
 @Builder
 @Table(name = "project_details", schema = "public")
-@TypeDef(name = "project_visibility", typeClass = PostgreSQLEnumType.class)
 @Immutable
 public class ProjectViewEntity {
     @Id
@@ -49,8 +47,8 @@ public class ProjectViewEntity {
     @Column(name = "key", insertable = false)
     String key;
     @Enumerated(EnumType.STRING)
-    @Type(type = "project_visibility")
-    @Column(columnDefinition = "visibility")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "project_visibility")
     ProjectVisibilityEnumEntity visibility;
     @Column(name = "reward_ignore_pull_requests_by_default")
     Boolean ignorePullRequests;
