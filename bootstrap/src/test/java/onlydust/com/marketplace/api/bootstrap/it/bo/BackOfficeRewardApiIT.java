@@ -113,8 +113,9 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         .firstName("Pierre")
                         .lastName("Qui roule n'amasse pas mousses")
                         .birthdate(faker.date().birthday())
-                        .usCitizen(false)
+                        .consideredUsPersonQuestionnaire(false)
                         .idDocumentCountryCode("FRA")
+                        .usCitizen(false)
                         .verificationStatus(VerificationStatusEntity.VERIFIED).build()));
 
         updatePayoutPreferences(595505L, olivierBillingProfile.id(), UUID.fromString("e41f44a2-464c-4c96-817f-81acb06b2523"));

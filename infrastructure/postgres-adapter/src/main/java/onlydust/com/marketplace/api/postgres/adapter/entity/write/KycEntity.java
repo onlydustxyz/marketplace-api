@@ -43,7 +43,7 @@ public class KycEntity {
     Date birthdate;
     String address;
     String country;
-    Boolean usCitizen;
+    Boolean consideredUsPersonQuestionnaire;
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "id_document_type")
@@ -53,6 +53,8 @@ public class KycEntity {
     Date validUntil;
     String reviewMessage;
     String applicantId;
+    Boolean usCitizen;
+
     @CreationTimestamp
     @Column(name = "tech_created_at", nullable = false, updatable = false)
     @EqualsAndHashCode.Exclude
@@ -100,7 +102,7 @@ public class KycEntity {
                 .validUntil(this.validUntil)
                 .idDocumentNumber(this.idDocumentNumber)
                 .idDocumentCountry(idDocumentCountryCode == null ? null : Country.fromIso3(idDocumentCountryCode))
-                .consideredUsPersonQuestionnaire(this.usCitizen)
+                .consideredUsPersonQuestionnaire(this.consideredUsPersonQuestionnaire)
                 .birthdate(this.birthdate)
                 .ownerId(UserId.of(this.ownerId))
                 .reviewMessageForApplicant(this.reviewMessage)
@@ -121,11 +123,12 @@ public class KycEntity {
                 .idDocumentNumber(kyc.getIdDocumentNumber())
                 .idDocumentType(IdDocumentTypeEnumEntity.fromDomain(kyc.getIdDocumentType()))
                 .ownerId(kyc.getOwnerId().value())
-                .usCitizen(kyc.getConsideredUsPersonQuestionnaire())
+                .consideredUsPersonQuestionnaire(kyc.getConsideredUsPersonQuestionnaire())
                 .verificationStatus(VerificationStatusEntity.fromDomain(kyc.getStatus()))
                 .idDocumentCountryCode(kyc.getIdDocumentCountry().map(Country::iso3Code).orElse(null))
                 .reviewMessage(kyc.getReviewMessageForApplicant())
                 .applicantId(kyc.getExternalApplicantId())
+                .usCitizen(kyc.isUsCitizen())
                 .build();
     }
 }

@@ -104,8 +104,9 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                         .address("2 Infinite Loop, Cupertino, CA 95014, United States")
                         .firstName("Antho")
                         .lastName("Arbuste")
-                        .usCitizen(false)
+                        .consideredUsPersonQuestionnaire(false)
                         .idDocumentCountryCode("FRA")
+                        .usCitizen(false)
                         .verificationStatus(VerificationStatusEntity.VERIFIED).build()))
                 .orElseThrow();
 
