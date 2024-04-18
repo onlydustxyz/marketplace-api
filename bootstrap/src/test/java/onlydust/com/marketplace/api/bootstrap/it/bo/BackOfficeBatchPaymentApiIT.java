@@ -106,6 +106,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                         .lastName("Arbuste")
                         .consideredUsPersonQuestionnaire(false)
                         .idDocumentCountryCode("FRA")
+                        .usCitizen(false)
                         .verificationStatus(VerificationStatusEntity.VERIFIED).build()))
                 .orElseThrow();
 

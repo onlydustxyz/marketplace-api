@@ -154,6 +154,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         .address("My address")
                         .consideredUsPersonQuestionnaire(false)
                         .idDocumentCountryCode("FRA")
+                        .usCitizen(false)
                         .verificationStatus(VerificationStatusEntity.VERIFIED)
                         .build()));
 

@@ -53,6 +53,8 @@ public class KycEntity {
     Date validUntil;
     String reviewMessage;
     String applicantId;
+    Boolean usCitizen;
+
     @CreationTimestamp
     @Column(name = "tech_created_at", nullable = false, updatable = false)
     @EqualsAndHashCode.Exclude
@@ -126,6 +128,7 @@ public class KycEntity {
                 .idDocumentCountryCode(kyc.getIdDocumentCountry().map(Country::iso3Code).orElse(null))
                 .reviewMessage(kyc.getReviewMessageForApplicant())
                 .applicantId(kyc.getExternalApplicantId())
+                .usCitizen(kyc.isUsCitizen())
                 .build();
     }
 }
