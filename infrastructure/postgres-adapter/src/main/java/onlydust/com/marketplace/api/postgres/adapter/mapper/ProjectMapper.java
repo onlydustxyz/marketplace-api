@@ -1,11 +1,5 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.project.domain.model.MoreInfoLink;
-import onlydust.com.marketplace.project.domain.model.Project;
-import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
-import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
-import onlydust.com.marketplace.project.domain.view.ProjectDetailsView;
-import onlydust.com.marketplace.project.domain.view.ProjectOrganizationView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
@@ -15,6 +9,12 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposit
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectMoreInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
+import onlydust.com.marketplace.project.domain.model.NamedLink;
+import onlydust.com.marketplace.project.domain.model.Project;
+import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
+import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
+import onlydust.com.marketplace.project.domain.view.ProjectDetailsView;
+import onlydust.com.marketplace.project.domain.view.ProjectOrganizationView;
 
 import java.sql.Date;
 import java.util.*;
@@ -146,17 +146,17 @@ public interface ProjectMapper {
                 .build();
     }
 
-    static List<MoreInfoLink> mapMoreInfosWithDefaultValue(final ProjectViewEntity projectViewEntity) {
+    static List<NamedLink> mapMoreInfosWithDefaultValue(final ProjectViewEntity projectViewEntity) {
         return projectViewEntity.getMoreInfos().stream()
                 .sorted(Comparator.comparing(ProjectMoreInfoEntity::getRank))
-                .map(projectMoreInfoEntity -> MoreInfoLink.builder()
+                .map(projectMoreInfoEntity -> NamedLink.builder()
                         .value(projectMoreInfoEntity.getName())
                         .url(projectMoreInfoEntity.getUrl()).build())
                 .toList();
 
     }
 
-    static Set<ProjectMoreInfoEntity> moreInfosToEntities(final List<MoreInfoLink> moreInfos, final UUID projectId) {
+    static Set<ProjectMoreInfoEntity> moreInfosToEntities(final List<NamedLink> moreInfos, final UUID projectId) {
         final Set<ProjectMoreInfoEntity> entities = new HashSet<>();
         for (int i = 0; i < moreInfos.size(); i++) {
             final var moreInfo = moreInfos.get(i);
