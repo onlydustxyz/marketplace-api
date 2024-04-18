@@ -178,6 +178,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String REWARDS = "/bo/v1/rewards";
     protected static final String GET_REWARDS_CSV = "/bo/v1/rewards/csv";
     protected static final String BILLING_PROFILE = "/bo/v1/billing-profiles/%s";
+    protected static final String HACKATHONS = "/bo/v1/hackathons";
 
     protected String apiKey() {
         return backOfficeApiKeyAuthenticationConfig.getApiKey();

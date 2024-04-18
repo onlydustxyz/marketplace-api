@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
+import onlydust.com.marketplace.project.domain.port.input.HackathonFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
@@ -87,8 +88,8 @@ public class BackofficeConfiguration {
     }
 
     @Bean
-    public BackofficeHackathonRestApi backofficeHackathonApi() {
-        return new BackofficeHackathonRestApi();
+    public BackofficeHackathonRestApi backofficeHackathonApi(final HackathonFacadePort hackathonFacadePort) {
+        return new BackofficeHackathonRestApi(hackathonFacadePort);
     }
 }
 
