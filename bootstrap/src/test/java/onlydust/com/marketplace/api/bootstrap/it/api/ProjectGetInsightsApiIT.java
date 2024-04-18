@@ -2,10 +2,8 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.ZonedDateTime;
@@ -15,7 +13,6 @@ import java.util.Map;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
     private final static String KAAPER = "298a547f-ecb6-4ab2-8975-68f4e9bf7b39";
 
@@ -23,7 +20,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
     private EntityManagerFactory entityManagerFactory;
 
     @Test
-    @Order(1)
     void should_get_staled_contributions() {
         // Given
         final String jwt = userAuthHelper.authenticateAnthony().jwt();
@@ -169,44 +165,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                         """);
     }
 
-    private void patchPullRequestContributionsForNewcomer(long githubRepoId, List<Long> prNumbers, ZonedDateTime createdAt) {
-        final EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-        em.createNativeQuery("""
-                        UPDATE indexer_exp.contributions
-                        SET created_at = :createdAt
-                        WHERE
-                            repo_id = :repoId AND
-                            github_number in :prNumbers AND
-                            type = 'PULL_REQUEST'
-                        """)
-                .setParameter("createdAt", createdAt)
-                .setParameter("repoId", githubRepoId)
-                .setParameter("prNumbers", prNumbers)
-                .executeUpdate();
-
-        em.createNativeQuery("""
-                        DELETE FROM indexer_exp.contributions
-                        WHERE
-                            repo_id = :repoId AND
-                            ((github_number not in :prNumbers AND type = 'PULL_REQUEST') OR type != 'PULL_REQUEST') AND
-                            contributor_id IN (
-                                SELECT contributor_id
-                                FROM indexer_exp.contributions
-                                WHERE repo_id = :repoId AND github_number in :prNumbers AND type = 'PULL_REQUEST'
-                            )
-                        """)
-                .setParameter("repoId", githubRepoId)
-                .setParameter("prNumbers", prNumbers)
-                .executeUpdate();
-
-        em.flush();
-        em.getTransaction().commit();
-        em.close();
-    }
-
     @Test
-    @Order(1)
     void should_get_churned_contributors() {
         // Given
         final String jwt = userAuthHelper.authenticateAnthony().jwt();
@@ -322,57 +281,61 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                         """);
     }
 
+    @SneakyThrows
     @Test
-    @Order(2)
     void should_get_project_newcomers() {
         // Given
         final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
-        patchPullRequestContributionsForNewcomer(498695724, List.of(1459L, 1497L, 1500L), ZonedDateTime.now().minusDays(1)); // A newcomer
-        patchPullRequestContributionsForNewcomer(498695724, List.of(2L), ZonedDateTime.now().minusDays(29)); // Still a newcomer
-        patchPullRequestContributionsForNewcomer(498695724, List.of(37L), ZonedDateTime.now().minusDays(31)); // No longer a newcomer
+        try {
+            patchPullRequestContributionsForNewcomer(498695724, List.of(1459L, 1497L, 1500L), ZonedDateTime.now().minusDays(1)); // A newcomer
+            patchPullRequestContributionsForNewcomer(498695724, List.of(2L), ZonedDateTime.now().minusDays(29)); // Still a newcomer
+            patchPullRequestContributionsForNewcomer(498695724, List.of(37L), ZonedDateTime.now().minusDays(31)); // No longer a newcomer
 
-        // When
-        client.get()
-                .uri(getApiURI(PROJECTS_INSIGHTS_NEWCOMERS.formatted(KAAPER)))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json("""
-                        {
-                          "contributors": [
-                            {
-                              "githubUserId": 143011364,
-                              "login": "pixelfact",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
-                              "isRegistered": false,
-                              "cover": "MAGENTA",
-                              "location": null,
-                              "bio": "Frontend Dev"
-                            },
-                            {
-                              "githubUserId": 45264458,
-                              "login": "abdelhamidbakhta",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
-                              "isRegistered": false,
-                              "cover": "BLUE",
-                              "location": "Genesis",
-                              "bio": "Starknet Exploration Lead\\r\\n.\\r\\nΞthereum Core Developer\\r\\n.\\r\\nΞIP-1559 Champion\\r\\n.\\r\\nBitcoin lover"
+            // When
+            client.get()
+                    .uri(getApiURI(PROJECTS_INSIGHTS_NEWCOMERS.formatted(KAAPER)))
+                    .header("Authorization", BEARER_PREFIX + jwt)
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody()
+                    .json("""
+                                                    
+                                {
+                              "contributors": [
+                                {
+                                  "githubUserId": 143011364,
+                                  "login": "pixelfact",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
+                                  "isRegistered": false,
+                                  "cover": "MAGENTA",
+                                  "location": null,
+                                  "bio": "Frontend Dev"
+                                },
+                                {
+                                  "githubUserId": 45264458,
+                                  "login": "abdelhamidbakhta",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
+                                  "isRegistered": false,
+                                  "cover": "BLUE",
+                                  "location": "Genesis",
+                                  "bio": "Starknet Exploration Lead\\r\\n.\\r\\nΞthereum Core Developer\\r\\n.\\r\\nΞIP-1559 Champion\\r\\n.\\r\\nBitcoin lover"
+                                }
+                              ],
+                              "hasMore": false,
+                              "totalPageNumber": 1,
+                              "totalItemNumber": 2,
+                              "nextPageIndex": 0
                             }
-                          ],
-                          "hasMore": false,
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 2,
-                          "nextPageIndex": 0
-                        }
-                        """);
+                            """);
+        } finally {
+            restoreIndexerDump();
+        }
     }
 
     @Test
-    @Order(1)
     void should_get_project_most_active_contributors() {
         // Given
         final String jwt = userAuthHelper.authenticateAnthony().jwt();
@@ -488,5 +451,41 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                            "nextPageIndex": 1
                          }
                         """);
+    }
+
+    private void patchPullRequestContributionsForNewcomer(long githubRepoId, List<Long> prNumbers, ZonedDateTime createdAt) {
+        final EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+        em.createNativeQuery("""
+                        UPDATE indexer_exp.contributions
+                        SET created_at = :createdAt
+                        WHERE
+                            repo_id = :repoId AND
+                            github_number in :prNumbers AND
+                            type = 'PULL_REQUEST'
+                        """)
+                .setParameter("createdAt", createdAt)
+                .setParameter("repoId", githubRepoId)
+                .setParameter("prNumbers", prNumbers)
+                .executeUpdate();
+
+        em.createNativeQuery("""
+                        DELETE FROM indexer_exp.contributions
+                        WHERE
+                            repo_id = :repoId AND
+                            ((github_number not in :prNumbers AND type = 'PULL_REQUEST') OR type != 'PULL_REQUEST') AND
+                            contributor_id IN (
+                                SELECT contributor_id
+                                FROM indexer_exp.contributions
+                                WHERE repo_id = :repoId AND github_number in :prNumbers AND type = 'PULL_REQUEST'
+                            )
+                        """)
+                .setParameter("repoId", githubRepoId)
+                .setParameter("prNumbers", prNumbers)
+                .executeUpdate();
+
+        em.flush();
+        em.getTransaction().commit();
+        em.close();
     }
 }

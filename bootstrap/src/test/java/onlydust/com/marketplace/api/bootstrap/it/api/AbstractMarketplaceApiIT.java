@@ -30,6 +30,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.testcontainers.containers.Container;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -214,6 +215,11 @@ public class AbstractMarketplaceApiIT {
             postgresSQLContainer.start();
         }
         assertThat(postgresSQLContainer.execInContainer("/scripts/restore_db.sh").getExitCode()).isEqualTo(0);
+    }
+
+    protected static void restoreIndexerDump() throws IOException, InterruptedException {
+        Container.ExecResult execResult = postgresSQLContainer.execInContainer("/scripts/restore_indexer_dump.sh");
+        assertThat(execResult.getExitCode()).isEqualTo(0);
     }
 
     @BeforeEach
