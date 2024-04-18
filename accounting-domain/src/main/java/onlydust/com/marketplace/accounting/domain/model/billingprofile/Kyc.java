@@ -8,6 +8,9 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+
 @Data
 @Builder(toBuilder = true)
 public class Kyc {
@@ -52,8 +55,17 @@ public class Kyc {
     }
 
     public Boolean isUsCitizen() {
-        if (consideredUsPersonQuestionnaire == null || country == null || idDocumentCountry == null) return null;
-        return consideredUsPersonQuestionnaire || country.isUsa() || idDocumentCountry.isUsa();
+        if (TRUE.equals(consideredUsPersonQuestionnaire) ||
+            TRUE.equals(getCountry().map(Country::isUsa).orElse(false)) ||
+            TRUE.equals(getIdDocumentCountry().map(Country::isUsa).orElse(false)))
+            return true;
+
+        if (FALSE.equals(consideredUsPersonQuestionnaire) &&
+            FALSE.equals(getCountry().map(Country::isUsa).orElse(true)) &&
+            FALSE.equals(getIdDocumentCountry().map(Country::isUsa).orElse(true)))
+            return false;
+
+        return null;
     }
 
     public Optional<Country> getCountry() {
