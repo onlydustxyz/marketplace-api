@@ -237,3 +237,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000207_create_bi_schema.sql
   - include:
       file: db/changelog/changelogs/00000208_modify-kyc-us-columns.sql
+  - include:
+      file: db/changelog/changelogs/00000209_update_bi_schema.sql
