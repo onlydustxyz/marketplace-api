@@ -20,7 +20,7 @@ public interface PaymentShortViewRepository extends JpaRepository<PaymentShortVi
                 bp.tech_created_at as created_at,
                 bp.status,
                 bp.network,
-                reward_stats_per_currency.reward_count as reward_count,
+                sum(reward_stats_per_currency.reward_count) as reward_count,
                 (select jsonb_agg(jsonb_build_object(
                                    'amount', reward_stats_per_currency.total_amount,
                                    'dollarsEquivalent', reward_stats_per_currency.total_dollars_equivalent,
@@ -52,7 +52,7 @@ public interface PaymentShortViewRepository extends JpaRepository<PaymentShortVi
 
     @Language("PostgreSQL")
     String GROUP_BY = """
-            GROUP BY bp.id, bp.tech_created_at, bp.status, bp.network, reward_stats_per_currency.reward_count
+            GROUP BY bp.id, bp.tech_created_at, bp.status, bp.network
             """;
 
     @Query(value = SELECT + """
