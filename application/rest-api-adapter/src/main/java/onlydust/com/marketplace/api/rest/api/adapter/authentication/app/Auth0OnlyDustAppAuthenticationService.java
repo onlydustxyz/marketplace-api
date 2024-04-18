@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.authentication.app;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtClaims;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.AuthenticationService;
@@ -10,7 +11,6 @@ import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.Authentication;
 
 import java.util.Optional;
@@ -23,8 +23,8 @@ public class Auth0OnlyDustAppAuthenticationService implements AuthenticationServ
     private final UserFacadePort userFacadePort;
 
     @Override
-    public Optional<Authentication> getAuthentication(@NotNull final Auth0JwtClaims userClaims,
-                                                      @NotNull final String credentials,
+    public Optional<Authentication> getAuthentication(@NonNull final Auth0JwtClaims userClaims,
+                                                      @NonNull final String credentials,
                                                       final String impersonationHeader) {
         final var user = getUserFromClaims(userClaims, false);
 

@@ -7,7 +7,6 @@ import onlydust.com.marketplace.accounting.domain.model.Amount;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.kernel.visitor.Visitable;
 import onlydust.com.marketplace.kernel.visitor.Visitor;
-import org.jetbrains.annotations.NotNull;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.AsSubgraph;
 import org.jgrapht.graph.SimpleDirectedGraph;
@@ -250,8 +249,8 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
     }
 
     @Override
-    @NotNull
-    public synchronized Map<AccountId, PositiveAmount> unspentChildren(@NotNull AccountId of) {
+    @NonNull
+    public synchronized Map<AccountId, PositiveAmount> unspentChildren(@NonNull AccountId of) {
         return accountVertices(of).stream()
                 .flatMap(v -> unspentChildren(v).entrySet().stream())
                 .collect(Collectors.groupingBy(e -> e.getKey().accountId,
@@ -261,7 +260,7 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
     }
 
     @Override
-    @NotNull
+    @NonNull
     public synchronized Map<AccountId, PositiveAmount> unspentChildren() {
         return unspentChildren(ROOT);
     }
@@ -343,7 +342,7 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
     }
 
     @Override
-    public synchronized void export(@NotNull Exporter exporter) {
+    public synchronized void export(@NonNull Exporter exporter) {
         exporter.export(this);
     }
 

@@ -41,10 +41,9 @@
         <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
         <hypersistence-utils.version>3.7.3</hypersistence-utils.version>
         <javafaker.version>1.0.2</javafaker.version>
-        <wiremock-jre8.version>2.35.0</wiremock-jre8.version>
         <reactor-netty.version>1.1.18</reactor-netty.version>
-        <test-container.version>1.17.3</test-container.version>
-        <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
+        <test-container.version>1.19.7</test-container.version>
+        <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
         <spring-boot-starter-security.version>3.2.4</spring-boot-starter-security.version>
         <spring-boot-starter-validation.version>3.2.4</spring-boot-starter-validation.version>
         <slack-api-client.version>1.38.1</slack-api-client.version>
@@ -227,12 +226,6 @@
                 <version>${spring-boot-starter-web.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.tomakehurst</groupId>
-                <artifactId>wiremock-jre8</artifactId>
-                <version>${wiremock-jre8.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>io.projectreactor.netty</groupId>
                 <artifactId>reactor-netty</artifactId>
                 <version>${reactor-netty.version}</version>
@@ -278,11 +271,10 @@
             <artifactId>spring-aspects</artifactId>
             <version>6.1.1</version>
         </dependency>
-        <!--  Needed to avoid conflict with OkHttp being used in auth0-java and okhttp3 being used by spring -->
         <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>4.9.0</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.14.0</version>
         </dependency>
 
         <!-- Test -->
@@ -305,6 +297,7 @@
             <groupId>com.github.javafaker</groupId>
             <artifactId>javafaker</artifactId>
             <version>${javafaker.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

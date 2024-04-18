@@ -7,7 +7,6 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -57,7 +56,7 @@ public class CachedAccountBookProvider {
         }
     }
 
-    private void insertEvents(@NotNull Currency currency, List<IdentifiedAccountBookEvent> pendingEvents) throws EventSequenceViolationException {
+    private void insertEvents(@NonNull Currency currency, List<IdentifiedAccountBookEvent> pendingEvents) throws EventSequenceViolationException {
         try {
             accountBookEventStorage.insert(currency, pendingEvents);
         } catch (DataIntegrityViolationException e) {

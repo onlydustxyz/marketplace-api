@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
+import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
@@ -17,7 +18,6 @@ import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 import java.util.List;
@@ -34,7 +34,7 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPa
 
 public interface BillingProfileMapper {
 
-    private static @NotNull KYCResponse kycToResponse(final Kyc kyc) {
+    private static @NonNull KYCResponse kycToResponse(final Kyc kyc) {
         final KYCResponse response = new KYCResponse();
         if (isNull(kyc)) {
             return response;
@@ -58,7 +58,7 @@ public interface BillingProfileMapper {
         return response;
     }
 
-    static @NotNull KYBResponse kybToResponse(final Kyb kyb) {
+    static @NonNull KYBResponse kybToResponse(final Kyb kyb) {
         final KYBResponse response = new KYBResponse();
         if (isNull(kyb)) {
             return response;
