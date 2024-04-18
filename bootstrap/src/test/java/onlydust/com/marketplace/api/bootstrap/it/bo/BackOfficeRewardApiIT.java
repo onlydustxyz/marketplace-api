@@ -113,7 +113,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         .firstName("Pierre")
                         .lastName("Qui roule n'amasse pas mousses")
                         .birthdate(faker.date().birthday())
-                        .usCitizen(false)
+                        .consideredUsPersonQuestionnaire(false)
                         .idDocumentCountryCode("FRA")
                         .verificationStatus(VerificationStatusEntity.VERIFIED).build()));
 
