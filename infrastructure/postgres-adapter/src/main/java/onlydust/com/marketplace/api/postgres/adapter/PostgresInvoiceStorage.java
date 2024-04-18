@@ -81,7 +81,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
                 .orElseThrow(() -> notFound("Invoice %s not found".formatted(invoice.id())));
 
         entity.updateWith(invoice);
-        invoiceRepository.saveAndFlush(entity);
+        invoiceRepository.save(entity);
     }
 
     @Override
