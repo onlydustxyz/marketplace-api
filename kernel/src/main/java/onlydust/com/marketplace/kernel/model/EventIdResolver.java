@@ -6,24 +6,20 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.jsontype.impl.TypeIdResolverBase;
 import org.reflections.Reflections;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 public class EventIdResolver extends TypeIdResolverBase {
-    private static final ThreadLocal<Reflections> reflections = ThreadLocal.withInitial(() -> new Reflections("onlydust.com"));
+    private static final Map<String, Class<?>> typeMap = Collections.synchronizedMap(new HashMap<>());
 
-    private final Map<String, Class<?>> typeMap = new HashMap<>();
-    private JavaType baseType;
+    record EventAnnotatedClass(Class<?> aClass, EventType eventType) {
+    }
 
-    @Override
-    public void init(JavaType baseType) {
-        this.baseType = baseType;
-
-        record EventAnnotatedClass(Class<?> aClass, EventType eventType) {
-        }
-
-        reflections.get().getSubTypesOf(baseType.getRawClass()).stream()
+    static {
+        final var reflections = new Reflections("onlydust.com");
+        reflections.getTypesAnnotatedWith(EventType.class).stream()
                 .map(aClass -> new EventAnnotatedClass(aClass, aClass.getAnnotation(EventType.class)))
                 .filter(annotatedClass -> Objects.nonNull(annotatedClass.eventType()))
                 .forEach(annotatedClass -> {
@@ -33,6 +29,13 @@ public class EventIdResolver extends TypeIdResolverBase {
                     }
                     typeMap.put(eventType, annotatedClass.aClass());
                 });
+    }
+
+    private JavaType baseType;
+
+    @Override
+    public void init(JavaType baseType) {
+        this.baseType = baseType;
     }
 
     @Override
@@ -46,7 +49,7 @@ public class EventIdResolver extends TypeIdResolverBase {
         if (eventType == null || !typeMap.containsKey(eventType.value())) {
             throw new IllegalArgumentException("Class " + aClass.getName() + " is not annotated with EventType or is not a subtype of " + baseType.getRawClass().getName());
         }
-        return aClass.getAnnotation(EventType.class).value();
+        return eventType.value();
     }
 
     @Override
