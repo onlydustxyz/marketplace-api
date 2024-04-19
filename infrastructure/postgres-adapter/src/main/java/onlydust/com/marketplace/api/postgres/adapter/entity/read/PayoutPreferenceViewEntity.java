@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.view.PayoutPreferenceView;
-import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
+import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -58,7 +58,7 @@ public class PayoutPreferenceViewEntity {
                                 .build()
                 )
                 .shortProjectView(
-                        ShortProjectView.builder()
+                        ProjectShortView.builder()
                                 .id(ProjectId.of(this.projectId))
                                 .logoUrl(this.projectLogoUrl)
                                 .name(this.projectName)

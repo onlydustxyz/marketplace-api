@@ -5,5 +5,5 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 
 @Builder
-public record ShortProjectView(@NonNull ProjectId id, @NonNull String name, String logoUrl, @NonNull String shortDescription, @NonNull String slug) {
+public record ProjectShortView(@NonNull ProjectId id, @NonNull String name, String logoUrl, @NonNull String shortDescription, @NonNull String slug) {
 }

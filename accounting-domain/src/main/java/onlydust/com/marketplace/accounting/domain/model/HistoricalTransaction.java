@@ -3,7 +3,7 @@ package onlydust.com.marketplace.accounting.domain.model;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
+import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -17,7 +17,7 @@ public record HistoricalTransaction(
         @NonNull SponsorAccount sponsorAccount,
         @NonNull Amount amount,
         ConvertedAmount usdAmount,
-        ShortProjectView project
+        ProjectShortView project
 ) {
     public enum Type {
         DEPOSIT, WITHDRAW, SPEND, // Balance transactions

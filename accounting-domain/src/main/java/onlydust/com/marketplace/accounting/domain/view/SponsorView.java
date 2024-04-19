@@ -9,7 +9,7 @@ import java.util.List;
 
 @Accessors(fluent = true, chain = true)
 @Builder
-public record SponsorView(@NonNull SponsorId id, @NonNull String name, @NonNull String logoUrl, String url, List<ShortProjectView> projects) {
+public record SponsorView(@NonNull SponsorId id, @NonNull String name, @NonNull String logoUrl, String url, List<ProjectShortView> projects) {
     public ShortSponsorView toShortView() {
         return ShortSponsorView.builder()
                 .name(name)
