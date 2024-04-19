@@ -43,4 +43,9 @@ public class HackathonService implements HackathonFacadePort {
     public Page<HackathonShortView> getHackathons(int pageIndex, int pageSize, Set<Hackathon.Status> statuses) {
         return hackathonStoragePort.findByStatuses(pageIndex, pageSize, statuses);
     }
+
+    @Override
+    public void deleteHackathon(Hackathon.Id hackathonId) {
+        hackathonStoragePort.delete(hackathonId);
+    }
 }

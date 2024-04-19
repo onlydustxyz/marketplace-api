@@ -57,4 +57,10 @@ public class BackofficeHackathonRestApi implements BackofficeHackathonManagement
                 EnumSet.allOf(Hackathon.Status.class));
         return ResponseEntity.ok(HackathonMapper.map(sanitizedPageIndex, hackathons));
     }
+
+    @Override
+    public ResponseEntity<Void> deleteHackathonById(UUID hackathonId) {
+        hackathonFacadePort.deleteHackathon(Hackathon.Id.of(hackathonId));
+        return ResponseEntity.noContent().build();
+    }
 }

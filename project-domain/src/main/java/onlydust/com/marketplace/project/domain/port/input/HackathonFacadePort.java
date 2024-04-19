@@ -17,4 +17,6 @@ public interface HackathonFacadePort {
     HackathonDetailsView getHackathonById(@NonNull Hackathon.Id hackathonId);
 
     Page<HackathonShortView> getHackathons(int sanitizedPageIndex, int sanitizedPageSize, Set<Hackathon.Status> statuses);
+
+    void deleteHackathon(Hackathon.Id hackathonId);
 }

@@ -57,6 +57,14 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .expectStatus()
                 // Then
                 .isUnauthorized();
+
+        // When
+        client.delete()
+                .uri(getApiURI(HACKATHONS_BY_ID.formatted(UUID.randomUUID().toString())))
+                .exchange()
+                .expectStatus()
+                // Then
+                .isUnauthorized();
     }
 
     @Test
@@ -661,6 +669,47 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "location": null,
                               "startDate": "2024-06-01T00:00:00Z",
                               "endDate": "2024-06-05T00:00:00Z"
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
+    @Order(100)
+    void should_delete_hackathon() {
+        // When
+        client.delete()
+                .uri(getApiURI(HACKATHONS_BY_ID.formatted(hackathonId2.getValue())))
+                .header("Authorization", "Bearer " + camille.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // When
+        client.get()
+                .uri(getApiURI(HACKATHONS, Map.of("pageIndex", "0", "pageSize", "10")))
+                .header("Authorization", "Bearer " + camille.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 1,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "hackathons": [
+                            {
+                              "slug": "hackathon-2021-updated",
+                              "status": "PUBLISHED",
+                              "title": "Hackathon 2021 updated",
+                              "location": "Paris 2",
+                              "startDate": "2024-04-23T00:00:00Z",
+                              "endDate": "2024-04-25T00:00:00Z"
                             }
                           ]
                         }

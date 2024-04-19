@@ -17,4 +17,6 @@ public interface HackathonStoragePort {
     boolean exists(Hackathon.Id id);
 
     Page<HackathonShortView> findByStatuses(int pageIndex, int pageSize, Set<Hackathon.Status> statuses);
+
+    void delete(Hackathon.Id hackathonId);
 }

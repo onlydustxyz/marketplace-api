@@ -50,4 +50,9 @@ public class PostgresHackathonAdapter implements HackathonStoragePort {
                 .totalPageNumber(page.getTotalPages())
                 .build();
     }
+
+    @Override
+    public void delete(Hackathon.Id hackathonId) {
+        hackathonRepository.deleteById(hackathonId.value());
+    }
 }
