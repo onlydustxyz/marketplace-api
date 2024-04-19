@@ -51,6 +51,44 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
     }
 
     @Test
+    @Order(1)
+    void should_raise_not_found_error_with_non_existing_hackathon() {
+        // When
+        client.get()
+                .uri(getApiURI(HACKATHONS_BY_ID.formatted(UUID.randomUUID().toString())))
+                .header("Authorization", "Bearer " + camille.jwt())
+                .exchange()
+                .expectStatus()
+                // Then
+                .isNotFound();
+
+        // When
+        client.put()
+                .uri(getApiURI(HACKATHONS_BY_ID.formatted(UUID.randomUUID().toString())))
+                .header("Authorization", "Bearer " + camille.jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "status": "PUBLISHED",
+                          "title": "Hackathon 2021 updated",
+                          "subtitle": "subtitle updated",
+                          "description": "My hackathon description",
+                          "location": "Paris",
+                          "totalBudget": "$1.000.000",
+                          "startDate": "2024-04-19T00:00:00Z",
+                          "endDate": "2024-04-22T00:00:00Z",
+                          "links": [],
+                          "sponsorIds": [],
+                          "tracks": []
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                // Then
+                .isNotFound();
+    }
+
+    @Test
     @Order(2)
     void should_create_new_hackathon() {
         // When

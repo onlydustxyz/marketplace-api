@@ -10,4 +10,6 @@ public interface HackathonStoragePort {
     void save(@NonNull Hackathon hackathon);
 
     Optional<HackathonDetailsView> findById(@NonNull Hackathon.Id id);
+
+    boolean exists(Hackathon.Id id);
 }
