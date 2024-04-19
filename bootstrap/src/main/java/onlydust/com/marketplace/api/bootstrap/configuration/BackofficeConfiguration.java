@@ -1,10 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.accounting.domain.port.in.*;
-import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
-import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.PaymentService;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
@@ -90,6 +87,12 @@ public class BackofficeConfiguration {
     @Bean
     public BackofficeHackathonRestApi backofficeHackathonApi(final HackathonFacadePort hackathonFacadePort) {
         return new BackofficeHackathonRestApi(hackathonFacadePort);
+    }
+
+    @Bean
+    public BackofficeDebugRestApi backofficeDebugRestApi(final AccountBookEventStorage accountBookEventStorage,
+                                                         final CurrencyFacadePort currencyFacadePort) {
+        return new BackofficeDebugRestApi(accountBookEventStorage, currencyFacadePort);
     }
 }
 
