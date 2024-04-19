@@ -5,7 +5,9 @@ import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.HackathonDetailsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.HackathonShortViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HackathonEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.HackathonRegistrationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.HackathonDetailsViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.HackathonRegistrationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.HackathonRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.HackathonShortViewRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -18,12 +20,14 @@ import org.springframework.data.domain.Sort;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @AllArgsConstructor
 public class PostgresHackathonAdapter implements HackathonStoragePort {
     private final HackathonRepository hackathonRepository;
     private final HackathonDetailsViewRepository hackathonDetailsViewRepository;
     private final HackathonShortViewRepository hackathonShortViewRepository;
+    private final HackathonRegistrationRepository hackathonRegistrationRepository;
 
     @Override
     public void save(@NonNull Hackathon hackathon) {
@@ -60,5 +64,15 @@ public class PostgresHackathonAdapter implements HackathonStoragePort {
     @Override
     public void delete(Hackathon.Id hackathonId) {
         hackathonRepository.deleteById(hackathonId.value());
+    }
+
+    @Override
+    public void registerUser(UUID userId, Hackathon.Id hackathonId) {
+        hackathonRegistrationRepository.saveAndFlush(new HackathonRegistrationEntity(hackathonId.value(), userId));
+    }
+
+    @Override
+    public boolean isRegisteredToHackathon(UUID userId, Hackathon.Id hackathonId) {
+        return hackathonRegistrationRepository.existsById(new HackathonRegistrationEntity.PrimaryKey(hackathonId.value(), userId));
     }
 }

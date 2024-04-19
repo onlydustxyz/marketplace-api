@@ -35,6 +35,7 @@ import static java.util.Objects.isNull;
 @EntityListeners(AuditingEntityListener.class)
 public class HackathonDetailsViewEntity {
     @Id
+    @EqualsAndHashCode.Include
     UUID id;
     @NonNull
     String slug;

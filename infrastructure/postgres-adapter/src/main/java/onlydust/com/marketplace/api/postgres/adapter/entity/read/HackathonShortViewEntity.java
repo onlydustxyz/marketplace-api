@@ -23,6 +23,7 @@ import java.util.UUID;
 @Table(name = "hackathons", schema = "public")
 public class HackathonShortViewEntity {
     @Id
+    @EqualsAndHashCode.Include
     UUID id;
     @NonNull
     String slug;

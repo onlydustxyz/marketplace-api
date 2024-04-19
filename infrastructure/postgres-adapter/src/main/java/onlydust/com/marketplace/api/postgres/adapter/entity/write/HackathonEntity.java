@@ -26,6 +26,7 @@ import java.util.UUID;
 @EntityListeners(AuditingEntityListener.class)
 public class HackathonEntity {
     @Id
+    @EqualsAndHashCode.Include
     UUID id;
     @NonNull
     String slug;

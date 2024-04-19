@@ -8,6 +8,7 @@ import onlydust.com.marketplace.project.domain.view.HackathonShortView;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 public interface HackathonStoragePort {
     void save(@NonNull Hackathon hackathon);
@@ -22,4 +23,7 @@ public interface HackathonStoragePort {
 
     void delete(Hackathon.Id hackathonId);
 
+    void registerUser(UUID userId, Hackathon.Id hackathonId);
+
+    boolean isRegisteredToHackathon(UUID userId, Hackathon.Id hackathonId);
 }

@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.api.contract.model.HackathonsDetailsResponseMe;
 import onlydust.com.marketplace.api.contract.model.ShortProjectResponse;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
@@ -9,15 +10,17 @@ import onlydust.com.marketplace.project.domain.model.NamedLink;
 import onlydust.com.marketplace.project.domain.view.HackathonDetailsView;
 import onlydust.com.marketplace.project.domain.view.HackathonShortView;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 
 public interface HackathonMapper {
-    static onlydust.com.marketplace.api.contract.model.HackathonsDetailsResponse toResponse(HackathonDetailsView view) {
+    static onlydust.com.marketplace.api.contract.model.HackathonsDetailsResponse toResponse(HackathonDetailsView view, Optional<Boolean> isRegistered) {
         return new onlydust.com.marketplace.api.contract.model.HackathonsDetailsResponse()
                 .id(view.id().value())
                 .slug(view.slug())
+                .me(isRegistered.map(value -> new HackathonsDetailsResponseMe().hasRegistered(value)).orElse(null))
                 .title(view.title())
                 .subtitle(view.subtitle())
                 .description(view.description())

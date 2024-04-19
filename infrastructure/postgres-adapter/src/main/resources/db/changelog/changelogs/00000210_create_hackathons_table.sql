@@ -30,3 +30,18 @@ CREATE TRIGGER hackathons_set_tech_updated_at
     ON hackathons
     FOR EACH ROW
 EXECUTE PROCEDURE set_tech_updated_at();
+
+CREATE TABLE hackathon_registrations
+(
+    hackathon_id    UUID      NOT NULL REFERENCES hackathons (id),
+    user_id         UUID      NOT NULL REFERENCES iam.users (id),
+    tech_created_at TIMESTAMP NOT NULL DEFAULT now(),
+    tech_updated_at TIMESTAMP NOT NULL DEFAULT now(),
+    PRIMARY KEY (hackathon_id, user_id)
+);
+
+CREATE TRIGGER hackathon_registrations_set_tech_updated_at
+    BEFORE UPDATE
+    ON hackathon_registrations
+    FOR EACH ROW
+EXECUTE PROCEDURE set_tech_updated_at();

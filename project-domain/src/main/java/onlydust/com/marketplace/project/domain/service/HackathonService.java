@@ -11,6 +11,7 @@ import onlydust.com.marketplace.project.domain.view.HackathonShortView;
 
 import java.time.ZonedDateTime;
 import java.util.Set;
+import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -53,5 +54,17 @@ public class HackathonService implements HackathonFacadePort {
     @Override
     public void deleteHackathon(Hackathon.Id hackathonId) {
         hackathonStoragePort.delete(hackathonId);
+    }
+
+    @Override
+    public void registerToHackathon(UUID userId, Hackathon.Id hackathonId) {
+        if (!hackathonStoragePort.exists(hackathonId))
+            throw notFound("Hackathon %s not found".formatted(hackathonId));
+        hackathonStoragePort.registerUser(userId, hackathonId);
+    }
+
+    @Override
+    public boolean isRegisteredToHackathon(UUID userId, Hackathon.Id hackathonId) {
+        return hackathonStoragePort.isRegisteredToHackathon(userId, hackathonId);
     }
 }

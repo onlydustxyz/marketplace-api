@@ -1,28 +1,35 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class HackathonApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     HackathonStoragePort hackathonStoragePort;
 
-    Hackathon.Id hackathonId1;
-    Hackathon.Id hackathonId2;
-    Hackathon.Id hackathonId3;
+    UserAuthHelper.AuthenticatedUser olivier;
 
-    void setup() {
+    static Hackathon.Id hackathonId1;
+    static Hackathon.Id hackathonId2;
+    static Hackathon.Id hackathonId3;
+
+    @BeforeEach
+    void setUp() {
+        olivier = userAuthHelper.authenticateOlivier();
+    }
+
+    void createHackathons() {
         final var hackathon1 = Hackathon.builder()
                 .id(Hackathon.Id.random())
                 .title("Hackathon 1")
@@ -80,7 +87,7 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
     @Test
     @Order(1)
     void should_get_hackathon_by_slug() {
-        setup();
+        createHackathons();
 
         // When
         client.get()
@@ -212,5 +219,49 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                           ]
                         }
                         """);
+    }
+
+    @Test
+    @Order(10)
+    void should_register_to_hackathon() {
+        // When
+        client.get()
+                .uri(getApiURI(HACKATHONS_BY_SLUG.formatted("hackathon-1")))
+                .header("Authorization", BEARER_PREFIX + olivier.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.me.hasRegistered").isEqualTo(false);
+
+        // When
+        client.put()
+                .uri(getApiURI(ME_PUT_HACKATHON_REGISTRATIONS.formatted(hackathonId1.value().toString())))
+                .header("Authorization", BEARER_PREFIX + olivier.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isNoContent();
+
+        // When
+        client.get()
+                .uri(getApiURI(HACKATHONS_BY_SLUG.formatted("hackathon-1")))
+                .header("Authorization", BEARER_PREFIX + olivier.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.me.hasRegistered").isEqualTo(true);
+
+        // When
+        client.put()
+                .uri(getApiURI(ME_PUT_HACKATHON_REGISTRATIONS.formatted(UUID.randomUUID().toString())))
+                .header("Authorization", BEARER_PREFIX + olivier.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isNotFound();
     }
 }

@@ -8,6 +8,7 @@ import onlydust.com.marketplace.project.domain.view.HackathonShortView;
 
 import java.time.ZonedDateTime;
 import java.util.Set;
+import java.util.UUID;
 
 public interface HackathonFacadePort {
     HackathonDetailsView createHackathon(@NonNull String title, @NonNull String subtitle, @NonNull ZonedDateTime startDate, @NonNull ZonedDateTime endDate);
@@ -22,4 +23,7 @@ public interface HackathonFacadePort {
 
     void deleteHackathon(Hackathon.Id hackathonId);
 
+    void registerToHackathon(UUID userId, Hackathon.Id hackathonId);
+
+    boolean isRegisteredToHackathon(UUID userId, Hackathon.Id hackathonId);
 }
