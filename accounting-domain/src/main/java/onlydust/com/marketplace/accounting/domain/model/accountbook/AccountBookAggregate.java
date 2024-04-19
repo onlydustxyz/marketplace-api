@@ -76,14 +76,16 @@ public class AccountBookAggregate implements AccountBook {
         if (event.id() != nextEventId()) {
             throw new IllegalStateException("Invalid event id. Expected %d, got %d".formatted(nextEventId(), event.id()));
         }
+        final var result = state.accept(event.data());
         incrementEventId();
-        return state.accept(event.data());
+        return result;
     }
 
     private <R> R emit(AccountBookEvent<R> event) {
+        final var result = state.accept(event);
         pendingEvents.add(new IdentifiedAccountBookEvent<>(nextEventId(), ZonedDateTime.now(), event));
         incrementEventId();
-        return state.accept(event);
+        return result;
     }
 
     private void incrementEventId() {
