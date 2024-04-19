@@ -419,4 +419,155 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                         """);
     }
 
+    @Test
+    @Order(20)
+    void should_update_hackathon_again_and_update_lists_accordingly() {
+        // When
+        client.put()
+                .uri(getApiURI(HACKATHONS_BY_ID.formatted(hackathonId1.getValue())))
+                .header("Authorization", "Bearer " + camille.jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "status": "PUBLISHED",
+                          "title": "Hackathon 2021 updated",
+                          "subtitle": "subtitle updated 2",
+                          "description": "My hackathon description 2",
+                          "location": "Paris 2",
+                          "totalBudget": "$2.000.000",
+                          "startDate": "2024-04-23T00:00:00Z",
+                          "endDate": "2024-04-25T00:00:00Z",
+                          "links": [
+                            {
+                              "url": "https://www.foo.com",
+                              "value": "Foo"
+                            },
+                            {
+                              "url": "https://www.facebook.com",
+                              "value": "Facebook"
+                            },
+                            {
+                              "url": "https://www.bar.com",
+                              "value": "Bar"
+                            }
+                          ],
+                          "sponsorIds": [
+                            "44c6807c-48d1-4987-a0a6-ac63f958bdae"
+                          ],
+                          "tracks": [
+                            {
+                              "name": "First track",
+                              "subtitle": "First track subtitle",
+                              "description": "First track description",
+                              "iconSlug": "icon-1",
+                              "projectIds": [
+                                "2073b3b2-60f4-488c-8a0a-ab7121ed850c"
+                              ]
+                            }
+                          ]
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(hackathonId1.getValue())
+                .json("""
+                        {
+                          "slug": "hackathon-2021-updated",
+                          "status": "PUBLISHED",
+                          "title": "Hackathon 2021 updated",
+                          "subtitle": "subtitle updated 2",
+                          "description": "My hackathon description 2",
+                          "location": "Paris 2",
+                          "totalBudget": "$2.000.000",
+                          "startDate": "2024-04-23T00:00:00Z",
+                          "endDate": "2024-04-25T00:00:00Z",
+                          "links": [
+                            {
+                              "url": "https://www.foo.com",
+                              "value": "Foo"
+                            },
+                            {
+                              "url": "https://www.facebook.com",
+                              "value": "Facebook"
+                            },
+                            {
+                              "url": "https://www.bar.com",
+                              "value": "Bar"
+                            }
+                          ],
+                          "sponsors": [
+                            {
+                              "id": "44c6807c-48d1-4987-a0a6-ac63f958bdae",
+                              "name": "Coca Colax",
+                              "url": "https://www.coca-cola-france.fr/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
+                            }
+                          ],
+                          "tracks": [
+                            {
+                              "name": "First track",
+                              "subtitle": "First track subtitle",
+                              "description": "First track description",
+                              "iconSlug": "icon-1",
+                              "projects": [
+                                {
+                                  "id": "2073b3b2-60f4-488c-8a0a-ab7121ed850c",
+                                  "slug": "apibara",
+                                  "name": "Apibara",
+                                  "logoUrl": null
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
+    @Order(30)
+    void should_create_another_hackathon() {
+        // When
+        client.post()
+                .uri(getApiURI(HACKATHONS))
+                .header("Authorization", "Bearer " + camille.jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "title": "OD Hack",
+                            "subtitle": "The best hackathon",
+                            "startDate": "2024-06-01T00:00:00Z",
+                            "endDate": "2024-06-05T00:00:00Z"
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.id").value(hackathonId2::setValue)
+                .json("""
+                        {
+                            "slug": "od-hack",
+                            "status": "DRAFT",
+                            "title": "OD Hack",
+                            "subtitle": "The best hackathon",
+                            "description": null,
+                            "location": null,
+                            "totalBudget": null,
+                            "startDate": "2024-06-01T00:00:00Z",
+                            "endDate": "2024-06-05T00:00:00Z",
+                            "links": [],
+                            "sponsors": [],
+                            "tracks": []
+                        }
+                        """);
+        assertThat(hackathonId2.getValue()).isNotEmpty();
+        assertThat(UUID.fromString(hackathonId2.getValue())).isNotNull();
+        assertThat(hackathonId2.getValue()).isNotEqualTo(hackathonId1.getValue());
+    }
+
+
 }
