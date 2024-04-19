@@ -22,6 +22,9 @@ CREATE TABLE hackathons
     tech_updated_at TIMESTAMP        NOT NULL DEFAULT now()
 );
 
+CREATE UNIQUE INDEX hackathons_slug_uindex
+    ON hackathons (slug);
+
 CREATE TRIGGER hackathons_set_tech_updated_at
     BEFORE UPDATE
     ON hackathons

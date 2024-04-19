@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HackathonEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
 import onlydust.com.marketplace.project.domain.view.HackathonDetailsView;
@@ -69,12 +70,14 @@ public class HackathonDetailsViewEntity {
     List<Project> projects;
 
     public record Project(@NonNull UUID id,
+                          @NonNull String slug,
                           @NonNull String name,
                           String logoUrl,
                           @NonNull String shortDescription,
-                          @NonNull String slug) {
+                          @NonNull ProjectVisibilityEnumEntity visibility
+    ) {
         public ProjectShortView toDomain() {
-            return new ProjectShortView(id, name, logoUrl, shortDescription, slug);
+            return new ProjectShortView(id, slug, name, logoUrl, shortDescription, visibility.toDomain());
         }
     }
 

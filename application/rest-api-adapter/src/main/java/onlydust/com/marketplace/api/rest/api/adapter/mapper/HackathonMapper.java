@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.api.contract.model.ShortProjectResponse;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
@@ -13,6 +14,49 @@ import java.util.UUID;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 
 public interface HackathonMapper {
+    static onlydust.com.marketplace.api.contract.model.HackathonsDetailsResponse toResponse(HackathonDetailsView view) {
+        return new onlydust.com.marketplace.api.contract.model.HackathonsDetailsResponse()
+                .id(view.id().value())
+                .slug(view.slug())
+                .title(view.title())
+                .subtitle(view.subtitle())
+                .description(view.description())
+                .location(view.location())
+                .totalBudget(view.totalBudget())
+                .startDate(view.startDate())
+                .endDate(view.endDate())
+                .links(view.links().stream().map(link -> new onlydust.com.marketplace.api.contract.model.SimpleLink()
+                        .value(link.getValue())
+                        .url(link.getUrl())
+                ).toList())
+                .sponsors(view.sponsors().stream().map(sponsor -> new onlydust.com.marketplace.api.contract.model.SponsorResponse()
+                        .id(sponsor.id())
+                        .name(sponsor.name())
+                        .url(sponsor.url())
+                        .logoUrl(sponsor.logoUrl())
+                ).toList())
+                .tracks(view.tracks().stream().map(track -> new onlydust.com.marketplace.api.contract.model.HackathonsTrackResponse()
+                        .name(track.name())
+                        .subtitle(track.subtitle())
+                        .description(track.description())
+                        .iconSlug(track.iconSlug())
+                        .projects(track.projects().stream().map(project -> new ShortProjectResponse()
+                                .id(project.id())
+                                .slug(project.slug())
+                                .name(project.name())
+                                .logoUrl(project.logoUrl())
+                                .shortDescription(project.shortDescription())
+                                .visibility(onlydust.com.marketplace.api.contract.model.ProjectVisibility.valueOf(project.visibility().name()))
+                        ).toList())
+                ).toList())
+                .projects(view.projects().stream().map(project -> new onlydust.com.marketplace.api.contract.model.ProjectLinkResponse()
+                        .id(project.id())
+                        .slug(project.slug())
+                        .name(project.name())
+                        .logoUrl(project.logoUrl())
+                ).toList());
+    }
+
     static HackathonsDetailsResponse toBackOfficeResponse(HackathonDetailsView view) {
         return new HackathonsDetailsResponse()
                 .id(view.id().value())

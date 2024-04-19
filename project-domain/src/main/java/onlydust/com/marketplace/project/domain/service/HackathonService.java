@@ -40,6 +40,12 @@ public class HackathonService implements HackathonFacadePort {
     }
 
     @Override
+    public HackathonDetailsView getHackathonBySlug(String hackathonSlug) {
+        return hackathonStoragePort.findBySlug(hackathonSlug)
+                .orElseThrow(() -> notFound("Hackathon %s not found".formatted(hackathonSlug)));
+    }
+
+    @Override
     public Page<HackathonShortView> getHackathons(int pageIndex, int pageSize, Set<Hackathon.Status> statuses) {
         return hackathonStoragePort.findByStatuses(pageIndex, pageSize, statuses);
     }

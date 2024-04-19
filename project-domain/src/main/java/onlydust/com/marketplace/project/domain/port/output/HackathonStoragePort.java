@@ -14,9 +14,12 @@ public interface HackathonStoragePort {
 
     Optional<HackathonDetailsView> findById(@NonNull Hackathon.Id id);
 
+    Optional<HackathonDetailsView> findBySlug(String hackathonSlug);
+
     boolean exists(Hackathon.Id id);
 
     Page<HackathonShortView> findByStatuses(int pageIndex, int pageSize, Set<Hackathon.Status> statuses);
 
     void delete(Hackathon.Id hackathonId);
+
 }

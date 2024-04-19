@@ -37,6 +37,12 @@ public class PostgresHackathonAdapter implements HackathonStoragePort {
     }
 
     @Override
+    public Optional<HackathonDetailsView> findBySlug(String hackathonSlug) {
+        return hackathonDetailsViewRepository.findBySlug(hackathonSlug)
+                .map(HackathonDetailsViewEntity::toDomain);
+    }
+
+    @Override
     public boolean exists(Hackathon.Id id) {
         return hackathonRepository.existsById(id.value());
     }
