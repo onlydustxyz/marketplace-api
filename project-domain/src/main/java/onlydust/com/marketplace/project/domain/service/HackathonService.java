@@ -10,6 +10,7 @@ import onlydust.com.marketplace.project.domain.view.HackathonDetailsView;
 import onlydust.com.marketplace.project.domain.view.HackathonShortView;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -49,6 +50,11 @@ public class HackathonService implements HackathonFacadePort {
     @Override
     public Page<HackathonShortView> getHackathons(int pageIndex, int pageSize, Set<Hackathon.Status> statuses) {
         return hackathonStoragePort.findByStatuses(pageIndex, pageSize, statuses);
+    }
+
+    @Override
+    public List<HackathonShortView> getAllPublishedHackathons() {
+        return hackathonStoragePort.findByStatuses(0, Integer.MAX_VALUE, Set.of(Hackathon.Status.PUBLISHED)).getContent();
     }
 
     @Override

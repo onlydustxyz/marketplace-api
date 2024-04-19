@@ -2,6 +2,8 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.api.contract.model.HackathonsDetailsResponseMe;
+import onlydust.com.marketplace.api.contract.model.HackathonsListItemResponse;
+import onlydust.com.marketplace.api.contract.model.HackathonsListResponse;
 import onlydust.com.marketplace.api.contract.model.ShortProjectResponse;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
@@ -10,6 +12,7 @@ import onlydust.com.marketplace.project.domain.model.NamedLink;
 import onlydust.com.marketplace.project.domain.view.HackathonDetailsView;
 import onlydust.com.marketplace.project.domain.view.HackathonShortView;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -146,6 +149,18 @@ public interface HackathonMapper {
                             case DRAFT -> HackathonStatus.DRAFT;
                             case PUBLISHED -> HackathonStatus.PUBLISHED;
                         })
+                ).toList());
+    }
+
+    static HackathonsListResponse map(List<HackathonShortView> page) {
+        return new HackathonsListResponse()
+                .hackathons(page.stream().map(hackathon -> new HackathonsListItemResponse()
+                        .id(hackathon.id().value())
+                        .slug(hackathon.slug())
+                        .title(hackathon.title())
+                        .location(hackathon.location())
+                        .startDate(hackathon.startDate())
+                        .endDate(hackathon.endDate())
                 ).toList());
     }
 }

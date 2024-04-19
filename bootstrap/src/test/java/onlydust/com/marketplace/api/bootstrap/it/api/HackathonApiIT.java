@@ -63,6 +63,7 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                 .id(Hackathon.Id.random())
                 .title("Hackathon 3")
                 .subtitle("Subtitle 3")
+                .location("Location 3")
                 .startDate(ZonedDateTime.now())
                 .endDate(ZonedDateTime.now().plusDays(1))
                 .description("Description 3")
@@ -263,5 +264,38 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .expectStatus()
                 .isNotFound();
+    }
+
+    @Test
+    @Order(20)
+    void should_get_all_published_hackathons() {
+        // When
+        client.get()
+                .uri(getApiURI(HACKATHONS))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "hackathons": [
+                            {
+                              "slug": "hackathon-1",
+                              "title": "Hackathon 1",
+                              "location": null,
+                              "startDate": "2024-04-19T00:00:00Z",
+                              "endDate": "2024-04-20T00:00:00Z"
+                            },
+                            {
+                              "slug": "hackathon-3",
+                              "title": "Hackathon 3",
+                              "location": "Location 3",
+                              "startDate": "2024-04-19T00:00:00Z",
+                              "endDate": "2024-04-20T00:00:00Z"
+                            }
+                          ]
+                        }
+                        """);
     }
 }

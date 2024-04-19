@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.HackathonsApi;
 import onlydust.com.marketplace.api.contract.model.HackathonsDetailsResponse;
+import onlydust.com.marketplace.api.contract.model.HackathonsListResponse;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.HackathonMapper;
 import onlydust.com.marketplace.project.domain.model.User;
@@ -27,5 +28,11 @@ public class HackathonRestApi implements HackathonsApi {
         final var isRegistered = authenticatedUser.map(User::getId)
                 .map(userId -> hackathonFacadePort.isRegisteredToHackathon(userId, hackathonDetailsView.id()));
         return ResponseEntity.ok(HackathonMapper.toResponse(hackathonDetailsView, isRegistered));
+    }
+
+    @Override
+    public ResponseEntity<HackathonsListResponse> getHackathons() {
+        final var hackathons = hackathonFacadePort.getAllPublishedHackathons();
+        return ResponseEntity.ok(HackathonMapper.map(hackathons));
     }
 }
