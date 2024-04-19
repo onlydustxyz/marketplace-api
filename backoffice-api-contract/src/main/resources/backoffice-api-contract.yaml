@@ -1698,8 +1698,12 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateHackathonRequest'
       responses:
-        "204":
-          description: 'The hackathon has been updated'
+        "200":
+          description: 'Updated hackathon'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HackathonsDetailsResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":

@@ -23,6 +23,11 @@ public class HackathonService implements HackathonFacadePort {
     }
 
     @Override
+    public void updateHackathon(@NonNull Hackathon hackathon) {
+        hackathonStoragePort.save(hackathon);
+    }
+
+    @Override
     public HackathonDetailsView getHackathonById(@NonNull Hackathon.Id hackathonId) {
         return hackathonStoragePort.findById(hackathonId)
                 .orElseThrow(() -> OnlyDustException.notFound("Hackathon %s not found".formatted(hackathonId)));

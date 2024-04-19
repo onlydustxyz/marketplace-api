@@ -9,5 +9,7 @@ import java.time.ZonedDateTime;
 public interface HackathonFacadePort {
     HackathonDetailsView createHackathon(@NonNull String title, @NonNull String subtitle, @NonNull ZonedDateTime startDate, @NonNull ZonedDateTime endDate);
 
+    void updateHackathon(@NonNull Hackathon hackathon);
+
     HackathonDetailsView getHackathonById(@NonNull Hackathon.Id hackathonId);
 }

@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.project.domain.model;
 
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
@@ -19,6 +16,8 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badReq
 @Value
 @Accessors(fluent = true)
 @EqualsAndHashCode
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Hackathon {
 
     private static final Pattern SLUGIFY_REGEX = Pattern.compile("[^a-zA-Z0-9_\\- ]+");

@@ -10,7 +10,6 @@ import onlydust.com.backoffice.api.contract.model.UpdateHackathonRequest;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.HackathonMapper;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.port.input.HackathonFacadePort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,9 +30,10 @@ public class BackofficeHackathonRestApi implements BackofficeHackathonManagement
     }
 
     @Override
-    public ResponseEntity<Void> updateHackathonById(UUID hackathonId, UpdateHackathonRequest updateHackathonRequest) {
-
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    public ResponseEntity<HackathonsDetailsResponse> updateHackathonById(UUID hackathonId, UpdateHackathonRequest updateHackathonRequest) {
+        hackathonFacadePort.updateHackathon(HackathonMapper.toDomain(hackathonId, updateHackathonRequest));
+        final var hackathonDetailsView = hackathonFacadePort.getHackathonById(Hackathon.Id.of(hackathonId));
+        return ResponseEntity.ok(HackathonMapper.toBackOfficeResponse(hackathonDetailsView));
     }
 
     @Override

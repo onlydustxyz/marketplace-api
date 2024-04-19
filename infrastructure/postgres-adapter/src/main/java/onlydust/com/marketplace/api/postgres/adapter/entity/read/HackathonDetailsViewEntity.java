@@ -81,7 +81,7 @@ public class HackathonDetailsViewEntity {
     public HackathonDetailsView toDomain() {
         final Map<UUID, Project> projects = isNull(this.projects)
                 ? Map.of()
-                : this.projects.stream().collect(Collectors.toMap(Project::id, Function.identity()));
+                : this.projects.stream().collect(Collectors.toMap(Project::id, Function.identity(), (p1, p2) -> p1));
 
         return new HackathonDetailsView(
                 Hackathon.Id.of(id),
