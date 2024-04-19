@@ -7,7 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 @Builder(toBuilder = true)
 public record PayoutPreferenceView(
         BillingProfileView billingProfileView,
-        @NonNull ShortProjectView shortProjectView) {
+        @NonNull ProjectShortView shortProjectView) {
 
     @Builder
     public record BillingProfileView(

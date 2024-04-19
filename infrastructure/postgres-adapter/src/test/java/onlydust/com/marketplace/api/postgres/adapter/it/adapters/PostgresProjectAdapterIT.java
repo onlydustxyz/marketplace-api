@@ -5,7 +5,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
-import onlydust.com.marketplace.project.domain.model.MoreInfoLink;
+import onlydust.com.marketplace.project.domain.model.NamedLink;
 import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.view.ProjectDetailsView;
@@ -33,12 +33,12 @@ public class PostgresProjectAdapterIT extends AbstractPostgresIT {
         userRepository.save(new UserEntity(userId, 1L, faker.rickAndMorty().character(),
                 faker.rickAndMorty().location(), faker.internet().emailAddress(), new AuthenticatedUser.Role[]{AuthenticatedUser.Role.ADMIN},
                 new Date(), new Date(), new Date()));
-        final List<MoreInfoLink> moreInfoLinks = List.of(
-                MoreInfoLink.builder()
+        final List<NamedLink> namedLinks = List.of(
+                NamedLink.builder()
                         .value(faker.pokemon().name())
                         .url(faker.pokemon().location())
                         .build(),
-                MoreInfoLink.builder()
+                NamedLink.builder()
                         .value(faker.harryPotter().location())
                         .url(faker.harryPotter().book())
                         .build()
@@ -48,35 +48,35 @@ public class PostgresProjectAdapterIT extends AbstractPostgresIT {
         // When
         final String slug = projectStoragePort.createProject(
                 projectId, faker.name().lastName(), faker.name().name(), faker.harryPotter().location(), false,
-                moreInfoLinks, null, userId
+                namedLinks, null, userId
                 , null, ProjectVisibility.PUBLIC, null,
                 ProjectRewardSettings.defaultSettings(new Date()), null
         );
         final ProjectDetailsView project = projectStoragePort.getBySlug(slug, null);
-        assertEquals(moreInfoLinks.size(), project.getMoreInfos().size());
-        assertTrue(project.getMoreInfos().contains(moreInfoLinks.get(0)));
-        assertTrue(project.getMoreInfos().contains(moreInfoLinks.get(1)));
+        assertEquals(namedLinks.size(), project.getMoreInfos().size());
+        assertTrue(project.getMoreInfos().contains(namedLinks.get(0)));
+        assertTrue(project.getMoreInfos().contains(namedLinks.get(1)));
 
         // Then
-        final List<MoreInfoLink> moreInfoLinksUpdated = List.of(
-                MoreInfoLink.builder()
+        final List<NamedLink> namedLinksUpdated = List.of(
+                NamedLink.builder()
                         .value(faker.hacker().abbreviation())
-                        .url(moreInfoLinks.get(0).getUrl())
+                        .url(namedLinks.get(0).getUrl())
                         .build(),
-                MoreInfoLink.builder()
+                NamedLink.builder()
                         .value(faker.cat().name())
                         .url(faker.cat().breed())
                         .build()
         );
         projectStoragePort.updateProject(
                 projectId, project.getName(), project.getShortDescription(), project.getLongDescription(), false,
-                moreInfoLinksUpdated,
+                namedLinksUpdated,
                 null, null, null, null, null, null
         );
         final ProjectDetailsView projectUpdated = projectStoragePort.getBySlug(slug, null);
-        assertEquals(moreInfoLinksUpdated.size(), projectUpdated.getMoreInfos().size());
-        assertTrue(projectUpdated.getMoreInfos().contains(moreInfoLinksUpdated.get(0)));
-        assertTrue(projectUpdated.getMoreInfos().contains(moreInfoLinksUpdated.get(1)));
+        assertEquals(namedLinksUpdated.size(), projectUpdated.getMoreInfos().size());
+        assertTrue(projectUpdated.getMoreInfos().contains(namedLinksUpdated.get(0)));
+        assertTrue(projectUpdated.getMoreInfos().contains(namedLinksUpdated.get(1)));
 
     }
 }

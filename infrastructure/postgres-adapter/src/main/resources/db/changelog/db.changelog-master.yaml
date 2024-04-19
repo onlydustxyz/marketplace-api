@@ -241,3 +241,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000209_update_bi_schema.sql
   - include:
       file: db/changelog/changelogs/00000210_add_ecosystem_and_sponsor_metrics.sql
+  - include:
+      file: db/changelog/changelogs/00000210_create_hackathons_table.sql

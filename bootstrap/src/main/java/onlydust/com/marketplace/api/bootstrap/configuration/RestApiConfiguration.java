@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.accounting.domain.port.in.*;
-import onlydust.com.marketplace.api.contract.HackathonsApi;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.project.domain.port.input.*;
@@ -49,9 +48,10 @@ public class RestApiConfiguration {
                                final ContributorFacadePort contributorFacadePort,
                                final GithubAccountService githubAccountService,
                                final BillingProfileFacadePort billingProfileFacadePort,
-                               final PayoutPreferenceFacadePort payoutPreferenceFacadePort) {
+                               final PayoutPreferenceFacadePort payoutPreferenceFacadePort,
+                               final HackathonFacadePort hackathonFacadePort) {
         return new MeRestApi(authenticatedAppUserService, userFacadePort, contributorFacadePort,
-                githubAccountService, billingProfileFacadePort, payoutPreferenceFacadePort);
+                githubAccountService, billingProfileFacadePort, payoutPreferenceFacadePort, hackathonFacadePort);
     }
 
     @Bean
@@ -78,7 +78,8 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public HackathonRestApi hackathonsApi() {
-        return new HackathonRestApi();
+    public HackathonRestApi hackathonsApi(final AuthenticatedAppUserService authenticatedAppUserService,
+                                          final HackathonFacadePort hackathonFacadePort) {
+        return new HackathonRestApi(authenticatedAppUserService, hackathonFacadePort);
     }
 }

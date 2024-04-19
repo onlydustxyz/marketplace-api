@@ -226,4 +226,9 @@ public class DomainConfiguration {
     public EcosystemFacadePort ecosystemFacadePort(final EcosystemStorage ecosystemStorage) {
         return new EcosystemService(ecosystemStorage);
     }
+
+    @Bean
+    public HackathonFacadePort hackathonFacadePort(final HackathonStoragePort hackathonStoragePort) {
+        return new HackathonService(hackathonStoragePort);
+    }
 }

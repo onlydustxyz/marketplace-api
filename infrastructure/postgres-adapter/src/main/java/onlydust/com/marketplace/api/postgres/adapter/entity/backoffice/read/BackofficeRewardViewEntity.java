@@ -103,7 +103,7 @@ public class BackofficeRewardViewEntity {
                 .requestedAt(DateMapper.ofNullable(this.requestedAt))
                 .processedAt(DateMapper.ofNullable(this.statusData.paidAt()))
                 .githubUrls(isNull(this.githubUrls) ? List.of() : this.githubUrls.stream().sorted().toList())
-                .project(ShortProjectView.builder()
+                .project(ProjectShortView.builder()
                         .id(ProjectId.of(this.projectId))
                         .name(this.projectName)
                         .logoUrl(this.projectLogoUrl)

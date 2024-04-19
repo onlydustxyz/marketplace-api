@@ -1,12 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.configuration;
 
+import jakarta.persistence.EntityManager;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndexerEventEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.TrackingEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
@@ -20,8 +20,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
-import jakarta.persistence.EntityManager;
 
 @Configuration
 @EnableAutoConfiguration
@@ -374,5 +372,16 @@ public class PostgresConfiguration {
     @Bean
     PostgresSponsorAdapter postgresSponsorAdapter(final SponsorViewRepository sponsorViewRepository) {
         return new PostgresSponsorAdapter(sponsorViewRepository);
+    }
+
+    @Bean
+    public PostgresHackathonAdapter postgresHackathonAdapter(final HackathonRepository hackathonRepository,
+                                                             final HackathonDetailsViewRepository hackathonDetailsViewRepository,
+                                                             final HackathonShortViewRepository hackathonShortViewRepository,
+                                                             final HackathonRegistrationRepository hackathonRegistrationRepository) {
+        return new PostgresHackathonAdapter(hackathonRepository,
+                hackathonDetailsViewRepository,
+                hackathonShortViewRepository,
+                hackathonRegistrationRepository);
     }
 }

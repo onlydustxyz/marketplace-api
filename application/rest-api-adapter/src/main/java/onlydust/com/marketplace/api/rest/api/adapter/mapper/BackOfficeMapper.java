@@ -223,7 +223,7 @@ public interface BackOfficeMapper {
                 ;
     }
 
-    static ProjectLinkResponse mapToProjectLink(final ShortProjectView project) {
+    static ProjectLinkResponse mapToProjectLink(final ProjectShortView project) {
         if (project == null) return null;
 
         return new ProjectLinkResponse()
