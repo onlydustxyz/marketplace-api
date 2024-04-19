@@ -2,12 +2,15 @@ package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.port.input.HackathonFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 import onlydust.com.marketplace.project.domain.view.HackathonDetailsView;
+import onlydust.com.marketplace.project.domain.view.HackathonShortView;
 
 import java.time.ZonedDateTime;
+import java.util.Set;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -34,5 +37,10 @@ public class HackathonService implements HackathonFacadePort {
     public HackathonDetailsView getHackathonById(@NonNull Hackathon.Id hackathonId) {
         return hackathonStoragePort.findById(hackathonId)
                 .orElseThrow(() -> notFound("Hackathon %s not found".formatted(hackathonId)));
+    }
+
+    @Override
+    public Page<HackathonShortView> getHackathons(int pageIndex, int pageSize, Set<Hackathon.Status> statuses) {
+        return hackathonStoragePort.findByStatuses(pageIndex, pageSize, statuses);
     }
 }

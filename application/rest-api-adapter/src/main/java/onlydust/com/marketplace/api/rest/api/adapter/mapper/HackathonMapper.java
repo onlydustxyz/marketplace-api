@@ -1,11 +1,16 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
 import onlydust.com.marketplace.project.domain.view.HackathonDetailsView;
+import onlydust.com.marketplace.project.domain.view.HackathonShortView;
 
 import java.util.UUID;
+
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 
 public interface HackathonMapper {
     static HackathonsDetailsResponse toBackOfficeResponse(HackathonDetailsView view) {
@@ -64,7 +69,7 @@ public interface HackathonMapper {
                 .url(link.getUrl())
                 .value(link.getValue())
                 .build()).toList());
-        
+
         hackathon.sponsorIds().addAll(request.getSponsorIds());
 
         hackathon.tracks().addAll(request.getTracks().stream().map(track -> new Hackathon.Track(
@@ -75,5 +80,25 @@ public interface HackathonMapper {
                 track.getProjectIds()
         )).toList());
         return hackathon;
+    }
+
+    static HackathonsPageResponse map(final int pageIndex, Page<HackathonShortView> page) {
+        return new HackathonsPageResponse()
+                .totalPageNumber(page.getTotalPageNumber())
+                .totalItemNumber(page.getTotalItemNumber())
+                .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()))
+                .hasMore(hasMore(pageIndex, page.getTotalPageNumber()))
+                .hackathons(page.getContent().stream().map(hackathon -> new HackathonsPageItemResponse()
+                        .id(hackathon.id().value())
+                        .slug(hackathon.slug())
+                        .title(hackathon.title())
+                        .location(hackathon.location())
+                        .startDate(hackathon.startDate())
+                        .endDate(hackathon.endDate())
+                        .status(switch (hackathon.status()) {
+                            case DRAFT -> HackathonStatus.DRAFT;
+                            case PUBLISHED -> HackathonStatus.PUBLISHED;
+                        })
+                ).toList());
     }
 }

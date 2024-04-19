@@ -4,6 +4,7 @@ import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,6 +26,14 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
     @Test
     @Order(1)
     void should_raise_missing_authentication_given_no_access_token() {
+        // When
+        client.get()
+                .uri(getApiURI(HACKATHONS))
+                .exchange()
+                .expectStatus()
+                // Then
+                .isUnauthorized();
+
         // When
         client.post()
                 .uri(getApiURI(HACKATHONS))
@@ -86,6 +95,23 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .expectStatus()
                 // Then
                 .isNotFound();
+    }
+
+    @Test
+    @Order(1)
+    void should_get_no_hackathons() {
+        // When
+        client.get()
+                .uri(getApiURI(HACKATHONS, Map.of("pageIndex", "0", "pageSize", "10")))
+                .header("Authorization", "Bearer " + camille.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {"totalPageNumber":0,"totalItemNumber":0,"hasMore":false,"nextPageIndex":0,"hackathons":[]}
+                        """);
     }
 
     @Test
@@ -569,5 +595,75 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
         assertThat(hackathonId2.getValue()).isNotEqualTo(hackathonId1.getValue());
     }
 
+    @Test
+    @Order(31)
+    void should_get_hackathons() {
+        // When
+        client.get()
+                .uri(getApiURI(HACKATHONS, Map.of("pageIndex", "0", "pageSize", "10")))
+                .header("Authorization", "Bearer " + camille.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "hackathons": [
+                            {
+                              "slug": "hackathon-2021-updated",
+                              "status": "PUBLISHED",
+                              "title": "Hackathon 2021 updated",
+                              "location": "Paris 2",
+                              "startDate": "2024-04-23T00:00:00Z",
+                              "endDate": "2024-04-25T00:00:00Z"
+                            },
+                            {
+                              "slug": "od-hack",
+                              "status": "DRAFT",
+                              "title": "OD Hack",
+                              "location": null,
+                              "startDate": "2024-06-01T00:00:00Z",
+                              "endDate": "2024-06-05T00:00:00Z"
+                            }
+                          ]
+                        }
+                        """);
+    }
 
+    @Test
+    @Order(31)
+    void should_get_hackathons_paginated() {
+        // When
+        client.get()
+                .uri(getApiURI(HACKATHONS, Map.of("pageIndex", "1", "pageSize", "1")))
+                .header("Authorization", "Bearer " + camille.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 2,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 1,
+                          "hackathons": [
+                            {
+                              "slug": "od-hack",
+                              "status": "DRAFT",
+                              "title": "OD Hack",
+                              "location": null,
+                              "startDate": "2024-06-01T00:00:00Z",
+                              "endDate": "2024-06-05T00:00:00Z"
+                            }
+                          ]
+                        }
+                        """);
+    }
 }

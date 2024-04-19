@@ -6,14 +6,21 @@ import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeHackathonManagementApi;
 import onlydust.com.backoffice.api.contract.model.CreateHackathonRequest;
 import onlydust.com.backoffice.api.contract.model.HackathonsDetailsResponse;
+import onlydust.com.backoffice.api.contract.model.HackathonsPageResponse;
 import onlydust.com.backoffice.api.contract.model.UpdateHackathonRequest;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.HackathonMapper;
+import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.port.input.HackathonFacadePort;
+import onlydust.com.marketplace.project.domain.view.HackathonShortView;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.EnumSet;
 import java.util.UUID;
+
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 
 @RestController
 @Tags(@Tag(name = "BackofficeHackathonManagement"))
@@ -40,5 +47,14 @@ public class BackofficeHackathonRestApi implements BackofficeHackathonManagement
     public ResponseEntity<HackathonsDetailsResponse> getHackathonById(UUID hackathonId) {
         final var hackathonDetailsView = hackathonFacadePort.getHackathonById(Hackathon.Id.of(hackathonId));
         return ResponseEntity.ok(HackathonMapper.toBackOfficeResponse(hackathonDetailsView));
+    }
+
+    @Override
+    public ResponseEntity<HackathonsPageResponse> getHackathons(Integer pageIndex, Integer pageSize) {
+        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
+        final Page<HackathonShortView> hackathons = hackathonFacadePort.getHackathons(sanitizedPageIndex, sanitizedPageSize,
+                EnumSet.allOf(Hackathon.Status.class));
+        return ResponseEntity.ok(HackathonMapper.map(sanitizedPageIndex, hackathons));
     }
 }
