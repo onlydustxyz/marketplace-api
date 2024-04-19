@@ -1732,6 +1732,26 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
 
+  # BackofficeDebug ===============================================================
+  /bo/v1/debug/accounting/check-events:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeDebug
+      summary: Check all accounting events
+      operationId: checkAccountingEvents
+      description: |
+        Check all accounting events by constructing every account books.
+      responses:
+        "204":
+          description: 'Everything is fine'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+
 components:
   securitySchemes:
     bearerAuth:
