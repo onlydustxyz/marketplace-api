@@ -1637,29 +1637,33 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateHackathonRequest'
       responses:
-        "204":
-          description: 'The hackathon has been created'
+        "200":
+          description: 'Newly created hackathon'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HackathonsDetailsResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/hackathons/slug/{hackathonSlug}:
+  /bo/v1/hackathons/{hackathonId}:
     get:
       security:
         - bearerAuth: [ ]
       tags:
         - BackofficeHackathonManagement
-      summary: Get hackathon by slug
-      operationId: getHackathonBySlug
+      summary: Get hackathon by id
+      operationId: getHackathonById
       description: |
-        Get hackathon by slug
+        Get hackathon by id
       parameters:
         - in: path
-          name: hackathonSlug
+          name: hackathonId
           required: true
           schema:
-            $ref: '#/components/schemas/HackathonSlug'
+            $ref: '#/components/schemas/HackathonId'
       responses:
         "200":
           description: 'hackathon response'
@@ -1671,8 +1675,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-
-  /bo/v1/hackathons/{hackathonId}:
     put:
       security:
         - bearerAuth: [ ]
@@ -1696,8 +1698,12 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateHackathonRequest'
       responses:
-        "204":
-          description: 'The hackathon has been updated'
+        "200":
+          description: 'Updated hackathon'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HackathonsDetailsResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":

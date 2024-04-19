@@ -115,6 +115,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_GET_REWARD_CURRENCIES = "/api/v1/me/reward-currencies";
     protected static final String ME_BILLING_PROFILES = "/api/v1/me/billing-profiles";
     protected static final String ME_GET_PROFILE_GITHUB = "/api/v1/me/profile/github";
+    protected static final String ME_PUT_HACKATHON_REGISTRATIONS = "/api/v1/me/hackathons/%s/registrations";
     protected static final String USERS_GET = "/api/v1/users";
     protected static final String USERS_GET_BY_LOGIN = "/api/v1/users/login";
     protected static final String ME_GET_ORGANIZATIONS = "/api/v1/me/organizations";
@@ -141,6 +142,8 @@ public class AbstractMarketplaceApiIT {
     protected static final String SPONSOR_ALLOCATE = "/api/v1/sponsors/%s/allocate";
     protected static final String SPONSOR_UNALLOCATE = "/api/v1/sponsors/%s/unallocate";
     protected static final String SPONSOR_TRANSACTIONS = "/api/v1/sponsors/%s/transactions";
+    protected static final String HACKATHONS = "/api/v1/hackathons";
+    protected static final String HACKATHONS_BY_SLUG = "/api/v1/hackathons/slug/%s";
 
     private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
             .withDatabaseName("marketplace_db")

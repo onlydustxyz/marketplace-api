@@ -7,7 +7,7 @@ import onlydust.com.backoffice.api.contract.model.SponsorPageItemResponse;
 import onlydust.com.marketplace.accounting.domain.model.HistoricalTransaction;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
-import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
+import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -43,7 +43,7 @@ public interface SponsorMapper {
                 .nextPageIndex(nextPageIndex(pageIndex, sponsorViewPage.getTotalPageNumber()));
     }
 
-    static ProjectLinkResponse projectToBoResponse(final ShortProjectView view) {
+    static ProjectLinkResponse projectToBoResponse(final ProjectShortView view) {
         return new ProjectLinkResponse()
                 .id(view.id().value())
                 .slug(view.slug())
@@ -51,7 +51,7 @@ public interface SponsorMapper {
                 .name(view.name());
     }
 
-    static onlydust.com.marketplace.api.contract.model.ProjectLinkResponse projectToResponse(final ShortProjectView view) {
+    static onlydust.com.marketplace.api.contract.model.ProjectLinkResponse projectToResponse(final ProjectShortView view) {
         return new onlydust.com.marketplace.api.contract.model.ProjectLinkResponse()
                 .id(view.id().value())
                 .slug(view.slug())
@@ -91,7 +91,7 @@ public interface SponsorMapper {
                         .toList());
     }
 
-    private static ProjectWithBudgetResponse mapToProjectWithBudget(ShortProjectView project, List<SponsorAccountStatement> accountStatements) {
+    private static ProjectWithBudgetResponse mapToProjectWithBudget(ProjectShortView project, List<SponsorAccountStatement> accountStatements) {
         final var budgets = accountStatements.stream().map(statement -> {
                             final var budget = statement.unspentBalanceSentTo(ProjectId.of(project.id().value())).getValue();
                             final var currency = statement.account().currency();

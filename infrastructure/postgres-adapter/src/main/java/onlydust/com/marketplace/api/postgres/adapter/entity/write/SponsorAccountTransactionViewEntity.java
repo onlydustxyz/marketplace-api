@@ -6,7 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.Amount;
 import onlydust.com.marketplace.accounting.domain.model.ConvertedAmount;
 import onlydust.com.marketplace.accounting.domain.model.HistoricalTransaction;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
-import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
+import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -86,7 +86,7 @@ public class SponsorAccountTransactionViewEntity {
                 sponsorAccount.currency().latestUsdQuote()
                         .map(usdConversionRate -> new ConvertedAmount(Amount.of(amount.multiply(usdConversionRate)), usdConversionRate))
                         .orElse(null),
-                project == null ? null : ShortProjectView.builder()
+                project == null ? null : ProjectShortView.builder()
                         .id(ProjectId.of(project.getId()))
                         .name(project.getName())
                         .logoUrl(project.getLogoUrl())

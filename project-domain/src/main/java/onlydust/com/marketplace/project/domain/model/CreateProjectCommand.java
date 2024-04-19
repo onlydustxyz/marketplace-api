@@ -15,7 +15,7 @@ public class CreateProjectCommand {
     UUID firstProjectLeaderId;
     List<Long> githubUserIdsAsProjectLeadersToInvite;
     List<Long> githubRepoIds;
-    List<MoreInfoLink> moreInfos;
+    List<NamedLink> moreInfos;
     Boolean isLookingForContributors;
     String imageUrl;
     List<UUID> ecosystemIds;

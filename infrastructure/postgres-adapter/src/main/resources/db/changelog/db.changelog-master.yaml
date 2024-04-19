@@ -239,3 +239,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000208_modify-kyc-us-columns.sql
   - include:
       file: db/changelog/changelogs/00000209_update_bi_schema.sql
+  - include:
+      file: db/changelog/changelogs/00000210_create_hackathons_table.sql
