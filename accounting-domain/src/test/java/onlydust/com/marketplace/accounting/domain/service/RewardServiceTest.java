@@ -1,13 +1,13 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.accounting.domain.events.RewardsPaid;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
@@ -15,6 +15,8 @@ import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
 import onlydust.com.marketplace.accounting.domain.view.UserView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
+import onlydust.com.marketplace.kernel.observer.MailObserver;
+import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,13 +34,13 @@ public class RewardServiceTest {
     private final AccountingRewardStoragePort accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
     private final AccountingFacadePort accountingFacadePort = mock(AccountingFacadePort.class);
     private final SponsorStoragePort sponsorStoragePort = mock(SponsorStoragePort.class);
-    private final MailNotificationPort mailNotificationPort = mock(MailNotificationPort.class);
-    private final RewardService rewardService = new RewardService(accountingRewardStoragePort, mailNotificationPort, accountingFacadePort, sponsorStoragePort);
+    private final MailObserver mailObserver = mock(MailObserver.class);
+    private final RewardService rewardService = new RewardService(accountingRewardStoragePort, accountingFacadePort, sponsorStoragePort, mailObserver);
 
 
     @BeforeEach
     void setUp() {
-        reset(accountingRewardStoragePort, mailNotificationPort);
+        reset(accountingRewardStoragePort, mailObserver);
     }
 
     @Test
@@ -63,8 +65,8 @@ public class RewardServiceTest {
         rewardService.notifyAllNewPaidRewards();
 
         // Then
-        verify(mailNotificationPort, times(1)).sendRewardsPaidMail(email1, List.of(r11, r12));
-        verify(mailNotificationPort, times(1)).sendRewardsPaidMail(email2, List.of(r21, r22));
+        verify(mailObserver, times(1)).send(new RewardsPaid(email1, List.of(r11, r12)));
+        verify(mailObserver, times(1)).send(new RewardsPaid(email2, List.of(r21, r22)));
         verify(accountingRewardStoragePort).markRewardsAsPaymentNotified(rewardViews.stream().map(RewardDetailsView::id).toList());
     }
 

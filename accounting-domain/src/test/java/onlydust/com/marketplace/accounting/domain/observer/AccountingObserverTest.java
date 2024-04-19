@@ -16,6 +16,8 @@ import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
+import onlydust.com.marketplace.kernel.observer.MailObserver;
+import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -44,6 +46,7 @@ public class AccountingObserverTest {
     CurrencyStorage currencyStorage;
     AccountingObserver accountingObserver;
     ReceiptStoragePort receiptStorage;
+    MailObserver mailObserver;
     final Faker faker = new Faker();
     final Currency currency = ETH;
     final Currency usd = USD;
@@ -62,9 +65,10 @@ public class AccountingObserverTest {
         invoiceStorage = mock(InvoiceStoragePort.class);
         receiptStorage = mock(ReceiptStoragePort.class);
         billingProfileStoragePort = mock(BillingProfileStoragePort.class);
+        mailObserver = mock(MailObserver.class);
         when(currencyStorage.findByCode(usd.code())).thenReturn(Optional.of(usd));
         accountingObserver = new AccountingObserver(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage, invoiceStorage,
-                receiptStorage, billingProfileStoragePort);
+                receiptStorage, billingProfileStoragePort, mailObserver);
 
         when(rewardStatusStorage.get(any(RewardId.class))).then(invocation -> {
             final var rewardId = invocation.getArgument(0, RewardId.class);
@@ -438,9 +442,7 @@ public class AccountingObserverTest {
                 final var rewardId = invocation.getArgument(0, RewardId.class);
                 return Optional.of(new RewardStatusData(rewardId).invoiceReceivedAt(invoice.createdAt()));
             });
-
-            // When
-            accountingObserver.onInvoiceRejected(new InvoiceRejected(
+            final InvoiceRejected invalidInvoice = new InvoiceRejected(
                     faker.internet().emailAddress(),
                     3L,
                     faker.internet().slug(),
@@ -454,7 +456,10 @@ public class AccountingObserverTest {
                             .dollarsEquivalent(r.amount().getValue())
                             .build()).toList(),
                     "Invalid invoice"
-            ));
+            );
+
+            // When
+            accountingObserver.onInvoiceRejected(invalidInvoice);
 
             // Then
             final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
@@ -462,6 +467,7 @@ public class AccountingObserverTest {
             final var rewardStatuses = rewardStatusCaptor.getAllValues();
             assertThat(rewardStatuses).hasSize(3);
             assertThat(rewardStatuses).allMatch(r -> r.invoiceReceivedAt().isEmpty());
+            verify(mailObserver,times(1)).send(invalidInvoice);
         }
     }
 

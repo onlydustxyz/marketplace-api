@@ -27,6 +27,7 @@
         <module>posthog-api-client-adapter</module>
         <module>sumsub-api-client-adapter</module>
         <module>slack-adapter</module>
+        <module>customer-io-adapter</module>
     </modules>
 
     <properties>

@@ -8,6 +8,8 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
+import onlydust.com.marketplace.kernel.observer.MailObserver;
+import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -26,16 +28,18 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
     private final ReceiptStoragePort receiptStorage;
     private final BillingProfileStoragePort billingProfileStoragePort;
     private final Currency usd;
+    private final MailObserver accountingMailObserver;
 
     public AccountingObserver(RewardStatusStorage rewardStatusStorage, RewardUsdEquivalentStorage rewardUsdEquivalentStorage, QuoteStorage quoteStorage,
                               CurrencyStorage currencyStorage, InvoiceStoragePort invoiceStorage, ReceiptStoragePort receiptStorage,
-                              BillingProfileStoragePort billingProfileStoragePort) {
+                              BillingProfileStoragePort billingProfileStoragePort, MailObserver accountingMailObserver) {
         this.rewardStatusStorage = rewardStatusStorage;
         this.rewardUsdEquivalentStorage = rewardUsdEquivalentStorage;
         this.quoteStorage = quoteStorage;
         this.invoiceStorage = invoiceStorage;
         this.receiptStorage = receiptStorage;
         this.billingProfileStoragePort = billingProfileStoragePort;
+        this.accountingMailObserver = accountingMailObserver;
         this.usd = currencyStorage.findByCode(Currency.Code.USD).orElseThrow(() -> internalServerError("Currency USD not found"));
     }
 
@@ -127,6 +131,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
                     rewardStatusStorage.get(reward.id()).orElseThrow(() -> notFound("RewardStatus not found for reward %s".formatted(reward.id())));
             rewardStatusStorage.save(rewardStatus.invoiceReceivedAt(null));
         });
+        accountingMailObserver.send(invoiceRejected);
     }
 
     @Override

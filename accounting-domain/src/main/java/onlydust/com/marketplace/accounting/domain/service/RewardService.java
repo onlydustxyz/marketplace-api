@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.accounting.domain.events.RewardsPaid;
 import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
@@ -8,12 +9,13 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
+import onlydust.com.marketplace.kernel.observer.MailObserver;
 import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,9 +29,9 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 @AllArgsConstructor
 public class RewardService implements AccountingRewardPort {
     private final AccountingRewardStoragePort accountingRewardStoragePort;
-    private final MailNotificationPort mailNotificationPort;
     private final AccountingFacadePort accountingFacadePort;
     private final SponsorStoragePort sponsorStoragePort;
+    private final MailObserver mailObserver;
 
     @Override
     public Page<RewardDetailsView> getRewards(int pageIndex, int pageSize,
@@ -63,7 +65,7 @@ public class RewardService implements AccountingRewardPort {
         final var rewardViews = accountingRewardStoragePort.findPaidRewardsToNotify();
         for (final var listOfPaidRewardsMapToAdminEmail :
                 rewardViews.stream().collect(groupingBy(rewardView -> rewardView.invoice().createdBy().email())).entrySet()) {
-            mailNotificationPort.sendRewardsPaidMail(listOfPaidRewardsMapToAdminEmail.getKey(), listOfPaidRewardsMapToAdminEmail.getValue());
+            mailObserver.send(new RewardsPaid(listOfPaidRewardsMapToAdminEmail.getKey(),listOfPaidRewardsMapToAdminEmail.getValue()));
         }
         accountingRewardStoragePort.markRewardsAsPaymentNotified(rewardViews.stream()
                 .map(RewardDetailsView::id)
