@@ -181,7 +181,7 @@ public class Invoice {
                     billingProfile.getType(),
                     isNull(billingProfile.getKyc()) ? null : KycSnapshot.of(billingProfile.getKyc()),
                     isNull(billingProfile.getKyb()) ? null : KybSnapshot.of(billingProfile.getKyb()),
-                    payoutInfo.getBankAccount(),
+                    payoutInfo.bankAccount().orElse(null),
                     payoutInfo.wallets()
             );
         }

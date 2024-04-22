@@ -1,0 +1,30 @@
+{
+    "request": {
+        "url": "/INFURA_API_KEY",
+        "method": "POST",
+        "bodyPatterns": [
+            {
+                "equalToJson": {
+                    "jsonrpc": "2.0",
+                    "method": "eth_call",
+                    "params": [
+                        {
+                            "to": "0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41",
+                            "data": "0x01ffc9a79061b92300000000000000000000000000000000000000000000000000000000"
+                        },
+                        "latest"
+                    ]
+                },
+                "ignoreArrayOrder": true,
+                "ignoreExtraElements": true
+            }
+        ]
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "body-eth_call-resolver-supportsInterface.json",
+        "headers": {
+            "Content-Type": "application/json"
+        }
+    }
+}

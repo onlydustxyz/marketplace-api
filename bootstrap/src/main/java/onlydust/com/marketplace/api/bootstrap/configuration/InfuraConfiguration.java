@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.api.infura.InfuraClient;
 import onlydust.com.marketplace.api.infura.adapters.EthInfuraERC20ProviderAdapter;
+import onlydust.com.marketplace.api.infura.adapters.EthInfuraEnsValidatorAdapter;
 import onlydust.com.marketplace.api.infura.adapters.StarknetInfuraERC20ProviderAdapter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +19,11 @@ public class InfuraConfiguration {
     @Bean
     public EthInfuraERC20ProviderAdapter ethereumERC20Provider(final InfuraClient.Properties ethereumProperties) {
         return new EthInfuraERC20ProviderAdapter(ethereumProperties);
+    }
+
+    @Bean
+    public EthInfuraEnsValidatorAdapter ethereumEnsValidatorAdapter(final InfuraClient.Properties ethereumProperties) {
+        return new EthInfuraEnsValidatorAdapter(ethereumProperties);
     }
 
     @Bean
