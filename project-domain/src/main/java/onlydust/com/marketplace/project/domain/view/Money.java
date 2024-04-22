@@ -1,29 +1,52 @@
 package onlydust.com.marketplace.project.domain.view;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Value;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.util.Optional;
 
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.pretty;
 
-@Value
-@Builder
-@AllArgsConstructor
+@Data
+@Getter(AccessLevel.NONE)
+@Accessors(fluent = true, chain = true)
 public class Money {
+    @NonNull
     BigDecimal amount;
+    @NonNull
     CurrencyView currency;
-    BigDecimal usdEquivalent;
+    BigDecimal usdConversionRateValue;
+    BigDecimal dollarsEquivalentValue;
 
-    public BigDecimal getPrettyAmount() {
-        if (amount == null || currency == null) {
-            return null;
-        }
+    public Money(@NonNull BigDecimal amount, @NonNull CurrencyView currency) {
+        this.amount = amount;
+        this.currency = currency;
+        this.usdConversionRateValue = null;
+        this.dollarsEquivalentValue = null;
+    }
 
-        final var rate = (amount.compareTo(BigDecimal.ZERO) == 0 || usdEquivalent == null) ? null : usdEquivalent.divide(amount, RoundingMode.HALF_EVEN);
-        return pretty(amount, currency.decimals(), rate);
+    public BigDecimal amount() {
+        return amount;
+    }
+
+    public CurrencyView currency() {
+        return currency;
+    }
+
+    public Optional<BigDecimal> usdConversionRate() {
+        return Optional.ofNullable(usdConversionRateValue);
+    }
+
+    public Optional<BigDecimal> dollarsEquivalent() {
+        return Optional.ofNullable(dollarsEquivalentValue);
+    }
+
+    public BigDecimal prettyAmount() {
+        return pretty(amount, currency.decimals(), usdConversionRateValue);
     }
 }

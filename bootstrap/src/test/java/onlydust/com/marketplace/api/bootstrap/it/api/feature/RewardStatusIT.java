@@ -4098,9 +4098,11 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
             final var totalAmount = new MutableObject<Long>();
             final var totalUsdEquivalent = new MutableObject<BigDecimal>();
             bodyContentSpec
-                    .jsonPath("$.rewardedAmount.amount").value(totalAmount::setValue, Long.class)
-                    .jsonPath("$.rewardedAmount.usdEquivalent").value(totalUsdEquivalent::setValue, BigDecimal.class)
-                    .jsonPath("$.pendingAmount.amount").isEqualTo(pendingAmount);
+                    .jsonPath("$.rewardedAmount.totalPerCurrency.length()").isEqualTo(1)
+                    .jsonPath("$.rewardedAmount.totalPerCurrency[0].amount").value(totalAmount::setValue, Long.class)
+                    .jsonPath("$.rewardedAmount.totalUsdEquivalent").value(totalUsdEquivalent::setValue, BigDecimal.class)
+                    .jsonPath("$.pendingAmount.totalPerCurrency.length()").isEqualTo(1)
+                    .jsonPath("$.pendingAmount.totalPerCurrency[0].amount").isEqualTo(pendingAmount);
 
             assertThat(totalAmount.getValue()).isEqualTo(rewardedAmount);
             assertThat(totalUsdEquivalent.getValue().doubleValue()).isEqualTo(usdEquivalent.doubleValue());

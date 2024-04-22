@@ -116,11 +116,9 @@ public class RewardDetailsViewEntity {
     }
 
     private Money amount() {
-        return Money.builder()
-                .amount(amount)
-                .currency(currency.toView())
-                .usdEquivalent(statusData.amountUsdEquivalent())
-                .build();
+        return new Money(amount, currency.toView())
+                .dollarsEquivalentValue(statusData.amountUsdEquivalent())
+                .usdConversionRateValue(statusData.usdConversionRate());
     }
 
     private RewardStatus status() {
