@@ -15,15 +15,12 @@ import onlydust.com.marketplace.project.domain.port.output.ProjectRewardStorageP
 import onlydust.com.marketplace.project.domain.view.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -63,20 +60,16 @@ public class PostgresProjectRewardAdapter implements ProjectRewardStoragePort {
                         .totalItemNumber((int) page.getTotalElements())
                         .totalPageNumber(page.getTotalPages())
                         .build())
-                .remainingBudget(budgetStats.size() == 1 ?
-                        new Money(budgetStats.get(0).getRemainingAmount(),
-                                budgetStats.get(0).getCurrency().toView(),
-                                budgetStats.get(0).getRemainingUsdAmount()) :
-                        new Money(null, null,
-                                budgetStats.stream().map(BudgetStatsEntity::getRemainingUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,
-                                        BigDecimal::add)))
-                .spentAmount(budgetStats.size() == 1 ?
-                        new Money(budgetStats.get(0).getSpentAmount(),
-                                budgetStats.get(0).getCurrency().toView(),
-                                budgetStats.get(0).getSpentUsdAmount()) :
-                        new Money(null, null,
-                                budgetStats.stream().map(BudgetStatsEntity::getSpentUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,
-                                        BigDecimal::add)))
+                .budgetStatsPerCurrency(budgetStats.stream()
+                        .map(budgetStatsEntity -> new ProjectRewardsPageView.BudgetStats(
+                                new Money(budgetStatsEntity.getRemainingAmount(),
+                                        budgetStatsEntity.getCurrency().toView(),
+                                        budgetStatsEntity.getRemainingUsdAmount()),
+                                new Money(budgetStatsEntity.getSpentAmount(),
+                                        budgetStatsEntity.getCurrency().toView(),
+                                        budgetStatsEntity.getSpentUsdAmount())
+                        ))
+                        .toList())
                 .sentRewardsCount(budgetStats.stream().map(BudgetStatsEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .rewardedContributionsCount(budgetStats.stream().map(BudgetStatsEntity::getRewardItemIds).flatMap(Collection::stream).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .rewardedContributorsCount(budgetStats.stream().map(BudgetStatsEntity::getRewardRecipientIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())

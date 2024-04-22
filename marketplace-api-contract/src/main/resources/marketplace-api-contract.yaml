@@ -3225,6 +3225,23 @@ components:
           description: USD conversion rate
           example: 1.5
 
+    DetailedTotalMoney:
+      type: object
+      description: Detailed total money value object
+      required:
+        - totalUsdEquivalent
+        - totalByCurrency
+      properties:
+        totalUsdEquivalent:
+          type: number
+          description: USD equivalent of the total amount
+          example: 100
+        totalPerCurrency:
+          type: array
+          description: Total amount by currency
+          items:
+            $ref: '#/components/schemas/Money'
+
 
     # RESPONSES ==================================================================
     GithubUserResponse:
@@ -4179,9 +4196,9 @@ components:
           items:
             $ref: '#/components/schemas/RewardPageItemResponse'
         remainingBudget:
-          $ref: '#/components/schemas/Money'
+          $ref: '#/components/schemas/DetailedTotalMoney'
         spentAmount:
-          $ref: '#/components/schemas/Money'
+          $ref: '#/components/schemas/DetailedTotalMoney'
         sentRewardsCount:
           type: integer
           description: Number of rewards that have been sent
@@ -4201,6 +4218,7 @@ components:
         nextPageIndex:
           description: if there is no next page, it will be equals to the last page
           type: integer
+
     MyRewardsPageResponse:
       type: object
       required:
@@ -4225,9 +4243,9 @@ components:
           description: if there is no next page, it will be equals to the last page
           type: integer
         rewardedAmount:
-          $ref: '#/components/schemas/Money'
+          $ref: '#/components/schemas/DetailedTotalMoney'
         pendingAmount:
-          $ref: '#/components/schemas/Money'
+          $ref: '#/components/schemas/DetailedTotalMoney'
         receivedRewardsCount:
           type: integer
           description: Number of rewards that have been received
