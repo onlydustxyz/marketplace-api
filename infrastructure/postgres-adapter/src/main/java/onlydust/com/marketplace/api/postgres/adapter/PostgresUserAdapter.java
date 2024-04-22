@@ -24,7 +24,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -246,20 +245,13 @@ public class PostgresUserAdapter implements UserStoragePort {
                         .totalItemNumber((int) page.getTotalElements())
                         .totalPageNumber(page.getTotalPages())
                         .build())
-                .rewardedAmount(rewardsStats.size() == 1 ?
-                        new Money(rewardsStats.get(0).getProcessedAmount(),
-                                rewardsStats.get(0).getCurrency().toView(),
-                                rewardsStats.get(0).getProcessedUsdAmount()) :
-                        new Money(null, null,
-                                rewardsStats.stream().map(RewardStatsEntity::getProcessedUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,
-                                        BigDecimal::add)))
-                .pendingAmount(rewardsStats.size() == 1 ?
-                        new Money(rewardsStats.get(0).getPendingAmount(),
-                                rewardsStats.get(0).getCurrency().toView(),
-                                rewardsStats.get(0).getPendingUsdAmount()) :
-                        new Money(null, null,
-                                rewardsStats.stream().map(RewardStatsEntity::getPendingUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,
-                                        BigDecimal::add)))
+                .rewardAmountsPerCurrency(rewardsStats.stream()
+                        .map(stats -> new UserRewardsPageView.RewardAmounts(
+                                new Money(stats.getProcessedAmount(), stats.getCurrency().toView())
+                                        .dollarsEquivalentValue(stats.getProcessedUsdAmount()),
+                                new Money(stats.getPendingAmount(), stats.getCurrency().toView())
+                                        .dollarsEquivalentValue(stats.getPendingUsdAmount())))
+                        .toList())
                 .pendingRequestCount(rewardsStats.size() == 1 ? rewardsStats.get(0).getPendingRequestCount() :
                         rewardsStats.stream().map(RewardStatsEntity::getPendingRequestCount).filter(Objects::nonNull).reduce(0, Integer::sum))
                 .receivedRewardsCount(rewardsStats.stream().map(RewardStatsEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())

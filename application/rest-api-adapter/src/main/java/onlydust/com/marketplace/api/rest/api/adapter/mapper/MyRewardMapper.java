@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
+import onlydust.com.marketplace.api.contract.model.DetailedTotalMoney;
 import onlydust.com.marketplace.api.contract.model.MyRewardPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.MyRewardsPageResponse;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
@@ -20,8 +21,16 @@ public interface MyRewardMapper {
                 .totalItemNumber(page.getRewards().getTotalItemNumber())
                 .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getRewards().getTotalPageNumber()))
                 .rewards(page.getRewards().getContent().stream().map((UserRewardView view) -> mapMyRewardViewToResponse(view, authenticatedUser)).toList())
-                .pendingAmount(toMoney(page.getPendingAmount()))
-                .rewardedAmount(toMoney(page.getRewardedAmount()))
+                .pendingAmount(new DetailedTotalMoney()
+                        .totalUsdEquivalent(page.totalPendingAmountUsdEquivalent())
+                        .totalPerCurrency(page.getRewardAmountsPerCurrency().stream()
+                                .map(budgetStats -> toMoney(budgetStats.pendingAmount()))
+                                .toList()))
+                .rewardedAmount(new DetailedTotalMoney()
+                        .totalUsdEquivalent(page.totalRewardedAmountUsdEquivalent())
+                        .totalPerCurrency(page.getRewardAmountsPerCurrency().stream()
+                                .map(budgetStats -> toMoney(budgetStats.rewardedAmount()))
+                                .toList()))
                 .receivedRewardsCount(page.getReceivedRewardsCount())
                 .rewardedContributionsCount(page.getRewardedContributionsCount())
                 .rewardingProjectsCount(page.getRewardingProjectsCount())

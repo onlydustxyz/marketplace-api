@@ -172,7 +172,7 @@ public interface UserMapper {
     static RewardTotalAmountsResponse totalsEarnedToResponse(TotalsEarned totalsEarned) {
         return new RewardTotalAmountsResponse()
                 .totalAmount(totalsEarned.getTotalDollarsEquivalent())
-                .details(totalsEarned.getDetails().stream().sorted(comparing(Money::getAmount)).map(MoneyMapper::toMoney).toList());
+                .details(totalsEarned.getDetails().stream().sorted(comparing(Money::amount)).map(MoneyMapper::toMoney).toList());
     }
 
     static List<ContactInformation> contactToResponse(final Set<Contact> contacts) {

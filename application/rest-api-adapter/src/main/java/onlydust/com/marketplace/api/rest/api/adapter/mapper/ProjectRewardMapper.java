@@ -1,11 +1,14 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
+import onlydust.com.marketplace.api.contract.model.DetailedTotalMoney;
 import onlydust.com.marketplace.api.contract.model.RewardPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.RewardsPageResponse;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.project.domain.view.ProjectRewardsPageView;
+
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MoneyMapper.toMoney;
 
 public interface ProjectRewardMapper {
 
@@ -15,8 +18,16 @@ public interface ProjectRewardMapper {
                 .totalPageNumber(page.getRewards().getTotalPageNumber())
                 .totalItemNumber(page.getRewards().getTotalItemNumber())
                 .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getRewards().getTotalPageNumber()))
-                .remainingBudget(MoneyMapper.toMoney(page.getRemainingBudget()))
-                .spentAmount(MoneyMapper.toMoney(page.getSpentAmount()))
+                .remainingBudget(new DetailedTotalMoney()
+                        .totalUsdEquivalent(page.totalRemainingUsdEquivalent())
+                        .totalPerCurrency(page.getBudgetStatsPerCurrency().stream()
+                                .map(budgetStats -> toMoney(budgetStats.remainingBudget()))
+                                .toList()))
+                .spentAmount(new DetailedTotalMoney()
+                        .totalUsdEquivalent(page.totalSpentUsdEquivalent())
+                        .totalPerCurrency(page.getBudgetStatsPerCurrency().stream()
+                                .map(budgetStats -> toMoney(budgetStats.spentAmount()))
+                                .toList()))
                 .sentRewardsCount(page.getSentRewardsCount())
                 .rewardedContributionsCount(page.getRewardedContributionsCount())
                 .rewardedContributorsCount(page.getRewardedContributorsCount());
@@ -33,7 +44,7 @@ public interface ProjectRewardMapper {
         rewardPageItemResponse.setId(view.getId());
         rewardPageItemResponse.setNumberOfRewardedContributions(view.getNumberOfRewardedContributions());
         rewardPageItemResponse.setRewardedUser(ContributorMapper.of(view.getRewardedUser()));
-        rewardPageItemResponse.setAmount(MoneyMapper.toMoney(view.getAmount()));
+        rewardPageItemResponse.setAmount(toMoney(view.getAmount()));
         rewardPageItemResponse.setStatus(RewardMapper.map(view.getStatus().as(authenticatedUser)));
         rewardPageItemResponse.setRequestedAt(DateMapper.toZoneDateTime(view.getRequestedAt()));
         rewardPageItemResponse.setProcessedAt(DateMapper.toZoneDateTime(view.getProcessedAt()));

@@ -21,8 +21,7 @@ import java.util.Objects;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.reducing;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.mapCurrency;
-import static onlydust.com.marketplace.kernel.mapper.AmountMapper.pretty;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MoneyMapper.toMoney;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
 
@@ -95,11 +94,7 @@ public interface SponsorMapper {
         final var budgets = accountStatements.stream().map(statement -> {
                             final var budget = statement.unspentBalanceSentTo(ProjectId.of(project.id().value())).getValue();
                             final var currency = statement.account().currency();
-                            return new Money()
-                                    .amount(budget)
-                                    .prettyAmount(pretty(budget, currency.decimals(), currency.latestUsdQuote().orElse(null)))
-                                    .currency(mapCurrency(currency))
-                                    .usdEquivalent(currency.latestUsdQuote().map(r -> r.multiply(budget)).orElse(null));
+                            return toMoney(budget, currency);
                         }
                 )
                 .filter(money -> money.getAmount().compareTo(BigDecimal.ZERO) > 0)
@@ -116,15 +111,7 @@ public interface SponsorMapper {
     }
 
     private static @NonNull Money mapAllowanceToMoney(SponsorAccountStatement accountStatement) {
-        return new Money()
-                .currency(mapCurrency(accountStatement.account().currency()))
-                .amount(accountStatement.allowance().getValue())
-                .prettyAmount(pretty(accountStatement.allowance().getValue(),
-                        accountStatement.account().currency().decimals(),
-                        accountStatement.account().currency().latestUsdQuote().orElse(null)))
-                .usdEquivalent(accountStatement.account().currency().latestUsdQuote()
-                        .map(q -> q.multiply(accountStatement.allowance().getValue()))
-                        .orElse(null));
+        return toMoney(accountStatement.allowance().getValue(), accountStatement.account().currency());
     }
 
     static TransactionHistoryPageResponse mapTransactionHistory(Page<HistoricalTransaction> page, int pageIndex) {
@@ -142,10 +129,7 @@ public interface SponsorMapper {
                 .date(historicalTransaction.timestamp())
                 .type(mapTransactionType(historicalTransaction))
                 .project(historicalTransaction.project() == null ? null : projectToResponse(historicalTransaction.project()))
-                .amount(new Money()
-                        .amount(historicalTransaction.amount().getValue())
-                        .currency(mapCurrency(historicalTransaction.sponsorAccount().currency()))
-                );
+                .amount(toMoney(historicalTransaction.amount().getValue(), historicalTransaction.sponsorAccount().currency()));
     }
 
     static SponsorAccountTransactionType mapTransactionType(HistoricalTransaction transaction) {

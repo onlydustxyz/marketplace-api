@@ -1,11 +1,13 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.api.contract.model.BaseMoney;
 import onlydust.com.marketplace.api.contract.model.ConvertibleMoney;
 import onlydust.com.marketplace.api.contract.model.Money;
 
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.mapCurrency;
@@ -14,10 +16,11 @@ import static onlydust.com.marketplace.kernel.mapper.AmountMapper.pretty;
 public interface MoneyMapper {
     static Money toMoney(onlydust.com.marketplace.project.domain.view.Money money) {
         return new Money()
-                .amount(money.getAmount())
-                .prettyAmount(money.getPrettyAmount())
-                .currency(mapCurrency(money.getCurrency()))
-                .usdEquivalent(money.getUsdEquivalent());
+                .amount(money.amount())
+                .prettyAmount(money.prettyAmount())
+                .currency(mapCurrency(money.currency()))
+                .usdEquivalent(money.dollarsEquivalent().orElse(null))
+                .usdConversionRate(money.usdConversionRate().orElse(null));
     }
 
     static Money toMoney(final MoneyView view) {
@@ -28,7 +31,15 @@ public interface MoneyMapper {
                 .amount(view.amount())
                 .prettyAmount(view.prettyAmount())
                 .currency(mapCurrency(view.currency()))
-                .usdEquivalent(view.dollarsEquivalent().orElse(null));
+                .usdEquivalent(view.dollarsEquivalent().orElse(null))
+                .usdConversionRate(view.usdConversionRate().orElse(null));
+    }
+
+    static Money toMoney(final BigDecimal amount, final Currency currency) {
+        if (amount == null || currency == null) {
+            return null;
+        }
+        return toMoney(new MoneyView(amount, currency));
     }
 
     static @NonNull Money add(Money left, @NonNull Money right) {
