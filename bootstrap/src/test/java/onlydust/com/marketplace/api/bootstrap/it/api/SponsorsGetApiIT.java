@@ -69,7 +69,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": null,
                                 "decimals": 8
                               },
-                              "usdEquivalent": null
+                              "usdEquivalent": null,
+                              "usdConversionRate": null
                             },
                             {
                               "amount": 0,
@@ -81,7 +82,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": null,
                                 "decimals": 18
                               },
-                              "usdEquivalent": 0.00
+                              "usdEquivalent": 0.00,
+                              "usdConversionRate": 1781.98
                             },
                             {
                               "amount": 0,
@@ -93,7 +95,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": null,
                                 "decimals": 18
                               },
-                              "usdEquivalent": null
+                              "usdEquivalent": null,
+                              "usdConversionRate": null
                             },
                             {
                               "amount": 0,
@@ -105,7 +108,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": null,
                                 "decimals": 2
                               },
-                              "usdEquivalent": 0
+                              "usdEquivalent": 0,
+                              "usdConversionRate": 1
                             },
                             {
                               "amount": 0,
@@ -117,7 +121,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                 "decimals": 6
                               },
-                              "usdEquivalent": 0.00
+                              "usdEquivalent": 0.00,
+                              "usdConversionRate": 1.01
                             }
                           ],
                           "projects": [
@@ -138,7 +143,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                     "logoUrl": null,
                                     "decimals": 8
                                   },
-                                  "usdEquivalent": null
+                                  "usdEquivalent": null,
+                                  "usdConversionRate": null
                                 },
                                 {
                                   "amount": 3000,
@@ -150,7 +156,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                     "logoUrl": null,
                                     "decimals": 18
                                   },
-                                  "usdEquivalent": 5345940.00
+                                  "usdEquivalent": 5345940.00,
+                                  "usdConversionRate": 1781.98
                                 },
                                 {
                                   "amount": 17000,
@@ -162,7 +169,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                     "logoUrl": null,
                                     "decimals": 18
                                   },
-                                  "usdEquivalent": null
+                                  "usdEquivalent": null,
+                                  "usdConversionRate": null
                                 },
                                 {
                                   "amount": 99250.00,
@@ -174,7 +182,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                     "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                     "decimals": 6
                                   },
-                                  "usdEquivalent": 100242.5000
+                                  "usdEquivalent": 100242.5000,
+                                  "usdConversionRate": 1.01
                                 }
                               ]
                             },
@@ -195,7 +204,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                     "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                     "decimals": 6
                                   },
-                                  "usdEquivalent": 20025335.65
+                                  "usdEquivalent": 20025335.65,
+                                  "usdConversionRate": 1.01
                                 }
                               ]
                             }
@@ -228,6 +238,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               "project": null,
                               "amount": {
                                 "amount": 3000,
+                                "prettyAmount": 3000,
                                 "currency": {
                                   "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                   "code": "USD",
@@ -235,7 +246,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 2
                                 },
-                                "usdEquivalent": null
+                                "usdEquivalent": 3000,
+                                "usdConversionRate": 1
                               }
                             },
                             {
@@ -245,6 +257,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               "project": null,
                               "amount": {
                                 "amount": 19933440,
+                                "prettyAmount": 19933440,
                                 "currency": {
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
@@ -252,7 +265,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                   "decimals": 6
                                 },
-                                "usdEquivalent": null
+                                "usdEquivalent": 20132774.40,
+                                "usdConversionRate": 1.01
                               }
                             },
                             {
@@ -262,6 +276,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               "project": null,
                               "amount": {
                                 "amount": 3000,
+                                "prettyAmount": 3000,
                                 "currency": {
                                   "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                   "code": "ETH",
@@ -269,7 +284,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": null
+                                "usdEquivalent": 5345940.00,
+                                "usdConversionRate": 1781.98
                               }
                             },
                             {
@@ -279,6 +295,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               "project": null,
                               "amount": {
                                 "amount": 17000,
+                                "prettyAmount": 17000,
                                 "currency": {
                                   "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
                                   "code": "OP",
@@ -286,7 +303,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": null
+                                "usdEquivalent": null,
+                                "usdConversionRate": null
                               }
                             },
                             {
@@ -296,6 +314,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               "project": null,
                               "amount": {
                                 "amount": 400000,
+                                "prettyAmount": 400000,
                                 "currency": {
                                   "id": "48388edb-fda2-4a32-b228-28152a147500",
                                   "code": "APT",
@@ -303,7 +322,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 8
                                 },
-                                "usdEquivalent": null
+                                "usdEquivalent": null,
+                                "usdConversionRate": null
                               }
                             },
                             {
@@ -318,6 +338,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               },
                               "amount": {
                                 "amount": 17000,
+                                "prettyAmount": 17000,
                                 "currency": {
                                   "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
                                   "code": "OP",
@@ -325,7 +346,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": null
+                                "usdEquivalent": null,
+                                "usdConversionRate": null
                               }
                             }
                           ]
