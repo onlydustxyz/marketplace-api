@@ -22,11 +22,11 @@ import java.util.*;
 @EqualsAndHashCode
 @Data
 @Builder
-@Table(name = "project_details", schema = "public")
+@Table(name = "projects", schema = "public")
 @Immutable
 public class ProjectViewEntity {
     @Id
-    @Column(name = "project_id", nullable = false)
+    @Column(name = "id", nullable = false)
     UUID id;
     @Column(name = "name")
     String name;

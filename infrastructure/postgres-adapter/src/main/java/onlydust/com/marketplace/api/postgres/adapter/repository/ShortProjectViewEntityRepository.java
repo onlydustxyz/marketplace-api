@@ -10,7 +10,7 @@ import java.util.UUID;
 public interface ShortProjectViewEntityRepository extends JpaRepository<ShortProjectViewEntity, UUID> {
     @Query(value = """
             SELECT
-                p.project_id as id,
+                p.id,
                 p.key,
                 p.name,
                 p.short_description,
@@ -20,7 +20,7 @@ public interface ShortProjectViewEntityRepository extends JpaRepository<ShortPro
                 p.hiring,
                 p.visibility
             FROM 
-                 project_details p
+                 projects p
             WHERE
                 EXISTS(
                     SELECT 1 
@@ -29,12 +29,12 @@ public interface ShortProjectViewEntityRepository extends JpaRepository<ShortPro
                     JOIN indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
                     INNER JOIN indexer_exp.contributions c on c.repo_id = gr.id 
                     WHERE 
-                        p.project_id = pgr.project_id AND
+                        p.id = pgr.project_id AND
                         gr.visibility = 'PUBLIC' AND
                         contributor_id = :rewardId AND 
                         (COALESCE(:repoIds) IS NULL OR pgr.github_repo_id IN (:repoIds))
                 )
-                AND (COALESCE(:projectIds) IS NULL OR p.project_id IN (:projectIds))
+                AND (COALESCE(:projectIds) IS NULL OR p.id IN (:projectIds))
             ORDER BY 
                 p.name 
             """, nativeQuery = true)
@@ -44,7 +44,7 @@ public interface ShortProjectViewEntityRepository extends JpaRepository<ShortPro
 
     @Query(value = """
             SELECT DISTINCT
-                p.project_id as id,
+                p.id,
                 p.key,
                 p.name,
                 p.short_description,
@@ -54,8 +54,8 @@ public interface ShortProjectViewEntityRepository extends JpaRepository<ShortPro
                 p.hiring,
                 p.visibility
             FROM 
-                 project_details p
-            JOIN rewards r ON r.project_id = p.project_id
+                 projects p
+            JOIN rewards r ON r.project_id = p.id
             WHERE
                 r.recipient_id = :rewardId
             ORDER BY 

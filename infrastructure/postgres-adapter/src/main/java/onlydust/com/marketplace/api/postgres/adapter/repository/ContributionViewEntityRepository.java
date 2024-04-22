@@ -33,7 +33,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 c.github_author_login,
                 c.github_author_html_url,
                 user_avatar_url(c.github_author_id, c.github_author_avatar_url) as github_author_avatar_url,
-                p.project_id as project_id,
+                p.id as project_id,
                 p.name as project_name,
                 p.key as project_key,
                 p.short_description as project_short_description,
@@ -50,7 +50,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 indexer_exp.contributions c
             INNER JOIN indexer_exp.github_repos gr on c.repo_id = gr.id and gr.visibility = 'PUBLIC'
             INNER JOIN public.project_github_repos pgr on pgr.github_repo_id = gr.id
-            INNER JOIN public.project_details p on p.project_id = pgr.project_id        
+            INNER JOIN public.projects p on p.id = pgr.project_id        
             LEFT JOIN iam.users u on u.github_user_id = c.contributor_id
             LEFT JOIN LATERAL (
                 SELECT 
@@ -144,11 +144,11 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 WHERE
                     ri.id = COALESCE(CAST(c.pull_request_id AS TEXT), CAST(c.issue_id AS TEXT), c.code_review_id) AND
                     c.contributor_id = r.recipient_id AND
-                    r.project_id = p.project_id
+                    r.project_id = p.id
             ) AS rewards ON TRUE
             WHERE 
                 (COALESCE(:contributorIds) IS NULL OR c.contributor_id IN (:contributorIds)) AND
-                (COALESCE(:projectIds) IS NULL OR p.project_id IN (:projectIds)) AND
+                (COALESCE(:projectIds) IS NULL OR p.id IN (:projectIds)) AND
                 (COALESCE(:repoIds) IS NULL OR c.repo_id IN (:repoIds)) AND
                 (COALESCE(:types) IS NULL OR CAST(c.type AS TEXT) IN (:types)) AND
                 (COALESCE(:statuses) IS NULL OR CAST(c.status AS TEXT) IN (:statuses)) AND
