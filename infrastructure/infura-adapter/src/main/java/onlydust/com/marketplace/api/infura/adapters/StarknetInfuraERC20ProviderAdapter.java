@@ -26,8 +26,7 @@ public class StarknetInfuraERC20ProviderAdapter implements ERC20Provider {
     public StarknetInfuraERC20ProviderAdapter(final InfuraClient.Properties properties) {
         provider = new JsonRpcProvider("%s/%s".formatted(properties.getBaseUri(), properties.getApiKey()));
         blockchain = properties.getBlockchain();
-        if (blockchain != Blockchain.STARKNET)
-            throw OnlyDustException.internalServerError("Invalid blockchain %s".formatted(blockchain));
+        assert blockchain == Blockchain.STARKNET;
     }
 
     @Override
