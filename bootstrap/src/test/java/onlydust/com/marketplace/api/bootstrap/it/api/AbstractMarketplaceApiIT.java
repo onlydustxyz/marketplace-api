@@ -173,6 +173,8 @@ public class AbstractMarketplaceApiIT {
     protected WireMockServer sumsubWireMockServer;
     @Autowired
     protected WireMockServer ethereumWireMockServer;
+    @Autowired
+    protected WireMockServer starknetWireMockServer;
 
     @LocalServerPort
     int port;
