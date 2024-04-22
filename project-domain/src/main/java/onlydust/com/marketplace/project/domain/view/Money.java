@@ -26,4 +26,8 @@ public class Money {
         final var rate = (amount.compareTo(BigDecimal.ZERO) == 0 || usdEquivalent == null) ? null : usdEquivalent.divide(amount, RoundingMode.HALF_EVEN);
         return pretty(amount, currency.decimals(), rate);
     }
+
+    public BigDecimal getUsdConversionRate() {
+        return (amount.compareTo(BigDecimal.ZERO) == 0 || usdEquivalent == null) ? null : usdEquivalent.divide(amount, RoundingMode.HALF_EVEN);
+    }
 }

@@ -3207,7 +3207,6 @@ components:
         - amount
         - prettyAmount
         - currency
-        - usdEquivalent
       properties:
         amount:
           type: number
@@ -3221,6 +3220,10 @@ components:
           type: number
           description: USD equivalent of the amount
           example: 100
+        usdConversionRate:
+          type: number
+          description: USD conversion rate
+          example: 1.5
 
 
     # RESPONSES ==================================================================
