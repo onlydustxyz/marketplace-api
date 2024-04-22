@@ -3,10 +3,10 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookObserver;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookProjector;
-import onlydust.com.marketplace.accounting.domain.observers.NotificationOutbox;
 import onlydust.com.marketplace.accounting.domain.port.in.*;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.*;
+import onlydust.com.marketplace.api.infura.adapters.EthInfuraEnsValidatorAdapter;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
 import onlydust.com.marketplace.kernel.port.output.*;
 import org.springframework.context.annotation.Bean;
@@ -56,9 +56,16 @@ public class AccountingConfiguration {
                                                              final @NonNull BillingProfileObserver billingProfileObservers,
                                                              final @NonNull IndexerPort indexerPort,
                                                              final @NonNull AccountingObserverPort accountingObserverPort,
-                                                             final @NonNull AccountingFacadePort accountingFacadePort) {
+                                                             final @NonNull AccountingFacadePort accountingFacadePort,
+                                                             final @NonNull PayoutInfoValidator payoutInfoValidator
+    ) {
         return new BillingProfileService(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort, billingProfileObservers,
-                indexerPort, accountingObserverPort, accountingFacadePort);
+                indexerPort, accountingObserverPort, accountingFacadePort, payoutInfoValidator);
+    }
+
+    @Bean
+    public PayoutInfoValidator payoutInfoValidator(final @NonNull EthInfuraEnsValidatorAdapter ethereumEnsValidatorAdapter) {
+        return new PayoutInfoValidator(ethereumEnsValidatorAdapter);
     }
 
     @Bean
