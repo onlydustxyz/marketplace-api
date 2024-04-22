@@ -13,7 +13,7 @@ public class TotalsEarned {
     public TotalsEarned(List<Money> totalEarnedPerCurrencies) {
         this.details = totalEarnedPerCurrencies;
         totalDollarsEquivalent = totalEarnedPerCurrencies.stream()
-                .map(Money::getUsdEquivalent)
+                .map(money -> money.dollarsEquivalent().orElse(BigDecimal.ZERO))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

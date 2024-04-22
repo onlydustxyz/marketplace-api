@@ -26,7 +26,7 @@ public class MoneyView {
         this.amount = amount;
         this.currency = currency;
         this.usdConversionRateValue = currency.latestUsdQuote().orElse(null);
-        this.dollarsEquivalentValue = amount.multiply(usdConversionRateValue);
+        this.dollarsEquivalentValue = currency.latestUsdQuote().map(amount::multiply).orElse(null);
     }
 
     public BigDecimal amount() {

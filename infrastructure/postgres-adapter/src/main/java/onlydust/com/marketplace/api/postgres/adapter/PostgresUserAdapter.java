@@ -247,8 +247,10 @@ public class PostgresUserAdapter implements UserStoragePort {
                         .build())
                 .rewardAmountsPerCurrency(rewardsStats.stream()
                         .map(stats -> new UserRewardsPageView.RewardAmounts(
-                                new Money(stats.getProcessedAmount(), stats.getCurrency().toView(), stats.getProcessedUsdAmount()),
-                                new Money(stats.getPendingAmount(), stats.getCurrency().toView(), stats.getPendingUsdAmount())))
+                                new Money(stats.getProcessedAmount(), stats.getCurrency().toView())
+                                        .dollarsEquivalentValue(stats.getProcessedUsdAmount()),
+                                new Money(stats.getPendingAmount(), stats.getCurrency().toView())
+                                        .dollarsEquivalentValue(stats.getPendingUsdAmount())))
                         .toList())
                 .pendingRequestCount(rewardsStats.size() == 1 ? rewardsStats.get(0).getPendingRequestCount() :
                         rewardsStats.stream().map(RewardStatsEntity::getPendingRequestCount).filter(Objects::nonNull).reduce(0, Integer::sum))

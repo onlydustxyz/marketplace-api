@@ -62,12 +62,10 @@ public class PostgresProjectRewardAdapter implements ProjectRewardStoragePort {
                         .build())
                 .budgetStatsPerCurrency(budgetStats.stream()
                         .map(budgetStatsEntity -> new ProjectRewardsPageView.BudgetStats(
-                                new Money(budgetStatsEntity.getRemainingAmount(),
-                                        budgetStatsEntity.getCurrency().toView(),
-                                        budgetStatsEntity.getRemainingUsdAmount()),
-                                new Money(budgetStatsEntity.getSpentAmount(),
-                                        budgetStatsEntity.getCurrency().toView(),
-                                        budgetStatsEntity.getSpentUsdAmount())
+                                new Money(budgetStatsEntity.getRemainingAmount(), budgetStatsEntity.getCurrency().toView())
+                                        .dollarsEquivalentValue(budgetStatsEntity.getRemainingUsdAmount()),
+                                new Money(budgetStatsEntity.getSpentAmount(), budgetStatsEntity.getCurrency().toView())
+                                        .dollarsEquivalentValue(budgetStatsEntity.getSpentUsdAmount())
                         ))
                         .toList())
                 .sentRewardsCount(budgetStats.stream().map(BudgetStatsEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())

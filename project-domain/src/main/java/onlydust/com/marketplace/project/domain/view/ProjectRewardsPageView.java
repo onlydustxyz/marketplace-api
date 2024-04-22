@@ -23,14 +23,14 @@ public class ProjectRewardsPageView {
     public BigDecimal totalRemainingUsdEquivalent() {
         return budgetStatsPerCurrency.stream()
                 .map(BudgetStats::remainingBudget)
-                .map(Money::getUsdEquivalent)
+                .map(money -> money.dollarsEquivalent().orElse(BigDecimal.ZERO))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public BigDecimal totalSpentUsdEquivalent() {
         return budgetStatsPerCurrency.stream()
                 .map(BudgetStats::spentAmount)
-                .map(Money::getUsdEquivalent)
+                .map(money -> money.dollarsEquivalent().orElse(BigDecimal.ZERO))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

@@ -136,17 +136,14 @@ public class UserProfileEntity {
         String logoUrl;
 
         public Money toDomain() {
-            return Money.builder()
-                    .usdEquivalent(totalDollarsEquivalent)
-                    .amount(totalAmount)
-                    .currency(CurrencyView.builder()
-                            .id(CurrencyView.Id.of(currencyId))
-                            .name(currencyName)
-                            .code(currencyCode)
-                            .decimals(currencyDecimals)
-                            .logoUrl(logoUrl != null ? URI.create(logoUrl) : null)
-                            .build())
-                    .build();
+            return new Money(totalAmount, CurrencyView.builder()
+                    .id(CurrencyView.Id.of(currencyId))
+                    .name(currencyName)
+                    .code(currencyCode)
+                    .decimals(currencyDecimals)
+                    .logoUrl(logoUrl != null ? URI.create(logoUrl) : null)
+                    .build())
+                    .dollarsEquivalentValue(totalDollarsEquivalent);
         }
     }
 

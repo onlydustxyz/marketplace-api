@@ -24,14 +24,14 @@ public class UserRewardsPageView {
     public BigDecimal totalRewardedAmountUsdEquivalent() {
         return rewardAmountsPerCurrency.stream()
                 .map(RewardAmounts::rewardedAmount)
-                .map(Money::getUsdEquivalent)
+                .map(money -> money.dollarsEquivalent().orElse(BigDecimal.ZERO))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public BigDecimal totalPendingAmountUsdEquivalent() {
         return rewardAmountsPerCurrency.stream()
                 .map(RewardAmounts::pendingAmount)
-                .map(Money::getUsdEquivalent)
+                .map(money -> money.dollarsEquivalent().orElse(BigDecimal.ZERO))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

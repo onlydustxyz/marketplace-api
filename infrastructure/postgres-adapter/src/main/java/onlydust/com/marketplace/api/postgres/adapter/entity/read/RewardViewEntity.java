@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
+import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
@@ -14,8 +15,6 @@ import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.Money;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
-
-import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -132,7 +131,9 @@ public class RewardViewEntity {
         return RewardDetailsView.builder()
                 .id(id)
                 .to(to())
-                .amount(new Money(amount, currency.toView(), statusData.amountUsdEquivalent()))
+                .amount(new Money(amount, currency.toView())
+                        .dollarsEquivalentValue(statusData.amountUsdEquivalent())
+                        .usdConversionRateValue(statusData.usdConversionRate()))
                 .createdAt(requestedAt)
                 .processedAt(statusData.paidAt())
                 .status(status())

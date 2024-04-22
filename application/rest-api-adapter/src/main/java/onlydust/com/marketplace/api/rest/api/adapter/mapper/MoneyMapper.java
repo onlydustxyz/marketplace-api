@@ -16,11 +16,11 @@ import static onlydust.com.marketplace.kernel.mapper.AmountMapper.pretty;
 public interface MoneyMapper {
     static Money toMoney(onlydust.com.marketplace.project.domain.view.Money money) {
         return new Money()
-                .amount(money.getAmount())
-                .prettyAmount(money.getPrettyAmount())
-                .currency(mapCurrency(money.getCurrency()))
-                .usdEquivalent(money.getUsdEquivalent())
-                .usdConversionRate(money.getUsdConversionRate());
+                .amount(money.amount())
+                .prettyAmount(money.prettyAmount())
+                .currency(mapCurrency(money.currency()))
+                .usdEquivalent(money.dollarsEquivalent().orElse(null))
+                .usdConversionRate(money.usdConversionRate().orElse(null));
     }
 
     static Money toMoney(final MoneyView view) {
