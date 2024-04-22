@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public interface ProjectRepository extends JpaRepository<ProjectEntity, UUID>, JpaSpecificationExecutor<ProjectEntity> {
 
-    @Query(value = "SELECT key FROM project_details WHERE project_id = ?1", nativeQuery = true)
+    @Query(value = "SELECT key FROM projects WHERE id = ?1", nativeQuery = true)
     String getKeyById(UUID id);
 
     Page<ProjectEntity> findAllByNameContainingIgnoreCase(String name, Pageable pageable);

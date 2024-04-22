@@ -18,9 +18,9 @@ public interface ProjectTagRepository extends JpaRepository<ProjectTagEntity, Pr
                                             JOIN
                                         project_github_repos pgr ON c.repo_id = pgr.github_repo_id
                                             LEFT JOIN
-                                        project_details pd ON pgr.project_id = pd.project_id
+                                        projects p ON pgr.project_id = p.id
                                    WHERE c.created_at > cast(:now as timestamp)   - INTERVAL '4 weeks'
-                                   GROUP BY pgr.project_id, pd.name
+                                   GROUP BY pgr.project_id, p.name
                                    HAVING COUNT(DISTINCT c.contributor_id) >= 10
                                    ORDER BY active_contributors_count DESC)
             insert into projects_tags (project_id, tag)
@@ -39,13 +39,13 @@ public interface ProjectTagRepository extends JpaRepository<ProjectTagEntity, Pr
                                                                        project_github_repos pgr ON c.repo_id = pgr.github_repo_id
                                                                   GROUP BY c.contributor_id, pgr.project_id)
                                       SELECT fc.project_id,
-                                             pd.name                  AS project_name,
+                                             p.name                  AS project_name,
                                              COUNT(fc.contributor_id) AS new_contributors_last_4_weeks
                                       FROM first_contribution fc
                                                LEFT JOIN
-                                           project_details pd ON fc.project_id = pd.project_id
+                                           projects p ON fc.project_id = p.id
                                       WHERE fc.first_contribution_date > cast(:now as timestamp) - INTERVAL '4 weeks'
-                                      GROUP BY fc.project_id, pd.name
+                                      GROUP BY fc.project_id, p.name
                                       HAVING COUNT(fc.contributor_id) >= 5
                                       ORDER BY new_contributors_last_4_weeks DESC)
              insert into projects_tags (project_id, tag)
@@ -60,11 +60,11 @@ public interface ProjectTagRepository extends JpaRepository<ProjectTagEntity, Pr
                                        COUNT(DISTINCT r.recipient_id) AS recipients_last_month
                                 FROM project_github_repos pgr
                                          JOIN
-                                     project_details pd ON pgr.project_id = pd.project_id
+                                     projects p ON pgr.project_id = p.id
                                          JOIN
                                      rewards r ON pgr.project_id = r.project_id
                                 WHERE r.requested_at > cast(:now as timestamp) - INTERVAL '1 month'
-                                GROUP BY pgr.project_id, pd.name
+                                GROUP BY pgr.project_id, p.name
                                 HAVING COUNT(DISTINCT r.recipient_id) >= 3
                                 ORDER BY recipients_last_month DESC)
              insert into projects_tags (project_id, tag)
@@ -79,7 +79,7 @@ public interface ProjectTagRepository extends JpaRepository<ProjectTagEntity, Pr
                                              COUNT(gi.id) AS issues_count
                                       FROM project_github_repos pgr
                                                LEFT JOIN
-                                           project_details pd ON pgr.project_id = pd.project_id
+                                           projects p ON pgr.project_id = p.id
                                                JOIN
                                            indexer_exp.github_issues gi ON pgr.github_repo_id = gi.repo_id
                                       WHERE gi.status = 'OPEN'
@@ -88,7 +88,7 @@ public interface ProjectTagRepository extends JpaRepository<ProjectTagEntity, Pr
                                         AND NOT EXISTS (SELECT 1
                                                         FROM indexer_exp.github_issues_assignees gia
                                                         WHERE gia.issue_id = gi.id)
-                                      GROUP BY pgr.project_id, pd.name
+                                      GROUP BY pgr.project_id, p.name
                                       HAVING count(gi.id) >= 3
                                       ORDER BY issues_count DESC)
              insert into projects_tags (project_id, tag)
@@ -105,9 +105,9 @@ public interface ProjectTagRepository extends JpaRepository<ProjectTagEntity, Pr
                                                 JOIN
                                             project_github_repos pgr ON c.repo_id = pgr.github_repo_id
                                                 LEFT JOIN
-                                            project_details pd ON pgr.project_id = pd.project_id
+                                            projects p ON pgr.project_id = p.id
                                        WHERE c.created_at > cast(:now as timestamp) - INTERVAL '4 weeks'
-                                       GROUP BY pgr.project_id, pd.name
+                                       GROUP BY pgr.project_id, p.name
                                        HAVING COUNT(c.id) >= 80
                                        ORDER BY contributions_last_4_weeks DESC)
              insert into projects_tags (project_id, tag)
@@ -123,9 +123,9 @@ public interface ProjectTagRepository extends JpaRepository<ProjectTagEntity, Pr
                                FROM rewards r
                                JOIN accounting.reward_status_data rsd ON r.id = rsd.reward_id
                                         LEFT JOIN
-                                    project_details pd ON r.project_id = pd.project_id
+                                    projects p ON r.project_id = p.id
                                WHERE r.requested_at > cast(:now as timestamp) - INTERVAL '3 months'
-                               GROUP BY r.project_id, pd.name
+                               GROUP BY r.project_id, p.name
                                HAVING SUM(rsd.amount_usd_equivalent) > 5000
                                ORDER BY total_rewards_in_usd DESC)
              insert into projects_tags (project_id, tag)

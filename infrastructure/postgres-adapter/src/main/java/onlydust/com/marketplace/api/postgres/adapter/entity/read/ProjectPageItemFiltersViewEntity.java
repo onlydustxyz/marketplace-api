@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -17,15 +16,14 @@ import java.util.stream.Collectors;
 import static java.util.Objects.nonNull;
 
 @Entity
-@Table(name = "project_details", schema = "public")
+@Table(name = "projects", schema = "public")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 public class ProjectPageItemFiltersViewEntity {
     @Id
-    @Column(name = "project_id")
-    UUID projectId;
+    UUID id;
     @JdbcTypeCode(SqlTypes.JSON)
     List<Ecosystem> ecosystems;
     @JdbcTypeCode(SqlTypes.JSON)

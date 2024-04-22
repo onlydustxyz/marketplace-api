@@ -23,7 +23,7 @@ public interface InvoiceRewardRepository extends JpaRepository<InvoiceRewardEnti
                 rewards r
                 JOIN accounting.reward_status_data rsd on rsd.reward_id = r.id
                 JOIN currencies usd ON usd.code = 'USD'
-                JOIN project_details p ON r.project_id = p.project_id
+                JOIN projects p ON r.project_id = p.id
             WHERE
                 r.id IN :rewardIds
             """, nativeQuery = true)

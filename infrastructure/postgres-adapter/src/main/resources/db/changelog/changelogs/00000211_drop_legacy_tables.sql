@@ -37,3 +37,9 @@ ALTER TABLE payments
 ALTER TABLE work_items
     SET SCHEMA legacy;
 
+-- Rename tables
+ALTER TABLE project_details
+    RENAME TO projects;
+
+ALTER TABLE projects
+    RENAME COLUMN project_id TO id;

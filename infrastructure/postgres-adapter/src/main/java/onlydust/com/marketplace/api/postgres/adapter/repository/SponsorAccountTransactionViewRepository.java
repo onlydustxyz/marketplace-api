@@ -18,7 +18,7 @@ public interface SponsorAccountTransactionViewRepository extends JpaRepository<S
             FROM accounting.all_sponsor_account_transactions t
             JOIN accounting.sponsor_accounts sa ON sa.id = t.sponsor_account_id
             JOIN currencies c ON sa.currency_id = c.id
-            LEFT JOIN project_details p ON p.project_id = t.project_id
+            LEFT JOIN projects p ON p.id = t.project_id
             WHERE
                 sa.sponsor_id = :sponsorId AND
                 (coalesce(:currencyIds) IS NULL OR sa.currency_id IN (:currencyIds) ) AND

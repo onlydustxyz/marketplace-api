@@ -33,14 +33,14 @@ public interface HackathonDetailsViewRepository extends JpaRepository<HackathonD
                         'url', s.url))
                  FROM sponsors s WHERE s.id = ANY(h.sponsor_ids)) as sponsors,
                 (SELECT jsonb_agg(jsonb_build_object(
-                        'id', p.project_id,
+                        'id', p.id,
                         'slug', p.key,
                         'name', p.name,
                         'logoUrl', p.logo_url,
                         'shortDescription', p.short_description,
                         'visibility', p.visibility))
-                 FROM project_details p
-                    JOIN (SELECT jsonb_array_elements_text(jsonb_array_elements(h.tracks) -> 'projectIds')) tracks(projects) ON p.project_id = cast(tracks.projects as uuid)
+                 FROM projects p
+                    JOIN (SELECT jsonb_array_elements_text(jsonb_array_elements(h.tracks) -> 'projectIds')) tracks(projects) ON p.id = cast(tracks.projects as uuid)
                  ) as projects
             FROM
                 hackathons h

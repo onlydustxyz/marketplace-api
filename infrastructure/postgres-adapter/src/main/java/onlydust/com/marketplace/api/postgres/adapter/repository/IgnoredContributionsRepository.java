@@ -21,7 +21,7 @@ public interface IgnoredContributionsRepository extends JpaRepository<IgnoredCon
                from indexer_exp.contributions c
                join indexer_exp.github_repos gr on gr.id = c.repo_id
                join project_github_repos pgr on pgr.github_repo_id = c.repo_id
-               join project_details pd on pd.project_id = pgr.project_id
+               join projects p on p.id = pgr.project_id
                left join custom_ignored_contributions cic on cic.contribution_id = c.id
                                                            and cic.project_id = pgr.project_id
                                                            and cic.ignored = false
@@ -30,11 +30,11 @@ public interface IgnoredContributionsRepository extends JpaRepository<IgnoredCon
                    and cic.contribution_id is null
                    and gr.visibility = 'PUBLIC'
                    and (
-                       (pd.reward_ignore_contributions_before_date_by_default is not null
-                           and c.created_at < pd.reward_ignore_contributions_before_date_by_default)
-                    or (pd.reward_ignore_pull_requests_by_default = true and c.type = 'PULL_REQUEST')
-                    or (pd.reward_ignore_issues_by_default = true and c.type = 'ISSUE')
-                    or (pd.reward_ignore_code_reviews_by_default = true and c.type = 'CODE_REVIEW')
+                       (p.reward_ignore_contributions_before_date_by_default is not null
+                           and c.created_at < p.reward_ignore_contributions_before_date_by_default)
+                    or (p.reward_ignore_pull_requests_by_default = true and c.type = 'PULL_REQUEST')
+                    or (p.reward_ignore_issues_by_default = true and c.type = 'ISSUE')
+                    or (p.reward_ignore_code_reviews_by_default = true and c.type = 'CODE_REVIEW')
                    )
                on conflict do nothing
                """, nativeQuery = true)
@@ -49,7 +49,7 @@ public interface IgnoredContributionsRepository extends JpaRepository<IgnoredCon
                 from indexer_exp.contributions c
                 join indexer_exp.github_repos gr on gr.id = c.repo_id
                 join project_github_repos pgr on pgr.github_repo_id = c.repo_id
-                join project_details pd on pd.project_id = pgr.project_id
+                join projects p on p.id = pgr.project_id
                 left join custom_ignored_contributions cic on cic.contribution_id = c.id
                                                             and cic.project_id = pgr.project_id
                                                             and cic.ignored = true
@@ -58,11 +58,11 @@ public interface IgnoredContributionsRepository extends JpaRepository<IgnoredCon
                     and cic.contribution_id is null
                     and gr.visibility = 'PUBLIC'
                     and (
-                        (pd.reward_ignore_contributions_before_date_by_default is null
-                            or c.created_at >= pd.reward_ignore_contributions_before_date_by_default)
-                     and (pd.reward_ignore_pull_requests_by_default = false or c.type != 'PULL_REQUEST')
-                     and (pd.reward_ignore_issues_by_default = false or c.type != 'ISSUE')
-                     and (pd.reward_ignore_code_reviews_by_default = false or c.type != 'CODE_REVIEW')
+                        (p.reward_ignore_contributions_before_date_by_default is null
+                            or c.created_at >= p.reward_ignore_contributions_before_date_by_default)
+                     and (p.reward_ignore_pull_requests_by_default = false or c.type != 'PULL_REQUEST')
+                     and (p.reward_ignore_issues_by_default = false or c.type != 'ISSUE')
+                     and (p.reward_ignore_code_reviews_by_default = false or c.type != 'CODE_REVIEW')
                     )
             )
             """, nativeQuery = true)
