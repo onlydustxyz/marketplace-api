@@ -30,12 +30,13 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
     }
 
     void createHackathons() {
+        final var startDate = ZonedDateTime.of(2024, 4, 19, 0, 0, 0, 0, ZonedDateTime.now().getZone());
         final var hackathon1 = Hackathon.builder()
                 .id(Hackathon.Id.random())
                 .title("Hackathon 1")
                 .subtitle("Subtitle 1")
-                .startDate(ZonedDateTime.now())
-                .endDate(ZonedDateTime.now().plusDays(1))
+                .startDate(startDate)
+                .endDate(startDate.plusDays(1))
                 .description("Description 1")
                 .status(Hackathon.Status.PUBLISHED)
                 .build();
@@ -53,8 +54,8 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                 .id(Hackathon.Id.random())
                 .title("Hackathon 2")
                 .subtitle("Subtitle 2")
-                .startDate(ZonedDateTime.now())
-                .endDate(ZonedDateTime.now().plusDays(1))
+                .startDate(startDate)
+                .endDate(startDate.plusDays(1))
                 .description("Description 2")
                 .status(Hackathon.Status.DRAFT)
                 .build();
@@ -64,8 +65,8 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                 .title("Hackathon 3")
                 .subtitle("Subtitle 3")
                 .location("Location 3")
-                .startDate(ZonedDateTime.now())
-                .endDate(ZonedDateTime.now().plusDays(1))
+                .startDate(startDate)
+                .endDate(startDate.plusDays(1))
                 .description("Description 3")
                 .status(Hackathon.Status.PUBLISHED)
                 .build();
