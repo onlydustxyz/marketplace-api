@@ -25,7 +25,6 @@ public interface Ethereum {
     }
 
     static WalletLocator wallet(String wallet) {
-        // TODO implement proper ENS check with Infura
         try {
             return new WalletLocator(accountAddress(wallet));
         } catch (OnlyDustException e) {

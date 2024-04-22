@@ -34,6 +34,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     private final @NonNull IndexerPort indexerPort;
     private final @NonNull AccountingObserverPort accountingObserverPort;
     private final @NonNull AccountingFacadePort accountingFacadePort;
+    private final @NonNull PayoutInfoValidator payoutInfoValidator;
 
 
     @Override
@@ -256,6 +257,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     public void updatePayoutInfo(BillingProfile.Id billingProfileId, UserId userId, PayoutInfo payoutInfo) {
         if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
             throw unauthorized("User %s must be admin to edit payout info of billing profile %s".formatted(userId, billingProfileId));
+        payoutInfoValidator.validate(payoutInfo);
         billingProfileStoragePort.savePayoutInfoForBillingProfile(payoutInfo, billingProfileId);
     }
 

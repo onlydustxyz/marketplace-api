@@ -1,0 +1,24 @@
+{
+    "request": {
+        "url": "/INFURA_API_KEY",
+        "method": "POST",
+        "bodyPatterns": [
+            {
+                "equalToJson": {
+                    "jsonrpc": "2.0",
+                    "method": "eth_syncing",
+                    "params": []
+                },
+                "ignoreArrayOrder": true,
+                "ignoreExtraElements": true
+            }
+        ]
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "body-eth_syncing.json",
+        "headers": {
+            "Content-Type": "application/json"
+        }
+    }
+}
