@@ -21,7 +21,7 @@ import java.util.UUID;
 public class ProjectStatsForUserEntity {
 
     @Id
-    @Column(name = "project_id")
+    @Column(name = "id")
     UUID id;
     @Column(name = "slug")
     String slug;

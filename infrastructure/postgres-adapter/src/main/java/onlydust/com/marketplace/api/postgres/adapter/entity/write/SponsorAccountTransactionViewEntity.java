@@ -40,7 +40,6 @@ public class SponsorAccountTransactionViewEntity {
     SponsorAccountEntity sponsorAccount;
 
     @ManyToOne
-    @JoinColumn(name = "project_id")
     ProjectEntity project;
 
     @NonNull

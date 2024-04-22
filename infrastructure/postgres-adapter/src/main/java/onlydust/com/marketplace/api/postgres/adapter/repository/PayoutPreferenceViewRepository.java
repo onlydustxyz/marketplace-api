@@ -11,21 +11,21 @@ public interface PayoutPreferenceViewRepository extends JpaRepository<PayoutPref
 
     @Query(value = """
             select u.id as user_id,
-                   p.project_id,
-                   pd.name as project_name,
-                   pd.logo_url as project_logo_url,
-                   pd.short_description as project_short_description,
-                   pd.key as project_key,
+                   p.id as project_id,
+                   p.name as project_name,
+                   p.logo_url as project_logo_url,
+                   p.short_description as project_short_description,
+                   p.key as project_key,
                    pp.billing_profile_id,
                    bp.name as billing_profile_name,
                    bp.type as billing_profile_type
             from iam.users u
-            join (select distinct r.project_id, r.recipient_id  from rewards r) p on p.recipient_id = u.github_user_id
-            join project_details pd on pd.project_id = p.project_id
-            left join accounting.payout_preferences pp on pp.project_id = p.project_id and pp.user_id = u.id
+            join (select distinct r.project_id, r.recipient_id  from rewards r) r on r.recipient_id = u.github_user_id
+            join projects p on p.id = r.project_id
+            left join accounting.payout_preferences pp on pp.project_id = r.project_id and pp.user_id = u.id
             left join accounting.billing_profiles bp on bp.id = pp.billing_profile_id
             where u.id = :userId
-            order by pd.name
+            order by p.name
             """, nativeQuery = true)
     List<PayoutPreferenceViewEntity> findAllForUser(UUID userId);
 }

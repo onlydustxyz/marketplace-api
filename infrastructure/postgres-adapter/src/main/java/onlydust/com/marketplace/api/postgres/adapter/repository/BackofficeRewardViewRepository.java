@@ -16,44 +16,44 @@ public interface BackofficeRewardViewRepository extends JpaRepository<Backoffice
 
     @Language("PostgreSQL")
     String SELECT = """
-                select r.id                                             id,
-                               r.requested_at                           requested_at,
-                               rsd.paid_at                              processed_at,
-                               r.recipient_id                           recipient_id,
-                               g_urls.urls                              github_urls,
+                select r.id                                     id,
+                       r.requested_at                           requested_at,
+                       rsd.paid_at                              processed_at,
+                       r.recipient_id                           recipient_id,
+                       g_urls.urls                              github_urls,
 
-                               pd.project_id                            project_id,
-                               pd.name                                  project_name,
-                               pd.logo_url                              project_logo_url,
-                               pd.short_description                     project_short_description,
-                               pd.key                                   project_slug,
+                       p.id                                     project_id,
+                       p.name                                   project_name,
+                       p.logo_url                               project_logo_url,
+                       p.short_description                      project_short_description,
+                       p.key                                    project_slug,
+             
+                       s2.s_list                                 sponsors,
+             
+                       r.amount                                  amount,
+                       c.id                                      currency_id,
+             
+                       i.billing_profile_id                      billing_profile_id,
+                       bp.type                                   billing_profile_type,
+                       case
+                           when kyc.id is not null then kyc.first_name || ' ' || kyc.last_name
+                           when kyb.id is not null then kyb.name
+                       end                                      billing_profile_name,
+                       bp.verification_status                   billing_profile_verification_status,
 
-                               s2.s_list                                sponsors,
+                       creator.info                             invoice_creator,
 
-                               r.amount                                 amount,
-                               c.id                                     currency_id,
-
-                               i.billing_profile_id                     billing_profile_id,
-                               bp.type                                  billing_profile_type,
-                               case
-                                   when kyc.id is not null then kyc.first_name || ' ' || kyc.last_name
-                                   when kyb.id is not null then kyb.name
-                               end                                      billing_profile_name,
-                               bp.verification_status                   billing_profile_verification_status,
-
-                               creator.info                             invoice_creator,
-
-                               i.id                                     invoice_id,
-                               i.number                                 invoice_number,
-                               i.status                                 invoice_status,
-                               
-                               batch_payment.id                         batch_payment_id
+                       i.id                                     invoice_id,
+                       i.number                                 invoice_number,
+                       i.status                                 invoice_status,
+                       
+                       batch_payment.id                         batch_payment_id
 
                         from rewards r
                                  join accounting.reward_statuses rs on rs.reward_id = r.id
                                  join accounting.reward_status_data rsd on rsd.reward_id = r.id
                                  join currencies c on c.id = r.currency_id
-                                 join project_details pd on r.project_id = pd.project_id
+                                 join projects p on r.project_id = p.id
 
                                  left join accounting.invoices i on i.id = r.invoice_id and i.status != 'DRAFT'
                                  left join accounting.billing_profiles bp on bp.id = i.billing_profile_id
