@@ -22,6 +22,6 @@ public class PayoutInfoValidator {
 
     private void validate(Name ens) {
         if (!ensValidator.isValid(ens))
-            throw badRequest("%s is not a valid ENS".formatted(ens.asString()));
+            throw badRequest("%s is not a valid ENS".formatted(ens.toString()));
     }
 }

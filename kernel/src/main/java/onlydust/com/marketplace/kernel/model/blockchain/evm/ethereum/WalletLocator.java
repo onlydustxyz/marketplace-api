@@ -24,7 +24,7 @@ public class WalletLocator {
     public String asString() {
         if (address == null) {
             assert ens != null;
-            return ens.asString();
+            return ens.toString();
         } else {
             return address.toString();
         }

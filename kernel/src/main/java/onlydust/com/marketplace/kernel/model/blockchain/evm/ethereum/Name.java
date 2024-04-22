@@ -1,24 +1,14 @@
 package onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum;
 
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 
-import java.util.regex.Pattern;
-
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
-
 @EqualsAndHashCode
+@AllArgsConstructor
 public class Name {
-    private static final Pattern ENS_PATTERN = Pattern.compile("^.+\\.eth$");
     private final String ens;
 
-    public Name(final String ens) {
-        if (!ENS_PATTERN.matcher(ens).matches())
-            throw badRequest("Provided ENS is not valid");
-
-        this.ens = ens;
-    }
-
-    public String asString() {
+    public String toString() {
         return ens;
     }
 }

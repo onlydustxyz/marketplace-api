@@ -17,6 +17,6 @@ public class EthInfuraEnsValidatorAdapter extends InfuraClient implements Wallet
 
     @Override
     public boolean isValid(Name wallet) {
-        return resolver.resolve(wallet.asString()) != null;
+        return resolver.resolve(wallet.toString()) != null;
     }
 }
