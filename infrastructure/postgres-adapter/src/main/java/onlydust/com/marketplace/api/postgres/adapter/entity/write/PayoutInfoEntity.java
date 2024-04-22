@@ -1,27 +1,18 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.WalletTypeEnumEntity;
-import onlydust.com.marketplace.kernel.model.bank.BankAccount;
-import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
-import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
-import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
-import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
-import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import jakarta.persistence.*;
-
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang3.stream.Streams.nonNull;
 
 @Data
 @AllArgsConstructor
@@ -31,7 +22,6 @@ import static java.util.Objects.nonNull;
 @Table(schema = "accounting", name = "payout_infos")
 @EntityListeners(AuditingEntityListener.class)
 public class PayoutInfoEntity {
-
     @Id
     UUID billingProfileId;
     @OneToOne
@@ -54,94 +44,30 @@ public class PayoutInfoEntity {
     @EqualsAndHashCode.Exclude
     private Date updatedAt;
 
-    public void addWallets(final WalletEntity walletEntity) {
-        this.wallets.add(walletEntity);
+    public PayoutInfo toDomain() {
+        return PayoutInfo.builder()
+                .bankAccount(nonNull(bankAccount) ? bankAccount.toDomain() : null)
+                .ethWallet(wallet(NetworkEnumEntity.ethereum).map(WalletEntity::ethereum).orElse(null))
+                .optimismAddress(wallet(NetworkEnumEntity.optimism).map(WalletEntity::optimism).orElse(null))
+                .aptosAddress(wallet(NetworkEnumEntity.aptos).map(WalletEntity::aptos).orElse(null))
+                .starknetAddress(wallet(NetworkEnumEntity.starknet).map(WalletEntity::starknet).orElse(null))
+                .build();
     }
 
-    public PayoutInfo toDomain() {
-        PayoutInfo payoutInfo = PayoutInfo.builder().build();
-        if (nonNull(this.getBankAccount())) {
-            payoutInfo = payoutInfo.toBuilder()
-                    .bankAccount(BankAccount.builder()
-                            .bic(this.getBankAccount().getBic())
-                            .accountNumber(this.getBankAccount().getNumber())
-                            .build())
-                    .build();
-        }
-        if (!this.getWallets().isEmpty()) {
-            for (WalletEntity wallet : this.getWallets()) {
-                switch (wallet.getNetwork()) {
-                    case ethereum -> {
-                        payoutInfo = switch (wallet.getType()) {
-                            case address -> payoutInfo.toBuilder()
-                                    .ethWallet(new WalletLocator(Ethereum.accountAddress(wallet.getAddress())))
-                                    .build();
-                            case name -> payoutInfo.toBuilder()
-                                    .ethWallet(new WalletLocator(Ethereum.name(wallet.getAddress())))
-                                    .build();
-                        };
-                    }
-                    case aptos -> payoutInfo = payoutInfo.toBuilder()
-                            .aptosAddress(Aptos.accountAddress(wallet.getAddress()))
-                            .build();
-                    case starknet -> payoutInfo = payoutInfo.toBuilder()
-                            .starknetAddress(StarkNet.accountAddress(wallet.getAddress()))
-                            .build();
-                    case optimism -> payoutInfo = payoutInfo.toBuilder()
-                            .optimismAddress(Optimism.accountAddress(wallet.getAddress()))
-                            .build();
-                }
-            }
-        }
-        return payoutInfo;
+    private Optional<WalletEntity> wallet(NetworkEnumEntity network) {
+        return wallets.stream().filter(w -> w.getNetwork().equals(network)).findFirst();
     }
 
     public static PayoutInfoEntity toEntity(final BillingProfile.Id billingProfileId, final PayoutInfo payoutInfo) {
-        PayoutInfoEntity entity = PayoutInfoEntity.builder()
+        return PayoutInfoEntity.builder()
                 .billingProfileId(billingProfileId.value())
+                .bankAccount(payoutInfo.bankAccount().map(b -> BankAccountEntity.of(billingProfileId, b)).orElse(null))
+                .wallets(nonNull(
+                        payoutInfo.ethWallet().map(w -> WalletEntity.ethereum(billingProfileId, w)).orElse(null),
+                        payoutInfo.optimismAddress().map(w -> WalletEntity.optimism(billingProfileId, w)).orElse(null),
+                        payoutInfo.aptosAddress().map(w -> WalletEntity.aptos(billingProfileId, w)).orElse(null),
+                        payoutInfo.starknetAddress().map(w -> WalletEntity.starknet(billingProfileId, w)).orElse(null)
+                ).collect(toSet()))
                 .build();
-        if (nonNull(payoutInfo.getBankAccount())) {
-            entity = entity.toBuilder()
-                    .bankAccount(BankAccountEntity.builder()
-                            .bic(payoutInfo.getBankAccount().bic())
-                            .number(payoutInfo.getBankAccount().accountNumber())
-                            .billingProfileId(billingProfileId.value())
-                            .build())
-                    .build();
-        }
-        if (nonNull(payoutInfo.getAptosAddress())) {
-            entity.addWallets(WalletEntity.builder()
-                    .address(payoutInfo.getAptosAddress().toString())
-                    .type(WalletTypeEnumEntity.address)
-                    .billingProfileId(billingProfileId.value())
-                    .network(NetworkEnumEntity.aptos)
-                    .build());
-        }
-        if (nonNull(payoutInfo.getOptimismAddress())) {
-            entity.addWallets(WalletEntity.builder()
-                    .address(payoutInfo.getOptimismAddress().toString())
-                    .type(WalletTypeEnumEntity.address)
-                    .billingProfileId(billingProfileId.value())
-                    .network(NetworkEnumEntity.optimism)
-                    .build());
-        }
-        if (nonNull(payoutInfo.getStarknetAddress())) {
-            entity.addWallets(WalletEntity.builder()
-                    .address(payoutInfo.getStarknetAddress().toString())
-                    .type(WalletTypeEnumEntity.address)
-                    .billingProfileId(billingProfileId.value())
-                    .network(NetworkEnumEntity.starknet)
-                    .build());
-        }
-        if (nonNull(payoutInfo.getEthWallet())) {
-            entity.addWallets(WalletEntity.builder()
-                    .address(payoutInfo.getEthWallet().asString())
-                    .type(payoutInfo.getEthWallet().accountAddress().isPresent() ?
-                            WalletTypeEnumEntity.address : WalletTypeEnumEntity.name)
-                    .billingProfileId(billingProfileId.value())
-                    .network(NetworkEnumEntity.ethereum)
-                    .build());
-        }
-        return entity;
     }
 }

@@ -1,11 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
+import jakarta.persistence.*;
 import lombok.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import jakarta.persistence.*;
 
 import java.util.Date;
 import java.util.UUID;
@@ -35,4 +36,17 @@ public class BankAccountEntity {
     @Column(name = "tech_updated_at", nullable = false)
     @EqualsAndHashCode.Exclude
     private Date updatedAt;
+
+
+    public static BankAccountEntity of(BillingProfile.Id billingProfileId, BankAccount bankAccount) {
+        return BankAccountEntity.builder()
+                .bic(bankAccount.bic())
+                .number(bankAccount.accountNumber())
+                .billingProfileId(billingProfileId.value())
+                .build();
+    }
+
+    public BankAccount toDomain() {
+        return new BankAccount(bic, number);
+    }
 }
