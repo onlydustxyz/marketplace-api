@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.*;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.*;
 import onlydust.com.marketplace.api.infura.adapters.EthInfuraEnsValidatorAdapter;
+import onlydust.com.marketplace.api.infura.adapters.InfuraEvmAccountAddressValidatorAdapter;
 import onlydust.com.marketplace.api.infura.adapters.StarknetInfuraAccountValidatorAdapter;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
 import onlydust.com.marketplace.kernel.port.output.*;
@@ -66,8 +67,9 @@ public class AccountingConfiguration {
 
     @Bean
     public PayoutInfoValidator payoutInfoValidator(final @NonNull EthInfuraEnsValidatorAdapter ethereumEnsValidatorAdapter,
-                                                   final @NonNull StarknetInfuraAccountValidatorAdapter starknetEnsValidatorAdapter) {
-        return new PayoutInfoValidator(ethereumEnsValidatorAdapter, starknetEnsValidatorAdapter);
+                                                   final @NonNull StarknetInfuraAccountValidatorAdapter starknetEnsValidatorAdapter,
+                                                   final @NonNull InfuraEvmAccountAddressValidatorAdapter infuraEvmAccountAddressValidatorAdapter) {
+        return new PayoutInfoValidator(ethereumEnsValidatorAdapter, starknetEnsValidatorAdapter, infuraEvmAccountAddressValidatorAdapter);
     }
 
     @Bean
