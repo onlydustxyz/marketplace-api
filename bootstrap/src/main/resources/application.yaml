@@ -158,3 +158,6 @@ infrastructure:
     kyc-kyb-channel: '#kyc-kyb'
     dev-rel-channel: '#dev-rel'
     tag-all-channel: ${SLACK_PING_ALL_CHANNEL_FOR_CLOSED_BILLING_PROFILE}
+  customer-io:
+    base-uri: https://api-eu.customer.io/v1/
+    api-key: ${CUSTOMER_IO_API_KEY}

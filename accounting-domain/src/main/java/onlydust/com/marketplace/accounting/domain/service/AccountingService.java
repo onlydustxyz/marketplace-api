@@ -178,7 +178,7 @@ public class AccountingService implements AccountingFacadePort {
         refundedAccounts.stream().filter(AccountId::isProject).map(AccountId::projectId).forEach(refundedProjectId -> onAllowanceUpdated(refundedProjectId,
                 currencyId, accountBook.state()));
         accountingRewardStoragePort.getReward(rewardId).orElseThrow(() -> internalServerError("Reward %s not found".formatted(rewardId.value())));
-        accountingMailObserver.send(new RewardCanceled());
+//        accountingMailObserver.send(new RewardCanceled());
     }
 
     @Override

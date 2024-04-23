@@ -23,5 +23,9 @@
             <artifactId>kernel</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>accounting-domain</artifactId>
+        </dependency>
     </dependencies>
 </project>

@@ -13,6 +13,7 @@ import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.observer.MailObserver;
 import onlydust.com.marketplace.kernel.port.output.*;
+import org.checkerframework.checker.units.qual.N;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,10 +31,12 @@ public class AccountingConfiguration {
                                                      final @NonNull AccountingObserver accountingObserver,
                                                      final @NonNull ProjectAccountingObserver projectAccountingObserver,
                                                      final @NonNull InvoiceStoragePort invoiceStoragePort,
-                                                     final @NonNull AccountBookObserver accountBookObserver
+                                                     final @NonNull AccountBookObserver accountBookObserver,
+                                                     final @NonNull MailObserver mailObserver,
+                                                     final @NonNull AccountingRewardStoragePort accountingRewardStoragePort
     ) {
         return new AccountingService(cachedAccountBookProvider, sponsorAccountStorage, currencyStorage, accountingObserver, projectAccountingObserver,
-                invoiceStoragePort, accountBookObserver);
+                invoiceStoragePort, accountBookObserver, mailObserver, accountingRewardStoragePort);
     }
 
     @Bean
