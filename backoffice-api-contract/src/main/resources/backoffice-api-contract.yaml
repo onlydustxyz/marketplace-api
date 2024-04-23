@@ -1628,7 +1628,7 @@ paths:
       summary: create hackathon
       operationId: createHackathon
       description: |
-        create hackathon
+        Create hackathon
       requestBody:
         description: Hackathon
         required: true
@@ -1683,7 +1683,7 @@ paths:
       summary: update hackathon by id
       operationId: updateHackathonById
       description: |
-        update hackathon by id
+        Update hackathon by id
       parameters:
         - in: path
           name: hackathonId
@@ -1700,6 +1700,39 @@ paths:
       responses:
         "200":
           description: 'Updated hackathon'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HackathonsDetailsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeHackathonManagement
+      summary: Patch hackathon by id
+      operationId: patchHackathonById
+      description: |
+        Patch hackathon by id
+      parameters:
+        - in: path
+          name: hackathonId
+          required: true
+          schema:
+            $ref: '#/components/schemas/HackathonId'
+      requestBody:
+        description: Hackathon
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchHackathonRequest'
+      responses:
+        "200":
+          description: 'Patched hackathon'
           content:
             application/json:
               schema:
@@ -3654,6 +3687,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/UpdateTracksRequest'
+
+    PatchHackathonRequest:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/HackathonStatus'
 
     CreateHackathonRequest:
       type: object
