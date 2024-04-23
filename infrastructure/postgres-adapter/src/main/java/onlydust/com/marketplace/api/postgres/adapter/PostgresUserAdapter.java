@@ -313,8 +313,8 @@ public class PostgresUserAdapter implements UserStoragePort {
     }
 
     @Override
-    public List<CurrencyView> listRewardCurrencies(Long githubUserId) {
-        return currencyRepository.listRewardCurrenciesByRecipient(githubUserId).stream()
+    public List<CurrencyView> listRewardCurrencies(Long githubUserId, List<UUID> administratedBillingProfileIds) {
+        return currencyRepository.listUserRewardCurrencies(githubUserId, administratedBillingProfileIds).stream()
                 .map(CurrencyEntity::toView)
                 .toList();
     }
