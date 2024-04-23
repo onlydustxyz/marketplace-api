@@ -41,8 +41,8 @@ public class CustomProjectRankingRepository {
                                                                           0
                                                                   ) AS normalized_inverted_days_since_creation
                                                            FROM projects p,
-                                                                (SELECT AVG(CURRENT_DATE - cast(p.created_at as date))    AS avg_days_since_creation,
-                                                                        STDDEV(CURRENT_DATE - cast(p.created_at as date)) AS stddev_days_since_creation
+                                                                (SELECT AVG(CURRENT_DATE - cast(created_at as date))    AS avg_days_since_creation,
+                                                                        STDDEV(CURRENT_DATE - cast(created_at as date)) AS stddev_days_since_creation
                                                                  FROM projects) pas))
                               select p.id as project_id,
                                      (normalized_values.normalized_amount_remaining_to_distribute +
