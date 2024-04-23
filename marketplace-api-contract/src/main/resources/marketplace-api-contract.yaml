@@ -3320,7 +3320,7 @@ components:
           type: boolean
         optimismAddress:
           type: string
-          example: 0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545
+          example: 0x72C30FCD1e7bd691Ce206Cd36BbD87C4C7099545
         missingOptimismWallet:
           type: boolean
         aptosAddress:
@@ -3352,7 +3352,7 @@ components:
           example: vitalik.eth
         optimismAddress:
           type: string
-          example: 0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545
+          example: 0x72C30FCD1e7bd691Ce206Cd36BbD87C4C7099545
         aptosAddress:
           type: string
           example: 0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5

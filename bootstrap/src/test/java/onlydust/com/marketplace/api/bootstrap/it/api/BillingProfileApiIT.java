@@ -441,7 +441,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                         {
                           "aptosAddress": "0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5",
                           "ethWallet": "vitalik.eth",
-                          "optimismAddress": "0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545",
+                          "optimismAddress": "0x72C30FCD1e7bd691Ce206Cd36BbD87C4C7099545",
                           "bankAccount": {
                             "bic": "DAAEFRPPCCT",
                             "number": "FR5417569000301995586997O41"
@@ -473,7 +473,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                           "missingBankAccount": false,
                           "ethWallet": "vitalik.eth",
                           "missingEthWallet": false,
-                          "optimismAddress": "0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545",
+                          "optimismAddress": "0x72C30FCD1e7bd691Ce206Cd36BbD87C4C7099545",
                           "missingOptimismWallet": false,
                           "aptosAddress": "0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5",
                           "missingAptosWallet": false,
@@ -489,7 +489,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                         {
                           "aptosAddress": null,
                           "ethWallet": null,
-                          "optimismAddress": "0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545",
+                          "optimismAddress": "0x72C30FCD1e7bd691Ce206Cd36BbD87C4C7099545",
                           "bankAccount": null,
                           "starknetAddress": "0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798"
                         }
@@ -515,7 +515,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                           "missingBankAccount": false,
                           "ethWallet": null,
                           "missingEthWallet": false,
-                          "optimismAddress": "0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545",
+                          "optimismAddress": "0x72C30FCD1e7bd691Ce206Cd36BbD87C4C7099545",
                           "missingOptimismWallet": false,
                           "aptosAddress": null,
                           "missingAptosWallet": false,
@@ -603,7 +603,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                           "missingBankAccount": false,
                           "ethWallet": null,
                           "missingEthWallet": true,
-                          "optimismAddress": "0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545",
+                          "optimismAddress": "0x72C30FCD1e7bd691Ce206Cd36BbD87C4C7099545",
                           "missingOptimismWallet": false,
                           "aptosAddress": null,
                           "missingAptosWallet": false,
