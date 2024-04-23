@@ -47,6 +47,6 @@ public class Money {
     }
 
     public BigDecimal prettyAmount() {
-        return pretty(amount, currency.decimals(), usdConversionRateValue);
+        return pretty(amount, currency.decimals(), usdConversionRateValue != null ? usdConversionRateValue : currency.latestUsdQuote());
     }
 }

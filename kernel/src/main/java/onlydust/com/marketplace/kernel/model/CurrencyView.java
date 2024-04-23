@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.UUID;
 
@@ -15,6 +16,7 @@ public class CurrencyView {
     @NonNull String name;
     @NonNull String code;
     @NonNull Integer decimals;
+    BigDecimal latestUsdQuote;
     URI logoUrl;
 
     @NoArgsConstructor(staticName = "random")
