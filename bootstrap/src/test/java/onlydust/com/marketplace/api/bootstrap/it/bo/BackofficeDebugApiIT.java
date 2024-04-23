@@ -27,7 +27,7 @@ public class BackofficeDebugApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectStatus()
                 .isNoContent();
 
-        final var event = accountBookEventRepository.findAllByAccountBookId(UUID.fromString("c8f1d94a-e9d4-40d6-9b93-6818b9a7730c")).stream()
+        final var event = accountBookEventRepository.findAllByAccountBookIdOrderByIdAsc(UUID.fromString("c8f1d94a-e9d4-40d6-9b93-6818b9a7730c")).stream()
                 .filter(e -> e.id().equals(168L)).findFirst().orElseThrow();
 
         final var invalidEvent = new AccountBookEventEntity(event.id(), event.accountBookId(), event.timestamp(),
