@@ -65,4 +65,9 @@ public class InfuraConfiguration {
     public StarknetInfuraAccountValidatorAdapter starknetInfuraAccountValidatorAdapter(final InfuraClient.Properties starknetProperties) {
         return new StarknetInfuraAccountValidatorAdapter(starknetProperties);
     }
+
+    @Bean
+    public StarknetInfuraTransactionStorageAdapter starknetInfuraTransactionStorageAdapter(final InfuraClient.Properties starknetProperties) {
+        return new StarknetInfuraTransactionStorageAdapter(starknetProperties);
+    }
 }
