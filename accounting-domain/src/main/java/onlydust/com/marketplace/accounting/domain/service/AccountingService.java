@@ -76,8 +76,12 @@ public class AccountingService implements AccountingFacadePort {
     @Override
     @Transactional
     public void allocate(SponsorId from, ProjectId to, PositiveAmount amount, Currency.Id currencyId) {
-        final var sponsorAccount = sponsorAccountStorage.find(from, currencyId)
-                .orElseThrow(() -> notFound("Sponsor account for sponsor %s and currency %s not found".formatted(from, currencyId)));
+        final var currency = getCurrency(currencyId);
+        final var accountBook = getAccountBook(currency).state();
+
+        final var sponsorAccount = sponsorAccountStorage.find(from, currencyId).stream()
+                .filter(account -> accountBook.balanceOf(AccountId.of(account.id())).isGreaterThanOrEqual(amount)).findFirst()
+                .orElseThrow(() -> badRequest("Sponsor account with enough funds for sponsor %s and currency %s not found".formatted(from, currencyId)));
 
         allocate(sponsorAccount.id(), to, amount, currencyId);
     }
@@ -92,7 +96,7 @@ public class AccountingService implements AccountingFacadePort {
     @Override
     @Transactional
     public void unallocate(ProjectId from, SponsorId to, PositiveAmount amount, Currency.Id currencyId) {
-        final var sponsorAccount = sponsorAccountStorage.find(to, currencyId)
+        final var sponsorAccount = sponsorAccountStorage.find(to, currencyId).stream().findFirst()
                 .orElseThrow(() -> notFound("Sponsor account for sponsor %s and currency %s not found".formatted(from, currencyId)));
 
         unallocate(from, sponsorAccount.id(), amount, currencyId);
@@ -414,7 +418,8 @@ public class AccountingService implements AccountingFacadePort {
 
         private boolean isPayable(RewardId rewardId) {
             if (accountBookState.balanceOf(AccountId.of(rewardId)).isZero()) return false;
-            if (!invoiceStoragePort.invoiceOf(rewardId).map(i -> i.status() == Invoice.Status.APPROVED).orElse(false)) return false;
+            if (!invoiceStoragePort.invoiceOf(rewardId).map(i -> i.status() == Invoice.Status.APPROVED).orElse(false))
+                return false;
 
             return accountBookState.balancePerOrigin(AccountId.of(rewardId)).entrySet().stream().allMatch(entry -> {
                 final var sponsorAccount = sponsorAccountProvider.get(entry.getKey().sponsorAccountId())
