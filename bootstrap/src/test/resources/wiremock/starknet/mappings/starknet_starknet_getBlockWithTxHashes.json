@@ -1,0 +1,28 @@
+{
+    "request": {
+        "url": "/INFURA_API_KEY",
+        "method": "POST",
+        "bodyPatterns": [
+            {
+                "equalToJson": {
+                    "jsonrpc": "2.0",
+                    "method": "starknet_getBlockWithTxHashes",
+                    "params": {
+                        "block_id": {
+                            "block_hash": "0x29369230c32633ec9950456a363d8d919c8e4bc5d6b783ba89772051c7b4366"
+                        }
+                    }
+                },
+                "ignoreArrayOrder": true,
+                "ignoreExtraElements": true
+            }
+        ]
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "body-starknet_getBlockWithTxHashes.json",
+        "headers": {
+            "Content-Type": "application/json"
+        }
+    }
+}
