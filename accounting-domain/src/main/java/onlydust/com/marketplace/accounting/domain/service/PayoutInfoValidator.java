@@ -18,6 +18,7 @@ public class PayoutInfoValidator {
 
     public void validate(PayoutInfo payoutInfo) {
         payoutInfo.ethWallet().ifPresent(this::validate);
+        payoutInfo.optimismAddress().ifPresent(this::validate);
         payoutInfo.starknetAddress().ifPresent(this::validate);
     }
 
@@ -33,7 +34,7 @@ public class PayoutInfoValidator {
 
     private void validate(EvmAccountAddress address) {
         if (!evmAccountAddressValidator.isValid(address))
-            throw badRequest("%s is not a valid Ethereum account address".formatted(address.toString()));
+            throw badRequest("%s is not a valid EVM account address".formatted(address.toString()));
     }
 
     private void validate(StarknetAccountAddress address) {

@@ -26,6 +26,7 @@ class PayoutInfoValidatorTest {
     private final StarknetAccountAddress starknetAccountAddress = StarkNet.accountAddress("0x0788b45a11Ee333293a1d4389430009529bC97D814233C2A5137c4F5Ff949905");
     private final PayoutInfo payoutInfo = PayoutInfo.builder()
             .ethWallet(new WalletLocator(ens))
+            .optimismAddress(evmAccountAddress)
             .starknetAddress(starknetAccountAddress)
             .build();
 
@@ -80,6 +81,18 @@ class PayoutInfoValidatorTest {
         assertThatThrownBy(() -> validator.validate(payoutInfo))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("0xdB3A62c5eE9886EdebFDe29D42731F59c8B30686 is not a valid Ethereum account address");
+                .hasMessage("0xdB3A62c5eE9886EdebFDe29D42731F59c8B30686 is not a valid EVM account address");
+    }
+
+    @Test
+    void should_reject_invalid_optimism_account_address() {
+        // Given
+        when(evmAccountAddressWalletValidator.isValid(evmAccountAddress)).thenReturn(false);
+
+        // When
+        assertThatThrownBy(() -> validator.validate(payoutInfo))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("0xdB3A62c5eE9886EdebFDe29D42731F59c8B30686 is not a valid EVM account address");
     }
 }
