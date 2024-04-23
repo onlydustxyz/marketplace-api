@@ -144,7 +144,16 @@ public class UserServiceTest {
 
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.empty());
-        when(userStoragePort.createUser(any())).thenReturn(User.builder().createdAt(createdAt).build());
+        when(userStoragePort.createUser(any())).thenReturn(User.builder()
+                .id(UUID.randomUUID())
+                .githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl())
+                .githubUserId(githubUserIdentity.getGithubUserId())
+                .githubLogin(githubUserIdentity.getGithubLogin())
+                .roles(List.of(AuthenticatedUser.Role.USER))
+                .hasAcceptedLatestTermsAndConditions(false)
+                .hasSeenOnboardingWizard(false)
+                .createdAt(createdAt)
+                .build());
         final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then
