@@ -84,6 +84,7 @@ public class CustomUserRepository {
                                    'currency_code', user_rewards.currency_code,
                                    'currency_name', user_rewards.currency_name,
                                    'currency_decimals', user_rewards.currency_decimals,
+                                   'currency_latest_usd_quote', user_rewards.currency_latest_usd_quote,
                                    'currency_logo_url', user_rewards.currency_logo_url
                                 ))
                     from (select sum(r.amount)  as total_amount,
@@ -92,12 +93,14 @@ public class CustomUserRepository {
                                  c.code as currency_code,
                                  c.name as currency_name,
                                  c.decimals as currency_decimals,
+                                 luq.price as currency_latest_usd_quote,
                                  c.logo_url as currency_logo_url
                           from rewards r
                           join accounting.reward_status_data rsd on rsd.reward_id = r.id
                           join currencies c on c.id = r.currency_id
+                          left join accounting.latest_usd_quotes luq on luq.currency_id = c.id
                           where r.recipient_id = gu.id
-                          group by c.id) as user_rewards)    totals_earned,
+                          group by c.id, luq.price) as user_rewards)    totals_earned,
                         
                    (select sum(rc.completed_contribution_count)
                     from indexer_exp.repos_contributors rc

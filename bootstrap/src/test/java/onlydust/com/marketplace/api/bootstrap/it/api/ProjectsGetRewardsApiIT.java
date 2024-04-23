@@ -31,7 +31,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
         accountingHelper.patchBillingProfile(UUID.fromString("20282367-56b0-42d3-81d3-5e4b38f67e3e"), BillingProfileEntity.Type.COMPANY,
                 VerificationStatusEntity.VERIFIED);
 
-        accountingHelper.patchReward("40fda3c6-2a3f-4cdd-ba12-0499dd232d53", 10, "ETH", 15000, null, "2023-07-12");
+        accountingHelper.patchReward("40fda3c6-2a3f-4cdd-ba12-0499dd232d53", 10.12345678987654321, "ETH", 15000.112233445566778899, null, "2023-07-12");
         accountingHelper.patchReward("e1498a17-5090-4071-a88a-6f0b0c337c3a", 50, "ETH", 75000, null, "2023-08-12");
         accountingHelper.patchReward("2ac80cc6-7e83-4eef-bc0c-932b58f683c0", 500, "APT", 100000, null, null);
         accountingHelper.patchReward("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0", 30, "OP", 6000, "2023-08-14", null);
@@ -100,8 +100,9 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[2].id").isEqualTo("40fda3c6-2a3f-4cdd-ba12-0499dd232d53")
                 .jsonPath("$.rewards[2].status").isEqualTo("COMPLETE")
                 .jsonPath("$.rewards[2].amount.currency.code").isEqualTo("ETH")
-                .jsonPath("$.rewards[2].amount.usdEquivalent").isEqualTo("15000.0")
-                .jsonPath("$.rewards[2].amount.amount").isEqualTo("10.0")
+                .jsonPath("$.rewards[2].amount.usdEquivalent").isEqualTo("15000.11")
+                .jsonPath("$.rewards[2].amount.amount").isEqualTo("10.123456789876544")
+                .jsonPath("$.rewards[2].amount.prettyAmount").isEqualTo("10.12346")
                 .jsonPath("$.rewards[2].requestedAt").isEqualTo("2023-09-19T07:40:26.971981Z")
 
                 .jsonPath("$.rewards[3].id").isEqualTo("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0")

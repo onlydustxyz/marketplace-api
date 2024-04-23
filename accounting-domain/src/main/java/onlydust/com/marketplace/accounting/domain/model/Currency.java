@@ -184,6 +184,7 @@ public class Currency implements Cloneable {
                 .name(name)
                 .code(code.toString())
                 .decimals(decimals)
+                .latestUsdQuote(latestUsdQuote)
                 .logoUrl(logoUri().orElse(null))
                 .build();
     }

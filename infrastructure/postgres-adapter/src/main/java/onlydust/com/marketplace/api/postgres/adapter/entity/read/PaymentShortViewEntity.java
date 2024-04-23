@@ -73,6 +73,7 @@ public class PaymentShortViewEntity {
                                      @NonNull String name,
                                      @NonNull String code,
                                      @NonNull Integer decimals,
+                                     BigDecimal latestUsdQuote,
                                      URI logoUrl
     ) {
         CurrencyView toDomain() {
@@ -81,6 +82,7 @@ public class PaymentShortViewEntity {
                     .name(name)
                     .code(code)
                     .decimals(decimals)
+                    .latestUsdQuote(latestUsdQuote)
                     .logoUrl(logoUrl)
                     .build();
         }

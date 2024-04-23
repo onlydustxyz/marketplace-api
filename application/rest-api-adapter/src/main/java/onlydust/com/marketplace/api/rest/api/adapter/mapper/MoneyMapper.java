@@ -12,6 +12,7 @@ import java.math.RoundingMode;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.mapCurrency;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.pretty;
+import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
 public interface MoneyMapper {
     static Money toMoney(onlydust.com.marketplace.project.domain.view.Money money) {
@@ -19,7 +20,7 @@ public interface MoneyMapper {
                 .amount(money.amount())
                 .prettyAmount(money.prettyAmount())
                 .currency(mapCurrency(money.currency()))
-                .usdEquivalent(money.dollarsEquivalent().orElse(null))
+                .usdEquivalent(prettyUsd(money.dollarsEquivalent().orElse(null)))
                 .usdConversionRate(money.usdConversionRate().orElse(null));
     }
 
@@ -31,7 +32,7 @@ public interface MoneyMapper {
                 .amount(view.amount())
                 .prettyAmount(view.prettyAmount())
                 .currency(mapCurrency(view.currency()))
-                .usdEquivalent(view.dollarsEquivalent().orElse(null))
+                .usdEquivalent(prettyUsd(view.dollarsEquivalent().orElse(null)))
                 .usdConversionRate(view.usdConversionRate().orElse(null));
     }
 
@@ -47,8 +48,7 @@ public interface MoneyMapper {
                 .currency(right.getCurrency())
                 .amount(left.getAmount().add(right.getAmount()))
                 .prettyAmount(left.getPrettyAmount().add(right.getPrettyAmount()))
-                .usdEquivalent(left.getUsdEquivalent() == null ? null : left.getUsdEquivalent().add(right.getUsdEquivalent()))
-                ;
+                .usdEquivalent(left.getUsdEquivalent() == null ? null : left.getUsdEquivalent().add(right.getUsdEquivalent()));
     }
 
     static ConvertibleMoney toConvertibleMoney(onlydust.com.marketplace.accounting.domain.model.Money money,

@@ -79,6 +79,7 @@ public class CurrencyEntity {
                 .code(code)
                 .logoUrl(logoUrl == null ? null : URI.create(logoUrl))
                 .decimals(decimals)
+                .latestUsdQuote(latestUsdQuote == null ? null : latestUsdQuote.getPrice())
                 .build();
     }
 

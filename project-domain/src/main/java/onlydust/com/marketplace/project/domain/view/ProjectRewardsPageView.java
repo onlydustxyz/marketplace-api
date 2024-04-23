@@ -8,6 +8,8 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
+
 @Data
 @Builder
 public class ProjectRewardsPageView {
@@ -21,16 +23,16 @@ public class ProjectRewardsPageView {
     }
 
     public BigDecimal totalRemainingUsdEquivalent() {
-        return budgetStatsPerCurrency.stream()
+        return prettyUsd(budgetStatsPerCurrency.stream()
                 .map(BudgetStats::remainingBudget)
                 .map(money -> money.dollarsEquivalent().orElse(BigDecimal.ZERO))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
     public BigDecimal totalSpentUsdEquivalent() {
-        return budgetStatsPerCurrency.stream()
+        return prettyUsd(budgetStatsPerCurrency.stream()
                 .map(BudgetStats::spentAmount)
                 .map(money -> money.dollarsEquivalent().orElse(BigDecimal.ZERO))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 }

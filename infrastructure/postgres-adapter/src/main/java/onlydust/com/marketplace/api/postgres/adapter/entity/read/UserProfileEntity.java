@@ -132,6 +132,8 @@ public class UserProfileEntity {
         String currencyName;
         @JsonProperty("currency_decimals")
         Integer currencyDecimals;
+        @JsonProperty("currency_latest_usd_quote")
+        BigDecimal currencyLatestUsdQuote;
         @JsonProperty("currency_logo_url")
         String logoUrl;
 
@@ -141,6 +143,7 @@ public class UserProfileEntity {
                     .name(currencyName)
                     .code(currencyCode)
                     .decimals(currencyDecimals)
+                    .latestUsdQuote(currencyLatestUsdQuote)
                     .logoUrl(logoUrl != null ? URI.create(logoUrl) : null)
                     .build())
                     .dollarsEquivalentValue(totalDollarsEquivalent);

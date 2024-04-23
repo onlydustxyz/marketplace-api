@@ -48,7 +48,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
         accountingHelper.patchBillingProfile(UUID.fromString("20282367-56b0-42d3-81d3-5e4b38f67e3e"), BillingProfileEntity.Type.COMPANY,
                 VerificationStatusEntity.VERIFIED);
 
-        accountingHelper.patchReward("40fda3c6-2a3f-4cdd-ba12-0499dd232d53", 10, "ETH", 15000, null, "2023-07-12");
+        accountingHelper.patchReward("40fda3c6-2a3f-4cdd-ba12-0499dd232d53", 10.12345678987654321, "ETH", 15000.112233445566778899, null, "2023-07-12");
         accountingHelper.patchReward("e1498a17-5090-4071-a88a-6f0b0c337c3a", 50, "ETH", 75000, null, "2023-08-12");
         accountingHelper.patchReward("2ac80cc6-7e83-4eef-bc0c-932b58f683c0", 500, "APT", 100000, null, null);
         accountingHelper.patchReward("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0", 30, "OP", null, "2023-08-14", null);
@@ -152,8 +152,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "status": "COMPLETE",
                               "unlockDate": null,
                               "amount": {
-                                "amount": 10.0,
-                                "prettyAmount": 10.0,
+                                "amount": 10.123456789876544,
+                                "prettyAmount": 10.12346,
                                 "currency": {
                                   "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                   "code": "ETH",
@@ -161,8 +161,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": 15000.0,
-                                "usdConversionRate": 1500.0
+                                "usdEquivalent": 15000.11,
+                                "usdConversionRate": 1481.718403583811
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -274,7 +274,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                           "totalItemNumber": 6,
                           "nextPageIndex": 0,
                           "rewardedAmount": {
-                            "totalUsdEquivalent": 191010.00,
+                            "totalUsdEquivalent": 191010.11,
                             "totalPerCurrency": [
                               {
                                 "amount": 30.0,
@@ -316,8 +316,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                 "usdConversionRate": null
                               },
                               {
-                                "amount": 60.0,
-                                "prettyAmount": 60.0,
+                                "amount": 60.123456789876544,
+                                "prettyAmount": 60.12346,
                                 "currency": {
                                   "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                   "code": "ETH",
@@ -325,7 +325,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": 90000.0,
+                                "usdEquivalent": 90000.11,
                                 "usdConversionRate": null
                               },
                               {
@@ -553,8 +553,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "status": "COMPLETE",
                               "unlockDate": null,
                               "amount": {
-                                "amount": 10.0,
-                                "prettyAmount": 10.0,
+                                "amount": 10.123456789876544,
+                                "prettyAmount": 10.12346,
                                 "currency": {
                                   "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                   "code": "ETH",
@@ -562,8 +562,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": 15000.0,
-                                "usdConversionRate": 1500.0
+                                "usdEquivalent": 15000.11,
+                                "usdConversionRate": 1481.718403583811
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -675,7 +675,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                           "totalItemNumber": 6,
                           "nextPageIndex": 0,
                           "rewardedAmount": {
-                            "totalUsdEquivalent": 191010.00,
+                            "totalUsdEquivalent": 191010.11,
                             "totalPerCurrency": [
                               {
                                 "amount": 30.0,
@@ -717,8 +717,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                 "usdConversionRate": null
                               },
                               {
-                                "amount": 60.0,
-                                "prettyAmount": 60.0,
+                                "amount": 60.123456789876544,
+                                "prettyAmount": 60.12346,
                                 "currency": {
                                   "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                   "code": "ETH",
@@ -726,7 +726,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": 90000.0,
+                                "usdEquivalent": 90000.11,
                                 "usdConversionRate": null
                               },
                               {
@@ -938,7 +938,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewardedAmount.totalPerCurrency.length()").isEqualTo(1)
                 .jsonPath("$.rewardedAmount.totalPerCurrency[0].amount").isEqualTo(60)
                 .jsonPath("$.rewardedAmount.totalPerCurrency[0].currency.code").isEqualTo("ETH")
-                .jsonPath("$.rewardedAmount.totalUsdEquivalent").isEqualTo(90000.00)
+                .jsonPath("$.rewardedAmount.totalUsdEquivalent").isEqualTo(90000.11)
                 .jsonPath("$.pendingAmount.totalPerCurrency.length()").isEqualTo(1)
                 .jsonPath("$.pendingAmount.totalPerCurrency[0].amount").isEqualTo(0)
                 .jsonPath("$.pendingAmount.totalPerCurrency[0].currency.code").isEqualTo("ETH")
@@ -968,9 +968,9 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.rewards[?(@.projectId in ['5aabf0f1-7495-4bff-8de2-4396837ce6b4'," +
-                          "'298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").exists()
+                        "'298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").exists()
                 .jsonPath("$.rewards[?(@.projectId nin ['5aabf0f1-7495-4bff-8de2-4396837ce6b4'," +
-                          "'298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").doesNotExist()
+                        "'298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").doesNotExist()
                 .jsonPath("$.rewardedAmount.totalPerCurrency.length()").isEqualTo(1)
                 .jsonPath("$.rewardedAmount.totalPerCurrency[0].amount").isEqualTo(12500)
                 .jsonPath("$.rewardedAmount.totalPerCurrency[0].currency.code").isEqualTo("USDC")
@@ -1005,7 +1005,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "rewardedAmount": {
-                            "totalUsdEquivalent": 191010.00,
+                            "totalUsdEquivalent": 191010.11,
                             "totalPerCurrency": [
                               {
                                 "amount": 30.0,
@@ -1047,8 +1047,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                 "usdConversionRate": null
                               },
                               {
-                                "amount": 60.0,
-                                "prettyAmount": 60.0,
+                                "amount": 60.12345678987654,
+                                "prettyAmount": 60.12346,
                                 "currency": {
                                   "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                   "code": "ETH",
@@ -1056,7 +1056,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": 90000.0,
+                                "usdEquivalent": 90000.11,
                                 "usdConversionRate": null
                               },
                               {
