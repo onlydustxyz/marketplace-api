@@ -4,10 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeHackathonManagementApi;
-import onlydust.com.backoffice.api.contract.model.CreateHackathonRequest;
-import onlydust.com.backoffice.api.contract.model.HackathonsDetailsResponse;
-import onlydust.com.backoffice.api.contract.model.HackathonsPageResponse;
-import onlydust.com.backoffice.api.contract.model.UpdateHackathonRequest;
+import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.HackathonMapper;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
@@ -39,6 +36,13 @@ public class BackofficeHackathonRestApi implements BackofficeHackathonManagement
     @Override
     public ResponseEntity<HackathonsDetailsResponse> updateHackathonById(UUID hackathonId, UpdateHackathonRequest updateHackathonRequest) {
         hackathonFacadePort.updateHackathon(HackathonMapper.toDomain(hackathonId, updateHackathonRequest));
+        final var hackathonDetailsView = hackathonFacadePort.getHackathonById(Hackathon.Id.of(hackathonId));
+        return ResponseEntity.ok(HackathonMapper.toBackOfficeResponse(hackathonDetailsView));
+    }
+
+    @Override
+    public ResponseEntity<HackathonsDetailsResponse> patchHackathonById(UUID hackathonId, PatchHackathonRequest patchHackathonRequest) {
+        hackathonFacadePort.updateHackathonStatus(hackathonId, Hackathon.Status.valueOf(patchHackathonRequest.getStatus().name()));
         final var hackathonDetailsView = hackathonFacadePort.getHackathonById(Hackathon.Id.of(hackathonId));
         return ResponseEntity.ok(HackathonMapper.toBackOfficeResponse(hackathonDetailsView));
     }

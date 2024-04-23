@@ -13,6 +13,8 @@ import java.util.UUID;
 public interface HackathonStoragePort {
     void save(@NonNull Hackathon hackathon);
 
+    void saveStatus(@NonNull Hackathon.Id hackathonId, @NonNull Hackathon.Status status);
+
     Optional<HackathonDetailsView> findById(@NonNull Hackathon.Id id);
 
     Optional<HackathonDetailsView> findBySlug(String hackathonSlug);

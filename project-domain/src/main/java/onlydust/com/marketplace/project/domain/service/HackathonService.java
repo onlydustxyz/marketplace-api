@@ -36,6 +36,13 @@ public class HackathonService implements HackathonFacadePort {
     }
 
     @Override
+    public void updateHackathonStatus(@NonNull UUID hackathonId, Hackathon.@NonNull Status status) {
+        if (!hackathonStoragePort.exists(Hackathon.Id.of(hackathonId)))
+            throw notFound("Hackathon %s not found".formatted(hackathonId));
+        hackathonStoragePort.saveStatus(Hackathon.Id.of(hackathonId), status);
+    }
+
+    @Override
     public HackathonDetailsView getHackathonById(@NonNull Hackathon.Id hackathonId) {
         return hackathonStoragePort.findById(hackathonId)
                 .orElseThrow(() -> notFound("Hackathon %s not found".formatted(hackathonId)));
