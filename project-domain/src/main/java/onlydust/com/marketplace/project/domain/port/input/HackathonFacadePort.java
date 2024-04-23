@@ -16,6 +16,8 @@ public interface HackathonFacadePort {
 
     void updateHackathon(@NonNull Hackathon hackathon);
 
+    void updateHackathonStatus(@NonNull UUID hackathonId, @NonNull Hackathon.Status status);
+
     HackathonDetailsView getHackathonById(@NonNull Hackathon.Id hackathonId);
 
     HackathonDetailsView getHackathonBySlug(String hackathonSlug);

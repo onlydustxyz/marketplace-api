@@ -35,6 +35,14 @@ public class PostgresHackathonAdapter implements HackathonStoragePort {
     }
 
     @Override
+    public void saveStatus(Hackathon.@NonNull Id hackathonId, Hackathon.@NonNull Status status) {
+        final var hackathon = hackathonRepository.findById(hackathonId.value())
+                .orElseThrow(() -> new IllegalArgumentException("Hackathon %s not found".formatted(hackathonId)));
+        hackathon.setStatus(status);
+        hackathonRepository.saveAndFlush(hackathon);
+    }
+
+    @Override
     public Optional<HackathonDetailsView> findById(@NonNull Hackathon.Id id) {
         return hackathonDetailsViewRepository.findById(id.value())
                 .map(HackathonDetailsViewEntity::toDomain);
