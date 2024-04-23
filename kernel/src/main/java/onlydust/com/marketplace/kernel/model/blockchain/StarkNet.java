@@ -3,13 +3,13 @@ package onlydust.com.marketplace.kernel.model.blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarkScan;
 import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetContractAddress;
-import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetTransactionHash;
+import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetTransaction;
 
 public interface StarkNet {
-    BlockExplorer<StarknetTransactionHash> BLOCK_EXPLORER = new StarkScan();
+    BlockExplorer<StarknetTransaction.Hash> BLOCK_EXPLORER = new StarkScan();
 
-    static StarknetTransactionHash transactionHash(String value) {
-        return new StarknetTransactionHash(value);
+    static StarknetTransaction.Hash transactionHash(String value) {
+        return new StarknetTransaction.Hash(value);
     }
 
     static StarknetAccountAddress accountAddress(String value) {
