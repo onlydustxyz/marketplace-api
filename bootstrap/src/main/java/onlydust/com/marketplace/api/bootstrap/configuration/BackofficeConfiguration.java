@@ -8,8 +8,6 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.Authenticate
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.HackathonFacadePort;
-import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
-import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.project.domain.service.BackofficeService;
 import org.springframework.context.annotation.Bean;
@@ -52,14 +50,14 @@ public class BackofficeConfiguration {
     @Bean
     public BackofficeAccountingManagementRestApi backofficeAccountingManagementRestApi(
             final AccountingFacadePort accountingFacadePort,
-            final RewardFacadePort rewardFacadePort,
-            final UserFacadePort userFacadePort,
             final AccountingRewardPort accountingRewardPort,
             final PaymentPort paymentPort,
             final BillingProfileFacadePort billingProfileFacadePort,
-            final AuthenticatedBackofficeUserService authenticatedBackofficeUserService) {
-        return new BackofficeAccountingManagementRestApi(accountingFacadePort, rewardFacadePort, userFacadePort, accountingRewardPort,
-                paymentPort, billingProfileFacadePort, authenticatedBackofficeUserService);
+            final AuthenticatedBackofficeUserService authenticatedBackofficeUserService,
+            final BlockchainFacadePort blockchainFacadePort
+    ) {
+        return new BackofficeAccountingManagementRestApi(accountingFacadePort, accountingRewardPort,
+                paymentPort, billingProfileFacadePort, authenticatedBackofficeUserService, blockchainFacadePort);
     }
 
     @Bean
@@ -79,9 +77,10 @@ public class BackofficeConfiguration {
     @Bean
     public PaymentPort batchPaymentPort(final AccountingRewardStoragePort accountingRewardStoragePort,
                                         final InvoiceStoragePort invoiceStoragePort,
-                                        final AccountingFacadePort accountingFacadePort) {
+                                        final AccountingFacadePort accountingFacadePort,
+                                        final BlockchainFacadePort blockchainFacadePort) {
         return new PaymentService(accountingRewardStoragePort, invoiceStoragePort,
-                accountingFacadePort);
+                accountingFacadePort, blockchainFacadePort);
     }
 
     @Bean

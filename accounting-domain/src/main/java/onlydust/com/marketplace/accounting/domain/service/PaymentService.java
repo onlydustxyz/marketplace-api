@@ -8,6 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.BlockchainFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.PaymentPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
@@ -16,7 +17,6 @@ import onlydust.com.marketplace.accounting.domain.view.BatchPaymentShortView;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +31,7 @@ public class PaymentService implements PaymentPort {
     private final AccountingRewardStoragePort accountingRewardStoragePort;
     private final InvoiceStoragePort invoiceStoragePort;
     private final AccountingFacadePort accountingFacadePort;
+    private final BlockchainFacadePort blockchainFacadePort;
 
     @NonNull
     private static Map<RewardId, Wallet> walletsPerRewardForNetwork(Map<RewardId, Invoice> rewardInvoices, Network network) {
@@ -50,12 +51,10 @@ public class PaymentService implements PaymentPort {
             throw badRequest("Batch payment %s is already paid".formatted(paymentId.value()));
         }
 
-        payment.network().validateTransactionReference(transactionReference);
-
         final Payment updatedPayment = payment.toBuilder()
                 .status(Payment.Status.PAID)
                 .transactionHash(transactionReference)
-                .confirmedAt(ZonedDateTime.now()) // TODO use the transaction timestamp
+                .confirmedAt(blockchainFacadePort.getTransactionTimestamp(payment.network().blockchain().orElseThrow(), transactionReference))
                 .build();
 
         accountingFacadePort.confirm(updatedPayment);
