@@ -31,5 +31,5 @@ public interface ContributorFacadePort {
 
     List<Project> rewardingProjects(Long githubUserId);
 
-    List<CurrencyView> getRewardCurrencies(Long githubUserId);
+    List<CurrencyView> getRewardCurrencies(Long githubUserId, List<UUID> administratedBillingProfileIds);
 }
