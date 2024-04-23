@@ -9,7 +9,6 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface SponsorAccountStorage extends SponsorAccountProvider {
     void save(SponsorAccount... sponsorAccounts);
@@ -25,5 +24,5 @@ public interface SponsorAccountStorage extends SponsorAccountProvider {
                                                @NonNull HistoricalTransaction.Sort sort,
                                                @NonNull SortDirection direction);
 
-    Optional<SponsorAccount> find(SponsorId sponsorId, Currency.Id currencyId);
+    List<SponsorAccount> find(SponsorId sponsorId, Currency.Id currencyId);
 }
