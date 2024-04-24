@@ -37,7 +37,9 @@ public class CurrencyServiceTest {
     final ERC20Provider ethereumERC20Provider = mock(ERC20Provider.class);
     final ERC20Provider optimismERC20Provider = mock(ERC20Provider.class);
     final ERC20Provider starknetERC20Provider = mock(ERC20Provider.class);
-    final ERC20ProviderFactory erc20ProviderFactory = new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider, starknetERC20Provider);
+    final ERC20Provider aptosERC20Provider = mock(ERC20Provider.class);
+    final ERC20ProviderFactory erc20ProviderFactory = new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider, starknetERC20Provider,
+            aptosERC20Provider);
     final QuoteService quoteService = mock(QuoteService.class);
     final QuoteStorage quoteStorage = mock(QuoteStorage.class);
     final IsoCurrencyService isoCurrencyService = mock(IsoCurrencyService.class);
@@ -47,7 +49,7 @@ public class CurrencyServiceTest {
 
     @BeforeEach
     void setUp() {
-        reset(currencyStorage, ethereumERC20Provider, optimismERC20Provider, starknetERC20Provider, quoteService, quoteStorage,
+        reset(currencyStorage, ethereumERC20Provider, optimismERC20Provider, starknetERC20Provider, aptosERC20Provider, quoteService, quoteStorage,
                 isoCurrencyService, imageStoragePort);
         when(currencyStorage.findByCode(any())).thenReturn(Optional.empty());
         when(currencyStorage.findByCode(Currencies.USD.code())).thenReturn(Optional.of(Currencies.USD));
@@ -151,12 +153,35 @@ public class CurrencyServiceTest {
     }
 
     @Test
-    void should_not_add_erc20_support_on_unsupported_blockchain() {
+    void should_add_erc20_support_on_aptos() {
+        //Given
+        when(aptosERC20Provider.get(APT.getAddress())).thenReturn(Optional.of(APT));
+        when(currencyMetadataService.get(APT)).thenReturn(Optional.of(new Currency.Metadata("Aptos Coin", "Aptos token", URI.create("https://aptos.com"))));
+        when(currencyStorage.all()).thenReturn(Set.of(Currencies.USD));
+        when(quoteService.currentPrice(anySet(), anySet()))
+                .then(i -> createQuotesFromInvocation(i, BigDecimal.valueOf(0.35)));
+
         // When
-        assertThatThrownBy(() -> currencyService.addERC20Support(APTOS, LORDS.getAddress()))
-                // Then
-                .isInstanceOf(OnlyDustException.class)
-                .hasMessage("ERC20 tokens on Aptos are not supported");
+        final var currency = currencyService.addERC20Support(APTOS, APT.getAddress());
+
+        // Then
+        verify(currencyStorage, times(1)).save(currency);
+
+        assertThat(currency.id()).isNotNull();
+        assertThat(currency.name()).isEqualTo("Aptos Coin");
+        assertThat(currency.code()).isEqualTo(Currency.Code.of("APT"));
+        assertThat(currency.description()).isEqualTo(Optional.of("Aptos token"));
+        assertThat(currency.logoUri()).isEqualTo(Optional.of(URI.create("https://aptos.com")));
+        assertThat(currency.decimals()).isEqualTo(6);
+        assertThat(currency.erc20()).contains(APT);
+
+        final ArgumentCaptor<List<Quote>> quotes = ArgumentCaptor.forClass(List.class);
+        verify(quoteStorage, times(1)).save(quotes.capture());
+
+        assertThat(quotes.getValue()).containsExactlyInAnyOrder(
+                new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35), TIMESTAMP),
+                new Quote(currency.id(), currency.id(), BigDecimal.ONE, TIMESTAMP)
+        );
     }
 
     @Test

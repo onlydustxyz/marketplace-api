@@ -1,11 +1,11 @@
 {
     "request": {
-        "urlPattern": "/accounts/[^/]*",
+        "urlPattern": "/accounts/.*/resource/.*",
         "method": "GET"
     },
     "response": {
         "status": 200,
-        "bodyFileName": "body-account.json",
+        "bodyFileName": "body-usdc-info.json",
         "headers": {
             "Content-Type": "application/json"
         }
