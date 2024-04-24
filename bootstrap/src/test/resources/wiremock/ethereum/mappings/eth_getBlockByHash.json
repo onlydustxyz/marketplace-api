@@ -1,0 +1,27 @@
+{
+    "request": {
+        "url": "/INFURA_API_KEY",
+        "method": "POST",
+        "bodyPatterns": [
+            {
+                "equalToJson": {
+                    "jsonrpc": "2.0",
+                    "method": "eth_getBlockByHash",
+                    "params": [
+                        "0x7fe3898aeb58060650930be8db994227e9ddfd59b704277931dbe60ec2393ccd",
+                        false
+                    ]
+                },
+                "ignoreArrayOrder": true,
+                "ignoreExtraElements": true
+            }
+        ]
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "body-eth_getBlockByHash.json",
+        "headers": {
+            "Content-Type": "application/json"
+        }
+    }
+}

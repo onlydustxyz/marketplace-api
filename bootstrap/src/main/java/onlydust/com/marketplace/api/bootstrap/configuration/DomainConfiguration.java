@@ -3,16 +3,21 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.ERC20ProviderFactory;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.BlockchainFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
+import onlydust.com.marketplace.accounting.domain.service.BlockchainService;
 import onlydust.com.marketplace.accounting.domain.service.CurrencyService;
 import onlydust.com.marketplace.api.infrastructure.accounting.AccountingServiceAdapter;
+import onlydust.com.marketplace.api.infura.adapters.InfuraEvmTransactionStorageAdapter;
+import onlydust.com.marketplace.api.infura.adapters.StarknetInfuraTransactionStorageAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresRewardAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
+import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosTransaction;
 import onlydust.com.marketplace.kernel.port.output.*;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.IndexerApiOutboxConsumer;
@@ -27,7 +32,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
 
+import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 @Configuration
@@ -230,5 +237,20 @@ public class DomainConfiguration {
     @Bean
     public HackathonFacadePort hackathonFacadePort(final HackathonStoragePort hackathonStoragePort) {
         return new HackathonService(hackathonStoragePort);
+    }
+
+    @Bean
+    public BlockchainTransactionStoragePort<AptosTransaction, AptosTransaction.Hash> aptosTransactionStorageAdapter() {
+        // TODO find and use Aptos SDK
+        return reference -> Optional.of(new AptosTransaction(reference, ZonedDateTime.now()));
+    }
+
+    @Bean
+    public BlockchainFacadePort blockchainFacadePort(final InfuraEvmTransactionStorageAdapter ethereumTransactionStorageAdapter,
+                                                     final InfuraEvmTransactionStorageAdapter optimismTransactionStorageAdapter,
+                                                     final StarknetInfuraTransactionStorageAdapter starknetTransactionStoragePort,
+                                                     final BlockchainTransactionStoragePort<AptosTransaction, AptosTransaction.Hash> aptosTransactionStorageAdapter) {
+        return new BlockchainService(ethereumTransactionStorageAdapter, optimismTransactionStorageAdapter, aptosTransactionStorageAdapter,
+                starknetTransactionStoragePort);
     }
 }

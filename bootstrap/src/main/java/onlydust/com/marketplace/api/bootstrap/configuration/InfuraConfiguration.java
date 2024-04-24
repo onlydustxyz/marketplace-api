@@ -30,6 +30,11 @@ public class InfuraConfiguration {
     }
 
     @Bean
+    public InfuraEvmTransactionStorageAdapter ethereumTransactionStorageAdapter(final InfuraClient.Properties ethereumProperties) {
+        return new InfuraEvmTransactionStorageAdapter(ethereumProperties);
+    }
+
+    @Bean
     @ConfigurationProperties("infrastructure.optimism")
     public InfuraClient.Properties optimismProperties() {
         return new InfuraClient.Properties();
@@ -38,6 +43,11 @@ public class InfuraConfiguration {
     @Bean
     public EthInfuraERC20ProviderAdapter optimismERC20Provider(final InfuraClient.Properties optimismProperties) {
         return new EthInfuraERC20ProviderAdapter(optimismProperties);
+    }
+
+    @Bean
+    public InfuraEvmTransactionStorageAdapter optimismTransactionStorageAdapter(final InfuraClient.Properties optimismProperties) {
+        return new InfuraEvmTransactionStorageAdapter(optimismProperties);
     }
 
     @Bean
@@ -54,5 +64,10 @@ public class InfuraConfiguration {
     @Bean
     public StarknetInfuraAccountValidatorAdapter starknetInfuraAccountValidatorAdapter(final InfuraClient.Properties starknetProperties) {
         return new StarknetInfuraAccountValidatorAdapter(starknetProperties);
+    }
+
+    @Bean
+    public StarknetInfuraTransactionStorageAdapter starknetInfuraTransactionStorageAdapter(final InfuraClient.Properties starknetProperties) {
+        return new StarknetInfuraTransactionStorageAdapter(starknetProperties);
     }
 }

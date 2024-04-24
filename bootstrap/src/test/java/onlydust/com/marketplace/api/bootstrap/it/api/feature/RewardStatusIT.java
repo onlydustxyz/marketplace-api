@@ -14,6 +14,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.Verificat
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.port.in.BlockchainFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.*;
@@ -85,6 +86,9 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     AccountingObserver accountingObserver;
     @Autowired
     InvoiceService invoiceService;
+    @Autowired
+    BlockchainFacadePort blockchainFacadePort;
+
     final AuthenticatedBackofficeUserService authenticatedBackofficeUserService = mock(AuthenticatedBackofficeUserService.class);
 
     private final Double strkToUsd1 = 2.5;
@@ -3849,13 +3853,12 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         ));
         final var backofficeAccountingManagementRestApi = new BackofficeAccountingManagementRestApi(
                 accountingService,
-                rewardService,
-                userFacadePort,
                 new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, mailNotificationPort, accountingService,
                         sponsorStoragePort),
-                new PaymentService(accountingRewardStoragePort, invoiceStoragePort, accountingService),
+                new PaymentService(accountingRewardStoragePort, invoiceStoragePort, accountingService, blockchainFacadePort),
                 billingProfileService,
-                authenticatedBackofficeUserService);
+                authenticatedBackofficeUserService,
+                blockchainFacadePort);
         backofficeAccountingManagementRestApi.payReward(individualBPAdminRewardId1,
                 new PayRewardRequest().network(TransactionNetwork.ETHEREUM).reference("0xb1c3579ffbe3eabe6f88c58a037367dee7de6c06262cfecc3bd2e8c013cc5156"));
         backofficeAccountingManagementRestApi.payReward(companyBPAdmin1RewardId1,

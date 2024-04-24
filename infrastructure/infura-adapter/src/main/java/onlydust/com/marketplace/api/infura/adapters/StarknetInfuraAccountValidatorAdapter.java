@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.infura.adapters;
 
 import com.swmansion.starknet.data.types.Call;
 import com.swmansion.starknet.data.types.Felt;
+import com.swmansion.starknet.data.types.StarknetChainId;
 import com.swmansion.starknet.provider.Provider;
 import com.swmansion.starknet.provider.rpc.JsonRpcProvider;
 import onlydust.com.marketplace.accounting.domain.port.out.WalletValidator;
@@ -19,7 +20,7 @@ public class StarknetInfuraAccountValidatorAdapter implements WalletValidator<St
     Provider provider;
 
     public StarknetInfuraAccountValidatorAdapter(final InfuraClient.Properties properties) {
-        provider = new JsonRpcProvider("%s/%s".formatted(properties.getBaseUri(), properties.getApiKey()));
+        provider = new JsonRpcProvider("%s/%s".formatted(properties.getBaseUri(), properties.getApiKey()), StarknetChainId.MAINNET);
     }
 
     @Override
