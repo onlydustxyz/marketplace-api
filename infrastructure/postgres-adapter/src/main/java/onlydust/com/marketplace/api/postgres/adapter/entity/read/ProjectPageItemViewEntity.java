@@ -23,10 +23,10 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Entity
-@Table(name = "project_details", schema = "public")
+@Table(name = "projects", schema = "public")
 public class ProjectPageItemViewEntity {
     @Id
-    @Column(name = "project_id")
+    @Column(name = "id")
     UUID projectId;
     Boolean hiring;
     @Column(name = "logo_url")

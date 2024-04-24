@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.project.domain.view;
 
 import lombok.*;
-import onlydust.com.marketplace.project.domain.model.MoreInfoLink;
+import onlydust.com.marketplace.project.domain.model.NamedLink;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
@@ -19,7 +19,7 @@ public class ProjectDetailsView {
     String shortDescription;
     String longDescription;
     String logoUrl;
-    List<MoreInfoLink> moreInfos;
+    List<NamedLink> moreInfos;
     Boolean hiring;
     ProjectVisibility visibility;
     Integer contributorCount;

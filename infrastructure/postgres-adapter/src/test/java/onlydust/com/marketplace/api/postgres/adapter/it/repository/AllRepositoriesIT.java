@@ -6,10 +6,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.*;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
-import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.UserViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import org.junit.jupiter.api.Test;
@@ -48,6 +45,8 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     PostgresUserAdapter postgresUserAdapter;
     @Autowired
     RewardRepository rewardRepository;
+    @Autowired
+    CustomProjectRankingRepository customProjectRankingRepository;
 
     @Test
     void should_create_user() {
@@ -130,6 +129,9 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .build();
 
         assertIsSaved(expected, projectRepository);
+
+        // Should not throw
+        customProjectRankingRepository.updateProjectsRanking();
     }
 
     @Test

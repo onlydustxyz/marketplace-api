@@ -4,10 +4,12 @@ import lombok.NonNull;
 import onlydust.com.backoffice.api.contract.model.ProjectLinkResponse;
 import onlydust.com.backoffice.api.contract.model.SponsorPage;
 import onlydust.com.backoffice.api.contract.model.SponsorPageItemResponse;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.HistoricalTransaction;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
-import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
+import onlydust.com.marketplace.accounting.domain.view.MoneyView;
+import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -16,13 +18,14 @@ import onlydust.com.marketplace.project.domain.model.Sponsor;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static java.util.Comparator.comparing;
+import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.reducing;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.mapCurrency;
-import static onlydust.com.marketplace.kernel.mapper.AmountMapper.pretty;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MoneyMapper.toMoney;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
 
@@ -43,7 +46,7 @@ public interface SponsorMapper {
                 .nextPageIndex(nextPageIndex(pageIndex, sponsorViewPage.getTotalPageNumber()));
     }
 
-    static ProjectLinkResponse projectToBoResponse(final ShortProjectView view) {
+    static ProjectLinkResponse projectToBoResponse(final ProjectShortView view) {
         return new ProjectLinkResponse()
                 .id(view.id().value())
                 .slug(view.slug())
@@ -51,7 +54,7 @@ public interface SponsorMapper {
                 .name(view.name());
     }
 
-    static onlydust.com.marketplace.api.contract.model.ProjectLinkResponse projectToResponse(final ShortProjectView view) {
+    static onlydust.com.marketplace.api.contract.model.ProjectLinkResponse projectToResponse(final ProjectShortView view) {
         return new onlydust.com.marketplace.api.contract.model.ProjectLinkResponse()
                 .id(view.id().value())
                 .slug(view.slug())
@@ -69,7 +72,8 @@ public interface SponsorMapper {
 
     static HistoricalTransaction.Type map(SponsorAccountTransactionType type) {
         return switch (type) {
-            case DEPOSIT -> HistoricalTransaction.Type.MINT; // Sponsor is interested on how much he can actually spend on projects
+            // Sponsor is interested on how much he can actually spend on projects
+            case DEPOSIT -> HistoricalTransaction.Type.MINT;
             case WITHDRAWAL -> HistoricalTransaction.Type.BURN;
             case ALLOCATION -> HistoricalTransaction.Type.TRANSFER;
             case UNALLOCATION -> HistoricalTransaction.Type.REFUND;
@@ -83,23 +87,28 @@ public interface SponsorMapper {
                 .url(sponsor.url())
                 .logoUrl(sponsor.logoUrl())
                 .projects(sponsor.projects().stream().map(p -> mapToProjectWithBudget(p, accountStatements)).toList())
-                .availableBudgets(accountStatements.stream()
-                        .map(SponsorMapper::mapAllowanceToMoney)
-                        .collect(groupingBy(Money::getCurrency, reducing(null, MoneyMapper::add)))
-                        .values().stream()
+                .availableBudgets(sponsorAccountStatementsToBudgets(accountStatements).values().stream()
+                        .map(MoneyMapper::toMoney)
                         .sorted(comparing(b -> b.getCurrency().getCode()))
                         .toList());
     }
 
-    private static ProjectWithBudgetResponse mapToProjectWithBudget(ShortProjectView project, List<SponsorAccountStatement> accountStatements) {
+    private static Map<Currency, MoneyView> sponsorAccountStatementsToBudgets(List<SponsorAccountStatement> accountStatements) {
+        return accountStatements.stream()
+                .map(account -> new MoneyView(account.allowance().getValue(), account.account().currency()))
+                .collect(
+                        groupingBy(MoneyView::getCurrency,
+                                reducing(null, (money1, money2) -> new MoneyView(
+                                        isNull(money1) ? money2.getAmount() : money1.getAmount().add(money2.getAmount()),
+                                        money2.getCurrency()
+                                ))));
+    }
+
+    private static ProjectWithBudgetResponse mapToProjectWithBudget(ProjectShortView project, List<SponsorAccountStatement> accountStatements) {
         final var budgets = accountStatements.stream().map(statement -> {
                             final var budget = statement.unspentBalanceSentTo(ProjectId.of(project.id().value())).getValue();
                             final var currency = statement.account().currency();
-                            return new Money()
-                                    .amount(budget)
-                                    .prettyAmount(pretty(budget, currency.decimals(), currency.latestUsdQuote().orElse(null)))
-                                    .currency(mapCurrency(currency))
-                                    .usdEquivalent(currency.latestUsdQuote().map(r -> r.multiply(budget)).orElse(null));
+                            return toMoney(budget, currency);
                         }
                 )
                 .filter(money -> money.getAmount().compareTo(BigDecimal.ZERO) > 0)
@@ -113,18 +122,6 @@ public interface SponsorMapper {
                 .totalUsdBudget(budgets.stream().map(Money::getUsdEquivalent).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add))
                 .remainingBudgets(budgets)
                 ;
-    }
-
-    private static @NonNull Money mapAllowanceToMoney(SponsorAccountStatement accountStatement) {
-        return new Money()
-                .currency(mapCurrency(accountStatement.account().currency()))
-                .amount(accountStatement.allowance().getValue())
-                .prettyAmount(pretty(accountStatement.allowance().getValue(),
-                        accountStatement.account().currency().decimals(),
-                        accountStatement.account().currency().latestUsdQuote().orElse(null)))
-                .usdEquivalent(accountStatement.account().currency().latestUsdQuote()
-                        .map(q -> q.multiply(accountStatement.allowance().getValue()))
-                        .orElse(null));
     }
 
     static TransactionHistoryPageResponse mapTransactionHistory(Page<HistoricalTransaction> page, int pageIndex) {
@@ -142,10 +139,7 @@ public interface SponsorMapper {
                 .date(historicalTransaction.timestamp())
                 .type(mapTransactionType(historicalTransaction))
                 .project(historicalTransaction.project() == null ? null : projectToResponse(historicalTransaction.project()))
-                .amount(new Money()
-                        .amount(historicalTransaction.amount().getValue())
-                        .currency(mapCurrency(historicalTransaction.sponsorAccount().currency()))
-                );
+                .amount(toMoney(historicalTransaction.amount().getValue(), historicalTransaction.sponsorAccount().currency()));
     }
 
     static SponsorAccountTransactionType mapTransactionType(HistoricalTransaction transaction) {
@@ -154,7 +148,8 @@ public interface SponsorMapper {
             case BURN -> SponsorAccountTransactionType.WITHDRAWAL;
             case TRANSFER -> SponsorAccountTransactionType.ALLOCATION;
             case REFUND -> SponsorAccountTransactionType.UNALLOCATION;
-            default -> throw OnlyDustException.internalServerError("Unexpected transaction type: %s".formatted(transaction.type()));
+            default -> throw OnlyDustException
+                    .internalServerError("Unexpected transaction type: %s".formatted(transaction.type()));
         };
     }
 

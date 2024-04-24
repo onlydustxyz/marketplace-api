@@ -132,21 +132,21 @@ public class UserProfileEntity {
         String currencyName;
         @JsonProperty("currency_decimals")
         Integer currencyDecimals;
+        @JsonProperty("currency_latest_usd_quote")
+        BigDecimal currencyLatestUsdQuote;
         @JsonProperty("currency_logo_url")
         String logoUrl;
 
         public Money toDomain() {
-            return Money.builder()
-                    .usdEquivalent(totalDollarsEquivalent)
-                    .amount(totalAmount)
-                    .currency(CurrencyView.builder()
-                            .id(CurrencyView.Id.of(currencyId))
-                            .name(currencyName)
-                            .code(currencyCode)
-                            .decimals(currencyDecimals)
-                            .logoUrl(logoUrl != null ? URI.create(logoUrl) : null)
-                            .build())
-                    .build();
+            return new Money(totalAmount, CurrencyView.builder()
+                    .id(CurrencyView.Id.of(currencyId))
+                    .name(currencyName)
+                    .code(currencyCode)
+                    .decimals(currencyDecimals)
+                    .latestUsdQuote(currencyLatestUsdQuote)
+                    .logoUrl(logoUrl != null ? URI.create(logoUrl) : null)
+                    .build())
+                    .dollarsEquivalentValue(totalDollarsEquivalent);
         }
     }
 

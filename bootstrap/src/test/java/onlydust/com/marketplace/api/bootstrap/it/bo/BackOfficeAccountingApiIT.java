@@ -13,12 +13,15 @@ import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacade
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
+import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.contract.model.CreateRewardResponse;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookEventRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardStatusRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
+import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
+import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -586,7 +589,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     }
 
     @Test
-    void should_allocate_budget_to_project_and_pay_rewards() {
+    void should_allocate_budget_to_project_and_pay_rewards_on_ethereum() {
         // Given
         final var antho = userAuthHelper.authenticateAnthony();
         final var ofux = userAuthHelper.authenticateOlivier();
@@ -830,6 +833,462 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     }
 
     @Test
+    void should_allocate_budget_to_project_and_pay_rewards_on_starknet() {
+        // Given
+        final var antho = userAuthHelper.authenticateAnthony();
+        final var ofux = userAuthHelper.authenticateOlivier();
+
+        client
+                .post()
+                .uri(getApiURI(POST_CURRENCIES))
+                .contentType(APPLICATION_JSON)
+                .header("Api-Key", apiKey())
+                .bodyValue("""
+                        {
+                            "type": "CRYPTO",
+                            "standard": "ERC20",
+                            "blockchain": "STARKNET",
+                            "address": "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8"
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        final var accountId = client.post()
+                .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(REDBULL)))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "currencyId": "%s",
+                            "receipt": {
+                                "reference": "0x01",
+                                "amount": 100,
+                                "network": "STARKNET",
+                                "thirdPartyName": "RedBull",
+                                "thirdPartyAccountNumber": "red-bull.stark"
+                            }
+                        }
+                        """.formatted(USDC))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(AccountResponse.class)
+                .returnResult()
+                .getResponseBody().getId();
+
+        // Given
+        client.post()
+                .uri(getApiURI(POST_PROJECTS_BUDGETS_ALLOCATE.formatted(KAAPER)))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "sponsorAccountId": "%s",
+                            "amount": 100
+                        }
+                        """.formatted(accountId))
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        indexerApiWireMockServer.stubFor(WireMock.put(
+                        WireMock.urlEqualTo("/api/v1/users/%d".formatted(ofux.user().getGithubUserId())))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+
+        // When
+        final var rewardId = client.post()
+                .uri(getApiURI(PROJECTS_REWARDS.formatted(KAAPER)))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "recipientId": "%d",
+                            "amount": 30,
+                            "currencyId": "%s",
+                            "items": [{
+                                "type": "PULL_REQUEST",
+                                "id": "1703880973",
+                                "number": 325,
+                                "repoId": 698096830
+                            }]
+                        }
+                        """.formatted(ofux.user().getGithubUserId(), USDC))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(CreateRewardResponse.class)
+                .returnResult().getResponseBody().getId();
+
+        // Then
+        client.get()
+                .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(REDBULL)))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.accounts[0].initialBalance").isEqualTo(100)
+                .jsonPath("$.accounts[0].currentBalance").isEqualTo(100)
+                .jsonPath("$.accounts[0].initialAllowance").isEqualTo(100)
+                .jsonPath("$.accounts[0].currentAllowance").isEqualTo(0)
+                .jsonPath("$.accounts[0].debt").isEqualTo(0)
+                .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(30)
+        ;
+
+        // When
+        invoiceReward(UserId.of(ofux.user().getId()), KAAPER, RewardId.of(rewardId));
+
+        // When
+        client.post()
+                .uri(getApiURI(POST_REWARDS_PAY.formatted(rewardId)))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "network": "STARKNET",
+                            "reference": "0x16096a49c236dfdbc5808c31a1d6eee90a082ca5717366a73b03a2eb80cd252"
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        client.get()
+                .uri(getApiURI(String.format(ME_REWARD, rewardId)))
+                .header("Authorization", BEARER_PREFIX + ofux.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                         
+                        {
+                           "amount": {
+                             "amount": 30,
+                             "prettyAmount": 30,
+                             "currency": {
+                               "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                               "code": "USDC",
+                               "name": "USD Coin",
+                               "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                               "decimals": 6
+                             },
+                             "usdEquivalent": 30.30,
+                             "usdConversionRate": 1.01
+                           },
+                           "status": "COMPLETE",
+                           "unlockDate": null,
+                           "from": {
+                             "githubUserId": 43467246,
+                             "login": "AnthonyBuisset",
+                             "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                             "isRegistered": true
+                           },
+                           "to": {
+                             "githubUserId": 595505,
+                             "login": "ofux",
+                             "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
+                             "isRegistered": true
+                           },
+                           "project": {
+                             "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                             "slug": "kaaper",
+                             "name": "kaaper",
+                             "logoUrl": null,
+                             "shortDescription": "Documentation generator for Cairo projects.",
+                             "visibility": "PUBLIC"
+                           },
+                           "receipt": {
+                             "type": "CRYPTO",
+                             "walletAddress": "0x0788b45a11Ee333293a1d4389430009529bC97D814233C2A5137c4F5Ff949905",
+                             "transactionReference": "0x16096a49c236dfdbc5808c31a1d6eee90a082ca5717366a73b03a2eb80cd252",
+                             "transactionReferenceLink": "https://starkscan.co/tx/0x016096a49c236dfdbc5808c31a1d6eee90a082ca5717366a73b03a2eb80cd252"
+                           }
+                         }
+                         """
+                );
+
+        client.get()
+                .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(REDBULL)))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.accounts[0].initialBalance").isEqualTo(100)
+                .jsonPath("$.accounts[0].currentBalance").isEqualTo(70)
+                .jsonPath("$.accounts[0].initialAllowance").isEqualTo(100)
+                .jsonPath("$.accounts[0].currentAllowance").isEqualTo(0)
+                .jsonPath("$.accounts[0].debt").isEqualTo(0)
+                .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(0)
+        ;
+
+        client.get()
+                .uri(getApiURI(GET_SPONSORS_TRANSACTIONS.formatted(REDBULL), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10"
+                )))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "transactions": [
+                            {
+                              "type": "ALLOCATION",
+                              "network": "STARKNET",
+                              "lockedUntil": null,
+                              "project": {
+                                "name": "kaaper",
+                                "logoUrl": null
+                              },
+                              "amount": {
+                                "amount": -100,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "dollarsEquivalent": 101.00,
+                                "conversionRate": 1.01
+                              }
+                            },
+                            {
+                              "type": "DEPOSIT",
+                              "network": "STARKNET",
+                              "lockedUntil": null,
+                              "project": null,
+                              "amount": {
+                                "amount": 100,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "dollarsEquivalent": 101.00,
+                                "conversionRate": 1.01
+                              }
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
+    void should_allocate_budget_to_project_and_pay_rewards_on_aptos() {
+        // Given
+        final var antho = userAuthHelper.authenticateAnthony();
+        final var ofux = userAuthHelper.authenticateOlivier();
+
+        final var accountId = client.post()
+                .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(REDBULL)))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "currencyId": "%s",
+                            "receipt": {
+                                "reference": "0x01",
+                                "amount": 100,
+                                "network": "APTOS",
+                                "thirdPartyName": "RedBull",
+                                "thirdPartyAccountNumber": "0xc4f5e07ce1de7369e5a408b9b153f32b5eb99e6b9b1c1a33549aba8f19fc3cc1"
+                            }
+                        }
+                        """.formatted(APT))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(AccountResponse.class)
+                .returnResult()
+                .getResponseBody().getId();
+
+        // Given
+        client.post()
+                .uri(getApiURI(POST_PROJECTS_BUDGETS_ALLOCATE.formatted(KAAPER)))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "sponsorAccountId": "%s",
+                            "amount": 100
+                        }
+                        """.formatted(accountId))
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        indexerApiWireMockServer.stubFor(WireMock.put(
+                        WireMock.urlEqualTo("/api/v1/users/%d".formatted(ofux.user().getGithubUserId())))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+
+        // When
+        final var rewardId = client.post()
+                .uri(getApiURI(PROJECTS_REWARDS.formatted(KAAPER)))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "recipientId": "%d",
+                            "amount": 30,
+                            "currencyId": "%s",
+                            "items": [{
+                                "type": "PULL_REQUEST",
+                                "id": "1703880973",
+                                "number": 325,
+                                "repoId": 698096830
+                            }]
+                        }
+                        """.formatted(ofux.user().getGithubUserId(), APT))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(CreateRewardResponse.class)
+                .returnResult().getResponseBody().getId();
+
+        // Then
+        client.get()
+                .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(REDBULL)))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.accounts[0].initialBalance").isEqualTo(100)
+                .jsonPath("$.accounts[0].currentBalance").isEqualTo(100)
+                .jsonPath("$.accounts[0].initialAllowance").isEqualTo(100)
+                .jsonPath("$.accounts[0].currentAllowance").isEqualTo(0)
+                .jsonPath("$.accounts[0].debt").isEqualTo(0)
+                .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(30)
+        ;
+
+        // When
+        invoiceReward(UserId.of(ofux.user().getId()), KAAPER, RewardId.of(rewardId));
+
+        // When
+        client.post()
+                .uri(getApiURI(POST_REWARDS_PAY.formatted(rewardId)))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "network": "APTOS",
+                            "reference": "0xffae983a8a8498980c4ecfd88eef5615037cad97ed1f1d7d727137421656cb2f"
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        client.get()
+                .uri(getApiURI(String.format(ME_REWARD, rewardId)))
+                .header("Authorization", BEARER_PREFIX + ofux.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                         
+                        {
+                           "amount": {
+                             "amount": 30,
+                             "prettyAmount": 30,
+                             "currency": {
+                               "code": "APT"
+                             }
+                           },
+                           "status": "COMPLETE",
+                           "receipt": {
+                             "type": "CRYPTO",
+                             "walletAddress": "0x66cb05df2d855fbae92cdb2dfac9a0b29c969a03998fa817735d27391b52b189",
+                             "transactionReference": "0xffae983a8a8498980c4ecfd88eef5615037cad97ed1f1d7d727137421656cb2f",
+                             "transactionReferenceLink": "https://aptoscan.com/transaction/0xffae983a8a8498980c4ecfd88eef5615037cad97ed1f1d7d727137421656cb2f"
+                           }
+                         }
+                         """
+                );
+
+        client.get()
+                .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(REDBULL)))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.accounts[0].initialBalance").isEqualTo(100)
+                .jsonPath("$.accounts[0].currentBalance").isEqualTo(70)
+                .jsonPath("$.accounts[0].initialAllowance").isEqualTo(100)
+                .jsonPath("$.accounts[0].currentAllowance").isEqualTo(0)
+                .jsonPath("$.accounts[0].debt").isEqualTo(0)
+                .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(0)
+        ;
+
+        client.get()
+                .uri(getApiURI(GET_SPONSORS_TRANSACTIONS.formatted(REDBULL), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10"
+                )))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "transactions": [
+                            {
+                              "type": "ALLOCATION",
+                              "network": "APTOS",
+                              "lockedUntil": null,
+                              "project": {
+                                "name": "kaaper",
+                                "logoUrl": null
+                              },
+                              "amount": {
+                                "amount": -100,
+                                "currency": {
+                                  "code": "APT"
+                                }
+                              }
+                            },
+                            {
+                              "type": "DEPOSIT",
+                              "network": "APTOS",
+                              "amount": {
+                                "amount": 100,
+                                "currency": {
+                                  "code": "APT"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
     void should_get_billing_profile() {
         final var billingProfileId = BillingProfile.Id.of("1253b889-e5d5-49ee-8e8a-21405ccab8a6");
         final var billingProfile = billingProfileStoragePort.findById(billingProfileId).orElseThrow();
@@ -875,7 +1334,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                         }
                         """);
     }
-
 
     @Test
     void should_get_current_month_rewarded_amounts() {
@@ -929,19 +1387,31 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     }
 
     private Invoice.Id invoiceReward(UserId userId, ProjectId projectId, RewardId rewardId) {
-        final var billingProfile = billingProfileFacadePort.createIndividualBillingProfile(userId, "Personal", null);
-        billingProfileStoragePort.updateBillingProfileStatus(billingProfile.id(), VerificationStatus.VERIFIED);
-        billingProfileStoragePort.saveKyc(billingProfile.kyc().toBuilder()
+        final var billingProfileId = billingProfileFacadePort.getBillingProfilesForUser(userId)
+                .stream().filter(bp -> bp.getType() == BillingProfile.Type.INDIVIDUAL)
+                .findFirst()
+                .map(ShortBillingProfileView::getId)
+                .orElseGet(() -> billingProfileFacadePort.createIndividualBillingProfile(userId, "Personal", null).id());
+
+        final var billingProfile = billingProfileStoragePort.findById(billingProfileId).orElseThrow();
+
+        billingProfileStoragePort.updateBillingProfileStatus(billingProfile.getId(), VerificationStatus.VERIFIED);
+        billingProfileStoragePort.saveKyc(billingProfile.getKyc().toBuilder()
                 .firstName(faker.name().firstName())
                 .address(faker.address().fullAddress())
                 .consideredUsPersonQuestionnaire(false)
                 .idDocumentCountry(Country.fromIso3("FRA"))
                 .country(Country.fromIso3("FRA"))
                 .build());
-        billingProfileFacadePort.updatePayoutInfo(billingProfile.id(), userId, PayoutInfo.builder().ethWallet(Ethereum.wallet("ofux.eth")).build());
-        payoutPreferenceFacadePort.setPayoutPreference(projectId, billingProfile.id(), userId);
+        billingProfileFacadePort.updatePayoutInfo(billingProfile.getId(), userId,
+                PayoutInfo.builder()
+                        .ethWallet(Ethereum.wallet("ofux.eth"))
+                        .starknetAddress(StarkNet.accountAddress("0x0788b45a11Ee333293a1d4389430009529bC97D814233C2A5137c4F5Ff949905"))
+                        .aptosAddress(Aptos.accountAddress("0x66cb05df2d855fbae92cdb2dfac9a0b29c969a03998fa817735d27391b52b189"))
+                        .build());
+        payoutPreferenceFacadePort.setPayoutPreference(projectId, billingProfile.getId(), userId);
 
-        final var invoiceId = billingProfileFacadePort.previewInvoice(userId, billingProfile.id(), List.of(rewardId)).id();
+        final var invoiceId = billingProfileFacadePort.previewInvoice(userId, billingProfile.getId(), List.of(rewardId)).id();
         final var pdf = new ByteArrayInputStream(faker.lorem().paragraph().getBytes());
 
         when(pdfStoragePort.upload(eq(invoiceId.value() + ".pdf"), any())).then(invocation -> {
@@ -949,7 +1419,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
             return new URL("https://s3.storage.com/%s".formatted(fileName));
         });
 
-        billingProfileFacadePort.uploadGeneratedInvoice(userId, billingProfile.id(), invoiceId, pdf);
+        billingProfileFacadePort.uploadGeneratedInvoice(userId, billingProfile.getId(), invoiceId, pdf);
 
         return invoiceId;
     }

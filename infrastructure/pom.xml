@@ -16,6 +16,7 @@
 
     <modules>
         <module>accounting-adapter</module>
+        <module>aptos-rpc-adapter</module>
         <module>postgres-adapter</module>
         <module>github-api-adapter</module>
         <module>indexer-api-client-adapter</module>

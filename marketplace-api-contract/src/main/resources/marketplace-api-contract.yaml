@@ -3207,7 +3207,6 @@ components:
         - amount
         - prettyAmount
         - currency
-        - usdEquivalent
       properties:
         amount:
           type: number
@@ -3221,6 +3220,27 @@ components:
           type: number
           description: USD equivalent of the amount
           example: 100
+        usdConversionRate:
+          type: number
+          description: USD conversion rate
+          example: 1.5
+
+    DetailedTotalMoney:
+      type: object
+      description: Detailed total money value object
+      required:
+        - totalUsdEquivalent
+        - totalByCurrency
+      properties:
+        totalUsdEquivalent:
+          type: number
+          description: USD equivalent of the total amount
+          example: 100
+        totalPerCurrency:
+          type: array
+          description: Total amount by currency
+          items:
+            $ref: '#/components/schemas/Money'
 
 
     # RESPONSES ==================================================================
@@ -3300,7 +3320,7 @@ components:
           type: boolean
         optimismAddress:
           type: string
-          example: 0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545
+          example: 0x72C30FCD1e7bd691Ce206Cd36BbD87C4C7099545
         missingOptimismWallet:
           type: boolean
         aptosAddress:
@@ -3332,7 +3352,7 @@ components:
           example: vitalik.eth
         optimismAddress:
           type: string
-          example: 0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545
+          example: 0x72C30FCD1e7bd691Ce206Cd36BbD87C4C7099545
         aptosAddress:
           type: string
           example: 0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5
@@ -4176,9 +4196,9 @@ components:
           items:
             $ref: '#/components/schemas/RewardPageItemResponse'
         remainingBudget:
-          $ref: '#/components/schemas/Money'
+          $ref: '#/components/schemas/DetailedTotalMoney'
         spentAmount:
-          $ref: '#/components/schemas/Money'
+          $ref: '#/components/schemas/DetailedTotalMoney'
         sentRewardsCount:
           type: integer
           description: Number of rewards that have been sent
@@ -4198,6 +4218,7 @@ components:
         nextPageIndex:
           description: if there is no next page, it will be equals to the last page
           type: integer
+
     MyRewardsPageResponse:
       type: object
       required:
@@ -4222,9 +4243,9 @@ components:
           description: if there is no next page, it will be equals to the last page
           type: integer
         rewardedAmount:
-          $ref: '#/components/schemas/Money'
+          $ref: '#/components/schemas/DetailedTotalMoney'
         pendingAmount:
-          $ref: '#/components/schemas/Money'
+          $ref: '#/components/schemas/DetailedTotalMoney'
         receivedRewardsCount:
           type: integer
           description: Number of rewards that have been received

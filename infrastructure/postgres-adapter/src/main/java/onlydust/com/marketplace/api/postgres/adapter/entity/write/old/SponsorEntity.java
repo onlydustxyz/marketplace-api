@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
-import lombok.*;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.*;
+import onlydust.com.marketplace.project.domain.model.Sponsor;
 
 import java.util.UUID;
 
@@ -24,4 +24,13 @@ public class SponsorEntity {
     @NonNull
     String logoUrl;
     String url;
+
+    public Sponsor toDomain() {
+        return Sponsor.builder()
+                .id(id)
+                .name(name)
+                .logoUrl(logoUrl)
+                .url(url)
+                .build();
+    }
 }

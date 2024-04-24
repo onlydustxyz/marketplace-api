@@ -3,10 +3,15 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.ERC20ProviderFactory;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.BlockchainFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
+import onlydust.com.marketplace.accounting.domain.service.BlockchainService;
 import onlydust.com.marketplace.accounting.domain.service.CurrencyService;
 import onlydust.com.marketplace.api.infrastructure.accounting.AccountingServiceAdapter;
+import onlydust.com.marketplace.api.infrastructure.aptosrpc.adapters.AptosTransactionStorageAdapter;
+import onlydust.com.marketplace.api.infura.adapters.InfuraEvmTransactionStorageAdapter;
+import onlydust.com.marketplace.api.infura.adapters.StarknetInfuraTransactionStorageAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresRewardAdapter;
@@ -225,5 +230,19 @@ public class DomainConfiguration {
     @Bean
     public EcosystemFacadePort ecosystemFacadePort(final EcosystemStorage ecosystemStorage) {
         return new EcosystemService(ecosystemStorage);
+    }
+
+    @Bean
+    public HackathonFacadePort hackathonFacadePort(final HackathonStoragePort hackathonStoragePort) {
+        return new HackathonService(hackathonStoragePort);
+    }
+
+    @Bean
+    public BlockchainFacadePort blockchainFacadePort(final InfuraEvmTransactionStorageAdapter ethereumTransactionStorageAdapter,
+                                                     final InfuraEvmTransactionStorageAdapter optimismTransactionStorageAdapter,
+                                                     final StarknetInfuraTransactionStorageAdapter starknetTransactionStoragePort,
+                                                     final AptosTransactionStorageAdapter aptosTransactionStorageAdapter) {
+        return new BlockchainService(ethereumTransactionStorageAdapter, optimismTransactionStorageAdapter, aptosTransactionStorageAdapter,
+                starknetTransactionStoragePort);
     }
 }

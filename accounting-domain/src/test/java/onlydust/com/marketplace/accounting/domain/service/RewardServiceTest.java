@@ -10,6 +10,10 @@ import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
+import onlydust.com.marketplace.accounting.domain.view.MoneyView;
+import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.accounting.domain.view.UserView;
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.observer.MailObserver;
@@ -80,7 +84,7 @@ public class RewardServiceTest {
                 .requestedAt(ZonedDateTime.now())
                 .githubUrls(List.of())
                 .sponsors(List.of())
-                .project(new ShortProjectView(ProjectId.random(), faker.rickAndMorty().character(), faker.internet().url(), faker.weather().description(),
+                .project(new ProjectShortView(ProjectId.random(), faker.rickAndMorty().character(), faker.internet().url(), faker.weather().description(),
                         faker.name().username()))
                 .money(new MoneyView(BigDecimal.ONE, currency, null, null))
                 .invoice(new InvoiceView(

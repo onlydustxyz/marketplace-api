@@ -1628,7 +1628,7 @@ paths:
       summary: create hackathon
       operationId: createHackathon
       description: |
-        create hackathon
+        Create hackathon
       requestBody:
         description: Hackathon
         required: true
@@ -1637,29 +1637,33 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateHackathonRequest'
       responses:
-        "204":
-          description: 'The hackathon has been created'
+        "200":
+          description: 'Newly created hackathon'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HackathonsDetailsResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/hackathons/slug/{hackathonSlug}:
+  /bo/v1/hackathons/{hackathonId}:
     get:
       security:
         - bearerAuth: [ ]
       tags:
         - BackofficeHackathonManagement
-      summary: Get hackathon by slug
-      operationId: getHackathonBySlug
+      summary: Get hackathon by id
+      operationId: getHackathonById
       description: |
-        Get hackathon by slug
+        Get hackathon by id
       parameters:
         - in: path
-          name: hackathonSlug
+          name: hackathonId
           required: true
           schema:
-            $ref: '#/components/schemas/HackathonSlug'
+            $ref: '#/components/schemas/HackathonId'
       responses:
         "200":
           description: 'hackathon response'
@@ -1671,8 +1675,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-
-  /bo/v1/hackathons/{hackathonId}:
     put:
       security:
         - bearerAuth: [ ]
@@ -1681,7 +1683,7 @@ paths:
       summary: update hackathon by id
       operationId: updateHackathonById
       description: |
-        update hackathon by id
+        Update hackathon by id
       parameters:
         - in: path
           name: hackathonId
@@ -1696,8 +1698,45 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateHackathonRequest'
       responses:
-        "204":
-          description: 'The hackathon has been updated'
+        "200":
+          description: 'Updated hackathon'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HackathonsDetailsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeHackathonManagement
+      summary: Patch hackathon by id
+      operationId: patchHackathonById
+      description: |
+        Patch hackathon by id
+      parameters:
+        - in: path
+          name: hackathonId
+          required: true
+          schema:
+            $ref: '#/components/schemas/HackathonId'
+      requestBody:
+        description: Hackathon
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchHackathonRequest'
+      responses:
+        "200":
+          description: 'Patched hackathon'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HackathonsDetailsResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -1720,6 +1759,26 @@ paths:
       responses:
         "204":
           description: 'The hackathon has been deleted'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+
+  # BackofficeDebug ===============================================================
+  /bo/v1/debug/accounting/check-events:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeDebug
+      summary: Check all accounting events
+      operationId: checkAccountingEvents
+      description: |
+        Check all accounting events by constructing every account books.
+      responses:
+        "204":
+          description: 'Everything is fine'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -3628,6 +3687,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/UpdateTracksRequest'
+
+    PatchHackathonRequest:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/HackathonStatus'
 
     CreateHackathonRequest:
       type: object

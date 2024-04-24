@@ -29,6 +29,7 @@ public interface PaymentShortViewRepository extends JpaRepository<PaymentShortVi
                                        'code', reward_stats_per_currency.currency_code,
                                        'name', reward_stats_per_currency.currency_name,
                                        'decimals', reward_stats_per_currency.currency_decimals,
+                                       'latestUsdQuote', reward_stats_per_currency.currency_latest_usd_quote,
                                        'logoUrl', reward_stats_per_currency.currency_logo_url
                                     )
                                 )))   as totals_per_currency
@@ -40,13 +41,15 @@ public interface PaymentShortViewRepository extends JpaRepository<PaymentShortVi
                                  c.code as currency_code,
                                  c.name as currency_name,
                                  c.decimals as currency_decimals,
+                                 luq.price as currency_latest_usd_quote,
                                  c.logo_url as currency_logo_url
                           from rewards r
                           join accounting.reward_status_data rsd on rsd.reward_id = r.id
                           join currencies c on c.id = r.currency_id
+                          left join accounting.latest_usd_quotes luq on luq.currency_id = c.id
                           join accounting.batch_payment_rewards bpr on r.id = bpr.reward_id
                           where bpr.batch_payment_id = bp.id
-                          group by c.id)    reward_stats_per_currency ON true
+                          group by c.id, luq.price)    reward_stats_per_currency ON true
             """;
 
 

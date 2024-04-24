@@ -48,7 +48,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
         accountingHelper.patchBillingProfile(UUID.fromString("20282367-56b0-42d3-81d3-5e4b38f67e3e"), BillingProfileEntity.Type.COMPANY,
                 VerificationStatusEntity.VERIFIED);
 
-        accountingHelper.patchReward("40fda3c6-2a3f-4cdd-ba12-0499dd232d53", 10, "ETH", 15000, null, "2023-07-12");
+        accountingHelper.patchReward("40fda3c6-2a3f-4cdd-ba12-0499dd232d53", 10.12345678987654321, "ETH", 15000.112233445566778899, null, "2023-07-12");
         accountingHelper.patchReward("e1498a17-5090-4071-a88a-6f0b0c337c3a", 50, "ETH", 75000, null, "2023-08-12");
         accountingHelper.patchReward("2ac80cc6-7e83-4eef-bc0c-932b58f683c0", 500, "APT", 100000, null, null);
         accountingHelper.patchReward("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0", 30, "OP", null, "2023-08-14", null);
@@ -91,6 +91,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": null,
                               "amount": {
                                 "amount": 500.0,
+                                "prettyAmount": 500.0,
                                 "currency": {
                                   "id": "48388edb-fda2-4a32-b228-28152a147500",
                                   "code": "APT",
@@ -98,7 +99,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 8
                                 },
-                                "usdEquivalent": 100000.0
+                                "usdEquivalent": 100000.0,
+                                "usdConversionRate": 200.0
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -120,6 +122,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": null,
                               "amount": {
                                 "amount": 50.0,
+                                "prettyAmount": 50.0,
                                 "currency": {
                                   "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                   "code": "ETH",
@@ -127,7 +130,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": 75000.0
+                                "usdEquivalent": 75000.0,
+                                "usdConversionRate": 1500.0
                               },
                               "numberOfRewardedContributions": 1,
                               "rewardedOnProjectName": "QA new contributions",
@@ -142,12 +146,14 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "requestedAt": "2023-09-19T07:40:26.971981Z",
+                              "processedAt": "2023-07-12T00:00:00Z",
                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                               "billingProfileId": "20282367-56b0-42d3-81d3-5e4b38f67e3e",
                               "status": "COMPLETE",
                               "unlockDate": null,
                               "amount": {
-                                "amount": 10.0,
+                                "amount": 10.123456789876544,
+                                "prettyAmount": 10.12346,
                                 "currency": {
                                   "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                   "code": "ETH",
@@ -155,7 +161,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": 15000.0
+                                "usdEquivalent": 15000.11,
+                                "usdConversionRate": 1481.718403583811
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -177,6 +184,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": null,
                               "amount": {
                                 "amount": 1000,
+                                "prettyAmount": 1000,
                                 "currency": {
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
@@ -184,7 +192,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                   "decimals": 6
                                 },
-                                "usdEquivalent": 1010.00
+                                "usdEquivalent": 1010.00,
+                                "usdConversionRate": 1.0100000000000000
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -206,6 +215,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": "2024-08-23T00:00:00Z",
                               "amount": {
                                 "amount": 30.0,
+                                "prettyAmount": 30.0,
                                 "currency": {
                                   "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
                                   "code": "OP",
@@ -213,7 +223,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": null
+                                "usdEquivalent": null,
+                                "usdConversionRate": null
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -235,6 +246,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": null,
                               "amount": {
                                 "amount": 9511147.0,
+                                "prettyAmount": 9511147.0,
                                 "currency": {
                                   "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
                                   "code": "STRK",
@@ -242,7 +254,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": null
+                                "usdEquivalent": null,
+                                "usdConversionRate": null
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -261,17 +274,148 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                           "totalItemNumber": 6,
                           "nextPageIndex": 0,
                           "rewardedAmount": {
-                            "amount": null,
-                            "currency": null,
-                            "usdEquivalent": 191010.00
+                            "totalUsdEquivalent": 191010.11,
+                            "totalPerCurrency": [
+                              {
+                                "amount": 30.0,
+                                "prettyAmount": 30.0,
+                                "currency": {
+                                  "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
+                                  "code": "OP",
+                                  "name": "Optimism",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 0,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 500.0,
+                                "prettyAmount": 500.0,
+                                "currency": {
+                                  "id": "48388edb-fda2-4a32-b228-28152a147500",
+                                  "code": "APT",
+                                  "name": "Aptos Coin",
+                                  "logoUrl": null,
+                                  "decimals": 8
+                                },
+                                "usdEquivalent": 100000.0,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 1000,
+                                "prettyAmount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 1010.00,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 60.123456789876544,
+                                "prettyAmount": 60.12346,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 90000.11,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 9511147.0,
+                                "prettyAmount": 9511147.0,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 0,
+                                "usdConversionRate": null
+                              }
+                            ]
                           },
                           "pendingAmount": {
-                            "amount": null,
-                            "currency": null,
-                            "usdEquivalent": 101010.00
+                            "totalUsdEquivalent": 101010.00,
+                            "totalPerCurrency": [
+                              {
+                                "amount": 30.0,
+                                "prettyAmount": 30.0,
+                                "currency": {
+                                  "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
+                                  "code": "OP",
+                                  "name": "Optimism",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 0,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 500.0,
+                                "prettyAmount": 500.0,
+                                "currency": {
+                                  "id": "48388edb-fda2-4a32-b228-28152a147500",
+                                  "code": "APT",
+                                  "name": "Aptos Coin",
+                                  "logoUrl": null,
+                                  "decimals": 8
+                                },
+                                "usdEquivalent": 100000.0,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 1000,
+                                "prettyAmount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 1010.00,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 0,
+                                "prettyAmount": 0,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 0,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 9511147.0,
+                                "prettyAmount": 9511147.0,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 0,
+                                "usdConversionRate": null
+                              }
+                            ]
                           },
                           "receivedRewardsCount": 6,
                           "rewardedContributionsCount": 26,
+                          "rewardingProjectsCount": 1,
                           "pendingRequestCount": 2
                         }
                         """);
@@ -348,6 +492,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": null,
                               "amount": {
                                 "amount": 500.0,
+                                "prettyAmount": 500.0,
                                 "currency": {
                                   "id": "48388edb-fda2-4a32-b228-28152a147500",
                                   "code": "APT",
@@ -355,7 +500,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 8
                                 },
-                                "usdEquivalent": 100000.0
+                                "usdEquivalent": 100000.0,
+                                "usdConversionRate": 200.0
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -377,6 +523,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": null,
                               "amount": {
                                 "amount": 50.0,
+                                "prettyAmount": 50.0,
                                 "currency": {
                                   "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                   "code": "ETH",
@@ -384,7 +531,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": 75000.0
+                                "usdEquivalent": 75000.0,
+                                "usdConversionRate": 1500.0
                               },
                               "numberOfRewardedContributions": 1,
                               "rewardedOnProjectName": "QA new contributions",
@@ -399,12 +547,14 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "requestedAt": "2023-09-19T07:40:26.971981Z",
+                              "processedAt": "2023-07-12T00:00:00Z",
                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                               "billingProfileId": "20282367-56b0-42d3-81d3-5e4b38f67e3e",
                               "status": "COMPLETE",
                               "unlockDate": null,
                               "amount": {
-                                "amount": 10.0,
+                                "amount": 10.123456789876544,
+                                "prettyAmount": 10.12346,
                                 "currency": {
                                   "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                   "code": "ETH",
@@ -412,7 +562,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": 15000.0
+                                "usdEquivalent": 15000.11,
+                                "usdConversionRate": 1481.718403583811
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -434,6 +585,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": null,
                               "amount": {
                                 "amount": 1000,
+                                "prettyAmount": 1000,
                                 "currency": {
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
@@ -441,7 +593,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                   "decimals": 6
                                 },
-                                "usdEquivalent": 1010.00
+                                "usdEquivalent": 1010.00,
+                                "usdConversionRate": 1.0100000000000000
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -463,6 +616,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": "2024-08-23T00:00:00Z",
                               "amount": {
                                 "amount": 30.0,
+                                "prettyAmount": 30.0,
                                 "currency": {
                                   "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
                                   "code": "OP",
@@ -470,7 +624,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": null
+                                "usdEquivalent": null,
+                                "usdConversionRate": null
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -492,6 +647,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": null,
                               "amount": {
                                 "amount": 9511147.0,
+                                "prettyAmount": 9511147.0,
                                 "currency": {
                                   "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
                                   "code": "STRK",
@@ -499,7 +655,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": null
+                                "usdEquivalent": null,
+                                "usdConversionRate": null
                               },
                               "numberOfRewardedContributions": 25,
                               "rewardedOnProjectName": "QA new contributions",
@@ -518,17 +675,148 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                           "totalItemNumber": 6,
                           "nextPageIndex": 0,
                           "rewardedAmount": {
-                            "amount": null,
-                            "currency": null,
-                            "usdEquivalent": 191010.00
+                            "totalUsdEquivalent": 191010.11,
+                            "totalPerCurrency": [
+                              {
+                                "amount": 30.0,
+                                "prettyAmount": 30.0,
+                                "currency": {
+                                  "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
+                                  "code": "OP",
+                                  "name": "Optimism",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 0,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 500.0,
+                                "prettyAmount": 500.0,
+                                "currency": {
+                                  "id": "48388edb-fda2-4a32-b228-28152a147500",
+                                  "code": "APT",
+                                  "name": "Aptos Coin",
+                                  "logoUrl": null,
+                                  "decimals": 8
+                                },
+                                "usdEquivalent": 100000.0,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 1000,
+                                "prettyAmount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 1010.00,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 60.123456789876544,
+                                "prettyAmount": 60.12346,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 90000.11,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 9511147.0,
+                                "prettyAmount": 9511147.0,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 0,
+                                "usdConversionRate": null
+                              }
+                            ]
                           },
                           "pendingAmount": {
-                            "amount": null,
-                            "currency": null,
-                            "usdEquivalent": 101010.00
+                            "totalUsdEquivalent": 101010.00,
+                            "totalPerCurrency": [
+                              {
+                                "amount": 30.0,
+                                "prettyAmount": 30.0,
+                                "currency": {
+                                  "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
+                                  "code": "OP",
+                                  "name": "Optimism",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 0,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 500.0,
+                                "prettyAmount": 500.0,
+                                "currency": {
+                                  "id": "48388edb-fda2-4a32-b228-28152a147500",
+                                  "code": "APT",
+                                  "name": "Aptos Coin",
+                                  "logoUrl": null,
+                                  "decimals": 8
+                                },
+                                "usdEquivalent": 100000.0,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 1000,
+                                "prettyAmount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 1010.00,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 0,
+                                "prettyAmount": 0,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 0,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 9511147.0,
+                                "prettyAmount": 9511147.0,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 0,
+                                "usdConversionRate": null
+                              }
+                            ]
                           },
                           "receivedRewardsCount": 6,
                           "rewardedContributionsCount": 26,
+                          "rewardingProjectsCount": 1,
                           "pendingRequestCount": 0
                         }
                         """);
@@ -616,12 +904,14 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 // we do not have any incorrect date
                 .jsonPath("$.rewards[?(@.requestedAt < '2023-09-20')]").doesNotExist()
                 .jsonPath("$.rewards[?(@.requestedAt > '2023-09-21')]").doesNotExist()
-                .jsonPath("$.rewardedAmount.amount").isEqualTo(50)
-                .jsonPath("$.rewardedAmount.currency.code").isEqualTo("ETH")
-                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(75000)
-                .jsonPath("$.pendingAmount.amount").isEqualTo(0)
-                .jsonPath("$.pendingAmount.currency.code").isEqualTo("ETH")
-                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(0)
+                .jsonPath("$.rewardedAmount.totalPerCurrency.length()").isEqualTo(1)
+                .jsonPath("$.rewardedAmount.totalPerCurrency[0].amount").isEqualTo(50)
+                .jsonPath("$.rewardedAmount.totalPerCurrency[0].currency.code").isEqualTo("ETH")
+                .jsonPath("$.rewardedAmount.totalUsdEquivalent").isEqualTo(75000)
+                .jsonPath("$.pendingAmount.totalPerCurrency.length()").isEqualTo(1)
+                .jsonPath("$.pendingAmount.totalPerCurrency[0].amount").isEqualTo(0)
+                .jsonPath("$.pendingAmount.totalPerCurrency[0].currency.code").isEqualTo("ETH")
+                .jsonPath("$.pendingAmount.totalUsdEquivalent").isEqualTo(0)
                 .jsonPath("$.receivedRewardsCount").isEqualTo(1)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(1)
                 .jsonPath("$.rewardingProjectsCount").isEqualTo(1)
@@ -645,12 +935,14 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.rewards[?(@.amount.currency.code == 'ETH')]").exists()
                 .jsonPath("$.rewards[?(@.amount.currency.code != 'ETH')]").doesNotExist()
-                .jsonPath("$.rewardedAmount.amount").isEqualTo(60)
-                .jsonPath("$.rewardedAmount.currency.code").isEqualTo("ETH")
-                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(90000.00)
-                .jsonPath("$.pendingAmount.amount").isEqualTo(0)
-                .jsonPath("$.pendingAmount.currency.code").isEqualTo("ETH")
-                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(0.00)
+                .jsonPath("$.rewardedAmount.totalPerCurrency.length()").isEqualTo(1)
+                .jsonPath("$.rewardedAmount.totalPerCurrency[0].amount").isEqualTo(60)
+                .jsonPath("$.rewardedAmount.totalPerCurrency[0].currency.code").isEqualTo("ETH")
+                .jsonPath("$.rewardedAmount.totalUsdEquivalent").isEqualTo(90000.11)
+                .jsonPath("$.pendingAmount.totalPerCurrency.length()").isEqualTo(1)
+                .jsonPath("$.pendingAmount.totalPerCurrency[0].amount").isEqualTo(0)
+                .jsonPath("$.pendingAmount.totalPerCurrency[0].currency.code").isEqualTo("ETH")
+                .jsonPath("$.pendingAmount.totalUsdEquivalent").isEqualTo(0.00)
                 .jsonPath("$.receivedRewardsCount").isEqualTo(2)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(26)
                 .jsonPath("$.rewardingProjectsCount").isEqualTo(1)
@@ -676,15 +968,17 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.rewards[?(@.projectId in ['5aabf0f1-7495-4bff-8de2-4396837ce6b4'," +
-                          "'298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").exists()
+                        "'298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").exists()
                 .jsonPath("$.rewards[?(@.projectId nin ['5aabf0f1-7495-4bff-8de2-4396837ce6b4'," +
-                          "'298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").doesNotExist()
-                .jsonPath("$.rewardedAmount.amount").isEqualTo(12500)
-                .jsonPath("$.rewardedAmount.currency.code").isEqualTo("USDC")
-                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(2683070)
-                .jsonPath("$.pendingAmount.amount").isEqualTo(12000)
-                .jsonPath("$.pendingAmount.currency.code").isEqualTo("USDC")
-                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(1792080.0)
+                        "'298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").doesNotExist()
+                .jsonPath("$.rewardedAmount.totalPerCurrency.length()").isEqualTo(1)
+                .jsonPath("$.rewardedAmount.totalPerCurrency[0].amount").isEqualTo(12500)
+                .jsonPath("$.rewardedAmount.totalPerCurrency[0].currency.code").isEqualTo("USDC")
+                .jsonPath("$.rewardedAmount.totalUsdEquivalent").isEqualTo(2683070)
+                .jsonPath("$.pendingAmount.totalPerCurrency.length()").isEqualTo(1)
+                .jsonPath("$.pendingAmount.totalPerCurrency[0].amount").isEqualTo(12000)
+                .jsonPath("$.pendingAmount.totalPerCurrency[0].currency.code").isEqualTo("USDC")
+                .jsonPath("$.pendingAmount.totalUsdEquivalent").isEqualTo(1792080.0)
                 .jsonPath("$.receivedRewardsCount").isEqualTo(13)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(88)
                 .jsonPath("$.rewardingProjectsCount").isEqualTo(2)
@@ -705,10 +999,157 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .consumeWith(System.out::println)
                 .jsonPath("$.rewards[?(@.amount.currency.code == 'STRK' && @.amount.usdEquivalent == null)]").exists()
                 .jsonPath("$.rewards[?(@.amount.currency.code == 'STRK' && @.amount.usdEquivalent != null)]").doesNotExist()
-                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(191010)
-                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(101010)
+                .json("""
+                        {
+                          "rewardedAmount": {
+                            "totalUsdEquivalent": 191010.11,
+                            "totalPerCurrency": [
+                              {
+                                "amount": 30.0,
+                                "prettyAmount": 30.0,
+                                "currency": {
+                                  "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
+                                  "code": "OP",
+                                  "name": "Optimism",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 0,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 500.0,
+                                "prettyAmount": 500.0,
+                                "currency": {
+                                  "id": "48388edb-fda2-4a32-b228-28152a147500",
+                                  "code": "APT",
+                                  "name": "Aptos Coin",
+                                  "logoUrl": null,
+                                  "decimals": 8
+                                },
+                                "usdEquivalent": 100000.0,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 1000,
+                                "prettyAmount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 1010.00,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 60.12345678987654,
+                                "prettyAmount": 60.12346,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 90000.11,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 9511147.0,
+                                "prettyAmount": 9511147.0,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 0,
+                                "usdConversionRate": null
+                              }
+                            ]
+                          },
+                          "pendingAmount": {
+                            "totalUsdEquivalent": 101010.00,
+                            "totalPerCurrency": [
+                              {
+                                "amount": 30.0,
+                                "prettyAmount": 30.0,
+                                "currency": {
+                                  "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
+                                  "code": "OP",
+                                  "name": "Optimism",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 0,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 500.0,
+                                "prettyAmount": 500.0,
+                                "currency": {
+                                  "id": "48388edb-fda2-4a32-b228-28152a147500",
+                                  "code": "APT",
+                                  "name": "Aptos Coin",
+                                  "logoUrl": null,
+                                  "decimals": 8
+                                },
+                                "usdEquivalent": 100000.0,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 1000,
+                                "prettyAmount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 1010.00,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 0,
+                                "prettyAmount": 0,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 0,
+                                "usdConversionRate": null
+                              },
+                              {
+                                "amount": 9511147.0,
+                                "prettyAmount": 9511147.0,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 0,
+                                "usdConversionRate": null
+                              }
+                            ]
+                          },
+                          "receivedRewardsCount": 6,
+                          "rewardedContributionsCount": 26,
+                          "rewardingProjectsCount": 1,
+                          "pendingRequestCount": 2
+                        }
+                        """)
         ;
     }
 }

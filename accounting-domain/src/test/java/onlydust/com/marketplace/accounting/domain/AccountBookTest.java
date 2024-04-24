@@ -5,6 +5,7 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.FullRefundEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.MintEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.RefundEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.TransferEvent;
@@ -77,6 +78,7 @@ public class AccountBookTest {
         assertThatThrownBy(() -> accountBook.burn(account, amount))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Cannot burn %s from %s".formatted(amount, account));
+        assertThat(accountBook.pendingEvents()).isEmpty();
 
         // Then
         assertThat(accountBook.state().balanceOf(account)).isEqualTo(PositiveAmount.ZERO);
@@ -113,6 +115,7 @@ public class AccountBookTest {
         assertThatThrownBy(() -> accountBook.transfer(sender, sender, amount))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("An account (%s) cannot transfer money to itself".formatted(sender));
+        assertThat(accountBook.pendingEvents()).isEmpty();
 
         // Then
         assertThat(accountBook.state().balanceOf(sender)).isEqualTo(amount);
@@ -130,6 +133,7 @@ public class AccountBookTest {
         assertThatThrownBy(() -> accountBook.transfer(sender, recipient, amount))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Cannot transfer %s from %s to %s".formatted(amount, sender, recipient));
+        assertThat(accountBook.pendingEvents()).isEmpty();
 
         // Then
         assertThat(accountBook.state().balanceOf(sender)).isEqualTo(PositiveAmount.ZERO);
@@ -239,6 +243,7 @@ public class AccountBookTest {
         assertThatThrownBy(() -> accountBook.refund(account2, account1, amount.add(PositiveAmount.of(1L))))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Cannot refund %s from %s to %s".formatted(amount.add(PositiveAmount.of(1L)), account2, account1));
+        assertThat(accountBook.pendingEvents()).isEmpty();
 
         // Then
         assertThat(accountBook.state().balanceOf(account1)).isEqualTo(PositiveAmount.ZERO);
@@ -266,6 +271,7 @@ public class AccountBookTest {
         assertThatThrownBy(() -> accountBook.refund(account2, account1, amount))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Cannot refund %s from %s to %s".formatted(amount, account2, account1));
+        assertThat(accountBook.pendingEvents()).isEmpty();
 
         // Then
         assertThat(accountBook.state().balanceOf(account1)).isEqualTo(PositiveAmount.ZERO);
@@ -341,6 +347,10 @@ public class AccountBookTest {
         final var refundedAccounts = accountBook.refund(recipient);
 
         // Then
+        assertThat(accountBook.pendingEvents()).containsExactly(
+                new IdentifiedAccountBookEvent<>(3, ZonedDateTime.now(), new RefundEvent(recipient, sender, PositiveAmount.of(10L))),
+                new IdentifiedAccountBookEvent<>(4, ZonedDateTime.now(), new FullRefundEvent(recipient))
+        );
         assertThat(accountBook.state().balanceOf(sender)).isEqualTo(amount);
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.ZERO);
         assertThat(refundedAccounts).containsExactlyInAnyOrder(sender);
@@ -366,6 +376,7 @@ public class AccountBookTest {
         assertThatThrownBy(() -> accountBook.refund(recipient))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Cannot entirely refund %s because it has outgoing transactions".formatted(recipient));
+        assertThat(accountBook.pendingEvents()).isEmpty();
 
         // Then
         assertThat(accountBook.state().balanceOf(sender)).isEqualTo(PositiveAmount.ZERO);

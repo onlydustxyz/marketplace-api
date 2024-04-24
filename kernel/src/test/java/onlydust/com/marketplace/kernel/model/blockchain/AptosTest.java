@@ -70,7 +70,6 @@ class AptosTest {
     void should_generate_transaction_url() {
         assertThat(Aptos.BLOCK_EXPLORER.url(Aptos.transactionHash(
                 "0x4906e5e67af366789ce5568c6573e256a82863b9e901bb3b51d07674bacfeb23")).toString())
-                .isEqualTo("https://aptoscan" +
-                           ".com/version/0x4906e5e67af366789ce5568c6573e256a82863b9e901bb3b51d07674bacfeb23");
+                .isEqualTo("https://aptoscan.com/transaction/0x4906e5e67af366789ce5568c6573e256a82863b9e901bb3b51d07674bacfeb23");
     }
 }

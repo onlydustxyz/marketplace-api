@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
-import onlydust.com.marketplace.kernel.model.blockchain.*;
+import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 
 import java.util.Optional;
 
@@ -37,16 +37,5 @@ public enum Network {
             case STARKNET -> Network.STARKNET;
             case APTOS -> Network.APTOS;
         };
-    }
-
-    public void validateTransactionReference(String transactionReference) {
-        switch (this) {
-            case ETHEREUM -> Ethereum.transactionHash(transactionReference);
-            case OPTIMISM -> Optimism.transactionHash(transactionReference);
-            case STARKNET -> StarkNet.transactionHash(transactionReference);
-            case APTOS -> Aptos.transactionHash(transactionReference);
-            case SEPA -> {
-            }
-        }
     }
 }

@@ -19,9 +19,11 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.GithubAccount;
+import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.GithubOrganizationFacadePort;
+import onlydust.com.marketplace.project.domain.port.input.HackathonFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.view.*;
 import org.springframework.core.io.Resource;
@@ -54,6 +56,7 @@ public class MeRestApi implements MeApi {
     private final GithubOrganizationFacadePort githubOrganizationFacadePort;
     private final BillingProfileFacadePort billingProfileFacadePort;
     private final PayoutPreferenceFacadePort payoutPreferenceFacadePort;
+    private final HackathonFacadePort hackathonFacadePort;
 
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
@@ -245,7 +248,10 @@ public class MeRestApi implements MeApi {
     @Override
     public ResponseEntity<CurrencyListResponse> getMyRewardCurrencies() {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var currencies = contributorFacadePort.getRewardCurrencies(authenticatedUser.getGithubUserId());
+        final var currencies = contributorFacadePort.getRewardCurrencies(
+                authenticatedUser.getGithubUserId(),
+                authenticatedUser.getAdministratedBillingProfile().stream().map(BillingProfileLinkView::id).toList()
+        );
         return ResponseEntity.ok(new CurrencyListResponse().currencies(currencies.stream()
                 .map(RewardMapper::mapCurrency)
                 .sorted(comparing(ShortCurrencyResponse::getCode))
@@ -333,6 +339,13 @@ public class MeRestApi implements MeApi {
                     BillingProfile.Id.of(billingProfileId),
                     GithubUserId.of(authenticatedUser.getGithubUserId()));
         }
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> registerToHackathon(UUID hackathonId) {
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        hackathonFacadePort.registerToHackathon(authenticatedUser.getId(), Hackathon.Id.of(hackathonId));
         return ResponseEntity.noContent().build();
     }
 }

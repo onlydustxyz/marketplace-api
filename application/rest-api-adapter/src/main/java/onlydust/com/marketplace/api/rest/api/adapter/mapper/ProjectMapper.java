@@ -4,7 +4,7 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.CreateProjectCommand;
-import onlydust.com.marketplace.project.domain.model.MoreInfoLink;
+import onlydust.com.marketplace.project.domain.model.NamedLink;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.UpdateProjectCommand;
 import onlydust.com.marketplace.project.domain.view.*;
@@ -30,7 +30,7 @@ public interface ProjectMapper {
                 .githubRepoIds(createProjectRequest.getGithubRepoIds())
                 .isLookingForContributors(createProjectRequest.getIsLookingForContributors())
                 .moreInfos(nonNull(createProjectRequest.getMoreInfos()) ? createProjectRequest.getMoreInfos().stream()
-                        .map(moreInfo -> MoreInfoLink.builder()
+                        .map(moreInfo -> NamedLink.builder()
                                 .url(moreInfo.getUrl()).value(moreInfo.getValue()).build()).toList() : null)
                 .imageUrl(createProjectRequest.getLogoUrl())
                 .ecosystemIds(createProjectRequest.getEcosystemIds())
@@ -51,7 +51,7 @@ public interface ProjectMapper {
                 .isLookingForContributors(updateProjectRequest.getIsLookingForContributors())
                 .moreInfos(isNull(updateProjectRequest.getMoreInfos()) ? null :
                         updateProjectRequest.getMoreInfos().stream()
-                                .map(moreInfo -> MoreInfoLink.builder()
+                                .map(moreInfo -> NamedLink.builder()
                                         .url(moreInfo.getUrl()).value(moreInfo.getValue()).build()).toList())
                 .imageUrl(updateProjectRequest.getLogoUrl())
                 .ecosystemIds(updateProjectRequest.getEcosystemIds())

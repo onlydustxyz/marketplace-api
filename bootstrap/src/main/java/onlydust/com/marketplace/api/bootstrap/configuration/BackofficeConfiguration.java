@@ -4,14 +4,14 @@ import onlydust.com.marketplace.accounting.domain.port.in.*;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.PaymentService;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
 import onlydust.com.marketplace.kernel.observer.MailObserver;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
-import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
-import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.project.domain.port.input.HackathonFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.project.domain.service.BackofficeService;
 import org.springframework.context.annotation.Bean;
@@ -54,14 +54,14 @@ public class BackofficeConfiguration {
     @Bean
     public BackofficeAccountingManagementRestApi backofficeAccountingManagementRestApi(
             final AccountingFacadePort accountingFacadePort,
-            final RewardFacadePort rewardFacadePort,
-            final UserFacadePort userFacadePort,
             final AccountingRewardPort accountingRewardPort,
             final PaymentPort paymentPort,
             final BillingProfileFacadePort billingProfileFacadePort,
-            final AuthenticatedBackofficeUserService authenticatedBackofficeUserService) {
-        return new BackofficeAccountingManagementRestApi(accountingFacadePort, rewardFacadePort, userFacadePort, accountingRewardPort,
-                paymentPort, billingProfileFacadePort, authenticatedBackofficeUserService);
+            final AuthenticatedBackofficeUserService authenticatedBackofficeUserService,
+            final BlockchainFacadePort blockchainFacadePort
+    ) {
+        return new BackofficeAccountingManagementRestApi(accountingFacadePort, accountingRewardPort,
+                paymentPort, billingProfileFacadePort, authenticatedBackofficeUserService, blockchainFacadePort);
     }
 
     @Bean
@@ -81,14 +81,21 @@ public class BackofficeConfiguration {
     @Bean
     public PaymentPort batchPaymentPort(final AccountingRewardStoragePort accountingRewardStoragePort,
                                         final InvoiceStoragePort invoiceStoragePort,
-                                        final AccountingFacadePort accountingFacadePort) {
+                                        final AccountingFacadePort accountingFacadePort,
+                                        final BlockchainFacadePort blockchainFacadePort) {
         return new PaymentService(accountingRewardStoragePort, invoiceStoragePort,
-                accountingFacadePort);
+                accountingFacadePort, blockchainFacadePort);
     }
 
     @Bean
-    public BackofficeHackathonRestApi backofficeHackathonApi() {
-        return new BackofficeHackathonRestApi();
+    public BackofficeHackathonRestApi backofficeHackathonApi(final HackathonFacadePort hackathonFacadePort) {
+        return new BackofficeHackathonRestApi(hackathonFacadePort);
+    }
+
+    @Bean
+    public BackofficeDebugRestApi backofficeDebugRestApi(final AccountBookEventStorage accountBookEventStorage,
+                                                         final CurrencyFacadePort currencyFacadePort) {
+        return new BackofficeDebugRestApi(accountBookEventStorage, currencyFacadePort);
     }
 }
 

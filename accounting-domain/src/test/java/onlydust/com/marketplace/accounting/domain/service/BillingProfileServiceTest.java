@@ -39,6 +39,7 @@ import java.util.UUID;
 import static onlydust.com.marketplace.accounting.domain.model.Invoice.Status.*;
 import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyb;
 import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyc;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
@@ -53,8 +54,9 @@ class BillingProfileServiceTest {
     final IndexerPort indexerPort = mock(IndexerPort.class);
     final AccountingObserverPort accountingObserverPort = mock(AccountingObserver.class);
     final AccountingFacadePort accountingFacadePort = mock(AccountingFacadePort.class);
+    final PayoutInfoValidator payoutInfoValidator = mock(PayoutInfoValidator.class);
     final BillingProfileService billingProfileService = new BillingProfileService(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort,
-            billingProfileObserver, indexerPort, accountingObserverPort, accountingFacadePort);
+            billingProfileObserver, indexerPort, accountingObserverPort, accountingFacadePort, payoutInfoValidator);
     final UserId userId = UserId.random();
     final Currency ETH = Currencies.ETH;
     final Currency USD = Currencies.USD;
@@ -1304,6 +1306,24 @@ class BillingProfileServiceTest {
 
         // Then
         verify(billingProfileStoragePort).savePayoutInfoForBillingProfile(payoutInfo, billingProfileId);
+        verify(payoutInfoValidator).validate(payoutInfo);
+    }
+
+    @Test
+    void should_not_update_payout_info_given_invalid_payout_info() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final PayoutInfo payoutInfo = PayoutInfo.builder().build();
+
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        doThrow(badRequest("Invalid payout info")).when(payoutInfoValidator).validate(payoutInfo);
+
+        // When
+        assertThatThrownBy(() -> billingProfileService.updatePayoutInfo(billingProfileId, userIAdmin, payoutInfo))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Invalid payout info");
     }
 
     @Test

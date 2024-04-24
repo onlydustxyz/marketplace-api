@@ -1,9 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
+import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import jakarta.persistence.EntityManager;
 
 @AllArgsConstructor
 @Slf4j
@@ -31,21 +30,21 @@ public class CustomProjectRankingRepository {
                                                 AVG(psfrc.total_dollars_equivalent_remaining_amount)      AS avg_amount_remaining_to_distribute,
                                                 STDDEV(psfrc.total_dollars_equivalent_remaining_amount)   AS stddev_amount_remaining_to_distribute
                                          FROM project_stats_for_ranking_computation psfrc),
-                                   project_date_stats AS ((SELECT pd.project_id,
+                                   project_date_stats AS ((SELECT p.id as project_id,
                                                                   GREATEST(
                                                                           ROUND(
-                                                                                          ((CURRENT_DATE - cast(pd.created_at as date)) - pas.avg_days_since_creation) /
+                                                                                          ((CURRENT_DATE - cast(p.created_at as date)) - pas.avg_days_since_creation) /
                                                                                           NULLIF(pas.stddev_days_since_creation, 0) *
                                                                                           -1,
                                                                                           2
                                                                           ),
                                                                           0
                                                                   ) AS normalized_inverted_days_since_creation
-                                                           FROM project_details pd,
+                                                           FROM projects p,
                                                                 (SELECT AVG(CURRENT_DATE - cast(created_at as date))    AS avg_days_since_creation,
                                                                         STDDEV(CURRENT_DATE - cast(created_at as date)) AS stddev_days_since_creation
-                                                                 FROM project_details) pas))
-                              select pd.project_id,
+                                                                 FROM projects) pas))
+                              select p.id as project_id,
                                      (normalized_values.normalized_amount_remaining_to_distribute +
                                       normalized_values.normalized_creation_date +
                                       normalized_values.normalized_number_of_distinct_contributors +
@@ -54,7 +53,7 @@ public class CustomProjectRankingRepository {
                                       normalized_values.normalized_total_grants +
                                       normalized_values.normalized_volume_of_pull_requests
                                          ) * 100 AS total_normalized_score
-                              from project_details pd
+                              from projects p
                                        join (select project_stats.project_id,
                                                     LEAST((project_stats.pr_count - s.avg_volume_of_pull_requests_last_3_months) /
                                                           NULLIF(s.stddev_volume_of_pull_requests_last_3_months, 0),
@@ -82,9 +81,9 @@ public class CustomProjectRankingRepository {
                                              from project_stats_for_ranking_computation project_stats
                                                       cross join s
                                                       join project_date_stats pds on pds.project_id = project_stats.project_id) normalized_values
-                                            on normalized_values.project_id = pd.project_id)
-            update project_details pd_to_update
+                                            on normalized_values.project_id = p.id)
+            update projects p_to_update
             set rank = subquery.total_normalized_score
             from subquery
-            where pd_to_update.project_id = subquery.project_id""";
+            where p_to_update.id = subquery.project_id""";
 }

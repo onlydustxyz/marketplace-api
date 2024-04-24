@@ -24,7 +24,7 @@ public class PostgresAccountBookEventAdapter implements AccountBookEventStorage 
     @Transactional(readOnly = true)
     public @NotNull List<IdentifiedAccountBookEvent> getAll(final @NonNull Currency currency) {
         return accountBookRepository.findByCurrencyId(currency.id().value())
-                .map(accountBookEntity -> accountBookEventRepository.findAllByAccountBookId(accountBookEntity.getId()))
+                .map(accountBookEntity -> accountBookEventRepository.findAllByAccountBookIdOrderByIdAsc(accountBookEntity.getId()))
                 .orElse(List.of())
                 .stream().map(AccountBookEventEntity::toIdentifiedAccountBookEvent)
                 .toList();

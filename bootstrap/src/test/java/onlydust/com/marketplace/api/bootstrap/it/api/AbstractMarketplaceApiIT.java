@@ -15,6 +15,7 @@ import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
 import onlydust.com.marketplace.api.bootstrap.helper.AccountingHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.helper.WireMockInitializer;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
@@ -26,6 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -50,6 +52,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @Testcontainers
 @Slf4j
 @Import(SwaggerConfiguration.class)
+@ContextConfiguration(initializers = WireMockInitializer.class)
 @EnableWireMock({
         @ConfigureWireMock(name = "github", stubLocation = "", property = "infrastructure.github.baseUri"),
         @ConfigureWireMock(name = "dustyBot", stubLocation = "", property = "infrastructure.dustyBot.baseUri"),
@@ -115,6 +118,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_GET_REWARD_CURRENCIES = "/api/v1/me/reward-currencies";
     protected static final String ME_BILLING_PROFILES = "/api/v1/me/billing-profiles";
     protected static final String ME_GET_PROFILE_GITHUB = "/api/v1/me/profile/github";
+    protected static final String ME_PUT_HACKATHON_REGISTRATIONS = "/api/v1/me/hackathons/%s/registrations";
     protected static final String USERS_GET = "/api/v1/users";
     protected static final String USERS_GET_BY_LOGIN = "/api/v1/users/login";
     protected static final String ME_GET_ORGANIZATIONS = "/api/v1/me/organizations";
@@ -141,6 +145,8 @@ public class AbstractMarketplaceApiIT {
     protected static final String SPONSOR_ALLOCATE = "/api/v1/sponsors/%s/allocate";
     protected static final String SPONSOR_UNALLOCATE = "/api/v1/sponsors/%s/unallocate";
     protected static final String SPONSOR_TRANSACTIONS = "/api/v1/sponsors/%s/transactions";
+    protected static final String HACKATHONS = "/api/v1/hackathons";
+    protected static final String HACKATHONS_BY_SLUG = "/api/v1/hackathons/slug/%s";
 
     private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
             .withDatabaseName("marketplace_db")
@@ -165,6 +171,10 @@ public class AbstractMarketplaceApiIT {
     protected WireMockServer posthogWireMockServer;
     @InjectWireMock("sumsub")
     protected WireMockServer sumsubWireMockServer;
+    @Autowired
+    protected WireMockServer ethereumWireMockServer;
+    @Autowired
+    protected WireMockServer starknetWireMockServer;
 
     @LocalServerPort
     int port;

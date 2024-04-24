@@ -1,0 +1,23 @@
+{
+    "request": {
+        "url": "/INFURA_API_KEY",
+        "method": "POST",
+        "bodyPatterns": [
+            {
+                "equalToJson": {
+                    "jsonrpc": "2.0",
+                    "method": "starknet_getTransactionReceipt"
+                },
+                "ignoreArrayOrder": true,
+                "ignoreExtraElements": true
+            }
+        ]
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "body-starknet_getTransactionReceipt.json",
+        "headers": {
+            "Content-Type": "application/json"
+        }
+    }
+}

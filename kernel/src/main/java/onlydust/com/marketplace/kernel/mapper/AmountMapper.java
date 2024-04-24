@@ -11,4 +11,9 @@ public interface AmountMapper {
 
         return amount.setScale(min(decimals, min(amount.scale(), optimumScale)), RoundingMode.HALF_EVEN);
     }
+
+    static BigDecimal prettyUsd(BigDecimal usdAmount) {
+        if (usdAmount == null) return null;
+        return pretty(usdAmount, 2, null);
+    }
 }

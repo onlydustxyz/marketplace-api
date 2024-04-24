@@ -3,18 +3,16 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.github.javafaker.Faker;
 import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.recording.RecordingStatus;
 import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
 import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
 import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
-import lombok.Builder;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.helper.WireMockInitializer;
 import onlydust.com.marketplace.api.postgres.adapter.repository.BackofficeUserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
@@ -24,12 +22,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -45,7 +39,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
@@ -56,7 +49,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @Testcontainers
 @Slf4j
 @Import(SwaggerConfiguration.class)
-@ContextConfiguration(initializers = AbstractMarketplaceBackOfficeApiIT.WireMockInitializer.class)
+@ContextConfiguration(initializers = WireMockInitializer.class)
 @EnableWireMock({
         @ConfigureWireMock(name = "auth0", property = "application.web.auth0.user-info-url"),
         @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri")
@@ -82,6 +75,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected WireMockServer optimismWireMockServer;
     @Autowired
     protected WireMockServer starknetWireMockServer;
+    protected WireMockServer aptosWireMockServer;
     @Autowired
     protected WireMockServer coinmarketcapWireMockServer;
     @InjectWireMock("auth0")
@@ -178,6 +172,8 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String REWARDS = "/bo/v1/rewards";
     protected static final String GET_REWARDS_CSV = "/bo/v1/rewards/csv";
     protected static final String BILLING_PROFILE = "/bo/v1/billing-profiles/%s";
+    protected static final String HACKATHONS = "/bo/v1/hackathons";
+    protected static final String HACKATHONS_BY_ID = "/bo/v1/hackathons/%s";
 
     protected String apiKey() {
         return backOfficeApiKeyAuthenticationConfig.getApiKey();
@@ -214,75 +210,6 @@ public class AbstractMarketplaceBackOfficeApiIT {
         return uriComponentsBuilder
                 .build()
                 .toUri();
-    }
-
-    public static class WireMockInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-        @Override
-        public void initialize(final @NonNull ConfigurableApplicationContext context) {
-            WiremockServerRegistration.builder()
-                    .beanName("ethereumWireMockServer")
-                    .stubLocation("ethereum")
-                    .property("infrastructure.ethereum.base-uri")
-//                    .recordFrom("https://mainnet.infura.io/v3")
-                    .build()
-                    .register(context);
-
-            WiremockServerRegistration.builder()
-                    .beanName("optimismWireMockServer")
-                    .stubLocation("optimism")
-                    .property("infrastructure.optimism.base-uri")
-                    .build()
-                    .register(context);
-
-            WiremockServerRegistration.builder()
-                    .beanName("starknetWireMockServer")
-                    .stubLocation("starknet")
-                    .property("infrastructure.starknet.base-uri")
-                    .build()
-                    .register(context);
-
-            WiremockServerRegistration.builder()
-                    .beanName("coinmarketcapWireMockServer")
-                    .stubLocation("coinmarketcap")
-                    .property("infrastructure.coinmarketcap.base-uri")
-                    .build()
-                    .register(context);
-        }
-    }
-
-    @Builder
-    public static class WiremockServerRegistration {
-        private final @NonNull String beanName;
-        private final @NonNull String stubLocation;
-        private final @NonNull String property;
-        private final String recordFrom;
-
-        public void register(final @NonNull ConfigurableApplicationContext context) {
-            final var wireMockServer = new WireMockServer(
-                    options()
-                            .dynamicPort()
-                            .globalTemplating(true)
-                            .usingFilesUnderClasspath("wiremock/" + stubLocation)
-            );
-
-            wireMockServer.start();
-
-            if (recordFrom != null)
-                wireMockServer.startRecording(recordFrom);
-
-            context.getBeanFactory().registerSingleton(beanName, wireMockServer);
-
-            TestPropertyValues.of("%s:http://localhost:%d".formatted(property, wireMockServer.port()))
-                    .applyTo(context);
-
-            context.addApplicationListener(event -> {
-                if (event instanceof ContextClosedEvent) {
-                    if (wireMockServer.getRecordingStatus().getStatus() == RecordingStatus.Recording)
-                        wireMockServer.stopRecording();
-                    wireMockServer.stop();
-                }
-            });
-        }
     }
 
     protected final static Faker faker = new Faker();

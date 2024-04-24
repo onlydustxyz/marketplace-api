@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
@@ -97,6 +98,8 @@ public class AccountingHelper {
             rewardStatus.networks(new NetworkEnumEntity[]{network});
         }
         rewardStatus.amountUsdEquivalent(usdAmount == null ? null : BigDecimal.valueOf(usdAmount.doubleValue()));
+        rewardStatus.usdConversionRate(usdAmount == null ? null : BigDecimal.valueOf(usdAmount.doubleValue()).divide(rewardEntity.amount(),
+                RoundingMode.HALF_EVEN));
 
         if (invoiceReceivedAt != null) {
             final var invoiceEntity = fakeInvoice(UUID.randomUUID(), List.of(rewardEntity.id()));

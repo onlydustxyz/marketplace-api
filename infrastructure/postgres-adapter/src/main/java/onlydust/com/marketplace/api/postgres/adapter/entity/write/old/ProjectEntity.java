@@ -5,7 +5,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
-import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
+import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.project.domain.model.Project;
@@ -25,12 +25,12 @@ import java.util.UUID;
 @EqualsAndHashCode
 @Data
 @Builder
-@Table(name = "project_details", schema = "public")
+@Table(name = "projects", schema = "public")
 @DynamicUpdate
 @SelectBeforeUpdate
 public class ProjectEntity {
     @Id
-    @Column(name = "project_id", nullable = false)
+    @Column(name = "id", nullable = false)
     UUID id;
     @Column(name = "name")
     String name;
@@ -109,8 +109,8 @@ public class ProjectEntity {
                 .build();
     }
 
-    public ShortProjectView toView() {
-        return ShortProjectView.builder()
+    public ProjectShortView toView() {
+        return ProjectShortView.builder()
                 .slug(key)
                 .name(name)
                 .logoUrl(logoUrl)

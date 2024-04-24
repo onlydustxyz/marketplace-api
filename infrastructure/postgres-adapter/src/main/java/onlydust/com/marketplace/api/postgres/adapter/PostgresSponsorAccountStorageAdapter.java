@@ -87,8 +87,8 @@ public class PostgresSponsorAccountStorageAdapter implements SponsorAccountStora
     }
 
     @Override
-    public Optional<SponsorAccount> find(SponsorId sponsorId, Currency.Id currencyId) {
+    public List<SponsorAccount> find(SponsorId sponsorId, Currency.Id currencyId) {
         return sponsorAccountRepository.findBySponsorIdAndCurrencyId(sponsorId.value(), currencyId.value())
-                .map(SponsorAccountEntity::toDomain);
+                .stream().map(SponsorAccountEntity::toDomain).toList();
     }
 }

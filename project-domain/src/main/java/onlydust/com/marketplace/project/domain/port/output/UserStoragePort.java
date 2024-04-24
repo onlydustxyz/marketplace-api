@@ -49,7 +49,7 @@ public interface UserStoragePort {
 
     void saveProjectLead(UUID userId, UUID projectId);
 
-    List<CurrencyView> listRewardCurrencies(Long githubUserId);
+    List<CurrencyView> listRewardCurrencies(Long githubUserId, List<UUID> administratedBillingProfileIds);
 
     List<User> getUsersLastSeenSince(ZonedDateTime since);
 

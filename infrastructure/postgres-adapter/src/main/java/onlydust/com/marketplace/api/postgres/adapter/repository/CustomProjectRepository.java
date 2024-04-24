@@ -1,10 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
+import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
-
-import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.UUID;
@@ -45,8 +44,8 @@ public class CustomProjectRepository {
     public boolean isProjectPublic(UUID projectId) {
         final var isProjectPublic = entityManager.createNativeQuery("""
                         select 1
-                        from project_details p
-                        where p.project_id = :projectId
+                        from projects p
+                        where p.id = :projectId
                           and p.visibility = 'PUBLIC'
                         """)
                 .setParameter("projectId", projectId)
@@ -57,7 +56,7 @@ public class CustomProjectRepository {
     public boolean isProjectPublic(String projectSlug) {
         final var isProjectPublic = entityManager.createNativeQuery("""
                         select 1
-                        from project_details p
+                        from projects p
                         where p.key = :projectSlug
                           and p.visibility = 'PUBLIC'
                         """)
@@ -69,25 +68,25 @@ public class CustomProjectRepository {
     public boolean hasUserAccessToProject(UUID projectId, UUID userId) {
         final var hasAccessToProject = entityManager.createNativeQuery("""
                         select 1
-                        from project_details p
+                        from projects p
                         left join (select pl_me.project_id, case count(*) when 0 then false else true end is_lead
                                 from project_leads pl_me
                                 where pl_me.user_id = :userId
-                                group by pl_me.project_id) is_me_lead on is_me_lead.project_id = p.project_id
+                                group by pl_me.project_id) is_me_lead on is_me_lead.project_id = p.id
                         left join (select ppc.project_id, case count(*) when 0 then false else true end is_p_c
                                 from projects_pending_contributors ppc
                                          left join iam.users me on me.github_user_id = ppc.github_user_id
                                 where me.id = :userId
-                                group by ppc.project_id) is_pending_contributor on is_pending_contributor.project_id = p.project_id
+                                group by ppc.project_id) is_pending_contributor on is_pending_contributor.project_id = p.id
                         left join (select ppli.project_id, case count(*) when 0 then false else true end is_p_pl
                                 from pending_project_leader_invitations ppli
                                          left join iam.users me on me.github_user_id = ppli.github_user_id
                                 where me.id = :userId
-                                group by ppli.project_id) is_pending_pl on is_pending_pl.project_id = p.project_id
+                                group by ppli.project_id) is_pending_pl on is_pending_pl.project_id = p.id
                         left join (select pl_count.project_id, count(pl_count.user_id) project_lead_count
                                 from project_leads pl_count
-                                group by pl_count.project_id) pl_count on pl_count.project_id = p.project_id
-                        where p.project_id = :projectId
+                                group by pl_count.project_id) pl_count on pl_count.project_id = p.id
+                        where p.id = :projectId
                             and
                             ((pl_count.project_lead_count > 0 or coalesce(is_pending_pl.is_p_pl, false))
                                 and (coalesce(is_pending_pl.is_p_pl, false) or
@@ -103,24 +102,24 @@ public class CustomProjectRepository {
     public boolean hasUserAccessToProject(String projectSlug, UUID userId) {
         final var hasAccessToProject = entityManager.createNativeQuery("""
                         select 1
-                        from project_details p
+                        from projects p
                         left join (select pl_me.project_id, case count(*) when 0 then false else true end is_lead
                                 from project_leads pl_me
                                 where pl_me.user_id = :userId
-                                group by pl_me.project_id) is_me_lead on is_me_lead.project_id = p.project_id
+                                group by pl_me.project_id) is_me_lead on is_me_lead.project_id = p.id
                         left join (select ppc.project_id, case count(*) when 0 then false else true end is_p_c
                                 from projects_pending_contributors ppc
                                          left join iam.users me on me.github_user_id = ppc.github_user_id
                                 where me.id = :userId
-                                group by ppc.project_id) is_pending_contributor on is_pending_contributor.project_id = p.project_id
+                                group by ppc.project_id) is_pending_contributor on is_pending_contributor.project_id = p.id
                         left join (select ppli.project_id, case count(*) when 0 then false else true end is_p_pl
                                 from pending_project_leader_invitations ppli
                                          left join iam.users me on me.github_user_id = ppli.github_user_id
                                 where me.id = :userId
-                                group by ppli.project_id) is_pending_pl on is_pending_pl.project_id = p.project_id
+                                group by ppli.project_id) is_pending_pl on is_pending_pl.project_id = p.id
                         left join (select pl_count.project_id, count(pl_count.user_id) project_lead_count
                                 from project_leads pl_count
-                                group by pl_count.project_id) pl_count on pl_count.project_id = p.project_id
+                                group by pl_count.project_id) pl_count on pl_count.project_id = p.id
                         where p.key = :projectSlug
                             and
                             ((pl_count.project_lead_count > 0 or coalesce(is_pending_pl.is_p_pl, false))

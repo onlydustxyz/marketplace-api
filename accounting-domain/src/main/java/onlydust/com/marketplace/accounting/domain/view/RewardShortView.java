@@ -15,6 +15,6 @@ import onlydust.com.marketplace.kernel.model.RewardStatus;
 public class RewardShortView {
     private final @NonNull RewardId id;
     private final @NonNull RewardStatus status;
-    private final @NonNull ShortProjectView project;
+    private final @NonNull ProjectShortView project;
     private final @NonNull MoneyView money;
 }

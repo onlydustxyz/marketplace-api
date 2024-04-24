@@ -48,7 +48,10 @@ public class SponsorAccountStorageStub implements SponsorAccountStorage {
     }
 
     @Override
-    public Optional<SponsorAccount> find(SponsorId sponsorId, Currency.Id currencyId) {
-        return Optional.empty();
+    public List<SponsorAccount> find(SponsorId sponsorId, Currency.Id currencyId) {
+        return SPONSOR_ACCOUNTS.stream()
+                .filter(l -> l.sponsorId().equals(sponsorId))
+                .filter(l -> l.currency().id().equals(currencyId))
+                .toList();
     }
 }

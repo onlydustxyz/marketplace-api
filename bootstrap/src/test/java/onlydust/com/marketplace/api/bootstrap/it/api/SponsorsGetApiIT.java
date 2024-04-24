@@ -2,27 +2,34 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.google.common.collect.Streams;
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
+import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
+import onlydust.com.marketplace.api.bootstrap.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.SponsorAccountTransactionType;
 import onlydust.com.marketplace.api.contract.model.TransactionHistoryPageResponse;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
-
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
     private final static SponsorId sponsorId = SponsorId.of("0980c5ab-befc-4314-acab-777fbf970cbb");
     private UserAuthHelper.AuthenticatedUser user;
+
+    @Autowired
+    private AccountingFacadePort accountingFacadePort;
 
     @BeforeEach
     void setup() {
@@ -30,6 +37,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(1)
     void should_return_forbidden_if_not_admin() {
         removeSponsorFor(user, sponsorId);
 
@@ -43,9 +51,14 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(2)
     void should_return_sponsor_by_id() {
         // Given
         addSponsorFor(user, sponsorId);
+
+        // create multiple sponsor accounts on the same currency to assert that they are well aggregated in available budgets
+        accountingFacadePort.createSponsorAccountWithInitialAllowance(sponsorId, CurrencyHelper.USDC, null, PositiveAmount.of(1000L));
+        accountingFacadePort.createSponsorAccountWithInitialAllowance(sponsorId, CurrencyHelper.USDC, null, PositiveAmount.of(BigDecimal.valueOf(8000.123456789D)));
 
         // When
         getSponsor(sponsorId)
@@ -69,7 +82,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": null,
                                 "decimals": 8
                               },
-                              "usdEquivalent": null
+                              "usdEquivalent": 0.00,
+                              "usdConversionRate": 0.30
                             },
                             {
                               "amount": 0,
@@ -81,7 +95,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": null,
                                 "decimals": 18
                               },
-                              "usdEquivalent": 0.00
+                              "usdEquivalent": 0.00,
+                              "usdConversionRate": 1781.98
                             },
                             {
                               "amount": 0,
@@ -93,7 +108,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": null,
                                 "decimals": 18
                               },
-                              "usdEquivalent": null
+                              "usdEquivalent": null,
+                              "usdConversionRate": null
                             },
                             {
                               "amount": 0,
@@ -105,11 +121,12 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": null,
                                 "decimals": 2
                               },
-                              "usdEquivalent": 0
+                              "usdEquivalent": 0,
+                              "usdConversionRate": 1
                             },
                             {
-                              "amount": 0,
-                              "prettyAmount": 0,
+                              "amount": 9000.123456789,
+                              "prettyAmount": 9000.12,
                               "currency": {
                                 "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                 "code": "USDC",
@@ -117,7 +134,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                 "decimals": 6
                               },
-                              "usdEquivalent": 0.00
+                              "usdEquivalent": 9090.12,
+                              "usdConversionRate": 1.01
                             }
                           ],
                           "projects": [
@@ -126,7 +144,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               "slug": "bretzel",
                               "name": "Bretzel",
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
-                              "totalUsdBudget": 5446182.5000,
+                              "totalUsdBudget": 5566182.50,
                               "remainingBudgets": [
                                 {
                                   "amount": 400000,
@@ -138,7 +156,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                     "logoUrl": null,
                                     "decimals": 8
                                   },
-                                  "usdEquivalent": null
+                                  "usdEquivalent": 120000.00,
+                                  "usdConversionRate": 0.30
                                 },
                                 {
                                   "amount": 3000,
@@ -150,7 +169,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                     "logoUrl": null,
                                     "decimals": 18
                                   },
-                                  "usdEquivalent": 5345940.00
+                                  "usdEquivalent": 5345940.00,
+                                  "usdConversionRate": 1781.98
                                 },
                                 {
                                   "amount": 17000,
@@ -162,7 +182,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                     "logoUrl": null,
                                     "decimals": 18
                                   },
-                                  "usdEquivalent": null
+                                  "usdEquivalent": null,
+                                  "usdConversionRate": null
                                 },
                                 {
                                   "amount": 99250.00,
@@ -174,7 +195,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                     "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                     "decimals": 6
                                   },
-                                  "usdEquivalent": 100242.5000
+                                  "usdEquivalent": 100242.50,
+                                  "usdConversionRate": 1.01
                                 }
                               ]
                             },
@@ -195,7 +217,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                     "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                     "decimals": 6
                                   },
-                                  "usdEquivalent": 20025335.65
+                                  "usdEquivalent": 20025335.65,
+                                  "usdConversionRate": 1.01
                                 }
                               ]
                             }
@@ -205,6 +228,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(3)
     void should_return_sponsor_transactions() {
         // Given
         addSponsorFor(user, sponsorId);
@@ -216,8 +240,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 2,
-                          "totalItemNumber": 11,
+                          "totalPageNumber": 3,
+                          "totalItemNumber": 13,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "transactions": [
@@ -228,6 +252,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               "project": null,
                               "amount": {
                                 "amount": 3000,
+                                "prettyAmount": 3000,
                                 "currency": {
                                   "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
                                   "code": "USD",
@@ -235,7 +260,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 2
                                 },
-                                "usdEquivalent": null
+                                "usdEquivalent": 3000,
+                                "usdConversionRate": 1
                               }
                             },
                             {
@@ -245,6 +271,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               "project": null,
                               "amount": {
                                 "amount": 19933440,
+                                "prettyAmount": 19933440,
                                 "currency": {
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
@@ -252,7 +279,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                   "decimals": 6
                                 },
-                                "usdEquivalent": null
+                                "usdEquivalent": 20132774.40,
+                                "usdConversionRate": 1.01
                               }
                             },
                             {
@@ -262,6 +290,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               "project": null,
                               "amount": {
                                 "amount": 3000,
+                                "prettyAmount": 3000,
                                 "currency": {
                                   "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                   "code": "ETH",
@@ -269,7 +298,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": null
+                                "usdEquivalent": 5345940.00,
+                                "usdConversionRate": 1781.98
                               }
                             },
                             {
@@ -279,6 +309,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               "project": null,
                               "amount": {
                                 "amount": 17000,
+                                "prettyAmount": 17000,
                                 "currency": {
                                   "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
                                   "code": "OP",
@@ -286,7 +317,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": null
+                                "usdEquivalent": null,
+                                "usdConversionRate": null
                               }
                             },
                             {
@@ -296,6 +328,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               "project": null,
                               "amount": {
                                 "amount": 400000,
+                                "prettyAmount": 400000,
                                 "currency": {
                                   "id": "48388edb-fda2-4a32-b228-28152a147500",
                                   "code": "APT",
@@ -303,7 +336,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 8
                                 },
-                                "usdEquivalent": null
+                                "usdEquivalent": 120000.00,
+                                "usdConversionRate": 0.30
                               }
                             },
                             {
@@ -318,6 +352,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               },
                               "amount": {
                                 "amount": 17000,
+                                "prettyAmount": 17000,
                                 "currency": {
                                   "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
                                   "code": "OP",
@@ -325,7 +360,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": null
+                                "usdEquivalent": null,
+                                "usdConversionRate": null
                               }
                             }
                           ]
@@ -335,6 +371,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
 
     @ParameterizedTest
     @EnumSource(value = SponsorAccountTransactionType.class)
+    @Order(10)
     void should_filter_sponsor_transactions_by_type(@NonNull SponsorAccountTransactionType type) {
         // Given
         addSponsorFor(user, sponsorId);
@@ -351,6 +388,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(10)
     void should_filter_sponsor_transactions_by_date() {
         // Given
         addSponsorFor(user, sponsorId);
@@ -369,6 +407,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(10)
     void should_filter_sponsor_transactions_by_currencies() {
         // Given
         addSponsorFor(user, sponsorId);
@@ -384,6 +423,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(10)
     void should_filter_sponsor_transactions_by_projects() {
         // Given
         addSponsorFor(user, sponsorId);
@@ -409,6 +449,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
             "PROJECT, DESC",
             "PROJECT, ASC"
     })
+    @Order(10)
     void should_order_sponsor_transactions(String sort, String direction) {
         // Given
         addSponsorFor(user, sponsorId);

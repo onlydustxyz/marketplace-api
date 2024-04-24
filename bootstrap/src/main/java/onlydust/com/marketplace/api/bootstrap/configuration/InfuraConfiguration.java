@@ -1,8 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.api.infura.InfuraClient;
-import onlydust.com.marketplace.api.infura.adapters.EthInfuraERC20ProviderAdapter;
-import onlydust.com.marketplace.api.infura.adapters.StarknetInfuraERC20ProviderAdapter;
+import onlydust.com.marketplace.api.infura.adapters.*;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +20,21 @@ public class InfuraConfiguration {
     }
 
     @Bean
+    public EthInfuraEnsValidatorAdapter ethereumEnsValidatorAdapter(final InfuraClient.Properties ethereumProperties) {
+        return new EthInfuraEnsValidatorAdapter(ethereumProperties);
+    }
+
+    @Bean
+    public InfuraEvmAccountAddressValidatorAdapter infuraEvmAccountAddressValidatorAdapter(final InfuraClient.Properties ethereumProperties) {
+        return new InfuraEvmAccountAddressValidatorAdapter(ethereumProperties);
+    }
+
+    @Bean
+    public InfuraEvmTransactionStorageAdapter ethereumTransactionStorageAdapter(final InfuraClient.Properties ethereumProperties) {
+        return new InfuraEvmTransactionStorageAdapter(ethereumProperties);
+    }
+
+    @Bean
     @ConfigurationProperties("infrastructure.optimism")
     public InfuraClient.Properties optimismProperties() {
         return new InfuraClient.Properties();
@@ -29,6 +43,11 @@ public class InfuraConfiguration {
     @Bean
     public EthInfuraERC20ProviderAdapter optimismERC20Provider(final InfuraClient.Properties optimismProperties) {
         return new EthInfuraERC20ProviderAdapter(optimismProperties);
+    }
+
+    @Bean
+    public InfuraEvmTransactionStorageAdapter optimismTransactionStorageAdapter(final InfuraClient.Properties optimismProperties) {
+        return new InfuraEvmTransactionStorageAdapter(optimismProperties);
     }
 
     @Bean
@@ -42,4 +61,13 @@ public class InfuraConfiguration {
         return new StarknetInfuraERC20ProviderAdapter(starknetProperties);
     }
 
+    @Bean
+    public StarknetInfuraAccountValidatorAdapter starknetInfuraAccountValidatorAdapter(final InfuraClient.Properties starknetProperties) {
+        return new StarknetInfuraAccountValidatorAdapter(starknetProperties);
+    }
+
+    @Bean
+    public StarknetInfuraTransactionStorageAdapter starknetInfuraTransactionStorageAdapter(final InfuraClient.Properties starknetProperties) {
+        return new StarknetInfuraTransactionStorageAdapter(starknetProperties);
+    }
 }

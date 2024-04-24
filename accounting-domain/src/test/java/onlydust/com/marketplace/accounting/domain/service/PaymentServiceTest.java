@@ -6,13 +6,17 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.port.in.BlockchainFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.BlockchainTransactionStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.ERC20Tokens;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
+import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmAccountAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmTransaction;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetAccountAddress;
@@ -41,7 +45,13 @@ public class PaymentServiceTest {
     private final AccountingRewardStoragePort accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
     private final AccountingService accountingService = mock(AccountingService.class);
     private final InvoiceStoragePort invoiceStoragePort = mock(InvoiceStoragePort.class);
-    private final PaymentService rewardService = new PaymentService(accountingRewardStoragePort, invoiceStoragePort, accountingService);
+    private final BlockchainTransactionStoragePort ethereumTransactionStoragePort = mock(BlockchainTransactionStoragePort.class);
+    private final BlockchainFacadePort blockchainFacadePort = new BlockchainService(
+            ethereumTransactionStoragePort,
+            mock(BlockchainTransactionStoragePort.class),
+            mock(BlockchainTransactionStoragePort.class),
+            mock(BlockchainTransactionStoragePort.class));
+    private final PaymentService rewardService = new PaymentService(accountingRewardStoragePort, invoiceStoragePort, accountingService, blockchainFacadePort);
 
     List<Invoice.Id> invoiceIds;
     List<Invoice> invoices;
@@ -243,6 +253,8 @@ public class PaymentServiceTest {
 
         // When
         when(accountingRewardStoragePort.findPayment(batchPaymentId)).thenReturn(Optional.of(payment));
+        when(ethereumTransactionStoragePort.get(Ethereum.transactionHash(transactionHash)))
+                .thenReturn(Optional.of(new EvmTransaction(Ethereum.transactionHash(transactionHash), ZonedDateTime.now())));
         rewardService.markPaymentAsPaid(batchPaymentId, transactionHash);
 
         // Then

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
@@ -20,11 +21,11 @@ import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.view.*;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -85,7 +86,15 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Override
     @Transactional
     public User createUser(User user) {
-        return mapCreatedUserToDomain(userRepository.saveAndFlush(mapUserToEntity(user)));
+        return mapCreatedUserToDomain(tryCreateUser(user));
+    }
+
+    private UserEntity tryCreateUser(User user) {
+        try {
+            return userRepository.saveAndFlush(mapUserToEntity(user));
+        } catch (DataIntegrityViolationException e) {
+            return userRepository.findByGithubUserId(user.getGithubUserId()).orElseThrow();
+        }
     }
 
     @Override
@@ -246,20 +255,13 @@ public class PostgresUserAdapter implements UserStoragePort {
                         .totalItemNumber((int) page.getTotalElements())
                         .totalPageNumber(page.getTotalPages())
                         .build())
-                .rewardedAmount(rewardsStats.size() == 1 ?
-                        new Money(rewardsStats.get(0).getProcessedAmount(),
-                                rewardsStats.get(0).getCurrency().toView(),
-                                rewardsStats.get(0).getProcessedUsdAmount()) :
-                        new Money(null, null,
-                                rewardsStats.stream().map(RewardStatsEntity::getProcessedUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,
-                                        BigDecimal::add)))
-                .pendingAmount(rewardsStats.size() == 1 ?
-                        new Money(rewardsStats.get(0).getPendingAmount(),
-                                rewardsStats.get(0).getCurrency().toView(),
-                                rewardsStats.get(0).getPendingUsdAmount()) :
-                        new Money(null, null,
-                                rewardsStats.stream().map(RewardStatsEntity::getPendingUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,
-                                        BigDecimal::add)))
+                .rewardAmountsPerCurrency(rewardsStats.stream()
+                        .map(stats -> new UserRewardsPageView.RewardAmounts(
+                                new Money(stats.getProcessedAmount(), stats.getCurrency().toView())
+                                        .dollarsEquivalentValue(stats.getProcessedUsdAmount()),
+                                new Money(stats.getPendingAmount(), stats.getCurrency().toView())
+                                        .dollarsEquivalentValue(stats.getPendingUsdAmount())))
+                        .toList())
                 .pendingRequestCount(rewardsStats.size() == 1 ? rewardsStats.get(0).getPendingRequestCount() :
                         rewardsStats.stream().map(RewardStatsEntity::getPendingRequestCount).filter(Objects::nonNull).reduce(0, Integer::sum))
                 .receivedRewardsCount(rewardsStats.stream().map(RewardStatsEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
@@ -321,8 +323,8 @@ public class PostgresUserAdapter implements UserStoragePort {
     }
 
     @Override
-    public List<CurrencyView> listRewardCurrencies(Long githubUserId) {
-        return currencyRepository.listRewardCurrenciesByRecipient(githubUserId).stream()
+    public List<CurrencyView> listRewardCurrencies(Long githubUserId, List<UUID> administratedBillingProfileIds) {
+        return currencyRepository.listUserRewardCurrencies(githubUserId, administratedBillingProfileIds).stream()
                 .map(CurrencyEntity::toView)
                 .toList();
     }

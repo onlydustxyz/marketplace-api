@@ -3,6 +3,8 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsForUserEntity;
@@ -11,9 +13,6 @@ import onlydust.com.marketplace.project.domain.model.Contact;
 import onlydust.com.marketplace.project.domain.model.UserAllocatedTimeToContribute;
 import onlydust.com.marketplace.project.domain.view.TotalsEarned;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
-
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -85,6 +84,7 @@ public class CustomUserRepository {
                                    'currency_code', user_rewards.currency_code,
                                    'currency_name', user_rewards.currency_name,
                                    'currency_decimals', user_rewards.currency_decimals,
+                                   'currency_latest_usd_quote', user_rewards.currency_latest_usd_quote,
                                    'currency_logo_url', user_rewards.currency_logo_url
                                 ))
                     from (select sum(r.amount)  as total_amount,
@@ -93,12 +93,14 @@ public class CustomUserRepository {
                                  c.code as currency_code,
                                  c.name as currency_name,
                                  c.decimals as currency_decimals,
+                                 luq.price as currency_latest_usd_quote,
                                  c.logo_url as currency_logo_url
                           from rewards r
                           join accounting.reward_status_data rsd on rsd.reward_id = r.id
                           join currencies c on c.id = r.currency_id
+                          left join accounting.latest_usd_quotes luq on luq.currency_id = c.id
                           where r.recipient_id = gu.id
-                          group by c.id) as user_rewards)    totals_earned,
+                          group by c.id, luq.price) as user_rewards)    totals_earned,
                         
                    (select sum(rc.completed_contribution_count)
                     from indexer_exp.repos_contributors rc
@@ -137,7 +139,7 @@ public class CustomUserRepository {
                 left join accounting.latest_usd_quotes luq on luq.currency_id = pa.currency_id
               group by pa.project_id
             )
-            select  p.project_id,
+            select  p.id,
                     p.key as slug,
                     p.is_lead,
                     p.assigned_at as lead_since,
@@ -147,7 +149,7 @@ public class CustomUserRepository {
                         
                    (select count(distinct github_user_id)
                     from projects_contributors
-                    where project_id = p.project_id)     contributors_count,
+                    where project_id = p.id)     contributors_count,
                     
                    granted_usd.total as total_granted,
                       
@@ -155,34 +157,34 @@ public class CustomUserRepository {
                     from project_github_repos pgr
                     join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id and gr.visibility = 'PUBLIC'
                     join indexer_exp.repos_contributors rc on rc.repo_id = gr.id and rc.contributor_id = :githubUserId
-                    where pgr.project_id = p.project_id and gr.visibility = 'PUBLIC') user_contributions_count,
+                    where pgr.project_id = p.id and gr.visibility = 'PUBLIC') user_contributions_count,
                     
                    (select max(c.completed_at)
                     from project_github_repos pgr
                     join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
                     join indexer_exp.contributions c on c.repo_id = gr.id and c.status = 'COMPLETED' and c.completed_at is not null and c.contributor_id = :githubUserId            
-                    where pgr.project_id = p.project_id and gr.visibility = 'PUBLIC') last_contribution_date,
+                    where pgr.project_id = p.id and gr.visibility = 'PUBLIC') last_contribution_date,
                     
                     
                    (select min(c.completed_at)
                     from project_github_repos pgr
                     join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
                     join indexer_exp.contributions c on c.repo_id = pgr.github_repo_id and c.status = 'COMPLETED' and c.completed_at is not null and c.contributor_id = :githubUserId
-                    where pgr.project_id = p.project_id and gr.visibility = 'PUBLIC') first_contribution_date
+                    where pgr.project_id = p.id and gr.visibility = 'PUBLIC') first_contribution_date
                    
-            from ((select distinct pd.project_id, false is_lead, cast(null as timestamp) as assigned_at, pd.name, pd.logo_url, pd.key, pd.visibility
+            from ((select distinct p.id, false is_lead, cast(null as timestamp) as assigned_at, p.name, p.logo_url, p.key, p.visibility
                    from indexer_exp.repos_contributors rc
                             join indexer_exp.github_repos gr on gr.id = rc.repo_id
                             join project_github_repos gpr on gpr.github_repo_id = gr.id
-                            join project_details pd on pd.project_id = gpr.project_id
+                            join projects p on p.id = gpr.project_id
                    where rc.contributor_id = :githubUserId and rc.completed_contribution_count > 0 and gr.visibility = 'PUBLIC')
                   UNION
-                  (select distinct pd.project_id, true is_lead, pl.assigned_at, pd.name, pd.logo_url, pd.key, pd.visibility
+                  (select distinct p.id, true is_lead, pl.assigned_at, p.name, p.logo_url, p.key, p.visibility
                    from iam.users u
                             join project_leads pl on pl.user_id = u.id
-                            join project_details pd on pd.project_id = pl.project_id
+                            join projects p on p.id = pl.project_id
                    where u.github_user_id = :githubUserId)) as p
-            left join granted_usd on granted_usd.project_id = p.project_id
+            left join granted_usd on granted_usd.project_id = p.id
             order by p.is_lead desc""";
     private final static TypeReference<HashMap<String, Long>> typeRef
             = new TypeReference<>() {

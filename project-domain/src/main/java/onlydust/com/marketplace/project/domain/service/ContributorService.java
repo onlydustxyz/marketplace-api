@@ -68,8 +68,8 @@ public class ContributorService implements ContributorFacadePort {
     }
 
     @Override
-    public List<CurrencyView> getRewardCurrencies(Long githubUserId) {
-        return userStoragePort.listRewardCurrencies(githubUserId);
+    public List<CurrencyView> getRewardCurrencies(Long githubUserId, List<UUID> administratedBillingProfileIds) {
+        return userStoragePort.listRewardCurrencies(githubUserId, administratedBillingProfileIds);
     }
 
     @Override

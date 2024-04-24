@@ -1,0 +1,32 @@
+{
+    "request": {
+        "url": "/INFURA_API_KEY",
+        "method": "POST",
+        "bodyPatterns": [
+            {
+                "equalToJson": {
+                    "jsonrpc": "2.0",
+                    "method": "starknet_call",
+                    "params": {
+                        "request": {
+                            "entry_point_selector": "0xfe80f537b66d12a00b6d3c072b44afbb716e78dde5c3f0ef116ee93d3e3283",
+                            "calldata": [
+                                "0x2ceccef7f994940b3962a6c67e0ba4fcd37df7d131417c604f91e03caecc1cd"
+                            ]
+                        },
+                        "block_id": "latest"
+                    }
+                },
+                "ignoreArrayOrder": true,
+                "ignoreExtraElements": true
+            }
+        ]
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "body-account-supports_interface.json",
+        "headers": {
+            "Content-Type": "application/json"
+        }
+    }
+}

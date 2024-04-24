@@ -102,6 +102,7 @@ public interface UserMapper {
                 .githubUserId(userEntity.getGithubUserId())
                 .githubLogin(userEntity.getGithubLogin())
                 .githubEmail(userEntity.getGithubEmail())
+                .githubAvatarUrl(userEntity.getGithubAvatarUrl())
                 .roles(Arrays.stream(userEntity.getRoles()).toList())
                 .createdAt(userEntity.getCreatedAt())
                 .build();
