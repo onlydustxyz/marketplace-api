@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.api.infrastructure.aptosrpc.RpcClient;
 import onlydust.com.marketplace.api.infrastructure.aptosrpc.adapters.AptosAccountValidatorAdapter;
+import onlydust.com.marketplace.api.infrastructure.aptosrpc.adapters.AptosTransactionStorageAdapter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,5 +23,10 @@ public class AptosRpcConfiguration {
     @Bean
     public AptosAccountValidatorAdapter aptosAccountValidatorAdapter(final RpcClient aptosClient) {
         return new AptosAccountValidatorAdapter(aptosClient);
+    }
+
+    @Bean
+    public AptosTransactionStorageAdapter aptosTransactionStorageAdapter(final RpcClient aptosClient) {
+        return new AptosTransactionStorageAdapter(aptosClient);
     }
 }

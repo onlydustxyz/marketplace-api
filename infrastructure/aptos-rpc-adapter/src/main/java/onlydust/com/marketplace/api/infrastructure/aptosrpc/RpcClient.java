@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.infrastructure.aptosrpc;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.AllArgsConstructor;
@@ -35,6 +36,10 @@ public class RpcClient extends HttpClient {
         return send("/accounts/%s".formatted(address), HttpMethod.GET, null, AccountResponse.class);
     }
 
+    public Optional<TransactionResponse> getTransactionByHash(String hash) {
+        return send("/transactions/by_hash/%s".formatted(hash), HttpMethod.GET, null, TransactionResponse.class);
+    }
+
     @NoArgsConstructor
     @AllArgsConstructor
     @Data
@@ -42,6 +47,11 @@ public class RpcClient extends HttpClient {
         String baseUri;
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public record AccountResponse(@JsonProperty("sequence_number") String sequenceNumber, @JsonProperty("authentication_key") String authenticationKey) {
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record TransactionResponse(Long version, String hash, Long timestamp) {
     }
 }
