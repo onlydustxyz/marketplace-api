@@ -26,6 +26,7 @@ public class WireMockInitializer implements ApplicationContextInitializer<Config
                 .beanName("starknetWireMockServer")
                 .stubLocation("starknet")
                 .property("infrastructure.starknet.base-uri")
+//                .recordFrom("https://starknet-mainnet.infura.io/v3")
                 .build()
                 .register(context);
 

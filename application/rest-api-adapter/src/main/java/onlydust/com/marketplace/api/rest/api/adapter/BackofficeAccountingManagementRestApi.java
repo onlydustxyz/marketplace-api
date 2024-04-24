@@ -7,10 +7,7 @@ import onlydust.com.backoffice.api.contract.BackofficeAccountingManagementApi;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
-import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.in.PaymentPort;
+import onlydust.com.marketplace.accounting.domain.port.in.*;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
@@ -19,13 +16,10 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
-import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
-import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,12 +35,11 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 @AllArgsConstructor
 public class BackofficeAccountingManagementRestApi implements BackofficeAccountingManagementApi {
     private final AccountingFacadePort accountingFacadePort;
-    private final RewardFacadePort rewardFacadePort;
-    private final UserFacadePort userFacadePort;
     private final AccountingRewardPort accountingRewardPort;
     private final PaymentPort paymentPort;
     private final BillingProfileFacadePort billingProfileFacadePort;
     private final AuthenticatedBackofficeUserService authenticatedBackofficeUserService;
+    private final BlockchainFacadePort blockchainFacadePort;
 
     @Override
     public ResponseEntity<AccountResponse> createSponsorAccount(UUID sponsorUuid, CreateAccountRequest createAccountRequest) {
@@ -155,10 +148,15 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
     @Override
     public ResponseEntity<Void> payReward(UUID rewardId, PayRewardRequest payRewardRequest) {
+        final var network = mapTransactionNetwork(payRewardRequest.getNetwork());
+        final var transactionTimestamp = blockchainFacadePort.getTransactionTimestamp(
+                network.blockchain().orElseThrow(),
+                payRewardRequest.getReference());
+
         accountingFacadePort.pay(
                 RewardId.of(rewardId),
-                ZonedDateTime.now(),
-                mapTransactionNetwork(payRewardRequest.getNetwork()),
+                transactionTimestamp,
+                network,
                 payRewardRequest.getReference());
 
         return ResponseEntity.noContent().build();

@@ -1,15 +1,15 @@
 package onlydust.com.marketplace.kernel.model.blockchain;
 
 
-import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptoScan;
-import onlydust.com.marketplace.kernel.model.blockchain.aptos.TransactionHash;
+import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosAccountAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosTransaction;
 
 public interface Aptos {
-    BlockExplorer<TransactionHash> BLOCK_EXPLORER = new AptoScan();
+    BlockExplorer<AptosTransaction.Hash> BLOCK_EXPLORER = new AptoScan();
 
-    static TransactionHash transactionHash(String value) {
-        return new TransactionHash(value);
+    static AptosTransaction.Hash transactionHash(String value) {
+        return new AptosTransaction.Hash(value);
     }
 
     static AptosAccountAddress accountAddress(String value) {
