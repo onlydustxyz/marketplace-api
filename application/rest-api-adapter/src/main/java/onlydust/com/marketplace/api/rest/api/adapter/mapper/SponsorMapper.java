@@ -4,9 +4,11 @@ import lombok.NonNull;
 import onlydust.com.backoffice.api.contract.model.ProjectLinkResponse;
 import onlydust.com.backoffice.api.contract.model.SponsorPage;
 import onlydust.com.backoffice.api.contract.model.SponsorPageItemResponse;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.HistoricalTransaction;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
+import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.api.contract.model.*;
@@ -16,9 +18,11 @@ import onlydust.com.marketplace.project.domain.model.Sponsor;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static java.util.Comparator.comparing;
+import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.reducing;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MoneyMapper.toMoney;
@@ -68,7 +72,8 @@ public interface SponsorMapper {
 
     static HistoricalTransaction.Type map(SponsorAccountTransactionType type) {
         return switch (type) {
-            case DEPOSIT -> HistoricalTransaction.Type.MINT; // Sponsor is interested on how much he can actually spend on projects
+            // Sponsor is interested on how much he can actually spend on projects
+            case DEPOSIT -> HistoricalTransaction.Type.MINT;
             case WITHDRAWAL -> HistoricalTransaction.Type.BURN;
             case ALLOCATION -> HistoricalTransaction.Type.TRANSFER;
             case UNALLOCATION -> HistoricalTransaction.Type.REFUND;
@@ -82,12 +87,21 @@ public interface SponsorMapper {
                 .url(sponsor.url())
                 .logoUrl(sponsor.logoUrl())
                 .projects(sponsor.projects().stream().map(p -> mapToProjectWithBudget(p, accountStatements)).toList())
-                .availableBudgets(accountStatements.stream()
-                        .map(SponsorMapper::mapAllowanceToMoney)
-                        .collect(groupingBy(Money::getCurrency, reducing(null, MoneyMapper::add)))
-                        .values().stream()
+                .availableBudgets(sponsorAccountStatementsToBudgets(accountStatements).values().stream()
+                        .map(MoneyMapper::toMoney)
                         .sorted(comparing(b -> b.getCurrency().getCode()))
                         .toList());
+    }
+
+    private static Map<Currency, MoneyView> sponsorAccountStatementsToBudgets(List<SponsorAccountStatement> accountStatements) {
+        return accountStatements.stream()
+                .map(account -> new MoneyView(account.allowance().getValue(), account.account().currency()))
+                .collect(
+                        groupingBy(MoneyView::getCurrency,
+                                reducing(null, (money1, money2) -> new MoneyView(
+                                        isNull(money1) ? money2.getAmount() : money1.getAmount().add(money2.getAmount()),
+                                        money2.getCurrency()
+                                ))));
     }
 
     private static ProjectWithBudgetResponse mapToProjectWithBudget(ProjectShortView project, List<SponsorAccountStatement> accountStatements) {
@@ -108,10 +122,6 @@ public interface SponsorMapper {
                 .totalUsdBudget(budgets.stream().map(Money::getUsdEquivalent).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add))
                 .remainingBudgets(budgets)
                 ;
-    }
-
-    private static @NonNull Money mapAllowanceToMoney(SponsorAccountStatement accountStatement) {
-        return toMoney(accountStatement.allowance().getValue(), accountStatement.account().currency());
     }
 
     static TransactionHistoryPageResponse mapTransactionHistory(Page<HistoricalTransaction> page, int pageIndex) {
@@ -138,7 +148,8 @@ public interface SponsorMapper {
             case BURN -> SponsorAccountTransactionType.WITHDRAWAL;
             case TRANSFER -> SponsorAccountTransactionType.ALLOCATION;
             case REFUND -> SponsorAccountTransactionType.UNALLOCATION;
-            default -> throw OnlyDustException.internalServerError("Unexpected transaction type: %s".formatted(transaction.type()));
+            default -> throw OnlyDustException
+                    .internalServerError("Unexpected transaction type: %s".formatted(transaction.type()));
         };
     }
 
