@@ -2,27 +2,34 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.google.common.collect.Streams;
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
+import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
+import onlydust.com.marketplace.api.bootstrap.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.SponsorAccountTransactionType;
 import onlydust.com.marketplace.api.contract.model.TransactionHistoryPageResponse;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
-
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
     private final static SponsorId sponsorId = SponsorId.of("0980c5ab-befc-4314-acab-777fbf970cbb");
     private UserAuthHelper.AuthenticatedUser user;
+
+    @Autowired
+    private AccountingFacadePort accountingFacadePort;
 
     @BeforeEach
     void setup() {
@@ -30,6 +37,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(1)
     void should_return_forbidden_if_not_admin() {
         removeSponsorFor(user, sponsorId);
 
@@ -43,9 +51,14 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(2)
     void should_return_sponsor_by_id() {
         // Given
         addSponsorFor(user, sponsorId);
+
+        // create multiple sponsor accounts on the same currency to assert that they are well aggregated in available budgets
+        accountingFacadePort.createSponsorAccountWithInitialAllowance(sponsorId, CurrencyHelper.USDC, null, PositiveAmount.of(1000L));
+        accountingFacadePort.createSponsorAccountWithInitialAllowance(sponsorId, CurrencyHelper.USDC, null, PositiveAmount.of(BigDecimal.valueOf(8000.123456789D)));
 
         // When
         getSponsor(sponsorId)
@@ -112,8 +125,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               "usdConversionRate": 1
                             },
                             {
-                              "amount": 0,
-                              "prettyAmount": 0,
+                              "amount": 9000.123456789,
+                              "prettyAmount": 9000.12,
                               "currency": {
                                 "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                 "code": "USDC",
@@ -121,7 +134,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                 "decimals": 6
                               },
-                              "usdEquivalent": 0.00,
+                              "usdEquivalent": 9090.12,
                               "usdConversionRate": 1.01
                             }
                           ],
@@ -215,6 +228,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(3)
     void should_return_sponsor_transactions() {
         // Given
         addSponsorFor(user, sponsorId);
@@ -226,8 +240,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 2,
-                          "totalItemNumber": 11,
+                          "totalPageNumber": 3,
+                          "totalItemNumber": 13,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "transactions": [
@@ -357,6 +371,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
 
     @ParameterizedTest
     @EnumSource(value = SponsorAccountTransactionType.class)
+    @Order(10)
     void should_filter_sponsor_transactions_by_type(@NonNull SponsorAccountTransactionType type) {
         // Given
         addSponsorFor(user, sponsorId);
@@ -373,6 +388,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(10)
     void should_filter_sponsor_transactions_by_date() {
         // Given
         addSponsorFor(user, sponsorId);
@@ -391,6 +407,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(10)
     void should_filter_sponsor_transactions_by_currencies() {
         // Given
         addSponsorFor(user, sponsorId);
@@ -406,6 +423,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(10)
     void should_filter_sponsor_transactions_by_projects() {
         // Given
         addSponsorFor(user, sponsorId);
@@ -431,6 +449,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
             "PROJECT, DESC",
             "PROJECT, ASC"
     })
+    @Order(10)
     void should_order_sponsor_transactions(String sort, String direction) {
         // Given
         addSponsorFor(user, sponsorId);

@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.api.contract.model.BaseMoney;
@@ -41,14 +40,6 @@ public interface MoneyMapper {
             return null;
         }
         return toMoney(new MoneyView(amount, currency));
-    }
-
-    static @NonNull Money add(Money left, @NonNull Money right) {
-        return left == null ? right : new Money()
-                .currency(right.getCurrency())
-                .amount(left.getAmount().add(right.getAmount()))
-                .prettyAmount(left.getPrettyAmount().add(right.getPrettyAmount()))
-                .usdEquivalent(left.getUsdEquivalent() == null ? null : left.getUsdEquivalent().add(right.getUsdEquivalent()));
     }
 
     static ConvertibleMoney toConvertibleMoney(onlydust.com.marketplace.accounting.domain.model.Money money,
