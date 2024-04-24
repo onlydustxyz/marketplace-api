@@ -1338,7 +1338,7 @@ paths:
       security:
         - apiKey: [ ]
       tags:
-        - Backoffice
+        - BackofficeUser
       summary: Get user page
       operationId: getUserPage
       description: |
@@ -1355,13 +1355,10 @@ paths:
           schema:
             type: integer
         - in: query
-          name: userIds
+          name: login
           required: false
           schema:
-            type: array
-            items:
-              type: string
-              format: uuid
+            type: string
       responses:
         "200":
           description: 'User page'
@@ -2417,92 +2414,41 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/UserPageItemResponse'
+
     UserPageItemResponse:
       type: object
+      required:
+        - id
+        - githubUserId
+        - login
+        - avatarUrl
+        - email
+        - lastSeenAt
       properties:
         id:
+          $ref: '#/components/schemas/UserId'
+        githubUserId:
+          $ref: '#/components/schemas/GithubUserId'
+        login:
           type: string
-          format: uuid
-        isCompany:
-          type: boolean
-        companyName:
+          description: User's Github login
+          example: ofux
+        avatarUrl:
           type: string
-        companyNum:
+          format: url
+          description: Direct URL to user's avatar image
+          example: 'https://avatars.githubusercontent.com/u/595505?v=4'
+        email:
           type: string
-        firstname:
-          type: string
-        lastname:
-          type: string
-        address:
-          type: string
-        country:
-          type: string
-        telegram:
-          type: string
-        twitter:
-          type: string
-        discord:
-          type: string
-        linkedin:
-          type: string
-        whatsapp:
-          type: string
-        bic:
-          type: string
-        iban:
-          type: string
-        ens:
-          type: string
-        ethAddress:
-          type: string
-        aptosAddress:
-          type: string
-        optimismAddress:
-          type: string
-        starknetAddress:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
+          format: email
+          description: User's email
         lastSeenAt:
           type: string
           format: date-time
-        email:
-          type: string
-        githubUserId:
-          $ref: '#/components/schemas/GithubUserId'
-        githubLogin:
-          type: string
-        githubHtmlUrl:
-          type: string
-        githubAvatarUrl:
-          type: string
-        bio:
-          type: string
-        location:
-          type: string
-        website:
-          type: string
-        lookingForAJob:
-          type: boolean
-        weeklyAllocatedTime:
-          type: string
-        languages:
-          type: array
-          items:
-            type: string
-        tcAcceptedAt:
-          type: string
-        onboardingCompletedAt:
+          description: Last time the user interacted with the platform
+        signedUpAt:
           type: string
           format: date-time
-        verificationStatus:
-          $ref: '#/components/schemas/VerificationStatus'
-        usEntity:
-          type: boolean
 
 
     VerificationStatus:

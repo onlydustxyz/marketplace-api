@@ -17,7 +17,6 @@ import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.view.ProjectSponsorView;
-import onlydust.com.marketplace.project.domain.view.backoffice.UserView;
 import onlydust.com.marketplace.project.domain.view.backoffice.*;
 
 import java.math.BigDecimal;
@@ -307,47 +306,16 @@ public interface BackOfficeMapper {
         return projectLeadInvitationPage;
     }
 
-    static UserPage mapUserPageToContract(final Page<UserView> userPage, int pageIndex) {
+    static UserPage mapUserPageToContract(final Page<UserShortView> userPage, int pageIndex) {
         return new UserPage()
                 .users(userPage.getContent().stream().map(user -> new UserPageItemResponse()
-                        .id(user.getId())
-                        .isCompany(user.getIsCompany())
-                        .companyName(user.getCompanyName())
-                        .companyNum(user.getCompanyNum())
-                        .firstname(user.getFirstname())
-                        .lastname(user.getLastname())
-                        .address(user.getAddress())
-                        .country(user.getCountry())
-                        .telegram(user.getTelegram())
-                        .twitter(user.getTwitter())
-                        .discord(user.getDiscord())
-                        .linkedin(user.getLinkedIn())
-                        .whatsapp(user.getWhatsApp())
-                        .bic(user.getBic())
-                        .iban(user.getIban())
-                        .ens(user.getEns())
-                        .ethAddress(user.getEthAddress())
-                        .optimismAddress(user.getOptimismAddress())
-                        .starknetAddress(user.getStarknetAddress())
-                        .aptosAddress(user.getAptosAddress())
-                        .createdAt(user.getCreatedAt())
-                        .updatedAt(user.getUpdatedAt())
-                        .lastSeenAt(user.getLastSeenAt())
-                        .email(user.getEmail())
-                        .githubUserId(user.getGithubUserId())
-                        .githubLogin(user.getGithubLogin())
-                        .githubHtmlUrl(user.getGithubHtmlUrl())
-                        .githubAvatarUrl(user.getGithubAvatarUrl())
-                        .bio(user.getBio())
-                        .location(user.getLocation())
-                        .website(user.getWebsite())
-                        .lookingForAJob(user.getLookingForAJob())
-                        .weeklyAllocatedTime(user.getWeeklyAllocatedTime())
-                        .languages(user.getLanguages())
-                        .tcAcceptedAt(user.getTcAcceptedAt())
-                        .onboardingCompletedAt(user.getOnboardingCompletedAt())
-                        .usEntity(user.getUsEntity())
-                        .verificationStatus(VerificationStatus.valueOf(user.getVerificationStatus()))
+                        .id(user.id())
+                        .githubUserId(user.githubUserId())
+                        .login(user.login())
+                        .avatarUrl(user.avatarUrl())
+                        .email(user.email())
+                        .lastSeenAt(user.lastSeenAt())
+                        .signedUpAt(user.signedUpAt())
                 ).toList())
                 .totalPageNumber(userPage.getTotalPageNumber())
                 .totalItemNumber(userPage.getTotalItemNumber())
@@ -490,16 +458,6 @@ public interface BackOfficeMapper {
                 .githubAvatarUrl(URI.create(userView.githubAvatarUrl().toString()))
                 .email(userView.email())
                 .name(userView.name());
-    }
-
-    static UserResponse map(UserView user) {
-        return new UserResponse()
-                .githubUserId(user.getGithubUserId())
-                .githubLogin(user.getGithubLogin())
-                .githubAvatarUrl(URI.create(user.getGithubAvatarUrl()))
-                .email(user.getEmail())
-                .id(user.getId())
-                .name(user.getFirstname() + " " + user.getLastname());
     }
 
     static RewardDetailsResponse map(RewardDetailsView view, AuthenticatedUser authenticatedUser) {

@@ -11,7 +11,6 @@ import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.project.domain.view.backoffice.EcosystemView;
 import onlydust.com.marketplace.project.domain.view.backoffice.ProjectLeadInvitationView;
 import onlydust.com.marketplace.project.domain.view.backoffice.ProjectRepositoryView;
-import onlydust.com.marketplace.project.domain.view.backoffice.UserView;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -81,20 +80,6 @@ public class BackofficeRestApi implements BackofficeApi {
         return projectLeadInvitationPage.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(projectLeadInvitationPage) :
                 ResponseEntity.ok(projectLeadInvitationPage);
-    }
-
-    @Override
-    public ResponseEntity<UserPage> getUserPage(Integer pageIndex, Integer pageSize, List<UUID> userIds) {
-        final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
-        final var filters = UserView.Filters.builder()
-                .users(Optional.ofNullable(userIds).orElse(List.of()))
-                .build();
-        final var usersPage = backofficeFacadePort.listUsers(sanitizedPageIndex, sanitizePageSize(pageSize, MAX_PAGE_SIZE), filters);
-        final var response = mapUserPageToContract(usersPage, sanitizedPageIndex);
-
-        return response.getTotalPageNumber() > 1 ?
-                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
-                ResponseEntity.ok(response);
     }
 
     @Override

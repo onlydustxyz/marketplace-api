@@ -36,7 +36,7 @@ public class BackofficeService implements BackofficeFacadePort {
     }
 
     @Override
-    public Page<UserView> listUsers(int pageIndex, int pageSize, UserView.Filters filters) {
+    public Page<UserShortView> listUsers(int pageIndex, int pageSize, UserShortView.Filters filters) {
         return backofficeStoragePort.listUsers(pageIndex, pageSize, filters);
     }
 

@@ -97,5 +97,10 @@ public class BackofficeConfiguration {
                                                          final CurrencyFacadePort currencyFacadePort) {
         return new BackofficeDebugRestApi(accountBookEventStorage, currencyFacadePort);
     }
+
+    @Bean
+    public BackofficeUserRestApi backofficeUserRestApi(final BackofficeFacadePort backofficeFacadePort) {
+        return new BackofficeUserRestApi(backofficeFacadePort);
+    }
 }
 
