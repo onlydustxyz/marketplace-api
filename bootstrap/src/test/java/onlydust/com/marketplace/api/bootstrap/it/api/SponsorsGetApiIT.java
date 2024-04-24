@@ -82,8 +82,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": null,
                                 "decimals": 8
                               },
-                              "usdEquivalent": null,
-                              "usdConversionRate": null
+                              "usdEquivalent": 0.00,
+                              "usdConversionRate": 0.30
                             },
                             {
                               "amount": 0,
@@ -144,7 +144,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               "slug": "bretzel",
                               "name": "Bretzel",
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
-                              "totalUsdBudget": 5446182.5000,
+                              "totalUsdBudget": 5566182.50,
                               "remainingBudgets": [
                                 {
                                   "amount": 400000,
@@ -156,8 +156,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                     "logoUrl": null,
                                     "decimals": 8
                                   },
-                                  "usdEquivalent": null,
-                                  "usdConversionRate": null
+                                  "usdEquivalent": 120000.00,
+                                  "usdConversionRate": 0.30
                                 },
                                 {
                                   "amount": 3000,
@@ -195,7 +195,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                     "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                     "decimals": 6
                                   },
-                                  "usdEquivalent": 100242.5000,
+                                  "usdEquivalent": 100242.50,
                                   "usdConversionRate": 1.01
                                 }
                               ]
@@ -336,8 +336,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 8
                                 },
-                                "usdEquivalent": null,
-                                "usdConversionRate": null
+                                "usdEquivalent": 120000.00,
+                                "usdConversionRate": 0.30
                               }
                             },
                             {

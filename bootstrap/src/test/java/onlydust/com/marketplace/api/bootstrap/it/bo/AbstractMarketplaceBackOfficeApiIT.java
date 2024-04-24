@@ -75,6 +75,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected WireMockServer optimismWireMockServer;
     @Autowired
     protected WireMockServer starknetWireMockServer;
+    protected WireMockServer aptosWireMockServer;
     @Autowired
     protected WireMockServer coinmarketcapWireMockServer;
     @InjectWireMock("auth0")

@@ -1,0 +1,13 @@
+{
+    "request": {
+        "urlPattern": "/transactions/by_hash/.*",
+        "method": "GET"
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "body-transaction.json",
+        "headers": {
+            "Content-Type": "application/json"
+        }
+    }
+}
