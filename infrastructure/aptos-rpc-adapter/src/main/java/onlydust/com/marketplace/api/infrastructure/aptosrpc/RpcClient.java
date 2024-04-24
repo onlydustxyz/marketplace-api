@@ -10,8 +10,12 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.kernel.infrastructure.HttpClient;
 
+import java.math.BigInteger;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpRequest;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -40,6 +44,11 @@ public class RpcClient extends HttpClient {
         return send("/transactions/by_hash/%s".formatted(hash), HttpMethod.GET, null, TransactionResponse.class);
     }
 
+    public Optional<TransactionResourceResponse> getAccountResource(String hash, String resource) {
+        return send("/accounts/%s/resource/%s".formatted(hash, URLEncoder.encode(resource, StandardCharsets.UTF_8)), HttpMethod.GET, null,
+                TransactionResourceResponse.class);
+    }
+
     @NoArgsConstructor
     @AllArgsConstructor
     @Data
@@ -53,5 +62,26 @@ public class RpcClient extends HttpClient {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record TransactionResponse(Long version, String hash, Long timestamp) {
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record TransactionResourceResponse(String type, Data data) {
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public record Data(java.lang.Integer decimals, String name, String symbol, Supply supply) {
+        }
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public record Supply(List<Data> vec) {
+            @JsonIgnoreProperties(ignoreUnknown = true)
+            public record Data(Integer integer) {
+            }
+        }
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public record Integer(List<Data> vec) {
+            @JsonIgnoreProperties(ignoreUnknown = true)
+            public record Data(BigInteger limit, BigInteger value) {
+            }
+        }
     }
 }

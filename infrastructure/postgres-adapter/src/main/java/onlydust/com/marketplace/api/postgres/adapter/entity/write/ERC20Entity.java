@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
+import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
@@ -58,7 +59,7 @@ public class ERC20Entity {
                 switch (blockchain.toBlockchain()) {
                     case ETHEREUM, OPTIMISM -> Ethereum.contractAddress(address);
                     case STARKNET -> StarkNet.contractAddress(address);
-                    default -> throw new IllegalStateException("Unexpected value: " + blockchain.toBlockchain());
+                    case APTOS -> Aptos.coinType(address);
                 },
                 name,
                 symbol,
