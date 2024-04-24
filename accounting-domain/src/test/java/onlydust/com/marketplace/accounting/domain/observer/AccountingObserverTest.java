@@ -121,7 +121,7 @@ public class AccountingObserverTest {
                     .paidAt(null)
                     .withAdditionalNetworks(Set.of(Network.ETHEREUM, Network.OPTIMISM));
             final MoneyView moneyView = mock(MoneyView.class);
-            final ShortProjectView shortProjectView = ShortProjectView.builder()
+            final ProjectShortView shortProjectView = ProjectShortView.builder()
                     .name(faker.name().fullName())
                     .shortDescription(faker.rickAndMorty().character())
                     .logoUrl(faker.internet().url())
@@ -176,7 +176,7 @@ public class AccountingObserverTest {
         public void should_cancel_reward() {
             // When
             final MoneyView moneyView = mock(MoneyView.class);
-            final ShortProjectView shortProjectView = ShortProjectView.builder()
+            final ProjectShortView shortProjectView = ProjectShortView.builder()
                     .name(faker.name().fullName())
                     .shortDescription(faker.rickAndMorty().character())
                     .logoUrl(faker.internet().url())
@@ -217,7 +217,7 @@ public class AccountingObserverTest {
         public void should_cancel_reward_and_not_notify_mail_given_a_recipient_not_signed_up() {
             // When
             final MoneyView moneyView = mock(MoneyView.class);
-            final ShortProjectView shortProjectView = ShortProjectView.builder()
+            final ProjectShortView shortProjectView = ProjectShortView.builder()
                     .name(faker.name().fullName())
                     .shortDescription(faker.rickAndMorty().character())
                     .logoUrl(faker.internet().url())
