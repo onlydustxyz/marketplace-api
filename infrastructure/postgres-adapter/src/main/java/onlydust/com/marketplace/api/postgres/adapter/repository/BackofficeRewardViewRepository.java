@@ -20,6 +20,7 @@ public interface BackofficeRewardViewRepository extends JpaRepository<Backoffice
                                r.requested_at                           requested_at,
                                rsd.paid_at                              processed_at,
                                r.recipient_id                           recipient_id,
+                               r.requestor_id                           requestor_id,
                                g_urls.urls                              github_urls,
 
                                pd.project_id                            project_id,

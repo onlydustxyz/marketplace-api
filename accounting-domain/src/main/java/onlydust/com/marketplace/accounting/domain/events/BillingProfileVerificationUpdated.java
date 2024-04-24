@@ -8,6 +8,7 @@ import onlydust.com.marketplace.kernel.jobs.OutboxSkippingException;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.EventType;
 
+import java.util.List;
 import java.util.UUID;
 
 import static java.util.Objects.nonNull;
@@ -41,5 +42,9 @@ public class BillingProfileVerificationUpdated extends Event {
             }
         }
         return false;
+    }
+
+    public boolean failed() {
+        return List.of(VerificationStatus.REJECTED, VerificationStatus.CLOSED).contains(this.verificationStatus);
     }
 }

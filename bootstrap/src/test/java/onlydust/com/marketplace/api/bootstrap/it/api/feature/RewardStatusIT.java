@@ -31,6 +31,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.BackofficeAccountingManagem
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
+import onlydust.com.marketplace.kernel.observer.MailObserver;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.service.RewardService;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
@@ -3833,7 +3834,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     @Autowired
     AccountingRewardStoragePort accountingRewardStoragePort;
     @Autowired
-    MailNotificationPort mailNotificationPort;
+    MailObserver accountingMailObserver;
     @Autowired
     InvoiceStoragePort invoiceStoragePort;
 
@@ -3851,8 +3852,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 accountingService,
                 rewardService,
                 userFacadePort,
-                new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, mailNotificationPort, accountingService,
-                        sponsorStoragePort),
+                new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, accountingService,
+                        sponsorStoragePort, accountingMailObserver),
                 new PaymentService(accountingRewardStoragePort, invoiceStoragePort, accountingService),
                 billingProfileService,
                 authenticatedBackofficeUserService);

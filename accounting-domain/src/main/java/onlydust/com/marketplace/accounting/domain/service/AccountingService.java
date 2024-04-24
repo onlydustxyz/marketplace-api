@@ -2,7 +2,6 @@ package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.events.RewardCanceled;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
@@ -11,7 +10,6 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookO
 import onlydust.com.marketplace.accounting.domain.model.accountbook.ReadOnlyAccountBookState;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
-import onlydust.com.marketplace.kernel.observer.MailObserver;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +21,8 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.*;
 import static onlydust.com.marketplace.accounting.domain.model.Amount.*;
 import static onlydust.com.marketplace.accounting.domain.model.SponsorAccount.Transaction.Type.SPEND;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
 public class AccountingService implements AccountingFacadePort {
@@ -34,8 +33,6 @@ public class AccountingService implements AccountingFacadePort {
     private final ProjectAccountingObserver projectAccountingObserver;
     private final InvoiceStoragePort invoiceStoragePort;
     private final AccountBookObserver accountBookObserver;
-    private final MailObserver accountingMailObserver;
-    private final AccountingRewardStoragePort accountingRewardStoragePort;
 
     @Override
     @Transactional
@@ -177,8 +174,6 @@ public class AccountingService implements AccountingFacadePort {
         accountingObserver.onRewardCancelled(rewardId);
         refundedAccounts.stream().filter(AccountId::isProject).map(AccountId::projectId).forEach(refundedProjectId -> onAllowanceUpdated(refundedProjectId,
                 currencyId, accountBook.state()));
-        accountingRewardStoragePort.getReward(rewardId).orElseThrow(() -> internalServerError("Reward %s not found".formatted(rewardId.value())));
-//        accountingMailObserver.send(new RewardCanceled());
     }
 
     @Override

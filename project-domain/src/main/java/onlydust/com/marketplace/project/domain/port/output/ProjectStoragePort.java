@@ -83,5 +83,4 @@ public interface ProjectStoragePort {
 
     void updateProjectsTags(Date now);
 
-    String getProjectNameById(UUID projectId);
 }

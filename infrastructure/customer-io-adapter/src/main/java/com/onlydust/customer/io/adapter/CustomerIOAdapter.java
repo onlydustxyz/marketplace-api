@@ -19,8 +19,8 @@ public class CustomerIOAdapter implements MailPort {
     @Override
     public void send(@NonNull Event event) {
         if (event instanceof InvoiceRejected invoiceRejected){
-            customerIOHttpClient.send()
+//            customerIOHttpClient.send()
         }
     }
-    
+
 }

@@ -35,7 +35,7 @@ public class RewardViewEntity {
     Date requestedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "requestorId")
+    @JoinColumn(name = "requestorId", referencedColumnName = "id")
     @NonNull
     UserViewEntity requestor;
 

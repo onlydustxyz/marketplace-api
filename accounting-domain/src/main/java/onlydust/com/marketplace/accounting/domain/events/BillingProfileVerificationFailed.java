@@ -6,9 +6,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.view.MoneyView;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.EventType;
 
@@ -17,10 +16,14 @@ import onlydust.com.marketplace.kernel.model.EventType;
 @EqualsAndHashCode(callSuper = true)
 @Accessors(fluent = true)
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
-@EventType("RewardCanceled")
-public class RewardCanceled extends Event {
+@EventType("BillingProfileVerificationFailed")
+public class BillingProfileVerificationFailed extends Event {
     @NonNull
-    String email;
+    String ownerEmail;
     @NonNull
-    ShortReward shortReward;
+    BillingProfile.Id billingProfileId;
+    @NonNull
+    String ownerGithubLogin;
+    @NonNull
+    VerificationStatus verificationStatus;
 }

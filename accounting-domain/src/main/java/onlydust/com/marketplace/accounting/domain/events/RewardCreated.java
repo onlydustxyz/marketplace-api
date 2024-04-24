@@ -1,33 +1,28 @@
 package onlydust.com.marketplace.accounting.domain.events;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
+import lombok.Value;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.EventType;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 @Value
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Accessors(fluent = true)
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
-@EventType("InvoiceRejected")
-public class InvoiceRejected extends Event {
+@EventType("RewardCreated")
+public class RewardCreated extends Event {
     @NonNull
-    String billingProfileAdminEmail;
+    String email;
     @NonNull
-    Long rewardCount;
+    Integer contributionsNumber;
     @NonNull
-    String billingProfileAdminGithubLogin;
-    String billingProfileAdminFirstName;
+    String sentByGithubLogin;
     @NonNull
-    String invoiceName;
-    @NonNull
-    List<ShortReward> rewards;
-    String rejectionReason;
+    ShortReward shortReward;
 }

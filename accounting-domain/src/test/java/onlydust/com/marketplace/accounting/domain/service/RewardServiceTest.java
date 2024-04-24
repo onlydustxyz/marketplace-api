@@ -10,13 +10,9 @@ import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
-import onlydust.com.marketplace.accounting.domain.view.MoneyView;
-import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.ShortProjectView;
-import onlydust.com.marketplace.accounting.domain.view.UserView;
+import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.observer.MailObserver;
-import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -74,6 +70,7 @@ public class RewardServiceTest {
     private RewardDetailsView generateRewardStubForCurrencyAndEmail(final Currency currency, final String email) {
         return RewardDetailsView.builder()
                 .id(RewardId.random())
+                .requester(new ShortContributorView(faker.rickAndMorty().character(),faker.internet().url(),faker.internet().emailAddress()))
                 .status(RewardStatus.builder()
                         .projectId(ProjectId.random().value())
                         .recipientId(faker.number().randomNumber(4, true))

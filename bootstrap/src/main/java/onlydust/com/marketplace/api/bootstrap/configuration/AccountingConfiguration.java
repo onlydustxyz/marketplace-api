@@ -13,7 +13,6 @@ import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.observer.MailObserver;
 import onlydust.com.marketplace.kernel.port.output.*;
-import org.checkerframework.checker.units.qual.N;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -31,12 +30,10 @@ public class AccountingConfiguration {
                                                      final @NonNull AccountingObserver accountingObserver,
                                                      final @NonNull ProjectAccountingObserver projectAccountingObserver,
                                                      final @NonNull InvoiceStoragePort invoiceStoragePort,
-                                                     final @NonNull AccountBookObserver accountBookObserver,
-                                                     final @NonNull MailObserver mailObserver,
-                                                     final @NonNull AccountingRewardStoragePort accountingRewardStoragePort
+                                                     final @NonNull AccountBookObserver accountBookObserver
     ) {
         return new AccountingService(cachedAccountBookProvider, sponsorAccountStorage, currencyStorage, accountingObserver, projectAccountingObserver,
-                invoiceStoragePort, accountBookObserver, mailObserver, accountingRewardStoragePort);
+                invoiceStoragePort, accountBookObserver);
     }
 
     @Bean
@@ -52,9 +49,12 @@ public class AccountingConfiguration {
                                                  final @NonNull InvoiceStoragePort invoiceStorage,
                                                  final @NonNull ReceiptStoragePort receiptStorage,
                                                  final @NonNull BillingProfileStoragePort billingProfileStoragePort,
-                                                 final @NonNull MailObserver accountingMailObserver) {
+                                                 final @NonNull MailObserver accountingMailObserver,
+                                                 final @NonNull AccountingRewardStoragePort accountingRewardStoragePort,
+                                                 final @NonNull NotificationPort notificationPort,
+                                                 final @NonNull WebhookPort webhookPort) {
         return new AccountingObserver(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage, invoiceStorage, receiptStorage,
-                billingProfileStoragePort, accountingMailObserver);
+                billingProfileStoragePort, accountingMailObserver, accountingRewardStoragePort, notificationPort, webhookPort);
     }
 
     @Bean
@@ -90,23 +90,20 @@ public class AccountingConfiguration {
     public BillingProfileVerificationFacadePort billingProfileVerificationFacadePort(final OutboxPort billingProfileVerificationOutbox,
                                                                                      final BillingProfileStoragePort billingProfileStoragePort,
                                                                                      final BillingProfileVerificationProviderPort billingProfileVerificationProviderPort,
-                                                                                     final BillingProfileObserver billingProfileObservers,
-                                                                                     final NotificationPort notificationPort,
-                                                                                     final WebhookPort webhookNotificationPort) {
+                                                                                     final BillingProfileObserver billingProfileObserver) {
         return new BillingProfileVerificationService(billingProfileVerificationOutbox, new SumsubMapper(), billingProfileStoragePort,
                 billingProfileVerificationProviderPort,
-                billingProfileObservers, notificationPort, webhookNotificationPort);
+                billingProfileObserver);
     }
 
     @Bean
     public OutboxConsumer billingProfileVerificationOutboxConsumer(final OutboxPort billingProfileVerificationOutbox,
                                                                    final BillingProfileStoragePort billingProfileStoragePort,
                                                                    final BillingProfileVerificationProviderPort billingProfileVerificationProviderPort,
-                                                                   final BillingProfileObserver billingProfileObservers,
-                                                                   final NotificationPort notificationPort, final WebhookPort webhookNotificationPort) {
+                                                                   final BillingProfileObserver billingProfileObserver) {
         return new BillingProfileVerificationService(billingProfileVerificationOutbox, new SumsubMapper(), billingProfileStoragePort,
                 billingProfileVerificationProviderPort,
-                billingProfileObservers, notificationPort, webhookNotificationPort);
+                billingProfileObserver);
     }
 
     @Bean

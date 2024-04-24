@@ -49,6 +49,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     private final @NonNull BillingProfileUserRightsViewRepository billingProfileUserRightsViewRepository;
     private final @NonNull RewardViewRepository rewardViewRepository;
     private final @NonNull RewardRepository rewardRepository;
+    private final @NonNull UserRepository userRepository;
 
 
     @Override
@@ -452,5 +453,11 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     public boolean isUserInvitedTo(BillingProfile.Id billingProfileId, GithubUserId githubUserId) {
         return billingProfileUserInvitationRepository.existsByBillingProfileIdAndGithubUserIdAndAcceptedIsFalse(billingProfileId.value(), githubUserId.value());
+    }
+
+    @Override
+    public Optional<ShortContributorView> getBillingProfileOwnerById(UserId ownerId) {
+        return userRepository.findById(ownerId.value()).map(userEntity -> new ShortContributorView(userEntity.getGithubLogin(), userEntity.getGithubAvatarUrl(),
+                userEntity.getGithubEmail()));
     }
 }

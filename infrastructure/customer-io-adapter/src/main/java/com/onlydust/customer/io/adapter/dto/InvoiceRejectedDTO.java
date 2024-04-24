@@ -13,6 +13,7 @@ public record InvoiceRejectedDTO(@NonNull String rewardsDetails,
                                  @NonNull String totalUsdAmount) {
 
     public static InvoiceRejectedDTO fromEvent(@NonNull InvoiceRejected invoiceRejected) {
-        return new InvoiceRejectedDTO();
+//        return new InvoiceRejectedDTO();
+        return null;
     }
 }

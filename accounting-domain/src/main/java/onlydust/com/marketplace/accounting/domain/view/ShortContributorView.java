@@ -4,6 +4,7 @@ import lombok.NonNull;
 
 public record ShortContributorView(
         @NonNull String login,
-        String avatarUrl
+        String avatarUrl,
+        String email
 ) {
 }

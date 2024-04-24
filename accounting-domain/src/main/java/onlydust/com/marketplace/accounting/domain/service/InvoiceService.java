@@ -3,6 +3,7 @@ package onlydust.com.marketplace.accounting.domain.service;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
+import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.InvoiceDownload;
@@ -59,7 +60,7 @@ public class InvoiceService implements InvoiceFacadePort {
                     billingProfileAdmin.firstName(),
                     invoice.number().value(),
                     invoice.rewards().stream()
-                            .map(reward -> InvoiceRejected.ShortReward.builder()
+                            .map(reward -> ShortReward.builder()
                                     .id(reward.id())
                                     .amount(reward.amount().getValue())
                                     .currencyCode(reward.amount().getCurrency().code().toString())

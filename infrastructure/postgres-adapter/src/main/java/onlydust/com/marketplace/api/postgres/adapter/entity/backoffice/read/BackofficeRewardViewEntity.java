@@ -17,6 +17,7 @@ import org.hibernate.type.SqlTypes;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static java.util.Comparator.comparing;
@@ -37,6 +38,10 @@ public class BackofficeRewardViewEntity {
     @ManyToOne
     @JoinColumn(name = "recipientId", referencedColumnName = "githubUserId")
     AllUserViewEntity recipient;
+
+    @ManyToOne
+    @JoinColumn(name = "requestorId", referencedColumnName = "userId")
+    AllUserViewEntity requester;
 
     @JdbcTypeCode(SqlTypes.JSON)
     List<String> githubUrls;
@@ -102,7 +107,7 @@ public class BackofficeRewardViewEntity {
                 .status(status())
                 .requestedAt(DateMapper.ofNullable(this.requestedAt))
                 .processedAt(DateMapper.ofNullable(this.statusData.paidAt()))
-                .githubUrls(isNull(this.githubUrls) ? List.of() : this.githubUrls.stream().sorted().toList())
+                .githubUrls(isNull(this.githubUrls) ? List.of() : this.githubUrls.stream().filter(Objects::nonNull).sorted().toList())
                 .project(ShortProjectView.builder()
                         .id(ProjectId.of(this.projectId))
                         .name(this.projectName)
@@ -111,7 +116,8 @@ public class BackofficeRewardViewEntity {
                         .slug(this.projectSlug)
                         .build())
                 .billingProfile(isNull(this.billingProfile) ? null : this.billingProfile.toDomain())
-                .recipient(new ShortContributorView(recipient.login(), recipient.avatarUrl()))
+                .recipient(new ShortContributorView(recipient.login(), recipient.avatarUrl(), recipient.email()))
+                .requester(new ShortContributorView(requester.login(), requester.avatarUrl(), requester.email()))
                 .sponsors(isNull(this.sponsors) ? List.of() : this.sponsors.stream()
                         .map(SponsorLinkView::toDomain)
                         .sorted(comparing(ShortSponsorView::name))
