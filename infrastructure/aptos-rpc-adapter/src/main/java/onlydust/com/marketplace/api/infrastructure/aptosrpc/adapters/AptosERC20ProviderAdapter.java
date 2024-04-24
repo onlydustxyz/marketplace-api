@@ -9,6 +9,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Hash;
 
+import java.math.BigInteger;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -25,7 +26,10 @@ public class AptosERC20ProviderAdapter implements ERC20Provider {
                         resource.data().name(),
                         resource.data().symbol(),
                         resource.data().decimals(),
-                        resource.data().supply().vec().get(0).integer().vec().get(0).value()
+                        resource.data().supply().vec().stream().findFirst()
+                                .flatMap(d -> d.integer().vec().stream().findFirst())
+                                .map(RpcClient.TransactionResourceResponse.Integer.Data::value)
+                                .orElse(BigInteger.ZERO)
                 ));
     }
 }
