@@ -48,6 +48,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
     @Order(1)
     void should_verify_individual_billing_profile() {
         // Given
+        slackNotificationStub.reset();
         final var githubUserId = faker.number().randomNumber() + faker.number().randomNumber();
         final var login = faker.name().username();
         final var avatarUrl = faker.internet().avatar();
