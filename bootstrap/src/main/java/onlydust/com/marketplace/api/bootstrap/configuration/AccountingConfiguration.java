@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookP
 import onlydust.com.marketplace.accounting.domain.port.in.*;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.*;
+import onlydust.com.marketplace.api.infrastructure.aptosrpc.adapters.AptosAccountValidatorAdapter;
 import onlydust.com.marketplace.api.infura.adapters.EthInfuraEnsValidatorAdapter;
 import onlydust.com.marketplace.api.infura.adapters.InfuraEvmAccountAddressValidatorAdapter;
 import onlydust.com.marketplace.api.infura.adapters.StarknetInfuraAccountValidatorAdapter;
@@ -68,8 +69,10 @@ public class AccountingConfiguration {
     @Bean
     public PayoutInfoValidator payoutInfoValidator(final @NonNull EthInfuraEnsValidatorAdapter ethereumEnsValidatorAdapter,
                                                    final @NonNull StarknetInfuraAccountValidatorAdapter starknetEnsValidatorAdapter,
-                                                   final @NonNull InfuraEvmAccountAddressValidatorAdapter infuraEvmAccountAddressValidatorAdapter) {
-        return new PayoutInfoValidator(ethereumEnsValidatorAdapter, starknetEnsValidatorAdapter, infuraEvmAccountAddressValidatorAdapter);
+                                                   final @NonNull InfuraEvmAccountAddressValidatorAdapter infuraEvmAccountAddressValidatorAdapter,
+                                                   final @NonNull AptosAccountValidatorAdapter aptosAccountValidatorAdapter) {
+        return new PayoutInfoValidator(ethereumEnsValidatorAdapter, starknetEnsValidatorAdapter, infuraEvmAccountAddressValidatorAdapter,
+                aptosAccountValidatorAdapter);
     }
 
     @Bean

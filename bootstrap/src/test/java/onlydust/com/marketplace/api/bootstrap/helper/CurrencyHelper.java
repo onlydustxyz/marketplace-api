@@ -10,4 +10,5 @@ public class CurrencyHelper {
     public static final Currency.Id USDC = Currency.Id.of("562bbf65-8a71-4d30-ad63-520c0d68ba27");
     public static final Currency.Id OP = Currency.Id.of("00ca98a5-0197-4b76-a208-4bfc55ea8256");
     public static final Currency.Id ETH = Currency.Id.of("71bdfcf4-74ee-486b-8cfe-5d841dd93d5c");
+    public static final Currency.Id APT = Currency.Id.of("48388edb-fda2-4a32-b228-28152a147500");
 }
