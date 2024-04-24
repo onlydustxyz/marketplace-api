@@ -193,6 +193,36 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
     }
 
     @Test
+    @Order(4)
+    void should_add_coin_support_on_aptos() {
+        client
+                .post()
+                .uri(getApiURI(POST_CURRENCIES))
+                .contentType(APPLICATION_JSON)
+                .header("Api-Key", apiKey())
+                .bodyValue("""
+                        {
+                            "type": "CRYPTO",
+                            "standard": "ERC20",
+                            "blockchain": "APTOS",
+                            "address": "0x5e156f1207d0ebfa19a9eeff00d62a282278fb8719f4fab3a586a0a2c0fffbea::coin::T"
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.type").isEqualTo("CRYPTO")
+                .jsonPath("$.tokens[?(@.blockchain=='APTOS')].address").isEqualTo("0x5e156f1207d0ebfa19a9eeff00d62a282278fb8719f4fab3a586a0a2c0fffbea::coin::T")
+                .jsonPath("$.name").isEqualTo("USD Coin")
+                .jsonPath("$.code").isEqualTo("USDC")
+                .jsonPath("$.logoUrl").isEqualTo("https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png")
+                .jsonPath("$.decimals").isEqualTo(6)
+        ;
+    }
+
+    @Test
     @Order(5)
     void should_add_native_cryptocurrency_support() {
         client
@@ -334,28 +364,47 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                               "code": "ETH",
                               "name": "Ethereum",
                               "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+                              "decimals": 18,
                               "type": "CRYPTO",
                               "tokens": [],
-                              "decimals": 18,
-                              "description": "Ethereum (ETH) is a cryptocurrency",
-                              "supportedOn": ["ETHEREUM"]
+                              "supportedOn": [
+                                "ETHEREUM"
+                              ],
+                              "description": "Ethereum (ETH) is a cryptocurrency"
                             },
                             {
                               "code": "EUR",
                               "name": "Euro2",
                               "logoUrl": "https://s3.upload.wikimedia.org/Flag_of_Europe.svg.png",
+                              "decimals": 3,
                               "type": "FIAT",
                               "tokens": [],
-                              "decimals": 3,
-                              "description": "Euro is the official currency of the European Union",
-                              "supportedOn": ["SEPA"]
+                              "supportedOn": [
+                                "SEPA"
+                              ],
+                              "description": "Euro is the official currency of the European Union"
                             },
                             {
                               "code": "USDC",
                               "name": "USD Coin",
                               "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                              "decimals": 6,
                               "type": "CRYPTO",
                               "tokens": [
+                                {
+                                  "blockchain": "STARKNET",
+                                  "address": "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8",
+                                  "decimals": 6,
+                                  "symbol": "USDC",
+                                  "name": "USD Coin"
+                                },
+                                {
+                                  "blockchain": "APTOS",
+                                  "address": "0x5e156f1207d0ebfa19a9eeff00d62a282278fb8719f4fab3a586a0a2c0fffbea::coin::T",
+                                  "decimals": 6,
+                                  "symbol": "USDC",
+                                  "name": "USD Coin"
+                                },
                                 {
                                   "blockchain": "OPTIMISM",
                                   "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
@@ -369,18 +418,15 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                                   "decimals": 6,
                                   "symbol": "USDC",
                                   "name": "USD Coin"
-                                },
-                                {
-                                  "blockchain": "STARKNET",
-                                  "address": "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8",
-                                  "decimals": 6,
-                                  "symbol": "USDC",
-                                  "name": "USD Coin"
                                 }
                               ],
-                              "decimals": 6,
-                              "description": "USDC (USDC) is a cryptocurrency and operates on the Ethereum platform.",
-                              "supportedOn": ["ETHEREUM", "OPTIMISM", "STARKNET"]
+                              "supportedOn": [
+                                "STARKNET",
+                                "APTOS",
+                                "OPTIMISM",
+                                "ETHEREUM"
+                              ],
+                              "description": "USDC (USDC) is a cryptocurrency and operates on the Ethereum platform."
                             }
                           ]
                         }
