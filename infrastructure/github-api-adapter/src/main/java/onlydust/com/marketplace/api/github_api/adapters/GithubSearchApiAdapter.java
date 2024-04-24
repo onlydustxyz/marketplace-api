@@ -2,15 +2,15 @@ package onlydust.com.marketplace.api.github_api.adapters;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.api.github_api.GithubHttpClient;
+import onlydust.com.marketplace.api.github_api.dto.*;
+import onlydust.com.marketplace.api.github_api.properties.GithubPaginationProperties;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.GithubAccount;
 import onlydust.com.marketplace.project.domain.model.GithubMembership;
 import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
-import onlydust.com.marketplace.api.github_api.GithubHttpClient;
-import onlydust.com.marketplace.api.github_api.dto.*;
-import onlydust.com.marketplace.api.github_api.properties.GithubPaginationProperties;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import static java.net.URLEncoder.encode;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.nonNull;
 
 @AllArgsConstructor
@@ -32,7 +34,8 @@ public class GithubSearchApiAdapter implements GithubSearchPort {
 
     @Override
     public List<GithubUserIdentity> searchUsersByLogin(final String login) {
-        return client.get("/search/users?per_page=5&q=" + login, GithubUserSearchResponse.class)
+        final var encodedLogin = encode(login.trim(), UTF_8);
+        return client.get("/search/users?per_page=5&q=" + encodedLogin, GithubUserSearchResponse.class)
                 .map(GithubUserSearchResponse::getItems)
                 .orElse(List.of())
                 .stream().map(
