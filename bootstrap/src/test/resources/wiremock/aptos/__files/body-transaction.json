@@ -1,0 +1,296 @@
+{
+    "version": "567482710",
+    "hash": "0xffae983a8a8498980c4ecfd88eef5615037cad97ed1f1d7d727137421656cb2f",
+    "state_change_hash": "0x5e88ea0766a322190fa5dc96a8152a4b64f00283ef48897d54fe95cda17d26f0",
+    "event_root_hash": "0xd73e4e6be829ffe957b9a18dee1ce96afa4159fd3fa1c71307be75909ef217d3",
+    "state_checkpoint_hash": null,
+    "gas_used": "12",
+    "success": true,
+    "vm_status": "Executed successfully",
+    "accumulator_root_hash": "0x89f7d0fca48d8e984c90311b0cffdde7183ad203b7e0ad09c65cdbf27a1ebe32",
+    "changes": [
+        {
+            "address": "0x31a6675cbe84365bf2b0cbce617ece6c47023ef70826533bde5203d32171dc3c",
+            "state_key_hash": "0xfefc72c38a42ecbe04ff6f9e77fb5c8087ff75b705f2ab098ad55b829f6a2308",
+            "data": {
+                "type": "0x31a6675cbe84365bf2b0cbce617ece6c47023ef70826533bde5203d32171dc3c::swap::PairEventHolder<0x1::aptos_coin::AptosCoin, 0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC>",
+                "data": {
+                    "add_liquidity": {
+                        "counter": "1625",
+                        "guid": {
+                            "id": {
+                                "addr": "0x31a6675cbe84365bf2b0cbce617ece6c47023ef70826533bde5203d32171dc3c",
+                                "creation_num": "5"
+                            }
+                        }
+                    },
+                    "remove_liquidity": {
+                        "counter": "448",
+                        "guid": {
+                            "id": {
+                                "addr": "0x31a6675cbe84365bf2b0cbce617ece6c47023ef70826533bde5203d32171dc3c",
+                                "creation_num": "6"
+                            }
+                        }
+                    },
+                    "swap": {
+                        "counter": "457656",
+                        "guid": {
+                            "id": {
+                                "addr": "0x31a6675cbe84365bf2b0cbce617ece6c47023ef70826533bde5203d32171dc3c",
+                                "creation_num": "7"
+                            }
+                        }
+                    }
+                }
+            },
+            "type": "write_resource"
+        },
+        {
+            "address": "0x31a6675cbe84365bf2b0cbce617ece6c47023ef70826533bde5203d32171dc3c",
+            "state_key_hash": "0x517d0058909f33edf5393fbe208787d6d5c6e6653798dc82439943a2f3f3a5de",
+            "data": {
+                "type": "0x31a6675cbe84365bf2b0cbce617ece6c47023ef70826533bde5203d32171dc3c::swap::TokenPairReserve<0x1::aptos_coin::AptosCoin, 0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC>",
+                "data": {
+                    "block_timestamp_last": "1713948164",
+                    "reserve_x": "24866101279402",
+                    "reserve_y": "2458763115916"
+                }
+            },
+            "type": "write_resource"
+        },
+        {
+            "address": "0x31a6675cbe84365bf2b0cbce617ece6c47023ef70826533bde5203d32171dc3c",
+            "state_key_hash": "0xb563dcd157c1bab7938cddce8b745505c8be92ca706a51be4dd1f81b1a6ff30a",
+            "data": {
+                "type": "0x31a6675cbe84365bf2b0cbce617ece6c47023ef70826533bde5203d32171dc3c::swap::TokenPairMetadata<0x1::aptos_coin::AptosCoin, 0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC>",
+                "data": {
+                    "balance_x": {
+                        "value": "24866101279402"
+                    },
+                    "balance_y": {
+                        "value": "2458763115916"
+                    },
+                    "burn_cap": {
+                        "dummy_field": false
+                    },
+                    "creator": "0x5bdeef2cde84f6ce4aeb5c5610db038de613b175652425cfb199ff833385f826",
+                    "fee_amount": {
+                        "value": "60815866822"
+                    },
+                    "freeze_cap": {
+                        "dummy_field": false
+                    },
+                    "k_last": "61057638706338152163096700",
+                    "mint_cap": {
+                        "dummy_field": false
+                    },
+                    "token_x_details": {
+                        "decimals": 8,
+                        "name": "Aptos Coin",
+                        "symbol": "APT",
+                        "token_address": "0x1::aptos_coin::AptosCoin"
+                    },
+                    "token_y_details": {
+                        "decimals": 6,
+                        "name": "USD Coin",
+                        "symbol": "USDC",
+                        "token_address": "0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC"
+                    }
+                }
+            },
+            "type": "write_resource"
+        },
+        {
+            "address": "0xc4f5e07ce1de7369e5a408b9b153f32b5eb99e6b9b1c1a33549aba8f19fc3cc1",
+            "state_key_hash": "0x702b6c7ccbe948914fdea6ad222b9339187f5eee49850e9a77b0ddc026f60276",
+            "data": {
+                "type": "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>",
+                "data": {
+                    "coin": {
+                        "value": "3511807666"
+                    },
+                    "deposit_events": {
+                        "counter": "406",
+                        "guid": {
+                            "id": {
+                                "addr": "0xc4f5e07ce1de7369e5a408b9b153f32b5eb99e6b9b1c1a33549aba8f19fc3cc1",
+                                "creation_num": "2"
+                            }
+                        }
+                    },
+                    "frozen": false,
+                    "withdraw_events": {
+                        "counter": "1286",
+                        "guid": {
+                            "id": {
+                                "addr": "0xc4f5e07ce1de7369e5a408b9b153f32b5eb99e6b9b1c1a33549aba8f19fc3cc1",
+                                "creation_num": "3"
+                            }
+                        }
+                    }
+                }
+            },
+            "type": "write_resource"
+        },
+        {
+            "address": "0xc4f5e07ce1de7369e5a408b9b153f32b5eb99e6b9b1c1a33549aba8f19fc3cc1",
+            "state_key_hash": "0xc307412c272a70c4f50ec05cf5e6f058174752ad680a8ca6e845874199e456e6",
+            "data": {
+                "type": "0x1::coin::CoinStore<0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC>",
+                "data": {
+                    "coin": {
+                        "value": "17515"
+                    },
+                    "deposit_events": {
+                        "counter": "51",
+                        "guid": {
+                            "id": {
+                                "addr": "0xc4f5e07ce1de7369e5a408b9b153f32b5eb99e6b9b1c1a33549aba8f19fc3cc1",
+                                "creation_num": "17"
+                            }
+                        }
+                    },
+                    "frozen": false,
+                    "withdraw_events": {
+                        "counter": "45",
+                        "guid": {
+                            "id": {
+                                "addr": "0xc4f5e07ce1de7369e5a408b9b153f32b5eb99e6b9b1c1a33549aba8f19fc3cc1",
+                                "creation_num": "18"
+                            }
+                        }
+                    }
+                }
+            },
+            "type": "write_resource"
+        },
+        {
+            "address": "0xc4f5e07ce1de7369e5a408b9b153f32b5eb99e6b9b1c1a33549aba8f19fc3cc1",
+            "state_key_hash": "0xc373d1f53510c4d1aa1f893755457cd507d0e0bf041c964a9df7193eb3346a2c",
+            "data": {
+                "type": "0x1::account::Account",
+                "data": {
+                    "authentication_key": "0xc4f5e07ce1de7369e5a408b9b153f32b5eb99e6b9b1c1a33549aba8f19fc3cc1",
+                    "coin_register_events": {
+                        "counter": "4",
+                        "guid": {
+                            "id": {
+                                "addr": "0xc4f5e07ce1de7369e5a408b9b153f32b5eb99e6b9b1c1a33549aba8f19fc3cc1",
+                                "creation_num": "0"
+                            }
+                        }
+                    },
+                    "guid_creation_num": "174",
+                    "key_rotation_events": {
+                        "counter": "0",
+                        "guid": {
+                            "id": {
+                                "addr": "0xc4f5e07ce1de7369e5a408b9b153f32b5eb99e6b9b1c1a33549aba8f19fc3cc1",
+                                "creation_num": "1"
+                            }
+                        }
+                    },
+                    "rotation_capability_offer": {
+                        "for": {
+                            "vec": []
+                        }
+                    },
+                    "sequence_number": "1585",
+                    "signer_capability_offer": {
+                        "for": {
+                            "vec": []
+                        }
+                    }
+                }
+            },
+            "type": "write_resource"
+        },
+        {
+            "state_key_hash": "0x6e4b28d40f98a106a65163530924c0dcb40c1349d3aa915d108b4d6cfc1ddb19",
+            "handle": "0x1b854694ae746cdbd8d44186ca4929b2b337df21d1c74633be19b2710552fdca",
+            "key": "0x0619dc29a0aac8fa146714058e8dd6d2d0f3bdf5f6331907bf91f3acd81e6935",
+            "value": "0x0a2e0095a22584010000000000000000",
+            "data": null,
+            "type": "write_table_item"
+        }
+    ],
+    "sender": "0xc4f5e07ce1de7369e5a408b9b153f32b5eb99e6b9b1c1a33549aba8f19fc3cc1",
+    "sequence_number": "1584",
+    "max_gas_amount": "5000",
+    "gas_unit_price": "100",
+    "expiration_timestamp_secs": "1713948763",
+    "payload": {
+        "function": "0x31a6675cbe84365bf2b0cbce617ece6c47023ef70826533bde5203d32171dc3c::router::swap_exact_input",
+        "type_arguments": [
+            "0x1::aptos_coin::AptosCoin",
+            "0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC"
+        ],
+        "arguments": [
+            "177579",
+            "0"
+        ],
+        "type": "entry_function_payload"
+    },
+    "signature": {
+        "public_key": "0x30b1e09eea35a18d9b917dc704ba83b248fcbb28988a2caf0c08c7fd47ace1db",
+        "signature": "0x3709383247cf6480de824f7076fd2289c10a7db15cb8ab230e76fd73fe13822830e730b9e56c5a7ccacb2357da8c8d5c46a8039497caacc47e00849064706106",
+        "type": "ed25519_signature"
+    },
+    "events": [
+        {
+            "guid": {
+                "creation_number": "3",
+                "account_address": "0xc4f5e07ce1de7369e5a408b9b153f32b5eb99e6b9b1c1a33549aba8f19fc3cc1"
+            },
+            "sequence_number": "1285",
+            "type": "0x1::coin::WithdrawEvent",
+            "data": {
+                "amount": "177579"
+            }
+        },
+        {
+            "guid": {
+                "creation_number": "17",
+                "account_address": "0xc4f5e07ce1de7369e5a408b9b153f32b5eb99e6b9b1c1a33549aba8f19fc3cc1"
+            },
+            "sequence_number": "50",
+            "type": "0x1::coin::DepositEvent",
+            "data": {
+                "amount": "17515"
+            }
+        },
+        {
+            "guid": {
+                "creation_number": "7",
+                "account_address": "0x31a6675cbe84365bf2b0cbce617ece6c47023ef70826533bde5203d32171dc3c"
+            },
+            "sequence_number": "457655",
+            "type": "0x31a6675cbe84365bf2b0cbce617ece6c47023ef70826533bde5203d32171dc3c::swap::SwapEvent<0x1::aptos_coin::AptosCoin, 0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC>",
+            "data": {
+                "amount_x_in": "177579",
+                "amount_x_out": "0",
+                "amount_y_in": "0",
+                "amount_y_out": "17515",
+                "user": "0xc4f5e07ce1de7369e5a408b9b153f32b5eb99e6b9b1c1a33549aba8f19fc3cc1"
+            }
+        },
+        {
+            "guid": {
+                "creation_number": "0",
+                "account_address": "0x0"
+            },
+            "sequence_number": "0",
+            "type": "0x1::transaction_fee::FeeStatement",
+            "data": {
+                "execution_gas_units": "6",
+                "io_gas_units": "7",
+                "storage_fee_octas": "0",
+                "storage_fee_refund_octas": "0",
+                "total_charge_gas_units": "12"
+            }
+        }
+    ],
+    "timestamp": "1713948164086208",
+    "type": "user_transaction"
+}

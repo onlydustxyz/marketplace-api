@@ -31,6 +31,13 @@ public class WireMockInitializer implements ApplicationContextInitializer<Config
                 .register(context);
 
         WiremockServerRegistration.builder()
+                .beanName("aptosWireMockServer")
+                .stubLocation("aptos")
+                .property("infrastructure.aptos.base-uri")
+                .build()
+                .register(context);
+
+        WiremockServerRegistration.builder()
                 .beanName("coinmarketcapWireMockServer")
                 .stubLocation("coinmarketcap")
                 .property("infrastructure.coinmarketcap.base-uri")
