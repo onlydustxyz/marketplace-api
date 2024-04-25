@@ -42,6 +42,7 @@ public class PostgresRewardStatusAdapter implements RewardStatusStorage {
     @Override
     public void delete(RewardId rewardId) {
         rewardStatusRepository.deleteById(rewardId.value());
+        rewardStatusRepository.flush();
     }
 
     @Override

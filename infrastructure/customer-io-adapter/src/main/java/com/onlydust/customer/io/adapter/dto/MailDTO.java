@@ -26,9 +26,9 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
     public static MailDTO<InvoiceRejectedDTO> fromInvoiceRejected(
             @NonNull CustomerIOProperties customerIOProperties,
             @NonNull InvoiceRejected invoiceRejected) {
-        return new MailDTO<>(customerIOProperties.invoiceRejectedEmailId().toString(), new IdentifiersDTO(invoiceRejected.billingProfileAdminId().toString(),
+        return new MailDTO<>(customerIOProperties.getInvoiceRejectedEmailId().toString(), new IdentifiersDTO(invoiceRejected.billingProfileAdminId().toString(),
                 null),
-                customerIOProperties.onlyDustAdminEmail(), invoiceRejected.billingProfileAdminEmail(),
+                customerIOProperties.getOnlyDustAdminEmail(), invoiceRejected.billingProfileAdminEmail(),
                 "An invoice for %s reward(s) got rejected".formatted(invoiceRejected.rewardCount()),
                 InvoiceRejectedDTO.fromEvent(invoiceRejected));
     }
@@ -37,9 +37,9 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
             @NonNull CustomerIOProperties customerIOProperties,
             @NonNull BillingProfileVerificationFailed billingProfileVerificationFailed
     ) {
-        return new MailDTO<>(customerIOProperties.verificationFailedEmailId().toString(),
+        return new MailDTO<>(customerIOProperties.getVerificationFailedEmailId().toString(),
                 new IdentifiersDTO(billingProfileVerificationFailed.ownerId().value().toString(), null),
-                customerIOProperties.onlyDustAdminEmail(), billingProfileVerificationFailed.ownerEmail(),
+                customerIOProperties.getOnlyDustAdminEmail(), billingProfileVerificationFailed.ownerEmail(),
                 "Your verification failed with status %s".formatted(billingProfileVerificationFailed.verificationStatus().name()),
                 VerificationFailedDTO.fromEvent(billingProfileVerificationFailed));
     }
@@ -48,25 +48,25 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
             @NonNull CustomerIOProperties customerIOProperties,
             @NonNull RewardCreated rewardCreated
     ) {
-        return new MailDTO<>(customerIOProperties.newRewardReceivedEmailId().toString(), mapIdentifiers(rewardCreated.email(),
+        return new MailDTO<>(customerIOProperties.getNewRewardReceivedEmailId().toString(), mapIdentifiers(rewardCreated.email(),
                 rewardCreated.recipientId())
-                , customerIOProperties.onlyDustAdminEmail(), rewardCreated.email(),
+                , customerIOProperties.getOnlyDustAdminEmail(), rewardCreated.email(),
                 "New reward received ✨", RewardCreatedDTO.fromEvent(rewardCreated));
     }
 
     public static MailDTO<RewardCanceledDTO> fromRewardCanceled(@NonNull CustomerIOProperties customerIOProperties,
                                                                 @NonNull RewardCanceled rewardCanceled) {
         final RewardCanceledDTO rewardCanceledDTO = RewardCanceledDTO.fromEvent(rewardCanceled);
-        return new MailDTO<>(customerIOProperties.rewardCanceledEmailId().toString(), mapIdentifiers(rewardCanceled.recipientEmail(),
+        return new MailDTO<>(customerIOProperties.getRewardCanceledEmailId().toString(), mapIdentifiers(rewardCanceled.recipientEmail(),
                 rewardCanceled.recipientId()),
-                customerIOProperties.onlyDustAdminEmail(), rewardCanceled.recipientEmail(),
+                customerIOProperties.getOnlyDustAdminEmail(), rewardCanceled.recipientEmail(),
                 "Reward %s got canceled".formatted(rewardCanceledDTO.rewardName()), rewardCanceledDTO);
     }
 
     public static MailDTO<RewardsPaidDTO> fromRewardsPaid(@NonNull CustomerIOProperties customerIOProperties,
                                                           @NonNull RewardsPaid rewardsPaid) {
-        return new MailDTO<>(customerIOProperties.rewardsPaidEmailId().toString(), mapIdentifiers(rewardsPaid.recipientEmail(), rewardsPaid.recipientId()),
-                customerIOProperties.onlyDustAdminEmail(), rewardsPaid.recipientEmail(), "Your rewards are processed! 🥳",
+        return new MailDTO<>(customerIOProperties.getRewardsPaidEmailId().toString(), mapIdentifiers(rewardsPaid.recipientEmail(), rewardsPaid.recipientId()),
+                customerIOProperties.getOnlyDustAdminEmail(), rewardsPaid.recipientEmail(), "Your rewards are processed! 🥳",
                 RewardsPaidDTO.fromEvent(rewardsPaid));
 
     }

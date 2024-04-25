@@ -29,6 +29,7 @@ application:
     billing-profile-verification-job: 5000 # 15 seconds
     update-projects-tags: 7200000 # 2 hours
     refresh-reward-usd-equivalents-job-delay: 7200000 # 2 hours
+    send-emails: 60000 # 1 minute
   sumsub:
     webhook:
       secret: ${SUMSUB_WEBHOOK_SECRET}
@@ -161,7 +162,7 @@ infrastructure:
     dev-rel-channel: '#dev-rel'
     tag-all-channel: ${SLACK_PING_ALL_CHANNEL_FOR_CLOSED_BILLING_PROFILE}
   customer-io:
-    base-uri: https://api-eu.customer.io/v1/
+    base-uri: https://api-eu.customer.io/v1
     api-key: ${CUSTOMER_IO_API_KEY}
     only-dust-admin-email: admin@onlydust.xyz
     rewards-paid-email-id: 4

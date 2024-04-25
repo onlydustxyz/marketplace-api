@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
 import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
 import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
+import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
@@ -52,7 +53,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @ContextConfiguration(initializers = WireMockInitializer.class)
 @EnableWireMock({
         @ConfigureWireMock(name = "auth0", property = "application.web.auth0.user-info-url"),
-        @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri")
+        @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri"),
+        @ConfigureWireMock(name = "customer-io", property = "infrastructure.customer-io.base-uri")
 })
 public class AbstractMarketplaceBackOfficeApiIT {
     private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
@@ -82,8 +84,12 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected WireMockServer auth0WireMockServer;
     @InjectWireMock("indexer-api")
     protected WireMockServer indexerApiWireMockServer;
+    @InjectWireMock("customer-io")
+    protected WireMockServer customerIOWireMockServer;
     @Autowired
     ApiKeyAuthenticationService.Config backOfficeApiKeyAuthenticationConfig;
+    @Autowired
+    CustomerIOProperties customerIOProperties;
 
     @Autowired
     UserRepository userRepository;

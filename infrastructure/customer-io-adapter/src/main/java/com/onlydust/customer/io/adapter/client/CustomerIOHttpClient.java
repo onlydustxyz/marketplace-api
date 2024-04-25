@@ -14,11 +14,11 @@ public class CustomerIOHttpClient extends HttpClient {
 
     @Override
     protected HttpRequest.Builder builder() {
-        return HttpRequest.newBuilder().header("Authorization", "Bearer %s".formatted(customerIOProperties.apiKey()));
+        return HttpRequest.newBuilder().header("Authorization", "Bearer %s".formatted(customerIOProperties.getApiKey()));
     }
 
     @Override
     protected URI uri(String path) {
-        return URI.create(customerIOProperties.baseUri() + path);
+        return URI.create(customerIOProperties.getBaseUri() + path);
     }
 }

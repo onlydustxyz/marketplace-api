@@ -36,6 +36,6 @@ public class CustomerIOAdapter implements MailPort {
     }
 
     private <MessageData> void sendEmail(MailDTO<MessageData> mail) {
-        customerIOHttpClient.send("send/email", HttpMethod.POST, mail, Void.class);
+        customerIOHttpClient.send("/send/email", HttpMethod.POST, mail, Void.class);
     }
 }

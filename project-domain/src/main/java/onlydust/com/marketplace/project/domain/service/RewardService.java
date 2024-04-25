@@ -75,8 +75,8 @@ public class RewardService implements RewardFacadePort {
         if (reward.inInvoice())
             throw forbidden("Reward %s cannot be cancelled because it is included in an invoice".formatted(rewardId));
 
-        rewardStoragePort.delete(rewardId);
         accountingServicePort.cancelReward(rewardId, reward.currencyId());
+        rewardStoragePort.delete(rewardId);
     }
 
     @Override

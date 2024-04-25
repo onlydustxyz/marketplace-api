@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentShortView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.accounting.domain.view.ShortRewardDetailsView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
@@ -42,4 +43,7 @@ public interface AccountingRewardStoragePort {
     void deletePayment(Payment.Id paymentId);
 
     Optional<RewardDetailsView> getReward(RewardId id);
+
+    Optional<ShortRewardDetailsView> getShortReward(RewardId rewardId);
+
 }

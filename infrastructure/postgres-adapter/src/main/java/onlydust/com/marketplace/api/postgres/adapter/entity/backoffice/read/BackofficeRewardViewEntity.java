@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.InvoiceViewEnti
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -24,10 +25,11 @@ import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(force = true)
 @EqualsAndHashCode
-@Data
 @Entity
+@Value
+@Immutable
 public class BackofficeRewardViewEntity {
     @Id
     @NonNull
@@ -79,11 +81,11 @@ public class BackofficeRewardViewEntity {
     List<ReceiptEntity> receipts;
 
     @OneToOne
-    @JoinColumn(name = "id", referencedColumnName = "reward_id")
+    @JoinColumn(name = "id", referencedColumnName = "reward_id", insertable = false, updatable = false)
     @NonNull
     RewardStatusEntity status;
     @OneToOne
-    @JoinColumn(name = "id", referencedColumnName = "reward_id")
+    @JoinColumn(name = "id", referencedColumnName = "reward_id", insertable = false, updatable = false)
     @NonNull
     RewardStatusDataEntity statusData;
 

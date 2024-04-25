@@ -27,6 +27,7 @@ public class JobScheduler {
     private final Properties cronProperties;
     private final OutboxConsumerJob billingProfileVerificationOutboxJob;
     private final AccountingObserver accountingObserver;
+    private final OutboxConsumerJob accountingMailOutboxJob;
 
     @Scheduled(fixedDelayString = "${application.cron.indexer-sync-job-delay}")
     public void processPendingIndexerApiCalls() {
@@ -74,6 +75,12 @@ public class JobScheduler {
     public void refreshRewardUsdEquivalents() {
         LOGGER.info("Refreshing reward USD equivalents");
         accountingObserver.refreshRewardsUsdEquivalents();
+    }
+
+    @Scheduled(fixedDelayString = "${application.cron.send-emails}")
+    public void sendEmails() {
+        LOGGER.info("Sending emails");
+        accountingMailOutboxJob.run();
     }
 
     @Data

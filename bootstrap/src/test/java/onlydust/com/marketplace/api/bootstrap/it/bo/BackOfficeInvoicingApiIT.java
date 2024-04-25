@@ -18,6 +18,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationSt
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserProfileInfoRepository;
+import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
@@ -33,6 +34,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.bootstrap.it.api.AbstractMarketplaceApiIT.ME_PUT_PAYOUT_PREFERENCES;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,6 +59,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     KybRepository kybRepository;
     @Autowired
     UserProfileInfoRepository userProfileInfoRepository;
+    @Autowired
+    OutboxConsumerJob accountingMailOutboxJob;
 
     private final Faker faker = new Faker();
 
@@ -507,7 +511,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
 
     @Test
     @Order(5)
-    void should_reject_invoices() {
+    void should_reject_invoices() throws InterruptedException {
         // Delete AnthonyBuisset user profile to check fallback of "createdBy.name" field in invoice details
         userProfileInfoRepository.deleteById(antho.value());
 
@@ -528,22 +532,25 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .isNoContent()
         ;
 
-        // TODO : migrate to new notification and mail system
+        accountingMailOutboxJob.run();
         final Invoice invoice = invoiceStoragePort.get(companyBillingProfileToReviewInvoices.get(1)).orElseThrow();
-//        makeWebhookSendRejectedInvoiceMailWireMockServer.verify(1,
-//                postRequestedFor(urlEqualTo("/?api-key=%s".formatted(webhookHttpClientProperties.getApiKey())))
-//                        .withHeader("Content-Type", equalTo("application/json"))
-//                        .withRequestBody(matchingJsonPath("$.recipientEmail", equalTo("abuisset@gmail.com")))
-//                        .withRequestBody(matchingJsonPath("$.recipientName", equalTo("AnthonyBuisset")))
-//                        .withRequestBody(matchingJsonPath("$.rewardCount", equalTo(String.valueOf(invoice.rewards().size()))))
-//                        .withRequestBody(matchingJsonPath("$.invoiceName", equalTo(invoice.number().value())))
-//                        .withRequestBody(matchingJsonPath("$.totalUsdAmount", equalTo("2020.0")))
-//                        .withRequestBody(
-//                                matchingJsonPath("$.rejectionReason", equalTo(rejectionReason))
-//                        )
-//                        .withRequestBody(matchingJsonPath("$.rewardNames", containing("#303F2 - kaaper - USDC - 1000")))
-//                        .withRequestBody(matchingJsonPath("$.rewardNames", containing("#79209 - kaaper - USDC - 1000")))
-//        );
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id", equalTo(customerIOProperties.getInvoiceRejectedEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo("747e663f-4e68-4b42-965b-b5aebedcd4c4")))
+                        .withRequestBody(matchingJsonPath("$.message_data.username", equalTo("AnthonyBuisset")))
+                        .withRequestBody(matchingJsonPath("$.message_data.rewardsNumber", equalTo(String.valueOf(invoice.rewards().size()))))
+                        .withRequestBody(matchingJsonPath("$.message_data.invoiceName", equalTo(invoice.number().value())))
+                        .withRequestBody(matchingJsonPath("$.message_data.totalUsdAmount", equalTo("2020.0")))
+                        .withRequestBody(matchingJsonPath("$.message_data.reason", equalTo(rejectionReason)))
+                        .withRequestBody(matchingJsonPath("$.message_data.rewardsDetails", containing("#303F2 - kaaper - USDC - 1000")))
+                        .withRequestBody(matchingJsonPath("$.message_data.rewardsDetails", containing("#79209 - kaaper - USDC - 1000")))
+                        .withRequestBody(matchingJsonPath("$.to", equalTo("abuisset@gmail.com")))
+                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo("An invoice for 2 reward(s) got rejected")))
+        );
 
         client
                 .get()

@@ -11,6 +11,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
+import onlydust.com.marketplace.accounting.domain.view.ShortRewardDetailsView;
 import onlydust.com.marketplace.kernel.observer.MailObserver;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.kernel.port.output.WebhookPort;
@@ -79,7 +80,8 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
         rewardStatusStorage.save(upToDateRewardStatus(accountBookFacade, new RewardStatusData(rewardId)));
         rewardStatusStorage.updateBillingProfileFromRecipientPayoutPreferences(rewardId);
         updateUsdEquivalent(rewardId);
-        final RewardDetailsView rewardDetailsView = getRewardDetailsView(rewardId);
+        final RewardDetailsView rewardDetailsView = accountingRewardStoragePort.getReward(rewardId)
+                .orElseThrow(() -> internalServerError(("Reward %s not found").formatted(rewardId.value())));
         if (nonNull(rewardDetailsView.recipient().email())) {
             accountingMailObserver.send(new RewardCreated(rewardDetailsView.recipient().email(),
                     rewardDetailsView.githubUrls().size(), rewardDetailsView.requester().login(), rewardDetailsView.recipient().login(), ShortReward.builder()
@@ -87,6 +89,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
                     .currencyCode(rewardDetailsView.money().currency().code().toString())
                     .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
                     .id(rewardId)
+                    .projectName(rewardDetailsView.project().name())
                     .build(), isNull(rewardDetailsView.recipient().id()) ? null : rewardDetailsView.recipient().id()));
 
         } else {
@@ -96,25 +99,22 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
 
     @Override
     public void onRewardCancelled(RewardId rewardId) {
-        rewardStatusStorage.delete(rewardId);
-        final RewardDetailsView rewardDetailsView = getRewardDetailsView(rewardId);
-        if (nonNull(rewardDetailsView.recipient().email())) {
-            accountingMailObserver.send(new RewardCanceled(rewardDetailsView.recipient().email(), rewardDetailsView.recipient().login(),
+        final ShortRewardDetailsView shortRewardDetailsView = accountingRewardStoragePort.getShortReward(rewardId).orElseThrow(() -> internalServerError(
+                "Reward %s not found".formatted(rewardId)));
+        if (nonNull(shortRewardDetailsView.recipient().email())) {
+            accountingMailObserver.send(new RewardCanceled(shortRewardDetailsView.recipient().email(), shortRewardDetailsView.recipient().login(),
                     ShortReward.builder()
-                            .amount(rewardDetailsView.money().amount())
-                            .currencyCode(rewardDetailsView.money().currency().code().toString())
-                            .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
+                            .amount(shortRewardDetailsView.money().amount())
+                            .currencyCode(shortRewardDetailsView.money().currency().code().toString())
+                            .dollarsEquivalent(shortRewardDetailsView.money().getDollarsEquivalentValue())
                             .id(rewardId)
+                            .projectName(shortRewardDetailsView.project().name())
                             .build(),
-                    isNull(rewardDetailsView.recipient().id()) ? null : rewardDetailsView.recipient().id()));
+                    isNull(shortRewardDetailsView.recipient().id()) ? null : shortRewardDetailsView.recipient().id()));
         } else {
-            LOGGER.warn("Unable to send cancel reward mail to recipient %s due to missing email".formatted(rewardDetailsView.recipient().login()));
+            LOGGER.warn("Unable to send cancel reward mail to recipient %s due to missing email".formatted(shortRewardDetailsView.recipient().login()));
         }
-    }
-
-    private RewardDetailsView getRewardDetailsView(RewardId rewardId) {
-        return accountingRewardStoragePort.getReward(rewardId)
-                .orElseThrow(() -> internalServerError(("Reward %s not found").formatted(rewardId.value())));
+        rewardStatusStorage.delete(rewardId);
     }
 
     @Override
@@ -199,7 +199,6 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
 
 
         refreshRewardsUsdEquivalentOf(billingProfileId);
-        webhookPort.send(billingProfileVerificationUpdated);
         notificationPort.notify(billingProfileVerificationUpdated);
         if (billingProfileVerificationUpdated.failed()) {
             final ShortContributorView owner = billingProfileStoragePort.getBillingProfileOwnerById(billingProfileVerificationUpdated.getUserId())
