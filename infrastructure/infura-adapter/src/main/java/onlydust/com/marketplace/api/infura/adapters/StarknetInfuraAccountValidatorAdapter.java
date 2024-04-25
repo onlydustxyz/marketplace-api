@@ -4,6 +4,7 @@ import com.swmansion.starknet.data.types.Call;
 import com.swmansion.starknet.data.types.Felt;
 import com.swmansion.starknet.data.types.StarknetChainId;
 import com.swmansion.starknet.provider.Provider;
+import com.swmansion.starknet.provider.exceptions.RpcRequestFailedException;
 import com.swmansion.starknet.provider.rpc.JsonRpcProvider;
 import onlydust.com.marketplace.accounting.domain.port.out.WalletValidator;
 import onlydust.com.marketplace.api.infura.InfuraClient;
@@ -32,6 +33,8 @@ public class StarknetInfuraAccountValidatorAdapter implements WalletValidator<St
                     .get();
         } catch (InterruptedException | ExecutionException e) {
             throw internalServerError("Unable to validate StarkNet account address %s".formatted(wallet), e);
+        } catch (RpcRequestFailedException e) {
+            return false;
         }
     }
 }
