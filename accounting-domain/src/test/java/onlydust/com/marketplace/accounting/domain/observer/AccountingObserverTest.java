@@ -51,7 +51,6 @@ public class AccountingObserverTest {
     MailObserver mailObserver;
     AccountingRewardStoragePort accountingRewardStoragePort;
     NotificationPort notificationPort;
-    WebhookPort webhookPort;
     final Faker faker = new Faker();
     final Currency currency = ETH;
     final Currency usd = USD;
@@ -73,11 +72,9 @@ public class AccountingObserverTest {
         mailObserver = mock(MailObserver.class);
         accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
         notificationPort = mock(NotificationPort.class);
-        webhookPort = mock(WebhookPort.class);
-
         when(currencyStorage.findByCode(usd.code())).thenReturn(Optional.of(usd));
         accountingObserver = new AccountingObserver(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage, invoiceStorage,
-                receiptStorage, billingProfileStoragePort, mailObserver, accountingRewardStoragePort, notificationPort, webhookPort);
+                receiptStorage, billingProfileStoragePort, mailObserver, accountingRewardStoragePort, notificationPort);
 
         when(rewardStatusStorage.get(any(RewardId.class))).then(invocation -> {
             final var rewardId = invocation.getArgument(0, RewardId.class);
@@ -164,6 +161,7 @@ public class AccountingObserverTest {
                     .currencyCode(rewardDetailsView.money().currency().code().toString())
                     .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
                     .id(rewardId)
+                    .projectName(shortProjectView.name())
                     .build(), recipient.id()));
         }
     }
@@ -187,19 +185,14 @@ public class AccountingObserverTest {
                     faker.internet().emailAddress(), UUID.randomUUID());
             final ShortContributorView requester = new ShortContributorView(faker.rickAndMorty().character(), faker.gameOfThrones().character(),
                     faker.internet().emailAddress(), UUID.randomUUID());
-            final RewardDetailsView rewardDetailsView = RewardDetailsView.builder()
+            final ShortRewardDetailsView rewardDetailsView = ShortRewardDetailsView.builder()
                     .money(moneyView)
                     .id(rewardId)
                     .project(shortProjectView)
                     .recipient(recipient)
-                    .sponsors(List.of())
-                    .billingProfile(mock(BillingProfile.class))
-                    .status(mock(RewardStatus.class))
-                    .requestedAt(ZonedDateTime.now())
-                    .githubUrls(List.of())
                     .requester(requester)
                     .build();
-            when(accountingRewardStoragePort.getReward(rewardId))
+            when(accountingRewardStoragePort.getShortReward(rewardId))
                     .thenReturn(Optional.of(rewardDetailsView));
             accountingObserver.onRewardCancelled(rewardId);
 
@@ -210,6 +203,7 @@ public class AccountingObserverTest {
                     .currencyCode(rewardDetailsView.money().currency().code().toString())
                     .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
                     .id(rewardId)
+                    .projectName(shortProjectView.name())
                     .build(), recipient.id()));
         }
 
@@ -228,18 +222,13 @@ public class AccountingObserverTest {
                     null, UUID.randomUUID());
             final ShortContributorView requester = new ShortContributorView(faker.rickAndMorty().character(), faker.gameOfThrones().character(),
                     faker.internet().emailAddress(), UUID.randomUUID());
-            when(accountingRewardStoragePort.getReward(rewardId))
-                    .thenReturn(Optional.of(RewardDetailsView.builder()
+            when(accountingRewardStoragePort.getShortReward(rewardId))
+                    .thenReturn(Optional.of(ShortRewardDetailsView.builder()
                             .money(moneyView)
                             .id(rewardId)
                             .project(shortProjectView)
                             .recipient(recipient)
                             .requester(requester)
-                            .sponsors(List.of())
-                            .billingProfile(mock(BillingProfile.class))
-                            .status(mock(RewardStatus.class))
-                            .requestedAt(ZonedDateTime.now())
-                            .githubUrls(List.of())
                             .build()));
             accountingObserver.onRewardCancelled(rewardId);
 
@@ -698,7 +687,6 @@ public class AccountingObserverTest {
             verifyNoInteractions(accountingRewardStoragePort);
             verifyNoInteractions(mailObserver);
             verify(notificationPort).notify(billingProfileVerificationUpdated);
-            verify(webhookPort).send(billingProfileVerificationUpdated);
         }
 
         @Test
@@ -718,7 +706,6 @@ public class AccountingObserverTest {
             verifyNoInteractions(accountingRewardStoragePort);
             verifyNoInteractions(mailObserver);
             verifyNoInteractions(notificationPort);
-            verifyNoInteractions(webhookPort);
         }
 
         @Test
@@ -738,7 +725,6 @@ public class AccountingObserverTest {
             verifyNoInteractions(accountingRewardStoragePort);
             verifyNoInteractions(mailObserver);
             verifyNoInteractions(notificationPort);
-            verifyNoInteractions(webhookPort);
         }
 
 
@@ -758,7 +744,6 @@ public class AccountingObserverTest {
             // Then
             verify(rewardStatusStorage).notRequested(kyb.getBillingProfileId());
             verify(notificationPort).notify(billingProfileVerificationUpdated);
-            verify(webhookPort).send(billingProfileVerificationUpdated);
             verifyNoInteractions(accountingRewardStoragePort);
             verifyNoInteractions(mailObserver);
         }
@@ -780,7 +765,6 @@ public class AccountingObserverTest {
             // Then
             verify(rewardStatusStorage).notRequested(kyb.getBillingProfileId());
             verify(notificationPort).notify(billingProfileVerificationUpdated);
-            verify(webhookPort).send(billingProfileVerificationUpdated);
             verifyNoInteractions(accountingRewardStoragePort);
             verifyNoInteractions(mailObserver);
         }
@@ -802,7 +786,6 @@ public class AccountingObserverTest {
             verifyNoInteractions(accountingRewardStoragePort);
             verifyNoInteractions(mailObserver);
             verifyNoInteractions(notificationPort);
-            verifyNoInteractions(webhookPort);
         }
 
         @Test
@@ -831,7 +814,6 @@ public class AccountingObserverTest {
                     shortContributorView.login(),
                     billingProfileVerificationUpdated.getVerificationStatus()));
             verify(notificationPort).notify(billingProfileVerificationUpdated);
-            verify(webhookPort).send(billingProfileVerificationUpdated);
         }
     }
 

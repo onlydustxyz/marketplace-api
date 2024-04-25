@@ -39,12 +39,11 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
     private final MailObserver accountingMailObserver;
     private final AccountingRewardStoragePort accountingRewardStoragePort;
     private final NotificationPort notificationPort;
-    private final WebhookPort webhookPort;
 
     public AccountingObserver(RewardStatusStorage rewardStatusStorage, RewardUsdEquivalentStorage rewardUsdEquivalentStorage, QuoteStorage quoteStorage,
                               CurrencyStorage currencyStorage, InvoiceStoragePort invoiceStorage, ReceiptStoragePort receiptStorage,
                               BillingProfileStoragePort billingProfileStoragePort, MailObserver accountingMailObserver,
-                              AccountingRewardStoragePort accountingRewardStoragePort, NotificationPort notificationPort, WebhookPort webhookPort) {
+                              AccountingRewardStoragePort accountingRewardStoragePort, NotificationPort notificationPort) {
         this.rewardStatusStorage = rewardStatusStorage;
         this.rewardUsdEquivalentStorage = rewardUsdEquivalentStorage;
         this.quoteStorage = quoteStorage;
@@ -54,7 +53,6 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
         this.accountingMailObserver = accountingMailObserver;
         this.accountingRewardStoragePort = accountingRewardStoragePort;
         this.notificationPort = notificationPort;
-        this.webhookPort = webhookPort;
         this.usd = currencyStorage.findByCode(Currency.Code.USD).orElseThrow(() -> internalServerError("Currency USD not found"));
     }
 

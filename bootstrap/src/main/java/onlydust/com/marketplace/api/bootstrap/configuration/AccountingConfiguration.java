@@ -55,10 +55,9 @@ public class AccountingConfiguration {
                                                  final @NonNull BillingProfileStoragePort billingProfileStoragePort,
                                                  final @NonNull MailObserver accountingMailObserver,
                                                  final @NonNull AccountingRewardStoragePort accountingRewardStoragePort,
-                                                 final @NonNull NotificationPort notificationPort,
-                                                 final @NonNull WebhookPort webhookPort) {
+                                                 final @NonNull NotificationPort notificationPort) {
         return new AccountingObserver(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage, invoiceStorage, receiptStorage,
-                billingProfileStoragePort, accountingMailObserver, accountingRewardStoragePort, notificationPort, webhookPort);
+                billingProfileStoragePort, accountingMailObserver, accountingRewardStoragePort, notificationPort);
     }
 
     @Bean
