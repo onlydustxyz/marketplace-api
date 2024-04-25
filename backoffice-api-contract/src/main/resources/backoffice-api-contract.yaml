@@ -142,6 +142,14 @@ paths:
               $ref: '#/components/schemas/BillingProfileType'
           style: form
         - in: query
+          name: billingProfiles
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/BillingProfileId'
+          style: form
+        - in: query
           name: search
           required: false
           schema:

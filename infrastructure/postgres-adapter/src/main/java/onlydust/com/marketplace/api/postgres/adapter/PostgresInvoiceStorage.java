@@ -124,12 +124,14 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
 
     @Override
     public Page<Invoice> findAll(@NonNull List<Invoice.Id> ids, @NonNull List<Invoice.Status> statuses, @NonNull List<Currency.Id> currencyIds,
-                                 @NonNull List<BillingProfile.Type> billingProfileTypes, String search, @NonNull Integer pageIndex, @NonNull Integer pageSize) {
+                                 @NonNull List<BillingProfile.Type> billingProfileTypes, @NonNull List<BillingProfile.Id> billingProfileIds, String search,
+                                 @NonNull Integer pageIndex, @NonNull Integer pageSize) {
         final var page = invoiceRepository.findAllExceptDrafts(
                 ids.stream().map(Invoice.Id::value).toList(),
                 statuses.stream().map(InvoiceEntity.Status::of).map(Enum::toString).toList(),
                 currencyIds.stream().map(Currency.Id::value).toList(),
                 billingProfileTypes.stream().map(BillingProfileEntity.Type::of).map(Enum::toString).toList(),
+                billingProfileIds.stream().map(BillingProfile.Id::value).toList(),
                 search == null ? "" : search,
                 PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "created_at")));
 

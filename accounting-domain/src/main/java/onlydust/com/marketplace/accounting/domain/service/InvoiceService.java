@@ -37,9 +37,10 @@ public class InvoiceService implements InvoiceFacadePort {
     }
 
     @Override
-    public Page<Invoice> findAll(@NonNull List<Invoice.Id> ids, @NonNull List<Invoice.Status> statuses, @NonNull List<Currency.Id> currencyIds,
-                                 @NonNull List<BillingProfile.Type> billingProfileTypes, String search, @NonNull Integer pageIndex, @NonNull Integer pageSize) {
-        return invoiceStoragePort.findAll(ids, statuses, currencyIds, billingProfileTypes, search, pageIndex, pageSize);
+    public Page<Invoice> findAll(final @NonNull List<Invoice.Id> ids, final @NonNull List<Invoice.Status> statuses, final @NonNull List<Currency.Id> currencyIds,
+                                 final @NonNull List<BillingProfile.Type> billingProfileTypes, final @NonNull List<BillingProfile.Id> billingProfileIds, String search,
+                                 final @NonNull Integer pageIndex, final @NonNull Integer pageSize) {
+        return invoiceStoragePort.findAll(ids, statuses, currencyIds, billingProfileTypes, billingProfileIds, search, pageIndex, pageSize);
     }
 
     @Override
