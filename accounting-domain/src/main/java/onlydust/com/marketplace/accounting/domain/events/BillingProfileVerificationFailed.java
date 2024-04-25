@@ -8,6 +8,7 @@ import lombok.Value;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.EventType;
 
@@ -20,6 +21,8 @@ import onlydust.com.marketplace.kernel.model.EventType;
 public class BillingProfileVerificationFailed extends Event {
     @NonNull
     String ownerEmail;
+    @NonNull
+    UserId ownerId;
     @NonNull
     BillingProfile.Id billingProfileId;
     @NonNull

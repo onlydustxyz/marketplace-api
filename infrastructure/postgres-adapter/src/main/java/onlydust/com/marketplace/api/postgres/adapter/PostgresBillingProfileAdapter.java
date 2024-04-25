@@ -458,6 +458,6 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     public Optional<ShortContributorView> getBillingProfileOwnerById(UserId ownerId) {
         return userRepository.findById(ownerId.value()).map(userEntity -> new ShortContributorView(userEntity.getGithubLogin(), userEntity.getGithubAvatarUrl(),
-                userEntity.getGithubEmail()));
+                userEntity.getGithubEmail(), userEntity.getId()));
     }
 }

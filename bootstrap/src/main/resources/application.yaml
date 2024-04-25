@@ -163,3 +163,9 @@ infrastructure:
   customer-io:
     base-uri: https://api-eu.customer.io/v1/
     api-key: ${CUSTOMER_IO_API_KEY}
+    only-dust-admin-email: admin@onlydust.xyz
+    rewards-paid-email-id: 4
+    reward-canceled-email-id: 5
+    new-reward-received-email-id: 6
+    invoice-rejected-email-id: 3
+    verification-failed-email-id: 8

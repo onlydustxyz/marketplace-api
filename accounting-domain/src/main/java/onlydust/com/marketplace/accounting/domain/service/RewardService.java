@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.events.RewardsPaid;
+import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
@@ -11,11 +12,11 @@ import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.observer.MailObserver;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -64,8 +65,19 @@ public class RewardService implements AccountingRewardPort {
     public void notifyAllNewPaidRewards() {
         final var rewardViews = accountingRewardStoragePort.findPaidRewardsToNotify();
         for (final var listOfPaidRewardsMapToAdminEmail :
-                rewardViews.stream().collect(groupingBy(rewardView -> rewardView.invoice().createdBy().email())).entrySet()) {
-            mailObserver.send(new RewardsPaid(listOfPaidRewardsMapToAdminEmail.getKey(),listOfPaidRewardsMapToAdminEmail.getValue()));
+                rewardViews.stream().collect(groupingBy(rewardView -> rewardView.recipient().email())).entrySet()) {
+            final ShortContributorView recipient = listOfPaidRewardsMapToAdminEmail.getValue().get(0).recipient();
+
+            mailObserver.send(new RewardsPaid(listOfPaidRewardsMapToAdminEmail.getKey(), recipient.login(), isNull(recipient.id()) ? null : recipient.id(),
+                    listOfPaidRewardsMapToAdminEmail.getValue().stream()
+                            .map(rewardDetailsView -> ShortReward.builder().
+                                    id(rewardDetailsView.id())
+                                    .amount(rewardDetailsView.money().amount())
+                                    .projectName(rewardDetailsView.project().name())
+                                    .currencyCode(rewardDetailsView.money().currency().code().toString())
+                                    .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
+                                    .build()).toList()
+            ));
         }
         accountingRewardStoragePort.markRewardsAsPaymentNotified(rewardViews.stream()
                 .map(RewardDetailsView::id)

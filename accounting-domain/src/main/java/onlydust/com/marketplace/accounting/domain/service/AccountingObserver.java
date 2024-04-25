@@ -20,6 +20,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -81,12 +82,12 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
         final RewardDetailsView rewardDetailsView = getRewardDetailsView(rewardId);
         if (nonNull(rewardDetailsView.recipient().email())) {
             accountingMailObserver.send(new RewardCreated(rewardDetailsView.recipient().email(),
-                    rewardDetailsView.githubUrls().size(), rewardDetailsView.requester().login(), ShortReward.builder()
+                    rewardDetailsView.githubUrls().size(), rewardDetailsView.requester().login(), rewardDetailsView.recipient().login(), ShortReward.builder()
                     .amount(rewardDetailsView.money().amount())
                     .currencyCode(rewardDetailsView.money().currency().code().toString())
                     .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
                     .id(rewardId)
-                    .build()));
+                    .build(), isNull(rewardDetailsView.recipient().id()) ? null : rewardDetailsView.recipient().id()));
 
         } else {
             LOGGER.warn("Unable to send reward created email to contributor %s".formatted(rewardDetailsView.recipient().login()));
@@ -98,12 +99,14 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
         rewardStatusStorage.delete(rewardId);
         final RewardDetailsView rewardDetailsView = getRewardDetailsView(rewardId);
         if (nonNull(rewardDetailsView.recipient().email())) {
-            accountingMailObserver.send(new RewardCanceled(rewardDetailsView.recipient().email(), ShortReward.builder()
-                    .amount(rewardDetailsView.money().amount())
-                    .currencyCode(rewardDetailsView.money().currency().code().toString())
-                    .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
-                    .id(rewardId)
-                    .build()));
+            accountingMailObserver.send(new RewardCanceled(rewardDetailsView.recipient().email(), rewardDetailsView.recipient().login(),
+                    ShortReward.builder()
+                            .amount(rewardDetailsView.money().amount())
+                            .currencyCode(rewardDetailsView.money().currency().code().toString())
+                            .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
+                            .id(rewardId)
+                            .build(),
+                    isNull(rewardDetailsView.recipient().id()) ? null : rewardDetailsView.recipient().id()));
         } else {
             LOGGER.warn("Unable to send cancel reward mail to recipient %s due to missing email".formatted(rewardDetailsView.recipient().login()));
         }
@@ -203,7 +206,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
                     .orElseThrow(() -> internalServerError(("Owner %s not found for billing profile %s")
                             .formatted(billingProfileVerificationUpdated.getUserId().value(), billingProfileId.value())));
             if (nonNull(owner.email())) {
-                accountingMailObserver.send(new BillingProfileVerificationFailed(owner.email(), billingProfileId, owner.login(),
+                accountingMailObserver.send(new BillingProfileVerificationFailed(owner.email(), UserId.of(owner.id()), billingProfileId, owner.login(),
                         billingProfileVerificationUpdated.getVerificationStatus()));
             } else {
                 LOGGER.warn("Unable to send billing profile verifcation failed mail to user %s".formatted(billingProfileVerificationUpdated.getUserId()));

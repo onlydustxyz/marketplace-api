@@ -147,6 +147,7 @@ class InvoiceServiceTest {
 
         final var invoiceCreatorId = UserId.random();
         final var invoiceCreator = BillingProfileCoworkerView.builder()
+                .userId(UserId.random())
                 .login(faker.name().username())
                 .email(faker.internet().emailAddress())
                 .firstName(faker.name().firstName())

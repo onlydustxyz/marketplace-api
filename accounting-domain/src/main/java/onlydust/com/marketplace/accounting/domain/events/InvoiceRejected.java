@@ -10,6 +10,7 @@ import onlydust.com.marketplace.kernel.model.EventType;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @Value
 @AllArgsConstructor
@@ -25,6 +26,8 @@ public class InvoiceRejected extends Event {
     @NonNull
     String billingProfileAdminGithubLogin;
     String billingProfileAdminFirstName;
+    @NonNull
+    UUID billingProfileAdminId;
     @NonNull
     String invoiceName;
     @NonNull

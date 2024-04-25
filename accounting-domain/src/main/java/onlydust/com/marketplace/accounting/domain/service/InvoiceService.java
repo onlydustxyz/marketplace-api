@@ -58,6 +58,7 @@ public class InvoiceService implements InvoiceFacadePort {
             billingProfileObserver.onInvoiceRejected(new InvoiceRejected(billingProfileAdmin.email(),
                     (long) invoice.rewards().size(), billingProfileAdmin.login(),
                     billingProfileAdmin.firstName(),
+                    billingProfileAdmin.userId().value(),
                     invoice.number().value(),
                     invoice.rewards().stream()
                             .map(reward -> ShortReward.builder()

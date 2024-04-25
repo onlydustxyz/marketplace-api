@@ -7,10 +7,11 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.view.MoneyView;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.EventType;
+
+import java.util.UUID;
 
 @Value
 @AllArgsConstructor
@@ -20,7 +21,10 @@ import onlydust.com.marketplace.kernel.model.EventType;
 @EventType("RewardCanceled")
 public class RewardCanceled extends Event {
     @NonNull
-    String email;
+    String recipientEmail;
+    @NonNull
+    String recipientGithubLogin;
     @NonNull
     ShortReward shortReward;
+    UUID recipientId;
 }

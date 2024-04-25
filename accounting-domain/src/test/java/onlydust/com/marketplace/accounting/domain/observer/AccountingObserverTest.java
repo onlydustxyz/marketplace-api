@@ -120,7 +120,7 @@ public class AccountingObserverTest {
                     .invoiceReceivedAt(null)
                     .paidAt(null)
                     .withAdditionalNetworks(Set.of(Network.ETHEREUM, Network.OPTIMISM));
-            final MoneyView moneyView = mock(MoneyView.class);
+            final MoneyView moneyView = new MoneyView(BigDecimal.ONE, Currency.crypto("OP", Currency.Code.OP, 3));
             final ProjectShortView shortProjectView = ProjectShortView.builder()
                     .name(faker.name().fullName())
                     .shortDescription(faker.rickAndMorty().character())
@@ -129,9 +129,9 @@ public class AccountingObserverTest {
                     .slug(faker.lorem().characters())
                     .build();
             final ShortContributorView recipient = new ShortContributorView(faker.rickAndMorty().character(), faker.gameOfThrones().character(),
-                    faker.internet().emailAddress());
+                    faker.internet().emailAddress(), UUID.randomUUID());
             final ShortContributorView requester = new ShortContributorView(faker.rickAndMorty().character(), faker.gameOfThrones().character(),
-                    faker.internet().emailAddress());
+                    faker.internet().emailAddress(), null);
             final RewardDetailsView rewardDetailsView = RewardDetailsView.builder()
                     .money(moneyView)
                     .id(rewardId)
@@ -159,12 +159,12 @@ public class AccountingObserverTest {
             verify(rewardStatusStorage, times(2)).save(any());
             assertThat(rewardStatus.usdAmount()).isPresent();
             verify(mailObserver).send(new RewardCreated(recipient.email(), rewardDetailsView.githubUrls().size(),
-                    requester.login(), ShortReward.builder()
+                    requester.login(), recipient.login(), ShortReward.builder()
                     .amount(rewardDetailsView.money().amount())
                     .currencyCode(rewardDetailsView.money().currency().code().toString())
                     .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
                     .id(rewardId)
-                    .build()));
+                    .build(), recipient.id()));
         }
     }
 
@@ -175,7 +175,7 @@ public class AccountingObserverTest {
         @Test
         public void should_cancel_reward() {
             // When
-            final MoneyView moneyView = mock(MoneyView.class);
+            final MoneyView moneyView = new MoneyView(BigDecimal.ONE, Currency.crypto("OP", Currency.Code.OP, 3));
             final ProjectShortView shortProjectView = ProjectShortView.builder()
                     .name(faker.name().fullName())
                     .shortDescription(faker.rickAndMorty().character())
@@ -184,9 +184,9 @@ public class AccountingObserverTest {
                     .slug(faker.lorem().characters())
                     .build();
             final ShortContributorView recipient = new ShortContributorView(faker.rickAndMorty().character(), faker.gameOfThrones().character(),
-                    faker.internet().emailAddress());
+                    faker.internet().emailAddress(), UUID.randomUUID());
             final ShortContributorView requester = new ShortContributorView(faker.rickAndMorty().character(), faker.gameOfThrones().character(),
-                    faker.internet().emailAddress());
+                    faker.internet().emailAddress(), UUID.randomUUID());
             final RewardDetailsView rewardDetailsView = RewardDetailsView.builder()
                     .money(moneyView)
                     .id(rewardId)
@@ -205,12 +205,12 @@ public class AccountingObserverTest {
 
             // Then
             verify(rewardStatusStorage).delete(rewardId);
-            verify(mailObserver).send(new RewardCanceled(recipient.email(), ShortReward.builder()
+            verify(mailObserver).send(new RewardCanceled(recipient.email(), recipient.login(), ShortReward.builder()
                     .amount(rewardDetailsView.money().amount())
                     .currencyCode(rewardDetailsView.money().currency().code().toString())
                     .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
                     .id(rewardId)
-                    .build()));
+                    .build(), recipient.id()));
         }
 
         @Test
@@ -225,9 +225,9 @@ public class AccountingObserverTest {
                     .slug(faker.lorem().characters())
                     .build();
             final ShortContributorView recipient = new ShortContributorView(faker.rickAndMorty().character(), faker.gameOfThrones().character(),
-                    null);
+                    null, UUID.randomUUID());
             final ShortContributorView requester = new ShortContributorView(faker.rickAndMorty().character(), faker.gameOfThrones().character(),
-                    faker.internet().emailAddress());
+                    faker.internet().emailAddress(), UUID.randomUUID());
             when(accountingRewardStoragePort.getReward(rewardId))
                     .thenReturn(Optional.of(RewardDetailsView.builder()
                             .money(moneyView)
@@ -558,6 +558,7 @@ public class AccountingObserverTest {
                     3L,
                     faker.internet().slug(),
                     faker.name().firstName(),
+                    UUID.randomUUID(),
                     invoice.number().toString(),
                     invoice.rewards().stream().map(r -> ShortReward.builder()
                             .id(r.id())
@@ -810,8 +811,9 @@ public class AccountingObserverTest {
             final UUID kybId = UUID.randomUUID();
             final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, VerificationType.KYC,
                     VerificationStatus.CLOSED, null, UserId.random(), null, faker.rickAndMorty().character(), null);
+            final UUID userId = UUID.randomUUID();
             final ShortContributorView shortContributorView = new ShortContributorView(faker.rickAndMorty().character(), faker.internet().url(),
-                    faker.internet().emailAddress());
+                    faker.internet().emailAddress(), userId);
             final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
             final Kyc kyc =
                     Kyc.builder().id(billingProfileVerificationUpdated.getVerificationId())
@@ -825,7 +827,8 @@ public class AccountingObserverTest {
             accountingObserver.onBillingProfileUpdated(billingProfileVerificationUpdated);
 
             // Then
-            verify(mailObserver).send(new BillingProfileVerificationFailed(shortContributorView.email(), billingProfileId, shortContributorView.login(),
+            verify(mailObserver).send(new BillingProfileVerificationFailed(shortContributorView.email(), UserId.of(userId), billingProfileId,
+                    shortContributorView.login(),
                     billingProfileVerificationUpdated.getVerificationStatus()));
             verify(notificationPort).notify(billingProfileVerificationUpdated);
             verify(webhookPort).send(billingProfileVerificationUpdated);
