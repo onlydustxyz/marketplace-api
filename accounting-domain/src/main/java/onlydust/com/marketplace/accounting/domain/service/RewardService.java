@@ -70,7 +70,7 @@ public class RewardService implements AccountingRewardPort {
                 rewardViews.stream().collect(groupingBy(rewardView -> rewardView.recipient().email())).entrySet()) {
             final ShortContributorView recipient = listOfPaidRewardsMapToAdminEmail.getValue().get(0).recipient();
 
-            mailObserver.send(new RewardsPaid(listOfPaidRewardsMapToAdminEmail.getKey(), recipient.login(), isNull(recipient.id()) ? null : recipient.id(),
+            mailObserver.send(new RewardsPaid(listOfPaidRewardsMapToAdminEmail.getKey(), recipient.login(), isNull(recipient.userId()) ? null : recipient.userId().value(),
                     listOfPaidRewardsMapToAdminEmail.getValue().stream()
                             .map(rewardDetailsView -> ShortReward.builder().
                                     id(rewardDetailsView.id())

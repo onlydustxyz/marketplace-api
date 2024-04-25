@@ -5,6 +5,9 @@ import io.hypersistence.utils.hibernate.type.array.EnumArrayType;
 import io.hypersistence.utils.hibernate.type.array.internal.AbstractArrayType;
 import jakarta.persistence.*;
 import lombok.*;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Parameter;
@@ -53,4 +56,8 @@ public class UserEntity {
     @Column(name = "updated_at", nullable = false)
     @EqualsAndHashCode.Exclude
     private Date updatedAt;
+
+    public ShortContributorView toDomain() {
+        return new ShortContributorView(GithubUserId.of(githubUserId), githubLogin, githubAvatarUrl, UserId.of(id), githubEmail);
+    }
 }

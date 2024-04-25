@@ -9,7 +9,6 @@ import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
-import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
 import onlydust.com.marketplace.accounting.domain.view.ShortRewardDetailsView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import org.hibernate.annotations.Immutable;
@@ -29,9 +28,11 @@ public class ShortRewardViewEntity {
     UUID id;
     @ManyToOne
     @JoinColumn(name = "recipientId", referencedColumnName = "githubUserId")
+    @NonNull
     AllUserViewEntity recipient;
     @ManyToOne
     @JoinColumn(name = "requestorId", referencedColumnName = "userId")
+    @NonNull
     AllUserViewEntity requester;
     @NonNull
     UUID projectId;
@@ -45,6 +46,7 @@ public class ShortRewardViewEntity {
     @NonNull
     BigDecimal amount;
     @ManyToOne
+    @NonNull
     CurrencyEntity currency;
 
     public ShortRewardDetailsView toDomain() {
@@ -57,9 +59,9 @@ public class ShortRewardViewEntity {
                         .shortDescription(this.projectShortDescription)
                         .slug(this.projectSlug)
                         .build())
-                .recipient(new ShortContributorView(recipient.login(), recipient.avatarUrl(), recipient.email(), recipient.userId()))
-                .requester(new ShortContributorView(requester.login(), requester.avatarUrl(), requester.email(), requester.userId()))
-                .money(new MoneyView(this.amount, this.currency.toDomain(), null, null))
+                .recipient(recipient.toDomain())
+                .requester(requester.toDomain())
+                .money(new MoneyView(this.amount, this.currency.toDomain()))
                 .build();
     }
 

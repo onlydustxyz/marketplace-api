@@ -3288,12 +3288,15 @@ components:
     RecipientLinkResponse:
       type: object
       required:
+        - githubUserId
         - login
         - avatarUrl
       properties:
+        githubUserId:
+          $ref: '#/components/schemas/GithubUserId'
+        userId:
+          $ref: '#/components/schemas/UserId'
         login:
-          type: string
-        name:
           type: string
         avatarUrl:
           type: string
