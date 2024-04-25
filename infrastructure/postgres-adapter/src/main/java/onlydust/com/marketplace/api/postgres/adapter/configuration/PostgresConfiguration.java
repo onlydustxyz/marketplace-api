@@ -214,14 +214,16 @@ public class PostgresConfiguration {
                                                        final BackofficeRewardViewRepository backofficeRewardViewRepository,
                                                        final RewardRepository rewardRepository,
                                                        final PaymentShortViewRepository paymentShortViewRepository,
-                                                       final ShortRewardViewRepository shortRewardViewRepository) {
+                                                       final ShortRewardViewRepository shortRewardViewRepository,
+                                                       final BackofficeEarningsViewRepository backofficeEarningsViewRepository) {
         return new PostgresRewardAdapter(shortProjectViewEntityRepository,
                 batchPaymentRepository,
                 rewardDetailsViewRepository,
                 backofficeRewardViewRepository,
                 rewardRepository,
                 paymentShortViewRepository,
-                shortRewardViewRepository);
+                shortRewardViewRepository,
+                backofficeEarningsViewRepository);
     }
 
     @Bean

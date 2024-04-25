@@ -1387,6 +1387,101 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/users/{userId}:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeUser
+      summary: Get user page
+      operationId: getUserById
+      description: |
+        Get user details
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserId'
+      responses:
+        "200":
+          description: 'User'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetailsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/earnings:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Get user earned data
+      operationId: getUserEarnedDetails
+      description: |
+        Get user earned data
+      parameters:
+        - in: query
+          name: statuses
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/RewardStatusContract'
+          style: form
+        - in: query
+          name: recipients
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/GithubUserId'
+          style: form
+        - in: query
+          name: billingProfiles
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/BillingProfileId'
+          style: form
+        - in: query
+          name: projects
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ProjectId'
+          style: form
+        - in: query
+          name: fromDate
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: toDate
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+      responses:
+        "200":
+          description: 'User earned data'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EarningsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /bo/v1/projects:
     get:
       security:
@@ -2466,6 +2561,103 @@ components:
           type: string
           format: date-time
 
+    UserDetailsResponse:
+      type: object
+      required:
+        - id
+        - githubUserId
+        - login
+        - avatarUrl
+        - email
+        - lastSeenAt
+      properties:
+        id:
+          $ref: '#/components/schemas/UserId'
+        githubUserId:
+          $ref: '#/components/schemas/GithubUserId'
+        login:
+          type: string
+          description: User's Github login
+          example: ofux
+        avatarUrl:
+          type: string
+          format: url
+          description: Direct URL to user's avatar image
+          example: 'https://avatars.githubusercontent.com/u/595505?v=4'
+        email:
+          type: string
+          format: email
+          description: User's email
+        lastSeenAt:
+          type: string
+          format: date-time
+          description: Last time the user interacted with the platform
+        signedUpAt:
+          type: string
+          format: date-time
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactInformation'
+        leadedProjectCount:
+          type: integer
+          description: Number of projects the user leads
+          example: 1
+        totalEarnedUsd:
+          type: number
+          description: Total amount earned by the user in USD
+          example: 1000
+        billingProfiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillingProfileShortResponse'
+
+    EarningsResponse:
+      type: object
+      required:
+        - totalUsdAmount
+        - amountsPerCurrency
+      properties:
+        totalUsdAmount:
+          type: number
+        amountsPerCurrency:
+          type: array
+          items:
+            allOf:
+              - type: object
+                properties:
+                  rewardCount:
+                    type: integer
+                    format: int64
+              - $ref: '#/components/schemas/TotalMoneyWithUsdEquivalentResponse'
+
+    ContactInformation:
+      type: object
+      required:
+        - channel
+        - contact
+        - visibility
+      properties:
+        channel:
+          $ref: '#/components/schemas/ContactInformationChannel'
+        contact:
+          type: string
+          example: foobar@gmail.com
+        visibility:
+          type: string
+          enum:
+            - public
+            - private
+
+    ContactInformationChannel:
+      type: string
+      enum:
+        - EMAIL
+        - TELEGRAM
+        - TWITTER
+        - DISCORD
+        - LINKEDIN
+        - WHATSAPP
 
     VerificationStatus:
       type: string

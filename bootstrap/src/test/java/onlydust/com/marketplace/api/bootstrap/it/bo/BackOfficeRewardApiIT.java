@@ -699,4 +699,75 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectStatus()
                 .isOk();
     }
+
+    @Test
+    @Order(20)
+    void should_get_earnings_of_the_whole_platform() {
+
+        // When
+        client.get()
+                .uri(getApiURI(EARNINGS)
+                )
+                .header("Authorization", "Bearer " + camille.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalUsdAmount": 2973233.78,
+                          "amountsPerCurrency": [
+                            {
+                              "amount": 29313.00,
+                              "currency": {
+                                "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                "code": "USD",
+                                "name": "US Dollar",
+                                "logoUrl": null,
+                                "decimals": 2
+                              },
+                              "dollarsEquivalent": 29313.00,
+                              "rewardCount": 21
+                            },
+                            {
+                              "amount": 271778.00,
+                              "currency": {
+                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                "code": "USDC",
+                                "name": "USD Coin",
+                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                "decimals": 6
+                              },
+                              "dollarsEquivalent": 2943920.78,
+                              "rewardCount": 223
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
+    @Order(21)
+    void should_get_no_earnings_with_some_specific_filters() {
+
+        // When
+        client.get()
+                .uri(getApiURI(EARNINGS, Map.of(
+                        "fromDate", "2010-02-08",
+                        "toDate", "2010-02-10"))
+                )
+                .header("Authorization", "Bearer " + camille.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalUsdAmount": 0,
+                          "amountsPerCurrency": []
+                        }
+                        """);
+    }
 }
