@@ -2769,7 +2769,12 @@ components:
       type: string
       enum:
         - DEPOSIT
-        - ALLOCATION
+        - WITHDRAWAL
+        - SPEND
+        - MINT
+        - BURN
+        - TRANSFER
+        - REFUND
 
     TotalMoneyWithUsdEquivalentResponse:
       description: |

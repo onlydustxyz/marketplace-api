@@ -9,14 +9,12 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.view.*;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.view.ProjectSponsorView;
 import onlydust.com.marketplace.project.domain.view.backoffice.UserView;
@@ -131,8 +129,7 @@ public interface BackOfficeMapper {
                 .lockedUntil(historicalTransaction.sponsorAccount().lockedUntil().map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
                 .project(mapToProjectLink(historicalTransaction.project()))
                 .amount(new MoneyWithUsdEquivalentResponse()
-                        .amount(historicalTransaction.type().isDebit() ? historicalTransaction.amount().getValue().negate() :
-                                historicalTransaction.amount().getValue())
+                        .amount(historicalTransaction.amount().getValue())
                         .currency(toShortCurrency(historicalTransaction.sponsorAccount().currency()))
                         .dollarsEquivalent(historicalTransaction.usdAmount() == null ? null : historicalTransaction.usdAmount().convertedAmount().getValue())
                         .conversionRate(historicalTransaction.usdAmount() == null ? null : historicalTransaction.usdAmount().conversionRate())
@@ -141,9 +138,13 @@ public interface BackOfficeMapper {
 
     static HistoricalTransactionType mapTransactionType(HistoricalTransaction.Type type) {
         return switch (type) {
-            case DEPOSIT, WITHDRAW -> HistoricalTransactionType.DEPOSIT;
-            case TRANSFER, REFUND -> HistoricalTransactionType.ALLOCATION;
-            default -> throw OnlyDustException.internalServerError("Unexpected transaction type: %s".formatted(type));
+            case DEPOSIT -> HistoricalTransactionType.DEPOSIT;
+            case WITHDRAW -> HistoricalTransactionType.WITHDRAWAL;
+            case SPEND -> HistoricalTransactionType.SPEND;
+            case MINT -> HistoricalTransactionType.MINT;
+            case BURN -> HistoricalTransactionType.BURN;
+            case TRANSFER -> HistoricalTransactionType.TRANSFER;
+            case REFUND -> HistoricalTransactionType.REFUND;
         };
     }
 
@@ -579,8 +580,8 @@ public interface BackOfficeMapper {
         final RewardPageResponse response = new RewardPageResponse();
         response.setTotalPageNumber(page.getTotalPageNumber());
         response.setTotalItemNumber(page.getTotalItemNumber());
-        response.setHasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()));
-        response.setNextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()));
+        response.setHasMore(hasMore(pageIndex, page.getTotalPageNumber()));
+        response.setNextPageIndex(nextPageIndex(pageIndex, page.getTotalPageNumber()));
         page.getContent().forEach(rewardDetailsView -> response.addRewardsItem(new RewardPageItemResponse()
                 .id(rewardDetailsView.id().value())
                 .status(BackOfficeMapper.map(rewardDetailsView.status().as(authenticatedUser)))

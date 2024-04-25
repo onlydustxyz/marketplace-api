@@ -274,12 +274,12 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                           "nextPageIndex": 0,
                           "transactions": [
                             {
-                              "type": "DEPOSIT",
+                              "type": "WITHDRAWAL",
                               "network": "ETHEREUM",
                               "lockedUntil": null,
                               "project": null,
                               "amount": {
-                                "amount": -30,
+                                "amount": 30,
                                 "currency": {
                                   "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
                                   "code": "STRK",
@@ -292,12 +292,12 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                               }
                             },
                             {
-                              "type": "DEPOSIT",
+                              "type": "WITHDRAWAL",
                               "network": "ETHEREUM",
                               "lockedUntil": null,
                               "project": null,
                               "amount": {
-                                "amount": -30,
+                                "amount": 30,
                                 "currency": {
                                   "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
                                   "code": "STRK",
@@ -310,7 +310,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                               }
                             },
                             {
-                              "type": "ALLOCATION",
+                              "type": "REFUND",
                               "network": "ETHEREUM",
                               "lockedUntil": null,
                               "project": {
@@ -331,7 +331,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                               }
                             },
                             {
-                              "type": "ALLOCATION",
+                              "type": "TRANSFER",
                               "network": "ETHEREUM",
                               "lockedUntil": null,
                               "project": {
@@ -339,7 +339,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                               },
                               "amount": {
-                                "amount": -90,
+                                "amount": 90,
                                 "currency": {
                                   "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
                                   "code": "STRK",
@@ -789,7 +789,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                           "nextPageIndex": 0,
                           "transactions": [
                             {
-                              "type": "ALLOCATION",
+                              "type": "TRANSFER",
                               "network": "ETHEREUM",
                               "lockedUntil": null,
                               "project": {
@@ -797,7 +797,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                 "logoUrl": null
                               },
                               "amount": {
-                                "amount": -100,
+                                "amount": 100,
                                 "currency": {
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
@@ -1046,7 +1046,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                           "nextPageIndex": 0,
                           "transactions": [
                             {
-                              "type": "ALLOCATION",
+                              "type": "TRANSFER",
                               "network": "STARKNET",
                               "lockedUntil": null,
                               "project": {
@@ -1054,7 +1054,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                 "logoUrl": null
                               },
                               "amount": {
-                                "amount": -100,
+                                "amount": 100,
                                 "currency": {
                                   "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                   "code": "USDC",
@@ -1259,7 +1259,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                           "nextPageIndex": 0,
                           "transactions": [
                             {
-                              "type": "ALLOCATION",
+                              "type": "TRANSFER",
                               "network": "APTOS",
                               "lockedUntil": null,
                               "project": {
@@ -1267,7 +1267,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                 "logoUrl": null
                               },
                               "amount": {
-                                "amount": -100,
+                                "amount": 100,
                                 "currency": {
                                   "code": "APT"
                                 }
