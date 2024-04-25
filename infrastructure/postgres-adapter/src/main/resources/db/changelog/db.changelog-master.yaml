@@ -244,8 +244,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelogs/00000210_create_hackathons_table.sql
   - include:
-      file: db/changelog/changelogs/00000210_add_ecosystem_and_sponsor_metrics.sql
-  - include:
       file: db/changelog/changelogs/00000211_drop_legacy_tables.sql
   - include:
       file: db/changelog/changelogs/00000212_add_new_contributors_in_bi_views.sql
