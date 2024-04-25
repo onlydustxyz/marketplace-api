@@ -552,6 +552,30 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
     @Test
     @Order(5)
+    void should_get_all_rewards_with_recipient_id() {
+        // Given
+        anthony = UserId.of(userAuthHelper.authenticateAnthony().user().getId());
+        final var billingProfile = billingProfileService.getBillingProfilesForUser(anthony).stream()
+                .filter(b -> b.getType() == BillingProfile.Type.SELF_EMPLOYED)
+                .findFirst().orElseThrow();
+
+        // When
+        final var rewards = client.get()
+                .uri(getApiURI(REWARDS, Map.of("pageIndex", "0", "pageSize", "5", "recipients", "595505")))
+                .header("Authorization", "Bearer " + camille.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(RewardPageResponse.class)
+                .returnResult().getResponseBody().getRewards();
+
+        assertThat(rewards.size()).isGreaterThan(0);
+        assertThat(rewards).allMatch(reward -> reward.getRecipient().getLogin().equals("ofux"));
+    }
+
+    @Test
+    @Order(10)
     void should_export_all_rewards_between_requested_dates() {
 
         // When
@@ -583,7 +607,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
     }
 
     @Test
-    @Order(5)
+    @Order(11)
     void should_export_all_rewards_for_a_given_billing_profile() {
         // Given
         olivier = UserId.of(userAuthHelper.authenticateOlivier().user().getId());
@@ -612,7 +636,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
     }
 
     @Test
-    @Order(6)
+    @Order(12)
     void should_export_all_rewards_between_processed_dates() {
         // When
         final var csv = client.get()
@@ -642,7 +666,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
     }
 
     @Test
-    @Order(7)
+    @Order(13)
     void should_export_nothing_when_there_is_no_reward() {
         // When
         final var csv = client.get()
@@ -663,7 +687,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
     }
 
     @Test
-    @Order(8)
+    @Order(14)
     void should_export_all_rewards_without_status_filter() {
         // When
         client.get()

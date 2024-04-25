@@ -7,6 +7,7 @@ import onlydust.com.backoffice.api.contract.BackofficeAccountingManagementApi;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.port.in.*;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
@@ -166,6 +167,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     public ResponseEntity<RewardPageResponse> getRewards(Integer pageIndex, Integer pageSize,
                                                          List<RewardStatusContract> statuses,
                                                          List<UUID> billingProfiles,
+                                                         List<Long> recipients,
                                                          String fromRequestedAt,
                                                          String toRequestedAt,
                                                          String fromProcessedAt,
@@ -180,6 +182,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                 sanitizedPageSize,
                 statuses != null ? statuses.stream().map(BackOfficeMapper::map).toList() : null,
                 billingProfiles != null ? billingProfiles.stream().map(BillingProfile.Id::of).toList() : null,
+                recipients != null ? recipients.stream().map(GithubUserId::of).toList() : null,
                 DateMapper.parseNullable(fromRequestedAt),
                 DateMapper.parseNullable(toRequestedAt),
                 DateMapper.parseNullable(fromProcessedAt),

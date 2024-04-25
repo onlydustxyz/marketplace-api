@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
@@ -38,11 +39,12 @@ public class RewardService implements AccountingRewardPort {
     public Page<RewardDetailsView> getRewards(int pageIndex, int pageSize,
                                               List<RewardStatus.Input> statuses,
                                               List<BillingProfile.Id> billingProfileIds,
+                                              List<GithubUserId> recipients,
                                               Date fromRequestedAt, Date toRequestedAt,
                                               Date fromProcessedAt, Date toProcessedAt) {
         final Set<RewardStatus.Input> sanitizedStatuses = isNull(statuses) ? Set.of() : statuses.stream().collect(Collectors.toUnmodifiableSet());
         return accountingRewardStoragePort.findRewards(pageIndex, pageSize, sanitizedStatuses, Optional.ofNullable(billingProfileIds).orElse(List.of()),
-                fromRequestedAt, toRequestedAt, fromProcessedAt, toProcessedAt);
+                Optional.ofNullable(recipients).orElse(List.of()), fromRequestedAt, toRequestedAt, fromProcessedAt, toProcessedAt);
     }
 
     @Override
@@ -51,8 +53,8 @@ public class RewardService implements AccountingRewardPort {
                                    Date fromRequestedAt, Date toRequestedAt,
                                    Date fromProcessedAt, Date toProcessedAt) {
         final var rewards = accountingRewardStoragePort.findRewards(0, 1_000_000,
-                statuses.stream().collect(Collectors.toUnmodifiableSet()), Optional.ofNullable(billingProfileIds).orElse(List.of()), fromRequestedAt,
-                toRequestedAt, fromProcessedAt, toProcessedAt);
+                statuses.stream().collect(Collectors.toUnmodifiableSet()), Optional.ofNullable(billingProfileIds).orElse(List.of()),
+                List.of(), fromRequestedAt, toRequestedAt, fromProcessedAt, toProcessedAt);
 
         if (rewards.getTotalPageNumber() > 1) {
             throw badRequest("Too many rewards to export");

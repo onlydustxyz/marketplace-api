@@ -646,6 +646,14 @@ paths:
               $ref: '#/components/schemas/BillingProfileId'
           style: form
         - in: query
+          name: recipients
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/GithubUserId'
+          style: form
+        - in: query
           name: fromRequestedAt
           required: false
           schema:

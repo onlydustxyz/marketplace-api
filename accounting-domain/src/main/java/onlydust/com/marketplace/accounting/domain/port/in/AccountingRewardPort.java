@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain.port.in;
 
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -14,6 +15,7 @@ public interface AccountingRewardPort {
     Page<RewardDetailsView> getRewards(int pageIndex, int pageSize,
                                        List<RewardStatus.Input> statuses,
                                        List<BillingProfile.Id> billingProfileIds,
+                                       List<GithubUserId> recipients,
                                        Date fromRequestedAt, Date toRequestedAt,
                                        Date fromProcessedAt, Date toProcessedAt);
 
