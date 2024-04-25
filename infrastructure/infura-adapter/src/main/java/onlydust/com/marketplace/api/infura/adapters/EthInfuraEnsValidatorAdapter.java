@@ -6,6 +6,10 @@ import onlydust.com.marketplace.api.infura.InfuraClient;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import org.web3j.ens.EnsResolver;
 
+import java.math.BigInteger;
+
+import static java.math.BigInteger.ZERO;
+
 @Slf4j
 public class EthInfuraEnsValidatorAdapter extends InfuraClient implements WalletValidator<Name> {
     private final EnsResolver resolver;
@@ -17,6 +21,7 @@ public class EthInfuraEnsValidatorAdapter extends InfuraClient implements Wallet
 
     @Override
     public boolean isValid(Name wallet) {
-        return resolver.resolve(wallet.toString()) != null;
+        final var address = resolver.resolve(wallet.toString());
+        return new BigInteger(address.substring(2), 16).compareTo(ZERO) > 0;
     }
 }

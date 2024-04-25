@@ -8,6 +8,7 @@ import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
+import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 import org.springframework.core.io.Resource;
@@ -44,7 +45,7 @@ public class BackofficeCurrencyManagementRestApi implements BackofficeCurrencyMa
                 yield switch (blockchain) {
                     case ETHEREUM, OPTIMISM -> currencyFacadePort.addERC20Support(blockchain, Ethereum.contractAddress(request.getAddress()));
                     case STARKNET -> currencyFacadePort.addERC20Support(blockchain, StarkNet.contractAddress(request.getAddress()));
-                    default -> throw badRequest("Standard %s is not supported for blockchain %s".formatted(request.getStandard(), request.getBlockchain()));
+                    case APTOS -> currencyFacadePort.addERC20Support(blockchain, Aptos.coinType(request.getAddress()));
                 };
             }
 
