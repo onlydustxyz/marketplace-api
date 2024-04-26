@@ -11,9 +11,15 @@ import onlydust.com.marketplace.project.domain.model.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -166,5 +172,69 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         final OnboardingEntity updatedOnboardingEntity = onboardingRepository.getById(userId);
         assertThat(updatedOnboardingEntity.getProfileWizardDisplayDate().toInstant()).isEqualTo(onboarding.getProfileWizardDisplayDate().toInstant());
         assertThat(updatedOnboardingEntity.getTermsAndConditionsAcceptanceDate()).isEqualTo(newDate);
+    }
+
+    @Test
+    void should_support_concurrent_calls_to_createUser() throws InterruptedException {
+        final int numberOfThreads = 5;
+        final int numberOfIterationPerThread = 50;
+        final ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
+        final CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        final var thrown = new ConcurrentLinkedQueue<Throwable>();
+        final var retrievedGithubUsers = new ConcurrentLinkedQueue<User>();
+
+        final var githubUserId = faker.number().randomNumber(10, true);
+
+        final var userData = User.builder()
+                .githubUserId(githubUserId)
+                .githubLogin(faker.name().name())
+                .githubAvatarUrl(faker.internet().avatar())
+                .githubEmail(faker.internet().emailAddress())
+                .roles(List.of(AuthenticatedUser.Role.USER))
+                .build();
+
+        // When
+        for (int t = 0; t < numberOfThreads; t++) {
+            service.execute(() -> {
+                TransactionSynchronizationManager.initSynchronization();
+                try {
+                    System.out.println("Thread " + Thread.currentThread().getName() + " started");
+                    final var user = User.builder()
+                            .githubUserId(githubUserId)
+                            .id(UUID.randomUUID())
+                            .githubLogin(userData.getGithubLogin())
+                            .githubAvatarUrl(userData.getGithubAvatarUrl())
+                            .githubEmail(userData.getGithubEmail())
+                            .roles(userData.getRoles())
+                            .build();
+                    for (int i = 0; i < numberOfIterationPerThread; i++) {
+                        try {
+                            final var u = postgresUserAdapter.createUser(user);
+                            retrievedGithubUsers.add(u);
+                        } catch (Exception e) {
+                            thrown.add(e);
+                        }
+                    }
+                    latch.countDown();
+                    System.out.println("Thread " + Thread.currentThread().getName() + " ended");
+                } finally {
+                    TransactionSynchronizationManager.clear();
+                }
+            });
+        }
+        latch.await();
+
+        // Then
+        assertThat(thrown).isEmpty();
+        assertThat(retrievedGithubUsers).hasSize(numberOfThreads * numberOfIterationPerThread);
+        final var userId = retrievedGithubUsers.stream().findFirst().get().getId();
+        retrievedGithubUsers.forEach(u -> {
+            assertThat(u.getGithubUserId()).isEqualTo(githubUserId);
+            assertThat(u.getGithubLogin()).isEqualTo(userData.getGithubLogin());
+            assertThat(u.getGithubAvatarUrl()).isEqualTo(userData.getGithubAvatarUrl());
+            assertThat(u.getGithubEmail()).isEqualTo(userData.getGithubEmail());
+            assertThat(u.getRoles()).containsExactlyElementsOf(userData.getRoles());
+            assertThat(u.getId()).isEqualTo(userId);
+        });
     }
 }
