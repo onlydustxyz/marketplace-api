@@ -21,8 +21,7 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.*;
 import static onlydust.com.marketplace.accounting.domain.model.Amount.*;
 import static onlydust.com.marketplace.accounting.domain.model.SponsorAccount.Transaction.Type.SPEND;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 
 @AllArgsConstructor
 public class AccountingService implements AccountingFacadePort {
@@ -173,11 +172,14 @@ public class AccountingService implements AccountingFacadePort {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
 
+        if (invoiceStoragePort.invoiceOf(rewardId).map(i -> i.status().isActive()).orElse(false))
+            throw forbidden("Reward %s cannot be cancelled because it is included in an invoice".formatted(rewardId));
+
         final var refundedAccounts = accountBook.refund(AccountId.of(rewardId));
         saveAccountBook(currency, accountBook);
         accountingObserver.onRewardCancelled(rewardId);
-        refundedAccounts.stream().filter(AccountId::isProject).map(AccountId::projectId).forEach(refundedProjectId -> onAllowanceUpdated(refundedProjectId,
-                currencyId, accountBook.state()));
+        refundedAccounts.stream().filter(AccountId::isProject).map(AccountId::projectId)
+                .forEach(refundedProjectId -> onAllowanceUpdated(refundedProjectId, currencyId, accountBook.state()));
     }
 
     @Override
@@ -418,7 +420,7 @@ public class AccountingService implements AccountingFacadePort {
 
         private boolean isPayable(RewardId rewardId) {
             if (accountBookState.balanceOf(AccountId.of(rewardId)).isZero()) return false;
-            if (!invoiceStoragePort.invoiceOf(rewardId).map(i -> i.status() == Invoice.Status.APPROVED).orElse(false))
+            if (!invoiceStoragePort.invoiceOf(rewardId).map(i -> i.status().isApproved()).orElse(false))
                 return false;
 
             return accountBookState.balancePerOrigin(AccountId.of(rewardId)).entrySet().stream().allMatch(entry -> {

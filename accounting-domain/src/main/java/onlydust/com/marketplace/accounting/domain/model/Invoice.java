@@ -75,6 +75,10 @@ public class Invoice {
         public boolean isActive() {
             return this != DRAFT && this != REJECTED;
         }
+
+        public boolean isApproved() {
+            return this == APPROVED;
+        }
     }
 
     public BillingProfile.Type billingProfileType() {

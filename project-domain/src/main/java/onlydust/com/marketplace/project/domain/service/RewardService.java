@@ -54,8 +54,7 @@ public class RewardService implements RewardFacadePort {
                             case pullRequest -> Reward.Item.Type.PULL_REQUEST;
                             case codeReview -> Reward.Item.Type.CODE_REVIEW;
                         })
-                        .build()).toList(),
-                false
+                        .build()).toList()
         );
         rewardStoragePort.save(reward);
 
@@ -71,9 +70,6 @@ public class RewardService implements RewardFacadePort {
 
         final var reward = rewardStoragePort.get(rewardId)
                 .orElseThrow(() -> notFound("Reward %s not found".formatted(rewardId)));
-
-        if (reward.inInvoice())
-            throw forbidden("Reward %s cannot be cancelled because it is included in an invoice".formatted(rewardId));
 
         accountingServicePort.cancelReward(rewardId, reward.currencyId());
         rewardStoragePort.delete(rewardId);

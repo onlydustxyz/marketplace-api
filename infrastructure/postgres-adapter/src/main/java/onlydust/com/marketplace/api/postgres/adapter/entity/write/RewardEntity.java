@@ -1,11 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.project.domain.model.Reward;
-
-import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -34,6 +33,7 @@ public class RewardEntity {
     BigDecimal amount;
     @NonNull
     Date requestedAt;
+
     UUID invoiceId;
 
     @OneToMany(mappedBy = "rewardId", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
@@ -77,7 +77,6 @@ public class RewardEntity {
                 amount,
                 CurrencyView.Id.of(currencyId),
                 requestedAt,
-                rewardItems.stream().map(RewardItemEntity::toRewardItem).toList(),
-                invoiceId != null);
+                rewardItems.stream().map(RewardItemEntity::toRewardItem).toList());
     }
 }

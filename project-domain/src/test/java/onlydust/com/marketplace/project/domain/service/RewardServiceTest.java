@@ -162,8 +162,7 @@ public class RewardServiceTest {
                 BigDecimal.TEN,
                 usdcId,
                 new Date(),
-                List.of(),
-                false
+                List.of()
         );
 
         @BeforeEach
@@ -195,29 +194,5 @@ public class RewardServiceTest {
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("User must be project lead to cancel a reward");
         }
-
-        @Test
-        void should_not_cancel_a_reward_which_is_in_an_invoice() {
-            // Given
-            when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
-            when(rewardStoragePort.get(rewardId)).thenReturn(Optional.of(new Reward(
-                    rewardId,
-                    projectId,
-                    projectLeadId,
-                    recipientId,
-                    BigDecimal.TEN,
-                    usdcId,
-                    new Date(),
-                    List.of(),
-                    true
-            )));
-
-            // When
-            assertThatThrownBy(() -> rewardService.cancelReward(projectLeadId, projectId, rewardId))
-                    // Then
-                    .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("Reward %s cannot be cancelled because it is included in an invoice".formatted(rewardId));
-        }
-
     }
 }
