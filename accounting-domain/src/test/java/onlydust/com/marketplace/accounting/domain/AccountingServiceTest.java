@@ -567,6 +567,7 @@ public class AccountingServiceTest {
             accountingService.createReward(projectId1, rewardId1, PositiveAmount.of(40L), currency.id());
             verify(projectAccountingObserver).onAllowanceUpdated(projectId1, currency.id(), PositiveAmount.of(60L), PositiveAmount.of(100L));
             reset(projectAccountingObserver);
+            when(invoiceStoragePort.invoiceOf(rewardId1)).thenReturn(Optional.of(invoice.status(Invoice.Status.REJECTED)));
 
             // When
             accountingService.cancel(rewardId1, currency.id());
@@ -599,7 +600,7 @@ public class AccountingServiceTest {
             assertThat(accountingService.getPayableRewards(Set.of(rewardId1))).isEmpty();
             assertThatThrownBy(() -> accountingService.cancel(rewardId1, currency.id()))
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessageContaining("Cannot entirely refund");
+                    .hasMessage("Reward %s cannot be cancelled because it is included in an invoice".formatted(rewardId1));
             assertThatThrownBy(() -> accountingService.pay(rewardId1, ZonedDateTime.now(), network, "0x123456789"))
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Reward %s is not payable".formatted(rewardId1));
@@ -988,6 +989,8 @@ public class AccountingServiceTest {
             verify(projectAccountingObserver).onAllowanceUpdated(projectId, currency.id(), PositiveAmount.of(50L), PositiveAmount.of(300L));
             reset(projectAccountingObserver);
 
+            when(invoiceStoragePort.invoiceOf(rewardId)).thenReturn(Optional.empty());
+
             // When
             accountingService.cancel(rewardId, currency.id());
 
@@ -1003,6 +1006,36 @@ public class AccountingServiceTest {
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
             events.forEach(e -> verify(accountBookObserver).on(e));
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = Invoice.Status.class, names = {"PAID", "APPROVED", "TO_REVIEW"})
+        void should_forbid_cancelling_a_reward_linked_to_an_active_invoice(Invoice.Status status) {
+            // Given
+            accountingService.increaseAllowance(unlockedSponsorSponsorAccount1.id(), PositiveAmount.of(200L));
+            accountingService.allocate(unlockedSponsorSponsorAccount1.id(), projectId, PositiveAmount.of(200L), currency.id());
+            accountingService.createReward(projectId, rewardId, PositiveAmount.of(200L), currency.id());
+            when(invoiceStoragePort.invoiceOf(rewardId)).thenReturn(Optional.of(invoice.status(status)));
+
+            // When
+            assertThatThrownBy(() -> accountingService.cancel(rewardId, currency.id()))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Reward %s cannot be cancelled because it is included in an invoice".formatted(rewardId));
+        }
+
+
+        @ParameterizedTest
+        @EnumSource(value = Invoice.Status.class, names = {"PAID", "APPROVED", "TO_REVIEW"}, mode = EnumSource.Mode.EXCLUDE)
+        void should_forbid_cancelling_a_reward_linked_to_an_inactive_invoice(Invoice.Status status) {
+            // Given
+            accountingService.increaseAllowance(unlockedSponsorSponsorAccount1.id(), PositiveAmount.of(200L));
+            accountingService.allocate(unlockedSponsorSponsorAccount1.id(), projectId, PositiveAmount.of(200L), currency.id());
+            accountingService.createReward(projectId, rewardId, PositiveAmount.of(200L), currency.id());
+            when(invoiceStoragePort.invoiceOf(rewardId)).thenReturn(Optional.of(invoice.status(status)));
+
+            // When
+            accountingService.cancel(rewardId, currency.id());
         }
     }
 

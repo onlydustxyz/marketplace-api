@@ -23,7 +23,6 @@ public class Reward {
     @NonNull CurrencyView.Id currencyId;
     @NonNull Date requestedAt;
     @NonNull List<Item> rewardItems;
-    boolean inInvoice;
 
     @Builder
     @Data

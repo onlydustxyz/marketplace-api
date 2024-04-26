@@ -33,50 +33,50 @@ public class RewardViewEntity {
     @NonNull
     Date requestedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "requestorId", referencedColumnName = "id")
     @NonNull
     UserViewEntity requestor;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "recipientId", referencedColumnName = "githubUserId")
     @NonNull
     AllUserViewEntity recipient;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "billingProfileId")
     BillingProfileEntity billingProfile;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "currencyId")
     @NonNull
     CurrencyEntity currency;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "projectId")
     @NonNull
     ProjectEntity project;
 
-    @OneToMany(mappedBy = "rewardId", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "rewardId", fetch = FetchType.EAGER)
     @NonNull
     List<RewardItemEntity> rewardItems;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "invoiceId")
     InvoiceEntity invoice;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(name = "rewards_receipts", schema = "accounting",
             joinColumns = @JoinColumn(name = "reward_id"),
             inverseJoinColumns = @JoinColumn(name = "receipt_id"))
     Set<ReceiptEntity> receipts = new HashSet<>();
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
     @NonNull
     RewardStatusEntity status;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
     @NonNull
     RewardStatusDataEntity statusData;

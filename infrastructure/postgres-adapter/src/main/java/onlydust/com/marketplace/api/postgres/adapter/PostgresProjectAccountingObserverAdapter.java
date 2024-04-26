@@ -21,7 +21,7 @@ public class PostgresProjectAccountingObserverAdapter implements ProjectAccounti
 
     @Override
     public void onAllowanceUpdated(ProjectId projectId, Currency.Id currencyId, PositiveAmount currentAllowance, PositiveAmount initialAllowance) {
-        projectAllowanceRepository.saveAndFlush(new ProjectAllowanceEntity(projectId.value(), currencyId.value(), currentAllowance.getValue(),
+        projectAllowanceRepository.save(new ProjectAllowanceEntity(projectId.value(), currencyId.value(), currentAllowance.getValue(),
                 initialAllowance.getValue()));
     }
 
