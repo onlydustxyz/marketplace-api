@@ -8,6 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.HistoricalTransaction;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
@@ -21,6 +22,7 @@ import java.util.UUID;
 @ToString
 @NoArgsConstructor(force = true)
 @Table(schema = "accounting", name = "all_sponsor_account_transactions")
+@Immutable
 public class SponsorAccountTransactionViewEntity {
     @Id
     @EqualsAndHashCode.Include

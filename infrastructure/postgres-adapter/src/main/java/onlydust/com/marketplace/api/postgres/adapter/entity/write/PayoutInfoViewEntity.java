@@ -14,6 +14,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 
@@ -28,6 +29,7 @@ import static java.util.Objects.nonNull;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 @Entity
+@Immutable
 public class PayoutInfoViewEntity {
     @Id
     UUID billingProfileId;

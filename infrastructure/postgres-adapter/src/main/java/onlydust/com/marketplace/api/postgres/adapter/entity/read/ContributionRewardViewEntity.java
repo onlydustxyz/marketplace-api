@@ -10,6 +10,7 @@ import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.view.ContributionRewardView;
 import onlydust.com.marketplace.project.domain.view.Money;
+import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Immutable
 public class ContributionRewardViewEntity {
 
     @Id

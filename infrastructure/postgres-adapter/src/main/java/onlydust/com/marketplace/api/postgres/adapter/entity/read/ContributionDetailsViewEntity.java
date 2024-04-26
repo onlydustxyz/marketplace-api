@@ -10,6 +10,7 @@ import onlydust.com.marketplace.project.domain.model.GithubRepo;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.view.ContributionDetailsView;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -23,6 +24,7 @@ import java.util.UUID;
 
 @Entity
 @IdClass(ContributionDetailsViewEntity.PrimaryKey.class)
+@Immutable
 public class ContributionDetailsViewEntity {
     @Id
     String id;

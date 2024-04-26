@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileUserRightsView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileUserEntity;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
@@ -14,6 +15,7 @@ import java.util.UUID;
 import static java.util.Objects.isNull;
 
 @Entity
+@Immutable
 public class BillingProfileUserRightsViewEntity {
     @Id
     UUID userId;

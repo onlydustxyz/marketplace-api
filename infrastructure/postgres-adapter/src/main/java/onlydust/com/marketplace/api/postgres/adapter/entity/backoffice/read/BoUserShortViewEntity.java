@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.project.domain.view.backoffice.UserShortView;
+import org.hibernate.annotations.Immutable;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @EqualsAndHashCode
 @Data
 @Entity
+@Immutable
 public class BoUserShortViewEntity {
     @Id
     UUID id;

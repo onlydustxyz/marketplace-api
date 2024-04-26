@@ -7,6 +7,7 @@ import lombok.NonNull;
 import lombok.Value;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountEntity;
 import onlydust.com.marketplace.project.domain.view.GithubIssueView;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
@@ -19,6 +20,7 @@ import java.util.Optional;
 @Value
 @NoArgsConstructor(force = true)
 @Table(schema = "indexer_exp", name = "github_issues")
+@Immutable
 public class GithubIssueViewEntity {
     @Id
     @EqualsAndHashCode.Include

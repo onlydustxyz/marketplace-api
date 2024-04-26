@@ -14,6 +14,7 @@ import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.Money;
 import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.project.domain.view.UserRewardView;
+import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -23,6 +24,7 @@ import java.util.UUID;
 @Value
 @NoArgsConstructor(force = true)
 @Entity
+@Immutable
 public class RewardDetailsViewEntity {
     @Id
     @NonNull

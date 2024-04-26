@@ -10,6 +10,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.view.PayoutPreferenceView;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
@@ -24,6 +25,7 @@ import static java.util.Objects.isNull;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @IdClass(value = PayoutPreferenceViewEntity.PrimaryKey.class)
+@Immutable
 public class PayoutPreferenceViewEntity {
 
     @Id

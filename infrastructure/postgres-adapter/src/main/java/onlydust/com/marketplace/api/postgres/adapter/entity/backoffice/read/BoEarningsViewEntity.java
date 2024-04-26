@@ -5,6 +5,7 @@ import lombok.*;
 import onlydust.com.marketplace.accounting.domain.view.EarningsView;
 import onlydust.com.marketplace.accounting.domain.view.TotalMoneyView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
+import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @EqualsAndHashCode
 @Data
 @Entity
+@Immutable
 public class BoEarningsViewEntity {
     @Id
     @NonNull

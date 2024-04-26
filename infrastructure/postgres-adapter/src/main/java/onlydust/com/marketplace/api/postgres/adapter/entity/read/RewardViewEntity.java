@@ -15,6 +15,7 @@ import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.Money;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
+import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -24,6 +25,7 @@ import java.util.*;
 @NoArgsConstructor(force = true)
 @Table(name = "rewards", schema = "public")
 @Accessors(fluent = true)
+@Immutable
 public class RewardViewEntity {
     @Id
     @NonNull

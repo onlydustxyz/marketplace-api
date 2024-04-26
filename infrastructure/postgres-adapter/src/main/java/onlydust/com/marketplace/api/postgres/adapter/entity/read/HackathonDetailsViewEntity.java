@@ -9,6 +9,7 @@ import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
 import onlydust.com.marketplace.project.domain.view.HackathonDetailsView;
 import onlydust.com.marketplace.project.domain.view.ProjectShortView;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -33,6 +34,7 @@ import static java.util.Objects.isNull;
 @Data
 @Builder
 @EntityListeners(AuditingEntityListener.class)
+@Immutable
 public class HackathonDetailsViewEntity {
     @Id
     @EqualsAndHashCode.Include
