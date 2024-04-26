@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
 @Slf4j
@@ -52,7 +53,7 @@ public class UserService implements UserFacadePort {
                 })
                 .orElseGet(() -> {
                     if (readOnly) {
-                        throw OnlyDustException.notFound("User %d not found".formatted(githubUserIdentity.getGithubUserId()));
+                        throw notFound("User %d not found".formatted(githubUserIdentity.getGithubUserId()));
                     }
 
                     final var user = userStoragePort.createUser(User.builder()
@@ -63,10 +64,16 @@ public class UserService implements UserFacadePort {
                             .githubLogin(githubUserIdentity.getGithubLogin())
                             .githubEmail(githubUserIdentity.getEmail())
                             .build());
-                    
+
                     userObserverPort.onUserSignedUp(user);
                     return user;
                 });
+    }
+
+    @Override
+    public User getUserById(UUID userId) {
+        return userStoragePort.getUserById(userId)
+                .orElseThrow(() -> notFound("User %s not found".formatted(userId)));
     }
 
     @Override
@@ -122,7 +129,7 @@ public class UserService implements UserFacadePort {
                         .githubLogin(githubUserProfile.getGithubLogin())
                         .githubAvatarUrl(githubUserProfile.getGithubAvatarUrl())
                         .githubEmail(githubUserProfile.getEmail())
-                        .build()).orElseThrow(() -> OnlyDustException.notFound(String.format("Github user %s to update was not found",
+                        .build()).orElseThrow(() -> notFound(String.format("Github user %s to update was not found",
                         user.getGithubUserId()))));
     }
 
@@ -159,7 +166,7 @@ public class UserService implements UserFacadePort {
                                                                                           List<UUID> companyAdminBillingProfileIds) {
         final RewardDetailsView reward = userStoragePort.findRewardById(rewardId);
         if (!reward.getTo().getGithubUserId().equals(recipientId) &&
-            (isNull(reward.getBillingProfileId()) || !companyAdminBillingProfileIds.contains(reward.getBillingProfileId()))) {
+                (isNull(reward.getBillingProfileId()) || !companyAdminBillingProfileIds.contains(reward.getBillingProfileId()))) {
             throw OnlyDustException.forbidden("Only recipient user or billing profile admin linked to this reward can read its details");
         }
         return reward;
@@ -169,8 +176,8 @@ public class UserService implements UserFacadePort {
                                                                                                       int pageSize, List<UUID> companyAdminBillingProfileIds) {
         final Page<RewardItemView> page = userStoragePort.findRewardItemsPageById(rewardId, pageIndex, pageSize);
         if (page.getContent().stream().anyMatch(rewardItemView -> !rewardItemView.getRecipientId().equals(recipientId)) &&
-            page.getContent().stream().anyMatch(rewardItemView -> isNull(rewardItemView.getBillingProfileId())
-                                                                  || !companyAdminBillingProfileIds.contains(rewardItemView.getBillingProfileId()))) {
+                page.getContent().stream().anyMatch(rewardItemView -> isNull(rewardItemView.getBillingProfileId())
+                        || !companyAdminBillingProfileIds.contains(rewardItemView.getBillingProfileId()))) {
             throw OnlyDustException.forbidden("Only recipient user or billing profile admin linked to this reward can read its details");
         }
         return page;
@@ -190,8 +197,8 @@ public class UserService implements UserFacadePort {
                 .anyMatch(org -> cannotBeClaimedByUser(user, org));
         if (isNotClaimable) {
             throw OnlyDustException.forbidden("User must be github admin on every organizations not installed and at " +
-                                              "least member on every organization already installed linked to the " +
-                                              "project");
+                    "least member on every organization already installed linked to the " +
+                    "project");
 
         }
         userStoragePort.saveProjectLead(user.getId(), projectId);

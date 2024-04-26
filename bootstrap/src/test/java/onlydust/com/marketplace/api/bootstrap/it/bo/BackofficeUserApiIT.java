@@ -1,10 +1,17 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
 public class BackofficeUserApiIT extends AbstractMarketplaceBackOfficeApiIT {
+    @Autowired
+    BillingProfileService billingProfileService;
 
     @Test
     void should_return_users_page() {
@@ -100,6 +107,189 @@ public class BackofficeUserApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "email": "abuisset@gmail.com",
                               "lastSeenAt": "2023-10-05T19:06:50.034Z",
                               "signedUpAt": "2022-12-12T09:51:58.48559Z"
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
+    void should_return_user_details() {
+        final var anthony = userAuthHelper.authenticateAnthony();
+
+        // When
+        client.get()
+                .uri(getApiURI(GET_USERS_BY_ID.formatted(anthony.user().getId().toString())))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                          "githubUserId": 43467246,
+                          "login": "AnthonyBuisset",
+                          "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                          "email": "abuisset@gmail.com",
+                          "lastSeenAt": "2023-10-05T19:06:50.034Z",
+                          "signedUpAt": "2022-12-12T09:51:58.48559Z",
+                          "contacts": [
+                            {
+                              "channel": "TELEGRAM",
+                              "contact": "https://t.me/abuisset",
+                              "visibility": "public"
+                            },
+                            {
+                              "channel": "EMAIL",
+                              "contact": "abuisset@gmail.com",
+                              "visibility": "private"
+                            },
+                            {
+                              "channel": "TWITTER",
+                              "contact": "https://twitter.com/abuisset",
+                              "visibility": "public"
+                            },
+                            {
+                              "channel": "DISCORD",
+                              "contact": "antho",
+                              "visibility": "public"
+                            }
+                          ],
+                          "leadedProjectCount": 2,
+                          "totalEarnedUsd": 2692632.50,
+                          "billingProfiles": [
+                            {
+                              "id": "50d8ae0d-1981-435b-90c5-09fc32b7d7d6",
+                              "subject": "Anthony BUISSET",
+                              "type": "INDIVIDUAL",
+                              "verificationStatus": "VERIFIED",
+                              "kyb": null,
+                              "kyc": {
+                                "firstName": "Anthony",
+                                "lastName": "BUISSET",
+                                "birthdate": null,
+                                "address": "771 chemin de la sine, 06140, Vence, France",
+                                "country": "France",
+                                "countryCode": "FRA",
+                                "usCitizen": null,
+                                "idDocumentType": null,
+                                "idDocumentNumber": null,
+                                "validUntil": null,
+                                "idDocumentCountryCode": null,
+                                "sumsubUrl": null
+                              }
+                            }
+                          ]
+                        }
+                        """);
+
+        // And given
+        final var userId = UserId.of(anthony.user().getId());
+        final CompanyBillingProfile companyBillingProfile = billingProfileService.createCompanyBillingProfile(userId, faker.rickAndMorty().character(), null);
+        final SelfEmployedBillingProfile selfEmployedBillingProfile = billingProfileService.createSelfEmployedBillingProfile(userId,
+                faker.rickAndMorty().character(), null);
+
+        // When
+        client.get()
+                .uri(getApiURI(GET_USERS_BY_ID.formatted(userId.value().toString())))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                          "githubUserId": 43467246,
+                          "login": "AnthonyBuisset",
+                          "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                          "email": "abuisset@gmail.com",
+                          "lastSeenAt": "2023-10-05T19:06:50.034Z",
+                          "signedUpAt": "2022-12-12T09:51:58.48559Z",
+                          "contacts": [
+                            {
+                              "channel": "DISCORD",
+                              "contact": "antho",
+                              "visibility": "public"
+                            },
+                            {
+                              "channel": "TWITTER",
+                              "contact": "https://twitter.com/abuisset",
+                              "visibility": "public"
+                            },
+                            {
+                              "channel": "TELEGRAM",
+                              "contact": "https://t.me/abuisset",
+                              "visibility": "public"
+                            },
+                            {
+                              "channel": "EMAIL",
+                              "contact": "abuisset@gmail.com",
+                              "visibility": "private"
+                            }
+                          ],
+                          "leadedProjectCount": 2,
+                          "totalEarnedUsd": 2692632.50,
+                          "billingProfiles": [
+                            {
+                              "id": "50d8ae0d-1981-435b-90c5-09fc32b7d7d6",
+                              "subject": "Anthony BUISSET",
+                              "type": "INDIVIDUAL",
+                              "verificationStatus": "VERIFIED",
+                              "kyb": null,
+                              "kyc": {
+                                "firstName": "Anthony",
+                                "lastName": "BUISSET",
+                                "birthdate": null,
+                                "address": "771 chemin de la sine, 06140, Vence, France",
+                                "country": "France",
+                                "countryCode": "FRA",
+                                "usCitizen": null,
+                                "idDocumentType": null,
+                                "idDocumentNumber": null,
+                                "validUntil": null,
+                                "idDocumentCountryCode": null,
+                                "sumsubUrl": null
+                              }
+                            },
+                            {
+                              "subject": null,
+                              "type": "COMPANY",
+                              "verificationStatus": "VERIFIED",
+                              "kyb": {
+                                "name": null,
+                                "registrationNumber": null,
+                                "registrationDate": null,
+                                "address": null,
+                                "country": null,
+                                "countryCode": null,
+                                "usEntity": null,
+                                "subjectToEuropeVAT": null,
+                                "euVATNumber": null,
+                                "sumsubUrl": null
+                              },
+                              "kyc": null
+                            },
+                            {
+                              "subject": null,
+                              "type": "SELF_EMPLOYED",
+                              "verificationStatus": "VERIFIED",
+                              "kyb": {
+                                "name": null,
+                                "registrationNumber": null,
+                                "registrationDate": null,
+                                "address": null,
+                                "country": null,
+                                "countryCode": null,
+                                "usEntity": null,
+                                "subjectToEuropeVAT": null,
+                                "euVATNumber": null,
+                                "sumsubUrl": null
+                              },
+                              "kyc": null
                             }
                           ]
                         }

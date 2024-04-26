@@ -15,6 +15,7 @@ import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.project.domain.model.Contact;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.view.ProjectSponsorView;
 import onlydust.com.marketplace.project.domain.view.backoffice.*;
@@ -25,9 +26,11 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
+import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.reducing;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
@@ -398,6 +401,28 @@ public interface BackOfficeMapper {
                 .usCitizen(kycSnapshot.usCitizen());
     }
 
+    static KybResponse mapKyb(Kyb kybSnapshot) {
+        return new KybResponse()
+                .name(kybSnapshot.getName())
+                .registrationNumber(kybSnapshot.getRegistrationNumber())
+                .address(kybSnapshot.getAddress())
+                .country(isNull(kybSnapshot.getCountry()) ? null : kybSnapshot.getCountry().display().orElse(null))
+                .countryCode(isNull(kybSnapshot.getCountry()) ? null : kybSnapshot.getCountry().iso3Code())
+                .usEntity(kybSnapshot.getUsEntity())
+                .subjectToEuropeVAT(kybSnapshot.getSubjectToEuropeVAT())
+                .euVATNumber(kybSnapshot.getEuVATNumber());
+    }
+
+    static KycResponse mapKyc(Kyc kycSnapshot) {
+        return new KycResponse()
+                .firstName(kycSnapshot.getFirstName())
+                .lastName(kycSnapshot.getLastName())
+                .address(kycSnapshot.getAddress())
+                .country(kycSnapshot.getCountry().flatMap(Country::display).orElse(null))
+                .countryCode(kycSnapshot.getCountry().map(Country::iso3Code).orElse(null))
+                .usCitizen(kycSnapshot.isUsCitizen());
+    }
+
     @SneakyThrows
     static InvoiceDetailsResponse mapInvoiceToContract(final InvoiceView invoice, AuthenticatedUser authenticatedUser) {
         return new InvoiceDetailsResponse()
@@ -448,6 +473,16 @@ public interface BackOfficeMapper {
                 .verificationStatus(VerificationStatus.VERIFIED)
                 .kyc(billingProfileSnapshot.kyc().map(BackOfficeMapper::mapKyc).orElse(null))
                 .kyb(billingProfileSnapshot.kyb().map(BackOfficeMapper::mapKyb).orElse(null));
+    }
+
+    static BillingProfileShortResponse mapToShortResponse(BillingProfileView billingProfileView) {
+        return new BillingProfileShortResponse()
+                .id(billingProfileView.getId().value())
+                .type(map(billingProfileView.getType()))
+                .subject(billingProfileView.subject())
+                .verificationStatus(VerificationStatus.VERIFIED)
+                .kyc(isNull(billingProfileView.getKyc()) ? null : mapKyc(billingProfileView.getKyc()))
+                .kyb(isNull(billingProfileView.getKyb()) ? null : mapKyb(billingProfileView.getKyb()));
     }
 
     static UserResponse map(onlydust.com.marketplace.accounting.domain.view.UserView userView) {
@@ -860,5 +895,26 @@ public interface BackOfficeMapper {
             case INDIVIDUAL -> BillingProfile.Type.INDIVIDUAL;
             case SELF_EMPLOYED -> BillingProfile.Type.SELF_EMPLOYED;
         };
+    }
+
+    static List<ContactInformation> contactToResponse(final Set<Contact> contacts) {
+        return contacts.stream()
+                .map(contactInformation -> {
+                    final ContactInformation response = new ContactInformation();
+                    response.setContact(contactInformation.getContact());
+                    response.setChannel(switch (contactInformation.getChannel()) {
+                        case EMAIL -> ContactInformationChannel.EMAIL;
+                        case LINKEDIN -> ContactInformationChannel.LINKEDIN;
+                        case TWITTER -> ContactInformationChannel.TWITTER;
+                        case TELEGRAM -> ContactInformationChannel.TELEGRAM;
+                        case DISCORD -> ContactInformationChannel.DISCORD;
+                        case WHATSAPP -> ContactInformationChannel.WHATSAPP;
+                    });
+                    response.setVisibility(switch (contactInformation.getVisibility()) {
+                        case PUBLIC -> ContactInformation.VisibilityEnum.PUBLIC;
+                        case PRIVATE -> ContactInformation.VisibilityEnum.PRIVATE;
+                    });
+                    return response;
+                }).toList();
     }
 }
