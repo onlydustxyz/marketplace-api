@@ -157,6 +157,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String POST_REWARDS_PAY = "/bo/v1/rewards/%s/pay";
     protected static final String GET_ECOSYSTEMS = "/bo/v1/ecosystems";
     protected static final String GET_USERS = "/bo/v1/users";
+    protected static final String GET_USERS_BY_ID = "/bo/v1/users/%s";
     protected static final String GET_PROJECTS = "/bo/v1/projects";
     protected static final String GET_PROJECTS_V2 = "/bo/v2/projects";
     protected static final String PROJECTS_REWARDS = "/api/v1/projects/%s/rewards";
@@ -180,6 +181,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String BILLING_PROFILE = "/bo/v1/billing-profiles/%s";
     protected static final String HACKATHONS = "/bo/v1/hackathons";
     protected static final String HACKATHONS_BY_ID = "/bo/v1/hackathons/%s";
+    protected static final String EARNINGS = "/bo/v1/earnings";
 
     protected String apiKey() {
         return backOfficeApiKeyAuthenticationConfig.getApiKey();

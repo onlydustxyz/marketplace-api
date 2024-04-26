@@ -12,6 +12,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryP
 import onlydust.com.marketplace.kernel.observer.MailObserver;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.HackathonFacadePort;
+import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.project.domain.service.BackofficeService;
 import org.springframework.context.annotation.Bean;
@@ -96,6 +97,13 @@ public class BackofficeConfiguration {
     public BackofficeDebugRestApi backofficeDebugRestApi(final AccountBookEventStorage accountBookEventStorage,
                                                          final CurrencyFacadePort currencyFacadePort) {
         return new BackofficeDebugRestApi(accountBookEventStorage, currencyFacadePort);
+    }
+
+    @Bean
+    public BackofficeUserRestApi backofficeUserRestApi(final BackofficeFacadePort backofficeFacadePort,
+                                                       final UserFacadePort userFacadePort,
+                                                       final BillingProfileFacadePort billingProfileFacadePort) {
+        return new BackofficeUserRestApi(backofficeFacadePort, userFacadePort, billingProfileFacadePort);
     }
 }
 

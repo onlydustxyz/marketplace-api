@@ -214,14 +214,16 @@ public class PostgresConfiguration {
                                                        final BackofficeRewardViewRepository backofficeRewardViewRepository,
                                                        final RewardRepository rewardRepository,
                                                        final PaymentShortViewRepository paymentShortViewRepository,
-                                                       final ShortRewardViewRepository shortRewardViewRepository) {
+                                                       final ShortRewardViewRepository shortRewardViewRepository,
+                                                       final BackofficeEarningsViewRepository backofficeEarningsViewRepository) {
         return new PostgresRewardAdapter(shortProjectViewEntityRepository,
                 batchPaymentRepository,
                 rewardDetailsViewRepository,
                 backofficeRewardViewRepository,
                 rewardRepository,
                 paymentShortViewRepository,
-                shortRewardViewRepository);
+                shortRewardViewRepository,
+                backofficeEarningsViewRepository);
     }
 
     @Bean
@@ -234,13 +236,13 @@ public class PostgresConfiguration {
                                                                final SponsorRepository sponsorRepository,
                                                                final SponsorViewRepository sponsorViewRepository,
                                                                final ProjectLeadInvitationRepository projectLeadInvitationRepository,
-                                                               final BoUserRepository boUserRepository,
+                                                               final BoUserShortViewRepository boUserShortViewRepository,
                                                                final BoProjectRepository boProjectRepository,
                                                                final BoEcosystemRepository boEcosystemRepository,
                                                                final EcosystemRepository ecosystemRepository,
                                                                final ProjectRepository projectRepository) {
         return new PostgresBackofficeAdapter(githubRepositoryLinkedToProjectRepository, sponsorRepository, sponsorViewRepository,
-                projectLeadInvitationRepository, boUserRepository, boProjectRepository, boEcosystemRepository, ecosystemRepository, projectRepository);
+                projectLeadInvitationRepository, boUserShortViewRepository, boProjectRepository, boEcosystemRepository, ecosystemRepository, projectRepository);
     }
 
     @Bean

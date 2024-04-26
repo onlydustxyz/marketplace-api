@@ -5,12 +5,15 @@ import onlydust.com.marketplace.accounting.domain.events.RewardsPaid;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
+import onlydust.com.marketplace.accounting.domain.view.EarningsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
@@ -38,11 +41,28 @@ public class RewardService implements AccountingRewardPort {
     public Page<RewardDetailsView> getRewards(int pageIndex, int pageSize,
                                               List<RewardStatus.Input> statuses,
                                               List<BillingProfile.Id> billingProfileIds,
+                                              List<GithubUserId> recipients,
                                               Date fromRequestedAt, Date toRequestedAt,
                                               Date fromProcessedAt, Date toProcessedAt) {
         final Set<RewardStatus.Input> sanitizedStatuses = isNull(statuses) ? Set.of() : statuses.stream().collect(Collectors.toUnmodifiableSet());
         return accountingRewardStoragePort.findRewards(pageIndex, pageSize, sanitizedStatuses, Optional.ofNullable(billingProfileIds).orElse(List.of()),
-                fromRequestedAt, toRequestedAt, fromProcessedAt, toProcessedAt);
+                Optional.ofNullable(recipients).orElse(List.of()), fromRequestedAt, toRequestedAt, fromProcessedAt, toProcessedAt);
+    }
+
+    @Override
+    public EarningsView getEarnings(List<RewardStatus.Input> statuses,
+                                    List<GithubUserId> recipientIds,
+                                    List<BillingProfile.Id> billingProfileIds,
+                                    List<ProjectId> projectIds,
+                                    Date fromDate, Date toDate) {
+        final Set<RewardStatus.Input> sanitizedStatuses = isNull(statuses) ? Set.of() : statuses.stream().collect(Collectors.toUnmodifiableSet());
+        return accountingRewardStoragePort.getEarnings(
+                sanitizedStatuses,
+                isNull(recipientIds) ? List.of() : recipientIds,
+                isNull(billingProfileIds) ? List.of() : billingProfileIds,
+                isNull(projectIds) ? List.of() : projectIds,
+                fromDate,
+                toDate);
     }
 
     @Override
@@ -51,8 +71,8 @@ public class RewardService implements AccountingRewardPort {
                                    Date fromRequestedAt, Date toRequestedAt,
                                    Date fromProcessedAt, Date toProcessedAt) {
         final var rewards = accountingRewardStoragePort.findRewards(0, 1_000_000,
-                statuses.stream().collect(Collectors.toUnmodifiableSet()), Optional.ofNullable(billingProfileIds).orElse(List.of()), fromRequestedAt,
-                toRequestedAt, fromProcessedAt, toProcessedAt);
+                statuses.stream().collect(Collectors.toUnmodifiableSet()), Optional.ofNullable(billingProfileIds).orElse(List.of()),
+                List.of(), fromRequestedAt, toRequestedAt, fromProcessedAt, toProcessedAt);
 
         if (rewards.getTotalPageNumber() > 1) {
             throw badRequest("Too many rewards to export");
@@ -68,7 +88,7 @@ public class RewardService implements AccountingRewardPort {
                 rewardViews.stream().collect(groupingBy(rewardView -> rewardView.recipient().email())).entrySet()) {
             final ShortContributorView recipient = listOfPaidRewardsMapToAdminEmail.getValue().get(0).recipient();
 
-            mailObserver.send(new RewardsPaid(listOfPaidRewardsMapToAdminEmail.getKey(), recipient.login(), isNull(recipient.id()) ? null : recipient.id(),
+            mailObserver.send(new RewardsPaid(listOfPaidRewardsMapToAdminEmail.getKey(), recipient.login(), isNull(recipient.userId()) ? null : recipient.userId().value(),
                     listOfPaidRewardsMapToAdminEmail.getValue().stream()
                             .map(rewardDetailsView -> ShortReward.builder().
                                     id(rewardDetailsView.id())

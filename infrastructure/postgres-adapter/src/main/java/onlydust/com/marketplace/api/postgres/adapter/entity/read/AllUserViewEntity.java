@@ -1,16 +1,20 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.Accessors;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
 
 import java.util.UUID;
+
+import static java.util.Objects.isNull;
 
 @Entity
 @Value
@@ -31,5 +35,9 @@ public class AllUserViewEntity {
 
     public Boolean isRegistered() {
         return userId != null;
+    }
+
+    public ShortContributorView toDomain() {
+        return new ShortContributorView(GithubUserId.of(githubUserId), login, avatarUrl, isNull(userId) ? null : UserId.of(userId), email);
     }
 }

@@ -7,7 +7,9 @@ import onlydust.com.backoffice.api.contract.BackofficeAccountingManagementApi;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.port.in.*;
+import onlydust.com.marketplace.accounting.domain.view.EarningsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
@@ -20,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,6 +30,7 @@ import java.util.stream.Collectors;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
+import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 
@@ -166,6 +170,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     public ResponseEntity<RewardPageResponse> getRewards(Integer pageIndex, Integer pageSize,
                                                          List<RewardStatusContract> statuses,
                                                          List<UUID> billingProfiles,
+                                                         List<Long> recipients,
                                                          String fromRequestedAt,
                                                          String toRequestedAt,
                                                          String fromProcessedAt,
@@ -180,6 +185,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                 sanitizedPageSize,
                 statuses != null ? statuses.stream().map(BackOfficeMapper::map).toList() : null,
                 billingProfiles != null ? billingProfiles.stream().map(BillingProfile.Id::of).toList() : null,
+                recipients != null ? recipients.stream().map(GithubUserId::of).toList() : null,
                 DateMapper.parseNullable(fromRequestedAt),
                 DateMapper.parseNullable(toRequestedAt),
                 DateMapper.parseNullable(fromProcessedAt),
@@ -266,5 +272,36 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     @Override
     public ResponseEntity<BillingProfileResponse> getBillingProfilesById(UUID billingProfileId) {
         return ResponseEntity.ok(map(billingProfileFacadePort.getById(BillingProfile.Id.of(billingProfileId))));
+    }
+
+    @Override
+    public ResponseEntity<EarningsResponse> getEarnings(List<RewardStatusContract> statuses,
+                                                        List<Long> recipients,
+                                                        List<UUID> billingProfiles,
+                                                        List<UUID> projects,
+                                                        String fromDate, String toDate) {
+        final EarningsView earnings = accountingRewardPort.getEarnings(
+                statuses != null ? statuses.stream().map(BackOfficeMapper::map).toList() : null,
+                recipients != null ? recipients.stream().map(GithubUserId::of).toList() : null,
+                billingProfiles != null ? billingProfiles.stream().map(BillingProfile.Id::of).toList() : null,
+                projects != null ? projects.stream().map(ProjectId::of).toList() : null,
+                DateMapper.parseNullable(fromDate),
+                DateMapper.parseNullable(toDate)
+        );
+        return ResponseEntity.ok(new EarningsResponse()
+                .totalUsdAmount(prettyUsd(earnings.totalUsdAmount()))
+                .amountsPerCurrency(earnings.earningsPerCurrencies().stream()
+                        .sorted(Comparator.comparing(a -> a.money().currency().code()))
+                        .map(earningsPerCurrency -> new EarningsResponseAmountsPerCurrencyInner()
+                                .rewardCount(earningsPerCurrency.rewardCount())
+                                .amount(earningsPerCurrency.money().amount())
+                                .dollarsEquivalent(prettyUsd(earningsPerCurrency.money().dollarsEquivalent()))
+                                .currency(new ShortCurrencyResponse()
+                                        .id(earningsPerCurrency.money().currency().id().value())
+                                        .code(earningsPerCurrency.money().currency().code())
+                                        .name(earningsPerCurrency.money().currency().name())
+                                        .decimals(earningsPerCurrency.money().currency().decimals())
+                                        .logoUrl(earningsPerCurrency.money().currency().logoUrl())))
+                        .toList()));
     }
 }

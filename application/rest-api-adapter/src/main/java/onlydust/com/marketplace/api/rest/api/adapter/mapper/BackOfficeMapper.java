@@ -15,9 +15,9 @@ import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.project.domain.model.Contact;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.view.ProjectSponsorView;
-import onlydust.com.marketplace.project.domain.view.backoffice.UserView;
 import onlydust.com.marketplace.project.domain.view.backoffice.*;
 
 import java.math.BigDecimal;
@@ -26,9 +26,11 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
+import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.reducing;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
@@ -307,47 +309,16 @@ public interface BackOfficeMapper {
         return projectLeadInvitationPage;
     }
 
-    static UserPage mapUserPageToContract(final Page<UserView> userPage, int pageIndex) {
+    static UserPage mapUserPageToContract(final Page<UserShortView> userPage, int pageIndex) {
         return new UserPage()
                 .users(userPage.getContent().stream().map(user -> new UserPageItemResponse()
-                        .id(user.getId())
-                        .isCompany(user.getIsCompany())
-                        .companyName(user.getCompanyName())
-                        .companyNum(user.getCompanyNum())
-                        .firstname(user.getFirstname())
-                        .lastname(user.getLastname())
-                        .address(user.getAddress())
-                        .country(user.getCountry())
-                        .telegram(user.getTelegram())
-                        .twitter(user.getTwitter())
-                        .discord(user.getDiscord())
-                        .linkedin(user.getLinkedIn())
-                        .whatsapp(user.getWhatsApp())
-                        .bic(user.getBic())
-                        .iban(user.getIban())
-                        .ens(user.getEns())
-                        .ethAddress(user.getEthAddress())
-                        .optimismAddress(user.getOptimismAddress())
-                        .starknetAddress(user.getStarknetAddress())
-                        .aptosAddress(user.getAptosAddress())
-                        .createdAt(user.getCreatedAt())
-                        .updatedAt(user.getUpdatedAt())
-                        .lastSeenAt(user.getLastSeenAt())
-                        .email(user.getEmail())
-                        .githubUserId(user.getGithubUserId())
-                        .githubLogin(user.getGithubLogin())
-                        .githubHtmlUrl(user.getGithubHtmlUrl())
-                        .githubAvatarUrl(user.getGithubAvatarUrl())
-                        .bio(user.getBio())
-                        .location(user.getLocation())
-                        .website(user.getWebsite())
-                        .lookingForAJob(user.getLookingForAJob())
-                        .weeklyAllocatedTime(user.getWeeklyAllocatedTime())
-                        .languages(user.getLanguages())
-                        .tcAcceptedAt(user.getTcAcceptedAt())
-                        .onboardingCompletedAt(user.getOnboardingCompletedAt())
-                        .usEntity(user.getUsEntity())
-                        .verificationStatus(VerificationStatus.valueOf(user.getVerificationStatus()))
+                        .id(user.id())
+                        .githubUserId(user.githubUserId())
+                        .login(user.login())
+                        .avatarUrl(user.avatarUrl())
+                        .email(user.email())
+                        .lastSeenAt(user.lastSeenAt())
+                        .signedUpAt(user.signedUpAt())
                 ).toList())
                 .totalPageNumber(userPage.getTotalPageNumber())
                 .totalItemNumber(userPage.getTotalItemNumber())
@@ -430,6 +401,28 @@ public interface BackOfficeMapper {
                 .usCitizen(kycSnapshot.usCitizen());
     }
 
+    static KybResponse mapKyb(Kyb kybSnapshot) {
+        return new KybResponse()
+                .name(kybSnapshot.getName())
+                .registrationNumber(kybSnapshot.getRegistrationNumber())
+                .address(kybSnapshot.getAddress())
+                .country(isNull(kybSnapshot.getCountry()) ? null : kybSnapshot.getCountry().display().orElse(null))
+                .countryCode(isNull(kybSnapshot.getCountry()) ? null : kybSnapshot.getCountry().iso3Code())
+                .usEntity(kybSnapshot.getUsEntity())
+                .subjectToEuropeVAT(kybSnapshot.getSubjectToEuropeVAT())
+                .euVATNumber(kybSnapshot.getEuVATNumber());
+    }
+
+    static KycResponse mapKyc(Kyc kycSnapshot) {
+        return new KycResponse()
+                .firstName(kycSnapshot.getFirstName())
+                .lastName(kycSnapshot.getLastName())
+                .address(kycSnapshot.getAddress())
+                .country(kycSnapshot.getCountry().flatMap(Country::display).orElse(null))
+                .countryCode(kycSnapshot.getCountry().map(Country::iso3Code).orElse(null))
+                .usCitizen(kycSnapshot.isUsCitizen());
+    }
+
     @SneakyThrows
     static InvoiceDetailsResponse mapInvoiceToContract(final InvoiceView invoice, AuthenticatedUser authenticatedUser) {
         return new InvoiceDetailsResponse()
@@ -482,6 +475,16 @@ public interface BackOfficeMapper {
                 .kyb(billingProfileSnapshot.kyb().map(BackOfficeMapper::mapKyb).orElse(null));
     }
 
+    static BillingProfileShortResponse mapToShortResponse(BillingProfileView billingProfileView) {
+        return new BillingProfileShortResponse()
+                .id(billingProfileView.getId().value())
+                .type(map(billingProfileView.getType()))
+                .subject(billingProfileView.subject())
+                .verificationStatus(VerificationStatus.VERIFIED)
+                .kyc(isNull(billingProfileView.getKyc()) ? null : mapKyc(billingProfileView.getKyc()))
+                .kyb(isNull(billingProfileView.getKyb()) ? null : mapKyb(billingProfileView.getKyb()));
+    }
+
     static UserResponse map(onlydust.com.marketplace.accounting.domain.view.UserView userView) {
         return new UserResponse()
                 .id(userView.id().value())
@@ -490,16 +493,6 @@ public interface BackOfficeMapper {
                 .githubAvatarUrl(URI.create(userView.githubAvatarUrl().toString()))
                 .email(userView.email())
                 .name(userView.name());
-    }
-
-    static UserResponse map(UserView user) {
-        return new UserResponse()
-                .githubUserId(user.getGithubUserId())
-                .githubLogin(user.getGithubLogin())
-                .githubAvatarUrl(URI.create(user.getGithubAvatarUrl()))
-                .email(user.getEmail())
-                .id(user.getId())
-                .name(user.getFirstname() + " " + user.getLastname());
     }
 
     static RewardDetailsResponse map(RewardDetailsView view, AuthenticatedUser authenticatedUser) {
@@ -602,6 +595,8 @@ public interface BackOfficeMapper {
                 )
                 .recipient(rewardDetailsView.recipient() != null ?
                         new RecipientLinkResponse()
+                                .githubUserId(rewardDetailsView.recipient().githubUserId().value())
+                                .userId(rewardDetailsView.recipient().userId() != null ? rewardDetailsView.recipient().userId().value() : null)
                                 .login(rewardDetailsView.recipient().login())
                                 .avatarUrl(rewardDetailsView.recipient().avatarUrl())
                         : null)
@@ -900,5 +895,26 @@ public interface BackOfficeMapper {
             case INDIVIDUAL -> BillingProfile.Type.INDIVIDUAL;
             case SELF_EMPLOYED -> BillingProfile.Type.SELF_EMPLOYED;
         };
+    }
+
+    static List<ContactInformation> contactToResponse(final Set<Contact> contacts) {
+        return contacts.stream()
+                .map(contactInformation -> {
+                    final ContactInformation response = new ContactInformation();
+                    response.setContact(contactInformation.getContact());
+                    response.setChannel(switch (contactInformation.getChannel()) {
+                        case EMAIL -> ContactInformationChannel.EMAIL;
+                        case LINKEDIN -> ContactInformationChannel.LINKEDIN;
+                        case TWITTER -> ContactInformationChannel.TWITTER;
+                        case TELEGRAM -> ContactInformationChannel.TELEGRAM;
+                        case DISCORD -> ContactInformationChannel.DISCORD;
+                        case WHATSAPP -> ContactInformationChannel.WHATSAPP;
+                    });
+                    response.setVisibility(switch (contactInformation.getVisibility()) {
+                        case PUBLIC -> ContactInformation.VisibilityEnum.PUBLIC;
+                        case PRIVATE -> ContactInformation.VisibilityEnum.PRIVATE;
+                    });
+                    return response;
+                }).toList();
     }
 }

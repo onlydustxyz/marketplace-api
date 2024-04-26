@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
@@ -22,7 +23,6 @@ import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.mockito.Mockito.*;
@@ -45,10 +45,10 @@ public class RewardServiceTest {
     @Test
     void should_notify_new_rewards_were_paid() {
         // Given
-        final ShortContributorView recipient1 = new ShortContributorView(faker.rickAndMorty().character(),
-                faker.internet().url(), faker.internet().emailAddress(), UUID.randomUUID());
-        final ShortContributorView recipient2 = new ShortContributorView(faker.rickAndMorty().location(),
-                faker.internet().url(), faker.internet().emailAddress(), null);
+        final ShortContributorView recipient1 = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)), faker.rickAndMorty().character(), faker.gameOfThrones().character(),
+                UserId.random(), faker.internet().emailAddress());
+        final ShortContributorView recipient2 = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)), faker.rickAndMorty().character(), faker.gameOfThrones().character(),
+                null, faker.internet().emailAddress());
         final var r11 = generateRewardStubForCurrencyAndEmail(Currencies.USD, recipient1);
         final var r21 = generateRewardStubForCurrencyAndEmail(Currencies.STRK, recipient2);
         final var r12 = generateRewardStubForCurrencyAndEmail(Currencies.OP, recipient1);
@@ -66,7 +66,7 @@ public class RewardServiceTest {
         rewardService.notifyAllNewPaidRewards();
 
         // Then
-        verify(mailObserver, times(1)).send(new RewardsPaid(recipient1.email(), recipient1.login(), recipient1.id(),
+        verify(mailObserver, times(1)).send(new RewardsPaid(recipient1.email(), recipient1.login(), recipient1.userId().value(),
                 Stream.of(r11, r12).map(rewardDetailsView -> ShortReward.builder().
                         id(rewardDetailsView.id())
                         .amount(rewardDetailsView.money().amount())
@@ -74,14 +74,14 @@ public class RewardServiceTest {
                         .currencyCode(rewardDetailsView.money().currency().code().toString())
                         .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
                         .build()).toList()));
-        verify(mailObserver, times(1)).send(new RewardsPaid(recipient2.email(), recipient2.login(), recipient2.id(),
+        verify(mailObserver, times(1)).send(new RewardsPaid(recipient2.email(), recipient2.login(), null,
                 Stream.of(r21, r22).map(rewardDetailsView -> ShortReward.builder().
-                id(rewardDetailsView.id())
-                .amount(rewardDetailsView.money().amount())
-                .projectName(rewardDetailsView.project().name())
-                .currencyCode(rewardDetailsView.money().currency().code().toString())
-                .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
-                .build()).toList()));
+                        id(rewardDetailsView.id())
+                        .amount(rewardDetailsView.money().amount())
+                        .projectName(rewardDetailsView.project().name())
+                        .currencyCode(rewardDetailsView.money().currency().code().toString())
+                        .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
+                        .build()).toList()));
         verify(accountingRewardStoragePort).markRewardsAsPaymentNotified(rewardViews.stream().map(RewardDetailsView::id).toList());
     }
 
@@ -89,8 +89,8 @@ public class RewardServiceTest {
     private RewardDetailsView generateRewardStubForCurrencyAndEmail(final Currency currency, final ShortContributorView recipient) {
         return RewardDetailsView.builder()
                 .id(RewardId.random())
-                .requester(new ShortContributorView(faker.rickAndMorty().character(), faker.internet().url(), faker.internet().emailAddress(),
-                        UUID.randomUUID()))
+                .requester(new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)), faker.rickAndMorty().character(), faker.gameOfThrones().character(),
+                        UserId.random(), faker.internet().emailAddress()))
                 .recipient(recipient)
                 .status(RewardStatus.builder()
                         .projectId(ProjectId.random().value())

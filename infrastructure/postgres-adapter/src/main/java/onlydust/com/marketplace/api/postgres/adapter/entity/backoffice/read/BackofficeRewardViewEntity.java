@@ -5,7 +5,10 @@ import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.view.*;
+import onlydust.com.marketplace.accounting.domain.view.MoneyView;
+import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.accounting.domain.view.ShortSponsorView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.AllUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.InvoiceViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
@@ -39,10 +42,12 @@ public class BackofficeRewardViewEntity {
 
     @ManyToOne
     @JoinColumn(name = "recipientId", referencedColumnName = "githubUserId")
+    @NonNull
     AllUserViewEntity recipient;
 
     @ManyToOne
     @JoinColumn(name = "requestorId", referencedColumnName = "userId")
+    @NonNull
     AllUserViewEntity requester;
 
     @JdbcTypeCode(SqlTypes.JSON)
@@ -64,6 +69,7 @@ public class BackofficeRewardViewEntity {
     @NonNull
     BigDecimal amount;
     @ManyToOne
+    @NonNull
     CurrencyEntity currency;
 
     @ManyToOne
@@ -118,8 +124,8 @@ public class BackofficeRewardViewEntity {
                         .slug(this.projectSlug)
                         .build())
                 .billingProfile(isNull(this.billingProfile) ? null : this.billingProfile.toDomain())
-                .recipient(new ShortContributorView(recipient.login(), recipient.avatarUrl(), recipient.email(), recipient.userId()))
-                .requester(new ShortContributorView(requester.login(), requester.avatarUrl(), requester.email(), requester.userId()))
+                .recipient(recipient.toDomain())
+                .requester(requester.toDomain())
                 .sponsors(isNull(this.sponsors) ? List.of() : this.sponsors.stream()
                         .map(SponsorLinkView::toDomain)
                         .sorted(comparing(ShortSponsorView::name))

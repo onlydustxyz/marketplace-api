@@ -2,10 +2,13 @@ package onlydust.com.marketplace.accounting.domain.port.out;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
+import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentShortView;
+import onlydust.com.marketplace.accounting.domain.view.EarningsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.ShortRewardDetailsView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
@@ -31,8 +34,15 @@ public interface AccountingRewardStoragePort {
     Page<RewardDetailsView> findRewards(int pageIndex, int pageSize,
                                         @NonNull Set<RewardStatus.Input> statuses,
                                         @NonNull List<BillingProfile.Id> billingProfileIds,
+                                        @NonNull List<GithubUserId> recipients,
                                         Date fromRequestedAt, Date toRequestedAt,
                                         Date fromProcessedAt, Date toProcessedAt);
+
+    EarningsView getEarnings(@NonNull Set<RewardStatus.Input> statuses,
+                             @NonNull List<GithubUserId> recipientIds,
+                             @NonNull List<BillingProfile.Id> billingProfileIds,
+                             @NonNull List<ProjectId> projectIds,
+                             Date fromDate, Date toDate);
 
     List<RewardDetailsView> findPaidRewardsToNotify();
 

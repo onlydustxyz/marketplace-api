@@ -96,9 +96,11 @@ public interface BackofficeRewardViewRepository extends JpaRepository<Backoffice
                 and (coalesce(:fromProcessedAt) is null or rsd.paid_at  >= cast(cast(:fromProcessedAt as text) as timestamp))
                 and (coalesce(:toProcessedAt)   is null or rsd.paid_at  <= cast(cast(:toProcessedAt   as text) as timestamp))
                 and (coalesce(:billingProfileIds) is null or i.billing_profile_id in (:billingProfileIds))
+                and (coalesce(:recipients) is null or r.recipient_id in (:recipients))
             """, nativeQuery = true)
     Page<BackofficeRewardViewEntity> findAllByStatusesAndDates(@NonNull List<String> statuses,
                                                                @NonNull List<UUID> billingProfileIds,
+                                                               @NonNull List<Long> recipients,
                                                                Date fromRequestedAt, Date toRequestedAt,
                                                                Date fromProcessedAt, Date toProcessedAt,
                                                                Pageable pageable);

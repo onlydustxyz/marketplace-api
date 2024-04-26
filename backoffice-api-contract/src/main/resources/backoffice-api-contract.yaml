@@ -142,6 +142,14 @@ paths:
               $ref: '#/components/schemas/BillingProfileType'
           style: form
         - in: query
+          name: billingProfiles
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/BillingProfileId'
+          style: form
+        - in: query
           name: search
           required: false
           schema:
@@ -644,6 +652,14 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/BillingProfileId'
+          style: form
+        - in: query
+          name: recipients
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/GithubUserId'
           style: form
         - in: query
           name: fromRequestedAt
@@ -1338,7 +1354,7 @@ paths:
       security:
         - apiKey: [ ]
       tags:
-        - Backoffice
+        - BackofficeUser
       summary: Get user page
       operationId: getUserPage
       description: |
@@ -1355,13 +1371,10 @@ paths:
           schema:
             type: integer
         - in: query
-          name: userIds
+          name: login
           required: false
           schema:
-            type: array
-            items:
-              type: string
-              format: uuid
+            type: string
       responses:
         "200":
           description: 'User page'
@@ -1369,6 +1382,102 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserPage'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/users/{userId}:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeUser
+      summary: Get user page
+      operationId: getUserById
+      description: |
+        Get user details
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserId'
+      responses:
+        "200":
+          description: 'User'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetailsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/earnings:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Get earnings
+      operationId: getEarnings
+      description: |
+        Get earnings. Use filters to get earnings of a specific user, project, billing profile, etc.
+        Filters can be combined to get more specific results (eg. get earnings of a specific user in a specific project).
+      parameters:
+        - in: query
+          name: statuses
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/RewardStatusContract'
+          style: form
+        - in: query
+          name: recipients
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/GithubUserId'
+          style: form
+        - in: query
+          name: billingProfiles
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/BillingProfileId'
+          style: form
+        - in: query
+          name: projects
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ProjectId'
+          style: form
+        - in: query
+          name: fromDate
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: toDate
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+      responses:
+        "200":
+          description: 'User earned data'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EarningsResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -2417,93 +2526,139 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/UserPageItemResponse'
+
     UserPageItemResponse:
       type: object
+      required:
+        - id
+        - githubUserId
+        - login
+        - avatarUrl
+        - email
+        - lastSeenAt
       properties:
         id:
+          $ref: '#/components/schemas/UserId'
+        githubUserId:
+          $ref: '#/components/schemas/GithubUserId'
+        login:
           type: string
-          format: uuid
-        isCompany:
-          type: boolean
-        companyName:
+          description: User's Github login
+          example: ofux
+        avatarUrl:
           type: string
-        companyNum:
+          format: url
+          description: Direct URL to user's avatar image
+          example: 'https://avatars.githubusercontent.com/u/595505?v=4'
+        email:
           type: string
-        firstname:
-          type: string
-        lastname:
-          type: string
-        address:
-          type: string
-        country:
-          type: string
-        telegram:
-          type: string
-        twitter:
-          type: string
-        discord:
-          type: string
-        linkedin:
-          type: string
-        whatsapp:
-          type: string
-        bic:
-          type: string
-        iban:
-          type: string
-        ens:
-          type: string
-        ethAddress:
-          type: string
-        aptosAddress:
-          type: string
-        optimismAddress:
-          type: string
-        starknetAddress:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
+          format: email
+          description: User's email
         lastSeenAt:
           type: string
           format: date-time
-        email:
-          type: string
-        githubUserId:
-          $ref: '#/components/schemas/GithubUserId'
-        githubLogin:
-          type: string
-        githubHtmlUrl:
-          type: string
-        githubAvatarUrl:
-          type: string
-        bio:
-          type: string
-        location:
-          type: string
-        website:
-          type: string
-        lookingForAJob:
-          type: boolean
-        weeklyAllocatedTime:
-          type: string
-        languages:
-          type: array
-          items:
-            type: string
-        tcAcceptedAt:
-          type: string
-        onboardingCompletedAt:
+          description: Last time the user interacted with the platform
+        signedUpAt:
           type: string
           format: date-time
-        verificationStatus:
-          $ref: '#/components/schemas/VerificationStatus'
-        usEntity:
-          type: boolean
 
+    UserDetailsResponse:
+      type: object
+      required:
+        - id
+        - githubUserId
+        - login
+        - avatarUrl
+        - email
+        - lastSeenAt
+      properties:
+        id:
+          $ref: '#/components/schemas/UserId'
+        githubUserId:
+          $ref: '#/components/schemas/GithubUserId'
+        login:
+          type: string
+          description: User's Github login
+          example: ofux
+        avatarUrl:
+          type: string
+          format: url
+          description: Direct URL to user's avatar image
+          example: 'https://avatars.githubusercontent.com/u/595505?v=4'
+        email:
+          type: string
+          format: email
+          description: User's email
+        lastSeenAt:
+          type: string
+          format: date-time
+          description: Last time the user interacted with the platform
+        signedUpAt:
+          type: string
+          format: date-time
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactInformation'
+        leadedProjectCount:
+          type: integer
+          description: Number of projects the user leads
+          example: 1
+        totalEarnedUsd:
+          type: number
+          description: Total amount earned by the user in USD
+          example: 1000
+        billingProfiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillingProfileShortResponse'
+
+    EarningsResponse:
+      type: object
+      required:
+        - totalUsdAmount
+        - amountsPerCurrency
+      properties:
+        totalUsdAmount:
+          type: number
+        amountsPerCurrency:
+          type: array
+          items:
+            allOf:
+              - type: object
+                properties:
+                  rewardCount:
+                    type: integer
+                    format: int64
+              - $ref: '#/components/schemas/TotalMoneyWithUsdEquivalentResponse'
+
+    ContactInformation:
+      type: object
+      required:
+        - channel
+        - contact
+        - visibility
+      properties:
+        channel:
+          $ref: '#/components/schemas/ContactInformationChannel'
+        contact:
+          type: string
+          example: foobar@gmail.com
+        visibility:
+          type: string
+          enum:
+            - public
+            - private
+
+    ContactInformationChannel:
+      type: string
+      enum:
+        - EMAIL
+        - TELEGRAM
+        - TWITTER
+        - DISCORD
+        - LINKEDIN
+        - WHATSAPP
 
     VerificationStatus:
       type: string
@@ -3334,12 +3489,15 @@ components:
     RecipientLinkResponse:
       type: object
       required:
+        - githubUserId
         - login
         - avatarUrl
       properties:
+        githubUserId:
+          $ref: '#/components/schemas/GithubUserId'
+        userId:
+          $ref: '#/components/schemas/UserId'
         login:
-          type: string
-        name:
           type: string
         avatarUrl:
           type: string

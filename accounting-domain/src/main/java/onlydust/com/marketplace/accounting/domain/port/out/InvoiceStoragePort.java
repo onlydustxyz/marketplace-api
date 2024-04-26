@@ -29,7 +29,8 @@ public interface InvoiceStoragePort {
     Optional<Invoice> get(final @NonNull Invoice.Id invoiceId);
 
     Page<Invoice> findAll(@NonNull List<Invoice.Id> ids, @NonNull List<Invoice.Status> statuses, @NonNull List<Currency.Id> currencyIds,
-                          @NonNull List<BillingProfile.Type> billingProfileTypes, String search, @NonNull Integer pageIndex, @NonNull Integer pageSize);
+                          @NonNull List<BillingProfile.Type> billingProfileTypes, @NonNull List<BillingProfile.Id> billingProfileIds, String search,
+                          @NonNull Integer pageIndex, @NonNull Integer pageSize);
 
     Optional<Invoice> invoiceOf(RewardId rewardId);
 

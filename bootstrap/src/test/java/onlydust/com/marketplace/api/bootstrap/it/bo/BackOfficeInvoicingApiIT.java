@@ -66,7 +66,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
 
     UserId antho;
     UserAuthHelper.AuthenticatedBackofficeUser camille;
-    CompanyBillingProfile companyBillingProfile;
+    static CompanyBillingProfile companyBillingProfile;
 
     static final List<Invoice.Id> companyBillingProfileToReviewInvoices = new ArrayList<>();
 
@@ -721,7 +721,28 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     }
 
     @Test
-    @Order(6)
+    @Order(7)
+    void should_filter_invoices_by_billing_profile_id() {
+
+        // When
+        client
+                .get()
+                .uri(getApiURI(V2_INVOICES, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10",
+                        "billingProfiles", companyBillingProfile.id().toString())))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.invoices[?(@.billingProfile.id == '%s')]".formatted(companyBillingProfile.id())).isArray()
+                .jsonPath("$.invoices[?(@.billingProfile.id != '%s')]".formatted(companyBillingProfile.id())).doesNotExist()
+        ;
+    }
+
+    @Test
+    @Order(8)
     void should_search_invoices() {
 
         // When
@@ -761,7 +782,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     }
 
     @Test
-    @Order(7)
+    @Order(20)
     void should_download_invoices() {
         final var invoiceId = companyBillingProfileToReviewInvoices.get(0);
         final var pdfData = faker.lorem().paragraph().getBytes();
@@ -779,7 +800,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     }
 
     @Test
-    @Order(8)
+    @Order(21)
     void should_reject_invoice_download_if_wrong_token() {
         final var invoiceId = companyBillingProfileToReviewInvoices.get(0);
 

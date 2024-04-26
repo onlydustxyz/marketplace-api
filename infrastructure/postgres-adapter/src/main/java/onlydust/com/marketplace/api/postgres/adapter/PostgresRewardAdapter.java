@@ -3,14 +3,14 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
+import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.BatchPaymentShortView;
-import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.ShortRewardDetailsView;
+import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BackofficeRewardViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoEarningsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.PaymentShortViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortRewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentEntity;
@@ -42,6 +42,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     private final RewardRepository rewardRepository;
     private final PaymentShortViewRepository paymentShortViewRepository;
     private final ShortRewardViewRepository shortRewardViewRepository;
+    private final BackofficeEarningsViewRepository backofficeEarningsViewRepository;
 
     @Override
     @Transactional
@@ -125,11 +126,13 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     public Page<RewardDetailsView> findRewards(int pageIndex, int pageSize,
                                                @NonNull Set<RewardStatus.Input> statuses,
                                                @NonNull List<BillingProfile.Id> billingProfileIds,
+                                               @NonNull List<GithubUserId> recipients,
                                                Date fromRequestedAt, Date toRequestedAt,
                                                Date fromProcessedAt, Date toProcessedAt) {
         final var page = backofficeRewardViewRepository.findAllByStatusesAndDates(
                 statuses.stream().map(RewardStatusEntity::from).map(RewardStatusEntity.Status::toString).toList(),
                 billingProfileIds.stream().map(BillingProfile.Id::value).toList(),
+                recipients.stream().map(GithubUserId::value).toList(),
                 fromRequestedAt, toRequestedAt,
                 fromProcessedAt, toProcessedAt,
                 PageRequest.of(pageIndex, pageSize, Sort.by("requested_at").descending())
@@ -140,6 +143,22 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();
+    }
+
+    @Override
+    public EarningsView getEarnings(@NonNull Set<RewardStatus.Input> statuses,
+                                    @NonNull List<GithubUserId> recipientIds,
+                                    @NonNull List<BillingProfile.Id> billingProfileIds,
+                                    @NonNull List<ProjectId> projectIds,
+                                    Date fromDate, Date toDate) {
+        return new EarningsView(
+                backofficeEarningsViewRepository.getEarnings(
+                        statuses.stream().map(RewardStatusEntity::from).map(RewardStatusEntity.Status::toString).toList(),
+                        recipientIds.stream().map(GithubUserId::value).toList(),
+                        billingProfileIds.stream().map(BillingProfile.Id::value).toList(),
+                        projectIds.stream().map(ProjectId::value).toList(),
+                        fromDate, toDate
+                ).stream().map(BoEarningsViewEntity::toDomain).toList());
     }
 
     @Override

@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoEcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoProjectEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoUserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoUserShortViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
@@ -35,7 +35,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     private final SponsorRepository sponsorRepository;
     private final SponsorViewRepository sponsorViewRepository;
     private final ProjectLeadInvitationRepository projectLeadInvitationRepository;
-    private final BoUserRepository boUserRepository;
+    private final BoUserShortViewRepository boUserShortViewRepository;
     private final BoProjectRepository boProjectRepository;
     private final BoEcosystemRepository boEcosystemRepository;
     private final EcosystemRepository ecosystemRepository;
@@ -94,11 +94,11 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     }
 
     @Override
-    public Page<UserView> listUsers(int pageIndex, int pageSize, UserView.Filters filters) {
-        final var page = boUserRepository.findAll(filters.getUsers(), PageRequest.of(pageIndex, pageSize,
+    public Page<UserShortView> listUsers(int pageIndex, int pageSize, UserShortView.Filters filters) {
+        final var page = boUserShortViewRepository.findAll(filters.loginLike().orElse(null), PageRequest.of(pageIndex, pageSize,
                 Sort.by(Sort.Direction.DESC, "created_at")));
-        return Page.<UserView>builder()
-                .content(page.getContent().stream().map(BoUserEntity::toView).toList())
+        return Page.<UserShortView>builder()
+                .content(page.getContent().stream().map(BoUserShortViewEntity::toDomain).toList())
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();

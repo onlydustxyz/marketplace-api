@@ -14,7 +14,6 @@ import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
 import onlydust.com.marketplace.accounting.domain.view.ShortRewardDetailsView;
 import onlydust.com.marketplace.kernel.observer.MailObserver;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
-import onlydust.com.marketplace.kernel.port.output.WebhookPort;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -88,7 +87,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
                     .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
                     .id(rewardId)
                     .projectName(rewardDetailsView.project().name())
-                    .build(), isNull(rewardDetailsView.recipient().id()) ? null : rewardDetailsView.recipient().id()));
+                    .build(), isNull(rewardDetailsView.recipient().userId()) ? null : rewardDetailsView.recipient().userId().value()));
 
         } else {
             LOGGER.warn("Unable to send reward created email to contributor %s".formatted(rewardDetailsView.recipient().login()));
@@ -108,7 +107,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
                             .id(rewardId)
                             .projectName(shortRewardDetailsView.project().name())
                             .build(),
-                    isNull(shortRewardDetailsView.recipient().id()) ? null : shortRewardDetailsView.recipient().id()));
+                    isNull(shortRewardDetailsView.recipient().userId()) ? null : shortRewardDetailsView.recipient().userId().value()));
         } else {
             LOGGER.warn("Unable to send cancel reward mail to recipient %s due to missing email".formatted(shortRewardDetailsView.recipient().login()));
         }
@@ -187,12 +186,14 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
                                         .formatted(billingProfileVerificationUpdated.getParentExternalApplicantId()))).getBillingProfileId()
                         :
                         switch (billingProfileVerificationUpdated.getType()) {
-                            case KYB -> billingProfileStoragePort.findKybById(billingProfileVerificationUpdated.getVerificationId())
-                                    .orElseThrow(() -> internalServerError("KYB %s not found"
-                                            .formatted(billingProfileVerificationUpdated.getVerificationId()))).getBillingProfileId();
-                            case KYC -> billingProfileStoragePort.findKycById(billingProfileVerificationUpdated.getVerificationId())
-                                    .orElseThrow(() -> internalServerError("KYC %s not found"
-                                            .formatted(billingProfileVerificationUpdated.getVerificationId()))).getBillingProfileId();
+                            case KYB ->
+                                    billingProfileStoragePort.findKybById(billingProfileVerificationUpdated.getVerificationId())
+                                            .orElseThrow(() -> internalServerError("KYB %s not found"
+                                                    .formatted(billingProfileVerificationUpdated.getVerificationId()))).getBillingProfileId();
+                            case KYC ->
+                                    billingProfileStoragePort.findKycById(billingProfileVerificationUpdated.getVerificationId())
+                                            .orElseThrow(() -> internalServerError("KYC %s not found"
+                                                    .formatted(billingProfileVerificationUpdated.getVerificationId()))).getBillingProfileId();
                         };
 
 
@@ -203,7 +204,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
                     .orElseThrow(() -> internalServerError(("Owner %s not found for billing profile %s")
                             .formatted(billingProfileVerificationUpdated.getUserId().value(), billingProfileId.value())));
             if (nonNull(owner.email())) {
-                accountingMailObserver.send(new BillingProfileVerificationFailed(owner.email(), UserId.of(owner.id()), billingProfileId, owner.login(),
+                accountingMailObserver.send(new BillingProfileVerificationFailed(owner.email(), owner.userId(), billingProfileId, owner.login(),
                         billingProfileVerificationUpdated.getVerificationStatus()));
             } else {
                 LOGGER.warn("Unable to send billing profile verifcation failed mail to user %s".formatted(billingProfileVerificationUpdated.getUserId()));
