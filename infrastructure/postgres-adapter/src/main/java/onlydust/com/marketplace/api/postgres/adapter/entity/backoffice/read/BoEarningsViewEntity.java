@@ -1,17 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.view.EarningsView;
 import onlydust.com.marketplace.accounting.domain.view.TotalMoneyView;
-import onlydust.com.marketplace.kernel.model.CurrencyView;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 
 import java.math.BigDecimal;
-import java.net.URI;
-import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -21,38 +16,18 @@ import java.util.UUID;
 @Entity
 public class BoEarningsViewEntity {
     @Id
-    Integer id;
+    @NonNull
+    @Column(name = "currency_id")
+    UUID currencyId;
+    @NonNull Long rewardCount;
+    @NonNull BigDecimal totalAmount;
+    BigDecimal totalDollarsEquivalent;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    List<EarningsPerCurrencyViewEntity> earningsPerCurrency;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "currency_id", insertable = false, updatable = false)
+    CurrencyEntity currency;
 
-    public EarningsView toView() {
-        return new EarningsView(earningsPerCurrency != null ? earningsPerCurrency.stream().map(EarningsPerCurrencyViewEntity::toDomain).toList() : List.of());
-    }
-
-    public record EarningsPerCurrencyViewEntity(@NonNull Long rewardCount,
-                                                @NonNull BigDecimal amount,
-                                                @NonNull CurrencyViewEntity currency,
-                                                BigDecimal dollarsEquivalent) {
-        public EarningsView.EarningsPerCurrency toDomain() {
-            return new EarningsView.EarningsPerCurrency(new TotalMoneyView(amount, currency.toDomain(), dollarsEquivalent), rewardCount);
-        }
-    }
-
-    public record CurrencyViewEntity(@NonNull UUID id,
-                                     @NonNull String name,
-                                     @NonNull String code,
-                                     @NonNull Integer decimals,
-                                     URI logoUrl
-    ) {
-        CurrencyView toDomain() {
-            return CurrencyView.builder()
-                    .id(CurrencyView.Id.of(id))
-                    .name(name)
-                    .code(code)
-                    .decimals(decimals)
-                    .logoUrl(logoUrl)
-                    .build();
-        }
+    public EarningsView.EarningsPerCurrency toDomain() {
+        return new EarningsView.EarningsPerCurrency(new TotalMoneyView(totalAmount, currency.toView(), totalDollarsEquivalent), rewardCount);
     }
 }
