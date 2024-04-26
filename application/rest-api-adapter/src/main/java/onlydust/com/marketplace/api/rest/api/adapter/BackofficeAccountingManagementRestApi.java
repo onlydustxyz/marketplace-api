@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -274,11 +275,11 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     }
 
     @Override
-    public ResponseEntity<EarningsResponse> getUserEarnedDetails(List<RewardStatusContract> statuses,
-                                                                 List<Long> recipients,
-                                                                 List<UUID> billingProfiles,
-                                                                 List<UUID> projects,
-                                                                 String fromDate, String toDate) {
+    public ResponseEntity<EarningsResponse> getEarnings(List<RewardStatusContract> statuses,
+                                                        List<Long> recipients,
+                                                        List<UUID> billingProfiles,
+                                                        List<UUID> projects,
+                                                        String fromDate, String toDate) {
         final EarningsView earnings = accountingRewardPort.getEarnings(
                 statuses != null ? statuses.stream().map(BackOfficeMapper::map).toList() : null,
                 recipients != null ? recipients.stream().map(GithubUserId::of).toList() : null,
@@ -289,15 +290,18 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
         );
         return ResponseEntity.ok(new EarningsResponse()
                 .totalUsdAmount(prettyUsd(earnings.totalUsdAmount()))
-                .amountsPerCurrency(earnings.earningsPerCurrencies().stream().map(earningsPerCurrency -> new EarningsResponseAmountsPerCurrencyInner()
-                        .rewardCount(earningsPerCurrency.rewardCount())
-                        .amount(earningsPerCurrency.money().amount())
-                        .dollarsEquivalent(prettyUsd(earningsPerCurrency.money().dollarsEquivalent()))
-                        .currency(new ShortCurrencyResponse()
-                                .id(earningsPerCurrency.money().currency().id().value())
-                                .code(earningsPerCurrency.money().currency().code())
-                                .name(earningsPerCurrency.money().currency().name())
-                                .decimals(earningsPerCurrency.money().currency().decimals())
-                                .logoUrl(earningsPerCurrency.money().currency().logoUrl()))).toList()));
+                .amountsPerCurrency(earnings.earningsPerCurrencies().stream()
+                        .sorted(Comparator.comparing(a -> a.money().currency().code()))
+                        .map(earningsPerCurrency -> new EarningsResponseAmountsPerCurrencyInner()
+                                .rewardCount(earningsPerCurrency.rewardCount())
+                                .amount(earningsPerCurrency.money().amount())
+                                .dollarsEquivalent(prettyUsd(earningsPerCurrency.money().dollarsEquivalent()))
+                                .currency(new ShortCurrencyResponse()
+                                        .id(earningsPerCurrency.money().currency().id().value())
+                                        .code(earningsPerCurrency.money().currency().code())
+                                        .name(earningsPerCurrency.money().currency().name())
+                                        .decimals(earningsPerCurrency.money().currency().decimals())
+                                        .logoUrl(earningsPerCurrency.money().currency().logoUrl())))
+                        .toList()));
     }
 }

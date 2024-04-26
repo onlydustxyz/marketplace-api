@@ -244,6 +244,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "5f9060a7-6f9e-4ef7-a1e4-1aaa4c85f03c",
                               "project": {
+                                "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                                "slug": "bretzel",
                                 "name": "Bretzel",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                               },
@@ -261,8 +263,9 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "conversionRate": 1.00000000000000000000
                               },
                               "recipient": {
+                                "githubUserId": 8642470,
+                                "userId": "45e98bf6-25c2-4edf-94da-e340daba8964",
                                 "login": "gregcha",
-                                "name": null,
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
                               },
                               "billingProfile": null,
@@ -272,6 +275,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "fab7aaf4-9b0c-4e52-bc9b-72ce08131617",
                               "project": {
+                                "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                                "slug": "bretzel",
                                 "name": "Bretzel",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                               },
@@ -289,8 +294,9 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "conversionRate": 1.00000000000000000000
                               },
                               "recipient": {
+                                "githubUserId": 8642470,
+                                "userId": "45e98bf6-25c2-4edf-94da-e340daba8964",
                                 "login": "gregcha",
-                                "name": null,
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
                               },
                               "billingProfile": null,
@@ -300,6 +306,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "64fb2732-5632-4b09-a8b1-217485648129",
                               "project": {
+                                "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                                "slug": "bretzel",
                                 "name": "Bretzel",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                               },
@@ -317,8 +325,9 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "conversionRate": 1.00000000000000000000
                               },
                               "recipient": {
+                                "githubUserId": 8642470,
+                                "userId": "45e98bf6-25c2-4edf-94da-e340daba8964",
                                 "login": "gregcha",
-                                "name": null,
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
                               },
                               "billingProfile": null,
@@ -328,6 +337,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "736e0554-f30e-4315-9731-7611fa089dcf",
                               "project": {
+                                "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                                "slug": "bretzel",
                                 "name": "Bretzel",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                               },
@@ -345,8 +356,9 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "conversionRate": 1.0100000000000000
                               },
                               "recipient": {
+                                "githubUserId": 8642470,
+                                "userId": "45e98bf6-25c2-4edf-94da-e340daba8964",
                                 "login": "gregcha",
-                                "name": null,
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
                               },
                               "billingProfile": null,
@@ -356,6 +368,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "id": "1c56d096-5284-4ae3-af3c-dd2b3211fb73",
                               "project": {
+                                "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                                "slug": "bretzel",
                                 "name": "Bretzel",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                               },
@@ -373,8 +387,9 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "conversionRate": 1.0100000000000000
                               },
                               "recipient": {
+                                "githubUserId": 8642470,
+                                "userId": "45e98bf6-25c2-4edf-94da-e340daba8964",
                                 "login": "gregcha",
-                                "name": null,
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
                               },
                               "billingProfile": null,
@@ -716,7 +731,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalUsdAmount": 2973233.78,
+                          "totalUsdAmount": 1193273.78,
                           "amountsPerCurrency": [
                             {
                               "amount": 29313.00,
@@ -739,7 +754,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                 "decimals": 6
                               },
-                              "dollarsEquivalent": 2943920.78,
+                              "dollarsEquivalent": 1163960.78,
                               "rewardCount": 223
                             }
                           ]
@@ -767,6 +782,298 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         {
                           "totalUsdAmount": 0,
                           "amountsPerCurrency": []
+                        }
+                        """);
+    }
+
+    @Test
+    @Order(22)
+    void should_get_earnings_with_date_range() {
+
+        // When
+        client.get()
+                .uri(getApiURI(EARNINGS, Map.of(
+                        "fromDate", "2023-02-08",
+                        "toDate", "2024-02-10"))
+                )
+                .header("Authorization", "Bearer " + camille.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalUsdAmount": 151144.52,
+                          "amountsPerCurrency": [
+                            {
+                              "amount": 22125.00,
+                              "currency": {
+                                "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                "code": "USD",
+                                "name": "US Dollar",
+                                "logoUrl": null,
+                                "decimals": 2
+                              },
+                              "dollarsEquivalent": 22125.00,
+                              "rewardCount": 19
+                            },
+                            {
+                              "amount": 128752.00,
+                              "currency": {
+                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                "code": "USDC",
+                                "name": "USD Coin",
+                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                "decimals": 6
+                              },
+                              "dollarsEquivalent": 129019.52,
+                              "rewardCount": 105
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
+    @Order(23)
+    void should_get_earnings_with_statuses() {
+
+        // When
+        client.get()
+                .uri(getApiURI(EARNINGS, Map.of(
+                        "statuses", "COMPLETE"))
+                )
+                .header("Authorization", "Bearer " + camille.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalUsdAmount": 1084927.88,
+                          "amountsPerCurrency": [
+                            {
+                              "amount": 22563,
+                              "currency": {
+                                "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                "code": "USD",
+                                "name": "US Dollar",
+                                "logoUrl": null,
+                                "decimals": 2
+                              },
+                              "dollarsEquivalent": 22563,
+                              "rewardCount": 15
+                            },
+                            {
+                              "amount": 171188.00,
+                              "currency": {
+                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                "code": "USDC",
+                                "name": "USD Coin",
+                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                "decimals": 6
+                              },
+                              "dollarsEquivalent": 1062364.88,
+                              "rewardCount": 133
+                            }
+                          ]
+                        }
+                        """);
+
+        // When
+        client.get()
+                .uri(getApiURI(EARNINGS, Map.of(
+                        "statuses", "COMPLETE,PROCESSING"))
+                )
+                .header("Authorization", "Bearer " + camille.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalUsdAmount": 1094737.88,
+                          "amountsPerCurrency": [
+                            {
+                              "amount": 26313,
+                              "currency": {
+                                "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                "code": "USD",
+                                "name": "US Dollar",
+                                "logoUrl": null,
+                                "decimals": 2
+                              },
+                              "dollarsEquivalent": 26313,
+                              "rewardCount": 18
+                            },
+                            {
+                              "amount": 177188.00,
+                              "currency": {
+                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                "code": "USDC",
+                                "name": "USD Coin",
+                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                "decimals": 6
+                              },
+                              "dollarsEquivalent": 1068424.88,
+                              "rewardCount": 139
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
+    @Order(24)
+    void should_get_earnings_with_billing_profiles() {
+
+        // When
+        client.get()
+                .uri(getApiURI(EARNINGS, Map.of(
+                        "billingProfiles", "50d8ae0d-1981-435b-90c5-09fc32b7d7d6,9cae91ac-e70f-426f-af0d-e35c1d3578ed"))
+                )
+                .header("Authorization", "Bearer " + camille.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalUsdAmount": 985610.00,
+                          "amountsPerCurrency": [
+                            {
+                              "amount": 18375.00,
+                              "currency": {
+                                "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                "code": "USD",
+                                "name": "US Dollar",
+                                "logoUrl": null,
+                                "decimals": 2
+                              },
+                              "dollarsEquivalent": 18375.00,
+                              "rewardCount": 16
+                            },
+                            {
+                              "amount": 77000.00,
+                              "currency": {
+                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                "code": "USDC",
+                                "name": "USD Coin",
+                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                "decimals": 6
+                              },
+                              "dollarsEquivalent": 967235.00,
+                              "rewardCount": 57
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+
+    @Test
+    @Order(25)
+    void should_get_earnings_with_recipient() {
+
+        // When
+        client.get()
+                .uri(getApiURI(EARNINGS, Map.of(
+                        "recipients", "595505"))
+                )
+                .header("Authorization", "Bearer " + camille.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalUsdAmount": 20855.02,
+                          "amountsPerCurrency": [
+                            {
+                              "amount": 4188,
+                              "currency": {
+                                "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                "code": "USD",
+                                "name": "US Dollar",
+                                "logoUrl": null,
+                                "decimals": 2
+                              },
+                              "dollarsEquivalent": 4188,
+                              "rewardCount": 4
+                            },
+                            {
+                              "amount": 16502,
+                              "currency": {
+                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                "code": "USDC",
+                                "name": "USD Coin",
+                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                "decimals": 6
+                              },
+                              "dollarsEquivalent": 16667.02,
+                              "rewardCount": 11
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+
+    @Test
+    @Order(25)
+    void should_get_earnings_all_combined() {
+
+        // When
+        client.get()
+                .uri(getApiURI(EARNINGS, Map.of(
+                                "recipients", "43467246,595505",
+                                "billingProfiles", "50d8ae0d-1981-435b-90c5-09fc32b7d7d6,9cae91ac-e70f-426f-af0d-e35c1d3578ed",
+                                "statuses", "COMPLETE",
+                                "fromDate", "2023-02-08",
+                                "toDate", "2024-02-10",
+                                "projects", "7d04163c-4187-4313-8066-61504d34fc56,1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e,57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8"
+                        ))
+                )
+                .header("Authorization", "Bearer " + camille.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalUsdAmount": 4260.00,
+                          "amountsPerCurrency": [
+                            {
+                              "amount": 3250,
+                              "currency": {
+                                "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                "code": "USD",
+                                "name": "US Dollar",
+                                "logoUrl": null,
+                                "decimals": 2
+                              },
+                              "dollarsEquivalent": 3250,
+                              "rewardCount": 1
+                            },
+                            {
+                              "amount": 1000,
+                              "currency": {
+                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                "code": "USDC",
+                                "name": "USD Coin",
+                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                "decimals": 6
+                              },
+                              "dollarsEquivalent": 1010.00,
+                              "rewardCount": 1
+                            }
+                          ]
                         }
                         """);
     }

@@ -1421,10 +1421,11 @@ paths:
         - apiKey: [ ]
       tags:
         - BackofficeAccountingManagement
-      summary: Get user earned data
-      operationId: getUserEarnedDetails
+      summary: Get earnings
+      operationId: getEarnings
       description: |
-        Get user earned data
+        Get earnings. Use filters to get earnings of a specific user, project, billing profile, etc.
+        Filters can be combined to get more specific results (eg. get earnings of a specific user in a specific project).
       parameters:
         - in: query
           name: statuses
