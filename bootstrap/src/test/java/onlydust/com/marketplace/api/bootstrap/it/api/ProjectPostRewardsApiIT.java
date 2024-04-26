@@ -2,6 +2,9 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
+import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.api.bootstrap.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.RewardItemRequest;
@@ -14,10 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 
@@ -154,5 +158,70 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                 .is5xxServerError()
                 .expectBody()
                 .jsonPath("$.message").isEqualTo("INTERNAL_SERVER_ERROR");
+    }
+
+    @Autowired
+    AccountingService accountingService;
+    @Autowired
+    CustomerIOProperties customerIOProperties;
+
+    @Test
+    void should_create_reward() {
+        // Given
+        final UUID strkId = currencyRepository.findByCode("ETH").orElseThrow().id();
+        final SponsorAccountStatement strkSponsorAccount = accountingService.createSponsorAccountWithInitialBalance(
+                SponsorId.of(UUID.fromString("eb04a5de-4802-4071-be7b-9007b563d48d")),
+                Currency.Id.of(strkId), null,
+                new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
+                        PositiveAmount.of(200000L),
+                        faker.rickAndMorty().character(), faker.hacker().verb()));
+        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        accountingService.allocate(strkSponsorAccount.account().id(), ProjectId.of(projectId), PositiveAmount.of(100000L), Currency.Id.of(strkId));
+        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
+        final String jwt = pierre.jwt();
+        final RewardRequest rewardRequest = new RewardRequest()
+                .amount(BigDecimal.valueOf(12.95))
+                .currencyId(CurrencyHelper.ETH.value())
+                .recipientId(pierre.user().getGithubUserId())
+                .items(List.of(
+                        new RewardItemRequest().id("pr1")
+                                .type(RewardType.PULL_REQUEST)
+                                .number(1L)
+                                .repoId(2L),
+                        new RewardItemRequest().id("issue1")
+                                .type(RewardType.ISSUE)
+                                .number(2L)
+                                .repoId(3L),
+                        new RewardItemRequest().id("codeReview1")
+                                .type(RewardType.CODE_REVIEW)
+                                .number(3L)
+                                .repoId(4L)
+                ));
+
+        client.post()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId)))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .body(BodyInserters.fromValue(rewardRequest))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        accountingMailOutboxJob.run();
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id", equalTo(customerIOProperties.getNewRewardReceivedEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(pierre.user().getId().toString())))
+                        .withRequestBody(matchingJsonPath("$.message_data.projectName", equalTo("QA new contributions")))
+                        .withRequestBody(matchingJsonPath("$.message_data.username", equalTo(pierre.user().getGithubLogin())))
+                        .withRequestBody(matchingJsonPath("$.message_data.currency", equalTo("ETH")))
+                        .withRequestBody(matchingJsonPath("$.message_data.amount", equalTo("12.95")))
+                        .withRequestBody(matchingJsonPath("$.message_data.sentBy", equalTo(pierre.user().getGithubLogin())))
+                        .withRequestBody(matchingJsonPath("$.to", equalTo(pierre.user().getGithubEmail())))
+                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo("New reward received ✨")))
+        );
     }
 }

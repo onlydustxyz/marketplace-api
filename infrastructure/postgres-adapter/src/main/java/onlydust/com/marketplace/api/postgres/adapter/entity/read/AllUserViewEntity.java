@@ -27,6 +27,8 @@ public class AllUserViewEntity {
     @NonNull
     String avatarUrl;
 
+    String email;
+
     public Boolean isRegistered() {
         return userId != null;
     }

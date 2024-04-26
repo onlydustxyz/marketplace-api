@@ -1,11 +1,15 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.accounting.domain.port.in.*;
-import onlydust.com.marketplace.accounting.domain.port.out.*;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.PaymentService;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
+import onlydust.com.marketplace.kernel.observer.MailObserver;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.HackathonFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
@@ -67,11 +71,11 @@ public class BackofficeConfiguration {
 
     @Bean
     public AccountingRewardPort accountingRewardPort(final AccountingRewardStoragePort accountingRewardStoragePort,
-                                                     final MailNotificationPort mailNotificationPort,
+                                                     final MailObserver mailObserver,
                                                      final AccountingFacadePort accountingFacadePort,
                                                      final SponsorStoragePort sponsorStoragePort) {
-        return new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, mailNotificationPort, accountingFacadePort,
-                sponsorStoragePort);
+        return new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, accountingFacadePort,
+                sponsorStoragePort, mailObserver);
     }
 
     @Bean

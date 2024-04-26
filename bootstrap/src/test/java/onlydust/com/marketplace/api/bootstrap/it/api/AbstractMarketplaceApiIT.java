@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
 import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
 import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
+import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +61,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         @ConfigureWireMock(name = "linear", property = "infrastructure.linear.base-uri"),
         @ConfigureWireMock(name = "auth0", property = "application.web.auth0.user-info-url"),
         @ConfigureWireMock(name = "posthog", property = "infrastructure.posthog.base-uri"),
-        @ConfigureWireMock(name = "sumsub", property = "infrastructure.sumsub.base-uri")
+        @ConfigureWireMock(name = "sumsub", property = "infrastructure.sumsub.base-uri"),
+        @ConfigureWireMock(name = "customer-io", property = "infrastructure.customer-io.base-uri")
 })
 public class AbstractMarketplaceApiIT {
 
@@ -175,6 +177,8 @@ public class AbstractMarketplaceApiIT {
     protected WireMockServer ethereumWireMockServer;
     @Autowired
     protected WireMockServer starknetWireMockServer;
+    @InjectWireMock("customer-io")
+    protected WireMockServer customerIOWireMockServer;
 
     @LocalServerPort
     int port;
@@ -196,6 +200,8 @@ public class AbstractMarketplaceApiIT {
     OutboxConsumerJob trackingOutboxJob;
     @Autowired
     OutboxConsumerJob billingProfileVerificationOutboxJob;
+    @Autowired
+    OutboxConsumerJob accountingMailOutboxJob;
 
     @Autowired
     RewardRepository rewardRepository;

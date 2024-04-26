@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
@@ -13,6 +14,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.Authenticate
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
+import onlydust.com.marketplace.project.domain.port.output.ProjectRewardStoragePort;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -25,6 +27,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 
@@ -35,6 +38,8 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     AuthenticatedAppUserService authenticatedAppUserService;
+    @Autowired
+    CustomerIOProperties customerIOProperties;
 
     @Test
     @Order(0)
@@ -78,7 +83,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     @Order(4)
-    void should_prevent_cancel_reward_action_given_a_reward_already_in_an_invoice() throws IOException {
+    void should_prevent_cancel_reward_action_given_a_reward_already_in_an_invoice() throws IOException, InterruptedException {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         final String jwt = pierre.jwt();
@@ -118,5 +123,42 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
                 .isForbidden()
                 .expectBody()
                 .jsonPath("$.message").isEqualTo("Reward %s cannot be cancelled because it is included in an invoice".formatted(rewardId));
+    }
+
+    @Autowired
+    ProjectRewardStoragePort projectRewardStoragePort;
+
+    @Test
+    @Order(5)
+    void should_delete_reward() {
+        // Given
+        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
+        final String jwt = pierre.jwt();
+        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var rewardId = UUID.fromString("e1498a17-5090-4071-a88a-6f0b0c337c3a");
+
+        // When
+        client.delete()
+                .uri(getApiURI(String.format(PROJECTS_REWARD, projectId, rewardId)))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        accountingMailOutboxJob.run();
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id", equalTo(customerIOProperties.getRewardCanceledEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(pierre.user().getId().toString())))
+                        .withRequestBody(matchingJsonPath("$.message_data.amount", equalTo("1000.0")))
+                        .withRequestBody(matchingJsonPath("$.message_data.username", equalTo(pierre.user().getGithubLogin())))
+                        .withRequestBody(matchingJsonPath("$.message_data.currency", equalTo("USDC")))
+                        .withRequestBody(matchingJsonPath("$.message_data.rewardName", equalTo("#E1498 - QA new contributions")))
+                        .withRequestBody(matchingJsonPath("$.to", equalTo(pierre.user().getGithubEmail())))
+                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo("Reward #E1498 - QA new contributions got canceled"))));
     }
 }

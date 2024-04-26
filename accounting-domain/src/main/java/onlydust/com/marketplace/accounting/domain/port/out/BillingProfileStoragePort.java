@@ -94,4 +94,6 @@ public interface BillingProfileStoragePort {
     List<BillingProfileRewardView> findInvoiceableRewardsForBillingProfile(BillingProfile.Id billingProfileId);
 
     boolean isUserInvitedTo(BillingProfile.Id billingProfileId, GithubUserId githubUserId);
+
+    Optional<ShortContributorView> getBillingProfileOwnerById(UserId ownerId);
 }

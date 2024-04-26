@@ -33,8 +33,6 @@ public class BillingProfileVerificationService implements BillingProfileVerifica
     private final BillingProfileStoragePort billingProfileStoragePort;
     private final BillingProfileVerificationProviderPort billingProfileVerificationProviderPort;
     private final BillingProfileObserver billingProfileObserver;
-    private final NotificationPort notificationPort;
-    private final WebhookPort webhookPort;
 
     @Override
     public void consumeBillingProfileVerificationEvent(Event event) {
@@ -51,8 +49,6 @@ public class BillingProfileVerificationService implements BillingProfileVerifica
             billingProfileVerificationUpdated = processParentBillingProfileVerification(billingProfileVerificationUpdated);
         }
         billingProfileObserver.onBillingProfileUpdated(billingProfileVerificationUpdated);
-        webhookPort.send(billingProfileVerificationUpdated);
-        notificationPort.notify(billingProfileVerificationUpdated);
     }
 
     private BillingProfileVerificationUpdated processParentBillingProfileVerification(final BillingProfileVerificationUpdated billingProfileVerificationUpdated) {

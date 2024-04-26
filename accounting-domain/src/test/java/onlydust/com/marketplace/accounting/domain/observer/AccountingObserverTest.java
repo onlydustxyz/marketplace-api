@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.accounting.domain.observer;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
-import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
+import onlydust.com.marketplace.accounting.domain.events.*;
+import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
@@ -12,10 +12,14 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
 import onlydust.com.marketplace.accounting.domain.service.AccountingObserver;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
+import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
+import onlydust.com.marketplace.kernel.observer.MailObserver;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
+import onlydust.com.marketplace.kernel.port.output.WebhookPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -44,6 +48,9 @@ public class AccountingObserverTest {
     CurrencyStorage currencyStorage;
     AccountingObserver accountingObserver;
     ReceiptStoragePort receiptStorage;
+    MailObserver mailObserver;
+    AccountingRewardStoragePort accountingRewardStoragePort;
+    NotificationPort notificationPort;
     final Faker faker = new Faker();
     final Currency currency = ETH;
     final Currency usd = USD;
@@ -62,9 +69,12 @@ public class AccountingObserverTest {
         invoiceStorage = mock(InvoiceStoragePort.class);
         receiptStorage = mock(ReceiptStoragePort.class);
         billingProfileStoragePort = mock(BillingProfileStoragePort.class);
+        mailObserver = mock(MailObserver.class);
+        accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
+        notificationPort = mock(NotificationPort.class);
         when(currencyStorage.findByCode(usd.code())).thenReturn(Optional.of(usd));
         accountingObserver = new AccountingObserver(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage, invoiceStorage,
-                receiptStorage, billingProfileStoragePort);
+                receiptStorage, billingProfileStoragePort, mailObserver, accountingRewardStoragePort, notificationPort);
 
         when(rewardStatusStorage.get(any(RewardId.class))).then(invocation -> {
             final var rewardId = invocation.getArgument(0, RewardId.class);
@@ -107,6 +117,32 @@ public class AccountingObserverTest {
                     .invoiceReceivedAt(null)
                     .paidAt(null)
                     .withAdditionalNetworks(Set.of(Network.ETHEREUM, Network.OPTIMISM));
+            final MoneyView moneyView = new MoneyView(BigDecimal.ONE, Currency.crypto("OP", Currency.Code.OP, 3));
+            final ProjectShortView shortProjectView = ProjectShortView.builder()
+                    .name(faker.name().fullName())
+                    .shortDescription(faker.rickAndMorty().character())
+                    .logoUrl(faker.internet().url())
+                    .id(ProjectId.random())
+                    .slug(faker.lorem().characters())
+                    .build();
+            final ShortContributorView recipient = new ShortContributorView(faker.rickAndMorty().character(), faker.gameOfThrones().character(),
+                    faker.internet().emailAddress(), UUID.randomUUID());
+            final ShortContributorView requester = new ShortContributorView(faker.rickAndMorty().character(), faker.gameOfThrones().character(),
+                    faker.internet().emailAddress(), null);
+            final RewardDetailsView rewardDetailsView = RewardDetailsView.builder()
+                    .money(moneyView)
+                    .id(rewardId)
+                    .project(shortProjectView)
+                    .recipient(recipient)
+                    .sponsors(List.of())
+                    .billingProfile(mock(BillingProfile.class))
+                    .status(mock(RewardStatus.class))
+                    .requestedAt(ZonedDateTime.now())
+                    .githubUrls(List.of("https://github.com/onlydust/onlydust"))
+                    .requester(requester)
+                    .build();
+            when(accountingRewardStoragePort.getReward(rewardId))
+                    .thenReturn(Optional.of(rewardDetailsView));
 
             when(accountBookFacade.isFunded(rewardId)).thenReturn(true);
             when(accountBookFacade.unlockDateOf(rewardId)).thenReturn(rewardStatus.unlockDate().map(ZonedDateTime::toInstant));
@@ -119,6 +155,14 @@ public class AccountingObserverTest {
             // Then
             verify(rewardStatusStorage, times(2)).save(any());
             assertThat(rewardStatus.usdAmount()).isPresent();
+            verify(mailObserver).send(new RewardCreated(recipient.email(), rewardDetailsView.githubUrls().size(),
+                    requester.login(), recipient.login(), ShortReward.builder()
+                    .amount(rewardDetailsView.money().amount())
+                    .currencyCode(rewardDetailsView.money().currency().code().toString())
+                    .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
+                    .id(rewardId)
+                    .projectName(shortProjectView.name())
+                    .build(), recipient.id()));
         }
     }
 
@@ -127,13 +171,73 @@ public class AccountingObserverTest {
         RewardId rewardId = RewardId.random();
 
         @Test
-        public void should_delete_status() {
+        public void should_cancel_reward() {
             // When
+            final MoneyView moneyView = new MoneyView(BigDecimal.ONE, Currency.crypto("OP", Currency.Code.OP, 3));
+            final ProjectShortView shortProjectView = ProjectShortView.builder()
+                    .name(faker.name().fullName())
+                    .shortDescription(faker.rickAndMorty().character())
+                    .logoUrl(faker.internet().url())
+                    .id(ProjectId.random())
+                    .slug(faker.lorem().characters())
+                    .build();
+            final ShortContributorView recipient = new ShortContributorView(faker.rickAndMorty().character(), faker.gameOfThrones().character(),
+                    faker.internet().emailAddress(), UUID.randomUUID());
+            final ShortContributorView requester = new ShortContributorView(faker.rickAndMorty().character(), faker.gameOfThrones().character(),
+                    faker.internet().emailAddress(), UUID.randomUUID());
+            final ShortRewardDetailsView rewardDetailsView = ShortRewardDetailsView.builder()
+                    .money(moneyView)
+                    .id(rewardId)
+                    .project(shortProjectView)
+                    .recipient(recipient)
+                    .requester(requester)
+                    .build();
+            when(accountingRewardStoragePort.getShortReward(rewardId))
+                    .thenReturn(Optional.of(rewardDetailsView));
             accountingObserver.onRewardCancelled(rewardId);
 
             // Then
             verify(rewardStatusStorage).delete(rewardId);
+            verify(mailObserver).send(new RewardCanceled(recipient.email(), recipient.login(), ShortReward.builder()
+                    .amount(rewardDetailsView.money().amount())
+                    .currencyCode(rewardDetailsView.money().currency().code().toString())
+                    .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
+                    .id(rewardId)
+                    .projectName(shortProjectView.name())
+                    .build(), recipient.id()));
         }
+
+        @Test
+        public void should_cancel_reward_and_not_notify_mail_given_a_recipient_not_signed_up() {
+            // When
+            final MoneyView moneyView = mock(MoneyView.class);
+            final ProjectShortView shortProjectView = ProjectShortView.builder()
+                    .name(faker.name().fullName())
+                    .shortDescription(faker.rickAndMorty().character())
+                    .logoUrl(faker.internet().url())
+                    .id(ProjectId.random())
+                    .slug(faker.lorem().characters())
+                    .build();
+            final ShortContributorView recipient = new ShortContributorView(faker.rickAndMorty().character(), faker.gameOfThrones().character(),
+                    null, UUID.randomUUID());
+            final ShortContributorView requester = new ShortContributorView(faker.rickAndMorty().character(), faker.gameOfThrones().character(),
+                    faker.internet().emailAddress(), UUID.randomUUID());
+            when(accountingRewardStoragePort.getShortReward(rewardId))
+                    .thenReturn(Optional.of(ShortRewardDetailsView.builder()
+                            .money(moneyView)
+                            .id(rewardId)
+                            .project(shortProjectView)
+                            .recipient(recipient)
+                            .requester(requester)
+                            .build()));
+            accountingObserver.onRewardCancelled(rewardId);
+
+            // Then
+            verify(rewardStatusStorage).delete(rewardId);
+            verifyNoInteractions(mailObserver);
+        }
+
+
     }
 
     @Nested
@@ -438,15 +542,14 @@ public class AccountingObserverTest {
                 final var rewardId = invocation.getArgument(0, RewardId.class);
                 return Optional.of(new RewardStatusData(rewardId).invoiceReceivedAt(invoice.createdAt()));
             });
-
-            // When
-            accountingObserver.onInvoiceRejected(new InvoiceRejected(
+            final InvoiceRejected invalidInvoice = new InvoiceRejected(
                     faker.internet().emailAddress(),
                     3L,
                     faker.internet().slug(),
                     faker.name().firstName(),
+                    UUID.randomUUID(),
                     invoice.number().toString(),
-                    invoice.rewards().stream().map(r -> InvoiceRejected.ShortReward.builder()
+                    invoice.rewards().stream().map(r -> ShortReward.builder()
                             .id(r.id())
                             .projectName(r.projectName())
                             .currencyCode(currency.code().toString())
@@ -454,7 +557,10 @@ public class AccountingObserverTest {
                             .dollarsEquivalent(r.amount().getValue())
                             .build()).toList(),
                     "Invalid invoice"
-            ));
+            );
+
+            // When
+            accountingObserver.onInvoiceRejected(invalidInvoice);
 
             // Then
             final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
@@ -462,6 +568,7 @@ public class AccountingObserverTest {
             final var rewardStatuses = rewardStatusCaptor.getAllValues();
             assertThat(rewardStatuses).hasSize(3);
             assertThat(rewardStatuses).allMatch(r -> r.invoiceReceivedAt().isEmpty());
+            verify(mailObserver, times(1)).send(invalidInvoice);
         }
     }
 
@@ -577,6 +684,9 @@ public class AccountingObserverTest {
 
             // Then
             verify(rewardStatusStorage).notRequested(kyc.getBillingProfileId());
+            verifyNoInteractions(accountingRewardStoragePort);
+            verifyNoInteractions(mailObserver);
+            verify(notificationPort).notify(billingProfileVerificationUpdated);
         }
 
         @Test
@@ -593,6 +703,9 @@ public class AccountingObserverTest {
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("KYC %s not found".formatted(kycId));
             verifyNoInteractions(rewardStatusStorage);
+            verifyNoInteractions(accountingRewardStoragePort);
+            verifyNoInteractions(mailObserver);
+            verifyNoInteractions(notificationPort);
         }
 
         @Test
@@ -609,6 +722,9 @@ public class AccountingObserverTest {
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("KYB %s not found".formatted(kybId));
             verifyNoInteractions(rewardStatusStorage);
+            verifyNoInteractions(accountingRewardStoragePort);
+            verifyNoInteractions(mailObserver);
+            verifyNoInteractions(notificationPort);
         }
 
 
@@ -627,6 +743,9 @@ public class AccountingObserverTest {
 
             // Then
             verify(rewardStatusStorage).notRequested(kyb.getBillingProfileId());
+            verify(notificationPort).notify(billingProfileVerificationUpdated);
+            verifyNoInteractions(accountingRewardStoragePort);
+            verifyNoInteractions(mailObserver);
         }
 
         @Test
@@ -645,6 +764,9 @@ public class AccountingObserverTest {
 
             // Then
             verify(rewardStatusStorage).notRequested(kyb.getBillingProfileId());
+            verify(notificationPort).notify(billingProfileVerificationUpdated);
+            verifyNoInteractions(accountingRewardStoragePort);
+            verifyNoInteractions(mailObserver);
         }
 
         @Test
@@ -661,9 +783,38 @@ public class AccountingObserverTest {
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("KYB not found for parentExternalApplicantId %s".formatted(billingProfileVerificationUpdated.getParentExternalApplicantId()));
             verifyNoInteractions(rewardStatusStorage);
+            verifyNoInteractions(accountingRewardStoragePort);
+            verifyNoInteractions(mailObserver);
+            verifyNoInteractions(notificationPort);
         }
 
+        @Test
+        void should_notify_billing_profile_verification_failed() {
+            // Given
+            final UUID kybId = UUID.randomUUID();
+            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, VerificationType.KYC,
+                    VerificationStatus.CLOSED, null, UserId.random(), null, faker.rickAndMorty().character(), null);
+            final UUID userId = UUID.randomUUID();
+            final ShortContributorView shortContributorView = new ShortContributorView(faker.rickAndMorty().character(), faker.internet().url(),
+                    faker.internet().emailAddress(), userId);
+            final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
+            final Kyc kyc =
+                    Kyc.builder().id(billingProfileVerificationUpdated.getVerificationId())
+                            .billingProfileId(billingProfileId).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();
 
+            // When
+            when(billingProfileStoragePort.getBillingProfileOwnerById(billingProfileVerificationUpdated.getUserId()))
+                    .thenReturn(Optional.of(shortContributorView));
+            when(billingProfileStoragePort.findKycById(billingProfileVerificationUpdated.getVerificationId()))
+                    .thenReturn(Optional.of(kyc));
+            accountingObserver.onBillingProfileUpdated(billingProfileVerificationUpdated);
+
+            // Then
+            verify(mailObserver).send(new BillingProfileVerificationFailed(shortContributorView.email(), UserId.of(userId), billingProfileId,
+                    shortContributorView.login(),
+                    billingProfileVerificationUpdated.getVerificationStatus()));
+            verify(notificationPort).notify(billingProfileVerificationUpdated);
+        }
     }
 
     @Nested

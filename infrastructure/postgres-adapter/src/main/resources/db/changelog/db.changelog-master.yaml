@@ -240,10 +240,14 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelogs/00000209_update_bi_schema.sql
   - include:
-      file: db/changelog/changelogs/00000210_add_ecosystem_and_sponsor_metrics.sql
-  - include:
       file: db/changelog/changelogs/00000210_create_hackathons_table.sql
+  - include:
+      file: db/changelog/changelogs/00000210_add_ecosystem_and_sponsor_metrics.sql
   - include:
       file: db/changelog/changelogs/00000211_drop_legacy_tables.sql
   - include:
       file: db/changelog/changelogs/00000212_add_new_contributors_in_bi_views.sql
+  - include:
+      file: db/changelog/changelogs/00000213_add_email_to_all_users_view.sql
+  - include:
+      file: db/changelog/changelogs/00000214_add_accounting_mail_outbox_events_table.sql

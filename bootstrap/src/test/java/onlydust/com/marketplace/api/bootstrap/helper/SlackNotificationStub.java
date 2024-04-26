@@ -20,4 +20,8 @@ public class SlackNotificationStub implements NotificationPort {
             this.notifications.add(billingProfileVerificationUpdated);
         }
     }
+
+    public void reset(){
+        this.notifications.clear();
+    }
 }

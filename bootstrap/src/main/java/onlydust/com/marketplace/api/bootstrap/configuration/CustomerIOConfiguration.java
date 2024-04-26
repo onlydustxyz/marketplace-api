@@ -1,6 +1,10 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
-import onlydust.com.marketplace.accounting.domain.port.out.MailNotificationPort;
+import com.onlydust.customer.io.adapter.CustomerIOAdapter;
+import com.onlydust.customer.io.adapter.client.CustomerIOHttpClient;
+import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
+import onlydust.com.marketplace.kernel.port.output.MailPort;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -8,9 +12,18 @@ import org.springframework.context.annotation.Configuration;
 public class CustomerIOConfiguration {
 
     @Bean
-    public MailNotificationPort mailNotificationPort() {
-        return (email, rewardViews) -> {
-            // TODO : implement customer-io adapter
-        };
+    @ConfigurationProperties(value = "infrastructure.customer-io")
+    public CustomerIOProperties customerIOProperties() {
+        return new CustomerIOProperties();
+    }
+
+    @Bean
+    public CustomerIOHttpClient customerIOHttpClient(final CustomerIOProperties customerIOProperties) {
+        return new CustomerIOHttpClient(customerIOProperties);
+    }
+
+    @Bean
+    public MailPort mailNotificationPort(final CustomerIOProperties customerIOProperties, final CustomerIOHttpClient customerIOHttpClient) {
+        return new CustomerIOAdapter(customerIOHttpClient, customerIOProperties);
     }
 }

@@ -26,7 +26,8 @@ public record RewardDetailsView(
         InvoiceView invoice,
         List<Receipt> receipts,
         ZonedDateTime paidNotificationSentAt,
-        Map<Network, PositiveAmount> pendingPayments
+        Map<Network, PositiveAmount> pendingPayments,
+        @NonNull ShortContributorView requester
 ) {
 
     @Deprecated

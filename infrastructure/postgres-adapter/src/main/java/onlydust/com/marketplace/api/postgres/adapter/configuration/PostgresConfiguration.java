@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndexerEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.TrackingEventEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
@@ -212,13 +213,15 @@ public class PostgresConfiguration {
                                                        final RewardDetailsViewRepository rewardDetailsViewRepository,
                                                        final BackofficeRewardViewRepository backofficeRewardViewRepository,
                                                        final RewardRepository rewardRepository,
-                                                       final PaymentShortViewRepository paymentShortViewRepository) {
+                                                       final PaymentShortViewRepository paymentShortViewRepository,
+                                                       final ShortRewardViewRepository shortRewardViewRepository) {
         return new PostgresRewardAdapter(shortProjectViewEntityRepository,
                 batchPaymentRepository,
                 rewardDetailsViewRepository,
                 backofficeRewardViewRepository,
                 rewardRepository,
-                paymentShortViewRepository);
+                paymentShortViewRepository,
+                shortRewardViewRepository);
     }
 
     @Bean
@@ -253,6 +256,11 @@ public class PostgresConfiguration {
     @Bean
     public PostgresOutboxAdapter<BillingProfileVerificationEventEntity> billingProfileVerificationOutbox(final BillingProfileVerificationEventRepository billingProfileVerificationEventRepository) {
         return new PostgresOutboxAdapter<>(billingProfileVerificationEventRepository);
+    }
+
+    @Bean
+    public PostgresOutboxAdapter<AccountingMailEventEntity> accountingMailOutbox(final AccountingMailEventRepository accountingMailEventRepository) {
+        return new PostgresOutboxAdapter<>(accountingMailEventRepository);
     }
 
     @Bean
@@ -333,12 +341,13 @@ public class PostgresConfiguration {
                                                                      final ShortBillingProfileViewRepository shortBillingProfileViewRepository,
                                                                      final BillingProfileUserRightsViewRepository billingProfileUserRightsViewRepository,
                                                                      final RewardViewRepository rewardViewRepository,
-                                                                     final RewardRepository rewardRepository) {
+                                                                     final RewardRepository rewardRepository,
+                                                                     final UserRepository userRepository) {
         return new PostgresBillingProfileAdapter(globalSettingsRepository,
                 billingProfileRepository, kybRepository, kycRepository, payoutInfoRepository, payoutInfoViewRepository, walletRepository,
                 billingProfileUserRepository, billingProfileUserViewRepository, childrenKycRepository, billingProfileUserInvitationRepository,
                 payoutPreferenceRepository, bankAccountRepository, shortBillingProfileViewRepository, billingProfileUserRightsViewRepository,
-                rewardViewRepository, rewardRepository);
+                rewardViewRepository, rewardRepository, userRepository);
     }
 
     @Bean

@@ -9,8 +9,10 @@ import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStora
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentShortView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.accounting.domain.view.ShortRewardDetailsView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BackofficeRewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.PaymentShortViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortRewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentRewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
@@ -39,6 +41,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     private final BackofficeRewardViewRepository backofficeRewardViewRepository;
     private final RewardRepository rewardRepository;
     private final PaymentShortViewRepository paymentShortViewRepository;
+    private final ShortRewardViewRepository shortRewardViewRepository;
 
     @Override
     @Transactional
@@ -163,8 +166,13 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Optional<RewardDetailsView> getReward(RewardId id) {
         return backofficeRewardViewRepository.findAllByRewardIds(List.of(id.value())).stream().findFirst().map(BackofficeRewardViewEntity::toDomain);
+    }
+
+    @Override
+    public Optional<ShortRewardDetailsView> getShortReward(RewardId rewardId) {
+        return shortRewardViewRepository.findById(rewardId.value()).map(ShortRewardViewEntity::toDomain);
     }
 }

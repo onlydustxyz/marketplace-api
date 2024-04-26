@@ -82,4 +82,5 @@ public interface ProjectStoragePort {
     void showContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId);
 
     void updateProjectsTags(Date now);
+
 }

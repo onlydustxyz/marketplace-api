@@ -147,6 +147,7 @@ class InvoiceServiceTest {
 
         final var invoiceCreatorId = UserId.random();
         final var invoiceCreator = BillingProfileCoworkerView.builder()
+                .userId(UserId.random())
                 .login(faker.name().username())
                 .email(faker.internet().emailAddress())
                 .firstName(faker.name().firstName())
@@ -184,9 +185,9 @@ class InvoiceServiceTest {
         assertThat(rejectedArgumentCaptor.getValue().billingProfileAdminFirstName()).isEqualTo(invoiceCreator.firstName());
         assertThat(rejectedArgumentCaptor.getValue().billingProfileAdminGithubLogin()).isEqualTo(invoiceCreator.login());
         assertThat(rejectedArgumentCaptor.getValue().rewardCount()).isEqualTo(invoice.rewards().size());
-        assertThat(rejectedArgumentCaptor.getValue().rewards().get(0).projectName()).isEqualTo(invoice.rewards().get(0).projectName());
-        assertThat(rejectedArgumentCaptor.getValue().rewards().get(0).amount()).isEqualTo(invoice.rewards().get(0).amount().getValue());
-        assertThat(rejectedArgumentCaptor.getValue().rewards().get(0).currencyCode()).isEqualTo(invoice.rewards().get(0).amount().getCurrency().code().toString());
+        assertThat(rejectedArgumentCaptor.getValue().rewards().get(0).getProjectName()).isEqualTo(invoice.rewards().get(0).projectName());
+        assertThat(rejectedArgumentCaptor.getValue().rewards().get(0).getAmount()).isEqualTo(invoice.rewards().get(0).amount().getValue());
+        assertThat(rejectedArgumentCaptor.getValue().rewards().get(0).getCurrencyCode()).isEqualTo(invoice.rewards().get(0).amount().getCurrency().code().toString());
     }
 
 

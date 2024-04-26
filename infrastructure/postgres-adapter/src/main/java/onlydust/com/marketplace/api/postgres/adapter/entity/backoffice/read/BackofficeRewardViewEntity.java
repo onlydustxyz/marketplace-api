@@ -11,22 +11,25 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.InvoiceViewEnti
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(force = true)
 @EqualsAndHashCode
-@Data
 @Entity
+@Value
+@Immutable
 public class BackofficeRewardViewEntity {
     @Id
     @NonNull
@@ -37,6 +40,10 @@ public class BackofficeRewardViewEntity {
     @ManyToOne
     @JoinColumn(name = "recipientId", referencedColumnName = "githubUserId")
     AllUserViewEntity recipient;
+
+    @ManyToOne
+    @JoinColumn(name = "requestorId", referencedColumnName = "userId")
+    AllUserViewEntity requester;
 
     @JdbcTypeCode(SqlTypes.JSON)
     List<String> githubUrls;
@@ -74,11 +81,11 @@ public class BackofficeRewardViewEntity {
     List<ReceiptEntity> receipts;
 
     @OneToOne
-    @JoinColumn(name = "id", referencedColumnName = "reward_id")
+    @JoinColumn(name = "id", referencedColumnName = "reward_id", insertable = false, updatable = false)
     @NonNull
     RewardStatusEntity status;
     @OneToOne
-    @JoinColumn(name = "id", referencedColumnName = "reward_id")
+    @JoinColumn(name = "id", referencedColumnName = "reward_id", insertable = false, updatable = false)
     @NonNull
     RewardStatusDataEntity statusData;
 
@@ -102,7 +109,7 @@ public class BackofficeRewardViewEntity {
                 .status(status())
                 .requestedAt(DateMapper.ofNullable(this.requestedAt))
                 .processedAt(DateMapper.ofNullable(this.statusData.paidAt()))
-                .githubUrls(isNull(this.githubUrls) ? List.of() : this.githubUrls.stream().sorted().toList())
+                .githubUrls(isNull(this.githubUrls) ? List.of() : this.githubUrls.stream().filter(Objects::nonNull).sorted().toList())
                 .project(ProjectShortView.builder()
                         .id(ProjectId.of(this.projectId))
                         .name(this.projectName)
@@ -111,7 +118,8 @@ public class BackofficeRewardViewEntity {
                         .slug(this.projectSlug)
                         .build())
                 .billingProfile(isNull(this.billingProfile) ? null : this.billingProfile.toDomain())
-                .recipient(new ShortContributorView(recipient.login(), recipient.avatarUrl()))
+                .recipient(new ShortContributorView(recipient.login(), recipient.avatarUrl(), recipient.email(), recipient.userId()))
+                .requester(new ShortContributorView(requester.login(), requester.avatarUrl(), requester.email(), requester.userId()))
                 .sponsors(isNull(this.sponsors) ? List.of() : this.sponsors.stream()
                         .map(SponsorLinkView::toDomain)
                         .sorted(comparing(ShortSponsorView::name))

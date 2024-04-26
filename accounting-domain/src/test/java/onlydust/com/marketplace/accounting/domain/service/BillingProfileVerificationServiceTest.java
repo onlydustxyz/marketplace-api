@@ -33,8 +33,6 @@ public class BillingProfileVerificationServiceTest {
     private Function<Event, BillingProfileVerificationUpdated> eventBillingProfileVerificationUpdatedFunction;
     private BillingProfileObserver billingProfileObserver;
     private BillingProfileVerificationProviderPort billingProfileVerificationProviderPort;
-    private NotificationPort notificationPort;
-    private WebhookPort webhookPort;
     private final Faker faker = new Faker();
 
     @BeforeEach
@@ -44,11 +42,9 @@ public class BillingProfileVerificationServiceTest {
         eventBillingProfileVerificationUpdatedFunction = mock(Function.class);
         billingProfileObserver = mock(BillingProfileObserver.class);
         billingProfileVerificationProviderPort = mock(BillingProfileVerificationProviderPort.class);
-        notificationPort = mock(NotificationPort.class);
-        webhookPort = mock(WebhookPort.class);
         billingProfileVerificationService = new BillingProfileVerificationService(outboxPort, eventBillingProfileVerificationUpdatedFunction,
                 billingProfileStoragePort,
-                billingProfileVerificationProviderPort, billingProfileObserver, notificationPort, webhookPort);
+                billingProfileVerificationProviderPort, billingProfileObserver);
     }
 
 
@@ -127,8 +123,6 @@ public class BillingProfileVerificationServiceTest {
             verify(billingProfileStoragePort).updateBillingProfileStatus(kycWithDataFromExternalSource.getBillingProfileId(),
                     billingProfileVerificationUpdated.getVerificationStatus());
             verify(billingProfileObserver).onBillingProfileUpdated(updatedEvent);
-            verify(notificationPort).notify(updatedEvent);
-            verify(webhookPort).send(updatedEvent);
         }
     }
 
@@ -206,8 +200,6 @@ public class BillingProfileVerificationServiceTest {
             // Then
             verify(billingProfileStoragePort).saveKyb(updateKyb);
             verify(billingProfileStoragePort).updateBillingProfileStatus(updateKyb.getBillingProfileId(), updateKyb.getStatus());
-            verify(notificationPort).notify(updatedEvent);
-            verify(webhookPort).send(updatedEvent);
             verify(billingProfileObserver).onBillingProfileUpdated(updatedEvent);
         }
 
@@ -254,8 +246,6 @@ public class BillingProfileVerificationServiceTest {
             // Then
             verify(billingProfileStoragePort).saveKyb(updateKyb);
             verify(billingProfileStoragePort).updateBillingProfileStatus(updateKyb.getBillingProfileId(), VerificationStatus.CLOSED);
-            verify(notificationPort).notify(updatedEvent);
-            verify(webhookPort).send(updatedEvent);
             verify(billingProfileObserver).onBillingProfileUpdated(updatedEvent);
         }
     }
@@ -326,8 +316,6 @@ public class BillingProfileVerificationServiceTest {
             verify(billingProfileStoragePort).saveChildrenKyc(billingProfileVerificationUpdated.getExternalApplicantId(),
                     billingProfileVerificationUpdated.getParentExternalApplicantId(), billingProfileVerificationUpdated.getVerificationStatus());
             verify(billingProfileStoragePort).updateBillingProfileStatus(initialKyb.getBillingProfileId(), VerificationStatus.REJECTED);
-            verify(notificationPort).notify(updatedEvent);
-            verify(webhookPort).send(updatedEvent);
             billingProfileObserver.onBillingProfileUpdated(updatedEvent);
         }
 

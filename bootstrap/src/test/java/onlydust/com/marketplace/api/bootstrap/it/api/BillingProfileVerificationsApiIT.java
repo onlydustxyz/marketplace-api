@@ -4,13 +4,17 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.stubbing.Scenario;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubApiClientAdapter;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubClientProperties;
+import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
+import com.onlydust.marketplace.api.cron.JobScheduler;
 import onlydust.com.marketplace.api.bootstrap.helper.SlackNotificationStub;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubSignatureVerifier;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookProperties;
+import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -22,7 +26,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.responseDefinition;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookApiAdapter.X_OD_API;
 import static onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookApiAdapter.X_SUMSUB_PAYLOAD_DIGEST;
@@ -43,16 +48,20 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
     KybRepository kybRepository;
     @Autowired
     BillingProfileRepository billingProfileRepository;
+    @Autowired
+    CustomerIOProperties customerIOProperties;
 
     @Test
     @Order(1)
-    void should_verify_individual_billing_profile() {
+    void should_verify_individual_billing_profile() throws InterruptedException {
         // Given
+        slackNotificationStub.reset();
         final var githubUserId = faker.number().randomNumber() + faker.number().randomNumber();
         final var login = faker.name().username();
         final var avatarUrl = faker.internet().avatar();
         final var userId = UUID.randomUUID();
-        final String jwt = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false);
+        final String jwt = authenticatedUser.jwt();
 
         // When
         client.post()
@@ -179,7 +188,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                         "ekycRetry_checkUnavailable"
                       ]
                     },
-                  "reviewStatus": "pending",
+                  "reviewStatus": "completed",
                   "applicantType": "individual",
                   "correlationId": "0727edcd2fd452f64b7dd9f76516d815",
                   "externalUserId": "%s",
@@ -212,7 +221,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .consumeWith(System.out::println)
                 .jsonPath("$.id").isNotEmpty()
-                .jsonPath("$.status").isEqualTo("UNDER_REVIEW")
+                .jsonPath("$.status").isEqualTo("CLOSED")
                 .jsonPath("$.kyc.address").isEqualTo("25 AVENUE SAINT LOUIS, ETAGE 2 APT, ST MAUR DES FOSSES, France, 94210")
                 .jsonPath("$.kyc.firstName").isEqualTo("ALEXIS")
                 .jsonPath("$.kyc.lastName").isEqualTo("BENOLIEL")
@@ -224,6 +233,21 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.kyc.validUntil").isEqualTo("2025-04-19T00:00:00Z")
                 .jsonPath("$.kyc.usCitizen").isEqualTo(false);
         assertEquals(2, slackNotificationStub.getNotifications().size());
+
+        accountingMailOutboxJob.run();
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id", equalTo(customerIOProperties.getVerificationFailedEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(userId.toString())))
+                        .withRequestBody(matchingJsonPath("$.message_data.status", equalTo("CLOSED")))
+                        .withRequestBody(matchingJsonPath("$.message_data.username", equalTo(login)))
+                        .withRequestBody(matchingJsonPath("$.message_data.billingProfileId", equalTo(billingProfileId.toString())))
+                        .withRequestBody(matchingJsonPath("$.to", equalTo(authenticatedUser.user().getGithubEmail())))
+                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo("Your verification failed with status CLOSED")))
+        );
     }
 
     @Test
