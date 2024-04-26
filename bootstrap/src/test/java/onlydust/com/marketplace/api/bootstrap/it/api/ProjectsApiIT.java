@@ -532,7 +532,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 121874
                   },
                   "isInvitedAsProjectLead": true,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -570,7 +570,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": false,
+                  "hasMissingGithubAppInstallation": false,
                   "tags": []
                 }
               ],
@@ -670,7 +670,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 121874
                   },
                   "isInvitedAsProjectLead": true,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": [
                     "NEWBIES_WELCOME",
                     "FAST_AND_FURIOUS"
@@ -711,7 +711,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": false,
+                  "hasMissingGithubAppInstallation": false,
                   "tags": [
                     "FAST_AND_FURIOUS"
                   ]
@@ -780,7 +780,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "ecosystems": [],
                   "technologies": {},
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -815,7 +815,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 235
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -839,7 +839,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "ecosystems": [],
                   "technologies": {},
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -888,7 +888,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 169898
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -946,7 +946,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 121874
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -975,7 +975,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 169898
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -1016,7 +1016,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 119986
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -1038,7 +1038,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 169898
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -1057,7 +1057,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Ruby": 9708
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -1090,7 +1090,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": false,
+                  "hasMissingGithubAppInstallation": false,
                   "tags": []
                 },
                 {
@@ -1143,7 +1143,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Dart": 121265
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -1183,7 +1183,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -1210,7 +1210,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "JavaScript": 6987
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": true,
+                  "hasMissingGithubAppInstallation": true,
                   "tags": []
                 },
                 {
@@ -1243,7 +1243,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Dart": 121265
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -1267,7 +1267,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 5416
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -1339,7 +1339,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 1676320
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -1377,7 +1377,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -1424,7 +1424,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 169898
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -1490,7 +1490,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 11538
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -1516,7 +1516,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Rust": 23314
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -1537,7 +1537,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 45301
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -1568,7 +1568,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 6719
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -1592,7 +1592,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "ecosystems": [],
                   "technologies": {},
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -1616,7 +1616,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "ecosystems": [],
                   "technologies": {},
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -1645,7 +1645,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Haskell": 16365
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -1673,7 +1673,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 871
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 }
               ],
@@ -1871,7 +1871,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "ecosystems": [],
                   "technologies": {},
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -1906,7 +1906,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 235
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -1930,7 +1930,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "ecosystems": [],
                   "technologies": {},
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -1988,7 +1988,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 121874
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -2017,7 +2017,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 169898
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -2058,7 +2058,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 119986
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -2080,7 +2080,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 169898
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -2099,7 +2099,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Ruby": 9708
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -2132,7 +2132,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -2185,7 +2185,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Dart": 121265
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -2225,7 +2225,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -2252,7 +2252,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "JavaScript": 6987
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -2285,7 +2285,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Dart": 121265
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -2309,7 +2309,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 5416
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -2381,7 +2381,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 1676320
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -2419,7 +2419,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -2466,7 +2466,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 169898
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -2532,7 +2532,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 11538
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -2558,7 +2558,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Rust": 23314
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -2579,7 +2579,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 45301
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -2610,7 +2610,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 6719
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -2634,7 +2634,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "ecosystems": [],
                   "technologies": {},
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -2658,7 +2658,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "ecosystems": [],
                   "technologies": {},
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -2687,7 +2687,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Haskell": 16365
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -2715,7 +2715,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 871
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 }
               ],
@@ -3030,7 +3030,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                 "HTML": 119986
                               },
                               "isInvitedAsProjectLead": false,
-                              "isMissingGithubAppInstallation": null,
+                              "hasMissingGithubAppInstallation": null,
                               "tags": []
                             },
                             {
@@ -3068,7 +3068,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                 "HTML": 1520
                               },
                               "isInvitedAsProjectLead": false,
-                              "isMissingGithubAppInstallation": null,
+                              "hasMissingGithubAppInstallation": null,
                               "tags": []
                             },
                             {
@@ -3094,7 +3094,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                 "Rust": 23314
                               },
                               "isInvitedAsProjectLead": false,
-                              "isMissingGithubAppInstallation": null,
+                              "hasMissingGithubAppInstallation": null,
                               "tags": []
                             },
                             {
@@ -3118,7 +3118,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                               "ecosystems": [],
                               "technologies": {},
                               "isInvitedAsProjectLead": false,
-                              "isMissingGithubAppInstallation": null,
+                              "hasMissingGithubAppInstallation": null,
                               "tags": []
                             },
                             {
@@ -3153,7 +3153,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                 "HTML": 235
                               },
                               "isInvitedAsProjectLead": false,
-                              "isMissingGithubAppInstallation": null,
+                              "hasMissingGithubAppInstallation": null,
                               "tags": []
                             }
                           ],
@@ -3412,7 +3412,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                 "HTML": 121874
                               },
                               "isInvitedAsProjectLead": false,
-                              "isMissingGithubAppInstallation": null,
+                              "hasMissingGithubAppInstallation": null,
                               "tags": [
                                 "NEWBIES_WELCOME",
                                 "FAST_AND_FURIOUS"
@@ -3453,7 +3453,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                 "HTML": 1520
                               },
                               "isInvitedAsProjectLead": false,
-                              "isMissingGithubAppInstallation": null,
+                              "hasMissingGithubAppInstallation": null,
                               "tags": [
                                 "FAST_AND_FURIOUS"
                               ]
@@ -3598,7 +3598,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                     "HTML": 121874
                                   },
                                   "isInvitedAsProjectLead": false,
-                                  "isMissingGithubAppInstallation": null,
+                                  "hasMissingGithubAppInstallation": null,
                                   "tags": [
                                     "NEWBIES_WELCOME",
                                     "FAST_AND_FURIOUS"
@@ -3639,7 +3639,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                     "HTML": 1520
                                   },
                                   "isInvitedAsProjectLead": false,
-                                  "isMissingGithubAppInstallation": null,
+                                  "hasMissingGithubAppInstallation": null,
                                   "tags": [
                                     "FAST_AND_FURIOUS"
                                   ]
@@ -3852,7 +3852,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 121874
                   },
                   "isInvitedAsProjectLead": true,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": [
                     "BIG_WHALE",
                     "NEWBIES_WELCOME"
@@ -3879,7 +3879,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "ecosystems": [],
                   "technologies": {},
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -3914,7 +3914,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 235
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": [
                     "BIG_WHALE"
                   ]
@@ -3940,7 +3940,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "ecosystems": [],
                   "technologies": {},
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -3969,7 +3969,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 169898
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -4010,7 +4010,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 119986
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": [
                     "HOT_COMMUNITY",
                     "WORK_IN_PROGRESS",
@@ -4037,7 +4037,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 169898
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -4056,7 +4056,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Ruby": 9708
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": [
                     "HOT_COMMUNITY",
                     "FAST_AND_FURIOUS",
@@ -4093,7 +4093,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": [
                     "HOT_COMMUNITY",
                     "BIG_WHALE",
@@ -4153,7 +4153,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Dart": 121265
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": [
                     "HOT_COMMUNITY",
                     "LIKELY_TO_REWARD",
@@ -4198,7 +4198,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": [
                     "HOT_COMMUNITY",
                     "BIG_WHALE",
@@ -4230,7 +4230,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "JavaScript": 6987
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": [
                     "HOT_COMMUNITY",
                     "NEWBIES_WELCOME"
@@ -4266,7 +4266,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 6719
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": [
                     "HOT_COMMUNITY",
                     "WORK_IN_PROGRESS",
@@ -4295,7 +4295,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 5416
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -4367,7 +4367,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Dart": 204844
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": [
                     "HOT_COMMUNITY",
                     "BIG_WHALE",
@@ -4412,7 +4412,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": false,
+                  "hasMissingGithubAppInstallation": false,
                   "tags": [
                     "HOT_COMMUNITY",
                     "BIG_WHALE",
@@ -4464,7 +4464,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 169898
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": [
                     "BIG_WHALE",
                     "LIKELY_TO_REWARD"
@@ -4533,7 +4533,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 11538
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": [
                     "HOT_COMMUNITY",
                     "BIG_WHALE",
@@ -4566,7 +4566,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Rust": 23314
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -4587,7 +4587,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 45301
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": [
                     "HOT_COMMUNITY",
                     "WORK_IN_PROGRESS",
@@ -4623,7 +4623,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 6719
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": [
                     "HOT_COMMUNITY",
                     "WORK_IN_PROGRESS",
@@ -4652,7 +4652,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "ecosystems": [],
                   "technologies": {},
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -4676,7 +4676,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "ecosystems": [],
                   "technologies": {},
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": []
                 },
                 {
@@ -4705,7 +4705,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Haskell": 16365
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": [
                     "NEWBIES_WELCOME"
                   ]
@@ -4735,7 +4735,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 871
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
+                  "hasMissingGithubAppInstallation": null,
                   "tags": [
                     "HOT_COMMUNITY",
                     "BIG_WHALE",

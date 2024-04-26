@@ -375,7 +375,7 @@ paths:
           description: Number of items returned by page
           schema:
             type: integer
-      
+
       responses:
         "200":
           description: 'Contribution list'
@@ -3883,7 +3883,7 @@ components:
         isInvitedAsProjectLead:
           type: boolean
           default: false
-        isMissingGithubAppInstallation:
+        hasMissingGithubAppInstallation:
           type: boolean
         tags:
           type: array
@@ -4929,6 +4929,7 @@ components:
         - slug
         - name
         - contributorCount
+        - hasMissingGithubAppInstallation
       properties:
         id:
           type: string
@@ -4942,6 +4943,8 @@ components:
         contributorCount:
           type: integer
           format: int64
+        hasMissingGithubAppInstallation:
+          type: boolean
 
     PatchMeContract:
       type: object

@@ -213,7 +213,7 @@ public interface ProjectMapper {
         project.setRepoCount(projectCardView.getRepoCount());
         project.setVisibility(mapProjectVisibility(projectCardView.getVisibility()));
         project.setIsInvitedAsProjectLead(projectCardView.getIsInvitedAsProjectLead());
-        project.setIsMissingGithubAppInstallation(projectCardView.getIsMissingGithubAppInstallation());
+        project.setHasMissingGithubAppInstallation(projectCardView.getIsMissingGithubAppInstallation());
         project.setTags(projectCardView.getTags().stream().map(ProjectMapper::mapTag).toList());
         return project;
     }

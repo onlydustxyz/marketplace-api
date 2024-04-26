@@ -220,6 +220,7 @@ public interface UserMapper {
                         .name(projectLedView.getName())
                         .logoUrl(projectLedView.getLogoUrl())
                         .contributorCount(projectLedView.getContributorCount())
+                        .hasMissingGithubAppInstallation(projectLedView.getHasMissingGithubAppInstallation())
                 )
                 .toList());
         getMeResponse.setPendingProjectsLed(authenticatedUser.getPendingProjectsLed()
@@ -229,6 +230,7 @@ public interface UserMapper {
                         .name(projectLedView.getName())
                         .logoUrl(projectLedView.getLogoUrl())
                         .contributorCount(projectLedView.getContributorCount())
+                        .hasMissingGithubAppInstallation(projectLedView.getHasMissingGithubAppInstallation())
                 )
                 .toList());
         getMeResponse.setProjectsAppliedTo(authenticatedUser.getProjectsAppliedTo());

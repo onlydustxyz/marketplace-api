@@ -24,6 +24,7 @@ public class ProjectLedIdViewEntity {
     String name;
     Boolean pending;
     Long contributorCount;
+    Boolean isMissingGithubAppInstallation;
 
     @Embeddable
     @Builder
