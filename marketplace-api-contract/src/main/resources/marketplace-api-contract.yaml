@@ -4339,6 +4339,10 @@ components:
           $ref: '#/components/schemas/ContributorResponse'
         id:
           $ref: '#/components/schemas/RewardId'
+        networks:
+          type: array
+          items:
+            $ref: '#/components/schemas/NetworkContract'
     RewardType:
       type: string
       enum:
@@ -6100,6 +6104,15 @@ components:
           type: string
         network:
           type: string
+
+    NetworkContract:
+      type: string
+      enum:
+        - SEPA
+        - ETHEREUM
+        - OPTIMISM
+        - APTOS
+        - STARKNET
 
     VatRegulationState:
       type: string
