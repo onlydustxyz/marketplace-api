@@ -12,6 +12,7 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.UserView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -29,6 +30,7 @@ import java.util.UUID;
 @Value
 @NoArgsConstructor(force = true)
 @Accessors(fluent = true)
+@Immutable
 public class InvoiceViewEntity {
     @Id
     @NonNull

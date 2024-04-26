@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
+import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
@@ -10,8 +11,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsor
 import onlydust.com.marketplace.api.postgres.adapter.mapper.SponsorMapper;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 import onlydust.com.marketplace.project.domain.view.backoffice.BoSponsorView;
-
-import jakarta.persistence.*;
+import org.hibernate.annotations.Immutable;
 
 import java.util.List;
 import java.util.Set;
@@ -23,6 +23,7 @@ import static java.util.stream.Collectors.toSet;
 @NoArgsConstructor(force = true)
 @Value
 @Table(name = "sponsors", schema = "public")
+@Immutable
 public class SponsorViewEntity {
     @Id
     @NonNull

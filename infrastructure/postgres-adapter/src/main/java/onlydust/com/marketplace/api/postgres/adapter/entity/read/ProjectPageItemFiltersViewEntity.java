@@ -7,6 +7,7 @@ import jakarta.persistence.Table;
 import lombok.*;
 import onlydust.com.marketplace.project.domain.view.EcosystemView;
 import onlydust.com.marketplace.project.domain.view.ProjectCardView;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -21,6 +22,7 @@ import static java.util.Objects.nonNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Immutable
 public class ProjectPageItemFiltersViewEntity {
     @Id
     UUID id;

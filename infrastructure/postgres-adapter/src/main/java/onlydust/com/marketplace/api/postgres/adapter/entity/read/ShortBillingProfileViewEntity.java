@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.Where;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -21,6 +22,7 @@ import static java.util.Objects.isNull;
 
 @Entity
 @Data
+@Immutable
 public class ShortBillingProfileViewEntity {
     @Id
     UUID id;

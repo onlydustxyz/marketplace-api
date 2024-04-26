@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
 import onlydust.com.marketplace.project.domain.view.NewcomerView;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
@@ -15,6 +16,7 @@ import static java.util.Objects.nonNull;
 @EqualsAndHashCode
 @Data
 @Entity
+@Immutable
 public class NewcomerViewEntity {
     @Id
     Long id;

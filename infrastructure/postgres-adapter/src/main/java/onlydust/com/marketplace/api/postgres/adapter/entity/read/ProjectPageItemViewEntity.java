@@ -10,6 +10,7 @@ import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.view.EcosystemView;
 import onlydust.com.marketplace.project.domain.view.ProjectCardView;
 import onlydust.com.marketplace.project.domain.view.ProjectLeaderLinkView;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -24,6 +25,7 @@ import static java.util.Objects.nonNull;
 
 @Entity
 @Table(name = "projects", schema = "public")
+@Immutable
 public class ProjectPageItemViewEntity {
     @Id
     @Column(name = "id")
@@ -121,7 +123,8 @@ public class ProjectPageItemViewEntity {
                 case "WORK_IN_PROGRESS" -> Project.Tag.WORK_IN_PROGRESS;
                 case "HOT_COMMUNITY" -> Project.Tag.HOT_COMMUNITY;
                 case "UPDATED_ROADMAP" -> Project.Tag.UPDATED_ROADMAP;
-                default -> throw OnlyDustException.internalServerError(String.format("Invalid project tag %s which is not contained in enum", tag));
+                default ->
+                        throw OnlyDustException.internalServerError(String.format("Invalid project tag %s which is not contained in enum", tag));
             }));
         }
         return view;

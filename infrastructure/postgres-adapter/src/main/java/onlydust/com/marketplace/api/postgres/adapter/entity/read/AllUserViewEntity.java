@@ -11,6 +11,7 @@ import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
+import org.hibernate.annotations.Immutable;
 
 import java.util.UUID;
 
@@ -21,6 +22,7 @@ import static java.util.Objects.isNull;
 @Table(name = "all_users", schema = "iam")
 @NoArgsConstructor(force = true)
 @Accessors(fluent = true)
+@Immutable
 public class AllUserViewEntity {
     @Id
     @NonNull

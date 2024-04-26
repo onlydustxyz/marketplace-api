@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
 import onlydust.com.marketplace.project.domain.view.ChurnedContributorView;
 import onlydust.com.marketplace.project.domain.view.ShortRepoView;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
@@ -16,6 +17,7 @@ import static java.util.Objects.nonNull;
 @EqualsAndHashCode
 @Data
 @Entity
+@Immutable
 public class ChurnedContributorViewEntity {
     @Id
     Long id;

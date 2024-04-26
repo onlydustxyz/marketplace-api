@@ -5,8 +5,10 @@ import lombok.EqualsAndHashCode;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
 import onlydust.com.marketplace.project.domain.view.ContributionLinkView;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
+import org.hibernate.annotations.Immutable;
 
 @EqualsAndHashCode
+@Immutable
 public class ContributionLinkViewEntity {
     @JsonProperty("type")
     ContributionViewEntity.Type type;
