@@ -18,7 +18,12 @@ public interface ProjectLedIdRepository extends JpaRepository<ProjectLedIdViewEn
                     false     pending,
                      (select count(pc.github_user_id)
                       from projects_contributors pc
-                      where pc.project_id = p.id) contributor_count
+                      where pc.project_id = p.id) contributor_count,
+                   (select count(pgr.github_repo_id) > count(agr.repo_id)
+                           from project_github_repos pgr
+                                    join indexer_exp.github_repos gr2 on gr2.id = pgr.github_repo_id
+                                    left join indexer_exp.authorized_github_repos agr on agr.repo_id = pgr.github_repo_id
+                           where pgr.project_id = p.id and gr2.visibility = 'PUBLIC')        as is_missing_github_app_installation
              from project_leads pl
                       join projects p on p.id = pl.project_id
              where pl.user_id = :userId and (select count(pgr2.github_repo_id)
@@ -35,7 +40,12 @@ public interface ProjectLedIdRepository extends JpaRepository<ProjectLedIdViewEn
                     true      pending,
                      (select count(pc.github_user_id)
                       from projects_contributors pc
-                      where pc.project_id = p.id) contributor_count
+                      where pc.project_id = p.id) contributor_count,
+                 (select count(pgr.github_repo_id) > count(agr.repo_id)
+                           from project_github_repos pgr
+                                    join indexer_exp.github_repos gr2 on gr2.id = pgr.github_repo_id
+                                    left join indexer_exp.authorized_github_repos agr on agr.repo_id = pgr.github_repo_id
+                           where pgr.project_id = p.id and gr2.visibility = 'PUBLIC')        as is_missing_github_app_installation
              from iam.users u
                       join pending_project_leader_invitations ppli on ppli.github_user_id = u.github_user_id
                       join projects p on p.id = ppli.project_id

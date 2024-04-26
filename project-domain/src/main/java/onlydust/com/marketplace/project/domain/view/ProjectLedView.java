@@ -13,4 +13,5 @@ public class ProjectLedView {
     String name;
     String logoUrl;
     Long contributorCount;
+    Boolean hasMissingGithubAppInstallation;
 }
