@@ -15,6 +15,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 
@@ -56,6 +57,11 @@ public class UserEntity {
     @Column(name = "updated_at", nullable = false)
     @EqualsAndHashCode.Exclude
     private Date updatedAt;
+
+    @SuppressWarnings("unused") // it is used in the repository's native insert query
+    public String rolesAsPostgresArray() {
+        return "{" + String.join(",", Arrays.stream(roles).map(Enum::name).toList()) + "}";
+    }
 
     public ShortContributorView toDomain() {
         return new ShortContributorView(GithubUserId.of(githubUserId), githubLogin, githubAvatarUrl, UserId.of(id), githubEmail);
