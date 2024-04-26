@@ -63,8 +63,9 @@ public class RestApiConfiguration {
     @Bean
     BillingProfileRestApi billingProfileRestApi(final AuthenticatedAppUserService authenticatedAppUserService,
                                                 final BillingProfileFacadePort billingProfileFacadePort,
-                                                final CurrencyFacadePort currencyFacadePort) {
-        return new BillingProfileRestApi(authenticatedAppUserService, billingProfileFacadePort, currencyFacadePort);
+                                                final CurrencyFacadePort currencyFacadePort,
+                                                final AccountingFacadePort accountingFacadePort) {
+        return new BillingProfileRestApi(authenticatedAppUserService, billingProfileFacadePort, currencyFacadePort, accountingFacadePort);
     }
 
     @Bean

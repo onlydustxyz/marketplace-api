@@ -1,10 +1,8 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.Country;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
 import onlydust.com.marketplace.accounting.domain.model.Money;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
@@ -17,10 +15,11 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.naturalOrder;
@@ -197,10 +196,10 @@ public interface BillingProfileMapper {
     static BillingProfileInvoicesPageResponse map(Page<InvoiceView> page, Integer pageIndex) {
         return new BillingProfileInvoicesPageResponse()
                 .invoices(page.getContent().stream().map(BillingProfileMapper::mapToBillingProfileInvoicesPageItemResponse).toList())
-                .hasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()))
+                .hasMore(hasMore(pageIndex, page.getTotalPageNumber()))
                 .totalPageNumber(page.getTotalPageNumber())
                 .totalItemNumber(page.getTotalItemNumber())
-                .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()));
+                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPageNumber()));
     }
 
     static BillingProfileInvoicesPageItemResponse mapToBillingProfileInvoicesPageItemResponse(InvoiceView invoice) {
@@ -296,12 +295,15 @@ public interface BillingProfileMapper {
 
 
     static BillingProfileInvoiceableRewardsResponse mapToInvoiceableRewardsResponse(List<BillingProfileRewardView> invoiceableRewards,
+                                                                                    Map<UUID, List<Network>> rewardNetworks,
                                                                                     AuthenticatedUser authenticatedUser) {
         return new BillingProfileInvoiceableRewardsResponse()
-                .rewards(invoiceableRewards.stream().map(r -> mapInvoiceableReward(r, authenticatedUser)).toList());
+                .rewards(invoiceableRewards.stream().map(r -> mapInvoiceableReward(r, rewardNetworks, authenticatedUser)).toList());
     }
 
-    static MyRewardPageItemResponse mapInvoiceableReward(BillingProfileRewardView view, AuthenticatedUser authenticatedUser) {
+    static MyRewardPageItemResponse mapInvoiceableReward(BillingProfileRewardView view,
+                                                         Map<UUID, List<Network>> rewardNetworks,
+                                                         AuthenticatedUser authenticatedUser) {
         return new MyRewardPageItemResponse()
                 .id(view.getId())
                 .projectId(view.getProjectId())
@@ -313,6 +315,17 @@ public interface BillingProfileMapper {
                 .requestedAt(DateMapper.toZoneDateTime(view.getRequestedAt()))
                 .processedAt(DateMapper.toZoneDateTime(view.getProcessedAt()))
                 .unlockDate(DateMapper.toZoneDateTime(view.getUnlockDate()))
+                .networks(rewardNetworks.get(view.getId()).stream().map(BillingProfileMapper::map).toList())
                 ;
+    }
+
+    static NetworkContract map(Network network) {
+        return switch (network) {
+            case ETHEREUM -> NetworkContract.ETHEREUM;
+            case OPTIMISM -> NetworkContract.OPTIMISM;
+            case STARKNET -> NetworkContract.STARKNET;
+            case APTOS -> NetworkContract.APTOS;
+            case SEPA -> NetworkContract.SEPA;
+        };
     }
 }

@@ -10,6 +10,7 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
@@ -30,11 +31,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.toMap;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BillingProfileMapper.map;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
@@ -48,6 +51,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final BillingProfileFacadePort billingProfileFacadePort;
     private final CurrencyFacadePort currencyFacadePort;
+    private final AccountingFacadePort accountingFacadePort;
 
     @Override
     public ResponseEntity<BillingProfileInvoicesPageResponse> getInvoices(UUID billingProfileId,
@@ -243,8 +247,14 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     @Override
     public ResponseEntity<BillingProfileInvoiceableRewardsResponse> getInvoiceableRewards(UUID billingProfileId) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+
         final var invoiceableRewards = billingProfileFacadePort.getInvoiceableRewardsForBillingProfile(UserId.of(authenticatedUser.getId()),
                 BillingProfile.Id.of(billingProfileId));
-        return ok(BillingProfileMapper.mapToInvoiceableRewardsResponse(invoiceableRewards, authenticatedUser.asAuthenticatedUser()));
+
+        final var rewardNetworks = invoiceableRewards.stream()
+                .map(r -> Map.entry(r.getId(), accountingFacadePort.networksOf(r.getAmount().getCurrency().id(), RewardId.of(r.getId()))))
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        return ok(BillingProfileMapper.mapToInvoiceableRewardsResponse(invoiceableRewards, rewardNetworks, authenticatedUser.asAuthenticatedUser()));
     }
 }

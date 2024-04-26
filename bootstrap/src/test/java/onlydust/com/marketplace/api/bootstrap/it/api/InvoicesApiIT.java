@@ -116,11 +116,62 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.rewards.size()").isEqualTo(12)
-                .jsonPath("$.rewards[?(@.id == '966cd55c-7de8-45c4-8bba-b388c38ca15d')]").exists()
-                .jsonPath("$.rewards[?(@.id == '79209029-c488-4284-aa3f-bce8870d3a66')]").exists()
-                .jsonPath("$.rewards[?(@.id == 'd22f75ab-d9f5-4dc6-9a85-60dcd7452028')]").exists()
-                .jsonPath("$.rewards[?(@.id == 'dd7d445f-6915-4955-9bae-078173627b05')]").exists()
+                .json("""
+                        {
+                          "rewards": [
+                            {
+                              "id": "6587511b-3791-47c6-8430-8f793606c63a",
+                              "networks": ["ETHEREUM"]
+                            },
+                            {
+                              "id": "79209029-c488-4284-aa3f-bce8870d3a66",
+                              "networks": ["ETHEREUM"]
+                            },
+                            {
+                              "id": "303f26b1-63f0-41f1-ab11-e70b54ef4a2a",
+                              "networks": ["ETHEREUM"]
+                            },
+                            {
+                              "id": "0b275f04-bdb1-4d4f-8cd1-76fe135ccbdf",
+                              "networks": ["ETHEREUM"]
+                            },
+                            {
+                              "id": "335e45a5-7f59-4519-8a12-1addc530214c",
+                              "networks": ["ETHEREUM"]
+                            },
+                            {
+                              "id": "e9ebbe59-fb74-4a6c-9a51-6d9050412977",
+                              "networks": ["ETHEREUM"]
+                            },
+                            {
+                              "id": "e33ea956-d2f5-496b-acf9-e2350faddb16",
+                              "networks": ["ETHEREUM"]
+                            },
+                            {
+                              "id": "dd7d445f-6915-4955-9bae-078173627b05",
+                              "networks": ["ETHEREUM"]
+                            },
+                            {
+                             
+                              "id": "d22f75ab-d9f5-4dc6-9a85-60dcd7452028",
+                              "networks": ["ETHEREUM"]
+                            },
+                            {
+                              
+                              "id": "95e079c9-609c-4531-8c5c-13217306b299",
+                              "networks": ["ETHEREUM"]
+                            },
+                            {
+                              "id": "966cd55c-7de8-45c4-8bba-b388c38ca15d",
+                              "networks": ["ETHEREUM"]
+                            },
+                            {
+                              "id": "f0c1b882-76f2-47d0-9331-151ce1f99281",
+                              "networks": ["ETHEREUM"]
+                            }
+                          ]
+                        }
+                        """)
         ;
 
         client.get()
