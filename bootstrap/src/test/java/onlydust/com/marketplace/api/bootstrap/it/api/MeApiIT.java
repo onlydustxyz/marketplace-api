@@ -328,7 +328,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.projectsLed[0].contributorCount").isEqualTo(4)
                 .jsonPath("$.projectsLed[0].hasMissingGithubAppInstallation").isEqualTo(true)
                 .jsonPath("$.projectsLed[0].logoUrl").isEqualTo("https://onlydust-app-images.s3.eu-west-1.amazonaws" +
-                                                                ".com/5003677688814069549.png")
+                        ".com/5003677688814069549.png")
                 .jsonPath("$.createdAt").isEqualTo(DateMapper.toZoneDateTime(pierre.user().getCreatedAt()).format(DateTimeFormatter.ISO_INSTANT))
                 .jsonPath("$.projectsLed[0].slug").isEqualTo("bretzel")
                 .jsonPath("$.pendingProjectsLed.length()").isEqualTo(0)
@@ -352,7 +352,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.pendingProjectsLed[0].name").isEqualTo("Red bull")
                 .jsonPath("$.pendingProjectsLed[0].contributorCount").isEqualTo(0)
                 .jsonPath("$.pendingProjectsLed[0].logoUrl").isEqualTo("https://cdn.filestackcontent" +
-                                                                       ".com/cZCHED10RzuEloOXuk7A")
+                        ".com/cZCHED10RzuEloOXuk7A")
                 .jsonPath("$.pendingProjectsLed[0].slug").isEqualTo("red-bull")
                 .jsonPath("$.pendingProjectsLed[0].hasMissingGithubAppInstallation").isEqualTo(false)
                 .jsonPath("$.pendingProjectsLed.length()").isEqualTo(1)
@@ -477,7 +477,6 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "billingProfiles": [],
                           "missingPayoutPreference": false
                         }
                         """);
@@ -495,18 +494,9 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "billingProfiles": [{
-                                                "id": "%s",
-                                                "type": "INDIVIDUAL",
-                                                "role": "ADMIN",
-                                                "verificationStatus": "NOT_STARTED",
-                                                "missingPayoutInfo": false,
-                                                "missingVerification": false,
-                                                "verificationBlocked": false
-                                              }],
                           "missingPayoutPreference": false
                         }
-                        """.formatted(individualBillingProfile.id().value()));
+                        """);
 
         // When user has a not-verified BP and some reward
         final var projectId = ProjectId.of("f39b827f-df73-498c-8853-99bc3f562723");
@@ -529,18 +519,9 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "billingProfiles": [{
-                                                "id": "%s",
-                                                "type": "INDIVIDUAL",
-                                                "role": "ADMIN",
-                                                "verificationStatus": "NOT_STARTED",
-                                                "missingPayoutInfo": false,
-                                                "missingVerification": false,
-                                                "verificationBlocked": false
-                                              }],
                           "missingPayoutPreference": true
                         }
-                        """.formatted(individualBillingProfile.id().value()));
+                        """);
 
         // When the user set missing payout preferences
         updatePayoutPreferences(authenticatedUser.user().getGithubUserId(), individualBillingProfile.id(), projectId.value());
@@ -554,18 +535,9 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "billingProfiles": [{
-                                                "id": "%s",
-                                                "type": "INDIVIDUAL",
-                                                "role": "ADMIN",
-                                                "verificationStatus": "NOT_STARTED",
-                                                "missingPayoutInfo": false,
-                                                "missingVerification": true,
-                                                "verificationBlocked": false
-                                              }],
                           "missingPayoutPreference": false
                         }
-                        """.formatted(individualBillingProfile.id().value()));
+                        """);
 
         // When the user gets his BP verification blocked
         accountingHelper.patchBillingProfile(individualBillingProfile.id().value(), null, VerificationStatusEntity.CLOSED);
@@ -579,18 +551,9 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "billingProfiles": [{
-                                                "id": "%s",
-                                                "type": "INDIVIDUAL",
-                                                "role": "ADMIN",
-                                                "verificationStatus": "CLOSED",
-                                                "missingPayoutInfo": false,
-                                                "missingVerification": true,
-                                                "verificationBlocked": true
-                                              }],
                           "missingPayoutPreference": false
                         }
-                        """.formatted(individualBillingProfile.id().value()));
+                        """);
 
         // When the user gets his BP verified
         accountingHelper.patchBillingProfile(individualBillingProfile.id().value(), null, VerificationStatusEntity.VERIFIED);
@@ -604,18 +567,9 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "billingProfiles": [{
-                                                "id": "%s",
-                                                "type": "INDIVIDUAL",
-                                                "role": "ADMIN",
-                                                "verificationStatus": "VERIFIED",
-                                                "missingPayoutInfo": true,
-                                                "missingVerification": false,
-                                                "verificationBlocked": false
-                                              }],
                           "missingPayoutPreference": false
                         }
-                        """.formatted(individualBillingProfile.id().value()));
+                        """);
 
         // When the user adds some payout infos
         client.put()
@@ -648,18 +602,9 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "billingProfiles": [{
-                                                "id": "%s",
-                                                "type": "INDIVIDUAL",
-                                                "role": "ADMIN",
-                                                "verificationStatus": "VERIFIED",
-                                                "missingPayoutInfo": false,
-                                                "missingVerification": false,
-                                                "verificationBlocked": false
-                                              }],
                           "missingPayoutPreference": false
                         }
-                        """.formatted(individualBillingProfile.id().value()));
+                        """);
     }
 
     @Test

@@ -120,7 +120,7 @@ public class MeRestApi implements MeApi {
         final var filters = UserRewardView.Filters.builder()
                 .currencies(Optional.ofNullable(currencies).orElse(List.of()))
                 .projectIds(Optional.ofNullable(projects).orElse(List.of()))
-                .administratedBillingProfilesIds(authenticatedUser.getAdministratedBillingProfile().stream().map(BillingProfileLinkView::id).toList())
+                .administratedBillingProfilesIds(authenticatedUser.getAdministratedBillingProfiles())
                 .from(isNull(fromDate) ? null : DateMapper.parse(fromDate))
                 .to(isNull(toDate) ? null : DateMapper.parse(toDate))
                 .build();
@@ -226,7 +226,7 @@ public class MeRestApi implements MeApi {
     public ResponseEntity<RewardDetailsResponse> getMyReward(UUID rewardId) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final RewardDetailsView rewardDetailsView = userFacadePort.getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId,
-                authenticatedUser.getGithubUserId(), authenticatedUser.getAdministratedBillingProfile().stream().map(BillingProfileLinkView::id).toList());
+                authenticatedUser.getGithubUserId(), authenticatedUser.getAdministratedBillingProfiles());
         return ResponseEntity.ok(RewardMapper.myRewardDetailsToResponse(rewardDetailsView, authenticatedUser.asAuthenticatedUser()));
     }
 
@@ -238,7 +238,7 @@ public class MeRestApi implements MeApi {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final Page<RewardItemView> page = userFacadePort.getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId,
                 authenticatedUser.getGithubUserId(), sanitizedPageIndex, sanitizedPageSize,
-                authenticatedUser.getAdministratedBillingProfile().stream().map(BillingProfileLinkView::id).toList());
+                authenticatedUser.getAdministratedBillingProfiles());
         final RewardItemsPageResponse rewardItemsPageResponse = RewardMapper.pageToResponse(sanitizedPageIndex, page);
         return rewardItemsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardItemsPageResponse) :
@@ -250,7 +250,7 @@ public class MeRestApi implements MeApi {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var currencies = contributorFacadePort.getRewardCurrencies(
                 authenticatedUser.getGithubUserId(),
-                authenticatedUser.getAdministratedBillingProfile().stream().map(BillingProfileLinkView::id).toList()
+                authenticatedUser.getAdministratedBillingProfiles()
         );
         return ResponseEntity.ok(new CurrencyListResponse().currencies(currencies.stream()
                 .map(RewardMapper::mapCurrency)

@@ -242,20 +242,7 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
                         .expectStatus()
                         .is2xxSuccessful()
                         .expectBody()
-                        .jsonPath("$.billingProfiles.length()").isEqualTo(meDatum.billingProfileData.size())
                         .jsonPath("$.missingPayoutPreference").isEqualTo(meDatum.missingPayoutPreference);
-
-                for (final var bpDatum : meDatum.billingProfileData()) {
-                    bodyContentSpec
-                            .jsonPath("$.billingProfiles[?(@.id == '%s')].missingPayoutInfo".formatted(bpDatum.billingProfileId.toString()))
-                            .isEqualTo(bpDatum.missingPayoutInfo);
-                    bodyContentSpec
-                            .jsonPath("$.billingProfiles[?(@.id == '%s')].missingVerification".formatted(bpDatum.billingProfileId.toString()))
-                            .isEqualTo(bpDatum.missingVerification);
-                    bodyContentSpec
-                            .jsonPath("$.billingProfiles[?(@.id == '%s')].verificationBlocked".formatted(bpDatum.billingProfileId.toString()))
-                            .isEqualTo(bpDatum.verificationBlocked);
-                }
             }
             {
                 for (final var bpDatum : meDatum.billingProfileData()) {

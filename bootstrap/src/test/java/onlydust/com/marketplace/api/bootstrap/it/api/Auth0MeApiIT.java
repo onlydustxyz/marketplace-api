@@ -165,7 +165,6 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         assertThat(me.getEmail()).isEqualTo(email);
         assertThat(me.getHasSeenOnboardingWizard()).isEqualTo(false);
         assertThat(me.getHasAcceptedLatestTermsAndConditions()).isEqualTo(false);
-        assertThat(me.getBillingProfiles()).isEmpty();
         assertThat(me.getIsAdmin()).isEqualTo(false);
         assertThat(me.getId()).isNotNull();
     }
