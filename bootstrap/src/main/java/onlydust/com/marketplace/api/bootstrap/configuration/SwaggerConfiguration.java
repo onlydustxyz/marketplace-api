@@ -26,6 +26,8 @@ public class SwaggerConfiguration {
                         .url("https://github.com/onlydustxyz/marketplace-api"))
                 .components(new Components()
                         .addSecuritySchemes("apiKey",
-                                new SecurityScheme().type(SecurityScheme.Type.APIKEY).in(SecurityScheme.In.HEADER).name("Api-Key")));
+                                new SecurityScheme().type(SecurityScheme.Type.APIKEY).in(SecurityScheme.In.HEADER).name("Api-Key"))
+                        .addSecuritySchemes("bearerAuth",
+                                new SecurityScheme().type(SecurityScheme.Type.HTTP).in(SecurityScheme.In.HEADER).scheme("bearer")));
     }
 }

@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.contract.model.OnlyDustError;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -43,6 +44,12 @@ public class OnlydustExceptionRestHandler {
             LOGGER.warn(format("%d error %s returned by the REST API", httpStatus.value(), errorId), exception);
         }
         return onlyDustError;
+    }
+
+    private String sanitizeMessage(String message) {
+        return message
+                .replaceAll("\\(class onlydust\\.com(\\.[a-zA-Z0-9_]+)+\\)", "")
+                .replaceAll("onlydust\\.com(\\.[a-zA-Z0-9_]+)+", "");
     }
 
     @ExceptionHandler({OnlyDustException.class})
@@ -90,6 +97,16 @@ public class OnlydustExceptionRestHandler {
                 exception
         ));
     }
+
+    @ExceptionHandler({HttpMessageConversionException.class})
+    protected ResponseEntity<OnlyDustError> handleHttpMessageConversionException(final HttpMessageConversionException exception) {
+        return handleOnlyDustException(new OnlyDustException(
+                HttpStatus.BAD_REQUEST.value(),
+                sanitizeMessage(exception.getMessage()),
+                exception
+        ));
+    }
+
 
     @ExceptionHandler(AuthenticationException.class)
     @ResponseBody

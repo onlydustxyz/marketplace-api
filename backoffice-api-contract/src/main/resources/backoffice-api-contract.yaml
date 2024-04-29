@@ -41,6 +41,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeInvoicingManagement
       summary: Get invoice page
@@ -170,6 +171,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeInvoicingManagement
       summary: Get invoice
@@ -198,6 +200,7 @@ paths:
     put:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeInvoicingManagement
       summary: Update invoice's status
@@ -229,6 +232,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeInvoicingManagement
       summary: Download invoice by id
@@ -258,6 +262,7 @@ paths:
     post:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Create a new account for the given sponsor
@@ -295,6 +300,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Get sponsor accounts
@@ -321,6 +327,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Get the list of all transactions related to this sponsor
@@ -357,6 +364,7 @@ paths:
     put:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Update the allowance of the given account.
@@ -395,6 +403,7 @@ paths:
     post:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Update the balance of the given account by providing a transaction receipt.
@@ -432,6 +441,7 @@ paths:
     delete:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Update the balance of the given account by removing a transaction receipt.
@@ -465,6 +475,7 @@ paths:
     patch:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Update some attributes of the account
@@ -500,6 +511,7 @@ paths:
     post:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Allocate a budget to a project
@@ -530,6 +542,7 @@ paths:
     post:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Refund a sponsor by unallocating funds from a project
@@ -560,6 +573,7 @@ paths:
     post:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Pay a reward
@@ -592,6 +606,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Get a reward details
@@ -620,6 +635,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Get all (paginated) rewards
@@ -701,6 +717,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Export rewards in a CSV
@@ -766,6 +783,7 @@ paths:
     post:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Create a batch payments for a given list of invoice ids
@@ -793,6 +811,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Get batch payments
@@ -834,6 +853,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Get batch payment details
@@ -860,6 +880,7 @@ paths:
     put:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Update batch payment with transaction hash
@@ -889,6 +910,7 @@ paths:
     delete:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Delete a batch payment
@@ -915,6 +937,7 @@ paths:
     put:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Notify payments sent
@@ -933,6 +956,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Get billing profiles by id
@@ -962,6 +986,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeSponsorManagement
       summary: Get sponsor page
@@ -1011,6 +1036,7 @@ paths:
     post:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeSponsorManagement
       summary: Add a new sponsor
@@ -1044,6 +1070,7 @@ paths:
     post:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeSponsorManagement
       summary: Upload a sponsor logo
@@ -1082,6 +1109,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeSponsorManagement
       summary: Get sponsor page
@@ -1119,6 +1147,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeSponsorManagement
       summary: Get sponsor data
@@ -1146,6 +1175,7 @@ paths:
     put:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeSponsorManagement
       summary: Modify sponsor data
@@ -1183,6 +1213,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - Backoffice
       summary: Get ecosystem page
@@ -1232,6 +1263,7 @@ paths:
     post:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - Backoffice
       summary: Create ecosystem
@@ -1259,6 +1291,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - Backoffice
       summary: Get github repository page
@@ -1301,6 +1334,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - Backoffice
       summary: Get project lead invitations page
@@ -1353,6 +1387,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeUser
       summary: Get user page
@@ -1391,6 +1426,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeUser
       summary: Get user page
@@ -1419,6 +1455,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Get earnings
@@ -1487,6 +1524,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - Backoffice
       summary: Get project page
@@ -1529,6 +1567,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - Backoffice
       summary: Get project page
@@ -1569,6 +1608,7 @@ paths:
     post:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeCurrencyManagement
       summary: Add support of a new currency
@@ -1600,6 +1640,7 @@ paths:
     get:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeCurrencyManagement
       summary: List all supported currencies
@@ -1625,6 +1666,7 @@ paths:
     put:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeCurrencyManagement
       summary: Modify currency data
@@ -1663,6 +1705,7 @@ paths:
     post:
       security:
         - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - BackofficeCurrencyManagement
       summary: Upload a currency logo
@@ -3819,6 +3862,18 @@ components:
 
     UpdateHackathonRequest:
       type: object
+      required:
+        - status
+        - title
+        - subtitle
+        - description
+        - location
+        - totalBudget
+        - startDate
+        - endDate
+        - links
+        - sponsorIds
+        - tracks
       properties:
         status:
           $ref: '#/components/schemas/HackathonStatus'
