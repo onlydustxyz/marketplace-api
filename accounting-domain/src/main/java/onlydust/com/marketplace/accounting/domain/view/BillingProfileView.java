@@ -33,6 +33,7 @@ public class BillingProfileView {
     Integer invoiceableRewardCount;
     Boolean missingPayoutInfo;
     Boolean missingVerification;
+    Boolean individualLimitReached;
 
     PositiveAmount currentYearPaymentLimit;
     PositiveAmount currentYearPaymentAmount;
@@ -47,8 +48,8 @@ public class BillingProfileView {
         if (type == BillingProfile.Type.INDIVIDUAL) return true;
 
         return invoiceMandateAcceptedAt != null &&
-               invoiceMandateLatestVersionDate != null &&
-               invoiceMandateAcceptedAt.isAfter(invoiceMandateLatestVersionDate);
+                invoiceMandateLatestVersionDate != null &&
+                invoiceMandateAcceptedAt.isAfter(invoiceMandateLatestVersionDate);
     }
 
     public boolean isSwitchableToSelfEmployed() {

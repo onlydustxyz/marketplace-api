@@ -28,13 +28,14 @@ public class ShortBillingProfileView {
     Integer invoiceableRewardCount;
     Boolean missingPayoutInfo;
     Boolean missingVerification;
+    Boolean individualLimitReached;
 
     public boolean isInvoiceMandateAccepted() {
         if (type == BillingProfile.Type.INDIVIDUAL) return true;
 
         return invoiceMandateAcceptedAt != null &&
-               invoiceMandateLatestVersionDate != null &&
-               invoiceMandateAcceptedAt.isAfter(invoiceMandateLatestVersionDate);
+                invoiceMandateLatestVersionDate != null &&
+                invoiceMandateAcceptedAt.isAfter(invoiceMandateLatestVersionDate);
     }
 
     public boolean isVerificationBlocked() {
