@@ -211,22 +211,6 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .value(jsonArray -> Assertions.assertEquals(2, ((JSONArray) jsonArray).toArray().length))
                 .jsonPath("$.billingProfiles[?(@.type == 'INDIVIDUAL' && @.name == 'individual')]")
                 .value(jsonArray -> Assertions.assertEquals(1, ((JSONArray) jsonArray).toArray().length));
-
-        // When
-        client.get()
-                .uri(getApiURI(ME_GET))
-                .header("Authorization", "Bearer " + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.billingProfiles[?(@.type == 'SELF_EMPLOYED')]")
-                .value(jsonArray -> Assertions.assertEquals(2, ((JSONArray) jsonArray).toArray().length))
-                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')]")
-                .value(jsonArray -> Assertions.assertEquals(2, ((JSONArray) jsonArray).toArray().length))
-                .jsonPath("$.billingProfiles[?(@.type == 'INDIVIDUAL')]")
-                .value(jsonArray -> Assertions.assertEquals(1, ((JSONArray) jsonArray).toArray().length));
     }
 
     @Test

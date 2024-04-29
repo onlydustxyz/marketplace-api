@@ -34,10 +34,6 @@ public class BillingProfileUserEntity {
     @Column(name = "billing_profile_id", nullable = false, updatable = false)
     UUID billingProfileId;
 
-    @ManyToOne
-    @JoinColumn(name = "billing_profile_id", referencedColumnName = "id", insertable = false, updatable = false)
-    BillingProfileEntity billingProfile;
-
     @Id
     @Column(name = "user_id", nullable = false, updatable = false)
     UUID userId;
@@ -74,25 +70,10 @@ public class BillingProfileUserEntity {
     public BillingProfileLinkView toBillingProfileLinkView() {
         return BillingProfileLinkView.builder()
                 .id(billingProfileId)
-                .type(switch (billingProfile.type) {
-                    case INDIVIDUAL -> BillingProfileLinkView.Type.INDIVIDUAL;
-                    case COMPANY -> BillingProfileLinkView.Type.COMPANY;
-                    case SELF_EMPLOYED -> BillingProfileLinkView.Type.SELF_EMPLOYED;
-                })
                 .role(switch (role) {
                     case ADMIN -> BillingProfileLinkView.Role.ADMIN;
                     case MEMBER -> BillingProfileLinkView.Role.MEMBER;
                 })
-                .verificationStatus(switch (billingProfile.verificationStatus) {
-                    case NOT_STARTED -> BillingProfileLinkView.VerificationStatus.NOT_STARTED;
-                    case STARTED -> BillingProfileLinkView.VerificationStatus.STARTED;
-                    case UNDER_REVIEW -> BillingProfileLinkView.VerificationStatus.UNDER_REVIEW;
-                    case VERIFIED -> BillingProfileLinkView.VerificationStatus.VERIFIED;
-                    case REJECTED -> BillingProfileLinkView.VerificationStatus.REJECTED;
-                    case CLOSED -> BillingProfileLinkView.VerificationStatus.CLOSED;
-                })
-                .missingPayoutInfo(billingProfile.stats.missingPayoutInfo())
-                .missingVerification(billingProfile.stats.missingVerification())
                 .build();
     }
 

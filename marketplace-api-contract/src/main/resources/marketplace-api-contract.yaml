@@ -4797,10 +4797,6 @@ components:
               type: string
               format: email
               description: User email
-            billingProfiles:
-              type: array
-              items:
-                $ref: '#/components/schemas/BillingProfileLinkResponse'
             missingPayoutPreference:
               type: boolean
               description: True if the user has not selected any billing profile for a project on which he has pending rewards.
@@ -4897,38 +4893,6 @@ components:
         individualLimitReached:
           type: boolean
           description: True if the (individual) billing profile has reached the yearly limit.
-    BillingProfileLinkResponse:
-      type: object
-      required:
-        - id
-        - type
-        - missingPayoutInfo
-        - missingVerification
-        - verificationBlocked
-        - verificationStatus
-        - role
-      properties:
-        id:
-          type: string
-          format: uuid
-        type:
-          $ref: '#/components/schemas/BillingProfileType'
-        role:
-          $ref: '#/components/schemas/BillingProfileCoworkerRole'
-        verificationStatus:
-          $ref: '#/components/schemas/VerificationStatus'
-        missingPayoutInfo:
-          type: boolean
-          description: True if any reward that is included in an invoice in this billing profile
-            requires some payout info to be set in order to be payable.
-            Always false when no pending rewards.
-        missingVerification:
-          type: boolean
-          description: True if there is any reward belonging to this billing profile and its status is not VERIFIED.
-            Always false when no pending rewards.
-        verificationBlocked:
-          type: boolean
-          description: True if the billing profile verification process is blocked.
     ProjectLedShortResponse:
       type: object
       required:

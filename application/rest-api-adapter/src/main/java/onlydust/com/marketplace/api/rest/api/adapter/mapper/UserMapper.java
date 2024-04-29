@@ -239,29 +239,6 @@ public interface UserMapper {
         getMeResponse.setEmail(authenticatedUser.getGithubEmail());
         getMeResponse.setFirstName(authenticatedUser.getFirstName());
         getMeResponse.setLastName(authenticatedUser.getLastName());
-        getMeResponse.setBillingProfiles(authenticatedUser.getBillingProfiles().stream().map(bp -> new BillingProfileLinkResponse()
-                .id(bp.id())
-                .role(switch (bp.role()) {
-                    case ADMIN -> BillingProfileCoworkerRole.ADMIN;
-                    case MEMBER -> BillingProfileCoworkerRole.MEMBER;
-                })
-                .missingPayoutInfo(bp.missingPayoutInfo())
-                .missingVerification(bp.missingVerification())
-                .verificationBlocked(bp.isVerificationBlocked())
-                .verificationStatus(switch (bp.verificationStatus()) {
-                    case VERIFIED -> VerificationStatus.VERIFIED;
-                    case UNDER_REVIEW -> VerificationStatus.UNDER_REVIEW;
-                    case STARTED -> VerificationStatus.STARTED;
-                    case NOT_STARTED -> VerificationStatus.NOT_STARTED;
-                    case REJECTED -> VerificationStatus.REJECTED;
-                    case CLOSED -> VerificationStatus.CLOSED;
-                })
-                .type(switch (bp.type()) {
-                    case SELF_EMPLOYED -> BillingProfileType.SELF_EMPLOYED;
-                    case COMPANY -> BillingProfileType.COMPANY;
-                    case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
-                })).toList()
-        );
         getMeResponse.setMissingPayoutPreference(authenticatedUser.isMissingPayoutPreference());
         getMeResponse.setSponsors(authenticatedUser.getSponsors().stream().map(SponsorMapper::map).toList());
         return getMeResponse;

@@ -53,9 +53,10 @@ public class User {
         return roles.contains(role);
     }
 
-    public List<BillingProfileLinkView> getAdministratedBillingProfile() {
+    public List<UUID> getAdministratedBillingProfiles() {
         return this.billingProfiles.stream()
                 .filter(bp -> bp.role() == BillingProfileLinkView.Role.ADMIN)
+                .map(BillingProfileLinkView::id)
                 .toList();
     }
 
@@ -65,7 +66,7 @@ public class User {
                 .roles(roles)
                 .githubUserId(githubUserId)
                 .projectsLed(projectsLed.stream().map(ProjectLedView::getId).toList())
-                .administratedBillingProfiles(getAdministratedBillingProfile().stream().map(BillingProfileLinkView::id).toList())
+                .administratedBillingProfiles(getAdministratedBillingProfiles())
                 .build();
     }
 }
