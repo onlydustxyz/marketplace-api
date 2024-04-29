@@ -37,7 +37,7 @@ import java.util.UUID;
 
 @Configuration
 @EnableRetry
-public class DomainConfiguration {
+public class ProjectConfiguration {
     @Bean
     public UUIDGeneratorPort uuidGeneratorPort() {
         return UUID::randomUUID;
@@ -246,4 +246,30 @@ public class DomainConfiguration {
         return new BlockchainService(ethereumTransactionStorageAdapter, optimismTransactionStorageAdapter, aptosTransactionStorageAdapter,
                 starknetTransactionStoragePort);
     }
+
+    @Bean
+    public BoostNodeGuardiansRewardsPort boostNodeGuardiansRewardsPort(final ProjectFacadePort projectFacadePort,
+                                                                       final BoostedRewardStoragePort boostedRewardStoragePort,
+                                                                       final RewardFacadePort rewardFacadePort, final NodeGuardiansApiPort nodeGuardiansApiPort,
+                                                                       final OutboxPort boostNodeGuardiansRewardsOutbox) {
+        return new BoostNodeGuardiansRewardsService(projectFacadePort, boostedRewardStoragePort, rewardFacadePort, nodeGuardiansApiPort,
+                boostNodeGuardiansRewardsOutbox);
+    }
+
+    @Bean
+    public OutboxConsumer nodeGuardiansOutboxConsumer(final ProjectFacadePort projectFacadePort,
+                                                      final BoostedRewardStoragePort boostedRewardStoragePort,
+                                                      final RewardFacadePort rewardFacadePort, final NodeGuardiansApiPort nodeGuardiansApiPort,
+                                                      final OutboxPort boostNodeGuardiansRewardsOutbox) {
+        return new BoostNodeGuardiansRewardsService(projectFacadePort, boostedRewardStoragePort, rewardFacadePort, nodeGuardiansApiPort,
+                boostNodeGuardiansRewardsOutbox);
+    }
+
+    @Bean
+    public OutboxConsumerJob nodeGuardiansOutboxJob(final OutboxConsumer nodeGuardiansOutboxConsumer,
+                                                    final OutboxPort boostNodeGuardiansRewardsOutbox) {
+        return new OutboxConsumerJob(boostNodeGuardiansRewardsOutbox, nodeGuardiansOutboxConsumer);
+    }
+
+
 }

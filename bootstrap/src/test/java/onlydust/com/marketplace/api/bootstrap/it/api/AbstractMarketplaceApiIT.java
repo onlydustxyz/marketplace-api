@@ -61,7 +61,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         @ConfigureWireMock(name = "auth0", property = "application.web.auth0.user-info-url"),
         @ConfigureWireMock(name = "posthog", property = "infrastructure.posthog.base-uri"),
         @ConfigureWireMock(name = "sumsub", property = "infrastructure.sumsub.base-uri"),
-        @ConfigureWireMock(name = "customer-io", property = "infrastructure.customer-io.base-uri")
+        @ConfigureWireMock(name = "customer-io", property = "infrastructure.customer-io.base-uri"),
+        @ConfigureWireMock(name = "node-guardians", property = "infrastructure.node-guardians.base-uri")
 })
 public class AbstractMarketplaceApiIT {
 
@@ -178,6 +179,9 @@ public class AbstractMarketplaceApiIT {
     protected WireMockServer starknetWireMockServer;
     @InjectWireMock("customer-io")
     protected WireMockServer customerIOWireMockServer;
+    @InjectWireMock("node-guardians")
+    protected WireMockServer nodeGuardiansWireMockServer;
+
 
     @LocalServerPort
     int port;

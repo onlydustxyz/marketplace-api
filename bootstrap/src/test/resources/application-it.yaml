@@ -68,6 +68,11 @@ application:
     webhook:
       secret: fake-sumsub-kyc-secret
       od-api-header: fake-sumsub-od-api-header
+  node-guardians:
+    project-id: a74b13ce-cc9a-427b-a0b5-ade01ab01c31  # Random value must be overridden in ITs
+    project-lead-id: ed648549-39ba-4d73-b67a-5356780a2855 # Random value must be overridden in ITs
+    github-repo-id: 111 # Random value must be overridden in ITs
+    ecosystem-id: d6513cd0-824b-4608-ab71-8d57bab6525e # Random value must be overridden in ITs
 spring:
   main:
     allow-bean-definition-overriding: true

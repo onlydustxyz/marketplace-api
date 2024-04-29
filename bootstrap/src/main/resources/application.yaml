@@ -30,10 +30,17 @@ application:
     update-projects-tags: 7200000 # 2 hours
     refresh-reward-usd-equivalents-job-delay: 7200000 # 2 hours
     send-emails: 60000 # 1 minute
+    process-node-guardians-boots: 3600000 # 1 hour
   sumsub:
     webhook:
       secret: ${SUMSUB_WEBHOOK_SECRET}
       od-api-header: ${SUMSUB_WEBHOOK_HEADER}
+  node-guardians:
+    boost-rewards-cron-expression: ${NODE_GUARDIANS_BOOST_CRON}
+    project-id: ${NODE_GUARDIANS_BOOST_PROJECT_ID}
+    project-lead-id: ${NODE_GUARDIANS_BOOST_PROJECT_LEAD_ID}
+    github-repo-id: ${NODE_GUARDIANS_BOOST_GITHUB_REPO_ID}
+    ecosystem-id: ${NODE_GUARDIANS_BOOST_ECOSYSTEM_ID}
 
 spring:
   liquibase:
@@ -170,3 +177,6 @@ infrastructure:
     new-reward-received-email-id: 6
     invoice-rejected-email-id: 3
     verification-failed-email-id: 8
+  node-guardians:
+    base-uri: ${NODE_GUARDIANS_BASE_URI}
+    api-key: ${NODE_GUARDIANS_API_KEY}

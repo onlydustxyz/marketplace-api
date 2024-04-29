@@ -5,10 +5,7 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountingMailEventEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndexerEventEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.TrackingEventEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
@@ -215,7 +212,8 @@ public class PostgresConfiguration {
                                                        final RewardRepository rewardRepository,
                                                        final PaymentShortViewRepository paymentShortViewRepository,
                                                        final ShortRewardViewRepository shortRewardViewRepository,
-                                                       final BackofficeEarningsViewRepository backofficeEarningsViewRepository) {
+                                                       final BackofficeEarningsViewRepository backofficeEarningsViewRepository,
+                                                       final NodeGuardianBoostRewardRepository nodeGuardianBoostRewardRepository) {
         return new PostgresRewardAdapter(shortProjectViewEntityRepository,
                 batchPaymentRepository,
                 rewardDetailsViewRepository,
@@ -223,7 +221,8 @@ public class PostgresConfiguration {
                 rewardRepository,
                 paymentShortViewRepository,
                 shortRewardViewRepository,
-                backofficeEarningsViewRepository);
+                backofficeEarningsViewRepository,
+                nodeGuardianBoostRewardRepository);
     }
 
     @Bean
@@ -264,6 +263,12 @@ public class PostgresConfiguration {
     public PostgresOutboxAdapter<AccountingMailEventEntity> accountingMailOutbox(final AccountingMailEventRepository accountingMailEventRepository) {
         return new PostgresOutboxAdapter<>(accountingMailEventRepository);
     }
+
+    @Bean
+    public PostgresOutboxAdapter<BoostNodeGuardiansRewardsEventEntity> boostNodeGuardiansRewardsOutbox(final BoostNodeGuardiansRewardsRepository boostNodeGuardiansRewardsRepository) {
+        return new PostgresOutboxAdapter<>(boostNodeGuardiansRewardsRepository);
+    }
+
 
     @Bean
     public CustomProjectRankingRepository customProjectRankingRepository(final EntityManager entityManager) {

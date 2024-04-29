@@ -11,6 +11,10 @@ import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.accounting.domain.view.ShortRewardDetailsView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
+import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
+import onlydust.com.marketplace.project.domain.view.Money;
+import onlydust.com.marketplace.project.domain.view.ShortProjectRewardView;
 import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
@@ -49,7 +53,7 @@ public class ShortRewardViewEntity {
     @NonNull
     CurrencyEntity currency;
 
-    public ShortRewardDetailsView toDomain() {
+    public ShortRewardDetailsView toAccountingDomain() {
         return ShortRewardDetailsView.builder()
                 .id(RewardId.of(this.id))
                 .project(ProjectShortView.builder()
@@ -62,6 +66,24 @@ public class ShortRewardViewEntity {
                 .recipient(recipient.toDomain())
                 .requester(requester.toDomain())
                 .money(new MoneyView(this.amount, this.currency.toDomain()))
+                .build();
+    }
+
+    public ShortProjectRewardView toProjectDomain() {
+        return ShortProjectRewardView.builder()
+                .rewardId(this.id)
+                .projectName(this.projectName)
+                .money(new Money(this.amount, CurrencyView.builder()
+                        .code(this.currency.code())
+                        .id(CurrencyView.Id.of(this.currency.id()))
+                        .name(this.currency.name())
+                        .decimals(this.currency.decimals())
+                        .build()))
+                .recipient(ContributorLinkView.builder()
+                        .githubUserId(this.recipient.githubUserId())
+                        .avatarUrl(this.recipient.avatarUrl())
+                        .login(this.recipient.login())
+                        .build())
                 .build();
     }
 
