@@ -5,10 +5,10 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountingMailEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndexerEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.TrackingEventEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
@@ -366,8 +366,9 @@ public class PostgresConfiguration {
     @Bean
     public PostgresPayoutPreferenceAdapter postgresPayoutPreferenceAdapter(final PayoutPreferenceRepository payoutPreferenceRepository,
                                                                            final PayoutPreferenceViewRepository payoutPreferenceViewRepository,
-                                                                           final RewardRepository rewardRepository) {
-        return new PostgresPayoutPreferenceAdapter(payoutPreferenceRepository, payoutPreferenceViewRepository, rewardRepository);
+                                                                           final RewardRepository rewardRepository,
+                                                                           final ShortBillingProfileViewRepository shortBillingProfileViewRepository) {
+        return new PostgresPayoutPreferenceAdapter(payoutPreferenceRepository, payoutPreferenceViewRepository, rewardRepository, shortBillingProfileViewRepository);
     }
 
     @Bean

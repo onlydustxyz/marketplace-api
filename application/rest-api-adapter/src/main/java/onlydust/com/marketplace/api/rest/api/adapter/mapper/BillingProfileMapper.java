@@ -240,6 +240,7 @@ public interface BillingProfileMapper {
         response.setMissingPayoutInfo(view.getMissingPayoutInfo());
         response.setMissingVerification(view.getMissingVerification());
         response.setVerificationBlocked(view.isVerificationBlocked());
+        response.setIndividualLimitReached(view.getIndividualLimitReached());
         response.setMe(isNull(view.getMe()) ? null :
                 new BillingProfileResponseMe()
                         .canLeave(view.getMe().canLeave())

@@ -156,6 +156,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
                             .missingPayoutInfo(billingProfileCustomData.getStats().missingPayoutInfo())
                             .missingVerification(billingProfileCustomData.getStats().missingVerification())
+                            .individualLimitReached(billingProfileCustomData.getIndividualLimitReached())
                             .rewardCount(billingProfileCustomData.getStats().rewardCount())
                             .invoiceableRewardCount(billingProfileCustomData.getStats().invoiceableRewardCount())
                             .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())

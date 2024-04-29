@@ -55,11 +55,12 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
                 .githubUserId(authenticatedUser.user().getGithubUserId())
                 .missingPayoutPreference(false)
                 .billingProfileData(List.of())
-                .build()));
+                .build()), 0);
 
         // When user has a not-verified BP and no reward
         final var individualBillingProfile = billingProfileService.createIndividualBillingProfile(UserId.of(authenticatedUser.user().getId()),
                 faker.rickAndMorty().character(), null);
+
         assertAlerting(List.of(MeDatum.builder()
                 .githubUserId(authenticatedUser.user().getGithubUserId())
                 .missingPayoutPreference(false)
@@ -69,13 +70,14 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
                         .missingPayoutInfo(false)
                         .missingVerification(false)
                         .verificationBlocked(false)
+                        .individualLimitReached(false)
                         .missingEthWallet(false)
                         .missingAptosWallet(false)
                         .missingOptimismWallet(false)
                         .missingStarknetWallet(false)
                         .missingBankAccount(false)
                         .build()))
-                .build()));
+                .build()), 0);
 
         // When user has a not-verified BP and some reward
         final var projectId = ProjectId.of("f39b827f-df73-498c-8853-99bc3f562723");
@@ -97,13 +99,14 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
                         .missingPayoutInfo(false)
                         .missingVerification(false)
                         .verificationBlocked(false)
+                        .individualLimitReached(false)
                         .missingEthWallet(false)
                         .missingAptosWallet(false)
                         .missingOptimismWallet(false)
                         .missingStarknetWallet(false)
                         .missingBankAccount(false)
                         .build()))
-                .build()));
+                .build()), 1);
 
         // When the user set missing payout preferences
         updatePayoutPreferences(authenticatedUser.user().getGithubUserId(), individualBillingProfile.id(), projectId.value());
@@ -116,13 +119,14 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
                         .missingPayoutInfo(false)
                         .missingVerification(true)
                         .verificationBlocked(false)
+                        .individualLimitReached(false)
                         .missingEthWallet(false)
                         .missingAptosWallet(false)
                         .missingOptimismWallet(false)
                         .missingStarknetWallet(false)
                         .missingBankAccount(false)
                         .build()))
-                .build()));
+                .build()), 1);
 
         // When the user gets his BP verification blocked
         accountingHelper.patchBillingProfile(individualBillingProfile.id().value(), null, VerificationStatusEntity.CLOSED);
@@ -135,13 +139,14 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
                         .missingPayoutInfo(false)
                         .missingVerification(true)
                         .verificationBlocked(true)
+                        .individualLimitReached(false)
                         .missingEthWallet(false)
                         .missingAptosWallet(false)
                         .missingOptimismWallet(false)
                         .missingStarknetWallet(false)
                         .missingBankAccount(false)
                         .build()))
-                .build()));
+                .build()), 1);
 
         // When the user gets his BP verified
         accountingHelper.patchBillingProfile(individualBillingProfile.id().value(), null, VerificationStatusEntity.VERIFIED);
@@ -154,13 +159,14 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
                         .missingPayoutInfo(true)
                         .missingVerification(false)
                         .verificationBlocked(false)
+                        .individualLimitReached(false)
                         .missingEthWallet(true)
                         .missingAptosWallet(false)
                         .missingOptimismWallet(false)
                         .missingStarknetWallet(false)
                         .missingBankAccount(false)
                         .build()))
-                .build()));
+                .build()), 1);
 
         // When the user adds some payout infos
         client.put()
@@ -192,17 +198,38 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
                         .missingPayoutInfo(false)
                         .missingVerification(false)
                         .verificationBlocked(false)
+                        .individualLimitReached(false)
                         .missingEthWallet(false)
                         .missingAptosWallet(false)
                         .missingOptimismWallet(false)
                         .missingStarknetWallet(false)
                         .missingBankAccount(false)
                         .build()))
-                .build()));
+                .build()), 1);
+
+
+        sendRewardToRecipient(authenticatedUser.user().getGithubUserId(), 6000L, projectId.value());
+        assertAlerting(List.of(MeDatum.builder()
+                .githubUserId(authenticatedUser.user().getGithubUserId())
+                .missingPayoutPreference(false)
+                .billingProfileData(List.of(MeBillingProfileDatum.builder()
+                        .billingProfileId(individualBillingProfile.id().value())
+                        .status("VERIFIED")
+                        .missingPayoutInfo(false)
+                        .missingVerification(false)
+                        .verificationBlocked(false)
+                        .individualLimitReached(true)
+                        .missingEthWallet(false)
+                        .missingAptosWallet(false)
+                        .missingOptimismWallet(false)
+                        .missingStarknetWallet(false)
+                        .missingBankAccount(false)
+                        .build()))
+                .build()), 1);
     }
 
 
-    private void assertAlerting(final List<MeDatum> meData) {
+    private void assertAlerting(final List<MeDatum> meData, final int expectedPayoutPreferenceCount) {
         for (final var meDatum : meData) {
             final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.authenticateUser(meDatum.githubUserId);
 
@@ -244,7 +271,8 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
                             .jsonPath("$.status").isEqualTo(bpDatum.status)
                             .jsonPath("$.missingPayoutInfo").isEqualTo(bpDatum.missingPayoutInfo)
                             .jsonPath("$.missingVerification").isEqualTo(bpDatum.missingVerification)
-                            .jsonPath("$.verificationBlocked").isEqualTo(bpDatum.verificationBlocked);
+                            .jsonPath("$.verificationBlocked").isEqualTo(bpDatum.verificationBlocked)
+                            .jsonPath("$.individualLimitReached").isEqualTo(bpDatum.individualLimitReached);
 
                     client.get()
                             .uri(getApiURI(BILLING_PROFILES_GET_PAYOUT_INFO.formatted(bpDatum.billingProfileId)))
@@ -282,6 +310,37 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
                     bodyContentSpec
                             .jsonPath("$.billingProfiles[?(@.id == '%s')].verificationBlocked".formatted(bpDatum.billingProfileId.toString()))
                             .isEqualTo(bpDatum.verificationBlocked);
+                    bodyContentSpec
+                            .jsonPath("$.billingProfiles[?(@.id == '%s')].individualLimitReached".formatted(bpDatum.billingProfileId.toString()))
+                            .isEqualTo(bpDatum.individualLimitReached);
+                }
+            }
+            if (!meDatum.missingPayoutPreference()) {
+                final WebTestClient.BodyContentSpec bodyContentSpec = client.get()
+                        .uri(getApiURI(ME_GET_PAYOUT_PREFERENCES))
+                        .header("Authorization", BEARER_PREFIX + authenticatedUser.jwt())
+                        // Then
+                        .exchange()
+                        .expectStatus()
+                        .is2xxSuccessful()
+                        .expectBody()
+                        .jsonPath("$.length()").isEqualTo(expectedPayoutPreferenceCount);
+
+                if (expectedPayoutPreferenceCount > 0) {
+                    for (final var bpDatum : meDatum.billingProfileData()) {
+                        bodyContentSpec
+                                .jsonPath("$[?(@.billingProfile.id == '%s')].billingProfile.missingPayoutInfo".formatted(bpDatum.billingProfileId.toString()))
+                                .isEqualTo(bpDatum.missingPayoutInfo);
+                        bodyContentSpec
+                                .jsonPath("$[?(@.billingProfile.id == '%s')].billingProfile.missingVerification".formatted(bpDatum.billingProfileId.toString()))
+                                .isEqualTo(bpDatum.missingVerification);
+                        bodyContentSpec
+                                .jsonPath("$[?(@.billingProfile.id == '%s')].billingProfile.verificationBlocked".formatted(bpDatum.billingProfileId.toString()))
+                                .isEqualTo(bpDatum.verificationBlocked);
+                        bodyContentSpec
+                                .jsonPath("$[?(@.billingProfile.id == '%s')].billingProfile.individualLimitReached".formatted(bpDatum.billingProfileId.toString()))
+                                .isEqualTo(bpDatum.individualLimitReached);
+                    }
                 }
             }
 
@@ -289,7 +348,8 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
     }
 
     @Builder
-    private record MeDatum(@NonNull Long githubUserId, boolean missingPayoutPreference, @NonNull List<MeBillingProfileDatum> billingProfileData) {
+    private record MeDatum(@NonNull Long githubUserId, boolean missingPayoutPreference,
+                           @NonNull List<MeBillingProfileDatum> billingProfileData) {
     }
 
     @Builder
@@ -297,6 +357,7 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
                                          boolean missingPayoutInfo,
                                          boolean missingVerification,
                                          boolean verificationBlocked,
+                                         boolean individualLimitReached,
                                          boolean missingBankAccount,
                                          boolean missingEthWallet,
                                          boolean missingOptimismWallet,

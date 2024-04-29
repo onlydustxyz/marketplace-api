@@ -46,6 +46,7 @@ public class ShortBillingProfileViewEntity {
     Date invoiceMandateAcceptedAt;
     Boolean enabled;
     Boolean pendingInvitation;
+    Boolean individualLimitReached;
 
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "billingProfileId")
@@ -80,6 +81,7 @@ public class ShortBillingProfileViewEntity {
                 .invoiceableRewardCount(this.stats.invoiceableRewardCount())
                 .missingVerification(this.stats.missingVerification())
                 .missingPayoutInfo(this.stats.missingPayoutInfo())
+                .individualLimitReached(this.individualLimitReached)
                 .build();
     }
 }
