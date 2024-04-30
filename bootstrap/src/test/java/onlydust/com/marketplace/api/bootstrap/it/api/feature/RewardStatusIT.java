@@ -2408,7 +2408,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.billingProfiles.length()").isEqualTo(1)
-                .jsonPath("$.billingProfiles[0].invoiceableRewardCount").isEqualTo(1);
+                .jsonPath("$.billingProfiles[0].invoiceableRewardCount").isEqualTo(1)
+                .jsonPath("$.billingProfiles[0].requestableRewardCount").isEqualTo(1);
 
         client.get()
                 .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(individualBPId)))
@@ -2608,7 +2609,19 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.billingProfiles.length()").isEqualTo(1)
-                .jsonPath("$.billingProfiles[0].invoiceableRewardCount").isEqualTo(3);
+                .jsonPath("$.billingProfiles[0].invoiceableRewardCount").isEqualTo(3)
+                .jsonPath("$.billingProfiles[0].requestableRewardCount").isEqualTo(3);
+
+        client.get()
+                .uri(getApiURI(ME_BILLING_PROFILES))
+                .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateUser(companyBPMember1GithubId).jwt())
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.billingProfiles.length()").isEqualTo(1)
+                .jsonPath("$.billingProfiles[0].invoiceableRewardCount").isEqualTo(3)
+                .jsonPath("$.billingProfiles[0].requestableRewardCount").isEqualTo(0);
 
         client.get()
                 .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(companyBPId)))
@@ -2810,7 +2823,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.billingProfiles.length()").isEqualTo(1)
-                .jsonPath("$.billingProfiles[0].invoiceableRewardCount").isEqualTo(2);
+                .jsonPath("$.billingProfiles[0].invoiceableRewardCount").isEqualTo(2)
+                .jsonPath("$.billingProfiles[0].requestableRewardCount").isEqualTo(2);
 
         client.get()
                 .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(selfEmployedBPId)))
@@ -4118,7 +4132,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     }
 
     @Builder
-    private record RewardDatum(@NonNull UUID rewardId, @NonNull String status, @NonNull Long rewardedAmount, @NonNull Long pendingAmount,
+    private record RewardDatum(@NonNull UUID rewardId, @NonNull String status, @NonNull Long rewardedAmount,
+                               @NonNull Long pendingAmount,
                                @NonNull Optional<Double> usdConversionRate) {
 
         Optional<BigDecimal> usdEquivalent() {
