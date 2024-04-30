@@ -157,8 +157,8 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                         {
                             "title": "Hackathon 2021",
                             "subtitle": "subtitle",
-                            "startDate": "2024-01-01T00:00:00Z",
-                            "endDate": "2024-01-05T00:00:00Z"
+                            "startDate": "2024-01-01T10:10:00Z",
+                            "endDate": "2024-01-05T20:20:00Z"
                         }
                         """)
                 .exchange()
@@ -176,8 +176,8 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                             "description": null,
                             "location": null,
                             "totalBudget": null,
-                            "startDate": "2024-01-01T00:00:00Z",
-                            "endDate": "2024-01-05T00:00:00Z",
+                            "startDate": "2024-01-01T10:10:00Z",
+                            "endDate": "2024-01-05T20:20:00Z",
                             "links": [],
                             "sponsors": [],
                             "tracks": []
@@ -209,8 +209,8 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                             "description": null,
                             "location": null,
                             "totalBudget": null,
-                            "startDate": "2024-01-01T00:00:00Z",
-                            "endDate": "2024-01-05T00:00:00Z",
+                            "startDate": "2024-01-01T10:10:00Z",
+                            "endDate": "2024-01-05T20:20:00Z",
                             "links": [],
                             "sponsors": [],
                             "tracks": []
@@ -234,8 +234,8 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "description": "My hackathon description",
                           "location": "Paris",
                           "totalBudget": "$1.000.000",
-                          "startDate": "2024-04-19T00:00:00Z",
-                          "endDate": "2024-04-22T00:00:00Z",
+                          "startDate": "2024-04-19T11:00:00Z",
+                          "endDate": "2024-04-22T13:00:00Z",
                           "links": [
                             {
                               "url": "https://www.google.com",
@@ -296,8 +296,8 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "description": "My hackathon description",
                           "location": "Paris",
                           "totalBudget": "$1.000.000",
-                          "startDate": "2024-04-19T00:00:00Z",
-                          "endDate": "2024-04-22T00:00:00Z",
+                          "startDate": "2024-04-19T11:00:00Z",
+                          "endDate": "2024-04-22T13:00:00Z",
                           "links": [
                             {
                               "url": "https://www.google.com",
@@ -397,8 +397,8 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "description": "My hackathon description",
                           "location": "Paris",
                           "totalBudget": "$1.000.000",
-                          "startDate": "2024-04-19T00:00:00Z",
-                          "endDate": "2024-04-22T00:00:00Z",
+                          "startDate": "2024-04-19T11:00:00Z",
+                          "endDate": "2024-04-22T13:00:00Z",
                           "links": [
                             {
                               "url": "https://www.google.com",
@@ -492,8 +492,8 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "description": "My hackathon description 2",
                           "location": "Paris 2",
                           "totalBudget": "$2.000.000",
-                          "startDate": "2024-04-23T00:00:00Z",
-                          "endDate": "2024-04-25T00:00:00Z",
+                          "startDate": "2024-04-23T11:00:00Z",
+                          "endDate": "2024-04-25T13:00:00Z",
                           "links": [
                             {
                               "url": "https://www.foo.com",
@@ -539,8 +539,8 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "description": "My hackathon description 2",
                           "location": "Paris 2",
                           "totalBudget": "$2.000.000",
-                          "startDate": "2024-04-23T00:00:00Z",
-                          "endDate": "2024-04-25T00:00:00Z",
+                          "startDate": "2024-04-23T11:00:00Z",
+                          "endDate": "2024-04-25T13:00:00Z",
                           "links": [
                             {
                               "url": "https://www.foo.com",
@@ -650,8 +650,8 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "status": "PUBLISHED",
                               "title": "Hackathon 2021 updated",
                               "location": "Paris 2",
-                              "startDate": "2024-04-23T00:00:00Z",
-                              "endDate": "2024-04-25T00:00:00Z"
+                              "startDate": "2024-04-23T11:00:00Z",
+                              "endDate": "2024-04-25T13:00:00Z"
                             },
                             {
                               "slug": "od-hack",
@@ -795,8 +795,8 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "status": "PUBLISHED",
                               "title": "Hackathon 2021 updated",
                               "location": "Paris 2",
-                              "startDate": "2024-04-23T00:00:00Z",
-                              "endDate": "2024-04-25T00:00:00Z"
+                              "startDate": "2024-04-23T11:00:00Z",
+                              "endDate": "2024-04-25T13:00:00Z"
                             }
                           ]
                         }
