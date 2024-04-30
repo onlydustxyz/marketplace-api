@@ -300,93 +300,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/me/contributions:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Me
-      summary: Get caller's contributions
-      operationId: getMyContributions
-      description: |
-        Get contributions of the caller.
-      parameters:
-        - in: query
-          name: types
-          description: Contribution type filter
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/ContributionType'
-        - in: query
-          name: statuses
-          description: Contribution status filter
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/ContributionStatus'
-        - in: query
-          name: projects
-          description: Project filter
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/ProjectId'
-        - in: query
-          name: repositories
-          description: Repository filter
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/GithubRepoId'
-        - in: query
-          name: fromDate
-          description: Contribution date filter
-          schema:
-            type: string
-            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
-        - in: query
-          name: toDate
-          description: Contribution date filter
-          schema:
-            type: string
-            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
-        - in: query
-          name: sort
-          description: Sorting field
-          schema:
-            $ref: '#/components/schemas/ContributionSort'
-        - in: query
-          name: direction
-          description: Sort direction
-          schema:
-            type: string
-            default: ASC
-            enum:
-              - ASC
-              - DESC
-        - in: query
-          name: pageIndex
-          description: Page number
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          description: Number of items returned by page
-          schema:
-            type: integer
-
-      responses:
-        "200":
-          description: 'Contribution list'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ContributionPageResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
   /api/v1/me/contributed-projects:
     get:
       security:
@@ -884,7 +797,6 @@ paths:
           $ref: '#/components/responses/UserNotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-
   /api/v1/users/login/{githubLogin}:
     get:
       tags:
@@ -906,6 +818,242 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PublicUserProfileResponse'
+        "404":
+          $ref: '#/components/responses/UserNotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v2/users/{githubId}:
+    get:
+      tags:
+        - Users
+      summary: Get user profile
+      operationId: getUserProfileV2
+      description: |
+        Get the publicly available user profile
+      parameters:
+        - in: path
+          name: githubId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: 'User profile'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicUserProfileResponseV2'
+        "404":
+          $ref: '#/components/responses/UserNotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v2/users/{githubId}/contributions:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Users
+      summary: Get user's contributions
+      operationId: getUserContributions
+      description: |
+        Get contributions of the user.
+      parameters:
+        - in: path
+          name: githubId
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - in: query
+          name: types
+          description: Contribution type filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ContributionType'
+        - in: query
+          name: statuses
+          description: Contribution status filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ContributionStatus'
+        - in: query
+          name: projects
+          description: Project filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: repositories
+          description: Repository filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/GithubRepoId'
+        - in: query
+          name: languages
+          description: Language filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/LanguageId'
+        - in: query
+          name: ecosystems
+          description: Ecosystem filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/EcosystemId'
+        - in: query
+          name: fromDate
+          description: Contribution date filter
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: toDate
+          description: Contribution date filter
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: sort
+          description: Sorting field
+          schema:
+            $ref: '#/components/schemas/ContributionSort'
+        - in: query
+          name: direction
+          description: Sort direction
+          schema:
+            type: string
+            default: ASC
+            enum:
+              - ASC
+              - DESC
+        - in: query
+          name: pageIndex
+          description: Page number
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          description: Number of items returned by page
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'Contribution list'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContributionPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /api/v2/users/{githubId}/stats:
+    get:
+      tags:
+        - Users
+      summary: Get user profile stats
+      operationId: getUserProfileStats
+      description: |
+        Get the publicly available user profile stats
+      parameters:
+        - in: path
+          name: githubId
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - in: query
+          name: ecosystem
+          schema:
+            $ref: '#/components/schemas/EcosystemId'
+      responses:
+        "200":
+          description: 'User profile stats'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileStatsV2'
+        "404":
+          $ref: '#/components/responses/UserNotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /api/v2/users/{githubId}/languages:
+    get:
+      tags:
+        - Users
+      summary: Get user profile stats per languages
+      operationId: getUserProfileStatsPerLanguages
+      description: |
+        Get the publicly available user stats per languages, ordered by rank
+      parameters:
+        - in: path
+          name: githubId
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'User profile stats per languages'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileLanguagePage'
+        "404":
+          $ref: '#/components/responses/UserNotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /api/v2/users/{githubId}/ecosystems:
+    get:
+      tags:
+        - Users
+      summary: Get user profile stats per ecosystems
+      operationId: getUserProfileStatsPerEcosystems
+      description: |
+        Get the publicly available user stats per ecosystems, ordered by rank
+      parameters:
+        - in: path
+          name: githubId
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'User profile stats per ecosystems'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileEcosystemPage'
         "404":
           $ref: '#/components/responses/UserNotFoundError'
         "500":
@@ -3184,6 +3332,11 @@ components:
       format: uuid
       description: OnlyDust ecosystem ID
 
+    LanguageId:
+      type: string
+      format: uuid
+      description: OnlyDust language ID
+
     RewardId:
       type: string
       format: uuid
@@ -3474,6 +3627,282 @@ components:
               type: string
             lastName:
               type: string
+
+    PublicUserProfileResponseV2:
+      allOf:
+        - $ref: '#/components/schemas/GithubUserResponse'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/UserId'
+            htmlUrl:
+              type: string
+              format: uri
+            location:
+              type: string
+              description: User location as in Github profile
+              example: Paris, France
+            bio:
+              type: string
+              description: User bio as in Github profile
+              example: Contributing to awesome open source projects.
+            website:
+              type: string
+              description: User website as in Github profile
+            signedUpOnGithubAt:
+              type: string
+              format: date-time
+              description: When the user signed up on Github
+            signedUpAt:
+              type: string
+              format: date-time
+              description: When the user signed up on OnlyDust
+            lastSeenAt:
+              type: string
+              format: date-time
+              description: The last time the user signed in on OnlyDust
+            contacts:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContactInformation'
+            statsSummary:
+              $ref: '#/components/schemas/UserProfileStatsSummary'
+            ecosystems:
+              type: array
+              description: List of ecosystems on which the user contributed
+              items:
+                $ref: '#/components/schemas/EcosystemId'
+
+    UserRankCategory:
+      type: string
+      enum:
+        - A
+        - B
+        - C
+        - D
+        - E
+        - F
+
+    UserProfileStatsSummary:
+      type: object
+      required:
+        - rank
+        - rankPercentile
+        - rankCategory
+        - contributionLevel
+        - contributedProjectCount
+        - leadedProjectCount
+        - contributionCount
+        - rewardCount
+      properties:
+        rank:
+          type: integer
+          description: User rank on OnlyDust (the lower, the better)
+          example: 42
+        rankPercentile:
+          type: number
+          description: User rank percentile on OnlyDust (the lower, the better)
+          example: 0.10
+        rankCategory:
+          $ref: '#/components/schemas/UserRankCategory'
+        contributedProjectCount:
+          type: integer
+          description: Number of projects on which the user contributed
+          example: 22
+        leadedProjectCount:
+          type: integer
+          description: Number of projects the user leads
+          example: 3
+        contributionCount:
+          type: integer
+          description: Total number of contributions made by the user within OnlyDust projects
+          example: 145
+        rewardCount:
+          type: integer
+          description: Total number of rewards received by the user
+          example: 44
+
+    UserProfileStatsV2:
+      type: object
+      required:
+        - activity
+        - earnings
+        - workDistribution
+      properties:
+        activity:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserWeeklyStats'
+        earnings:
+          type: object
+          required:
+            - totalEarnedUsd
+            - perProject
+          properties:
+            totalEarnedUsd:
+              type: number
+            perProject:
+              type: array
+              items:
+                $ref: '#/components/schemas/UserProfileProjectEarnings'
+        workDistribution:
+          $ref: '#/components/schemas/UserWorkDistribution'
+
+    UserProfileProjectEarnings:
+      type: object
+      required:
+        - projectName
+        - totalEarnedUsd
+      properties:
+        projectName:
+          type: string
+        totalEarnedUsd:
+          type: number
+
+    UserWeeklyStats:
+      type: object
+      required:
+        - year
+        - week
+        - codeReviewCount
+        - issueCount
+        - pullRequestCount
+        - rewardCount
+      properties:
+        year:
+          type: integer
+          example: 2023
+        week:
+          type: integer
+          example: 34
+        codeReviewCount:
+          type: integer
+        issueCount:
+          type: integer
+        pullRequestCount:
+          type: integer
+        rewardCount:
+          type: integer
+
+    UserWorkDistribution:
+      type: object
+      required:
+        - codeReviewCount
+        - issueCount
+        - pullRequestCount
+      properties:
+        codeReviewCount:
+          type: integer
+        issueCount:
+          type: integer
+        pullRequestCount:
+          type: integer
+
+
+    UserProfileLanguagePage:
+      #A paginer
+      type: object
+      required:
+        - languages
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserProfileLanguagePageItem'
+
+    UserProfileLanguagePageItem:
+      allOf:
+        - $ref: '#/components/schemas/UserProfileSubStats'
+        - type: object
+          required:
+            - language
+          properties:
+            language:
+              $ref: '#/components/schemas/LanguageResponse'
+
+
+    UserProfileEcosystemPage:
+      type: object
+      required:
+        - languages
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        ecosystems:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserProfileEcosystemPageItem'
+
+    UserProfileEcosystemPageItem:
+      allOf:
+        - $ref: '#/components/schemas/UserProfileSubStats'
+        - type: object
+          required:
+            - ecosystem
+          properties:
+            ecosystem:
+              $ref: '#/components/schemas/EcosystemResponse'
+
+    UserProfileSubStats:
+      type: object
+      required:
+        - contributingStatus
+        - contributedProjectCount
+        - contributionCount
+        - rewardCount
+        - totalEarnedUsd
+        - projects
+      properties:
+        rank:
+          type: integer
+          description: User rank on this project (the lower, the better)
+          example: 42
+        contributingStatus:
+          $ref: '#/components/schemas/UserProfileContributingStatus'
+        contributedProjectCount:
+          type: integer
+          description: Number of projects on which the user contributed in this language
+          example: 22
+        contributionCount:
+          type: integer
+          description: Total number of contributions made by the user in this language
+          example: 145
+        rewardCount:
+          type: integer
+          description: Total number of rewards received by the user granted on contributions in this language
+          example: 44
+        totalEarnedUsd:
+          type: number
+          description: Total USD-equivalent amount of all rewards granted on contributions in this language
+          example: 25400
+        projects:
+          type: array
+          description: List of projects on which the user contributed in this language, ordered by contribution count
+          items:
+            $ref: '#/components/schemas/ProjectLinkResponse'
+
+    UserProfileContributingStatus:
+      type: string
+      enum:
+        - RED
+        - ORANGE
+        - GREEN
 
     UserProfileStats:
       type: object
@@ -3793,6 +4222,40 @@ components:
           format: url
           description: Direct URL to ecosystem's logo image
           example: 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png'
+        bannerUrl:
+          type: string
+          format: url
+          description: Direct URL to ecosystem's banner image
+          example: 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png'
+
+    LanguageResponse:
+      type: object
+      required:
+        - id
+        - name
+        - logoUrl
+      properties:
+        id:
+          $ref: '#/components/schemas/LanguageId'
+        name:
+          type: string
+          description: Language name
+          example: Rust
+        url:
+          type: string
+          format: url
+          description: URL of language's website
+          example: 'https://rust.org'
+        logoUrl:
+          type: string
+          format: url
+          description: Direct URL to language's logo image
+          example: 'https://rust.org/logo.png'
+        bannerUrl:
+          type: string
+          format: url
+          description: Direct URL to language's banner image
+          example: 'https://rust.org/banner.png'
 
     ProjectPageResponse:
       type: object

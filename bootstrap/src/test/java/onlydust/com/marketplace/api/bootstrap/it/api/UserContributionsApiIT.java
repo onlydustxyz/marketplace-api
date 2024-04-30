@@ -8,18 +8,18 @@ import java.util.Map;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 
-public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
+public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
 
 
     @Test
     void should_get_my_contributions() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final var user = userAuthHelper.authenticateAnthony();
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS, Map.of("pageSize", "3")))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()), Map.of("pageSize", "3")))
+                .header("Authorization", BEARER_PREFIX + user.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -170,14 +170,14 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_my_rewards_with_project_filter() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final var user = userAuthHelper.authenticateAnthony();
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS, Map.of(
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()), Map.of(
                         "projects", "f39b827f-df73-498c-8853-99bc3f562723,594ca5ca-48f7-49a8-9c26-84b949d4fdd9")
                 ))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + user.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -194,14 +194,14 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_my_rewards_with_repos_filter() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final var user = userAuthHelper.authenticateAnthony();
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS, Map.of(
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()), Map.of(
                         "repositories", "493591124")
                 ))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + user.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -218,14 +218,14 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_my_rewards_with_type_filter() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final var user = userAuthHelper.authenticateAnthony();
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS, Map.of(
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()), Map.of(
                         "types", "ISSUE")
                 ))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + user.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -243,14 +243,14 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_my_rewards_with_status_filter() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final var user = userAuthHelper.authenticateAnthony();
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS, Map.of(
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()), Map.of(
                         "statuses", "IN_PROGRESS")
                 ))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + user.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -268,18 +268,18 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_list_rewards_associated_to_a_contribution() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final var user = userAuthHelper.authenticateAnthony();
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()),
                         Map.of("pageSize", "1",
                                 "pageIndex", "17",
                                 "projects", "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
                                 "repositories", "498695724",
                                 "statuses", "COMPLETED",
                                 "types", "PULL_REQUEST")))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + user.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -309,16 +309,16 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_order_by_project_repo_name() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final var user = userAuthHelper.authenticateAnthony();
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()),
                         Map.of("pageSize", "1",
                                 "projects", "298a547f-ecb6-4ab2-8975-68f4e9bf7b39,594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
                                 "sort", "PROJECT_REPO_NAME"
                         )))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + user.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -330,12 +330,12 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()),
                         Map.of("pageSize", "1",
                                 "projects", "298a547f-ecb6-4ab2-8975-68f4e9bf7b39,594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
                                 "sort", "PROJECT_REPO_NAME",
                                 "direction", "DESC")))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + user.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -349,15 +349,15 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_order_by_last_update_date() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final var user = userAuthHelper.authenticateAnthony();
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()),
                         Map.of("pageSize", "1",
                                 "sort", "LAST_UPDATED_AT"
                         )))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + user.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -368,11 +368,11 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()),
                         Map.of("pageSize", "1",
                                 "sort", "LAST_UPDATED_AT",
                                 "direction", "DESC")))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + user.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -385,16 +385,16 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_order_by_github_number_title() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final var user = userAuthHelper.authenticateAnthony();
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()),
                         Map.of("pageSize", "1",
                                 "projects", "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
                                 "sort", "GITHUB_NUMBER_TITLE"
                         )))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + user.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -406,12 +406,12 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()),
                         Map.of("pageSize", "1",
                                 "projects", "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
                                 "sort", "GITHUB_NUMBER_TITLE",
                                 "direction", "DESC")))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + user.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -425,14 +425,14 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_order_by_links_count() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final var user = userAuthHelper.authenticateAnthony();
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()),
                         Map.of("pageSize", "1",
                                 "sort", "LINKS_COUNT")))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + user.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -443,11 +443,11 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()),
                         Map.of("pageSize", "1",
                                 "sort", "LINKS_COUNT",
                                 "direction", "DESC")))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + user.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -461,18 +461,18 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_not_duplicate_contributions() {
         // Given
-        final String jwt = userAuthHelper.authenticateHayden().jwt();
+        final var user = userAuthHelper.authenticateHayden();
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()),
                         Map.of("pageSize", "10",
                                 "projects", "594ca5ca-48f7-49a8-9c26-84b949d4fdd9,90fb751a-1137-4815-b3c4-54927a5db059",
                                 "types", "ISSUE",
                                 "statuses", "IN_PROGRESS",
                                 "sort", "PROJECT_REPO_NAME"
                         )))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + user.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
