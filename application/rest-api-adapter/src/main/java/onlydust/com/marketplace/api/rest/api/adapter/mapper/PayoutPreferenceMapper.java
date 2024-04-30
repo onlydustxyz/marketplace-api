@@ -26,6 +26,7 @@ public interface PayoutPreferenceMapper {
                 .invoiceMandateAccepted(view.isInvoiceMandateAccepted())
                 .pendingInvitationResponse(view.getPendingInvitationResponse())
                 .invoiceableRewardCount(view.getInvoiceableRewardCount())
+                .requestableRewardCount(view.requestableRewardCount())
                 .rewardCount(view.getRewardCount())
                 .missingPayoutInfo(view.getMissingPayoutInfo())
                 .missingVerification(view.getMissingVerification())

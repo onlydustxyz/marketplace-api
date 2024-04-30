@@ -41,4 +41,11 @@ public class ShortBillingProfileView {
     public boolean isVerificationBlocked() {
         return verificationStatus.isBlocked();
     }
+
+    public Integer requestableRewardCount() {
+        if (invoiceableRewardCount == null || role == null)
+            return null;
+        
+        return role == BillingProfile.User.Role.ADMIN ? invoiceableRewardCount : 0;
+    }
 }

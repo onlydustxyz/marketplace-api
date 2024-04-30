@@ -4856,6 +4856,7 @@ components:
         - verificationBlocked
         - rewardCount
         - invoiceableRewardCount
+        - requestableRewardCount
         - enabled
         - role
       properties:
@@ -4870,6 +4871,10 @@ components:
           type: integer
         invoiceableRewardCount:
           type: integer
+          description: Number of rewards that are pending invoice
+        requestableRewardCount:
+          type: integer
+          description: Like invoiceableRewardCount, except that it only counts rewards that can be requested by the caller
         invoiceMandateAccepted:
           type: boolean
         enabled:
