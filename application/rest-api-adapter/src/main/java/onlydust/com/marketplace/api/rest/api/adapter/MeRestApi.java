@@ -135,48 +135,6 @@ public class MeRestApi implements MeApi {
                 ResponseEntity.ok(myRewardsPageResponse);
     }
 
-    @Override
-    public ResponseEntity<ContributionPageResponse> getMyContributions(List<ContributionType> types,
-                                                                       List<ContributionStatus> statuses,
-                                                                       List<UUID> projects,
-                                                                       List<Long> repositories,
-                                                                       String fromDate,
-                                                                       String toDate,
-                                                                       ContributionSort sort,
-                                                                       String direction,
-                                                                       Integer page,
-                                                                       Integer pageSize) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final int sanitizedPageSize = sanitizePageSize(pageSize);
-        final int sanitizedPageIndex = sanitizePageIndex(page);
-
-        final var filters = ContributionView.Filters.builder()
-                .contributors(List.of(authenticatedUser.getGithubUserId()))
-                .projects(Optional.ofNullable(projects).orElse(List.of()))
-                .repos(Optional.ofNullable(repositories).orElse(List.of()))
-                .types(Optional.ofNullable(types).orElse(List.of()).stream().map(ContributionMapper::mapContributionType).toList())
-                .statuses(Optional.ofNullable(statuses).orElse(List.of()).stream().map(ContributionMapper::mapContributionStatus).toList())
-                .from(isNull(fromDate) ? null : DateMapper.parse(fromDate))
-                .to(isNull(toDate) ? null : DateMapper.parse(toDate))
-                .build();
-
-        final var contributions = contributorFacadePort.contributions(
-                authenticatedUser.getGithubUserId(),
-                filters,
-                ContributionMapper.mapSort(sort),
-                SortDirectionMapper.requestToDomain(direction),
-                sanitizedPageIndex,
-                sanitizedPageSize);
-
-        final var contributionPageResponse = ContributionMapper.mapContributionPageResponse(
-                sanitizedPageIndex,
-                contributions);
-
-        return contributionPageResponse.getTotalPageNumber() > 1 ?
-                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(contributionPageResponse)
-                : ResponseEntity.ok(contributionPageResponse);
-
-    }
 
     @Override
     public ResponseEntity<ProjectListResponse> getMyContributedProjects(List<Long> repositories) {
