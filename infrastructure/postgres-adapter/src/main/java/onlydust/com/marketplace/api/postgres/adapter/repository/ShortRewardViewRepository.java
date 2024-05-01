@@ -32,9 +32,9 @@ public interface ShortRewardViewRepository extends JpaRepository<ShortRewardView
 
 
     @Query(nativeQuery = true, value = """
-            with sub as (select r.id                                                     id,
-                                r.recipient_id                                           recipient_id,
+            with ecosystem_rewards as (select r.id                                                     id,
                                 r.requestor_id                                           requestor_id,
+                                r.recipient_id                                           recipient_id,
                                 r.requested_at                                           requested_at,
                                 p.id                                                     project_id,
                                 p.name                                                   project_name,
@@ -42,20 +42,22 @@ public interface ShortRewardViewRepository extends JpaRepository<ShortRewardView
                                 p.short_description                                      project_short_description,
                                 p.key                                                    project_slug,
                                 r.amount                                                 amount,
-                                c.id                                                     currency_id,
-                                (select count(*) from node_guardians_boost_rewards) count
+                                c.id                                                     currency_id
                          from ecosystems e
                                   join projects_ecosystems pe on pe.ecosystem_id = e.id
                                   join projects p on p.id = pe.project_id
                                   join rewards r on r.project_id = p.id
                                   join currencies c on c.id = r.currency_id
-                                  left join iam.users u on u.github_user_id = r.recipient_id
-                                  left join user_profile_info upi on upi.id = u.id
-                         where e.id = :ecosystemId and p.id != :projectId)
-            select *
-            from sub
-            left join node_guardians_boost_rewards ngbr on ngbr.boosted_reward_id = sub.id
-            where ((sub.count = 0 && sub.requested_at >= to_date('01-04-2024', 'dd-MM-yyyy')) || (ngbr.boosted_reward_id is null and sub.requested_at >= current_date - 7))
+                         where e.id = :ecosystemId and p.id != :projectId),
+            first_boost as (select count(*) = 0 as is_true from node_guardians_boost_rewards)
+            select ecosystem_rewards.*
+            from ecosystem_rewards
+            left join node_guardians_boost_rewards ngbr on ngbr.boosted_reward_id = ecosystem_rewards.id
+            join first_boost fb on true
+            where (
+                (fb.is_true and ecosystem_rewards.requested_at >= to_date('01-04-2024', 'dd-MM-yyyy'))
+                       or (ngbr.boosted_reward_id is null and ecosystem_rewards.requested_at >= current_date - 7)
+                )
             """)
     List<ShortRewardViewEntity> findRewardsToBoosWithNodeGuardiansForEcosystemIdNotLinkedToProject(UUID ecosystemId, UUID projectId);
 

@@ -5,7 +5,7 @@ create table node_guardians_boost_rewards
     recipient_id      bigint    not null,
     tech_created_at   TIMESTAMP NOT NULL DEFAULT now(),
     tech_updated_at   TIMESTAMP NOT NULL DEFAULT now(),
-    PRIMARY KEY (boosted_reward_id, recipient_id)
+    PRIMARY KEY (recipient_id, boosted_reward_id)
 );
 
 create table node_guardians_rewards_boost_outbox_events

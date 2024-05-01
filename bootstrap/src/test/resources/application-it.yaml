@@ -44,6 +44,9 @@ infrastructure:
     environment: local-it
     token: fake-slack-token
     tag-all-channel: false
+  node-guardians:
+    base-uri: http://fake-url
+    api-key: fake-api-key
 application:
   web:
     machine-to-machine:

@@ -54,30 +54,32 @@ public class BoostNodeGuardiansRewardsService implements BoostNodeGuardiansRewar
             final Map<CurrencyView.Id, List<ShortProjectRewardView>> recipientRewardsMapToCurrency = rewardsToBoostForRecipient.stream()
                     .collect(Collectors.groupingBy(shortProjectRewardView -> shortProjectRewardView.getMoney().currency().id()));
 
-            for (Map.Entry<CurrencyView.Id, List<ShortProjectRewardView>> currencyRewardsEntry : recipientRewardsMapToCurrency.entrySet()) {
 
-                final List<ShortProjectRewardView> rewardsToBoostOnSingleCurrency = currencyRewardsEntry.getValue();
+            final Optional<Integer> optionalContributorLevel = nodeGuardiansApiPort.getContributorLevel(recipientLogin);
+            if (optionalContributorLevel.isPresent()) {
+                final Integer contributorLevel = optionalContributorLevel.get();
+                if (contributorLevel > 0 && contributorLevel <= 3) {
 
-                final Optional<Integer> optionalContributorLevel = nodeGuardiansApiPort.getContributorLevel(recipientLogin);
-                if (optionalContributorLevel.isPresent()) {
-                    final Integer contributorLevel = optionalContributorLevel.get();
-                    if (contributorLevel > 0 && contributorLevel <= 3) {
+                    final BigDecimal boostRate = switch (contributorLevel) {
+                        case 1:
+                            yield BigDecimal.valueOf(0.02D);
+                        case 2:
+                            yield BigDecimal.valueOf(0.05D);
+                        case 3:
+                            yield BigDecimal.valueOf(0.10D);
+                        default:
+                            throw OnlyDustException.internalServerError("Not supported NodeGuardians level %s for contributor %s".formatted(contributorLevel,
+                                    recipientLogin));
+                    };
+
+                    for (Map.Entry<CurrencyView.Id, List<ShortProjectRewardView>> currencyRewardsEntry : recipientRewardsMapToCurrency.entrySet()) {
+
+                        final List<ShortProjectRewardView> rewardsToBoostOnSingleCurrency = currencyRewardsEntry.getValue();
+
                         final BigDecimal rewardedAmountToBoost = rewardsToBoostOnSingleCurrency.stream()
                                 .map(ShortProjectRewardView::getMoney)
                                 .map(Money::amount)
                                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-                        double boostRate = switch (contributorLevel) {
-                            case 1:
-                                yield 0.02D;
-                            case 2:
-                                yield 0.05D;
-                            case 3:
-                                yield 0.10D;
-                            default:
-                                throw OnlyDustException.internalServerError("Not supported NodeGuardians level %s for contributor %s".formatted(contributorLevel,
-                                        recipientLogin));
-                        };
 
                         // Unique constraint on rewardId x recipientId in DB should prevent duplicate boost resulting in an abnormal behavior
                         boostedRewardStoragePort.markRewardsAsBoosted(rewardsToBoostOnSingleCurrency.stream().map(ShortProjectRewardView::getRewardId).toList(),
@@ -97,8 +99,9 @@ public class BoostNodeGuardiansRewardsService implements BoostNodeGuardiansRewar
                                                 .toList()))
                                         .build()
                         );
+
                         nodeGuardiansRewardBoostoutboxPort.push(BoostNodeGuardiansRewards.builder()
-                                .amount(rewardedAmountToBoost.multiply(BigDecimal.valueOf(boostRate)))
+                                .amount(rewardedAmountToBoost.multiply(boostRate))
                                 .projectId(projectId)
                                 .currencyId(currencyRewardsEntry.getKey())
                                 .recipientId(recipientGithubUserId)
