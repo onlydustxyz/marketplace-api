@@ -91,10 +91,10 @@ public interface BackofficeRewardViewRepository extends JpaRepository<Backoffice
 
     @Query(value = SELECT + """
             where (coalesce(:statuses) is null or cast(rs.status as text) in (:statuses))
-                and (coalesce(:fromRequestedAt) is null or r.requested_at >= cast(cast(:fromRequestedAt as text) as timestamp))
-                and (coalesce(:toRequestedAt)   is null or r.requested_at <= cast(cast(:toRequestedAt   as text) as timestamp))
-                and (coalesce(:fromProcessedAt) is null or rsd.paid_at  >= cast(cast(:fromProcessedAt as text) as timestamp))
-                and (coalesce(:toProcessedAt)   is null or rsd.paid_at  <= cast(cast(:toProcessedAt   as text) as timestamp))
+                and (coalesce(:fromRequestedAt) is null or date_trunc('day', r.requested_at) >= cast(cast(:fromRequestedAt as text) as timestamp))
+                and (coalesce(:toRequestedAt)   is null or date_trunc('day', r.requested_at) <= cast(cast(:toRequestedAt   as text) as timestamp))
+                and (coalesce(:fromProcessedAt) is null or date_trunc('day', rsd.paid_at)  >= cast(cast(:fromProcessedAt as text) as timestamp))
+                and (coalesce(:toProcessedAt)   is null or date_trunc('day', rsd.paid_at)  <= cast(cast(:toProcessedAt   as text) as timestamp))
                 and (coalesce(:billingProfileIds) is null or i.billing_profile_id in (:billingProfileIds))
                 and (coalesce(:recipients) is null or r.recipient_id in (:recipients))
             """, nativeQuery = true)
