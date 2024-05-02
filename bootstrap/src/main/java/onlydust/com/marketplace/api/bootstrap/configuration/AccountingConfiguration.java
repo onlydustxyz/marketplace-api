@@ -10,7 +10,7 @@ import onlydust.com.marketplace.accounting.domain.service.*;
 import onlydust.com.marketplace.api.infrastructure.aptosrpc.adapters.AptosAccountValidatorAdapter;
 import onlydust.com.marketplace.api.infura.adapters.EthInfuraEnsValidatorAdapter;
 import onlydust.com.marketplace.api.infura.adapters.InfuraEvmAccountAddressValidatorAdapter;
-import onlydust.com.marketplace.api.infura.adapters.StarknetInfuraAccountValidatorAdapter;
+import onlydust.com.marketplace.api.infura.adapters.StarknetAccountValidatorAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountingMailEventEntity;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
@@ -76,7 +76,7 @@ public class AccountingConfiguration {
 
     @Bean
     public PayoutInfoValidator payoutInfoValidator(final @NonNull EthInfuraEnsValidatorAdapter ethereumEnsValidatorAdapter,
-                                                   final @NonNull StarknetInfuraAccountValidatorAdapter starknetEnsValidatorAdapter,
+                                                   final @NonNull StarknetAccountValidatorAdapter starknetEnsValidatorAdapter,
                                                    final @NonNull InfuraEvmAccountAddressValidatorAdapter infuraEvmAccountAddressValidatorAdapter,
                                                    final @NonNull AptosAccountValidatorAdapter aptosAccountValidatorAdapter) {
         return new PayoutInfoValidator(ethereumEnsValidatorAdapter, starknetEnsValidatorAdapter, infuraEvmAccountAddressValidatorAdapter,
