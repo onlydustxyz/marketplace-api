@@ -88,7 +88,7 @@ public class JobScheduler {
         accountingMailOutboxJob.run();
     }
 
-    @Scheduled(cron = "${application.cron.boost-node-guardians-rewards}")
+    @Scheduled(cron = "${application.node-guardians.boost-rewards-cron-expression}")
     public void boostNodeGuardianRewards() {
         LOGGER.info("Boost rewards for NodeGuardians");
         boostNodeGuardiansRewardsPort.boostProject(nodeGuardiansBoostProperties.getProjectId(), nodeGuardiansBoostProperties.getProjectLeadId(),

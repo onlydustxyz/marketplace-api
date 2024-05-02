@@ -76,6 +76,7 @@ application:
     project-lead-id: ed648549-39ba-4d73-b67a-5356780a2855 # Random value must be overridden in ITs
     github-repo-id: 111 # Random value must be overridden in ITs
     ecosystem-id: d6513cd0-824b-4608-ab71-8d57bab6525e # Random value must be overridden in ITs
+    boost-rewards-cron-expression: 0 0 * * * *
 spring:
   main:
     allow-bean-definition-overriding: true
