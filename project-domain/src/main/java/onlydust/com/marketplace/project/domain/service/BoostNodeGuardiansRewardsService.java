@@ -124,7 +124,7 @@ public class BoostNodeGuardiansRewardsService implements BoostNodeGuardiansRewar
                             .projectLeadId(boostNodeGuardiansRewards.getProjectLeadId())
                             .githubRepoId(boostNodeGuardiansRewards.getRepoId())
                             .title("Node Guardians boost #%s for contributor %s"
-                                    .formatted(boostedRewardStoragePort.getBoostedRewardsCountByRecipientId(boostNodeGuardiansRewards.getRecipientId()).orElse(0) + 1,
+                                    .formatted(boostedRewardStoragePort.getBoostedRewardsCountByRecipientId(boostNodeGuardiansRewards.getRecipientId()).orElse(1),
                                             boostNodeGuardiansRewards.getRecipientLogin()))
                             .description(String.join("\n", boostNodeGuardiansRewards.getBoostedRewards().stream()
                                     .map(r -> String.join(" - ", "#" + r.getId().toString().substring(0, 5).toUpperCase(), r.getProjectName(),

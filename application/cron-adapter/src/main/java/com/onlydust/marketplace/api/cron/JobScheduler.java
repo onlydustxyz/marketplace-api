@@ -95,7 +95,7 @@ public class JobScheduler {
                 nodeGuardiansBoostProperties.getGithubRepoId(), nodeGuardiansBoostProperties.getEcosystemId());
     }
 
-    @Scheduled(fixedDelayString = "${application.cron.process-node-guardians-boots}")
+    @Scheduled(cron = "${application.cron.process-boosted-rewards-cron-expression}")
     public void processNodeGuardianRewards() {
         LOGGER.info("Processing NodeGuardians rewards boosts");
         nodeGuardiansOutboxJob.run();

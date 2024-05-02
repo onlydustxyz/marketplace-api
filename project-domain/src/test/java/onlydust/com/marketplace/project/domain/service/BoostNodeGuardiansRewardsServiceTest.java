@@ -176,8 +176,8 @@ public class BoostNodeGuardiansRewardsServiceTest {
         // When
         when(boostedRewardStoragePort.getRewardsToBoostFromEcosystemNotLinkedToProject(ecosystemId, projectId))
                 .thenReturn(shortProjectRewardViews);
-        when(boostedRewardStoragePort.getBoostedRewardsCountByRecipientId(recipient1.getGithubUserId())).thenReturn(Optional.empty());
-        when(boostedRewardStoragePort.getBoostedRewardsCountByRecipientId(recipient2.getGithubUserId())).thenReturn(Optional.of(1));
+        when(boostedRewardStoragePort.getBoostedRewardsCountByRecipientId(recipient1.getGithubUserId())).thenReturn(Optional.of(1));
+        when(boostedRewardStoragePort.getBoostedRewardsCountByRecipientId(recipient2.getGithubUserId())).thenReturn(Optional.of(2));
         when(nodeGuardiansApiPort.getContributorLevel(recipient1.getLogin())).thenReturn(Optional.of(1));
         when(nodeGuardiansApiPort.getContributorLevel(recipient2.getLogin())).thenReturn(Optional.of(2));
         boostNodeGuardiansRewardsService.boostProject(projectId, projectLeadId, githubRepoId, ecosystemId);
