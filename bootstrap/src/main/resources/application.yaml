@@ -30,7 +30,7 @@ application:
     update-projects-tags: 7200000 # 2 hours
     refresh-reward-usd-equivalents-job-delay: 7200000 # 2 hours
     send-emails: 60000 # 1 minute
-    process-node-guardians-boots: 3600000 # 1 hour
+    process-node-guardians-boots: 300000 # 5 minute
   sumsub:
     webhook:
       secret: ${SUMSUB_WEBHOOK_SECRET}
