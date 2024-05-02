@@ -54,6 +54,7 @@ public interface ShortRewardViewRepository extends JpaRepository<ShortRewardView
             from ecosystem_rewards
             left join node_guardians_boost_rewards ngbr on ngbr.boosted_reward_id = ecosystem_rewards.id
             join first_boost fb on true
+            join currencies c on c.id = ecosystem_rewards.currency_id and c.code = 'STRK'
             where (
                 (fb.is_true and ecosystem_rewards.requested_at >= to_date('01-04-2024', 'dd-MM-yyyy'))
                        or (ngbr.boosted_reward_id is null and ecosystem_rewards.requested_at >= current_date - 7)

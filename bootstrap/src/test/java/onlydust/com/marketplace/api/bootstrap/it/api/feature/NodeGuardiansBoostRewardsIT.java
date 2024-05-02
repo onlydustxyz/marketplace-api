@@ -149,10 +149,10 @@ public class NodeGuardiansBoostRewardsIT extends AbstractMarketplaceApiIT {
         setupGithubApiMocks();
         boostNodeGuardiansRewardsPort.boostProject(marketplace, authenticatedUser.user().getId(), githubRepoId, ecosystemId);
 
-        assertEquals(3, nodeGuardianBoostRewardRepository.count());
-        assertEquals(3, boostNodeGuardiansRewardsRepository.count());
+        assertEquals(1, nodeGuardianBoostRewardRepository.count());
+        assertEquals(1, boostNodeGuardiansRewardsRepository.count());
         for (NodeGuardianBoostRewardEntity nodeGuardianBoostRewardEntity : nodeGuardianBoostRewardRepository.findAll()) {
-            assertTrue(List.of(rewardId1, rewardId2, rewardId3).contains(nodeGuardianBoostRewardEntity.getBoostedRewardId()));
+            assertTrue(List.of(rewardId1).contains(nodeGuardianBoostRewardEntity.getBoostedRewardId()));
             assertNull(nodeGuardianBoostRewardEntity.getBoostRewardId());
         }
         for (BoostNodeGuardiansRewardsEventEntity boostNodeGuardiansRewardsEventEntity : boostNodeGuardiansRewardsRepository.findAll()) {
@@ -161,22 +161,14 @@ public class NodeGuardiansBoostRewardsIT extends AbstractMarketplaceApiIT {
 
         // When
         nodeGuardiansOutboxJob.run();
-        assertEquals(3, nodeGuardianBoostRewardRepository.count());
-        assertEquals(3, boostNodeGuardiansRewardsRepository.count());
+        assertEquals(1, nodeGuardianBoostRewardRepository.count());
+        assertEquals(1, boostNodeGuardiansRewardsRepository.count());
         UUID boostRewardId1 = null;
-        UUID boostRewardId2 = null;
-        UUID boostRewardId3 = null;
         for (NodeGuardianBoostRewardEntity nodeGuardianBoostRewardEntity : nodeGuardianBoostRewardRepository.findAll()) {
-            assertTrue(List.of(rewardId1, rewardId2, rewardId3).contains(nodeGuardianBoostRewardEntity.getBoostedRewardId()));
+            assertTrue(List.of(rewardId1).contains(nodeGuardianBoostRewardEntity.getBoostedRewardId()));
             assertNotNull(nodeGuardianBoostRewardEntity.getBoostRewardId());
             if (nodeGuardianBoostRewardEntity.getBoostedRewardId().equals(rewardId1)) {
                 boostRewardId1 = nodeGuardianBoostRewardEntity.getBoostRewardId();
-            }
-            if (nodeGuardianBoostRewardEntity.getBoostedRewardId().equals(rewardId2)) {
-                boostRewardId2 = nodeGuardianBoostRewardEntity.getBoostRewardId();
-            }
-            if (nodeGuardianBoostRewardEntity.getBoostedRewardId().equals(rewardId3)) {
-                boostRewardId3 = nodeGuardianBoostRewardEntity.getBoostRewardId();
             }
         }
         for (BoostNodeGuardiansRewardsEventEntity boostNodeGuardiansRewardsEventEntity : boostNodeGuardiansRewardsRepository.findAll()) {
@@ -191,20 +183,6 @@ public class NodeGuardiansBoostRewardsIT extends AbstractMarketplaceApiIT {
                         .filter(projectRewardView -> projectRewardView.getId().equals(finalBoostRewardId1)).findFirst().orElseThrow();
         assertEquals(rewardBoost1.getAmount().amount().doubleValue(), 50.0D);
         assertEquals(rewardBoost1.getAmount().currency().code(), "STRK");
-
-        final UUID finalBoostRewardId2 = boostRewardId2;
-        final ProjectRewardView rewardBoost2 =
-                rewardsOnMarketplaceForOlivier.getRewards().getContent().stream()
-                        .filter(projectRewardView -> projectRewardView.getId().equals(finalBoostRewardId2)).findFirst().orElseThrow();
-        assertEquals(rewardBoost2.getAmount().amount().doubleValue(), 25.0D);
-        assertEquals(rewardBoost2.getAmount().currency().code(), "ETH");
-
-        final UUID finalBoostRewardId3 = boostRewardId3;
-        final ProjectRewardView rewardBoost3 =
-                rewardsOnMarketplaceForOlivier.getRewards().getContent().stream()
-                        .filter(projectRewardView -> projectRewardView.getId().equals(finalBoostRewardId3)).findFirst().orElseThrow();
-        assertEquals(rewardBoost3.getAmount().amount().doubleValue(), 10.0D);
-        assertEquals(rewardBoost3.getAmount().currency().code(), "USD");
 
     }
 
