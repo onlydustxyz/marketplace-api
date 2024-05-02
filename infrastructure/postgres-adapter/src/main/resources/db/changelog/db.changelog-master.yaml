@@ -253,3 +253,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000214_add_accounting_mail_outbox_events_table.sql
   - include:
       file: db/changelog/changelogs/00000215_fix_hackathons_table.sql
+  - include:
+      file: db/changelog/changelogs/00000216_add_node_guardians_boost_rewards_tables.sql

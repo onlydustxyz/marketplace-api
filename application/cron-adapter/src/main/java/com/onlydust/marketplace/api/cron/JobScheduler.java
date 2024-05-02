@@ -1,11 +1,13 @@
 package com.onlydust.marketplace.api.cron;
 
+import com.onlydust.marketplace.api.cron.properties.CronProperties;
+import com.onlydust.marketplace.api.cron.properties.NodeGuardiansBoostProperties;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.AccountingObserver;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
+import onlydust.com.marketplace.project.domain.port.input.BoostNodeGuardiansRewardsPort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import org.springframework.context.annotation.Profile;
@@ -24,10 +26,13 @@ public class JobScheduler {
     private final ProjectFacadePort projectFacadePort;
     private final CurrencyFacadePort currencyFacadePort;
     private final UserFacadePort userFacadePort;
-    private final Properties cronProperties;
+    private final CronProperties cronProperties;
     private final OutboxConsumerJob billingProfileVerificationOutboxJob;
     private final AccountingObserver accountingObserver;
     private final OutboxConsumerJob accountingMailOutboxJob;
+    private final BoostNodeGuardiansRewardsPort boostNodeGuardiansRewardsPort;
+    private final NodeGuardiansBoostProperties nodeGuardiansBoostProperties;
+    private final OutboxConsumerJob nodeGuardiansOutboxJob;
 
     @Scheduled(fixedDelayString = "${application.cron.indexer-sync-job-delay}")
     public void processPendingIndexerApiCalls() {
@@ -62,7 +67,7 @@ public class JobScheduler {
     @Scheduled(fixedDelayString = "${application.cron.refresh-active-user-profiles}")
     public void refreshActiveUserProfiles() {
         LOGGER.info("Refreshing active user profiles");
-        userFacadePort.refreshActiveUserProfiles(ZonedDateTime.now().minusDays(cronProperties.activeUserProfilesRefreshPeriodInDays));
+        userFacadePort.refreshActiveUserProfiles(ZonedDateTime.now().minusDays(cronProperties.getActiveUserProfilesRefreshPeriodInDays()));
     }
 
     @Scheduled(fixedDelayString = "${application.cron.billing-profile-verification-job}")
@@ -83,17 +88,17 @@ public class JobScheduler {
         accountingMailOutboxJob.run();
     }
 
-    @Data
-    public static class Properties {
-        Long notificationJobDelay;
-        Long indexerSyncJobDelay;
-        Long updateProjectsRanking;
-        Long updateProjectsTags;
-        Long refreshCurrencyQuotes;
-        Long refreshActiveUserProfiles;
-        Long activeUserProfilesRefreshPeriodInDays;
-        Long trackingJobDelay;
-        Long billingProfileVerificationJob;
-        Long refreshRewardUsdEquivalentsJobDelay;
+    @Scheduled(cron = "${application.cron.boost-node-guardians-rewards}")
+    public void boostNodeGuardianRewards() {
+        LOGGER.info("Boost rewards for NodeGuardians");
+        boostNodeGuardiansRewardsPort.boostProject(nodeGuardiansBoostProperties.getProjectId(), nodeGuardiansBoostProperties.getProjectLeadId(),
+                nodeGuardiansBoostProperties.getGithubRepoId(), nodeGuardiansBoostProperties.getEcosystemId());
     }
+
+    @Scheduled(fixedDelayString = "${application.cron.process-node-guardians-boots}")
+    public void processNodeGuardianRewards() {
+        LOGGER.info("Processing NodeGuardians rewards boosts");
+        nodeGuardiansOutboxJob.run();
+    }
+
 }

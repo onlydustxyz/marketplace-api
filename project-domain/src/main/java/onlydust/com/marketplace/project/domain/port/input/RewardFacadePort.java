@@ -2,7 +2,9 @@ package onlydust.com.marketplace.project.domain.port.input;
 
 import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.project.domain.model.Reward;
+import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 

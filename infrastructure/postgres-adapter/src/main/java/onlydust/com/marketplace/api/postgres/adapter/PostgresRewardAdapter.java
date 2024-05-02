@@ -13,10 +13,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.Back
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoEarningsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.PaymentShortViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortRewardViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentRewardEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
@@ -25,7 +22,10 @@ import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.Reward;
+import onlydust.com.marketplace.project.domain.port.output.BoostedRewardStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.RewardStoragePort;
+import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
+import onlydust.com.marketplace.project.domain.view.ShortProjectRewardView;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +34,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
-public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewardStoragePort {
+public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewardStoragePort, BoostedRewardStoragePort {
     private final ShortProjectViewEntityRepository shortProjectViewEntityRepository;
     private final BatchPaymentRepository batchPaymentRepository;
     private final RewardDetailsViewRepository rewardDetailsViewRepository;
@@ -43,6 +43,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     private final PaymentShortViewRepository paymentShortViewRepository;
     private final ShortRewardViewRepository shortRewardViewRepository;
     private final BackofficeEarningsViewRepository backofficeEarningsViewRepository;
+    private final NodeGuardianBoostRewardRepository nodeGuardianBoostRewardRepository;
 
     @Override
     @Transactional
@@ -192,6 +193,35 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
 
     @Override
     public Optional<ShortRewardDetailsView> getShortReward(RewardId rewardId) {
-        return shortRewardViewRepository.findById(rewardId.value()).map(ShortRewardViewEntity::toDomain);
+        return shortRewardViewRepository.findById(rewardId.value()).map(ShortRewardViewEntity::toAccountingDomain);
+    }
+
+    @Override
+    @Transactional
+    public void markRewardsAsBoosted(List<UUID> rewardsBoosted, Long recipientId) {
+        for (UUID rewardBoostedId : rewardsBoosted) {
+            nodeGuardianBoostRewardRepository.save(new NodeGuardianBoostRewardEntity(rewardBoostedId, recipientId, null));
+        }
+    }
+
+    @Override
+    @Transactional
+    public void updateBoostedRewardsWithBoostRewardId(List<UUID> rewardsBoosted, Long recipientId, UUID rewardId) {
+        for (UUID rewardBoostedId : rewardsBoosted) {
+            nodeGuardianBoostRewardRepository.save(new NodeGuardianBoostRewardEntity(rewardBoostedId, recipientId, rewardId));
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ShortProjectRewardView> getRewardsToBoostFromEcosystemNotLinkedToProject(UUID ecosystemId, UUID projectId) {
+        return shortRewardViewRepository.findRewardsToBoosWithNodeGuardiansForEcosystemIdNotLinkedToProject(ecosystemId, projectId).stream()
+                .map(ShortRewardViewEntity::toProjectDomain).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Integer> getBoostedRewardsCountByRecipientId(Long recipientId) {
+        return shortRewardViewRepository.countNumberOfBoostByRecipientId(recipientId);
     }
 }

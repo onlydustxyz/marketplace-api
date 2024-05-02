@@ -20,5 +20,4 @@ public interface ProjectRewardFacadePort {
 
     Page<RewardItemView> getRewardItemsPageByIdForProjectLead(UUID projectId, UUID rewardId, UUID projectLead,
                                                               int pageIndex, int pageSize);
-
 }
