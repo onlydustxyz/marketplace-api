@@ -182,6 +182,9 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String HACKATHONS = "/bo/v1/hackathons";
     protected static final String HACKATHONS_BY_ID = "/bo/v1/hackathons/%s";
     protected static final String EARNINGS = "/bo/v1/earnings";
+    protected static final String LANGUAGES = "/bo/v1/languages";
+    protected static final String LANGUAGES_BY_ID = "/bo/v1/languages/%s";
+    protected static final String LANGUAGES_EXTENSIONS = "/bo/v1/languages/extensions";
 
     protected String apiKey() {
         return backOfficeApiKeyAuthenticationConfig.getApiKey();
