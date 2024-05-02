@@ -39,6 +39,7 @@ public class BoostNodeGuardiansRewardsService implements BoostNodeGuardiansRewar
     private final OutboxPort nodeGuardiansRewardBoostoutboxPort;
 
     @Override
+    @Transactional
     public void boostProject(UUID projectId, UUID projectLeadId, Long githubRepoId, UUID ecosystemId) {
         List<ShortProjectRewardView> rewardsToBoost = boostedRewardStoragePort.getRewardsToBoostFromEcosystemNotLinkedToProject(ecosystemId, projectId);
 
@@ -85,31 +86,23 @@ public class BoostNodeGuardiansRewardsService implements BoostNodeGuardiansRewar
                         boostedRewardStoragePort.markRewardsAsBoosted(rewardsToBoostOnSingleCurrency.stream().map(ShortProjectRewardView::getRewardId).toList(),
                                 recipientGithubUserId);
 
-                        final RewardableItemView otherWork = projectFacadePort.createAndCloseIssueForProjectIdAndRepositoryId(
-                                CreateAndCloseIssueCommand.builder()
-                                        .projectId(projectId)
-                                        .projectLeadId(projectLeadId)
-                                        .githubRepoId(githubRepoId)
-                                        .title("Node Guardians boost #%s for contributor %s"
-                                                .formatted(boostedRewardStoragePort.getBoostedRewardsCountByRecipientId(recipientGithubUserId).orElse(0) + 1,
-                                                        recipientLogin))
-                                        .description(String.join("\n", rewardsToBoostOnSingleCurrency.stream()
-                                                .map(r -> String.join(" - ", "#" + r.getRewardId().toString().substring(0, 5).toUpperCase(), r.getProjectName(),
-                                                        r.getMoney().currency().code(), r.getMoney().amount().toString()))
-                                                .toList()))
-                                        .build()
-                        );
 
                         nodeGuardiansRewardBoostoutboxPort.push(BoostNodeGuardiansRewards.builder()
                                 .amount(rewardedAmountToBoost.multiply(boostRate))
                                 .projectId(projectId)
                                 .currencyId(currencyRewardsEntry.getKey())
                                 .recipientId(recipientGithubUserId)
-                                .issueId(otherWork.getId())
-                                .issueNumber(otherWork.getNumber())
+                                .recipientLogin(recipientLogin)
+                                .boostedRewards(rewardsToBoostOnSingleCurrency.stream().map(
+                                        shortProjectRewardView -> BoostNodeGuardiansRewards.BoostedReward.builder()
+                                                .currencyCode(shortProjectRewardView.getMoney().currency().code())
+                                                .projectName(shortProjectRewardView.getProjectName())
+                                                .amount(shortProjectRewardView.getMoney().amount())
+                                                .id(shortProjectRewardView.getRewardId())
+                                                .build()
+                                ).toList())
                                 .repoId(githubRepoId)
                                 .projectLeadId(projectLeadId)
-                                .boostedRewardIds(rewardsToBoostOnSingleCurrency.stream().map(ShortProjectRewardView::getRewardId).toList())
                                 .build());
                     }
                 } else {
@@ -124,20 +117,37 @@ public class BoostNodeGuardiansRewardsService implements BoostNodeGuardiansRewar
     @Transactional
     public void process(Event event) {
         if (event instanceof BoostNodeGuardiansRewards boostNodeGuardiansRewards) {
+
+            final RewardableItemView otherWork = projectFacadePort.createAndCloseIssueForProjectIdAndRepositoryId(
+                    CreateAndCloseIssueCommand.builder()
+                            .projectId(boostNodeGuardiansRewards.getProjectId())
+                            .projectLeadId(boostNodeGuardiansRewards.getProjectLeadId())
+                            .githubRepoId(boostNodeGuardiansRewards.getRepoId())
+                            .title("Node Guardians boost #%s for contributor %s"
+                                    .formatted(boostedRewardStoragePort.getBoostedRewardsCountByRecipientId(boostNodeGuardiansRewards.getRecipientId()).orElse(0) + 1,
+                                            boostNodeGuardiansRewards.getRecipientLogin()))
+                            .description(String.join("\n", boostNodeGuardiansRewards.getBoostedRewards().stream()
+                                    .map(r -> String.join(" - ", "#" + r.getId().toString().substring(0, 5).toUpperCase(), r.getProjectName(),
+                                            r.getCurrencyCode(), r.getAmount().toString()))
+                                    .toList()))
+                            .build()
+            );
+
             final RequestRewardCommand requestRewardCommand = RequestRewardCommand.builder()
                     .amount(boostNodeGuardiansRewards.getAmount())
                     .projectId(boostNodeGuardiansRewards.getProjectId())
                     .currencyId(boostNodeGuardiansRewards.getCurrencyId())
                     .recipientId(boostNodeGuardiansRewards.getRecipientId())
                     .items(List.of(RequestRewardCommand.Item.builder()
-                            .id(boostNodeGuardiansRewards.getIssueId())
+                            .id(otherWork.getId())
                             .type(RequestRewardCommand.Item.Type.issue)
-                            .number(boostNodeGuardiansRewards.getIssueNumber())
+                            .number(otherWork.getNumber())
                             .repoId(boostNodeGuardiansRewards.getRepoId())
                             .build()))
                     .build();
             final UUID rewardId = rewardFacadePort.createReward(boostNodeGuardiansRewards.getProjectLeadId(), requestRewardCommand);
-            boostedRewardStoragePort.updateBoostedRewardsWithBoostRewardId(boostNodeGuardiansRewards.getBoostedRewardIds(),
+            boostedRewardStoragePort.updateBoostedRewardsWithBoostRewardId(
+                    boostNodeGuardiansRewards.getBoostedRewards().stream().map(BoostNodeGuardiansRewards.BoostedReward::getId).toList(),
                     boostNodeGuardiansRewards.getRecipientId(), rewardId);
         } else {
             LOGGER.error("Invalid event class %s for NodeGuardians reward boost outbox consumer".formatted(event.getClass()));

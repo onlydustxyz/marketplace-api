@@ -136,44 +136,40 @@ public class BoostNodeGuardiansRewardsServiceTest {
                 .projectId(projectId)
                 .currencyId(strk.id())
                 .recipientId(recipient1.getGithubUserId())
-                .issueId(otherWork11.getId())
-                .issueNumber(otherWork11.getNumber())
+                .recipientLogin(recipient1.getLogin())
                 .repoId(githubRepoId)
                 .projectLeadId(projectLeadId)
-                .boostedRewardIds(List.of(r11.getRewardId(), r12.getRewardId()))
+                .boostedRewards(List.of(fromView(r11), fromView(r12)))
                 .build();
         final BoostNodeGuardiansRewards e12 = BoostNodeGuardiansRewards.builder()
                 .amount(Stream.of(r13).map(ShortProjectRewardView::getMoney).map(Money::amount).reduce(BigDecimal::add).get().multiply(BigDecimal.valueOf(0.02D)))
                 .projectId(projectId)
                 .currencyId(usd.id())
                 .recipientId(recipient1.getGithubUserId())
-                .issueId(otherWork12.getId())
-                .issueNumber(otherWork12.getNumber())
+                .recipientLogin(recipient1.getLogin())
                 .repoId(githubRepoId)
                 .projectLeadId(projectLeadId)
-                .boostedRewardIds(List.of(r13.getRewardId()))
+                .boostedRewards(List.of(fromView(r13)))
                 .build();
         final BoostNodeGuardiansRewards e21 = BoostNodeGuardiansRewards.builder()
                 .amount(Stream.of(r21).map(ShortProjectRewardView::getMoney).map(Money::amount).reduce(BigDecimal::add).get().multiply(BigDecimal.valueOf(0.05D)))
                 .projectId(projectId)
                 .currencyId(usd.id())
                 .recipientId(recipient2.getGithubUserId())
-                .issueId(otherWork21.getId())
-                .issueNumber(otherWork21.getNumber())
+                .recipientLogin(recipient2.getLogin())
                 .repoId(githubRepoId)
                 .projectLeadId(projectLeadId)
-                .boostedRewardIds(List.of(r21.getRewardId()))
+                .boostedRewards(List.of(fromView(r21)))
                 .build();
         final BoostNodeGuardiansRewards e22 = BoostNodeGuardiansRewards.builder()
                 .amount(Stream.of(r22).map(ShortProjectRewardView::getMoney).map(Money::amount).reduce(BigDecimal::add).get().multiply(BigDecimal.valueOf(0.05D)))
                 .projectId(projectId)
                 .currencyId(strk.id())
                 .recipientId(recipient2.getGithubUserId())
-                .issueId(otherWork22.getId())
-                .issueNumber(otherWork22.getNumber())
+                .recipientLogin(recipient2.getLogin())
                 .repoId(githubRepoId)
                 .projectLeadId(projectLeadId)
-                .boostedRewardIds(List.of(r22.getRewardId()))
+                .boostedRewards(List.of(fromView(r22)))
                 .build();
 
 
@@ -182,14 +178,6 @@ public class BoostNodeGuardiansRewardsServiceTest {
                 .thenReturn(shortProjectRewardViews);
         when(boostedRewardStoragePort.getBoostedRewardsCountByRecipientId(recipient1.getGithubUserId())).thenReturn(Optional.empty());
         when(boostedRewardStoragePort.getBoostedRewardsCountByRecipientId(recipient2.getGithubUserId())).thenReturn(Optional.of(1));
-        when(projectFacadePort.createAndCloseIssueForProjectIdAndRepositoryId(createOtherWorkerFromStubs(projectId, projectLeadId, githubRepoId,
-                List.of(r11, r12), 1))).thenReturn(otherWork11);
-        when(projectFacadePort.createAndCloseIssueForProjectIdAndRepositoryId(createOtherWorkerFromStubs(projectId, projectLeadId, githubRepoId,
-                List.of(r13), 1))).thenReturn(otherWork12);
-        when(projectFacadePort.createAndCloseIssueForProjectIdAndRepositoryId(createOtherWorkerFromStubs(projectId, projectLeadId, githubRepoId,
-                List.of(r21), 2))).thenReturn(otherWork21);
-        when(projectFacadePort.createAndCloseIssueForProjectIdAndRepositoryId(createOtherWorkerFromStubs(projectId, projectLeadId, githubRepoId,
-                List.of(r22), 2))).thenReturn(otherWork22);
         when(nodeGuardiansApiPort.getContributorLevel(recipient1.getLogin())).thenReturn(Optional.of(1));
         when(nodeGuardiansApiPort.getContributorLevel(recipient2.getLogin())).thenReturn(Optional.of(2));
         boostNodeGuardiansRewardsService.boostProject(projectId, projectLeadId, githubRepoId, ecosystemId);
@@ -206,6 +194,14 @@ public class BoostNodeGuardiansRewardsServiceTest {
 
 
         // when
+        when(projectFacadePort.createAndCloseIssueForProjectIdAndRepositoryId(createOtherWorkerFromStubs(projectId, projectLeadId, githubRepoId,
+                List.of(r11, r12), 1))).thenReturn(otherWork11);
+        when(projectFacadePort.createAndCloseIssueForProjectIdAndRepositoryId(createOtherWorkerFromStubs(projectId, projectLeadId, githubRepoId,
+                List.of(r13), 1))).thenReturn(otherWork12);
+        when(projectFacadePort.createAndCloseIssueForProjectIdAndRepositoryId(createOtherWorkerFromStubs(projectId, projectLeadId, githubRepoId,
+                List.of(r21), 2))).thenReturn(otherWork21);
+        when(projectFacadePort.createAndCloseIssueForProjectIdAndRepositoryId(createOtherWorkerFromStubs(projectId, projectLeadId, githubRepoId,
+                List.of(r22), 2))).thenReturn(otherWork22);
         when(rewardFacadePort.createReward(projectLeadId, RequestRewardCommand.builder()
                 .amount(Stream.of(r11, r12).map(ShortProjectRewardView::getMoney).map(Money::amount).reduce(BigDecimal::add).get().multiply(BigDecimal.valueOf(0.02D)))
                 .projectId(projectId)
@@ -280,6 +276,15 @@ public class BoostNodeGuardiansRewardsServiceTest {
                         .map(r -> String.join(" - ", "#" + r.getRewardId().toString().substring(0, 5).toUpperCase(), r.getProjectName(),
                                 r.getMoney().currency().code(), r.getMoney().amount().toString()))
                         .toList()))
+                .build();
+    }
+
+    private BoostNodeGuardiansRewards.BoostedReward fromView(final ShortProjectRewardView shortProjectRewardView) {
+        return BoostNodeGuardiansRewards.BoostedReward.builder()
+                .currencyCode(shortProjectRewardView.getMoney().currency().code())
+                .projectName(shortProjectRewardView.getProjectName())
+                .amount(shortProjectRewardView.getMoney().amount())
+                .id(shortProjectRewardView.getRewardId())
                 .build();
     }
 }

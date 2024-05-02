@@ -17,12 +17,22 @@ import java.util.UUID;
 @Builder
 public class BoostNodeGuardiansRewards extends Event {
     Long recipientId;
+    String recipientLogin;
     BigDecimal amount;
     CurrencyView.Id currencyId;
     UUID projectId;
     UUID projectLeadId;
-    String issueId;
-    Long issueNumber;
     Long repoId;
-    List<UUID> boostedRewardIds;
+    List<BoostedReward> boostedRewards;
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BoostedReward {
+        UUID id;
+        BigDecimal amount;
+        String currencyCode;
+        String projectName;
+    }
 }
