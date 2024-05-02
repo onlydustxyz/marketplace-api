@@ -401,4 +401,10 @@ public class PostgresConfiguration {
                 hackathonShortViewRepository,
                 hackathonRegistrationRepository);
     }
+
+    @Bean
+    public PostgresLanguageAdapter postgresLanguageAdapter(final LanguageRepository languageRepository,
+                                                           final LanguageExtensionRepository languageExtensionRepository) {
+        return new PostgresLanguageAdapter(languageRepository, languageExtensionRepository);
+    }
 }

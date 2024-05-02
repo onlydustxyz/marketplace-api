@@ -10,10 +10,13 @@ import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
 import onlydust.com.marketplace.kernel.observer.MailObserver;
+import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.HackathonFacadePort;
+import onlydust.com.marketplace.project.domain.port.input.LanguageFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.LanguageStorage;
 import onlydust.com.marketplace.project.domain.service.BackofficeService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -104,6 +107,17 @@ public class BackofficeConfiguration {
                                                        final UserFacadePort userFacadePort,
                                                        final BillingProfileFacadePort billingProfileFacadePort) {
         return new BackofficeUserRestApi(backofficeFacadePort, userFacadePort, billingProfileFacadePort);
+    }
+
+    @Bean
+    public BackofficeLanguageRestApi backofficeLanguageRestApi(final LanguageFacadePort languageFacadePort) {
+        return new BackofficeLanguageRestApi(languageFacadePort);
+    }
+
+    @Bean
+    public LanguageFacadePort languageFacadePort(final LanguageStorage languageStorage,
+                                                 final ImageStoragePort imageStoragePort) {
+        return new onlydust.com.marketplace.project.domain.service.LanguageService(languageStorage, imageStoragePort);
     }
 }
 

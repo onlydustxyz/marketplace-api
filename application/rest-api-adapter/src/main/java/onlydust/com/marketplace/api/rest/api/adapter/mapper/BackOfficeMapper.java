@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
@@ -17,6 +18,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Contact;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
+import onlydust.com.marketplace.project.domain.model.Language;
 import onlydust.com.marketplace.project.domain.view.ProjectSponsorView;
 import onlydust.com.marketplace.project.domain.view.backoffice.*;
 
@@ -24,9 +26,7 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
@@ -916,5 +916,31 @@ public interface BackOfficeMapper {
                     });
                     return response;
                 }).toList();
+    }
+
+    static LanguageResponse mapLanguageResponse(Language language) {
+        return new LanguageResponse()
+                .id(language.id().value())
+                .name(language.name())
+                .fileExtensions(language.fileExtensions().stream().toList())
+                .logoUrl(language.logoUrl())
+                .bannerUrl(language.bannerUrl());
+    }
+
+    static Language mapLanguageUpdateRequest(UUID languageId, LanguageUpdateRequest languageUpdateRequest) {
+        return new Language(Language.Id.of(languageId),
+                languageUpdateRequest.getName(),
+                new HashSet<>(languageUpdateRequest.getFileExtensions()),
+                languageUpdateRequest.getLogoUrl(),
+                languageUpdateRequest.getBannerUrl());
+    }
+
+    static LanguageExtensionListResponse mapLanguageExtensionResponse(Map<String, Optional<Language>> extensions) {
+        return new LanguageExtensionListResponse()
+                .knownExtensions(extensions.entrySet().stream()
+                        .map(entry -> new LanguageExtensionResponse()
+                                .extension(entry.getKey())
+                                .language(entry.getValue().map(BackOfficeMapper::mapLanguageResponse).orElse(null))
+                        ).toList());
     }
 }

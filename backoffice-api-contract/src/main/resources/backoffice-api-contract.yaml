@@ -1602,6 +1602,170 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  # BackofficeLanguageManagement ===============================================================
+
+  /bo/v1/languages:
+    post:
+      security:
+        - apiKey: [ ]
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeLanguageManagement
+      summary: Add support of a new language
+      operationId: createLanguage
+      description: Add support of a new language
+      requestBody:
+        description: Language to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LanguageCreateRequest'
+      responses:
+        "200":
+          description: 'Language created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LanguageResponse'
+        "400":
+          $ref: '#/components/responses/BadRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+    get:
+      security:
+        - apiKey: [ ]
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeLanguageManagement
+      summary: List all supported languages
+      operationId: listLanguages
+      description: List all supported languages
+      responses:
+        "200":
+          description: 'List of all languages'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LanguageListResponse'
+        "400":
+          $ref: '#/components/responses/BadRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/languages/{languageId}:
+    put:
+      security:
+        - apiKey: [ ]
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeLanguageManagement
+      summary: Modify language data
+      operationId: updateLanguage
+      description: Modify language data
+      parameters:
+        - in: path
+          name: languageId
+          required: true
+          schema:
+            $ref: '#/components/schemas/LanguageId'
+      requestBody:
+        description: Language data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LanguageUpdateRequest'
+      responses:
+        "200":
+          description: 'Language has been updated'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LanguageResponse'
+        "400":
+          $ref: '#/components/responses/BadRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/languages/logos:
+    post:
+      security:
+        - apiKey: [ ]
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeLanguageManagement
+      summary: Upload a language logo or banner
+      operationId: uploadLanguagePicture
+      requestBody:
+        content:
+          image/png:
+            schema:
+              type: string
+              format: binary
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+          image/svg+xml:
+            schema:
+              type: string
+              format: binary
+          image/webp:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: 'Image uploaded'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadImageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/languages/extensions:
+    get:
+      security:
+        - apiKey: [ ]
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeLanguageManagement
+      summary: Get all known languages extensions
+      operationId: getKnownExtensions
+      description: Get all known languages extensions
+      responses:
+        "200":
+          description: 'Languages extensions'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LanguageExtensionListResponse'
+        "400":
+          $ref: '#/components/responses/BadRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   # BackofficeCurrencyManagement ===============================================================
 
   /bo/v1/currencies:
@@ -3213,6 +3377,86 @@ components:
         - PUBLIC
         - PRIVATE
 
+    LanguageCreateRequest:
+      type: object
+      required:
+        - name
+        - fileExtensions
+      properties:
+        name:
+          type: string
+        fileExtensions:
+          type: array
+          items:
+            type: string
+
+    LanguageUpdateRequest:
+      type: object
+      required:
+        - name
+        - fileExtensions
+      properties:
+        name:
+          type: string
+        fileExtensions:
+          type: array
+          items:
+            type: string
+        logoUrl:
+          type: string
+          format: uri
+        bannerUrl:
+          type: string
+          format: uri
+
+    LanguageListResponse:
+      type: object
+      properties:
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageResponse'
+
+    LanguageResponse:
+      type: object
+      required:
+        - id
+        - name
+        - fileExtensions
+      properties:
+        id:
+          $ref: '#/components/schemas/LanguageId'
+        name:
+          type: string
+        fileExtensions:
+          type: array
+          items:
+            type: string
+        logoUrl:
+          type: string
+          format: uri
+        bannerUrl:
+          type: string
+          format: uri
+
+    LanguageExtensionListResponse:
+      type: object
+      properties:
+        knownExtensions:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageExtensionResponse'
+
+    LanguageExtensionResponse:
+      type: object
+      required:
+        - extension
+      properties:
+        extension:
+          type: string
+        language:
+          $ref: '#/components/schemas/LanguageResponse'
+
     CurrencyCreateRequest:
       type: object
       required:
@@ -3358,6 +3602,10 @@ components:
       enum:
         - ISO4217
         - ERC20
+
+    LanguageId:
+      type: string
+      format: uuid
 
     BlockchainContract:
       type: string
