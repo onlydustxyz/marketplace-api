@@ -561,19 +561,13 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectBody()
                 .jsonPath("$.rewards[?(@.status == 'COMPLETE')]").isArray()
                 .jsonPath("$.rewards[?(@.status != 'COMPLETE')]").doesNotExist()
-                .jsonPath("$.rewards[?(@.requestedAt >= '2023-02-08' && @.requestedAt <= '2023-02-10')]").isArray()
-                .jsonPath("$.rewards[?(@.requestedAt < '2023-02-08' || @.requestedAt > '2023-02-10')]").doesNotExist();
+                .jsonPath("$.rewards[?(@.requestedAt >= '2023-02-08' && @.requestedAt < '2023-02-11')]").isArray()
+                .jsonPath("$.rewards[?(@.requestedAt < '2023-02-08' || @.requestedAt >= '2023-02-11')]").doesNotExist();
     }
 
     @Test
     @Order(5)
     void should_get_all_rewards_with_recipient_id() {
-        // Given
-        anthony = UserId.of(userAuthHelper.authenticateAnthony().user().getId());
-        final var billingProfile = billingProfileService.getBillingProfilesForUser(anthony).stream()
-                .filter(b -> b.getType() == BillingProfile.Type.SELF_EMPLOYED)
-                .findFirst().orElseThrow();
-
         // When
         final var rewards = client.get()
                 .uri(getApiURI(REWARDS, Map.of("pageIndex", "0", "pageSize", "5", "recipients", "595505")))
