@@ -27,7 +27,7 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .bodyValue("""
                         {
                             "name": "Alphabetic",
-                            "fileExtensions": ["a", "b", "c"]
+                            "fileExtensions": ["a", "B", "c"]
                         }
                         """)
                 .exchange()
@@ -87,7 +87,7 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .bodyValue("""
                         {
                             "name": "Alphabeticcc",
-                            "fileExtensions": ["b", "c", "d"],
+                            "fileExtensions": ["b", "C", "d"],
                             "logoUrl": "https://example.com/logo.png",
                             "bannerUrl": "https://example.com/banner.png"
                         }
