@@ -57,7 +57,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
                 filters.getRepos(),
                 filters.getTypes().stream().map(Enum::name).toList(),
                 filters.getStatuses().stream().map(Enum::name).toList(),
-                //TODO: filters.getLanguages(),
+                filters.getLanguages().toArray(UUID[]::new),
                 filters.getEcosystems().toArray(UUID[]::new),
                 isNull(filters.getFrom()) ? null : format.format(filters.getFrom()),
                 isNull(filters.getTo()) ? null : format.format(filters.getTo()),

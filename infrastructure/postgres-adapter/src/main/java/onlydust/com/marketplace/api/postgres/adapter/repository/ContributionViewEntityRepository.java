@@ -46,7 +46,8 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 COALESCE(closing_issues.links,closing_pull_requests.links, reviewed_pull_requests.links) as links,
                 rewards.ids as reward_ids,
                 c.pr_review_state,
-                project_ecosystems.ecosystem_ids as ecosystem_ids
+                contrib_ecosystems.ecosystem_ids as ecosystem_ids,
+                contrib_languages.language_ids as language_ids
             FROM
                 indexer_exp.contributions c
             INNER JOIN indexer_exp.github_repos gr on c.repo_id = gr.id and gr.visibility = 'PUBLIC'
@@ -54,10 +55,15 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
             INNER JOIN public.projects p on p.id = pgr.project_id
             LEFT JOIN iam.users u on u.github_user_id = c.contributor_id
             LEFT JOIN LATERAL (
-                SELECT array_agg(peco.ecosystem_id) as ecosystem_ids
+                SELECT array_agg(distinct peco.ecosystem_id) as ecosystem_ids
                 FROM projects_ecosystems peco
                 WHERE peco.project_id = p.id
-            ) AS project_ecosystems ON TRUE
+            ) AS contrib_ecosystems ON TRUE
+            LEFT JOIN LATERAL (
+                SELECT array_agg(distinct langext.language_id) as language_ids
+                FROM language_file_extensions langext
+                WHERE langext.extension = ANY(c.main_file_extensions)
+            ) AS contrib_languages ON TRUE
             LEFT JOIN LATERAL (
                 SELECT
                     jsonb_agg(jsonb_build_object(
@@ -158,7 +164,8 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 (COALESCE(:repoIds) IS NULL OR c.repo_id IN (:repoIds)) AND
                 (COALESCE(:types) IS NULL OR CAST(c.type AS TEXT) IN (:types)) AND
                 (COALESCE(:statuses) IS NULL OR CAST(c.status AS TEXT) IN (:statuses)) AND
-                (array_length(:ecosystemIds, 1) IS NULL OR project_ecosystems.ecosystem_ids && :ecosystemIds) AND
+                (array_length(:ecosystemIds, 1) IS NULL OR contrib_ecosystems.ecosystem_ids && :ecosystemIds) AND
+                (array_length(:languageIds, 1) IS NULL OR contrib_languages.language_ids && :languageIds) AND
                 (:fromDate IS NULL OR coalesce(c.completed_at, c.created_at) >= to_date(cast(:fromDate as text), 'YYYY-MM-DD')) AND
                 (:toDate IS NULL OR coalesce(c.completed_at, c.created_at) < to_date(cast(:toDate as text), 'YYYY-MM-DD') + 1)
             """, nativeQuery = true)
@@ -168,7 +175,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                                                    List<Long> repoIds,
                                                    List<String> types,
                                                    List<String> statuses,
-                                                   //TODO: List<UUID languageIds,
+                                                   UUID[] languageIds,
                                                    UUID[] ecosystemIds,
                                                    String fromDate,
                                                    String toDate,

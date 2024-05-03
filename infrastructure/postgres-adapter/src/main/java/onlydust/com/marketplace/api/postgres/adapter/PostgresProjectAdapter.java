@@ -143,6 +143,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         List.of(),
                         List.of(),
                         new UUID[0],
+                        new UUID[0],
                         null,
                         null,
                         Pageable.ofSize(1)).isEmpty(),
