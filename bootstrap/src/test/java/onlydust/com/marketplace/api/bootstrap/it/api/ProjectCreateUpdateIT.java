@@ -108,6 +108,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         assertThat(response).isNotNull();
         assertThat(response.getProjectId()).isNotNull();
         projectId = response.getProjectId();
+        runJobs();
 
         assertThat(response.getProjectSlug()).isEqualTo("super-project");
 

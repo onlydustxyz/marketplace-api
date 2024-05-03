@@ -5,21 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 
-import java.util.List;
-
 @Slf4j
 @AllArgsConstructor
-public class OutboxConsumerJob implements Runnable {
+public class OutboxConsumerJob {
 
     private final OutboxPort outbox;
     private final OutboxConsumer consumer;
 
-    @Override
     public void run() {
-        List<OutboxPort.IdentifiableEvent> identifiableEvents;
-        while (!(identifiableEvents = outbox.peek()).isEmpty()) {
-            identifiableEvents.forEach(this::processEvent);
-        }
+        outbox.peek().forEach(this::processEvent);
     }
 
     private void processEvent(OutboxPort.IdentifiableEvent identifiableEvent) {

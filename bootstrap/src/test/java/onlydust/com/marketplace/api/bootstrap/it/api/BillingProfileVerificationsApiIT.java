@@ -527,6 +527,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .expectStatus()
                 .is2xxSuccessful();
+        billingProfileVerificationOutboxJob.run();
         // When
         client.post()
                 .uri(getApiURI("/api/v1/sumsub/webhook"))
@@ -548,7 +549,6 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.status").isEqualTo("REJECTED");
         assertEquals(6, slackNotificationStub.getNotifications().size());
