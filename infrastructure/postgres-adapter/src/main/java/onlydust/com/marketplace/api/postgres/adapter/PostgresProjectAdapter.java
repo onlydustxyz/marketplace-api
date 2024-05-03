@@ -117,13 +117,13 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     public boolean hasUserAccessToProject(UUID projectId, UUID userId) {
         return customProjectRepository.isProjectPublic(projectId) ||
-               (userId != null && customProjectRepository.hasUserAccessToProject(projectId, userId));
+                (userId != null && customProjectRepository.hasUserAccessToProject(projectId, userId));
     }
 
     @Override
     public boolean hasUserAccessToProject(String projectSlug, UUID userId) {
         return customProjectRepository.isProjectPublic(projectSlug) ||
-               (userId != null && customProjectRepository.hasUserAccessToProject(projectSlug, userId));
+                (userId != null && customProjectRepository.hasUserAccessToProject(projectSlug, userId));
     }
 
     private ProjectDetailsView getProjectDetails(ProjectViewEntity projectView, User caller) {
@@ -142,6 +142,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         List.of(),
                         List.of(),
                         List.of(),
+                        new UUID[0],
                         null,
                         null,
                         Pageable.ofSize(1)).isEmpty(),
@@ -286,12 +287,12 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
             if (nonNull(projectLeaderInvitations)) {
                 projectLeaderInvitations.removeIf(invitation -> githubUserIdsAsProjectLeadersToInvite.stream()
                         .noneMatch(githubUserId -> invitation.getGithubUserId().equals(githubUserId) &&
-                                                   invitation.getProjectId().equals(projectId)));
+                                invitation.getProjectId().equals(projectId)));
 
                 projectLeaderInvitations.addAll(githubUserIdsAsProjectLeadersToInvite.stream()
                         .filter(githubUserId -> projectLeaderInvitations.stream()
                                 .noneMatch(invitation -> invitation.getGithubUserId().equals(githubUserId) &&
-                                                         invitation.getProjectId().equals(projectId)))
+                                        invitation.getProjectId().equals(projectId)))
                         .map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId,
                                 githubUserId)).toList());
             } else {

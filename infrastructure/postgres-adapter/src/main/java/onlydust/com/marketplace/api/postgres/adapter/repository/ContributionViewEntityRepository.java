@@ -12,7 +12,7 @@ import java.util.UUID;
 public interface ContributionViewEntityRepository extends JpaRepository<ContributionViewEntity, String> {
 
     @Query(value = """
-            SELECT 
+            SELECT
                 c.id,
                 c.created_at,
                 c.completed_at,
@@ -45,15 +45,21 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 c.repo_html_url,
                 COALESCE(closing_issues.links,closing_pull_requests.links, reviewed_pull_requests.links) as links,
                 rewards.ids as reward_ids,
-                c.pr_review_state
-            FROM 
+                c.pr_review_state,
+                project_ecosystems.ecosystem_ids as ecosystem_ids
+            FROM
                 indexer_exp.contributions c
             INNER JOIN indexer_exp.github_repos gr on c.repo_id = gr.id and gr.visibility = 'PUBLIC'
             INNER JOIN public.project_github_repos pgr on pgr.github_repo_id = gr.id
-            INNER JOIN public.projects p on p.id = pgr.project_id        
+            INNER JOIN public.projects p on p.id = pgr.project_id
             LEFT JOIN iam.users u on u.github_user_id = c.contributor_id
             LEFT JOIN LATERAL (
-                SELECT 
+                SELECT array_agg(peco.ecosystem_id) as ecosystem_ids
+                FROM projects_ecosystems peco
+                WHERE peco.project_id = p.id
+            ) AS project_ecosystems ON TRUE
+            LEFT JOIN LATERAL (
+                SELECT
                     jsonb_agg(jsonb_build_object(
                         'type', 'ISSUE',
                         'github_number', i.number,
@@ -65,7 +71,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                         'github_author_login', i.author_login,
                         'github_author_html_url', i.author_html_url,
                         'github_author_avatar_url', user_avatar_url(i.author_id, i.author_avatar_url),
-                        'is_mine', :rewardId = i.author_id,
+                        'is_mine', :callerGithubUserId = i.author_id,
                         'repo_id', i.repo_id,
                         'repo_owner', i.repo_owner_login,
                         'repo_name', i.repo_name,
@@ -93,7 +99,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                         'github_author_login', pr.author_login,
                         'github_author_html_url', pr.author_html_url,
                         'github_author_avatar_url', user_avatar_url(pr.author_id, pr.author_avatar_url),
-                        'is_mine', :rewardId = pr.author_id,
+                        'is_mine', :callerGithubUserId = pr.author_id,
                         'repo_id', pr.repo_id,
                         'repo_owner', pr.repo_owner_login,
                         'repo_name', pr.repo_name,
@@ -121,7 +127,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                         'github_author_login', pr.author_login,
                         'github_author_html_url', pr.author_html_url,
                         'github_author_avatar_url', user_avatar_url(pr.author_id, pr.author_avatar_url),
-                        'is_mine', :rewardId = pr.author_id,
+                        'is_mine', :callerGithubUserId = pr.author_id,
                         'repo_id', pr.repo_id,
                         'repo_owner', pr.repo_owner_login,
                         'repo_name', pr.repo_name,
@@ -152,15 +158,18 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 (COALESCE(:repoIds) IS NULL OR c.repo_id IN (:repoIds)) AND
                 (COALESCE(:types) IS NULL OR CAST(c.type AS TEXT) IN (:types)) AND
                 (COALESCE(:statuses) IS NULL OR CAST(c.status AS TEXT) IN (:statuses)) AND
+                (array_length(:ecosystemIds, 1) IS NULL OR project_ecosystems.ecosystem_ids && :ecosystemIds) AND
                 (:fromDate IS NULL OR coalesce(c.completed_at, c.created_at) >= to_date(cast(:fromDate as text), 'YYYY-MM-DD')) AND
                 (:toDate IS NULL OR coalesce(c.completed_at, c.created_at) < to_date(cast(:toDate as text), 'YYYY-MM-DD') + 1)
             """, nativeQuery = true)
-    Page<ContributionViewEntity> findContributions(Long rewardId,
+    Page<ContributionViewEntity> findContributions(Long callerGithubUserId,
                                                    List<Long> contributorIds,
                                                    List<UUID> projectIds,
                                                    List<Long> repoIds,
                                                    List<String> types,
                                                    List<String> statuses,
+                                                   //TODO: List<UUID languageIds,
+                                                   UUID[] ecosystemIds,
                                                    String fromDate,
                                                    String toDate,
                                                    Pageable pageable);

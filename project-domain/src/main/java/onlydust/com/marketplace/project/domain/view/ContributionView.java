@@ -52,6 +52,10 @@ public class ContributionView {
         List<ContributionType> types = List.of();
         @Builder.Default
         List<ContributionStatus> statuses = List.of();
+        @Builder.Default
+        List<UUID> languages = List.of();
+        @Builder.Default
+        List<UUID> ecosystems = List.of();
         Date from;
         Date to;
     }

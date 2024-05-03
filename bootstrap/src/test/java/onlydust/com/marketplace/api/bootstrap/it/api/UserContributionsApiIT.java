@@ -192,6 +192,30 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    void should_get_my_rewards_with_ecosystem_filter() {
+        // Given
+        final var user = userAuthHelper.authenticateAnthony();
+
+        // When
+        client.get()
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()), Map.of(
+                        "ecosystems", "99b6c284-f9bb-4f89-8ce7-03771465ef8e,6ab7fa6c-c418-4997-9c5f-55fb021a8e5c")
+                ))
+                .header("Authorization", BEARER_PREFIX + user.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .expectBody()
+                .jsonPath("$.contributions.length()").isEqualTo(50)
+                .jsonPath("$.hasMore").isEqualTo(true)
+                .jsonPath("$.totalPageNumber").isEqualTo(22)
+                .jsonPath("$.totalItemNumber").isEqualTo(1054)
+                .jsonPath("$.nextPageIndex").isEqualTo(1)
+        ;
+    }
+
+    @Test
     void should_get_my_rewards_with_repos_filter() {
         // Given
         final var user = userAuthHelper.authenticateAnthony();
