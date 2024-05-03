@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 
-import java.util.List;
+import java.util.Optional;
 
 @NoRepositoryBean
 public interface OutboxRepository<E extends EventEntity> extends JpaRepository<E, Long> {
@@ -16,8 +16,9 @@ public interface OutboxRepository<E extends EventEntity> extends JpaRepository<E
     @Query(value = """
             SELECT next_event
             FROM #{#entityName} next_event
-            WHERE next_event.id IN (SELECT min(n.id) FROM #{#entityName} n WHERE n.status = 'PENDING' OR n.status = 'FAILED' GROUP BY n.group)
-            ORDER BY next_event.id
+            WHERE next_event.status = 'PENDING' OR next_event.status = 'FAILED'
+            ORDER BY next_event.id ASC
+            LIMIT 1
             """)
-    List<E> findNextToProcess();
+    Optional<E> findNextToProcess();
 }

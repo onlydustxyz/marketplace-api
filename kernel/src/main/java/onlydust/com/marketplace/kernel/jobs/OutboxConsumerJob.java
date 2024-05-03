@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 
+import java.util.Optional;
+
 @Slf4j
 @AllArgsConstructor
 public class OutboxConsumerJob {
@@ -13,7 +15,10 @@ public class OutboxConsumerJob {
     private final OutboxConsumer consumer;
 
     public void run() {
-        outbox.peek().forEach(this::processEvent);
+        Optional<OutboxPort.IdentifiableEvent> identifiableEvent;
+        while ((identifiableEvent = outbox.peek()).isPresent()) {
+            processEvent(identifiableEvent.get());
+        }
     }
 
     private void processEvent(OutboxPort.IdentifiableEvent identifiableEvent) {
@@ -28,6 +33,7 @@ public class OutboxConsumerJob {
             } else {
                 LOGGER.error("Error while processing event %d".formatted(eventId), e);
                 outbox.nack(eventId, e.getMessage());
+                throw e;
             }
         }
     }

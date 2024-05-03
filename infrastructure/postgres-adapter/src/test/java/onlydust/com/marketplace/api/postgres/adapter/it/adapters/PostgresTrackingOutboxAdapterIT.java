@@ -51,9 +51,9 @@ class PostgresTrackingOutboxAdapterIT extends AbstractPostgresIT {
         final var notificationPeeked = postgresOutboxAdapter.peek();
 
         // Then
-        assertThat(notificationPeeked).hasSize(1);
-        assertThat(notificationPeeked.get(0).id()).isNotNull();
-        assertThat(notificationPeeked.get(0).event()).isEqualTo(event);
+        assertThat(notificationPeeked).isPresent();
+        assertThat(notificationPeeked.get().id()).isNotNull();
+        assertThat(notificationPeeked.get().event()).isEqualTo(event);
     }
 
     @Test
@@ -70,39 +70,39 @@ class PostgresTrackingOutboxAdapterIT extends AbstractPostgresIT {
         var notificationPeeked = postgresOutboxAdapter.peek();
 
         // Then
-        assertThat(notificationPeeked).hasSize(1);
-        assertThat(notificationPeeked.get(0).id()).isNotNull();
-        assertThat(notificationPeeked.get(0).event()).isEqualTo(event1);
+        assertThat(notificationPeeked).isPresent();
+        assertThat(notificationPeeked.get().id()).isNotNull();
+        assertThat(notificationPeeked.get().event()).isEqualTo(event1);
 
         // When
-        postgresOutboxAdapter.ack(notificationPeeked.get(0).id());
+        postgresOutboxAdapter.ack(notificationPeeked.get().id());
         notificationPeeked = postgresOutboxAdapter.peek();
 
         // Then
-        assertThat(notificationPeeked).hasSize(1);
-        assertThat(notificationPeeked.get(0).id()).isNotNull();
-        assertThat(notificationPeeked.get(0).event()).isEqualTo(event2);
+        assertThat(notificationPeeked).isPresent();
+        assertThat(notificationPeeked.get().id()).isNotNull();
+        assertThat(notificationPeeked.get().event()).isEqualTo(event2);
 
         // When
-        postgresOutboxAdapter.nack(notificationPeeked.get(0).id(), "Some error");
+        postgresOutboxAdapter.nack(notificationPeeked.get().id(), "Some error");
         notificationPeeked = postgresOutboxAdapter.peek();
 
         // Then
-        assertThat(notificationPeeked).hasSize(1);
-        assertThat(notificationPeeked.get(0).id()).isNotNull();
-        assertThat(notificationPeeked.get(0).event()).isEqualTo(event2);
+        assertThat(notificationPeeked).isPresent();
+        assertThat(notificationPeeked.get().id()).isNotNull();
+        assertThat(notificationPeeked.get().event()).isEqualTo(event2);
 
         // When
-        postgresOutboxAdapter.ack(notificationPeeked.get(0).id());
+        postgresOutboxAdapter.ack(notificationPeeked.get().id());
         notificationPeeked = postgresOutboxAdapter.peek();
 
         // Then
-        assertThat(notificationPeeked).hasSize(1);
-        assertThat(notificationPeeked.get(0).id()).isNotNull();
-        assertThat(notificationPeeked.get(0).event()).isEqualTo(event3);
+        assertThat(notificationPeeked).isPresent();
+        assertThat(notificationPeeked.get().id()).isNotNull();
+        assertThat(notificationPeeked.get().event()).isEqualTo(event3);
 
         // When
-        postgresOutboxAdapter.ack(notificationPeeked.get(0).id());
+        postgresOutboxAdapter.ack(notificationPeeked.get().id());
         notificationPeeked = postgresOutboxAdapter.peek();
 
         // Then
@@ -128,12 +128,12 @@ class PostgresTrackingOutboxAdapterIT extends AbstractPostgresIT {
         final var notificationPeeked = postgresOutboxAdapter.peek();
 
         // Then
-        assertThat(notificationPeeked).hasSize(1);
-        assertThat(notificationPeeked.get(0).id()).isNotNull();
-        assertThat(notificationPeeked.get(0).event()).isEqualTo(event);
+        assertThat(notificationPeeked).isPresent();
+        assertThat(notificationPeeked.get().id()).isNotNull();
+        assertThat(notificationPeeked.get().event()).isEqualTo(event);
 
         // And when
-        postgresOutboxAdapter.ack(notificationPeeked.get(0).id());
+        postgresOutboxAdapter.ack(notificationPeeked.get().id());
         assertThat(postgresOutboxAdapter.peek()).isEmpty();
 
         final var entity = trackingEventRepository.findAll().get(0);
@@ -151,15 +151,15 @@ class PostgresTrackingOutboxAdapterIT extends AbstractPostgresIT {
         final var notificationPeeked = postgresOutboxAdapter.peek();
 
         // Then
-        assertThat(notificationPeeked).hasSize(1);
-        assertThat(notificationPeeked.get(0).id()).isNotNull();
-        assertThat(notificationPeeked.get(0).event()).isEqualTo(event);
+        assertThat(notificationPeeked).isPresent();
+        assertThat(notificationPeeked.get().id()).isNotNull();
+        assertThat(notificationPeeked.get().event()).isEqualTo(event);
 
         // And when
-        postgresOutboxAdapter.nack(notificationPeeked.get(0).id(), "Some error");
-        assertThat(notificationPeeked).hasSize(1);
-        assertThat(notificationPeeked.get(0).id()).isNotNull();
-        assertThat(notificationPeeked.get(0).event()).isEqualTo(event);
+        postgresOutboxAdapter.nack(notificationPeeked.get().id(), "Some error");
+        assertThat(notificationPeeked).isPresent();
+        assertThat(notificationPeeked.get().id()).isNotNull();
+        assertThat(notificationPeeked.get().event()).isEqualTo(event);
 
         final var entity = trackingEventRepository.findAll().get(0);
         assertThat(entity.getStatus()).isEqualTo(NotificationEventEntity.Status.FAILED);
@@ -174,11 +174,11 @@ class PostgresTrackingOutboxAdapterIT extends AbstractPostgresIT {
         // When
         postgresOutboxAdapter.push(event);
         final var notificationPeeked = postgresOutboxAdapter.peek();
-        assertThat(notificationPeeked).hasSize(1);
-        assertThat(notificationPeeked.get(0).id()).isNotNull();
-        assertThat(notificationPeeked.get(0).event()).isEqualTo(event);
+        assertThat(notificationPeeked).isPresent();
+        assertThat(notificationPeeked.get().id()).isNotNull();
+        assertThat(notificationPeeked.get().event()).isEqualTo(event);
 
-        postgresOutboxAdapter.skip(notificationPeeked.get(0).id(), "Some reason to skip");
+        postgresOutboxAdapter.skip(notificationPeeked.get().id(), "Some reason to skip");
 
         // Then
         final var entity = trackingEventRepository.findAll().get(0);

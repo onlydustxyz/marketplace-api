@@ -5,7 +5,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.EventEntity;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 
-import java.util.List;
+import java.util.Optional;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
@@ -20,8 +20,8 @@ public class PostgresOutboxAdapter<E extends EventEntity> implements OutboxPort 
     }
 
     @Override
-    public List<IdentifiableEvent> peek() {
-        return outboxRepository.findNextToProcess().stream().map(EventEntity::toIdentifiableEvent).toList();
+    public Optional<IdentifiableEvent> peek() {
+        return outboxRepository.findNextToProcess().map(EventEntity::toIdentifiableEvent);
     }
 
     @Override
