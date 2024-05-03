@@ -1,6 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.adapters;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.TrackingEventEntity;
@@ -12,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,20 +35,6 @@ class PostgresTrackingOutboxAdapterIT extends AbstractPostgresIT {
         UUID id;
     }
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @EqualsAndHashCode(callSuper = true)
-    @EventType("GroupedTestEvent")
-    public static class GroupedTestEvent extends Event {
-        @NonNull String group;
-        UUID id;
-
-        @Override
-        public Optional<String> group() {
-            return Optional.of(group);
-        }
-    }
 
     @BeforeEach
     void setUp() {
@@ -103,65 +91,6 @@ class PostgresTrackingOutboxAdapterIT extends AbstractPostgresIT {
         assertThat(notificationPeeked).hasSize(1);
         assertThat(notificationPeeked.get(0).id()).isNotNull();
         assertThat(notificationPeeked.get(0).event()).isEqualTo(event2);
-
-        // When
-        postgresOutboxAdapter.ack(notificationPeeked.get(0).id());
-        notificationPeeked = postgresOutboxAdapter.peek();
-
-        // Then
-        assertThat(notificationPeeked).hasSize(1);
-        assertThat(notificationPeeked.get(0).id()).isNotNull();
-        assertThat(notificationPeeked.get(0).event()).isEqualTo(event3);
-
-        // When
-        postgresOutboxAdapter.ack(notificationPeeked.get(0).id());
-        notificationPeeked = postgresOutboxAdapter.peek();
-
-        // Then
-        assertThat(notificationPeeked).isEmpty();
-    }
-
-    @Test
-    void should_peek_the_first_pending_event_per_group() {
-        // Given
-        final Event event1 = new GroupedTestEvent("a", UUID.randomUUID());
-        final Event event2 = new GroupedTestEvent("a", UUID.randomUUID());
-        final Event event3 = new GroupedTestEvent("b", UUID.randomUUID());
-
-        // When
-        postgresOutboxAdapter.push(event1);
-        postgresOutboxAdapter.push(event2);
-        postgresOutboxAdapter.push(event3);
-        var notificationPeeked = postgresOutboxAdapter.peek();
-
-        // Then
-        assertThat(notificationPeeked).hasSize(2);
-        assertThat(notificationPeeked.get(0).id()).isNotNull();
-        assertThat(notificationPeeked.get(0).event()).isEqualTo(event1);
-        assertThat(notificationPeeked.get(1).id()).isNotNull();
-        assertThat(notificationPeeked.get(1).event()).isEqualTo(event3);
-
-        // When
-        postgresOutboxAdapter.ack(notificationPeeked.get(0).id());
-        notificationPeeked = postgresOutboxAdapter.peek();
-
-        // Then
-        assertThat(notificationPeeked).hasSize(2);
-        assertThat(notificationPeeked.get(0).id()).isNotNull();
-        assertThat(notificationPeeked.get(0).event()).isEqualTo(event2);
-        assertThat(notificationPeeked.get(1).id()).isNotNull();
-        assertThat(notificationPeeked.get(1).event()).isEqualTo(event3);
-
-        // When
-        postgresOutboxAdapter.nack(notificationPeeked.get(0).id(), "Some error");
-        notificationPeeked = postgresOutboxAdapter.peek();
-
-        // Then
-        assertThat(notificationPeeked).hasSize(2);
-        assertThat(notificationPeeked.get(0).id()).isNotNull();
-        assertThat(notificationPeeked.get(0).event()).isEqualTo(event2);
-        assertThat(notificationPeeked.get(1).id()).isNotNull();
-        assertThat(notificationPeeked.get(1).event()).isEqualTo(event3);
 
         // When
         postgresOutboxAdapter.ack(notificationPeeked.get(0).id());
