@@ -37,9 +37,6 @@ public abstract class EventEntity {
     @Column(columnDefinition = "outbox_event_status")
     Status status;
 
-    @Column(name = "group_key")
-    String group;
-
     String error;
 
     @EqualsAndHashCode.Exclude
@@ -55,7 +52,6 @@ public abstract class EventEntity {
     public EventEntity(Event event) {
         this.payload = new Payload(event);
         this.status = Status.PENDING;
-        this.group = event.group().orElse(null);
     }
 
     public OutboxPort.IdentifiableEvent toIdentifiableEvent() {

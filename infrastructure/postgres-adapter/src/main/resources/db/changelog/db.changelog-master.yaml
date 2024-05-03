@@ -257,3 +257,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000216_add_node_guardians_boost_rewards_tables.sql
   - include:
       file: db/changelog/changelogs/00000217_languages.sql
+  - include:
+      file: db/changelog/changelogs/00000218_drop_events_group_key.sql

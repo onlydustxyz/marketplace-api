@@ -10,19 +10,14 @@ create table if not exists auth.user_providers
 );
 
 
-insert into accounting.historical_quotes
+insert into accounting.historical_quotes(timestamp, base_id, target_id, price)
 SELECT now(), aptos.id, usd.id, 0.30
 FROM currencies aptos
          JOIN currencies usd on usd.code = 'USD'
 where aptos.code = 'APT';
 
-insert into accounting.latest_quotes
+insert into accounting.latest_quotes(timestamp, base_id, target_id, price)
 SELECT now(), aptos.id, usd.id, 0.30
 FROM currencies aptos
          JOIN currencies usd on usd.code = 'USD'
-where aptos.code = 'APT';
-
-insert into accounting.latest_usd_quotes
-SELECT now(), aptos.id, 0.30
-FROM currencies aptos
 where aptos.code = 'APT';

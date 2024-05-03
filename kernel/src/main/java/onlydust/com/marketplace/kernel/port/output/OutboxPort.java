@@ -2,12 +2,12 @@ package onlydust.com.marketplace.kernel.port.output;
 
 import onlydust.com.marketplace.kernel.model.Event;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface OutboxPort {
     void push(Event event);
 
-    List<IdentifiableEvent> peek();
+    Optional<IdentifiableEvent> peek();
 
     void ack(Long eventId);
 
