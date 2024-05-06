@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.slack.mapper;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.view.ProjectDetailsView;
 
+import static onlydust.com.marketplace.api.slack.mapper.FrontUrlHelper.getMarketplaceFrontendUrlFromEnvironment;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 public interface UserAppliedOnProjectEventMapper {
@@ -27,14 +28,5 @@ public interface UserAppliedOnProjectEventMapper {
         );
     }
 
-
-    static String getMarketplaceFrontendUrlFromEnvironment(String environment) {
-        return switch (environment) {
-            case "develop" -> "https://develop-app.onlydust.com/";
-            case "staging" -> "https://staging-app.onlydust.com/";
-            case "production" -> "https://app.onlydust.com/";
-            default -> throw internalServerError("Invalid environment " + environment);
-        };
-    }
 
 }

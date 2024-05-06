@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import onlydust.com.marketplace.api.bootstrap.helper.SlackNotificationStub;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
@@ -12,11 +13,14 @@ import java.util.List;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class HackathonApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     HackathonStoragePort hackathonStoragePort;
+    @Autowired
+    SlackNotificationStub slackNotificationStub;
 
     UserAuthHelper.AuthenticatedUser olivier;
 
@@ -245,6 +249,10 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .expectStatus()
                 .isNoContent();
+
+        assertEquals(1, slackNotificationStub.getHackathonNotifications().size());
+        assertEquals(olivier.user().getId(), slackNotificationStub.getHackathonNotifications().get(0).getUserId());
+        assertEquals(hackathonId1, slackNotificationStub.getHackathonNotifications().get(0).getHackathonId());
 
         // When
         client.get()

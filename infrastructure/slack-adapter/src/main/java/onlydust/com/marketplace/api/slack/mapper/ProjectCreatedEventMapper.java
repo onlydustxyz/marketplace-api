@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.slack.mapper;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.view.ProjectDetailsView;
 
-import static onlydust.com.marketplace.api.slack.mapper.UserAppliedOnProjectEventMapper.getMarketplaceFrontendUrlFromEnvironment;
+import static onlydust.com.marketplace.api.slack.mapper.FrontUrlHelper.getMarketplaceFrontendUrlFromEnvironment;
 
 public interface ProjectCreatedEventMapper {
 
