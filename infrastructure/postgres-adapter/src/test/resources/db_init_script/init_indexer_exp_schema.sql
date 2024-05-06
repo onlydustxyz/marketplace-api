@@ -125,32 +125,33 @@ create table indexer_exp.github_issues_assignees
 
 create table indexer_exp.github_pull_requests
 (
-    id                bigint                                       not null
+    id                   bigint                                       not null
         primary key,
-    repo_id           bigint                                       not null
+    repo_id              bigint                                       not null
         references indexer_exp.github_repos,
-    number            bigint                                       not null,
-    title             text                                         not null,
-    status            indexer_exp.github_pull_request_status       not null,
-    created_at        timestamp                                    not null,
-    closed_at         timestamp,
-    merged_at         timestamp,
-    author_id         bigint                                       not null
+    number               bigint                                       not null,
+    title                text                                         not null,
+    status               indexer_exp.github_pull_request_status       not null,
+    created_at           timestamp                                    not null,
+    closed_at            timestamp,
+    merged_at            timestamp,
+    author_id            bigint                                       not null
         references indexer_exp.github_accounts,
-    html_url          text                                         not null,
-    body              text,
-    comments_count    integer                                      not null,
-    tech_created_at   timestamp default now()                      not null,
-    tech_updated_at   timestamp default now()                      not null,
-    draft             boolean   default false                      not null,
-    repo_owner_login  text                                         not null,
-    repo_name         text                                         not null,
-    repo_html_url     text                                         not null,
-    author_login      text                                         not null,
-    author_html_url   text                                         not null,
-    author_avatar_url text                                         not null,
-    review_state      indexer_exp.github_pull_request_review_state not null,
-    commit_count      integer                                      not null
+    html_url             text                                         not null,
+    body                 text,
+    comments_count       integer                                      not null,
+    tech_created_at      timestamp default now()                      not null,
+    tech_updated_at      timestamp default now()                      not null,
+    draft                boolean   default false                      not null,
+    repo_owner_login     text                                         not null,
+    repo_name            text                                         not null,
+    repo_html_url        text                                         not null,
+    author_login         text                                         not null,
+    author_html_url      text                                         not null,
+    author_avatar_url    text                                         not null,
+    review_state         indexer_exp.github_pull_request_review_state not null,
+    commit_count         integer                                      not null,
+    main_file_extensions text[]
 );
 
 create trigger indexer_exp_github_pull_requests_set_tech_updated_at
@@ -243,6 +244,7 @@ create table indexer_exp.contributions
     contributor_html_url     text                            not null,
     contributor_avatar_url   text                            not null,
     pr_review_state          indexer_exp.github_pull_request_review_state,
+    main_file_extensions     text[],
     constraint contributions_unique_constraint
         unique (contributor_id, repo_id, pull_request_id, issue_id, code_review_id),
     constraint contributions_check
