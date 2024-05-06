@@ -10,6 +10,8 @@ import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import static java.util.Objects.isNull;
+
 @Value
 @Builder(toBuilder = true)
 @Getter
@@ -48,8 +50,8 @@ public class BillingProfileView {
         if (type == BillingProfile.Type.INDIVIDUAL) return true;
 
         return invoiceMandateAcceptedAt != null &&
-                invoiceMandateLatestVersionDate != null &&
-                invoiceMandateAcceptedAt.isAfter(invoiceMandateLatestVersionDate);
+               invoiceMandateLatestVersionDate != null &&
+               invoiceMandateAcceptedAt.isAfter(invoiceMandateLatestVersionDate);
     }
 
     public boolean isSwitchableToSelfEmployed() {
@@ -61,7 +63,7 @@ public class BillingProfileView {
     }
 
     public String subject() {
-        return kyc == null ? kyb.getName() : kyc.fullName();
+        return kyc == null ? (isNull(kyb) ? null : kyb.getName()) : kyc.fullName();
     }
 
     public record User(

@@ -809,6 +809,7 @@ public interface BackOfficeMapper {
                 .id(billingProfile.getId().value())
                 .subject(billingProfile.subject())
                 .type(map(billingProfile.getType()))
+                .name(billingProfile.getName())
                 .verificationStatus(map(billingProfile.getVerificationStatus()))
                 .kyb(billingProfile.getKyb() == null ? null : map(billingProfile.getKyb()))
                 .kyc(billingProfile.getKyc() == null ? null : map(billingProfile.getKyc()))

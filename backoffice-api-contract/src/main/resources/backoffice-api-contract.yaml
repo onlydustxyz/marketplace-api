@@ -3187,7 +3187,10 @@ components:
         - type: object
           required:
             - verificationStatus
+            - name
           properties:
+            name:
+              type: string
             verificationStatus:
               $ref: '#/components/schemas/VerificationStatus'
             kyb:
