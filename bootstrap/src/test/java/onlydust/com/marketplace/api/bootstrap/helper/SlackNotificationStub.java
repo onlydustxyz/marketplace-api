@@ -4,6 +4,7 @@ import lombok.Getter;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
+import onlydust.com.marketplace.project.domain.model.notification.UserRegisteredOnHackathon;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,16 +13,21 @@ import java.util.List;
 @Getter
 public class SlackNotificationStub implements NotificationPort {
 
-    private final List<BillingProfileVerificationUpdated> notifications = Collections.synchronizedList(new ArrayList<>());
+    private final List<BillingProfileVerificationUpdated> billingProfileNotifications = Collections.synchronizedList(new ArrayList<>());
+    private final List<UserRegisteredOnHackathon> hackathonNotifications = Collections.synchronizedList(new ArrayList<>());
 
     @Override
     public void notify(Event event) {
         if (event instanceof BillingProfileVerificationUpdated billingProfileVerificationUpdated) {
-            this.notifications.add(billingProfileVerificationUpdated);
+            this.billingProfileNotifications.add(billingProfileVerificationUpdated);
+        }
+        if (event instanceof UserRegisteredOnHackathon userRegisteredOnHackathon) {
+            this.hackathonNotifications.add(userRegisteredOnHackathon);
         }
     }
 
     public void reset(){
-        this.notifications.clear();
+        this.billingProfileNotifications.clear();
+        this.hackathonNotifications.clear();
     }
 }

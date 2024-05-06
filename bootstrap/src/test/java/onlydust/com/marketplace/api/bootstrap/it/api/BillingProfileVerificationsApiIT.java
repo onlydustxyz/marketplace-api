@@ -158,7 +158,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.status").isEqualTo("UNDER_REVIEW")
                 .jsonPath("$.id").isNotEmpty();
 
-        assertEquals(1, slackNotificationStub.getNotifications().size());
+        assertEquals(1, slackNotificationStub.getBillingProfileNotifications().size());
 
         final String reviewMessage = "We could not verify your profile. If you have any questions, please contact the Company where you try to verify your " +
                                      "profile tech@onlydust.xyz\\n\\nTemporary we could not verify your profile via doc-free method. Please try again " +
@@ -232,7 +232,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.kyc.idDocumentCountryCode").isEqualTo("FRA")
                 .jsonPath("$.kyc.validUntil").isEqualTo("2025-04-19T00:00:00Z")
                 .jsonPath("$.kyc.usCitizen").isEqualTo(false);
-        assertEquals(2, slackNotificationStub.getNotifications().size());
+        assertEquals(2, slackNotificationStub.getBillingProfileNotifications().size());
 
         accountingMailOutboxJob.run();
         customerIOWireMockServer.verify(1,
@@ -383,7 +383,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.kyb.subjectToEuropeVAT").isEqualTo(true)
                 .jsonPath("$.kyb.euVATNumber").isEqualTo("FR26908233638")
                 .jsonPath("$.kyb.usEntity").isEqualTo(false);
-        assertEquals(3, slackNotificationStub.getNotifications().size());
+        assertEquals(3, slackNotificationStub.getBillingProfileNotifications().size());
 
         final String reviewMessage = "Enter your date of birth exactly as it is on your identity document.\\n\\n - Tax number is incorrect. Provide a correct" +
                                      " tax number.\\n - SSN is incorrect. Provide a correct SSN.";
@@ -454,7 +454,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.kyb.subjectToEuropeVAT").isEqualTo(true)
                 .jsonPath("$.kyb.euVATNumber").isEqualTo("FR26908233638")
                 .jsonPath("$.kyb.usEntity").isEqualTo(false);
-        assertEquals(4, slackNotificationStub.getNotifications().size());
+        assertEquals(4, slackNotificationStub.getBillingProfileNotifications().size());
 
         final byte[] sumsubPayloadChildrenKycUnderReview = String.format("""
                 {
@@ -551,7 +551,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.status").isEqualTo("REJECTED");
-        assertEquals(6, slackNotificationStub.getNotifications().size());
+        assertEquals(6, slackNotificationStub.getBillingProfileNotifications().size());
     }
 
     @Test

@@ -5,6 +5,7 @@ import lombok.NonNull;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.port.input.HackathonFacadePort;
+import onlydust.com.marketplace.project.domain.port.input.HackathonObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 import onlydust.com.marketplace.project.domain.view.HackathonDetailsView;
 import onlydust.com.marketplace.project.domain.view.HackathonShortView;
@@ -19,6 +20,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 @AllArgsConstructor
 public class HackathonService implements HackathonFacadePort {
     private final HackathonStoragePort hackathonStoragePort;
+    private final HackathonObserverPort hackathonObserverPort;
 
     @Override
     public HackathonDetailsView createHackathon(@NonNull String title, @NonNull String subtitle, @NonNull ZonedDateTime startDate,
@@ -74,6 +76,7 @@ public class HackathonService implements HackathonFacadePort {
         if (!hackathonStoragePort.exists(hackathonId))
             throw notFound("Hackathon %s not found".formatted(hackathonId));
         hackathonStoragePort.registerUser(userId, hackathonId);
+        hackathonObserverPort.onUserRegistration(hackathonId, userId);
     }
 
     @Override

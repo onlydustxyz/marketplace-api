@@ -23,6 +23,7 @@ import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.IndexerApiOutboxConsumer;
 import onlydust.com.marketplace.project.domain.job.WebhookNotificationOutboxConsumer;
 import onlydust.com.marketplace.project.domain.observer.ContributionObserver;
+import onlydust.com.marketplace.project.domain.observer.HackathonObserver;
 import onlydust.com.marketplace.project.domain.observer.ProjectObserver;
 import onlydust.com.marketplace.project.domain.observer.UserObserver;
 import onlydust.com.marketplace.project.domain.port.input.*;
@@ -234,8 +235,9 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public HackathonFacadePort hackathonFacadePort(final HackathonStoragePort hackathonStoragePort) {
-        return new HackathonService(hackathonStoragePort);
+    public HackathonFacadePort hackathonFacadePort(final HackathonStoragePort hackathonStoragePort,
+                                                   final HackathonObserverPort hackathonObserverPort) {
+        return new HackathonService(hackathonStoragePort, hackathonObserverPort);
     }
 
     @Bean
@@ -272,4 +274,8 @@ public class ProjectConfiguration {
     }
 
 
+    @Bean
+    public HackathonObserverPort hackathonObserverPort(final NotificationPort notificationPort){
+        return new HackathonObserver(notificationPort);
+    }
 }
