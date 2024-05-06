@@ -239,7 +239,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .exchange()
                 .expectStatus()
-                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .isOk()
                 .expectBody()
                 .jsonPath("$.contributions.length()").isEqualTo(0)
                 .jsonPath("$.hasMore").isEqualTo(false)
@@ -262,10 +262,10 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                 .expectBody()
-                .jsonPath("$.contributions.length()").isEqualTo(0)
-                .jsonPath("$.hasMore").isEqualTo(false)
-                .jsonPath("$.totalPageNumber").isEqualTo(0)
-                .jsonPath("$.totalItemNumber").isEqualTo(0)
+                .jsonPath("$.contributions.length()").isEqualTo(50)
+                .jsonPath("$.hasMore").isEqualTo(true)
+                .jsonPath("$.totalPageNumber").isEqualTo(17)
+                .jsonPath("$.totalItemNumber").isEqualTo(828)
         ;
     }
 
