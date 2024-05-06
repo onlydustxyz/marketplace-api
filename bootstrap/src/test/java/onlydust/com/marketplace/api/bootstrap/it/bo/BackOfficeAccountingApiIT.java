@@ -19,8 +19,10 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookEvent
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardStatusRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
+import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
+import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
@@ -1293,6 +1295,16 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         final var billingProfileId = BillingProfile.Id.of("1253b889-e5d5-49ee-8e8a-21405ccab8a6");
         final var billingProfile = billingProfileStoragePort.findById(billingProfileId).orElseThrow();
         billingProfileStoragePort.saveKyb(billingProfile.getKyb().toBuilder().externalApplicantId("123456").build());
+        billingProfileStoragePort.savePayoutInfoForBillingProfile(PayoutInfo.builder()
+                .bankAccount(BankAccount.builder()
+                        .bic("AGFBFRCC")
+                        .accountNumber("NL50RABO3741207772")
+                        .build())
+                .ethWallet(Ethereum.wallet("vitalik.eth"))
+                .optimismAddress(Optimism.accountAddress("0x1111"))
+                .aptosAddress(Aptos.accountAddress("0x2222"))
+                .starknetAddress(StarkNet.accountAddress("0x3333"))
+                .build(), billingProfileId);
 
         client.get()
                 .uri(getApiURI(BILLING_PROFILE.formatted("1253b889-e5d5-49ee-8e8a-21405ccab8a6")))
@@ -1330,7 +1342,17 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                               "name": null
                             }
                           ],
-                          "currentMonthRewardedAmounts": []
+                          "currentMonthRewardedAmounts": [],
+                          "payoutInfos": {
+                            "bankAccount": {
+                              "bic": "AGFBFRCC",
+                              "number": "NL50RABO3741207772"
+                            },
+                            "ethWallet": "vitalik.eth",
+                            "optimismAddress": "0x1111",
+                            "aptosAddress": "0x2222",
+                            "starknetAddress": "0x3333"
+                          }
                         }
                         """);
     }
