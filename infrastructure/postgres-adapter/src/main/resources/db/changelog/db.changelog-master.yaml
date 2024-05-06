@@ -263,3 +263,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000219_add_missing_indexes.sql
   - include:
       file: db/changelog/changelogs/00000220_create_users_languages_ranks_view.sql
+  - include:
+      file: db/changelog/changelogs/00000221_create_users_ecosystems_ranks_view.sql
