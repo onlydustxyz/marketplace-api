@@ -1,15 +1,25 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.LanguageStorage;
+import onlydust.com.marketplace.project.domain.service.LanguageService;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 
 public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
 
+    @Autowired
+    private LanguageStorage languageStorage;
+    @Autowired
+    private ImageStoragePort imageStoragePort;
 
     @Test
     void should_get_my_contributions() {
@@ -188,6 +198,74 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.totalPageNumber").isEqualTo(42)
                 .jsonPath("$.totalItemNumber").isEqualTo(2087)
                 .jsonPath("$.nextPageIndex").isEqualTo(1)
+        ;
+    }
+
+    @Test
+    void should_get_my_rewards_with_ecosystem_filter() {
+        // Given
+        final var user = userAuthHelper.authenticateAnthony();
+
+        // When
+        client.get()
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()), Map.of(
+                        "ecosystems", "99b6c284-f9bb-4f89-8ce7-03771465ef8e,6ab7fa6c-c418-4997-9c5f-55fb021a8e5c")
+                ))
+                .header("Authorization", BEARER_PREFIX + user.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .expectBody()
+                .jsonPath("$.contributions.length()").isEqualTo(50)
+                .jsonPath("$.hasMore").isEqualTo(true)
+                .jsonPath("$.totalPageNumber").isEqualTo(22)
+                .jsonPath("$.totalItemNumber").isEqualTo(1054)
+                .jsonPath("$.nextPageIndex").isEqualTo(1)
+        ;
+    }
+
+    @Test
+    void should_get_my_rewards_with_language_filter() {
+        // Given
+        final var user = userAuthHelper.authenticateAnthony();
+
+        // When
+        client.get()
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()), Map.of(
+                        "languages", UUID.randomUUID().toString())
+                ))
+                .header("Authorization", BEARER_PREFIX + user.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.contributions.length()").isEqualTo(0)
+                .jsonPath("$.hasMore").isEqualTo(false)
+                .jsonPath("$.totalPageNumber").isEqualTo(0)
+                .jsonPath("$.totalItemNumber").isEqualTo(0)
+        ;
+
+        // And given
+        final var languageService = new LanguageService(languageStorage, imageStoragePort);
+        final var rust = languageService.createLanguage("Rust", Set.of("rs"));
+
+        // When
+        client.get()
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()), Map.of(
+                        "languages", UUID.randomUUID() + "," + rust.id())
+                ))
+                .header("Authorization", BEARER_PREFIX + user.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .expectBody()
+                .jsonPath("$.contributions.length()").isEqualTo(50)
+                .jsonPath("$.hasMore").isEqualTo(true)
+                .jsonPath("$.totalPageNumber").isEqualTo(17)
+                .jsonPath("$.totalItemNumber").isEqualTo(828)
         ;
     }
 

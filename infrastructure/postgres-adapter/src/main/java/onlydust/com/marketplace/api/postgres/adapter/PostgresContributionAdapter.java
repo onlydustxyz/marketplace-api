@@ -57,6 +57,8 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
                 filters.getRepos(),
                 filters.getTypes().stream().map(Enum::name).toList(),
                 filters.getStatuses().stream().map(Enum::name).toList(),
+                filters.getLanguages().toArray(UUID[]::new),
+                filters.getEcosystems().toArray(UUID[]::new),
                 isNull(filters.getFrom()) ? null : format.format(filters.getFrom()),
                 isNull(filters.getTo()) ? null : format.format(filters.getTo()),
                 PageRequest.of(page, pageSize, sortBy(sort, direction == SortDirection.asc ? Sort.Direction.ASC :
@@ -89,8 +91,8 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
             case GITHUB_NUMBER_TITLE -> Sort.by(direction, "github_number", "github_title");
             case CONTRIBUTOR_LOGIN -> Sort.by(direction, "contributor_login");
             case LINKS_COUNT -> JpaSort.unsafe(direction, "COALESCE(jsonb_array_length(COALESCE(closing_issues.links," +
-                                                          "closing_pull_requests.links, reviewed_pull_requests.links)" +
-                                                          "), 0)");
+                    "closing_pull_requests.links, reviewed_pull_requests.links)" +
+                    "), 0)");
         };
     }
 

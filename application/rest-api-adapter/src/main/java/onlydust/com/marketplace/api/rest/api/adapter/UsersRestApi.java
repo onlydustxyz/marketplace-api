@@ -80,8 +80,8 @@ public class UsersRestApi implements UsersApi {
                                                                          List<ContributionStatus> statuses,
                                                                          List<UUID> projects,
                                                                          List<Long> repositories,
-                                                                         List<UUID> languages,//TODO: take this filter into account
-                                                                         List<UUID> ecosystems,//TODO: take this filter into account
+                                                                         List<UUID> languages,
+                                                                         List<UUID> ecosystems,
                                                                          String fromDate,
                                                                          String toDate,
                                                                          ContributionSort sort,
@@ -97,6 +97,8 @@ public class UsersRestApi implements UsersApi {
                 .repos(Optional.ofNullable(repositories).orElse(List.of()))
                 .types(Optional.ofNullable(types).orElse(List.of()).stream().map(ContributionMapper::mapContributionType).toList())
                 .statuses(Optional.ofNullable(statuses).orElse(List.of()).stream().map(ContributionMapper::mapContributionStatus).toList())
+                .languages(Optional.ofNullable(languages).orElse(List.of()))
+                .ecosystems(Optional.ofNullable(ecosystems).orElse(List.of()))
                 .from(isNull(fromDate) ? null : DateMapper.parse(fromDate))
                 .to(isNull(toDate) ? null : DateMapper.parse(toDate))
                 .build();
