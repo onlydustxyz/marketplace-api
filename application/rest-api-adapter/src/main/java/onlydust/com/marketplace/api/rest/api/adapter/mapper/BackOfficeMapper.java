@@ -2,19 +2,22 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import onlydust.com.backoffice.api.contract.model.VerificationStatus;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
+import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
+import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosAccountAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmAccountAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
+import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetAccountAddress;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Contact;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
@@ -817,6 +820,24 @@ public interface BackOfficeMapper {
                 .currentMonthRewardedAmounts(billingProfile.getCurrentMonthRewardedAmounts().stream()
                         .map(BackOfficeMapper::totalMoneyViewToResponse)
                         .toList())
+                .payoutInfos(map(billingProfile.getPayoutInfo()))
+                ;
+    }
+
+    static BillingProfilePayoutInfoResponse map(PayoutInfo payoutInfo) {
+        return new BillingProfilePayoutInfoResponse()
+                .bankAccount(payoutInfo.bankAccount().map(BackOfficeMapper::map).orElse(null))
+                .ethWallet(payoutInfo.ethWallet().map(WalletLocator::asString).orElse(null))
+                .optimismAddress(payoutInfo.optimismAddress().map(EvmAccountAddress::toString).orElse(null))
+                .aptosAddress(payoutInfo.aptosAddress().map(AptosAccountAddress::toString).orElse(null))
+                .starknetAddress(payoutInfo.starknetAddress().map(StarknetAccountAddress::toString).orElse(null))
+                ;
+    }
+
+    static BillingProfilePayoutInfoResponseBankAccount map(BankAccount bankAccount) {
+        return new BillingProfilePayoutInfoResponseBankAccount()
+                .number(bankAccount.accountNumber())
+                .bic(bankAccount.bic())
                 ;
     }
 

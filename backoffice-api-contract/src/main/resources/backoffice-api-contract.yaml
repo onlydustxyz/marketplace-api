@@ -3211,6 +3211,34 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/TotalMoneyWithUsdEquivalentResponse'
+            payoutInfos:
+              $ref: '#/components/schemas/BillingProfilePayoutInfoResponse'
+
+    BillingProfilePayoutInfoResponse:
+      type: object
+      properties:
+        bankAccount:
+          type: object
+          properties:
+            bic:
+              type: string
+              example: DAAEFRPPCCT
+            number:
+              type: string
+              example: FR5417569000301995586997O41
+        ethWallet:
+          type: string
+          description: ETH wallet address or ENS
+          example: vitalik.eth
+        optimismAddress:
+          type: string
+          example: 0x72C30FCD1e7bd691Ce206Cd36BbD87C4C7099545
+        aptosAddress:
+          type: string
+          example: 0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5
+        starknetAddress:
+          type: string
+          example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
 
     GithubUserResponse:
       type: object
