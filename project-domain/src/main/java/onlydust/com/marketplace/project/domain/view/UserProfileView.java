@@ -31,7 +31,6 @@ public class UserProfileView {
     String twitter;
     String linkedin;
     String github;
-    String telegram;
     String discord;
     Map<String, Long> technologies;
     UserProfileCover cover;
@@ -45,6 +44,10 @@ public class UserProfileView {
     Set<Contact> contacts = new HashSet<>();
     String firstName;
     String lastName;
+
+    public String getTelegram() {
+        return this.contacts.stream().filter(contact -> contact.getChannel().equals(Contact.Channel.TELEGRAM)).findFirst().map(Contact::getContact).orElse(null);
+    }
 
     public void addProjectStats(final ProjectStats projectStats) {
         if (projectStats.getUserFirstContributedAt() != null && (firstContributedAt == null || projectStats.getUserFirstContributedAt().before(firstContributedAt))) {

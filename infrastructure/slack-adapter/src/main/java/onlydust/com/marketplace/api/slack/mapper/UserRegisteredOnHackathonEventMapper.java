@@ -25,9 +25,9 @@ public interface UserRegisteredOnHackathonEventMapper {
 
     static String mapToSlackBlock(UserProfileView userProfileView, HackathonDetailsView hackathonDetailsView, String environment) {
         return BLOCK.formatted(
-                userProfileView.getLogin(), FrontUrlHelper.getBackOfficeFrontendUrlFromEnvironment(environment) + "user/%s".formatted(userProfileView.getId()),
-                hackathonDetailsView.title(),
+                FrontUrlHelper.getBackOfficeFrontendUrlFromEnvironment(environment) + "users/%s".formatted(userProfileView.getId()), userProfileView.getLogin(),
                 FrontUrlHelper.getMarketplaceFrontendUrlFromEnvironment(environment) + "h/%s".formatted(hackathonDetailsView.slug()),
+                hackathonDetailsView.title(),
                 userProfileView.getTelegram()
         );
     }
