@@ -172,11 +172,11 @@ infrastructure:
     base-uri: https://api-eu.customer.io/v1
     api-key: ${CUSTOMER_IO_API_KEY}
     only-dust-admin-email: Camille from OnlyDust <admin@onlydust.xyz>
-    rewards-paid-email-id: 4
-    reward-canceled-email-id: 5
-    new-reward-received-email-id: 6
-    invoice-rejected-email-id: 3
-    verification-failed-email-id: 8
+    rewards-paid-email-id: 11
+    reward-canceled-email-id: 12
+    new-reward-received-email-id: 13
+    invoice-rejected-email-id: 10
+    verification-failed-email-id: 15
   node-guardians:
     base-uri: ${NODE_GUARDIANS_BASE_URI}
     api-key: ${NODE_GUARDIANS_API_KEY}
