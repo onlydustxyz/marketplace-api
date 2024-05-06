@@ -10,7 +10,6 @@ import onlydust.com.marketplace.accounting.domain.view.BillingProfileRewardView;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.RewardShortView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.Money;
@@ -45,19 +44,17 @@ public class RewardViewEntity {
     @NonNull
     AllUserViewEntity recipient;
 
-    @ManyToOne
-    @JoinColumn(name = "billingProfileId")
-    BillingProfileEntity billingProfile;
+    UUID billingProfileId;
 
     @ManyToOne
     @JoinColumn(name = "currencyId")
     @NonNull
-    CurrencyEntity currency;
+    CurrencyViewEntity currency;
 
     @ManyToOne
     @JoinColumn(name = "projectId")
     @NonNull
-    ProjectEntity project;
+    ProjectViewEntity project;
 
     @OneToMany(mappedBy = "rewardId", fetch = FetchType.EAGER)
     @NonNull
@@ -65,23 +62,23 @@ public class RewardViewEntity {
 
     @ManyToOne
     @JoinColumn(name = "invoiceId")
-    InvoiceEntity invoice;
+    InvoiceViewEntity invoice;
 
     @ManyToMany
     @JoinTable(name = "rewards_receipts", schema = "accounting",
             joinColumns = @JoinColumn(name = "reward_id"),
             inverseJoinColumns = @JoinColumn(name = "receipt_id"))
-    Set<ReceiptEntity> receipts = new HashSet<>();
+    Set<ReceiptViewEntity> receipts = new HashSet<>();
 
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
     @NonNull
-    RewardStatusEntity status;
+    RewardStatusViewEntity status;
 
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
     @NonNull
-    RewardStatusDataEntity statusData;
+    RewardStatusDataViewEntity statusData;
 
     public RewardShortView toShortView() {
         return RewardShortView.builder()
@@ -107,7 +104,7 @@ public class RewardViewEntity {
                 .recipientAvatarUrl(recipient.avatarUrl())
                 .recipientId(recipient.githubUserId())
                 .recipientLogin(recipient.login())
-                .billingProfileId(billingProfile == null ? null : billingProfile.getId())
+                .billingProfileId(billingProfileId)
                 .build();
     }
 
@@ -142,15 +139,15 @@ public class RewardViewEntity {
                 .unlockDate(statusData.unlockDate())
                 .from(from())
                 .project(project.toDomain())
-                .receipt(receipts.stream().findFirst().map(ReceiptEntity::toView).orElse(null))
-                .billingProfileId(billingProfile == null ? null : billingProfile.getId())
+                .receipt(receipts.stream().findFirst().map(ReceiptViewEntity::toView).orElse(null))
+                .billingProfileId(billingProfileId)
                 .build();
     }
 
     public RewardStatus status() {
         return RewardStatus.builder()
                 .projectId(project.getId())
-                .billingProfileId(billingProfile == null ? null : billingProfile.getId())
+                .billingProfileId(billingProfileId)
                 .recipientId(recipient.githubUserId())
                 .status(this.status.toDomain())
                 .build();

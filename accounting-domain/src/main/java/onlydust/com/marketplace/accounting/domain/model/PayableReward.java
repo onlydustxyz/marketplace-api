@@ -15,10 +15,10 @@ public record PayableReward(
         return ImmutablePair.of(id, currency);
     }
 
-    public static PayableReward of(@NonNull RewardId id, @NonNull PayableCurrency currency, @NonNull PositiveAmount amount, @NonNull Invoice invoice) {
+    public static PayableReward of(@NonNull RewardId id, @NonNull PayableCurrency currency, @NonNull PositiveAmount amount, @NonNull Invoice.BillingProfileSnapshot billingProfileSnapshot) {
         return new PayableReward(id, currency, amount,
-                invoice.billingProfileSnapshot().wallet(currency.network()).orElseThrow(),
-                invoice.billingProfileSnapshot().subject());
+                billingProfileSnapshot.wallet(currency.network()).orElseThrow(),
+                billingProfileSnapshot.subject());
     }
 
     public PayableReward add(final PayableReward other) {
