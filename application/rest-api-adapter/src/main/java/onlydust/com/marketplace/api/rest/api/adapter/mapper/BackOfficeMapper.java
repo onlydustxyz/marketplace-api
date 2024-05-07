@@ -825,7 +825,7 @@ public interface BackOfficeMapper {
     }
 
     static BillingProfilePayoutInfoResponse map(PayoutInfo payoutInfo) {
-        return new BillingProfilePayoutInfoResponse()
+        return isNull(payoutInfo) ? null : new BillingProfilePayoutInfoResponse()
                 .bankAccount(payoutInfo.bankAccount().map(BackOfficeMapper::map).orElse(null))
                 .ethWallet(payoutInfo.ethWallet().map(WalletLocator::asString).orElse(null))
                 .optimismAddress(payoutInfo.optimismAddress().map(EvmAccountAddress::toString).orElse(null))
