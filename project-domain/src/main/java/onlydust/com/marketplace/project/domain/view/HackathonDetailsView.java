@@ -41,6 +41,8 @@ public class HackathonDetailsView {
     List<Track> tracks;
     @NonNull
     List<ProjectShortView> projects;
+    @NonNull
+    List<RegisteredContributorLinkView> registeredUsers;
 
     public record Track(
             @NonNull String name,

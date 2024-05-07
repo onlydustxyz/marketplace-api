@@ -597,7 +597,7 @@ public interface BackOfficeMapper {
                         : null
                 )
                 .recipient(rewardDetailsView.recipient() != null ?
-                        new RecipientLinkResponse()
+                        new UserLinkResponse()
                                 .githubUserId(rewardDetailsView.recipient().githubUserId().value())
                                 .userId(rewardDetailsView.recipient().userId() != null ? rewardDetailsView.recipient().userId().value() : null)
                                 .login(rewardDetailsView.recipient().login())

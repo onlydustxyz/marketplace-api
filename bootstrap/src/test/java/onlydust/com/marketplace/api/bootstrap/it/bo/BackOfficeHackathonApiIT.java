@@ -1,8 +1,11 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.project.domain.model.Hackathon;
+import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 import java.util.UUID;
@@ -375,9 +378,14 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                         """);
     }
 
+    @Autowired
+    HackathonStoragePort hackathonStoragePort;
+
     @Test
     @Order(11)
     void should_get_updated_hackathon() {
+        hackathonStoragePort.registerUser(UUID.fromString("fc92397c-3431-4a84-8054-845376b630a0"), Hackathon.Id.of(hackathonId1.getValue()));
+
         // When
         client.get()
                 .uri(getApiURI(HACKATHONS_BY_ID.formatted(hackathonId1.getValue())))
@@ -471,7 +479,15 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "iconSlug": "icon-3",
                               "projects": []
                             }
-                          ]
+                          ],
+                          "registeredUsers": [
+                              {
+                                "githubUserId": 16590657,
+                                "userId": "fc92397c-3431-4a84-8054-845376b630a0",
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                              }
+                            ]
                         }
                         """);
     }

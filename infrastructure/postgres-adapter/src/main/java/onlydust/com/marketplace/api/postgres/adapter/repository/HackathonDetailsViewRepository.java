@@ -41,7 +41,16 @@ public interface HackathonDetailsViewRepository extends JpaRepository<HackathonD
                         'visibility', p.visibility))
                  FROM projects p
                     JOIN (SELECT jsonb_array_elements_text(jsonb_array_elements(h.tracks) -> 'projectIds')) tracks(projects) ON p.id = cast(tracks.projects as uuid)
-                 ) as projects
+                 ) as projects,
+                 (SELECT jsonb_agg(jsonb_build_object(
+                         'id', u.id,
+                         'githubUserId', u.github_user_id,
+                         'login', u.github_login,
+                         'avatarUrl', u.github_avatar_url
+                                   ))
+                  FROM hackathon_registrations hr
+                           JOIN iam.users u ON u.id = hr.user_id
+                  WHERE hr.hackathon_id = h.id)                             registered_users
             FROM
                 hackathons h
             """;

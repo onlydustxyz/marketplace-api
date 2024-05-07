@@ -99,6 +99,12 @@ public interface HackathonMapper {
                                 .name(project.name())
                                 .logoUrl(project.logoUrl())
                         ).toList())
+                ).toList())
+                .registeredUsers(view.registeredUsers().stream().map(registeredContributor -> new UserLinkResponse()
+                        .userId(registeredContributor.getId())
+                        .avatarUrl(registeredContributor.getAvatarUrl())
+                        .login(registeredContributor.getLogin())
+                        .githubUserId(registeredContributor.getGithubUserId())
                 ).toList());
     }
 
