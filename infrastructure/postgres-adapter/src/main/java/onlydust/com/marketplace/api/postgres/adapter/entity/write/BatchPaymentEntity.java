@@ -92,7 +92,7 @@ public class BatchPaymentEntity {
                                 RewardId.of(r.rewardId()),
                                 r.reward().currency().toDomain().forNetwork(this.network.toNetwork()),
                                 PositiveAmount.of(r.amount()),
-                                r.reward().invoice().toDomain()
+                                r.reward().invoice().toView().billingProfileSnapshot()
                         )).toList())
                 .status(this.status.toDomain())
                 .createdAt(this.createdAt)

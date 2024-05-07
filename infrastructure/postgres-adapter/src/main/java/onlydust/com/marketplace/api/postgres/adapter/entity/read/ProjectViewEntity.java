@@ -2,12 +2,16 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
 import lombok.*;
+import onlydust.com.marketplace.accounting.domain.model.ProjectId;
+import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectTagEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectMoreInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
+import onlydust.com.marketplace.project.domain.model.Project;
+import onlydust.com.marketplace.project.domain.view.backoffice.ProjectView;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -86,4 +90,36 @@ public class ProjectViewEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "id.projectId")
     Set<ProjectTagEntity> tags;
+
+    public Project toDomain() {
+        return Project.builder()
+                .id(id)
+                .slug(key)
+                .name(name)
+                .shortDescription(shortDescription)
+                .longDescription(longDescription)
+                .logoUrl(logoUrl)
+                .moreInfoUrl(moreInfos.stream().findFirst().map(ProjectMoreInfoEntity::getUrl).orElse(null))
+                .hiring(hiring)
+                .visibility(visibility.toDomain())
+                .build();
+    }
+
+    public ProjectView toBoView() {
+        return ProjectView.builder()
+                .id(id)
+                .name(name)
+                .logoUrl(logoUrl)
+                .build();
+    }
+
+    public ProjectShortView toView() {
+        return ProjectShortView.builder()
+                .slug(key)
+                .name(name)
+                .logoUrl(logoUrl)
+                .shortDescription(shortDescription)
+                .id(ProjectId.of(id))
+                .build();
+    }
 }

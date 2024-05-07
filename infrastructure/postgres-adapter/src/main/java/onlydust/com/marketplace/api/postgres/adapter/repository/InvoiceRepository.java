@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface InvoiceRepository extends JpaRepository<InvoiceEntity, UUID> {
@@ -48,4 +49,24 @@ public interface InvoiceRepository extends JpaRepository<InvoiceEntity, UUID> {
                                             final @NonNull Pageable pageable);
 
     Integer countByBillingProfileIdAndStatusNot(final @NonNull UUID billingProfileId, final @NonNull InvoiceEntity.Status exceptStatus);
+
+    @Query(value = """
+            SELECT
+                    i.id                    as id,
+                    i.billing_profile_id    as billing_profile_id,
+                    i.number                as number,
+                    i.created_by            as created_by,
+                    i.created_at            as created_at,
+                    i.status                as status,
+                    i.amount                as amount,
+                    i.currency_id           as currency_id,
+                    i.url                   as url,
+                    i.original_file_name    as original_file_name,
+                    i.rejection_reason      as rejection_reason,
+                    i.data                  as data
+            FROM accounting.invoices i
+                JOIN rewards r on r.invoice_id = i.id
+            WHERE r.id = :rewardId
+            """, nativeQuery = true)
+    Optional<InvoiceEntity> findByReward(UUID rewardId);
 }

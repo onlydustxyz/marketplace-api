@@ -34,6 +34,8 @@ public interface InvoiceStoragePort {
 
     Optional<Invoice> invoiceOf(RewardId rewardId);
 
+    Optional<InvoiceView> invoiceViewOf(RewardId rewardId);
+
     int getNextSequenceNumber(BillingProfile.Id billingProfileId);
 
     List<Invoice.Reward> findRewards(List<RewardId> rewardIds);

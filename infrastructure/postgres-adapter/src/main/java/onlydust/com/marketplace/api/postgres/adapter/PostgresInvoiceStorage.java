@@ -50,9 +50,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     @Override
     @Transactional
     public void create(final @NonNull Invoice invoice) {
-        final var entity = new InvoiceEntity().id(invoice.id().value());
-        entity.updateWith(invoice);
-        invoiceRepository.saveAndFlush(entity);
+        invoiceRepository.saveAndFlush(InvoiceEntity.fromDomain(invoice));
 
         final var rewards = rewardRepository.findAllById(invoice.rewards().stream().map(r -> r.id().value()).toList());
         if (rewards.size() != invoice.rewards().size()) {
@@ -70,7 +68,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
                         r.status(),
                         r.invoice() == null ? null : Invoice.Id.of(r.invoice().id()),
                         r.invoice() == null ? null : r.invoice().status().toDomain(),
-                        r.billingProfile() == null ? null : BillingProfile.Id.of(r.billingProfile().getId())
+                        r.billingProfileId() == null ? null : BillingProfile.Id.of(r.billingProfileId())
                 )).toList();
     }
 
@@ -144,8 +142,13 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
 
     @Override
     public Optional<Invoice> invoiceOf(RewardId rewardId) {
+        return invoiceRepository.findByReward(rewardId.value()).map(InvoiceEntity::toDomain);
+    }
+
+    @Override
+    public Optional<InvoiceView> invoiceViewOf(RewardId rewardId) {
         final var reward = rewardViewRepository.findById(rewardId.value()).orElseThrow(() -> notFound("Reward %s not found".formatted(rewardId)));
-        return Optional.ofNullable(reward.invoice()).map(InvoiceEntity::toDomain);
+        return Optional.ofNullable(reward.invoice()).map(InvoiceViewEntity::toView);
     }
 
     @Override

@@ -406,8 +406,8 @@ public class AccountingService implements AccountingFacadePort {
 
         private PayableReward createPayableReward(SponsorAccount.Id sponsorAccountId, RewardId rewardId, PositiveAmount amount) {
             final var sponsorAccountNetwork = sponsorAccount(sponsorAccountId).network().orElseThrow();
-            final var invoice = invoiceStoragePort.invoiceOf(rewardId).orElseThrow();
-            return PayableReward.of(rewardId, currency.forNetwork(sponsorAccountNetwork), amount, invoice);
+            final var invoice = invoiceStoragePort.invoiceViewOf(rewardId).orElseThrow();
+            return PayableReward.of(rewardId, currency.forNetwork(sponsorAccountNetwork), amount, invoice.billingProfileSnapshot());
         }
 
         private boolean stillEnoughBalance(SponsorAccount.Id sponsorAccountId, PositiveAmount amount) {
