@@ -23,14 +23,17 @@ public interface BackofficeEarningsViewRepository extends JpaRepository<BoEarnin
               AND (coalesce(:recipientIds) is null or r.recipient_id in (:recipientIds))
               AND (coalesce(:billingProfileIds) is null or r.billing_profile_id in (:billingProfileIds))
               AND (coalesce(:projectIds) is null or r.project_id in (:projectIds))
-              AND (coalesce(:fromDate) is null or r.requested_at >= cast(cast(:fromDate as text) as timestamp))
-              AND (coalesce(:toDate)   is null or r.requested_at <= cast(cast(:toDate   as text) as timestamp))
+              AND (coalesce(:fromRequestedAt) is null or r.requested_at >= cast(cast(:fromRequestedAt as text) as timestamp))
+              AND (coalesce(:toRequestedAt)   is null or r.requested_at <= cast(cast(:toRequestedAt   as text) as timestamp))
+              AND (coalesce(:fromProcessedAt) is null or rsd.paid_at >= cast(cast(:fromProcessedAt as text) as timestamp))
+              AND (coalesce(:toProcessedAt)   is null or rsd.paid_at <= cast(cast(:toProcessedAt   as text) as timestamp))
             GROUP BY r.currency_id
             """, nativeQuery = true)
     List<BoEarningsViewEntity> getEarnings(@NonNull List<String> statuses,
                                            @NonNull List<Long> recipientIds,
                                            @NonNull List<UUID> billingProfileIds,
                                            @NonNull List<UUID> projectIds,
-                                           Date fromDate, Date toDate);
+                                           Date fromRequestedAt, Date toRequestedAt,
+                                           Date fromProcessedAt, Date toProcessedAt);
 
 }

@@ -763,8 +763,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(EARNINGS, Map.of(
-                        "fromDate", "2010-02-08",
-                        "toDate", "2010-02-10"))
+                        "fromRequestedAt", "2010-02-08",
+                        "toRequestedAt", "2010-02-10"))
                 )
                 .header("Authorization", "Bearer " + camille.jwt())
                 // Then
@@ -782,13 +782,13 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
     @Test
     @Order(22)
-    void should_get_earnings_with_date_range() {
+    void should_get_earnings_with_requested_at_date_range() {
 
         // When
         client.get()
                 .uri(getApiURI(EARNINGS, Map.of(
-                        "fromDate", "2023-02-08",
-                        "toDate", "2024-02-10"))
+                        "fromRequestedAt", "2023-02-08",
+                        "toRequestedAt", "2024-02-10"))
                 )
                 .header("Authorization", "Bearer " + camille.jwt())
                 // Then
@@ -1017,9 +1017,58 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         """);
     }
 
-
     @Test
     @Order(25)
+    void should_get_earnings_with_processed_at_date_range() {
+
+        // When
+        client.get()
+                .uri(getApiURI(EARNINGS, Map.of(
+                        "fromProcessedAt", "2023-02-08",
+                        "toProcessedAt", "2024-02-10"))
+                )
+                .header("Authorization", "Bearer " + camille.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalUsdAmount": 998953.65,
+                          "amountsPerCurrency": [
+                            {
+                              "amount": 22563,
+                              "currency": {
+                                "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                "code": "USD",
+                                "name": "US Dollar",
+                                "logoUrl": null,
+                                "decimals": 2
+                              },
+                              "dollarsEquivalent": 22563,
+                              "rewardCount": 15
+                            },
+                            {
+                              "amount": 86065.00,
+                              "currency": {
+                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                "code": "USDC",
+                                "name": "USD Coin",
+                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                "decimals": 6
+                              },
+                              "dollarsEquivalent": 976390.65,
+                              "rewardCount": 66
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+
+    @Test
+    @Order(26)
     void should_get_earnings_all_combined() {
 
         // When
@@ -1028,8 +1077,10 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "recipients", "43467246,595505",
                                 "billingProfiles", "50d8ae0d-1981-435b-90c5-09fc32b7d7d6,9cae91ac-e70f-426f-af0d-e35c1d3578ed",
                                 "statuses", "COMPLETE",
-                                "fromDate", "2023-02-08",
-                                "toDate", "2024-02-10",
+                                "fromRequestedAt", "2023-02-08",
+                                "toRequestedAt", "2024-02-10",
+                                "fromProcessedAt", "2023-02-08",
+                                "toProcessedAt", "2024-02-10",
                                 "projects", "7d04163c-4187-4313-8066-61504d34fc56,1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e,57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8"
                         ))
                 )

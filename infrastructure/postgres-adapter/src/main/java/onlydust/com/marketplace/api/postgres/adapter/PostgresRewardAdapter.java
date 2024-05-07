@@ -24,7 +24,6 @@ import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.output.BoostedRewardStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.RewardStoragePort;
-import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.project.domain.view.ShortProjectRewardView;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -151,14 +150,16 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
                                     @NonNull List<GithubUserId> recipientIds,
                                     @NonNull List<BillingProfile.Id> billingProfileIds,
                                     @NonNull List<ProjectId> projectIds,
-                                    Date fromDate, Date toDate) {
+                                    Date fromRequestedAt, Date toRequestedAt,
+                                    Date fromProcessedAt, Date toProcessedAt) {
         return new EarningsView(
                 backofficeEarningsViewRepository.getEarnings(
                         statuses.stream().map(RewardStatusEntity::from).map(RewardStatusEntity.Status::toString).toList(),
                         recipientIds.stream().map(GithubUserId::value).toList(),
                         billingProfileIds.stream().map(BillingProfile.Id::value).toList(),
                         projectIds.stream().map(ProjectId::value).toList(),
-                        fromDate, toDate
+                        fromRequestedAt, toRequestedAt,
+                        fromProcessedAt, toProcessedAt
                 ).stream().map(BoEarningsViewEntity::toDomain).toList());
     }
 
