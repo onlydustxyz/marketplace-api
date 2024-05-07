@@ -1,11 +1,11 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import org.apache.commons.lang3.mutable.MutableObject;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,6 +16,13 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
 
     final static MutableObject<String> languageId1 = new MutableObject<>();
 
+    UserAuthHelper.AuthenticatedBackofficeUser pierre;
+
+    @BeforeEach
+    void setUp() {
+        pierre = userAuthHelper.authenticateBackofficeUser("pierre.oucif@gadz.org", List.of(BackofficeUser.Role.BO_READER, BackofficeUser.Role.BO_ADMIN));
+    }
+
     @Test
     @Order(1)
     void should_create_language() {
@@ -23,7 +30,7 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .post()
                 .uri(getApiURI(LANGUAGES))
                 .contentType(APPLICATION_JSON)
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + pierre.jwt())
                 .bodyValue("""
                         {
                             "name": "Alphabetic",
@@ -53,7 +60,7 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
         client
                 .get()
                 .uri(getApiURI(LANGUAGES))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + pierre.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -83,7 +90,7 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .put()
                 .uri(getApiURI(LANGUAGES_BY_ID.formatted(languageId1.getValue())))
                 .contentType(APPLICATION_JSON)
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + pierre.jwt())
                 .bodyValue("""
                         {
                             "name": "Alphabeticcc",
@@ -110,7 +117,7 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
         client
                 .get()
                 .uri(getApiURI(LANGUAGES))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + pierre.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -141,7 +148,7 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .post()
                 .uri(getApiURI(LANGUAGES))
                 .contentType(APPLICATION_JSON)
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + pierre.jwt())
                 .bodyValue("""
                         {
                             "name": "Foo",
@@ -166,7 +173,7 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
         client
                 .get()
                 .uri(getApiURI(LANGUAGES))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + pierre.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -200,7 +207,7 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
         client
                 .get()
                 .uri(getApiURI(LANGUAGES_EXTENSIONS))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + pierre.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()

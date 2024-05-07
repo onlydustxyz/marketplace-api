@@ -14,6 +14,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.CreateRewardResponse;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookEventRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
@@ -75,6 +76,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     PdfStoragePort pdfStoragePort;
     @Autowired
     RewardStatusRepository rewardStatusRepository;
+    UserAuthHelper.AuthenticatedBackofficeUser camille;
 
     @BeforeEach
     void setup() {
@@ -82,6 +84,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         accountBookRepository.deleteAll();
         sponsorAccountRepository.deleteAll();
         accountBookProvider.evictAll();
+        camille = userAuthHelper.authenticateCamille();
     }
 
     @Test
@@ -89,7 +92,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // When
         final var response = client.post()
                 .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(COCA_COLAX)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -120,7 +123,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // When
         client.post()
                 .uri(getApiURI(POST_SPONSOR_ACCOUNTS_RECEIPTS.formatted(accountId)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -148,7 +151,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // When
         client.post()
                 .uri(getApiURI(POST_PROJECTS_BUDGETS_ALLOCATE.formatted(BRETZEL)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -165,7 +168,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // When
         client.post()
                 .uri(getApiURI(POST_PROJECTS_BUDGETS_UNALLOCATE.formatted(BRETZEL)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -181,7 +184,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // When
         client.post()
                 .uri(getApiURI(POST_SPONSOR_ACCOUNTS_RECEIPTS.formatted(accountId)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -208,7 +211,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         client.post()
                 .uri(getApiURI(POST_SPONSOR_ACCOUNTS_RECEIPTS.formatted(accountId)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -237,7 +240,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // When
         client.put()
                 .uri(getApiURI(POST_SPONSOR_ACCOUNTS_ALLOWANCE.formatted(accountId)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -263,7 +266,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                         "pageIndex", "0",
                         "pageSize", "10"
                 )))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -382,7 +385,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // Given
         client.post()
                 .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(THEODO)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -403,7 +406,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         client.post()
                 .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(THEODO)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -422,7 +425,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         client.get()
                 .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(THEODO)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -487,7 +490,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // Given
         final var account = client.post()
                 .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(COCA_COLAX)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -510,7 +513,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // When
         client.delete()
                 .uri(getApiURI(DELETE_SPONSOR_ACCOUNTS_RECEIPTS.formatted(account.getId(), account.getReceipts().get(0).getId())))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -530,7 +533,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // Given
         final var response = client.post()
                 .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(COCA_COLAX)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -556,7 +559,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // When
         client.patch()
                 .uri(getApiURI(PATCH_SPONSOR_ACCOUNTS.formatted(response.getId())))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -574,7 +577,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // When
         client.patch()
                 .uri(getApiURI(PATCH_SPONSOR_ACCOUNTS.formatted(response.getId())))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -598,7 +601,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         final var accountId = client.post()
                 .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(REDBULL)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -622,7 +625,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // Given
         client.post()
                 .uri(getApiURI(POST_PROJECTS_BUDGETS_ALLOCATE.formatted(KAAPER)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -667,7 +670,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // Then
         client.get()
                 .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(REDBULL)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -683,7 +686,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // When
         client.post()
                 .uri(getApiURI(POST_REWARDS_PAY.formatted(rewardId)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -707,7 +710,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // When
         client.post()
                 .uri(getApiURI(POST_REWARDS_PAY.formatted(rewardId)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -760,7 +763,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         client.get()
                 .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(REDBULL)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -778,7 +781,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                         "pageIndex", "0",
                         "pageSize", "10"
                 )))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -844,7 +847,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .post()
                 .uri(getApiURI(POST_CURRENCIES))
                 .contentType(APPLICATION_JSON)
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .bodyValue("""
                         {
                             "type": "CRYPTO",
@@ -859,7 +862,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         final var accountId = client.post()
                 .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(REDBULL)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -883,7 +886,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // Given
         client.post()
                 .uri(getApiURI(POST_PROJECTS_BUDGETS_ALLOCATE.formatted(KAAPER)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -928,7 +931,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // Then
         client.get()
                 .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(REDBULL)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -947,7 +950,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // When
         client.post()
                 .uri(getApiURI(POST_REWARDS_PAY.formatted(rewardId)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -1017,7 +1020,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         client.get()
                 .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(REDBULL)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -1035,7 +1038,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                         "pageIndex", "0",
                         "pageSize", "10"
                 )))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -1099,7 +1102,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         final var accountId = client.post()
                 .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(REDBULL)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -1123,7 +1126,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // Given
         client.post()
                 .uri(getApiURI(POST_PROJECTS_BUDGETS_ALLOCATE.formatted(KAAPER)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -1168,7 +1171,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // Then
         client.get()
                 .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(REDBULL)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -1187,7 +1190,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         // When
         client.post()
                 .uri(getApiURI(POST_REWARDS_PAY.formatted(rewardId)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -1230,7 +1233,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         client.get()
                 .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(REDBULL)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -1248,7 +1251,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                         "pageIndex", "0",
                         "pageSize", "10"
                 )))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -1308,7 +1311,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         client.get()
                 .uri(getApiURI(BILLING_PROFILE.formatted("1253b889-e5d5-49ee-8e8a-21405ccab8a6")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -1375,7 +1378,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         client.get()
                 .uri(getApiURI(BILLING_PROFILE.formatted(billingProfileId)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()

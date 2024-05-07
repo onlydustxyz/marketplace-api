@@ -34,8 +34,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import java.net.http.HttpClient;
 
 import static onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.*;
-import static onlydust.com.marketplace.user.domain.model.BackofficeUser.Role.BO_ADMIN;
-import static onlydust.com.marketplace.user.domain.model.BackofficeUser.Role.BO_READER;
+import static onlydust.com.marketplace.user.domain.model.BackofficeUser.Role.*;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @Configuration
@@ -61,13 +60,40 @@ public class WebSecurityConfiguration {
                 .authorizeHttpRequests((authorize) ->
                         authorize
                                 .requestMatchers(antMatcher("/bo/v1/external/**")).hasAnyAuthority(UNSAFE_INTERNAL_SERVICE.name(), BO_READER.name())
-                                .requestMatchers(antMatcher(HttpMethod.GET, "/bo/v1/**")).hasAnyAuthority(INTERNAL_SERVICE.name(), BO_READER.name())
-                                .requestMatchers(antMatcher(HttpMethod.OPTIONS, "/bo/v1/**")).hasAnyAuthority(INTERNAL_SERVICE.name(), BO_READER.name())
-                                .requestMatchers(antMatcher(HttpMethod.HEAD, "/bo/v1/**")).hasAnyAuthority(INTERNAL_SERVICE.name(), BO_READER.name())
-                                .requestMatchers(antMatcher(HttpMethod.POST, "/bo/v1/**")).hasAnyAuthority(INTERNAL_SERVICE.name(), BO_ADMIN.name())
-                                .requestMatchers(antMatcher(HttpMethod.PUT, "/bo/v1/**")).hasAnyAuthority(INTERNAL_SERVICE.name(), BO_ADMIN.name())
-                                .requestMatchers(antMatcher(HttpMethod.PATCH, "/bo/v1/**")).hasAnyAuthority(INTERNAL_SERVICE.name(), BO_ADMIN.name())
-                                .requestMatchers(antMatcher(HttpMethod.DELETE, "/bo/v1/**")).hasAnyAuthority(INTERNAL_SERVICE.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/bo/v1/**")).hasAnyAuthority(BO_READER.name())
+                                .requestMatchers(antMatcher(HttpMethod.OPTIONS, "/bo/v1/**")).hasAnyAuthority(BO_READER.name())
+                                .requestMatchers(antMatcher(HttpMethod.HEAD, "/bo/v1/**")).hasAnyAuthority(BO_READER.name())
+
+                                .requestMatchers(antMatcher(HttpMethod.POST, "/bo/v1/hackathons/**")).hasAnyAuthority(BO_MARKETING_ADMIN.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.PUT, "/bo/v1/hackathons/**")).hasAnyAuthority(BO_MARKETING_ADMIN.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.PATCH, "/bo/v1/hackathons/**")).hasAnyAuthority(BO_MARKETING_ADMIN.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.DELETE, "/bo/v1/hackathons/**")).hasAnyAuthority(BO_MARKETING_ADMIN.name(), BO_ADMIN.name())
+
+                                .requestMatchers(antMatcher(HttpMethod.POST, "/bo/v1/rewards/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.PUT, "/bo/v1/rewards/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.PATCH, "/bo/v1/rewards/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.DELETE, "/bo/v1/rewards/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name(), BO_ADMIN.name())
+
+                                .requestMatchers(antMatcher(HttpMethod.POST, "/bo/v1/sponsors")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.POST, "/bo/v1/sponsors/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.PUT, "/bo/v1/sponsors/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.PATCH, "/bo/v1/sponsors/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.DELETE, "/bo/v1/sponsors/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name(), BO_ADMIN.name())
+
+                                .requestMatchers(antMatcher(HttpMethod.POST, "/bo/v1/sponsor-accounts/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.PUT, "/bo/v1/sponsor-accounts/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.PATCH, "/bo/v1/sponsor-accounts/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.DELETE, "/bo/v1/sponsor-accounts/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name(), BO_ADMIN.name())
+
+                                .requestMatchers(antMatcher(HttpMethod.POST, "/bo/v1/projects/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.PUT, "/bo/v1/projects/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.PATCH, "/bo/v1/projects/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.DELETE, "/bo/v1/projects/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name(), BO_ADMIN.name())
+
+                                .requestMatchers(antMatcher(HttpMethod.POST, "/bo/v1/currencies/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.PUT, "/bo/v1/currencies/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.PATCH, "/bo/v1/currencies/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name(), BO_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.DELETE, "/bo/v1/currencies/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name(), BO_ADMIN.name())
 
                                 .requestMatchers(antMatcher("/api/v1/me/**")).hasAuthority(USER.name())
                                 .requestMatchers(antMatcher("/api/v1/billing-profiles/**")).hasAuthority(USER.name())

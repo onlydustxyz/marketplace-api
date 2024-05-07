@@ -28,7 +28,7 @@ public record BackofficeUser(@NonNull Id id, @NonNull String email, @NonNull Str
     }
 
     public enum Role {
-        BO_ADMIN, BO_READER
+        BO_ADMIN, BO_FINANCIAL_ADMIN, BO_MARKETING_ADMIN, BO_READER
     }
 
     @Builder

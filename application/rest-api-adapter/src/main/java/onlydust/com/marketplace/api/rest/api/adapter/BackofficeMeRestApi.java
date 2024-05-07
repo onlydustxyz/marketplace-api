@@ -25,7 +25,9 @@ public class BackofficeMeRestApi implements BackofficeMeApi {
                 .name(user.name())
                 .email(user.email())
                 .roles(user.roles().stream().map(role -> switch (role) {
-                            case BO_ADMIN -> BackofficeUserRole.ADMIN;
+                            case BO_MARKETING_ADMIN -> BackofficeUserRole.MARKETING_ADMIN;
+                            case BO_FINANCIAL_ADMIN -> BackofficeUserRole.ADMIN;
+                            case BO_ADMIN -> BackofficeUserRole.FINANCIAL_ADMIN;
                             case BO_READER -> BackofficeUserRole.READER;
                         }
                 ).toList()));

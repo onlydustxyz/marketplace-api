@@ -5,12 +5,10 @@ import onlydust.com.backoffice.api.contract.model.CurrencyResponse;
 import onlydust.com.backoffice.api.contract.model.CurrencyType;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.api.bootstrap.helper.AccountingHelper;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
@@ -62,6 +60,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
 
     @Autowired
     private ProjectAllowanceRepository projectAllowanceRepository;
+    UserAuthHelper.AuthenticatedBackofficeUser camille;
 
     @Test
     @Order(0)
@@ -75,6 +74,12 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
         projectAllowanceRepository.deleteAll();
         currencyRepository.deleteAll();
         accountBookProvider.evictAll();
+
+    }
+
+    @BeforeEach
+    void setUp() {
+        camille = userAuthHelper.authenticateCamille();
     }
 
     @Test
@@ -84,7 +89,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .post()
                 .uri(getApiURI(POST_CURRENCIES))
                 .contentType(APPLICATION_JSON)
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .bodyValue("""
                         {
                             "type": "CRYPTO",
@@ -115,7 +120,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .post()
                 .uri(getApiURI(POST_CURRENCIES))
                 .contentType(APPLICATION_JSON)
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .bodyValue("""
                         {
                             "type": "CRYPTO",
@@ -146,7 +151,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .post()
                 .uri(getApiURI(POST_CURRENCIES))
                 .contentType(APPLICATION_JSON)
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .bodyValue("""
                         {
                             "type": "CRYPTO",
@@ -168,7 +173,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .post()
                 .uri(getApiURI(POST_CURRENCIES))
                 .contentType(APPLICATION_JSON)
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .bodyValue("""
                         {
                             "type": "CRYPTO",
@@ -199,7 +204,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .post()
                 .uri(getApiURI(POST_CURRENCIES))
                 .contentType(APPLICATION_JSON)
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .bodyValue("""
                         {
                             "type": "CRYPTO",
@@ -229,7 +234,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .post()
                 .uri(getApiURI(POST_CURRENCIES))
                 .contentType(APPLICATION_JSON)
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .bodyValue("""
                         {
                             "type": "CRYPTO",
@@ -267,7 +272,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .post()
                 .uri(getApiURI(POST_CURRENCIES))
                 .contentType(APPLICATION_JSON)
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .bodyValue("""
                         {
                             "type": "FIAT",
@@ -297,7 +302,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .put()
                 .uri(getApiURI(PUT_CURRENCIES.formatted(currencyId)))
                 .contentType(APPLICATION_JSON)
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .bodyValue("""
                         {
                             "name": "Euro2",
@@ -351,7 +356,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
         client
                 .get()
                 .uri(getApiURI(GET_CURRENCIES))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()

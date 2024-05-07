@@ -1,8 +1,11 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import onlydust.com.backoffice.api.contract.model.EcosystemRequest;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoEcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoEcosystemRepository;
+import onlydust.com.marketplace.user.domain.model.BackofficeUser;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +18,13 @@ import java.util.Map;
 public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Autowired
     BoEcosystemRepository ecosystemRepository;
+
+    UserAuthHelper.AuthenticatedBackofficeUser pierre;
+
+    @BeforeEach
+    void setUp() {
+        pierre = userAuthHelper.authenticateBackofficeUser("pierre.oucif@gadz.org", List.of(BackofficeUser.Role.BO_READER, BackofficeUser.Role.BO_ADMIN));
+    }
 
     @Test
     void should_raise_missing_authentication_given_no_api_key_when_getting_github_repos() {
@@ -41,7 +51,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(GET_GITHUB_REPOS, Map.of("pageIndex", "0", "pageSize", "5")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + pierre.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -127,10 +137,10 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
         client.get()
                 .uri(getApiURI(GET_GITHUB_REPOS, Map.of("pageIndex", "0", "pageSize", "5", "projectIds", "467cb27c" +
-                        "-9726-4f94" +
-                        "-818e" +
-                        "-6aa49bbf5e75,b0f54343-3732-4118-8054-dba40f1ffb85")))
-                .header("Api-Key", apiKey())
+                                                                                                         "-9726-4f94" +
+                                                                                                         "-818e" +
+                                                                                                         "-6aa49bbf5e75,b0f54343-3732-4118-8054-dba40f1ffb85")))
+                .header("Authorization", "Bearer " + pierre.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -208,7 +218,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(GET_ECOSYSTEMS, Map.of("pageIndex", "0", "pageSize", "5")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + pierre.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -276,7 +286,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         "pageSize", "5",
                         "projectIds", "7d04163c-4187-4313-8066-61504d34fc56,1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e")
                 ))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + pierre.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -338,7 +348,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         "pageSize", "5",
                         "ecosystemIds", zama.getId().toString())
                 ))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + pierre.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -362,7 +372,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.post()
                 .uri(getApiURI(GET_ECOSYSTEMS))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + pierre.jwt())
                 .body(BodyInserters.fromValue(ecosystemRequest))
                 // Then
                 .exchange()
@@ -380,7 +390,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(GET_PROJECT_LEAD_INVITATIONS, Map.of("pageIndex", "0", "pageSize", "5")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + pierre.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -425,7 +435,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
         client.get()
                 .uri(getApiURI(GET_PROJECT_LEAD_INVITATIONS, Map.of("pageIndex", "0", "pageSize", "5", "ids",
                         "03d6f190-f898-49fa-a1e5-e6174295d3e8,16def485-d98f-4619-801a-ca147c8c64a6")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + pierre.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -458,7 +468,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         "pageIndex", "0",
                         "pageSize", "5",
                         "projectIds", "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54,298a547f-ecb6-4ab2-8975-68f4e9bf7b39")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + pierre.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -491,7 +501,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(GET_PROJECTS, Map.of("pageIndex", "0", "pageSize", "5")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + pierre.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -616,7 +626,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         "pageIndex", "0",
                         "pageSize", "5",
                         "projectIds", "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54,61ef7d3a-81a2-4baf-bdb0-e7ae5e165d17")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + pierre.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -679,7 +689,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(GET_PROJECTS_V2, Map.of("pageIndex", "0", "pageSize", "5")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + pierre.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -727,7 +737,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(GET_PROJECTS_V2, Map.of("pageIndex", "0", "pageSize", "5", "search", "Du")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + pierre.jwt())
                 // Then
                 .exchange()
                 .expectStatus()

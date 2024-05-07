@@ -261,3 +261,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000218_drop_events_group_key.sql
   - include:
       file: db/changelog/changelogs/00000219_add_missing_indexes.sql
+  - include:
+      file: db/changelog/changelogs/00000222_update_backoffice_users_roles.sql
