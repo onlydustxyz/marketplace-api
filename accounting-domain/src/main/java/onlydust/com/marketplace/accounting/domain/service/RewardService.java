@@ -54,15 +54,16 @@ public class RewardService implements AccountingRewardPort {
                                     List<GithubUserId> recipientIds,
                                     List<BillingProfile.Id> billingProfileIds,
                                     List<ProjectId> projectIds,
-                                    Date fromDate, Date toDate) {
+                                    Date fromRequestedAt, Date toRequestedAt,
+                                    Date fromProcessedAt, Date toProcessedAt) {
         final Set<RewardStatus.Input> sanitizedStatuses = isNull(statuses) ? Set.of() : statuses.stream().collect(Collectors.toUnmodifiableSet());
         return accountingRewardStoragePort.getEarnings(
                 sanitizedStatuses,
                 isNull(recipientIds) ? List.of() : recipientIds,
                 isNull(billingProfileIds) ? List.of() : billingProfileIds,
                 isNull(projectIds) ? List.of() : projectIds,
-                fromDate,
-                toDate);
+                fromRequestedAt, toRequestedAt,
+                fromProcessedAt, toProcessedAt);
     }
 
     @Override

@@ -279,14 +279,19 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                                                         List<Long> recipients,
                                                         List<UUID> billingProfiles,
                                                         List<UUID> projects,
-                                                        String fromDate, String toDate) {
+                                                        String fromRequestedAt,
+                                                        String toRequestedAt,
+                                                        String fromProcessedAt,
+                                                        String toProcessedAt) {
         final EarningsView earnings = accountingRewardPort.getEarnings(
                 statuses != null ? statuses.stream().map(BackOfficeMapper::map).toList() : null,
                 recipients != null ? recipients.stream().map(GithubUserId::of).toList() : null,
                 billingProfiles != null ? billingProfiles.stream().map(BillingProfile.Id::of).toList() : null,
                 projects != null ? projects.stream().map(ProjectId::of).toList() : null,
-                DateMapper.parseNullable(fromDate),
-                DateMapper.parseNullable(toDate)
+                DateMapper.parseNullable(fromRequestedAt),
+                DateMapper.parseNullable(toRequestedAt),
+                DateMapper.parseNullable(fromProcessedAt),
+                DateMapper.parseNullable(toProcessedAt)
         );
         return ResponseEntity.ok(new EarningsResponse()
                 .totalUsdAmount(prettyUsd(earnings.totalUsdAmount()))

@@ -20,12 +20,13 @@ public interface AccountingRewardPort {
                                        List<GithubUserId> recipients,
                                        Date fromRequestedAt, Date toRequestedAt,
                                        Date fromProcessedAt, Date toProcessedAt);
-    
+
     EarningsView getEarnings(List<RewardStatus.Input> statuses,
                              List<GithubUserId> recipientIds,
                              List<BillingProfile.Id> billingProfileIds,
                              List<ProjectId> projectIds,
-                             Date fromDate, Date toDate);
+                             Date fromRequestedAt, Date toRequestedAt,
+                             Date fromProcessedAt, Date toProcessedAt);
 
     String exportRewardsCSV(List<RewardStatus.Input> statuses,
                             List<BillingProfile.Id> billingProfileIds,

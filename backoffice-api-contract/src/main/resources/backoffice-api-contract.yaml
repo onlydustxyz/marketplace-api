@@ -1497,13 +1497,25 @@ paths:
               $ref: '#/components/schemas/ProjectId'
           style: form
         - in: query
-          name: fromDate
+          name: fromRequestedAt
           required: false
           schema:
             type: string
             pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
         - in: query
-          name: toDate
+          name: toRequestedAt
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: fromProcessedAt
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: toProcessedAt
           required: false
           schema:
             type: string

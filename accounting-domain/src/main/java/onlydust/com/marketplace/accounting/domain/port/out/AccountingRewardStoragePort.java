@@ -6,11 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.BatchPaymentShortView;
-import onlydust.com.marketplace.accounting.domain.view.EarningsView;
-import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.ShortRewardDetailsView;
+import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
@@ -42,7 +38,8 @@ public interface AccountingRewardStoragePort {
                              @NonNull List<GithubUserId> recipientIds,
                              @NonNull List<BillingProfile.Id> billingProfileIds,
                              @NonNull List<ProjectId> projectIds,
-                             Date fromDate, Date toDate);
+                             Date fromRequestedAt, Date toRequestedAt,
+                             Date fromProcessedAt, Date toProcessedAt);
 
     List<RewardDetailsView> findPaidRewardsToNotify();
 
