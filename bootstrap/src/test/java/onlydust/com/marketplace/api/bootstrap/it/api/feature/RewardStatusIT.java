@@ -131,7 +131,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     void setupAuthenticationMock() {
         Mockito.reset(authenticatedBackofficeUserService);
         when(authenticatedBackofficeUserService.getAuthenticatedBackofficeUser()).thenReturn(new BackofficeUser(BackofficeUser.Id.random(),
-                faker.internet().emailAddress(), faker.internet().slug(), Set.of(BackofficeUser.Role.BO_ADMIN), faker.internet().avatar()));
+                faker.internet().emailAddress(), faker.internet().slug(), Set.of(BackofficeUser.Role.BO_FINANCIAL_ADMIN), faker.internet().avatar()));
     }
 
     public void resetAuth0Mock() {

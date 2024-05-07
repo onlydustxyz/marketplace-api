@@ -20,7 +20,7 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
 
     @BeforeEach
     void setUp() {
-        pierre = userAuthHelper.authenticateBackofficeUser("pierre.oucif@gadz.org", List.of(BackofficeUser.Role.BO_READER, BackofficeUser.Role.BO_ADMIN));
+        pierre = userAuthHelper.authenticateBackofficeUser("pierre.oucif@gadz.org", List.of(BackofficeUser.Role.BO_READER));
     }
 
     @Test

@@ -267,3 +267,4 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000221_create_users_ecosystems_ranks_view.sql
   - include:
       file: db/changelog/changelogs/00000222_update_backoffice_users_roles.sql
+
