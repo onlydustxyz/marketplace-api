@@ -1,9 +1,11 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.repository.LanguageRepository;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,6 +18,9 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
 
     final static MutableObject<String> languageId1 = new MutableObject<>();
 
+    @Autowired
+    LanguageRepository languageRepository;
+
     UserAuthHelper.AuthenticatedBackofficeUser pierre;
 
     @BeforeEach
@@ -26,6 +31,8 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
     @Test
     @Order(1)
     void should_create_language() {
+        languageRepository.deleteAll();
+
         client
                 .post()
                 .uri(getApiURI(LANGUAGES))
