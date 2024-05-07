@@ -9,6 +9,7 @@ import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
 import onlydust.com.marketplace.project.domain.view.HackathonDetailsView;
 import onlydust.com.marketplace.project.domain.view.ProjectShortView;
+import onlydust.com.marketplace.project.domain.view.RegisteredContributorLinkView;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -72,6 +73,9 @@ public class HackathonDetailsViewEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     List<Project> projects;
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    List<RegisteredContributorLinkView> registeredUsers;
+
     public record Project(@NonNull UUID id,
                           @NonNull String slug,
                           @NonNull String name,
@@ -109,7 +113,8 @@ public class HackathonDetailsViewEntity {
                         track.iconSlug(),
                         track.projectIds().stream().map(projectId -> projects.get(projectId).toDomain()).toList()
                 )).toList(),
-                projects.values().stream().map(Project::toDomain).toList()
+                projects.values().stream().map(Project::toDomain).toList(),
+                isNull(registeredUsers) ? List.of() : registeredUsers
         );
     }
 }

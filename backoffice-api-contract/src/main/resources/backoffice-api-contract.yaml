@@ -3788,7 +3788,7 @@ components:
             - githubUrls
           properties:
             recipient:
-              $ref: '#/components/schemas/RecipientLinkResponse'
+              $ref: '#/components/schemas/UserLinkResponse'
             billingProfile:
               $ref: '#/components/schemas/BillingProfileLinkResponse'
             requestedAt:
@@ -3810,7 +3810,7 @@ components:
         - PROCESSING
         - COMPLETE
 
-    RecipientLinkResponse:
+    UserLinkResponse:
       type: object
       required:
         - githubUserId
@@ -4124,6 +4124,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/HackathonsTrackResponse'
+        registeredUsers:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserLinkResponse'
 
     UpdateTracksRequest:
       type: object
