@@ -347,11 +347,17 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         userRepository.findByGithubUserId(selfEmployedBPAdminGithubId).ifPresent(userEntity -> selfEmployedBPAdminId = userEntity.getId());
 
         individualBPId = isNull(individualBPAdminId) ? null :
-                billingProfileService.getBillingProfilesForUser(UserId.of(individualBPAdminId)).stream().map(s -> s.getId().value()).findFirst().orElse(null);
+                billingProfileService.getBillingProfilesForUser(UserId.of(individualBPAdminId)).stream()
+                        .filter(bp -> bp.getType() == BillingProfile.Type.INDIVIDUAL)
+                        .map(bp -> bp.getId().value()).findFirst().orElse(null);
         companyBPId = isNull(companyBPAdmin1Id) ? null :
-                billingProfileService.getBillingProfilesForUser(UserId.of(companyBPAdmin1Id)).stream().map(s -> s.getId().value()).findFirst().orElse(null);
+                billingProfileService.getBillingProfilesForUser(UserId.of(companyBPAdmin1Id)).stream()
+                        .filter(bp -> bp.getType() == BillingProfile.Type.COMPANY)
+                        .map(bp -> bp.getId().value()).findFirst().orElse(null);
         selfEmployedBPId = isNull(selfEmployedBPAdminId) ? null :
-                billingProfileService.getBillingProfilesForUser(UserId.of(selfEmployedBPAdminId)).stream().map(s -> s.getId().value()).findFirst().orElse(null);
+                billingProfileService.getBillingProfilesForUser(UserId.of(selfEmployedBPAdminId)).stream()
+                        .filter(bp -> bp.getType() == BillingProfile.Type.SELF_EMPLOYED)
+                        .map(bp -> bp.getId().value()).findFirst().orElse(null);
     }
 
     private void sendRewardToRecipient(Long recipientId, Long amount, UUID projectId) {
