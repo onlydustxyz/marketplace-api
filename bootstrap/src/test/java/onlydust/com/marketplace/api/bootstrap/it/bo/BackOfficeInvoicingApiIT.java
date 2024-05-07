@@ -24,6 +24,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import onlydust.com.marketplace.project.domain.service.UserService;
+import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -169,6 +170,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     @Order(1)
     void should_list_invoices() throws IOException {
         setUp();
+        final String jwt = userAuthHelper.authenticateBackofficeUser("pierre.oucif@gadz.org", List.of(BackofficeUser.Role.BO_READER)).jwt();
 
         // When
         client
@@ -177,7 +179,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         "pageIndex", "0",
                         "pageSize", "10",
                         "invoiceIds", companyBillingProfileToReviewInvoices.stream().map(Invoice.Id::toString).collect(Collectors.joining(",")))))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -256,7 +258,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         "pageIndex", "0",
                         "pageSize", "10",
                         "invoiceIds", companyBillingProfileToReviewInvoices.stream().map(Invoice.Id::toString).collect(Collectors.joining(",")))))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -348,6 +350,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     void should_list_invoices_with_kyc_without_lastname() throws IOException {
         // Given
         final var ofux = UserId.of(userAuthHelper.authenticateOlivier().user().getId());
+        final String jwt = userAuthHelper.authenticateBackofficeUser("pierre.oucif@gadz.org", List.of(BackofficeUser.Role.BO_READER)).jwt();
         final var individualBillingProfile = createIndividualBillingProfileFor(ofux, ProjectId.of("e41f44a2-464c-4c96-817f-81acb06b2523"));
         final Invoice.Id invoiceId = billingProfileService.previewInvoice(ofux, individualBillingProfile.id(), List.of(
                 RewardId.of("5c668b61-e42c-4f0e-b31f-44c4e50dc2f4")
@@ -362,7 +365,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         "pageIndex", "0",
                         "pageSize", "10",
                         "statuses", "APPROVED,TO_REVIEW")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -460,7 +463,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
         client
                 .put()
                 .uri(getApiURI(PUT_INVOICES_STATUS.formatted(companyBillingProfileToReviewInvoices.get(0))))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -475,7 +478,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
         client
                 .get()
                 .uri(getApiURI(V2_INVOICES, Map.of("pageIndex", "0", "pageSize", "10")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -519,7 +522,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
         client
                 .put()
                 .uri(getApiURI(PUT_INVOICES_STATUS.formatted(companyBillingProfileToReviewInvoices.get(1))))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -566,7 +569,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
         client
                 .get()
                 .uri(getApiURI(V2_INVOICES, Map.of("pageIndex", "0", "pageSize", "10")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -608,7 +611,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
         client
                 .get()
                 .uri(getApiURI(V2_INVOICES, Map.of("pageIndex", "0", "pageSize", "10", "statuses", "TO_REVIEW,REJECTED")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -645,7 +648,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         "pageIndex", "0",
                         "pageSize", "10",
                         "currencies", "562bbf65-8a71-4d30-ad63-520c0d68ba27")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -691,7 +694,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         "pageIndex", "0",
                         "pageSize", "10",
                         "billingProfileTypes", "COMPANY,SELF_EMPLOYED")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -731,7 +734,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         "pageIndex", "0",
                         "pageSize", "10",
                         "billingProfiles", companyBillingProfile.id().toString())))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -752,7 +755,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         "pageIndex", "0",
                         "pageSize", "10",
                         "search", "apple")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()

@@ -16,11 +16,11 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
     final static MutableObject<String> hackathonId1 = new MutableObject<>();
     final static MutableObject<String> hackathonId2 = new MutableObject<>();
 
-    UserAuthHelper.AuthenticatedBackofficeUser camille;
+    UserAuthHelper.AuthenticatedBackofficeUser emilie;
 
     @BeforeEach
     void login() {
-        camille = userAuthHelper.authenticateCamille();
+        emilie = userAuthHelper.authenticateEmilie();
     }
 
     @Test
@@ -81,7 +81,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
         // When
         client.get()
                 .uri(getApiURI(HACKATHONS_BY_ID.formatted(UUID.randomUUID().toString())))
-                .header("Authorization", "Bearer " + camille.jwt())
+                .header("Authorization", "Bearer " + emilie.jwt())
                 .exchange()
                 .expectStatus()
                 // Then
@@ -90,7 +90,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
         // When
         client.put()
                 .uri(getApiURI(HACKATHONS_BY_ID.formatted(UUID.randomUUID().toString())))
-                .header("Authorization", "Bearer " + camille.jwt())
+                .header("Authorization", "Bearer " + emilie.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -115,7 +115,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
         // When
         client.patch()
                 .uri(getApiURI(HACKATHONS_BY_ID.formatted(UUID.randomUUID().toString())))
-                .header("Authorization", "Bearer " + camille.jwt())
+                .header("Authorization", "Bearer " + emilie.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -134,7 +134,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
         // When
         client.get()
                 .uri(getApiURI(HACKATHONS, Map.of("pageIndex", "0", "pageSize", "10")))
-                .header("Authorization", "Bearer " + camille.jwt())
+                .header("Authorization", "Bearer " + emilie.jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -151,7 +151,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
         // When
         client.post()
                 .uri(getApiURI(HACKATHONS))
-                .header("Authorization", "Bearer " + camille.jwt())
+                .header("Authorization", "Bearer " + emilie.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -193,7 +193,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
         // When
         client.get()
                 .uri(getApiURI(HACKATHONS_BY_ID.formatted(hackathonId1.getValue())))
-                .header("Authorization", "Bearer " + camille.jwt())
+                .header("Authorization", "Bearer " + emilie.jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -224,7 +224,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
         // When
         client.put()
                 .uri(getApiURI(HACKATHONS_BY_ID.formatted(hackathonId1.getValue())))
-                .header("Authorization", "Bearer " + camille.jwt())
+                .header("Authorization", "Bearer " + emilie.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -381,7 +381,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
         // When
         client.get()
                 .uri(getApiURI(HACKATHONS_BY_ID.formatted(hackathonId1.getValue())))
-                .header("Authorization", "Bearer " + camille.jwt())
+                .header("Authorization", "Bearer " + emilie.jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -482,7 +482,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
         // When
         client.put()
                 .uri(getApiURI(HACKATHONS_BY_ID.formatted(hackathonId1.getValue())))
-                .header("Authorization", "Bearer " + camille.jwt())
+                .header("Authorization", "Bearer " + emilie.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -589,7 +589,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
         // When
         client.post()
                 .uri(getApiURI(HACKATHONS))
-                .header("Authorization", "Bearer " + camille.jwt())
+                .header("Authorization", "Bearer " + emilie.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -632,7 +632,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
         // When
         client.get()
                 .uri(getApiURI(HACKATHONS, Map.of("pageIndex", "0", "pageSize", "10")))
-                .header("Authorization", "Bearer " + camille.jwt())
+                .header("Authorization", "Bearer " + emilie.jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -672,7 +672,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
         // When
         client.get()
                 .uri(getApiURI(HACKATHONS, Map.of("pageIndex", "1", "pageSize", "1")))
-                .header("Authorization", "Bearer " + camille.jwt())
+                .header("Authorization", "Bearer " + emilie.jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -704,7 +704,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
         // When
         client.patch()
                 .uri(getApiURI(HACKATHONS_BY_ID.formatted(hackathonId2.getValue())))
-                .header("Authorization", "Bearer " + camille.jwt())
+                .header("Authorization", "Bearer " + emilie.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -736,7 +736,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
         // And when
         client.get()
                 .uri(getApiURI(HACKATHONS, Map.of("pageIndex", "1", "pageSize", "1")))
-                .header("Authorization", "Bearer " + camille.jwt())
+                .header("Authorization", "Bearer " + emilie.jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -768,7 +768,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
         // When
         client.delete()
                 .uri(getApiURI(HACKATHONS_BY_ID.formatted(hackathonId2.getValue())))
-                .header("Authorization", "Bearer " + camille.jwt())
+                .header("Authorization", "Bearer " + emilie.jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -777,7 +777,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
         // When
         client.get()
                 .uri(getApiURI(HACKATHONS, Map.of("pageIndex", "0", "pageSize", "10")))
-                .header("Authorization", "Bearer " + camille.jwt())
+                .header("Authorization", "Bearer " + emilie.jwt())
                 .exchange()
                 // Then
                 .expectStatus()

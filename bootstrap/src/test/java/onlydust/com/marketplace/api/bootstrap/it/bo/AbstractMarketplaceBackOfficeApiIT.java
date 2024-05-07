@@ -186,10 +186,6 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String LANGUAGES_BY_ID = "/bo/v1/languages/%s";
     protected static final String LANGUAGES_EXTENSIONS = "/bo/v1/languages/extensions";
 
-    protected String apiKey() {
-        return backOfficeApiKeyAuthenticationConfig.getApiKey();
-    }
-
     protected URI getApiURI(final String path) {
         return UriComponentsBuilder.newInstance()
                 .scheme("http")

@@ -4,11 +4,15 @@ import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountBookEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookEventRepository;
+import onlydust.com.marketplace.user.domain.model.BackofficeUser;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
 import java.util.UUID;
 
 public class BackofficeDebugApiIT extends AbstractMarketplaceBackOfficeApiIT {
@@ -17,12 +21,19 @@ public class BackofficeDebugApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Autowired
     private AccountBookEventRepository accountBookEventRepository;
 
+    UserAuthHelper.AuthenticatedBackofficeUser olivier;
+
+    @BeforeEach
+    void setUp() {
+        olivier = userAuthHelper.authenticateBackofficeUser("olivier.fuxet@gmail.com", List.of(BackofficeUser.Role.BO_READER));
+    }
+
     @Test
     public void should_check_accounting_events() {
         client
                 .get()
                 .uri(getApiURI(CHECK_ACCOUNTING_EVENTS))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + olivier.jwt())
                 .exchange()
                 .expectStatus()
                 .isNoContent();
@@ -39,7 +50,7 @@ public class BackofficeDebugApiIT extends AbstractMarketplaceBackOfficeApiIT {
         client
                 .get()
                 .uri(getApiURI(CHECK_ACCOUNTING_EVENTS))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + olivier.jwt())
                 .exchange()
                 .expectStatus()
                 .is4xxClientError()

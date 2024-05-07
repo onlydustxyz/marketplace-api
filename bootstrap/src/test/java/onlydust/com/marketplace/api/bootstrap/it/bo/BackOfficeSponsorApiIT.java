@@ -2,13 +2,12 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import onlydust.com.backoffice.api.contract.model.AccountResponse;
 import onlydust.com.backoffice.api.contract.model.SponsorResponse;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectSponsorRepository;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import onlydust.com.marketplace.user.domain.model.BackofficeUser;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
@@ -18,6 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import static onlydust.com.marketplace.api.bootstrap.helper.CurrencyHelper.STRK;
@@ -36,13 +36,22 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Autowired
     private ImageStoragePort imageStoragePort;
 
+    UserAuthHelper.AuthenticatedBackofficeUser pierre;
+
+    @BeforeEach
+    void setUp() {
+        pierre = userAuthHelper.authenticateBackofficeUser("pierre.oucif@gadz.org", List.of(BackofficeUser.Role.BO_READER, BackofficeUser.Role.BO_FINANCIAL_ADMIN));
+    }
+
     @Test
     @Order(1)
     void should_get_sponsor() {
+        final String jwt = pierre.jwt();
+
         // When
         client.get()
                 .uri(getApiURI(GET_SPONSOR.formatted("85435c9b-da7f-4670-bf65-02b84c5da7f0")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + jwt)
                 // Then
                 .exchange()
                 .expectStatus()
@@ -122,10 +131,12 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Test
     @Order(2)
     void should_get_sponsors() {
+        final String jwt = pierre.jwt();
+
         // When
         client.get()
                 .uri(getApiURI(OLD_GET_SPONSORS, Map.of("pageIndex", "0", "pageSize", "5")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + jwt)
                 // Then
                 .exchange()
                 .expectStatus()
@@ -193,7 +204,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         "pageSize", "5",
                         "projectIds", "467cb27c-9726-4f94-818e-6aa49bbf5e75,b0f54343-3732-4118-8054-dba40f1ffb85")
                 ))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + jwt)
                 // Then
                 .exchange()
                 .expectStatus()
@@ -301,7 +312,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         "pageSize", "5",
                         "sponsorIds", "eb04a5de-4802-4071-be7b-9007b563d48d,2639563e-4437-4bde-a4f4-654977c0cb39")
                 ))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + jwt)
                 // Then
                 .exchange()
                 .expectStatus()
@@ -342,10 +353,12 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Test
     @Order(3)
     void should_create_sponsor() {
+        final String jwt = pierre.jwt();
+
         // When
         client.post()
                 .uri(getApiURI(POST_SPONSORS))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -372,10 +385,12 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Test
     @Order(4)
     void should_update_sponsor() {
+        final String jwt = pierre.jwt();
+
         // When
         client.put()
                 .uri(getApiURI(PUT_SPONSORS.formatted("85435c9b-da7f-4670-bf65-02b84c5da7f0")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -402,10 +417,12 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Test
     @Order(5)
     void should_link_sponsor_to_project_on_allocation() {
+        final String jwt = pierre.jwt();
+
         // Given
         final var sponsor = client.post()
                 .uri(getApiURI(POST_SPONSORS))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -422,7 +439,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
         final var sponsorAccount = client.post()
                 .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(sponsor.getId())))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + jwt)
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -440,7 +457,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // Then
         client.get()
                 .uri(getApiURI(GET_SPONSOR.formatted(sponsorAccount.getSponsorId())))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + jwt)
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
@@ -455,7 +472,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // And when
         client.post()
                 .uri(getApiURI(POST_PROJECTS_BUDGETS_ALLOCATE.formatted(BRETZEL)))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + jwt)
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -469,7 +486,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
         client.get()
                 .uri(getApiURI(GET_SPONSOR.formatted(sponsorAccount.getSponsorId())))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + jwt)
                 // Then
                 .exchange()
                 .expectStatus()
@@ -524,7 +541,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         "pageIndex", "0",
                         "pageSize", "5",
                         "sponsorIds", sponsor.getId().toString())))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + jwt)
                 // Then
                 .exchange()
                 .expectStatus()
@@ -554,7 +571,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
         client.get()
                 .uri(getApiURI(GET_SPONSOR.formatted(sponsorAccount.getSponsorId())))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + jwt)
                 // Then
                 .exchange()
                 .expectStatus()
@@ -572,7 +589,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         "pageIndex", "0",
                         "pageSize", "5",
                         "sponsorIds", sponsor.getId().toString())))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + jwt)
                 // Then
                 .exchange()
                 .expectStatus()
@@ -599,11 +616,12 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Test
     @Order(6)
     void should_get_sponsors_for_new_bo() {
+        final String jwt = pierre.jwt();
 
         // When
         client.get()
                 .uri(getApiURI(GET_SPONSORS, Map.of("pageIndex", "0", "pageSize", "10")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + jwt)
                 // Then
                 .exchange()
                 .expectStatus()
@@ -967,7 +985,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(GET_SPONSORS, Map.of("pageIndex", "1", "pageSize", "10")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + jwt)
                 // Then
                 .exchange()
                 .expectStatus()
@@ -1052,11 +1070,12 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Test
     @Order(6)
     void should_get_sponsors_by_name_for_new_bo() {
+        final String jwt = pierre.jwt();
 
         // When
         client.get()
                 .uri(getApiURI(GET_SPONSORS, Map.of("pageIndex", "0", "pageSize", "10", "search", "coca")))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + jwt)
                 // Then
                 .exchange()
                 .expectStatus()
@@ -1078,12 +1097,14 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
     @Test
     void should_upload_sponsor_logo() throws MalformedURLException {
+        final String jwt = pierre.jwt();
+
         when(imageStoragePort.storeImage(any(InputStream.class)))
                 .thenReturn(new URL("https://s3.amazon.com/logo.jpeg"));
 
         client.post()
                 .uri(getApiURI(SPONSORS_LOGO))
-                .header("Api-Key", apiKey())
+                .header("Authorization", "Bearer " + jwt)
                 .body(fromResource(new FileSystemResource(getClass().getResource("/images/logo-sample.jpeg").getFile())))
                 .exchange()
                 // Then

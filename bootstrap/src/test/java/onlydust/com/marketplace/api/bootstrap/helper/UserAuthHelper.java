@@ -9,8 +9,10 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.BackofficeUserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
+import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -135,15 +137,29 @@ public class UserAuthHelper {
 
     @NonNull
     public AuthenticatedBackofficeUser authenticateCamille() {
-        return authenticateBackofficeUser("admin@onlydust.xyz");
+        return authenticateBackofficeUser("admin@onlydust.xyz", List.of(BackofficeUser.Role.BO_READER, BackofficeUser.Role.BO_FINANCIAL_ADMIN));
     }
 
     @NonNull
-    public AuthenticatedBackofficeUser authenticateBackofficeUser(String email) {
-        final var user = backofficeUserRepository.findByEmail(email).orElseThrow();
+    public AuthenticatedBackofficeUser authenticateEmilie() {
+        return authenticateBackofficeUser("emilie@onlydust.xyz", List.of(BackofficeUser.Role.BO_READER, BackofficeUser.Role.BO_MARKETING_ADMIN));
+    }
+
+    @NonNull
+    public AuthenticatedBackofficeUser authenticateBackofficeUser(String email, final List<BackofficeUser.Role> roles) {
+        final var user = backofficeUserRepository.findByEmail(email)
+                .map(backofficeUserEntity -> updateBackofficeUserRole(backofficeUserEntity, roles))
+                .orElseGet(() -> backofficeUserRepository.save(
+                        new BackofficeUserEntity(UUID.randomUUID(), email, "name-%s".formatted(email), "avatarUrl-%s".formatted(email),
+                                roles.toArray(new BackofficeUser.Role[0]), new Date(), new Date())));
         final var token = ((JwtVerifierStub) jwtVerifier).googleTokenFor(email);
         mockAuth0UserInfo(user);
         return new AuthenticatedBackofficeUser(token, user);
+    }
+
+    public BackofficeUserEntity updateBackofficeUserRole(final BackofficeUserEntity backofficeUserEntity, final List<BackofficeUser.Role> roles) {
+        backofficeUserEntity.setRoles(roles.toArray(new BackofficeUser.Role[0]));
+        return backofficeUserRepository.save(backofficeUserEntity);
     }
 
     @NonNull
