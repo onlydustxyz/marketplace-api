@@ -25,7 +25,7 @@ public class BackofficeDebugApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
     @BeforeEach
     void setUp() {
-        olivier = userAuthHelper.authenticateBackofficeUser("olivier.fuxet@gmail.com", List.of(BackofficeUser.Role.BO_ADMIN));
+        olivier = userAuthHelper.authenticateBackofficeUser("olivier.fuxet@gmail.com", List.of(BackofficeUser.Role.BO_READER));
     }
 
     @Test
