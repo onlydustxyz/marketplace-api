@@ -989,7 +989,7 @@ paths:
   /api/v2/users/{githubId}/languages:
     get:
       tags:
-        - Users
+        - BffReadUsers
       summary: Get user profile stats per languages
       operationId: getUserProfileStatsPerLanguages
       description: |
