@@ -8,9 +8,13 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.PublicUserProfileResponseV2;
 import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Entity
 @Value
@@ -30,8 +34,8 @@ public class PublicUserProfileResponseV2Entity {
 
 //    UserProfileStatsSummary statsSummary;
 
-//    @JdbcTypeCode(SqlTypes.ARRAY)
-//    List<UUID> ecosystems;
+    @JdbcTypeCode(SqlTypes.JSON)
+    List<UUID> ecosystems;
 
     public PublicUserProfileResponseV2 toDto() {
         return new PublicUserProfileResponseV2()
@@ -48,7 +52,7 @@ public class PublicUserProfileResponseV2Entity {
                 .lastSeenAt(Optional.ofNullable(user.registered()).map(RegisteredUserViewEntity::lastSeenAt).orElse(null))
                 .contacts(Optional.ofNullable(user.profile()).flatMap(UserProfileViewEntity::contacts).orElse(user.github().contacts()))
                 .statsSummary(null) // TODO
-//                .ecosystems(ecosystems)
+                .ecosystems(ecosystems)
                 ;
     }
 }

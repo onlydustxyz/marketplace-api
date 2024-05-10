@@ -266,7 +266,16 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             }
                           ],
                           "statsSummary": null,
-                          "ecosystems": null
+                          "ecosystems": [
+                            "397df411-045d-4d9f-8d65-8284c88f9208",
+                            "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                            "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                            "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                            "b599313c-a074-440f-af04-a466529ab2e7",
+                            "dd6f737e-2a9d-40b9-be62-8f64ec157989",
+                            "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
+                            "f7821bfb-df73-464c-9d87-a94dfb4f5aef"
+                          ]
                         }
                         """);
     }
@@ -310,7 +319,13 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             }
                           ],
                           "statsSummary": null,
-                          "ecosystems": null
+                          "ecosystems": [
+                            "397df411-045d-4d9f-8d65-8284c88f9208",
+                            "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                            "dd6f737e-2a9d-40b9-be62-8f64ec157989",
+                            "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
+                            "f7821bfb-df73-464c-9d87-a94dfb4f5aef"
+                          ]
                         }
                         """);
     }

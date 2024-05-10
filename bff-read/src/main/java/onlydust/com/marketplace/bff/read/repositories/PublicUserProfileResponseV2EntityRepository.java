@@ -9,7 +9,8 @@ import java.util.UUID;
 public interface PublicUserProfileResponseV2EntityRepository extends Repository<PublicUserProfileResponseV2Entity, UUID> {
     @Query(value = """
             select
-                u.github_user_id                    as github_user_id
+                u.github_user_id                    as github_user_id,
+                coalesce(jsonb_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null ), '[]') as ecosystems
             from
                 iam.all_users u
                 left join indexer_exp.contributions c on c.contributor_id = u.github_user_id
