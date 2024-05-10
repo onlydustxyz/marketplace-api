@@ -1,13 +1,16 @@
 package onlydust.com.marketplace.bff.read.repositories;
 
 import onlydust.com.marketplace.bff.read.entities.PublicUserProfileResponseV2Entity;
+import org.intellij.lang.annotations.Language;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
 import java.util.UUID;
 
 public interface PublicUserProfileResponseV2EntityRepository extends Repository<PublicUserProfileResponseV2Entity, UUID> {
-    @Query(value = """
+
+    @Language("PostgreSQL")
+    String SELECT = """
             select
                 gur.github_user_id                                                                               as github_user_id,
                 gur.rank                                                                                         as rank,
@@ -35,12 +38,31 @@ public interface PublicUserProfileResponseV2EntityRepository extends Repository<
                 left join projects p on p.id = pgr.project_id and p.visibility = 'PUBLIC'
                 left join project_leads pl on pl.project_id = pgr.project_id and pl.user_id = u.id
                 left join rewards r on r.recipient_id = gur.github_user_id
+            """;
+
+    @Language("PostgreSQL")
+    String WHERE_GITHUB_ID = """
             where
                 gur.github_user_id = :githubUserId
+            """;
+
+    @Language("PostgreSQL")
+    String WHERE_GITHUB_LOGIN = """
+            where
+                u.github_login = :githubUserLogin
+            """;
+
+    @Language("PostgreSQL")
+    String GROUP_BY = """
             group by
                 gur.github_user_id,
                 gur.rank,
                 gur.rank_percentile
-            """, nativeQuery = true)
+            """;
+
+    @Query(value = SELECT + WHERE_GITHUB_ID + GROUP_BY, nativeQuery = true)
     PublicUserProfileResponseV2Entity findByGithubUserId(Long githubUserId);
+
+    @Query(value = SELECT + WHERE_GITHUB_LOGIN + GROUP_BY, nativeQuery = true)
+    PublicUserProfileResponseV2Entity findByGithubUserLogin(String githubUserLogin);
 }

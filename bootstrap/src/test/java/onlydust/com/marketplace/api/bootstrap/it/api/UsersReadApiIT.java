@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserProfileInfoRepository;
+import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -222,15 +223,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
         // Given
         final var user = userAuthHelper.authenticateAnthony().user();
 
-        // When
-        client.get()
-                .uri(getApiURI(V2_USER.formatted(user.getGithubUserId())))
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json("""
+        @Language("JSON") final var expected = """
                         {
                           "githubUserId": 43467246,
                           "login": "AnthonyBuisset",
@@ -285,13 +278,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             "f7821bfb-df73-464c-9d87-a94dfb4f5aef"
                           ]
                         }
-                        """);
-    }
-
-    @Test
-    void should_return_default_to_github_info() {
-        // Given
-        final var user = userAuthHelper.authenticateOlivier().user();
+                """;
 
         // When
         client.get()
@@ -301,7 +288,25 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .json("""
+                .json(expected);
+
+        // When
+        client.get()
+                .uri(getApiURI(V2_USER_BY_SLUG.formatted(user.getGithubLogin())))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json(expected);
+    }
+
+    @Test
+    void should_return_default_to_github_info() {
+        // Given
+        final var user = userAuthHelper.authenticateOlivier().user();
+
+        @Language("JSON") final var expected = """
                         {
                           "githubUserId": 595505,
                           "login": "ofux",
@@ -343,6 +348,27 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             "f7821bfb-df73-464c-9d87-a94dfb4f5aef"
                           ]
                         }
-                        """);
+                """;
+
+        // When
+        client.get()
+                .uri(getApiURI(V2_USER.formatted(user.getGithubUserId())))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json(expected);
+
+
+        // When
+        client.get()
+                .uri(getApiURI(V2_USER_BY_SLUG.formatted(user.getGithubLogin())))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json(expected);
     }
 }

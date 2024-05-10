@@ -26,6 +26,12 @@ public class BffReadUsersApiPostgresAdapter implements BffReadUsersApi {
     final PublicUserProfileResponseV2EntityRepository publicUserProfileResponseV2EntityRepository;
 
     @Override
+    public ResponseEntity<PublicUserProfileResponseV2> getUserProfileBySlugV2(String slug) {
+        final var userProfile = publicUserProfileResponseV2EntityRepository.findByGithubUserLogin(slug);
+        return ok(userProfile.toDto());
+    }
+
+    @Override
     public ResponseEntity<UserProfileEcosystemPage> getUserProfileStatsPerEcosystems(Long githubId, Integer pageIndex, Integer pageSize) {
         final var page = userProfileEcosystemPageItemEntityRepository.findByContributorId(githubId, PageRequest.of(pageIndex, pageSize));
         return ok(new UserProfileEcosystemPage()
