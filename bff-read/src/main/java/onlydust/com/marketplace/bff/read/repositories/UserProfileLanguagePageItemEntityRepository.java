@@ -44,6 +44,7 @@ public interface UserProfileLanguagePageItemEntityRepository extends Repository<
                           on max_ranks.language_id = lfe.language_id
             where c.contributor_id = :githubUserId
             group by lfe.language_id, ulr.rank, max_ranks.rank
+            order by cast(ulr.rank as numeric) / max_ranks.rank
             """, nativeQuery = true)
     Page<UserProfileLanguagePageItemEntity> findByContributorId(Long githubUserId, Pageable pageable);
 }

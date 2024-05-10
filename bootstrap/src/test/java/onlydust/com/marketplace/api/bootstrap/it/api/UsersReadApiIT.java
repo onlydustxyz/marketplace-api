@@ -109,6 +109,6 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             }
                           ]
                         }
-                        """);
+                        """, true);
     }
 }
