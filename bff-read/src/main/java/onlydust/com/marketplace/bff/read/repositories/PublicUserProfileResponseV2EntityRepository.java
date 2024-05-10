@@ -11,7 +11,7 @@ public interface PublicUserProfileResponseV2EntityRepository extends Repository<
             select
                 gur.github_user_id                                                                               as github_user_id,
                 gur.rank                                                                                         as rank,
-                gur.rank_percentile                                                                        as rank_percentile,
+                gur.rank_percentile                                                                              as rank_percentile,
                 case
                     when gur.rank_percentile < 0.1666 then 'A'
                     when gur.rank_percentile < 0.3333 then 'B'
@@ -26,7 +26,7 @@ public interface PublicUserProfileResponseV2EntityRepository extends Repository<
                 count(distinct pgr.project_id) filter ( where pl.project_id is not null )                        as leaded_project_count,
                 count(distinct r.id )                                                                            as reward_count
             from
-                (select github_user_id, rank, cast(rank as numeric) / max(rank) over () as rank_percentile from global_users_ranks) gur
+                global_users_ranks gur
                 left join iam.users u on u.github_user_id = gur.github_user_id
                 left join indexer_exp.contributions c on c.contributor_id = gur.github_user_id
                 left join project_github_repos pgr on c.repo_id = pgr.github_repo_id

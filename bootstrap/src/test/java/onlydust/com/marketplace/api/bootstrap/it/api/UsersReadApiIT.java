@@ -37,47 +37,6 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                           "nextPageIndex": 0,
                           "languages": [
                             {
-                              "rank": 3,
-                              "contributingStatus": "GREEN",
-                              "contributedProjectCount": 4,
-                              "contributionCount": 42,
-                              "rewardCount": 10,
-                              "totalEarnedUsd": 8461120.00,
-                              "projects": [
-                                {
-                                  "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
-                                  "slug": "kaaper",
-                                  "name": "kaaper",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                                  "slug": "mooooooonlight",
-                                  "name": "Mooooooonlight",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
-                                },
-                                {
-                                  "id": "90fb751a-1137-4815-b3c4-54927a5db059",
-                                  "slug": "no-sponsors",
-                                  "name": "No sponsors",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "id": "f39b827f-df73-498c-8853-99bc3f562723",
-                                  "slug": "qa-new-contributions",
-                                  "name": "QA new contributions",
-                                  "logoUrl": null
-                                }
-                              ],
-                              "language": {
-                                "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
-                                "name": "Typescript",
-                                "url": null,
-                                "logoUrl": null,
-                                "bannerUrl": null
-                              }
-                            },
-                            {
                               "rank": 2,
                               "contributingStatus": "GREEN",
                               "contributedProjectCount": 4,
@@ -117,6 +76,47 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": null,
                                 "bannerUrl": null
                               }
+                            },
+                            {
+                              "rank": 3,
+                              "contributingStatus": "GREEN",
+                              "contributedProjectCount": 4,
+                              "contributionCount": 42,
+                              "rewardCount": 10,
+                              "totalEarnedUsd": 8461120.00,
+                              "projects": [
+                                {
+                                  "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                  "slug": "kaaper",
+                                  "name": "kaaper",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                  "slug": "mooooooonlight",
+                                  "name": "Mooooooonlight",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                },
+                                {
+                                  "id": "90fb751a-1137-4815-b3c4-54927a5db059",
+                                  "slug": "no-sponsors",
+                                  "name": "No sponsors",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                                  "slug": "qa-new-contributions",
+                                  "name": "QA new contributions",
+                                  "logoUrl": null
+                                }
+                              ],
+                              "language": {
+                                "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                                "name": "Typescript",
+                                "url": null,
+                                "logoUrl": null,
+                                "bannerUrl": null
+                              }
                             }
                           ]
                         }
@@ -143,6 +143,29 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                           "hasMore": false,
                           "nextPageIndex": 0,
                           "ecosystems": [
+                            {
+                              "rank": 1,
+                              "contributingStatus": "GREEN",
+                              "contributedProjectCount": 1,
+                              "contributionCount": 88,
+                              "rewardCount": 14,
+                              "totalEarnedUsd": 1564155.00,
+                              "projects": [
+                                {
+                                  "id": "90fb751a-1137-4815-b3c4-54927a5db059",
+                                  "slug": "no-sponsors",
+                                  "name": "No sponsors",
+                                  "logoUrl": null
+                                }
+                              ],
+                              "ecosystem": {
+                                "id": "397df411-045d-4d9f-8d65-8284c88f9208",
+                                "name": "Avail",
+                                "url": "https://www.availproject.org/",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png",
+                                "bannerUrl": null
+                              }
+                            },
                             {
                               "rank": 10,
                               "contributingStatus": "GREEN",
@@ -175,29 +198,6 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "totalEarnedUsd": 1564155.00,
                               "projects": [
                                 {
-                                  "id": "90fb751a-1137-4815-b3c4-54927a5db059",
-                                  "slug": "no-sponsors",
-                                  "name": "No sponsors",
-                                  "logoUrl": null
-                                }
-                              ],
-                              "ecosystem": {
-                                "id": "397df411-045d-4d9f-8d65-8284c88f9208",
-                                "name": "Avail",
-                                "url": "https://www.availproject.org/",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png",
-                                "bannerUrl": null
-                              }
-                            },
-                            {
-                              "rank": 1,
-                              "contributingStatus": "GREEN",
-                              "contributedProjectCount": 1,
-                              "contributionCount": 88,
-                              "rewardCount": 14,
-                              "totalEarnedUsd": 1564155.00,
-                              "projects": [
-                                {
                                   "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
                                   "slug": "mooooooonlight",
                                   "name": "Mooooooonlight",
@@ -214,7 +214,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             }
                           ]
                         }
-                        """, true);
+                        """);
     }
 
     @Test
@@ -267,7 +267,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                           ],
                           "statsSummary": {
                             "rank": 1,
-                            "rankPercentile": 0.000043177892918825561313,
+                            "rankPercentile": 0,
                             "rankCategory": "A",
                             "contributedProjectCount": 9,
                             "leadedProjectCount": 1,
@@ -328,7 +328,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                           ],
                           "statsSummary": {
                             "rank": 4,
-                            "rankPercentile": 0.00017271157167530225,
+                            "rankPercentile": 0.0001295392719892914,
                             "rankCategory": "A",
                             "contributedProjectCount": 9,
                             "leadedProjectCount": 1,
