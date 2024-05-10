@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.bff.read;
 
 import onlydust.com.marketplace.bff.read.adapters.BffReadUsersApiPostgresAdapter;
+import onlydust.com.marketplace.bff.read.repositories.UserProfileEcosystemPageItemEntityRepository;
 import onlydust.com.marketplace.bff.read.repositories.UserProfileLanguagePageItemEntityRepository;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -20,7 +21,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class BffReadConfiguration {
     @Bean
-    public BffReadUsersApiPostgresAdapter bffReadUsersApiPostgresAdapter(final UserProfileLanguagePageItemEntityRepository userProfileLanguagePageItemEntityRepository) {
-        return new BffReadUsersApiPostgresAdapter(userProfileLanguagePageItemEntityRepository);
+    public BffReadUsersApiPostgresAdapter bffReadUsersApiPostgresAdapter(final UserProfileLanguagePageItemEntityRepository userProfileLanguagePageItemEntityRepository,
+                                                                         final UserProfileEcosystemPageItemEntityRepository userProfileEcosystemPageItemEntityRepository) {
+        return new BffReadUsersApiPostgresAdapter(
+                userProfileLanguagePageItemEntityRepository,
+                userProfileEcosystemPageItemEntityRepository);
     }
 }
