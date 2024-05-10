@@ -1,11 +1,13 @@
 package onlydust.com.marketplace.bff.read.entities;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.api.contract.model.ProjectLinkResponse;
 import org.hibernate.annotations.Immutable;
 
 import java.util.UUID;
@@ -18,6 +20,7 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(force = true)
 @Accessors(fluent = true)
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class ProjectLinkViewEntity {
     @Id
     @EqualsAndHashCode.Include
@@ -27,4 +30,12 @@ public class ProjectLinkViewEntity {
     @NonNull String name;
     @Column(name = "logo_url")
     @NonNull String logoUrl;
+
+    public ProjectLinkResponse toDto() {
+        return new ProjectLinkResponse()
+                .id(id)
+                .slug(slug)
+                .name(name)
+                .logoUrl(logoUrl);
+    }
 }

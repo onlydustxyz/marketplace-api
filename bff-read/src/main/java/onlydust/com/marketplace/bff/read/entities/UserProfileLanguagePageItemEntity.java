@@ -9,6 +9,8 @@ import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.UserProfileContributingStatus;
 import onlydust.com.marketplace.api.contract.model.UserProfileLanguagePageItem;
 import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,7 +30,6 @@ public class UserProfileLanguagePageItemEntity {
 
     @NonNull Integer rank;
     @NonNull String contributingStatus;
-    @NonNull Integer contributedProjectCount;
     @NonNull Integer contributionCount;
     @NonNull Integer rewardCount;
     @NonNull BigDecimal totalEarnedUsd;
@@ -37,15 +38,18 @@ public class UserProfileLanguagePageItemEntity {
     @JoinColumn(insertable = false, updatable = false)
     @NonNull LanguageViewEntity language;
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    @NonNull List<ProjectLinkViewEntity> projects;
+
     public UserProfileLanguagePageItem toDto() {
         return new UserProfileLanguagePageItem()
                 .rank(rank)
                 .contributingStatus(UserProfileContributingStatus.valueOf(contributingStatus))
-                .contributedProjectCount(contributedProjectCount)
+                .contributedProjectCount(projects.size())
                 .contributionCount(contributionCount)
                 .rewardCount(rewardCount)
                 .totalEarnedUsd(totalEarnedUsd)
-                .projects(List.of()) // TODO
+                .projects(projects.stream().map(p -> p.toDto()).toList())
                 .language(language.toDto());
     }
 }

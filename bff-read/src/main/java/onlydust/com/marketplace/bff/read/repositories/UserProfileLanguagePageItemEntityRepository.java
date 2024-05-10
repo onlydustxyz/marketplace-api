@@ -13,10 +13,15 @@ public interface UserProfileLanguagePageItemEntityRepository extends Repository<
             select lfe.language_id                    as language_id,
                    ulr.rank                           as rank,
                    'GREEN'                            as contributing_status,
-                   count(distinct pgr.project_id)     as contributed_project_count,
                    count(distinct c.id)               as contribution_count,
                    count(distinct ri.reward_id)       as reward_count,
-                   ROUND(sum(rewarded.usd_amount), 2) as total_earned_usd
+                   ROUND(sum(rewarded.usd_amount), 2) as total_earned_usd,
+                   jsonb_agg(distinct jsonb_build_object(
+                           'id', p.id,
+                           'slug', p.key,
+                           'name', p.name,
+                           'logoUrl', p.logo_url
+                             ))                       as projects
             from indexer_exp.contributions c
                      join language_file_extensions lfe
                           on lfe.extension = any (c.main_file_extensions)
@@ -25,6 +30,7 @@ public interface UserProfileLanguagePageItemEntityRepository extends Repository<
                      join reward_items ri
                           on ri.id = coalesce(CAST(c.pull_request_id AS TEXT), CAST(c.issue_id AS TEXT), c.code_review_id) and
                              ri.recipient_id = c.contributor_id
+                     join projects p on p.id = pgr.project_id
                      join lateral ( select distinct on (reward_id) amount_usd_equivalent as usd_amount
                                     from accounting.reward_status_data rsd
                                     where rsd.reward_id = ri.reward_id) rewarded on true
