@@ -53,4 +53,5 @@ public interface UserFacadePort {
 
     void updateGithubProfile(User authenticatedUser);
 
+    void refreshUserRanks();
 }

@@ -268,4 +268,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelogs/00000222_update_backoffice_users_roles.sql
   - include:
+      file: db/changelog/changelogs/00000223_create_global_user_ranking_views.sql
+  - include:
       file: db/changelog/changelogs/00000224_filter_users_languages_ranks_on_public_projects.sql
