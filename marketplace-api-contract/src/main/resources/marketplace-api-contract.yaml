@@ -826,7 +826,7 @@ paths:
   /api/v2/users/{githubId}:
     get:
       tags:
-        - Users
+        - BffReadUsers
       summary: Get user profile
       operationId: getUserProfileV2
       description: |

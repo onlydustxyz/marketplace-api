@@ -1,9 +1,20 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserProfileInfoRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 public class UsersReadApiIT extends AbstractMarketplaceApiIT {
+    @Autowired
+    UserProfileInfoRepository userProfileInfoRepository;
+
+    @BeforeEach
+    void setup() {
+        final var olivier = userAuthHelper.authenticateOlivier().user();
+        userProfileInfoRepository.deleteById(olivier.getId());
+    }
 
     @Test
     void should_return_users_languages_stats() {
@@ -204,5 +215,103 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                           ]
                         }
                         """, true);
+    }
+
+    @Test
+    void should_return_user_contributor_profile_by_id() {
+        // Given
+        final var user = userAuthHelper.authenticateAnthony().user();
+
+        // When
+        client.get()
+                .uri(getApiURI(V2_USER.formatted(user.getGithubUserId())))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "githubUserId": 43467246,
+                          "login": "AnthonyBuisset",
+                          "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                          "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                          "htmlUrl": "https://github.com/AnthonyBuisset",
+                          "location": "Vence, France",
+                          "bio": "FullStack engineerr",
+                          "website": "https://linktr.ee/abuisset",
+                          "signedUpOnGithubAt": null,
+                          "signedUpAt": "2022-12-12T09:51:58.48559Z",
+                          "lastSeenAt": "2023-10-05T19:06:50.034Z",
+                          "contacts": [
+                            {
+                              "channel": "EMAIL",
+                              "contact": "abuisset@gmail.com",
+                              "visibility": "private"
+                            },
+                            {
+                              "channel": "TELEGRAM",
+                              "contact": "https://t.me/abuisset",
+                              "visibility": "public"
+                            },
+                            {
+                              "channel": "TWITTER",
+                              "contact": "https://twitter.com/abuisset",
+                              "visibility": "public"
+                            },
+                            {
+                              "channel": "DISCORD",
+                              "contact": "antho",
+                              "visibility": "public"
+                            }
+                          ],
+                          "statsSummary": null,
+                          "ecosystems": null
+                        }
+                        """);
+    }
+
+    @Test
+    void should_return_default_to_github_info() {
+        // Given
+        final var user = userAuthHelper.authenticateOlivier().user();
+
+        // When
+        client.get()
+                .uri(getApiURI(V2_USER.formatted(user.getGithubUserId())))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "githubUserId": 595505,
+                          "login": "ofux",
+                          "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4",
+                          "id": "e461c019-ba23-4671-9b6c-3a5a18748af9",
+                          "htmlUrl": "https://github.com/ofux",
+                          "location": "Paris, France",
+                          "bio": "Web3, Cloud, Unity3D",
+                          "website": "",
+                          "signedUpOnGithubAt": null,
+                          "signedUpAt": "2022-12-12T15:52:23.593172Z",
+                          "lastSeenAt": "2023-09-27T08:52:36.037Z",
+                          "contacts": [
+                            {
+                              "channel": "TWITTER",
+                              "contact": "https://twitter.com/fuxeto",
+                              "visibility": "public"
+                            },
+                            {
+                              "channel": "LINKEDIN",
+                              "contact": "https://www.linkedin.com/in/olivier-fuxet/",
+                              "visibility": "public"
+                            }
+                          ],
+                          "statsSummary": null,
+                          "ecosystems": null
+                        }
+                        """);
     }
 }
