@@ -150,6 +150,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String HACKATHONS = "/api/v1/hackathons";
     protected static final String HACKATHONS_BY_SLUG = "/api/v1/hackathons/slug/%s";
     protected static final String USER_LANGUAGES = "/api/v2/users/%d/languages";
+    protected static final String USER_ECOSYSTEMS = "/api/v2/users/%d/ecosystems";
 
     private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
             .withDatabaseName("marketplace_db")

@@ -1025,7 +1025,7 @@ paths:
   /api/v2/users/{githubId}/ecosystems:
     get:
       tags:
-        - Users
+        - BffReadUsers
       summary: Get user profile stats per ecosystems
       operationId: getUserProfileStatsPerEcosystems
       description: |
@@ -1039,14 +1039,14 @@ paths:
             format: int64
         - in: query
           name: pageIndex
-          required: true
           schema:
             type: integer
+            default: 0
         - in: query
           name: pageSize
-          required: true
           schema:
             type: integer
+            default: 5
       responses:
         "200":
           description: 'User profile stats per ecosystems'

@@ -111,4 +111,98 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                         }
                         """, true);
     }
+
+    @Test
+    void should_return_users_ecosystems_stats() {
+        // Given
+        final var user = userAuthHelper.authenticateAnthony().user();
+
+        // When
+        client.get()
+                .uri(getApiURI(USER_ECOSYSTEMS.formatted(user.getGithubUserId())))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 3,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "ecosystems": [
+                            {
+                              "rank": 10,
+                              "contributingStatus": "GREEN",
+                              "contributedProjectCount": 1,
+                              "contributionCount": 88,
+                              "rewardCount": 14,
+                              "totalEarnedUsd": 1564155.00,
+                              "projects": [
+                                {
+                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                  "slug": "mooooooonlight",
+                                  "name": "Mooooooonlight",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                }
+                              ],
+                              "ecosystem": {
+                                "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                                "name": "Starknet",
+                                "url": "https://www.starknet.io/en",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png",
+                                "bannerUrl": null
+                              }
+                            },
+                            {
+                              "rank": 1,
+                              "contributingStatus": "GREEN",
+                              "contributedProjectCount": 1,
+                              "contributionCount": 88,
+                              "rewardCount": 14,
+                              "totalEarnedUsd": 1564155.00,
+                              "projects": [
+                                {
+                                  "id": "90fb751a-1137-4815-b3c4-54927a5db059",
+                                  "slug": "no-sponsors",
+                                  "name": "No sponsors",
+                                  "logoUrl": null
+                                }
+                              ],
+                              "ecosystem": {
+                                "id": "397df411-045d-4d9f-8d65-8284c88f9208",
+                                "name": "Avail",
+                                "url": "https://www.availproject.org/",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png",
+                                "bannerUrl": null
+                              }
+                            },
+                            {
+                              "rank": 1,
+                              "contributingStatus": "GREEN",
+                              "contributedProjectCount": 1,
+                              "contributionCount": 88,
+                              "rewardCount": 14,
+                              "totalEarnedUsd": 1564155.00,
+                              "projects": [
+                                {
+                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                  "slug": "mooooooonlight",
+                                  "name": "Mooooooonlight",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                }
+                              ],
+                              "ecosystem": {
+                                "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
+                                "name": "Aztec",
+                                "url": "https://aztec.network/",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg",
+                                "bannerUrl": null
+                              }
+                            }
+                          ]
+                        }
+                        """, true);
+    }
 }
