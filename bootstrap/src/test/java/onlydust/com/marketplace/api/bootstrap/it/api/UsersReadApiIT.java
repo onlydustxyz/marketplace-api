@@ -240,7 +240,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                           "location": "Vence, France",
                           "bio": "FullStack engineerr",
                           "website": "https://linktr.ee/abuisset",
-                          "signedUpOnGithubAt": null,
+                          "signedUpOnGithubAt": "2018-09-21T00:00:00Z",
                           "signedUpAt": "2022-12-12T09:51:58.48559Z",
                           "lastSeenAt": "2023-10-05T19:06:50.034Z",
                           "contacts": [
@@ -311,7 +311,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                           "location": "Paris, France",
                           "bio": "Web3, Cloud, Unity3D",
                           "website": "",
-                          "signedUpOnGithubAt": null,
+                          "signedUpOnGithubAt": "2011-02-01T00:00:00Z",
                           "signedUpAt": "2022-12-12T15:52:23.593172Z",
                           "lastSeenAt": "2023-09-27T08:52:36.037Z",
                           "contacts": [

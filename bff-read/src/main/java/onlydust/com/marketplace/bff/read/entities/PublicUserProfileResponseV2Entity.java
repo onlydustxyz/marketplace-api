@@ -54,7 +54,7 @@ public class PublicUserProfileResponseV2Entity {
                 .location(Optional.ofNullable(user.profile()).map(UserProfileViewEntity::location).orElse(user.github().location()))
                 .bio(Optional.ofNullable(user.profile()).map(UserProfileViewEntity::bio).orElse(user.github().bio()))
                 .website(Optional.ofNullable(user.profile()).map(UserProfileViewEntity::website).orElse(user.github().website()))
-                .signedUpOnGithubAt(null) // TODO
+                .signedUpOnGithubAt(user.github().createdAt())
                 .signedUpAt(Optional.ofNullable(user.registered()).map(RegisteredUserViewEntity::createdAt).orElse(null))
                 .lastSeenAt(Optional.ofNullable(user.registered()).map(RegisteredUserViewEntity::lastSeenAt).orElse(null))
                 .contacts(Optional.ofNullable(user.profile()).flatMap(UserProfileViewEntity::contacts).orElse(user.github().contacts()))

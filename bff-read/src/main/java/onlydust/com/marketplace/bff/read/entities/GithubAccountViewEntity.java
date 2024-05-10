@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.contract.model.ContactInformation;
 import onlydust.com.marketplace.api.contract.model.ContactInformationChannel;
 import org.hibernate.annotations.Immutable;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -35,6 +36,7 @@ public class GithubAccountViewEntity {
     String twitter;
     String linkedin;
     String telegram;
+    @NonNull ZonedDateTime createdAt;
 
     public enum Type {
         USER, ORGANIZATION, BOT
