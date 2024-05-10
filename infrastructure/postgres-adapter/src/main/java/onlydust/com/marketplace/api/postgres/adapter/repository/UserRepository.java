@@ -31,4 +31,8 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID>, JpaSpec
                 ON CONFLICT (github_user_id) DO NOTHING
             """, nativeQuery = true)
     void tryInsert(UserEntity userEntity);
+
+    @Modifying
+    @Query(value = "REFRESH MATERIALIZED VIEW CONCURRENTLY global_users_ranks", nativeQuery = true)
+    void refreshGlobalUsersRanks();
 }

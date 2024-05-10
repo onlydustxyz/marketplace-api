@@ -56,4 +56,6 @@ public interface UserStoragePort {
     void saveUsers(List<User> users);
 
     void saveUser(User user);
+
+    void refreshUserRanks();
 }

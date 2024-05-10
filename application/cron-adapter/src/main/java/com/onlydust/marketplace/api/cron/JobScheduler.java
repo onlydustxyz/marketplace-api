@@ -99,4 +99,10 @@ public class JobScheduler {
         nodeGuardiansOutboxJob.run();
     }
 
+    @Scheduled(fixedDelayString = "${application.cron.refresh-user-ranks}")
+    public void refreshUserRanks() {
+        LOGGER.info("Refreshing user ranks");
+        userFacadePort.refreshUserRanks();
+    }
+
 }
