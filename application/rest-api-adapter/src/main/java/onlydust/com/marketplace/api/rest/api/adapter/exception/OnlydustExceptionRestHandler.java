@@ -11,6 +11,7 @@ import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -107,6 +108,14 @@ public class OnlydustExceptionRestHandler {
         ));
     }
 
+    @ExceptionHandler({MissingServletRequestParameterException.class})
+    protected ResponseEntity<OnlyDustError> handleMissingServletRequestParameterException(final MissingServletRequestParameterException exception) {
+        return handleOnlyDustException(new OnlyDustException(
+                HttpStatus.BAD_REQUEST.value(),
+                sanitizeMessage(exception.getMessage()),
+                exception
+        ));
+    }
 
     @ExceptionHandler(AuthenticationException.class)
     @ResponseBody

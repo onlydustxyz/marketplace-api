@@ -5,6 +5,7 @@
 
     <modules>
         <module>bootstrap</module>
+        <module>bff-read</module>
         <module>application</module>
         <module>infrastructure</module>
         <module>marketplace-api-contract</module>
