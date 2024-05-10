@@ -12,7 +12,11 @@ public interface UserProfileLanguagePageItemEntityRepository extends Repository<
     @Query(value = """
             select lfe.language_id                    as language_id,
                    ulr.rank                           as rank,
-                   'GREEN'                            as contributing_status,
+                   case
+                       when ulr.rank < 0.33 * max_ranks.rank THEN 'GREEN'
+                       when ulr.rank < 0.66 * max_ranks.rank THEN 'ORANGE'
+                       ELSE 'RED'
+                       END                            as contributing_status,
                    count(distinct c.id)               as contribution_count,
                    count(distinct ri.reward_id)       as reward_count,
                    ROUND(sum(rewarded.usd_amount), 2) as total_earned_usd,
@@ -21,7 +25,7 @@ public interface UserProfileLanguagePageItemEntityRepository extends Repository<
                            'slug', p.key,
                            'name', p.name,
                            'logoUrl', p.logo_url
-                             ))                       as projects
+                                      ))              as projects
             from indexer_exp.contributions c
                      join language_file_extensions lfe
                           on lfe.extension = any (c.main_file_extensions)
@@ -34,8 +38,12 @@ public interface UserProfileLanguagePageItemEntityRepository extends Repository<
                      join lateral ( select distinct on (reward_id) amount_usd_equivalent as usd_amount
                                     from accounting.reward_status_data rsd
                                     where rsd.reward_id = ri.reward_id) rewarded on true
+                     join lateral ( select mulr.language_id, max(mulr.rank) as rank
+                                    from users_languages_ranks mulr
+                                    group by language_id) max_ranks
+                          on max_ranks.language_id = lfe.language_id
             where c.contributor_id = :githubUserId
-            group by lfe.language_id, ulr.rank
+            group by lfe.language_id, ulr.rank, max_ranks.rank
             """, nativeQuery = true)
     Page<UserProfileLanguagePageItemEntity> findByContributorId(Long githubUserId, Pageable pageable);
 }
