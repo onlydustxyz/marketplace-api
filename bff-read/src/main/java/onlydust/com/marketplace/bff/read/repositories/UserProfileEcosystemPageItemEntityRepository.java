@@ -13,8 +13,8 @@ public interface UserProfileEcosystemPageItemEntityRepository extends Repository
             select pe.ecosystem_id                    as ecosystem_id,
                    uer.rank                           as rank,
                    case
-                       when uer.rank < 0.33 * max_ranks.rank THEN 'GREEN'
-                       when uer.rank < 0.66 * max_ranks.rank THEN 'ORANGE'
+                       when uer.rank_percentile < 0.33 THEN 'GREEN'
+                       when uer.rank_percentile < 0.66 THEN 'ORANGE'
                        ELSE 'RED'
                        END                            as contributing_status,
                    count(distinct c.id)               as contribution_count,
@@ -37,13 +37,9 @@ public interface UserProfileEcosystemPageItemEntityRepository extends Repository
                      join lateral ( select distinct on (reward_id) amount_usd_equivalent as usd_amount
                                     from accounting.reward_status_data rsd
                                     where rsd.reward_id = ri.reward_id) rewarded on true
-                     join lateral ( select muer.ecosystem_id, max(muer.rank) as rank
-                                    from users_ecosystems_ranks muer
-                                    group by muer.ecosystem_id) max_ranks
-                          on max_ranks.ecosystem_id = pe.ecosystem_id
             where c.contributor_id = :githubUserId
-            group by pe.ecosystem_id, uer.rank, max_ranks.rank
-            order by cast(uer.rank as numeric) / max_ranks.rank
+            group by pe.ecosystem_id, uer.rank, uer.rank_percentile
+            order by uer.rank_percentile
             """, nativeQuery = true)
     Page<UserProfileEcosystemPageItemEntity> findByContributorId(Long githubUserId, Pageable pageable);
 }

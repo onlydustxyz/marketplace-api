@@ -49,7 +49,7 @@ public class UserProfileEcosystemPageItemEntity {
                 .contributionCount(contributionCount)
                 .rewardCount(rewardCount)
                 .totalEarnedUsd(totalEarnedUsd)
-                .projects(projects.stream().map(p -> p.toDto()).toList())
+                .projects(projects.stream().map(ProjectLinkViewEntity::toDto).toList())
                 .ecosystem(ecosystem.toDto());
     }
 }

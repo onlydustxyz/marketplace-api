@@ -826,7 +826,7 @@ paths:
   /api/v2/users/{githubId}:
     get:
       tags:
-        - Users
+        - BffReadUsers
       summary: Get user profile
       operationId: getUserProfileV2
       description: |
@@ -838,6 +838,32 @@ paths:
           schema:
             type: integer
             format: int64
+      responses:
+        "200":
+          description: 'User profile'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicUserProfileResponseV2'
+        "404":
+          $ref: '#/components/responses/UserNotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v2/users/slug/{slug}:
+    get:
+      tags:
+        - BffReadUsers
+      summary: Get user profile
+      operationId: getUserProfileBySlugV2
+      description: |
+        Get the publicly available user profile
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: 'User profile'
