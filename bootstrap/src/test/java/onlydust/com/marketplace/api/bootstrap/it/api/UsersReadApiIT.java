@@ -265,7 +265,15 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "visibility": "public"
                             }
                           ],
-                          "statsSummary": null,
+                          "statsSummary": {
+                            "rank": 1,
+                            "rankPercentile": 0.000043177892918825561313,
+                            "rankCategory": "A",
+                            "contributedProjectCount": 9,
+                            "leadedProjectCount": 1,
+                            "contributionCount": 1700,
+                            "rewardCount": 21
+                          },
                           "ecosystems": [
                             "397df411-045d-4d9f-8d65-8284c88f9208",
                             "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
@@ -318,7 +326,15 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "visibility": "public"
                             }
                           ],
-                          "statsSummary": null,
+                          "statsSummary": {
+                            "rank": 4,
+                            "rankPercentile": 0.00017271157167530225,
+                            "rankCategory": "A",
+                            "contributedProjectCount": 9,
+                            "leadedProjectCount": 1,
+                            "contributionCount": 1252,
+                            "rewardCount": 15
+                          },
                           "ecosystems": [
                             "397df411-045d-4d9f-8d65-8284c88f9208",
                             "99b6c284-f9bb-4f89-8ce7-03771465ef8e",

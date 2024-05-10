@@ -1,16 +1,16 @@
 package onlydust.com.marketplace.bff.read.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.PublicUserProfileResponseV2;
+import onlydust.com.marketplace.api.contract.model.UserProfileStatsSummary;
+import onlydust.com.marketplace.api.contract.model.UserRankCategory;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +32,14 @@ public class PublicUserProfileResponseV2Entity {
     @JoinColumn(name = "githubUserId", insertable = false, updatable = false)
     @NonNull BffUserViewEntity user;
 
-//    UserProfileStatsSummary statsSummary;
+    @NonNull Integer rank;
+    @NonNull BigDecimal rankPercentile;
+    @Enumerated(EnumType.STRING)
+    @NonNull UserRankCategory rankCategory;
+    @NonNull Integer contributedProjectCount;
+    @NonNull Integer leadedProjectCount;
+    @NonNull Integer contributionCount;
+    @NonNull Integer rewardCount;
 
     @JdbcTypeCode(SqlTypes.JSON)
     List<UUID> ecosystems;
@@ -51,7 +58,14 @@ public class PublicUserProfileResponseV2Entity {
                 .signedUpAt(Optional.ofNullable(user.registered()).map(RegisteredUserViewEntity::createdAt).orElse(null))
                 .lastSeenAt(Optional.ofNullable(user.registered()).map(RegisteredUserViewEntity::lastSeenAt).orElse(null))
                 .contacts(Optional.ofNullable(user.profile()).flatMap(UserProfileViewEntity::contacts).orElse(user.github().contacts()))
-                .statsSummary(null) // TODO
+                .statsSummary(new UserProfileStatsSummary()
+                        .rank(rank)
+                        .rankPercentile(rankPercentile)
+                        .rankCategory(rankCategory)
+                        .contributedProjectCount(contributedProjectCount)
+                        .leadedProjectCount(leadedProjectCount)
+                        .contributionCount(contributionCount)
+                        .rewardCount(rewardCount))
                 .ecosystems(ecosystems)
                 ;
     }
