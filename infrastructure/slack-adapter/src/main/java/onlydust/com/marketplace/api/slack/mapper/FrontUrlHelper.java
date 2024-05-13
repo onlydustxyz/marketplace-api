@@ -17,7 +17,7 @@ public interface FrontUrlHelper {
         return switch (environment) {
             case "develop" -> "https://develop-bo.onlydust.com/";
             case "staging" -> "https://staging-bo.onlydust.com/";
-            case "production" -> "https://app.onlydust.bo/";
+            case "production" -> "https://bo.onlydust.com/";
             default -> throw internalServerError("Invalid environment " + environment);
         };
     }
