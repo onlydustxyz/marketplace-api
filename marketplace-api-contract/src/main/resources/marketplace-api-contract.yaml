@@ -774,7 +774,7 @@ paths:
   /api/v1/users/{githubId}:
     get:
       tags:
-        - BffReadUsers
+        - ReadUsers
       summary: Get user profile
       operationId: getUserProfile
       description: |
@@ -801,7 +801,7 @@ paths:
   /api/v1/users/login/{slug}:
     get:
       tags:
-        - BffReadUsers
+        - ReadUsers
       summary: Get user profile
       operationId: getUserProfileByLogin
       description: |
@@ -933,7 +933,7 @@ paths:
   /api/v1/users/{githubId}/stats:
     get:
       tags:
-        - Users
+        - ReadUsers
       summary: Get user profile stats
       operationId: getUserProfileStats
       description: |
@@ -963,7 +963,7 @@ paths:
   /api/v1/users/{githubId}/languages:
     get:
       tags:
-        - BffReadUsers
+        - ReadUsers
       summary: Get user profile stats per languages
       operationId: getUserProfileStatsPerLanguages
       description: |
@@ -999,7 +999,7 @@ paths:
   /api/v1/users/{githubId}/ecosystems:
     get:
       tags:
-        - BffReadUsers
+        - ReadUsers
       summary: Get user profile stats per ecosystems
       operationId: getUserProfileStatsPerEcosystems
       description: |

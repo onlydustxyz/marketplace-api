@@ -6,7 +6,7 @@ import onlydust.com.marketplace.api.postgres.adapter.configuration.PostgresConfi
 import onlydust.com.marketplace.api.rest.api.adapter.AppRestApi;
 import onlydust.com.marketplace.api.rest.api.adapter.VersionRestApi;
 import onlydust.com.marketplace.api.rest.api.adapter.exception.OnlydustExceptionRestHandler;
-import onlydust.com.marketplace.bff.read.BffReadConfiguration;
+import onlydust.com.marketplace.bff.read.ReadApiConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -23,7 +23,7 @@ import java.util.TimeZone;
 @EnableConfigurationProperties
 @EnableScheduling
 @EnableRetry
-@Import({PostgresConfiguration.class, JobScheduler.class, BffReadConfiguration.class})
+@Import({PostgresConfiguration.class, JobScheduler.class, ReadApiConfiguration.class})
 public class MarketplaceApiApplication {
 
     public static void main(String[] args) {
