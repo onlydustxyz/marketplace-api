@@ -11,11 +11,13 @@ import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -28,26 +30,20 @@ import static java.lang.String.format;
 public class OnlydustExceptionRestHandler {
 
     private static OnlyDustError onlyDustErrorFromException(final OnlyDustException exception) {
-        final HttpStatus httpStatus = Optional.ofNullable(HttpStatus.resolve(exception.getStatus()))
-                .orElse(HttpStatus.INTERNAL_SERVER_ERROR);
-        final UUID errorId = UUID.randomUUID();
-        final OnlyDustError onlyDustError = new OnlyDustError();
-        onlyDustError.setId(errorId);
-        onlyDustError.setStatus(httpStatus.value());
-        if (httpStatus.is5xxServerError()) {
-            onlyDustError.setMessage(httpStatus.name());
-        } else {
-            onlyDustError.setMessage(exception.getMessage());
-        }
+        final var httpStatus = Optional.ofNullable(HttpStatus.resolve(exception.getStatus())).orElse(HttpStatus.INTERNAL_SERVER_ERROR);
+        final var errorId = UUID.randomUUID();
         if (httpStatus.is5xxServerError()) {
             LOGGER.error(format("%d error %s returned by the REST API", httpStatus.value(), errorId), exception);
         } else {
             LOGGER.warn(format("%d error %s returned by the REST API", httpStatus.value(), errorId), exception);
         }
-        return onlyDustError;
+        return new OnlyDustError()
+                .id(errorId)
+                .status(httpStatus.value())
+                .message(httpStatus.is5xxServerError() ? httpStatus.name() : exception.getMessage());
     }
 
-    private String sanitizeMessage(String message) {
+    private static String sanitizeMessage(String message) {
         return message
                 .replaceAll("\\(class onlydust\\.com(\\.[a-zA-Z0-9_]+)+\\)", "")
                 .replaceAll("onlydust\\.com(\\.[a-zA-Z0-9_]+)+", "");
@@ -57,6 +53,23 @@ public class OnlydustExceptionRestHandler {
     protected ResponseEntity<OnlyDustError> handleOnlyDustException(final OnlyDustException exception) {
         final OnlyDustError onlyDustError = onlyDustErrorFromException(exception);
         return ResponseEntity.status(onlyDustError.getStatus()).body(onlyDustError);
+    }
+
+    @ExceptionHandler({
+            BindException.class,
+            JsonMappingException.class,
+            HttpMessageConversionException.class,
+            MethodArgumentTypeMismatchException.class,
+            MissingServletRequestPartException.class,
+            ConstraintViolationException.class,
+            ServletRequestBindingException.class,
+    })
+    protected ResponseEntity<OnlyDustError> handleBadRequests(final Exception exception) {
+        return handleOnlyDustException(new OnlyDustException(
+                HttpStatus.BAD_REQUEST.value(),
+                sanitizeMessage(exception.getMessage()),
+                exception
+        ));
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class})
@@ -72,54 +85,8 @@ public class OnlydustExceptionRestHandler {
         ));
     }
 
-    @ExceptionHandler({MethodArgumentTypeMismatchException.class})
-    protected ResponseEntity<OnlyDustError> handleMethodArgumentTypeMismatchException(final MethodArgumentTypeMismatchException exception) {
-        return handleOnlyDustException(new OnlyDustException(
-                HttpStatus.BAD_REQUEST.value(),
-                exception.getMessage(),
-                exception
-        ));
-    }
-
-    @ExceptionHandler({BindException.class})
-    protected ResponseEntity<OnlyDustError> handleBindException(final BindException exception) {
-        return handleOnlyDustException(new OnlyDustException(
-                HttpStatus.BAD_REQUEST.value(),
-                exception.getMessage(),
-                exception
-        ));
-    }
-
-    @ExceptionHandler({JsonMappingException.class})
-    protected ResponseEntity<OnlyDustError> handleJsonMappingException(final JsonMappingException exception) {
-        return handleOnlyDustException(new OnlyDustException(
-                HttpStatus.BAD_REQUEST.value(),
-                exception.getMessage(),
-                exception
-        ));
-    }
-
-    @ExceptionHandler({HttpMessageConversionException.class})
-    protected ResponseEntity<OnlyDustError> handleHttpMessageConversionException(final HttpMessageConversionException exception) {
-        return handleOnlyDustException(new OnlyDustException(
-                HttpStatus.BAD_REQUEST.value(),
-                sanitizeMessage(exception.getMessage()),
-                exception
-        ));
-    }
-
-    @ExceptionHandler({MissingServletRequestParameterException.class})
-    protected ResponseEntity<OnlyDustError> handleMissingServletRequestParameterException(final MissingServletRequestParameterException exception) {
-        return handleOnlyDustException(new OnlyDustException(
-                HttpStatus.BAD_REQUEST.value(),
-                sanitizeMessage(exception.getMessage()),
-                exception
-        ));
-    }
-
     @ExceptionHandler(AuthenticationException.class)
-    @ResponseBody
-    public ResponseEntity<OnlyDustError> unauthorized(AuthenticationException exception) {
+    public ResponseEntity<OnlyDustError> unauthorized(final AuthenticationException exception) {
         return handleOnlyDustException(new OnlyDustException(
                 HttpStatus.UNAUTHORIZED.value(),
                 "Missing authentication",
@@ -127,12 +94,14 @@ public class OnlydustExceptionRestHandler {
         ));
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseBody
-    public ResponseEntity<OnlyDustError> badRequest(ConstraintViolationException exception) {
+    @ExceptionHandler({
+            NoResourceFoundException.class,
+            NoHandlerFoundException.class
+    })
+    public ResponseEntity<OnlyDustError> notFound(final NoResourceFoundException exception) {
         return handleOnlyDustException(new OnlyDustException(
-                HttpStatus.BAD_REQUEST.value(),
-                "Bad request",
+                HttpStatus.NOT_FOUND.value(),
+                exception.getMessage(),
                 exception
         ));
     }
