@@ -275,3 +275,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000225_add_ecosystem_banner_url.sql
   - include:
       file: db/changelog/changelogs/00000226_add_global_user_rank_percentile.sql
+  - include:
+      file: db/changelog/changelogs/00000227_add_global_user_rank_unique_index.sql
