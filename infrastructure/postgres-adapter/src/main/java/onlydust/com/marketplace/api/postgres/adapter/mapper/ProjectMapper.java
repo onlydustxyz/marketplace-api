@@ -34,26 +34,26 @@ public interface ProjectMapper {
                                                       ProjectDetailsView.Me me) {
 
         final var organizationEntities = new HashMap<Long, GithubAccountEntity>();
-        projectEntity.getRepos().forEach(repo -> organizationEntities.put(repo.getOwner().getId(), repo.getOwner()));
+        projectEntity.getRepos().forEach(repo -> organizationEntities.put(repo.getOwner().id(), repo.getOwner()));
         final var repoIdsIncludedInProject =
                 projectEntity.getRepos().stream()
                         .filter(GithubRepoEntity::isPublic)
                         .map(GithubRepoEntity::getId).collect(Collectors.toSet());
 
         final var organizations = organizationEntities.values().stream().map(entity -> ProjectOrganizationView.builder()
-                .id(entity.getId())
-                .login(entity.getLogin())
-                .avatarUrl(entity.getAvatarUrl())
-                .htmlUrl(entity.getHtmlUrl())
-                .name(entity.getName())
-                .installationId(isNull(entity.getInstallation()) ? null : entity.getInstallation().getId())
-                .isInstalled(nonNull(entity.getInstallation()))
-                .repos(entity.getRepos().stream()
+                .id(entity.id())
+                .login(entity.login())
+                .avatarUrl(entity.avatarUrl())
+                .htmlUrl(entity.htmlUrl())
+                .name(entity.name())
+                .installationId(isNull(entity.installation()) ? null : entity.installation().getId())
+                .isInstalled(nonNull(entity.installation()))
+                .repos(entity.repos().stream()
                         .filter(GithubRepoEntity::isPublic)
                         .map(repo -> RepoMapper.mapToDomain(repo,
                                 repoIdsIncludedInProject.contains(repo.getId()),
-                                entity.getInstallation() != null &&
-                                entity.getInstallation().getAuthorizedRepos().stream()
+                                entity.installation() != null &&
+                                entity.installation().getAuthorizedRepos().stream()
                                         .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId())))
                         )
                         .collect(Collectors.toSet()))

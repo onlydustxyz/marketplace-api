@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.project.domain.view.ProjectOrganizationRepoView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoLanguageEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoStatsEntity;
+import onlydust.com.marketplace.project.domain.view.ProjectOrganizationRepoView;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,7 +14,7 @@ public interface RepoMapper {
                                                    boolean isAuthorizedInGithubApp) {
         return ProjectOrganizationRepoView.builder()
                 .githubRepoId(repo.getId())
-                .owner(repo.getOwner().getLogin())
+                .owner(repo.getOwner().login())
                 .name(repo.getName())
                 .description(repo.getDescription())
                 .forkCount(repo.getForksCount())
@@ -23,7 +23,8 @@ public interface RepoMapper {
                 .hasIssues(repo.getHasIssues())
                 .isIncludedInProject(isIncludedInProject)
                 .isAuthorizedInGithubApp(isAuthorizedInGithubApp)
-                .technologies(repo.getLanguages().stream().collect(Collectors.toMap(GithubRepoLanguageEntity::getLanguage, GithubRepoLanguageEntity::getLineCount)))
+                .technologies(repo.getLanguages().stream().collect(Collectors.toMap(GithubRepoLanguageEntity::getLanguage,
+                        GithubRepoLanguageEntity::getLineCount)))
                 .indexedAt(Optional.ofNullable(repo.getStats()).map(GithubRepoStatsEntity::getLastIndexedAt).orElse(null))
                 .build();
     }

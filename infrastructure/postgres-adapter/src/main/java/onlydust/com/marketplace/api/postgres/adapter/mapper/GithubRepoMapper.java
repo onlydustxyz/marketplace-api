@@ -8,7 +8,7 @@ public interface GithubRepoMapper {
     static GithubRepo map(GithubRepoEntity repo) {
         return GithubRepo.builder()
                 .id(repo.getId())
-                .owner(repo.getOwner().getLogin())
+                .owner(repo.getOwner().login())
                 .name(repo.getName())
                 .htmlUrl(repo.getHtmlUrl())
                 .updatedAt(repo.getUpdatedAt())

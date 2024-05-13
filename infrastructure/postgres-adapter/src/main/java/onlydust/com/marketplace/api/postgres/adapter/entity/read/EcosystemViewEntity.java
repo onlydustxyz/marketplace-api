@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.bff.read.entities;
+package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,23 +8,24 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.Immutable;
 
-import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users", schema = "iam")
+@Table(name = "ecosystems", schema = "public")
 @Value
 @ToString
 @Immutable
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(force = true)
 @Accessors(fluent = true)
-public class RegisteredUserViewEntity {
+public class EcosystemViewEntity {
     @Id
     @EqualsAndHashCode.Include
     @NonNull UUID id;
 
-    @Column(name = "created_at")
-    @NonNull ZonedDateTime createdAt;
-    @NonNull ZonedDateTime lastSeenAt;
+    @NonNull String name;
+    String url;
+    @Column(name = "logo_url")
+    String logoUrl;
+    String bannerUrl;
 }

@@ -44,5 +44,9 @@
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>postgres-adapter</artifactId>
+        </dependency>
     </dependencies>
 </project>

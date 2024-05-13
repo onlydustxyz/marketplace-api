@@ -1,11 +1,10 @@
-package onlydust.com.marketplace.bff.read.entities;
+package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.api.contract.model.LanguageResponse;
 import org.hibernate.annotations.Immutable;
 
 import java.util.UUID;
@@ -26,12 +25,4 @@ public class LanguageViewEntity {
     @NonNull String name;
     String logoUrl;
     String bannerUrl;
-
-    public LanguageResponse toDto() {
-        return new LanguageResponse()
-                .id(id)
-                .name(name)
-                .logoUrl(logoUrl)
-                .bannerUrl(bannerUrl);
-    }
 }

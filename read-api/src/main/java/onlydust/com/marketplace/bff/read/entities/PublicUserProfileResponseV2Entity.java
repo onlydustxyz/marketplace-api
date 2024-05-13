@@ -3,18 +3,24 @@ package onlydust.com.marketplace.bff.read.entities;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.api.contract.model.PublicUserProfileResponseV2;
-import onlydust.com.marketplace.api.contract.model.UserProfileStatsSummary;
-import onlydust.com.marketplace.api.contract.model.UserRankCategory;
+import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.AllUserViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountEntity;
+import onlydust.com.marketplace.bff.read.mapper.ContactMapper;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.net.URI;
+import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Entity
 @Value
@@ -30,7 +36,7 @@ public class PublicUserProfileResponseV2Entity {
 
     @OneToOne
     @JoinColumn(name = "githubUserId", insertable = false, updatable = false)
-    @NonNull BffUserViewEntity user;
+    @NonNull AllUserViewEntity user;
 
     @NonNull Integer rank;
     @NonNull BigDecimal rankPercentile;
@@ -55,9 +61,9 @@ public class PublicUserProfileResponseV2Entity {
                 .bio(Optional.ofNullable(user.profile()).map(UserProfileViewEntity::bio).orElse(user.github().bio()))
                 .website(Optional.ofNullable(user.profile()).map(UserProfileViewEntity::website).orElse(user.github().website()))
                 .signedUpOnGithubAt(user.github().createdAt())
-                .signedUpAt(Optional.ofNullable(user.registered()).map(RegisteredUserViewEntity::createdAt).orElse(null))
-                .lastSeenAt(Optional.ofNullable(user.registered()).map(RegisteredUserViewEntity::lastSeenAt).orElse(null))
-                .contacts(Optional.ofNullable(user.profile()).flatMap(UserProfileViewEntity::publicContacts).orElse(user.github().contacts()))
+                .signedUpAt(Optional.ofNullable(user.registered()).map(UserViewEntity::createdAt).map(d -> d.toInstant().atZone(ZoneOffset.UTC)).orElse(null))
+                .lastSeenAt(Optional.ofNullable(user.registered()).map(UserViewEntity::lastSeenAt).orElse(null))
+                .contacts(Optional.ofNullable(user.profile()).flatMap(UserProfileViewEntity::publicContacts).map(l -> l.stream().map(ContactMapper::map).toList()).orElse(contactsOf(user.github())))
                 .statsSummary(new UserProfileStatsSummary()
                         .rank(rank)
                         .rankPercentile(rankPercentile)
@@ -68,5 +74,17 @@ public class PublicUserProfileResponseV2Entity {
                         .rewardCount(rewardCount))
                 .ecosystems(ecosystems)
                 ;
+    }
+
+    private static List<ContactInformation> contactsOf(GithubAccountEntity account) {
+        return Stream.of(
+                        account.twitter() == null ? null :
+                                new ContactInformation().channel(ContactInformationChannel.TWITTER).contact(account.twitter()).visibility(ContactInformation.VisibilityEnum.PUBLIC),
+                        account.linkedin() == null ? null :
+                                new ContactInformation().channel(ContactInformationChannel.LINKEDIN).contact(account.linkedin()).visibility(ContactInformation.VisibilityEnum.PUBLIC),
+                        account.telegram() == null ? null :
+                                new ContactInformation().channel(ContactInformationChannel.TELEGRAM).contact(account.telegram()).visibility(ContactInformation.VisibilityEnum.PUBLIC)
+                ).filter(Objects::nonNull)
+                .toList();
     }
 }
