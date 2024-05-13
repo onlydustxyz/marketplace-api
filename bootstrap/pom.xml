@@ -188,7 +188,7 @@
         </dependency>
         <dependency>
             <groupId>onlydust.com.marketplace.api</groupId>
-            <artifactId>bff-read</artifactId>
+            <artifactId>read-api</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
