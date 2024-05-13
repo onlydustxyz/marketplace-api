@@ -5,6 +5,7 @@ import org.intellij.lang.annotations.Language;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface PublicUserProfileResponseV2EntityRepository extends Repository<PublicUserProfileResponseV2Entity, UUID> {
@@ -61,8 +62,8 @@ public interface PublicUserProfileResponseV2EntityRepository extends Repository<
             """;
 
     @Query(value = SELECT + WHERE_GITHUB_ID + GROUP_BY, nativeQuery = true)
-    PublicUserProfileResponseV2Entity findByGithubUserId(Long githubUserId);
+    Optional<PublicUserProfileResponseV2Entity> findByGithubUserId(Long githubUserId);
 
     @Query(value = SELECT + WHERE_GITHUB_LOGIN + GROUP_BY, nativeQuery = true)
-    PublicUserProfileResponseV2Entity findByGithubUserLogin(String githubUserLogin);
+    Optional<PublicUserProfileResponseV2Entity> findByGithubUserLogin(String githubUserLogin);
 }

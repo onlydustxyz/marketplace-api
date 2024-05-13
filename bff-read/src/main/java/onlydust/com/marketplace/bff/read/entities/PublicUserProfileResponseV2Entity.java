@@ -57,7 +57,7 @@ public class PublicUserProfileResponseV2Entity {
                 .signedUpOnGithubAt(user.github().createdAt())
                 .signedUpAt(Optional.ofNullable(user.registered()).map(RegisteredUserViewEntity::createdAt).orElse(null))
                 .lastSeenAt(Optional.ofNullable(user.registered()).map(RegisteredUserViewEntity::lastSeenAt).orElse(null))
-                .contacts(Optional.ofNullable(user.profile()).flatMap(UserProfileViewEntity::contacts).orElse(user.github().contacts()))
+                .contacts(Optional.ofNullable(user.profile()).flatMap(UserProfileViewEntity::publicContacts).orElse(user.github().contacts()))
                 .statsSummary(new UserProfileStatsSummary()
                         .rank(rank)
                         .rankPercentile(rankPercentile)

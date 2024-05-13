@@ -34,7 +34,7 @@ public class UserProfileViewEntity {
     @Getter(AccessLevel.NONE)
     List<ContactInformationViewEntity> contacts;
 
-    Optional<List<ContactInformation>> contacts() {
-        return Optional.ofNullable(contacts).map(c -> c.stream().map(ContactInformationViewEntity::toDto).toList());
+    Optional<List<ContactInformation>> publicContacts() {
+        return Optional.ofNullable(contacts).map(c -> c.stream().filter(ContactInformationViewEntity::isPublic).map(ContactInformationViewEntity::toDto).toList());
     }
 }

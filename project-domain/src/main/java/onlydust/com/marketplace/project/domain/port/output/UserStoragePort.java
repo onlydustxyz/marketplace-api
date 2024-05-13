@@ -15,10 +15,6 @@ import java.util.*;
 public interface UserStoragePort {
     UserProfileView getProfileById(UUID userId);
 
-    UserProfileView getProfileById(Long githubUserId);
-
-    UserProfileView getProfileByLogin(String githubLogin);
-
     void saveProfile(UUID userId, UserProfile userProfile);
 
     Optional<User> getUserByGithubId(Long githubId);

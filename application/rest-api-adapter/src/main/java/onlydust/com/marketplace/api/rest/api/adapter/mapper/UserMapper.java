@@ -8,12 +8,10 @@ import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.view.Money;
 import onlydust.com.marketplace.project.domain.view.TotalsEarned;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
-import org.springframework.beans.BeanUtils;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
@@ -67,21 +65,6 @@ public interface UserMapper {
             case MAGENTA -> UserProfileCover.MAGENTA;
             case YELLOW -> UserProfileCover.YELLOW;
         };
-    }
-
-
-    static PublicUserProfileResponse userProfileToPublicResponse(UserProfileView userProfileView) {
-        final PrivateUserProfileResponse privateUserProfileResponse = userProfileToPrivateResponse(userProfileView);
-        privateUserProfileResponse.setIsLookingForAJob(null);
-        privateUserProfileResponse.setAllocatedTimeToContribute(null);
-        privateUserProfileResponse.setContacts(
-                privateUserProfileResponse.getContacts().stream().filter(contact -> contact.getVisibility() == ContactInformation.VisibilityEnum.PUBLIC).collect(Collectors.toList())
-        );
-        privateUserProfileResponse.setProjects(userProjectsToResponse(userProfileView.getProjectsStats(), false));
-
-        final PublicUserProfileResponse publicUserProfileResponse = new PublicUserProfileResponse();
-        BeanUtils.copyProperties(privateUserProfileResponse, publicUserProfileResponse);
-        return publicUserProfileResponse;
     }
 
     static PrivateUserProfileResponse userProfileToPrivateResponse(UserProfileView userProfileView) {

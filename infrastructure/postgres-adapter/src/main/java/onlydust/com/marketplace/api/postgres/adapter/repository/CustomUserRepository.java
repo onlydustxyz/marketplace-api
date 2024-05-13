@@ -116,20 +116,6 @@ public class CustomUserRepository {
             where u.id = :userId
             """;
 
-    private final static String SELECT_USER_PROFILE_WHERE_GITHUB_ID = SELECT_USER_PROFILE + """
-            from indexer_exp.github_accounts gu
-                     left join iam.users u on gu.id = u.github_user_id
-                     left join public.user_profile_info upi on upi.id = u.id
-            where gu.id = :githubUserId
-            """;
-
-    private final static String SELECT_USER_PROFILE_WHERE_GITHUB_LOGIN = SELECT_USER_PROFILE + """
-            from indexer_exp.github_accounts gu
-                     left join iam.users u on gu.id = u.github_user_id
-                     left join public.user_profile_info upi on upi.id = u.id
-            where gu.login = :githubLogin
-            """;
-
     private final static String GET_PROJECT_STATS_BY_USER = """
             with granted_usd as (
               select 
@@ -278,32 +264,6 @@ public class CustomUserRepository {
                     (UserProfileEntity) entityManager.createNativeQuery(SELECT_USER_PROFILE_WHERE_ID,
                                     UserProfileEntity.class)
                             .setParameter("userId", userId)
-                            .getSingleResult();
-            return Optional.ofNullable(rowToUserProfile(row));
-        } catch (NoResultException e) {
-            return Optional.empty();
-        }
-    }
-
-    public Optional<UserProfileView> findProfileById(final Long githubUserId) {
-        try {
-            final UserProfileEntity row =
-                    (UserProfileEntity) entityManager.createNativeQuery(SELECT_USER_PROFILE_WHERE_GITHUB_ID,
-                                    UserProfileEntity.class)
-                            .setParameter("githubUserId", githubUserId)
-                            .getSingleResult();
-            return Optional.ofNullable(rowToUserProfile(row));
-        } catch (NoResultException e) {
-            return Optional.empty();
-        }
-    }
-
-    public Optional<UserProfileView> findProfileByLogin(String githubLogin) {
-        try {
-            final UserProfileEntity row =
-                    (UserProfileEntity) entityManager.createNativeQuery(SELECT_USER_PROFILE_WHERE_GITHUB_LOGIN,
-                                    UserProfileEntity.class)
-                            .setParameter("githubLogin", githubLogin)
                             .getSingleResult();
             return Optional.ofNullable(rowToUserProfile(row));
         } catch (NoResultException e) {
