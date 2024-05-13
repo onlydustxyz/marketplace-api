@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.bff.read;
 
-import onlydust.com.marketplace.bff.read.adapters.BffReadUsersApiPostgresAdapter;
+import onlydust.com.marketplace.bff.read.adapters.ReadUsersApiPostgresAdapter;
 import onlydust.com.marketplace.bff.read.repositories.PublicUserProfileResponseV2EntityRepository;
 import onlydust.com.marketplace.bff.read.repositories.UserProfileEcosystemPageItemEntityRepository;
 import onlydust.com.marketplace.bff.read.repositories.UserProfileLanguagePageItemEntityRepository;
@@ -20,12 +20,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         "onlydust.com.marketplace.bff.read.repositories"
 })
 @EnableTransactionManagement
-public class BffReadConfiguration {
+public class ReadApiConfiguration {
     @Bean
-    public BffReadUsersApiPostgresAdapter bffReadUsersApiPostgresAdapter(final UserProfileLanguagePageItemEntityRepository userProfileLanguagePageItemEntityRepository,
-                                                                         final UserProfileEcosystemPageItemEntityRepository userProfileEcosystemPageItemEntityRepository,
-                                                                         final PublicUserProfileResponseV2EntityRepository publicUserProfileResponseV2EntityRepository) {
-        return new BffReadUsersApiPostgresAdapter(
+    public ReadUsersApiPostgresAdapter bffReadUsersApiPostgresAdapter(final UserProfileLanguagePageItemEntityRepository userProfileLanguagePageItemEntityRepository,
+                                                                      final UserProfileEcosystemPageItemEntityRepository userProfileEcosystemPageItemEntityRepository,
+                                                                      final PublicUserProfileResponseV2EntityRepository publicUserProfileResponseV2EntityRepository) {
+        return new ReadUsersApiPostgresAdapter(
                 userProfileLanguagePageItemEntityRepository,
                 userProfileEcosystemPageItemEntityRepository,
                 publicUserProfileResponseV2EntityRepository);

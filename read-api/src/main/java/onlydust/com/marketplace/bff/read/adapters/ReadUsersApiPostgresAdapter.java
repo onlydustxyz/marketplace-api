@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.bff.read.adapters;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.contract.BffReadUsersApi;
+import onlydust.com.marketplace.api.contract.ReadUsersApi;
 import onlydust.com.marketplace.api.contract.model.PublicUserProfileResponseV2;
 import onlydust.com.marketplace.api.contract.model.UserProfileEcosystemPage;
 import onlydust.com.marketplace.api.contract.model.UserProfileLanguagePage;
@@ -21,7 +21,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @RestController
 @AllArgsConstructor
 @Transactional(readOnly = true)
-public class BffReadUsersApiPostgresAdapter implements BffReadUsersApi {
+public class ReadUsersApiPostgresAdapter implements ReadUsersApi {
     final UserProfileLanguagePageItemEntityRepository userProfileLanguagePageItemEntityRepository;
     final UserProfileEcosystemPageItemEntityRepository userProfileEcosystemPageItemEntityRepository;
     final PublicUserProfileResponseV2EntityRepository publicUserProfileResponseV2EntityRepository;
