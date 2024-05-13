@@ -27,7 +27,7 @@ public interface BackofficeRewardViewRepository extends JpaRepository<Backoffice
                        p.name                                   project_name,
                        p.logo_url                               project_logo_url,
                        p.short_description                      project_short_description,
-                       p.key                                    project_slug,
+                       p.slug                                   project_slug,
              
                        s2.s_list                                 sponsors,
              

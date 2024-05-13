@@ -12,7 +12,7 @@ public interface ProjectLedIdRepository extends JpaRepository<ProjectLedIdViewEn
     @Query(value = """
               (select pl.user_id,
                     pl.project_id,
-                    p.key as project_slug,
+                    p.slug as project_slug,
                     p.name,
                     p.logo_url,
                     false     pending,
@@ -34,7 +34,7 @@ public interface ProjectLedIdRepository extends JpaRepository<ProjectLedIdViewEn
             union
             (select u.id,
                     p.id as project_id,
-                    p.key as project_slug,
+                    p.slug as project_slug,
                     p.name,
                     p.logo_url,
                     true      pending,

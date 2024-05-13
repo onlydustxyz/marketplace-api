@@ -18,7 +18,7 @@ public interface ShortRewardViewRepository extends JpaRepository<ShortRewardView
                                    p.name                                   project_name,
                                    p.logo_url                               project_logo_url,
                                    p.short_description                      project_short_description,
-                                   p.key                                    project_slug,
+                                   p.slug                                    project_slug,
                                    r.amount                                  amount,
                                    c.id                                      currency_id
                                     from rewards r
@@ -40,7 +40,7 @@ public interface ShortRewardViewRepository extends JpaRepository<ShortRewardView
                                 p.name                                                   project_name,
                                 p.logo_url                                               project_logo_url,
                                 p.short_description                                      project_short_description,
-                                p.key                                                    project_slug,
+                                p.slug                                                    project_slug,
                                 r.amount                                                 amount,
                                 c.id                                                     currency_id
                          from ecosystems e

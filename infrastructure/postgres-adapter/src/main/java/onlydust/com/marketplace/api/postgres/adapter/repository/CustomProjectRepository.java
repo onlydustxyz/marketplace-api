@@ -57,7 +57,7 @@ public class CustomProjectRepository {
         final var isProjectPublic = entityManager.createNativeQuery("""
                         select 1
                         from projects p
-                        where p.key = :projectSlug
+                        where p.slug = :projectSlug
                           and p.visibility = 'PUBLIC'
                         """)
                 .setParameter("projectSlug", projectSlug)
@@ -120,7 +120,7 @@ public class CustomProjectRepository {
                         left join (select pl_count.project_id, count(pl_count.user_id) project_lead_count
                                 from project_leads pl_count
                                 group by pl_count.project_id) pl_count on pl_count.project_id = p.id
-                        where p.key = :projectSlug
+                        where p.slug = :projectSlug
                             and
                             ((pl_count.project_lead_count > 0 or coalesce(is_pending_pl.is_p_pl, false))
                                 and (coalesce(is_pending_pl.is_p_pl, false) or

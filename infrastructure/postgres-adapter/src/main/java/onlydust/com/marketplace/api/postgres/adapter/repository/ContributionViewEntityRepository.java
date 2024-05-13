@@ -35,7 +35,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 user_avatar_url(c.github_author_id, c.github_author_avatar_url) as github_author_avatar_url,
                 p.id as project_id,
                 p.name as project_name,
-                p.key as project_key,
+                p.slug as project_key,
                 p.short_description as project_short_description,
                 p.logo_url as project_logo_url,
                 p.visibility as project_visibility,

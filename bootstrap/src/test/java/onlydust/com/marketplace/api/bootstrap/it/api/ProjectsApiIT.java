@@ -2856,7 +2856,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     @Order(5)
     void should_get_projects_given_anonymous_user_with_sorts_and_filters() {
         client.get().uri(getApiURI(PROJECTS_GET, Map.of("sort", "CONTRIBUTOR_COUNT", "technologies", "Rust", "ecosystemId", "c848d288-e6d9-4c93-ad8b" +
-                                                                                                                            "-1db94483aaa6", "search", "t",
+                                "-1db94483aaa6", "search", "t",
                         "pageIndex", "0", "pageSize",
                         "100"))).exchange()
                 // Then
@@ -2881,7 +2881,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         // Given
         final var auth = userAuthHelper.authenticatePierre();
 
-        final ProjectViewEntity bretzel = projectViewRepository.findByKey("bretzel").orElseThrow();
+        final ProjectViewEntity bretzel = projectViewRepository.findBySlug("bretzel").orElseThrow();
         projectLeaderInvitationRepository.save(new ProjectLeaderInvitationEntity(UUID.randomUUID(), bretzel.getId(), auth.user().getGithubUserId()));
 
         // When

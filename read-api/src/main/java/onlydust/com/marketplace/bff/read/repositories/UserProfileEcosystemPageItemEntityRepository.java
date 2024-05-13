@@ -22,7 +22,7 @@ public interface UserProfileEcosystemPageItemEntityRepository extends Repository
                    ROUND(sum(rewarded.usd_amount), 2) as total_earned_usd,
                    jsonb_agg(distinct jsonb_build_object(
                            'id', p.id,
-                           'slug', p.key,
+                           'slug', p.slug,
                            'name', p.name,
                            'logoUrl', p.logo_url
                                       ))              as projects

@@ -142,7 +142,9 @@ public class ProjectServiceTest {
 
         // When
         when(uuidGeneratorPort.generate()).thenReturn(expectedProjectId);
-        when(projectStoragePort.createProject(expectedProjectId, command.getName(),
+        when(projectStoragePort.createProject(expectedProjectId,
+                Project.slugOf(command.getName()),
+                command.getName(),
                 command.getShortDescription(),
                 command.getLongDescription(), command.getIsLookingForContributors(),
                 command.getMoreInfos(), command.getGithubRepoIds(),
@@ -203,7 +205,9 @@ public class ProjectServiceTest {
 
         // Then
         verify(indexerPort, times(1)).indexUsers(usersToInviteAsProjectLeaders);
-        verify(projectStoragePort, times(1)).updateProject(command.getId(), command.getName(),
+        verify(projectStoragePort, times(1)).updateProject(command.getId(),
+                Project.slugOf(command.getName()),
+                command.getName(),
                 command.getShortDescription(),
                 command.getLongDescription(), command.getIsLookingForContributors(),
                 command.getMoreInfos(), command.getGithubRepoIds(),

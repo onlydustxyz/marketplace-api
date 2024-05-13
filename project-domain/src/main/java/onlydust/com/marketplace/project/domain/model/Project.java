@@ -29,4 +29,10 @@ public class Project {
         BIG_WHALE,
         UPDATED_ROADMAP
     }
+
+    public static String slugOf(String name) {
+        return name.replaceAll("[^a-zA-Z0-9_\\- ]+", "")
+                .replaceAll("\s+", "-")
+                .toLowerCase();
+    }
 }

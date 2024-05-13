@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
+import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.view.ProjectDetailsView;
@@ -47,7 +48,7 @@ public class PostgresProjectAdapterIT extends AbstractPostgresIT {
 
         // When
         final String slug = projectStoragePort.createProject(
-                projectId, faker.name().lastName(), faker.name().name(), faker.harryPotter().location(), false,
+                projectId, faker.name().lastName(), faker.name().lastName(), faker.name().name(), faker.harryPotter().location(), false,
                 namedLinks, null, userId
                 , null, ProjectVisibility.PUBLIC, null,
                 ProjectRewardSettings.defaultSettings(new Date()), null
@@ -69,7 +70,7 @@ public class PostgresProjectAdapterIT extends AbstractPostgresIT {
                         .build()
         );
         projectStoragePort.updateProject(
-                projectId, project.getName(), project.getShortDescription(), project.getLongDescription(), false,
+                projectId, Project.slugOf(project.getName()), project.getName(), project.getShortDescription(), project.getLongDescription(), false,
                 namedLinksUpdated,
                 null, null, null, null, null, null
         );

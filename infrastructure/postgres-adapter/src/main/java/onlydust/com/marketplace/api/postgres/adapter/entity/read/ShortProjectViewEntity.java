@@ -21,7 +21,7 @@ import java.util.UUID;
 public class ShortProjectViewEntity {
     @Id
     UUID id;
-    String key;
+    String slug;
     String name;
     String shortDescription;
     String longDescription;

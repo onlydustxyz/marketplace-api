@@ -6,10 +6,8 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
-import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.model.notification.ProjectCreated;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.*;
@@ -95,7 +93,10 @@ public class ProjectService implements ProjectFacadePort {
         }
 
         final UUID projectId = uuidGeneratorPort.generate();
-        final String projectSlug = this.projectStoragePort.createProject(projectId, command.getName(),
+
+        final String projectSlug = this.projectStoragePort.createProject(projectId,
+                Project.slugOf(command.getName()),
+                command.getName(),
                 command.getShortDescription(), command.getLongDescription(),
                 command.getIsLookingForContributors(), command.getMoreInfos(),
                 command.getGithubRepoIds(),
@@ -132,6 +133,7 @@ public class ProjectService implements ProjectFacadePort {
         getLinkedReposChanges(command, linkedRepoIds, unlinkedRepoIds);
 
         this.projectStoragePort.updateProject(command.getId(),
+                Project.slugOf(command.getName()),
                 command.getName(),
                 command.getShortDescription(), command.getLongDescription(),
                 command.getIsLookingForContributors(), command.getMoreInfos(),
@@ -160,7 +162,7 @@ public class ProjectService implements ProjectFacadePort {
                 .anyMatch(userId -> projectLeadIds.stream()
                         .noneMatch(projectLeaderId -> projectLeaderId.equals(userId)))) {
             throw OnlyDustException.badRequest("Project leaders to keep must be a subset of current project " +
-                                               "leaders");
+                    "leaders");
         }
         return projectLeadIds.stream()
                 .filter(leaderId -> !command.getProjectLeadersToKeep().contains(leaderId))
@@ -268,7 +270,7 @@ public class ProjectService implements ProjectFacadePort {
                 return closedIssue;
             } else {
                 throw OnlyDustException.forbidden("Rewardable issue can only be created on repos linked to this " +
-                                                  "project");
+                        "project");
             }
         } else {
             throw OnlyDustException.forbidden("Only project leads can create rewardable issue on their projects");

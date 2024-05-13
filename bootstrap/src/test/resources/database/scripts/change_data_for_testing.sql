@@ -9,6 +9,8 @@ create table if not exists auth.user_providers
     id uuid primary key
 );
 
+REFRESH MATERIALIZED VIEW global_users_ranks;
+
 insert into languages (id, name)
 values ('ca600cac-0f45-44e9-a6e8-25e21b0c6887', 'Rust'),
        ('75ce6b37-8610-4600-8d2d-753b50aeda1e', 'Typescript'),

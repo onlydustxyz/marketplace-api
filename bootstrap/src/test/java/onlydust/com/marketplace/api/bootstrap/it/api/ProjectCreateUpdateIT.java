@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
     private static UUID projectId;
+    private static UUID projectId2;
 
 
     @BeforeEach
@@ -142,7 +143,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.organizations[0].repos.length()").isEqualTo(1)
                 .jsonPath("$.organizations[0].repos[0].name").isEqualTo("marketplace-frontend")
                 .jsonPath("$.organizations[0].repos[0].description").isEqualTo("Contributions marketplace backend " +
-                                                                               "services")
+                        "services")
                 .jsonPath("$.organizations[1].login").isEqualTo("od-mocks")
                 .jsonPath("$.organizations[1].installationId").isEqualTo(null)
                 .jsonPath("$.organizations[1].repos.length()").isEqualTo(1)
@@ -488,9 +489,8 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .returnResult().getResponseBody();
 
         assertThat(response.getMessage()).contains("Project leaders to keep must be a subset of current project " +
-                                                   "leaders");
+                "leaders");
     }
-
 
     @Test
     @Order(21)
@@ -530,7 +530,6 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         assertThat(response.getMessage()).contains("shortDescription: must not be null");
         assertThat(response.getMessage()).contains("longDescription: must not be null");
     }
-
 
     @Test
     @Order(23)
@@ -610,6 +609,137 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.moreInfos").isEmpty();
+
+        projectId2 = responseBody.getProjectId();
+    }
+
+    @SneakyThrows
+    @Test
+    @Order(40)
+    public void should_fail_to_create_a_new_project_with_existing_slug() {
+        // Given
+        indexerApiWireMockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/events/on-repo-link-changed"))
+                .withRequestBody(WireMock.equalToJson("""
+                        {
+                          "linkedRepoIds": [498695724],
+                          "unlinkedRepoIds": []
+                        }
+                        """, true, false))
+                .willReturn(WireMock.noContent()));
+
+        // When
+        client.post()
+                .uri(getApiURI(PROJECTS_POST))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticatePierre().jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "name": "Updated Project",
+                          "shortDescription": "Testing conflict",
+                          "longDescription": "CONFLICT",
+                          "isLookingForContributors": false,
+                          "inviteGithubUserIdsAsProjectLeads": [
+                            595505
+                          ],
+                          "githubRepoIds": [
+                            498695724
+                          ],
+                          "logoUrl": "https://foo.bar",
+                          "ecosystemIds" : ["b599313c-a074-440f-af04-a466529ab2e7"]
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is4xxClientError();
+
+        // Then
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + "updated-project"))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(projectId.toString())
+                .jsonPath("$.visibility").isEqualTo("PUBLIC")
+                .jsonPath("$.name").isEqualTo("Updated Project")
+                .jsonPath("$.shortDescription").isEqualTo("This is a updated super project")
+                .jsonPath("$.longDescription").isEqualTo("This is a super awesome updated project with a nice description");
+    }
+
+    @SneakyThrows
+    @Test
+    @Order(41)
+    public void should_fail_to_update_the_project_with_existing_slug() {
+        // Given
+        indexerApiWireMockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/events/on-repo-link-changed"))
+                .withRequestBody(WireMock.equalToJson("""
+                        {
+                          "linkedRepoIds": [452047076],
+                          "unlinkedRepoIds": [602953043]
+                        }
+                        """, true, false))
+                .willReturn(WireMock.noContent()));
+
+        // And When
+        client.put()
+                .uri(getApiURI(format(PROJECTS_PUT, projectId2)))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticatePierre().jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "name": "Updated Project",
+                          "shortDescription": "Testing conflict",
+                          "longDescription": "CONFLICT",
+                          "moreInfos": [
+                            {
+                              "url": "https://t.me/foobar/updated",
+                              "value": "foobar-updated"
+                            },
+                            {
+                              "url": "https://foobar.com",
+                              "value": "foobar-updated2"
+                            }
+                          ],
+                          "isLookingForContributors": false,
+                          "inviteGithubUserIdsAsProjectLeads": [
+                            16590657, 43467246
+                          ],
+                          "projectLeadsToKeep": [
+                            "e461c019-ba23-4671-9b6c-3a5a18748af9"
+                          ],
+                          "githubRepoIds": [
+                            498695724, 452047076
+                          ],
+                          "logoUrl": "https://avatars.githubusercontent.com/u/yyyyyyyyyyyy",
+                          "rewardSettings": {
+                            "ignorePullRequests": false,
+                            "ignoreIssues": true,
+                            "ignoreCodeReviews": true,
+                            "ignoreContributionsBefore": "2021-01-01T00:00:00Z"
+                          },
+                          "ecosystemIds": ["99b6c284-f9bb-4f89-8ce7-03771465ef8e","6ab7fa6c-c418-4997-9c5f-55fb021a8e5c"]
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is4xxClientError();
+
+        // And Then
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + "updated-project"))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(projectId.toString())
+                .jsonPath("$.visibility").isEqualTo("PUBLIC")
+                .jsonPath("$.name").isEqualTo("Updated Project")
+                .jsonPath("$.shortDescription").isEqualTo("This is a updated super project")
+                .jsonPath("$.longDescription").isEqualTo("This is a super awesome updated project with a nice description");
     }
 
     private void assertProjectWasUpdated() {
@@ -626,7 +756,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.slug").isEqualTo("updated-project")
                 .jsonPath("$.shortDescription").isEqualTo("This is a super updated project")
                 .jsonPath("$.longDescription").isEqualTo("This is a super awesome updated project with a nice " +
-                                                         "description")
+                        "description")
                 .jsonPath("$.logoUrl").isEqualTo("https://avatars.githubusercontent.com/u/yyyyyyyyyyyy")
                 .jsonPath("$.hiring").isEqualTo(false)
                 .jsonPath("$.moreInfos.length()").isEqualTo(2)

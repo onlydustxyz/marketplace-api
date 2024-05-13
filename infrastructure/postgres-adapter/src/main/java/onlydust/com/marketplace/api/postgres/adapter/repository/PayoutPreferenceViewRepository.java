@@ -15,7 +15,7 @@ public interface PayoutPreferenceViewRepository extends JpaRepository<PayoutPref
                    p.name as project_name,
                    p.logo_url as project_logo_url,
                    p.short_description as project_short_description,
-                   p.key as project_key,
+                   p.slug as project_key,
                    pp.billing_profile_id
             from iam.users u
             join (select distinct r.project_id, r.recipient_id  from rewards r) r on r.recipient_id = u.github_user_id

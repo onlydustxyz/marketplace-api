@@ -126,7 +126,7 @@ public class CustomUserRepository {
               group by pa.project_id
             )
             select  p.id,
-                    p.key as slug,
+                    p.slug,
                     p.is_lead,
                     p.assigned_at as lead_since,
                     p.name,
@@ -158,14 +158,14 @@ public class CustomUserRepository {
                     join indexer_exp.contributions c on c.repo_id = pgr.github_repo_id and c.status = 'COMPLETED' and c.completed_at is not null and c.contributor_id = :githubUserId
                     where pgr.project_id = p.id and gr.visibility = 'PUBLIC') first_contribution_date
                    
-            from ((select distinct p.id, false is_lead, cast(null as timestamp) as assigned_at, p.name, p.logo_url, p.key, p.visibility
+            from ((select distinct p.id, false is_lead, cast(null as timestamp) as assigned_at, p.name, p.logo_url, p.slug, p.visibility
                    from indexer_exp.repos_contributors rc
                             join indexer_exp.github_repos gr on gr.id = rc.repo_id
                             join project_github_repos gpr on gpr.github_repo_id = gr.id
                             join projects p on p.id = gpr.project_id
                    where rc.contributor_id = :githubUserId and rc.completed_contribution_count > 0 and gr.visibility = 'PUBLIC')
                   UNION
-                  (select distinct p.id, true is_lead, pl.assigned_at, p.name, p.logo_url, p.key, p.visibility
+                  (select distinct p.id, true is_lead, pl.assigned_at, p.name, p.logo_url, p.slug, p.visibility
                    from iam.users u
                             join project_leads pl on pl.user_id = u.id
                             join projects p on p.id = pl.project_id
