@@ -4,6 +4,7 @@ import onlydust.com.marketplace.bff.read.adapters.ReadUsersApiPostgresAdapter;
 import onlydust.com.marketplace.bff.read.repositories.PublicUserProfileResponseV2EntityRepository;
 import onlydust.com.marketplace.bff.read.repositories.UserProfileEcosystemPageItemEntityRepository;
 import onlydust.com.marketplace.bff.read.repositories.UserProfileLanguagePageItemEntityRepository;
+import onlydust.com.marketplace.bff.read.repositories.UserProfileProjectEarningsEntityRepository;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -24,10 +25,12 @@ public class ReadApiConfiguration {
     @Bean
     public ReadUsersApiPostgresAdapter bffReadUsersApiPostgresAdapter(final UserProfileLanguagePageItemEntityRepository userProfileLanguagePageItemEntityRepository,
                                                                       final UserProfileEcosystemPageItemEntityRepository userProfileEcosystemPageItemEntityRepository,
-                                                                      final PublicUserProfileResponseV2EntityRepository publicUserProfileResponseV2EntityRepository) {
+                                                                      final PublicUserProfileResponseV2EntityRepository publicUserProfileResponseV2EntityRepository,
+                                                                      final UserProfileProjectEarningsEntityRepository userProfileProjectEarningsEntityRepository) {
         return new ReadUsersApiPostgresAdapter(
                 userProfileLanguagePageItemEntityRepository,
                 userProfileEcosystemPageItemEntityRepository,
-                publicUserProfileResponseV2EntityRepository);
+                publicUserProfileResponseV2EntityRepository,
+                userProfileProjectEarningsEntityRepository);
     }
 }

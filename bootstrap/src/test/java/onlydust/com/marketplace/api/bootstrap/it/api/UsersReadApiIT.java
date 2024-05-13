@@ -216,4 +216,54 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                         }
                         """);
     }
+
+    @Test
+    void should_return_users_stats() {
+        // Given
+        final var user = userAuthHelper.authenticateAnthony().user();
+
+        // When
+        client.get()
+                .uri(getApiURI(USER_STATS.formatted(user.getGithubUserId())))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "activity": [],
+                          "earnings": {
+                            "totalEarnedUsd": 2692632.50,
+                            "perProject": [
+                              {
+                                "projectName": "kaaper",
+                                "totalEarnedUsd": 1792080.00
+                              },
+                              {
+                                "projectName": "kaaper 3",
+                                "totalEarnedUsd": 2525.00
+                              },
+                              {
+                                "projectName": "Pizzeria Yoshi !",
+                                "totalEarnedUsd": 4260.00
+                              },
+                              {
+                                "projectName": "Marketplace 2",
+                                "totalEarnedUsd": 890990.00
+                              },
+                              {
+                                "projectName": "Aldébaran du Taureau",
+                                "totalEarnedUsd": 1767.50
+                              },
+                              {
+                                "projectName": "oscar's awesome project",
+                                "totalEarnedUsd": 1010.00
+                              }
+                            ]
+                          },
+                          "workDistribution": null
+                        }
+                        """);
+    }
 }
