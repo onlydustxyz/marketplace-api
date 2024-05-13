@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.bff.read.entities.UserProfileEcosystemPageItemEntity;
 import onlydust.com.marketplace.bff.read.entities.UserProfileLanguagePageItemEntity;
 import onlydust.com.marketplace.bff.read.entities.UserProfileProjectEarningsEntity;
+import onlydust.com.marketplace.bff.read.entities.UserWeeklyStatsEntity;
 import onlydust.com.marketplace.bff.read.repositories.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,7 @@ public class ReadUsersApiPostgresAdapter implements ReadUsersApi {
     final PublicUserProfileResponseV2EntityRepository publicUserProfileResponseV2EntityRepository;
     final UserProfileProjectEarningsEntityRepository userProfileProjectEarningsEntityRepository;
     final UserWorkDistributionEntityRepository userWorkDistributionEntityRepository;
+    final UserWeeklyStatsEntityRepository userWeeklyStatsEntityRepository;
 
     @Override
     public ResponseEntity<PublicUserProfileResponseV2> getUserProfileByLogin(String login) {
@@ -40,6 +42,7 @@ public class ReadUsersApiPostgresAdapter implements ReadUsersApi {
         final var workDistribution = userWorkDistributionEntityRepository.findByContributorId(githubId)
                 .orElseThrow(() -> notFound("User %d not found".formatted(githubId)));
         final var perProjectsStats = userProfileProjectEarningsEntityRepository.findByContributorId(githubId);
+        final var userWeeklyStats = userWeeklyStatsEntityRepository.findByContributorId(githubId);
 
         return ok(new UserProfileStatsV2()
                 .earnings(new UserProfileStatsV2Earnings()
@@ -47,6 +50,7 @@ public class ReadUsersApiPostgresAdapter implements ReadUsersApi {
                                 BigDecimal::add))
                         .perProject(perProjectsStats.stream().map(UserProfileProjectEarningsEntity::toDto).toList()))
                 .workDistribution(workDistribution.toDto())
+                .activity(userWeeklyStats.stream().map(UserWeeklyStatsEntity::toDto).toList())
         );
     }
 

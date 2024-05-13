@@ -24,12 +24,14 @@ public class ReadApiConfiguration {
                                                                       final UserProfileEcosystemPageItemEntityRepository userProfileEcosystemPageItemEntityRepository,
                                                                       final PublicUserProfileResponseV2EntityRepository publicUserProfileResponseV2EntityRepository,
                                                                       final UserProfileProjectEarningsEntityRepository userProfileProjectEarningsEntityRepository,
-                                                                      final UserWorkDistributionEntityRepository userWorkDistributionEntityRepository) {
+                                                                      final UserWorkDistributionEntityRepository userWorkDistributionEntityRepository,
+                                                                      final UserWeeklyStatsEntityRepository userWeeklyStatsEntityRepository) {
         return new ReadUsersApiPostgresAdapter(
                 userProfileLanguagePageItemEntityRepository,
                 userProfileEcosystemPageItemEntityRepository,
                 publicUserProfileResponseV2EntityRepository,
                 userProfileProjectEarningsEntityRepository,
-                userWorkDistributionEntityRepository);
+                userWorkDistributionEntityRepository,
+                userWeeklyStatsEntityRepository);
     }
 }
