@@ -6,10 +6,7 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.bff.read.entities.UserProfileEcosystemPageItemEntity;
 import onlydust.com.marketplace.bff.read.entities.UserProfileLanguagePageItemEntity;
 import onlydust.com.marketplace.bff.read.entities.UserProfileProjectEarningsEntity;
-import onlydust.com.marketplace.bff.read.repositories.PublicUserProfileResponseV2EntityRepository;
-import onlydust.com.marketplace.bff.read.repositories.UserProfileEcosystemPageItemEntityRepository;
-import onlydust.com.marketplace.bff.read.repositories.UserProfileLanguagePageItemEntityRepository;
-import onlydust.com.marketplace.bff.read.repositories.UserProfileProjectEarningsEntityRepository;
+import onlydust.com.marketplace.bff.read.repositories.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +26,7 @@ public class ReadUsersApiPostgresAdapter implements ReadUsersApi {
     final UserProfileEcosystemPageItemEntityRepository userProfileEcosystemPageItemEntityRepository;
     final PublicUserProfileResponseV2EntityRepository publicUserProfileResponseV2EntityRepository;
     final UserProfileProjectEarningsEntityRepository userProfileProjectEarningsEntityRepository;
+    final UserWorkDistributionEntityRepository userWorkDistributionEntityRepository;
 
     @Override
     public ResponseEntity<PublicUserProfileResponseV2> getUserProfileByLogin(String login) {
@@ -39,13 +37,17 @@ public class ReadUsersApiPostgresAdapter implements ReadUsersApi {
 
     @Override
     public ResponseEntity<UserProfileStatsV2> getUserProfileStats(Long githubId, UUID ecosystem) {
+        final var workDistribution = userWorkDistributionEntityRepository.findByContributorId(githubId)
+                .orElseThrow(() -> notFound("User %d not found".formatted(githubId)));
         final var perProjectsStats = userProfileProjectEarningsEntityRepository.findByContributorId(githubId);
+
         return ok(new UserProfileStatsV2()
                 .earnings(new UserProfileStatsV2Earnings()
                         .totalEarnedUsd(perProjectsStats.stream().map(UserProfileProjectEarningsEntity::totalEarnedUsd).reduce(BigDecimal.ZERO,
                                 BigDecimal::add))
-                        .perProject(perProjectsStats.stream().map(UserProfileProjectEarningsEntity::toDto).toList())))
-                ;
+                        .perProject(perProjectsStats.stream().map(UserProfileProjectEarningsEntity::toDto).toList()))
+                .workDistribution(workDistribution.toDto())
+        );
     }
 
     @Override
