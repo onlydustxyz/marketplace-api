@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.sumsub.webhook.adapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileVerificationFacadePort;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @Slf4j
 @RestController
+@Hidden
 public class SumsubWebhookApiAdapter {
 
     public static final String X_OD_API = "X-OD-Api";
