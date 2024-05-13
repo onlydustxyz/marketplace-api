@@ -221,7 +221,6 @@ public class Currency implements Cloneable {
         public final static Code STRK = Code.of(STRK_STR);
         public final static Code OP = Code.of(OP_STR);
         public final static Code USDC = Code.of(USDC_STR);
-        public final static Code LORDS = Code.of(LORDS_STR);
 
         String inner;
 
