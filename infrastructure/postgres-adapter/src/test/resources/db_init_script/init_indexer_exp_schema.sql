@@ -32,7 +32,8 @@ create table indexer_exp.github_accounts
     website         text,
     twitter         text,
     linkedin        text,
-    telegram        text
+    telegram        text,
+    created_at      timestamp
 );
 
 create trigger indexer_exp_github_accounts_set_tech_updated_at

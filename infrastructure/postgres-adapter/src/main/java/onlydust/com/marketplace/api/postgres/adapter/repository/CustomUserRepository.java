@@ -116,20 +116,6 @@ public class CustomUserRepository {
             where u.id = :userId
             """;
 
-    private final static String SELECT_USER_PROFILE_WHERE_GITHUB_ID = SELECT_USER_PROFILE + """
-            from indexer_exp.github_accounts gu
-                     left join iam.users u on gu.id = u.github_user_id
-                     left join public.user_profile_info upi on upi.id = u.id
-            where gu.id = :githubUserId
-            """;
-
-    private final static String SELECT_USER_PROFILE_WHERE_GITHUB_LOGIN = SELECT_USER_PROFILE + """
-            from indexer_exp.github_accounts gu
-                     left join iam.users u on gu.id = u.github_user_id
-                     left join public.user_profile_info upi on upi.id = u.id
-            where gu.login = :githubLogin
-            """;
-
     private final static String GET_PROJECT_STATS_BY_USER = """
             with granted_usd as (
               select 
@@ -194,52 +180,52 @@ public class CustomUserRepository {
 
     private UserProfileView rowToUserProfile(UserProfileEntity row) {
         return UserProfileView.builder()
-                .id(row.getId())
-                .login(row.getLogin())
-                .bio(row.getBio())
-                .githubId(row.getGithubId())
-                .avatarUrl(row.getAvatarUrl())
-                .createAt(row.getCreatedAt())
-                .lastSeenAt(row.getLastSeenAt())
-                .htmlUrl(row.getHtmlUrl())
-                .location(row.getLocation())
-                .cover(isNull(row.getCover()) ? null : row.getCover().toDomain())
-                .website(row.getWebsite())
+                .id(row.id())
+                .login(row.login())
+                .bio(row.bio())
+                .githubId(row.githubId())
+                .avatarUrl(row.avatarUrl())
+                .createAt(row.createdAt())
+                .lastSeenAt(row.lastSeenAt())
+                .htmlUrl(row.htmlUrl())
+                .location(row.location())
+                .cover(isNull(row.cover()) ? null : row.cover().toDomain())
+                .website(row.website())
                 .technologies(getTechnologies(row))
                 .profileStats(UserProfileView.ProfileStats.builder()
-                        .totalsEarned(new TotalsEarned(isNull(row.getTotalEarnedPerCurrencies())
+                        .totalsEarned(new TotalsEarned(isNull(row.totalEarnedPerCurrencies())
                                 ? List.of()
-                                : row.getTotalEarnedPerCurrencies().stream().map(UserProfileEntity.TotalEarnedPerCurrency::toDomain).toList())
+                                : row.totalEarnedPerCurrencies().stream().map(UserProfileEntity.TotalEarnedPerCurrency::toDomain).toList())
                         )
-                        .leadedProjectCount(row.getNumberOfLeadingProject())
-                        .contributedProjectCount(row.getNumberOfOwnContributorOnProject())
-                        .contributionCount(row.getContributionsCount())
-                        .contributionStats(isNull(row.getCounts()) ? List.of() :
-                                row.getCounts().stream().map(UserProfileEntity.WeekCount::toDomain)
+                        .leadedProjectCount(row.numberOfLeadingProject())
+                        .contributedProjectCount(row.numberOfOwnContributorOnProject())
+                        .contributionCount(row.contributionsCount())
+                        .contributionStats(isNull(row.counts()) ? List.of() :
+                                row.counts().stream().map(UserProfileEntity.WeekCount::toDomain)
                                         .sorted(new UserProfileView.ProfileStats.ContributionStatsComparator())
                                         .collect(Collectors.toList())
                         )
                         .build())
-                .isLookingForAJob(row.getIsLookingForAJob())
-                .allocatedTimeToContribute(isNull(row.getAllocatedTimeToContribute()) ? null :
-                        switch (row.getAllocatedTimeToContribute()) {
+                .isLookingForAJob(row.isLookingForAJob())
+                .allocatedTimeToContribute(isNull(row.allocatedTimeToContribute()) ? null :
+                        switch (row.allocatedTimeToContribute()) {
                             case none -> UserAllocatedTimeToContribute.NONE;
                             case less_than_one_day -> UserAllocatedTimeToContribute.LESS_THAN_ONE_DAY;
                             case one_to_three_days -> UserAllocatedTimeToContribute.ONE_TO_THREE_DAYS;
                             case greater_than_three_days -> UserAllocatedTimeToContribute.GREATER_THAN_THREE_DAYS;
                         })
                 .contacts(getContacts(row))
-                .firstName(row.getFirstName())
-                .lastName(row.getLastName())
+                .firstName(row.firstName())
+                .lastName(row.lastName())
                 .build();
     }
 
     private Set<Contact> getContacts(UserProfileEntity row) {
-        final List<UserProfileEntity.Contact> contactEntities = row.getContacts() != null ? row.getContacts() : List.of();
+        final List<UserProfileEntity.Contact> contactEntities = row.contacts() != null ? row.contacts() : List.of();
 
         final var contacts = contactEntities.stream().map(contact -> Contact.builder()
-                .contact(email.equals(contact.getChannel()) ? row.getEmail() : contact.getContact())
-                .channel(isNull(contact.getChannel()) ? null : switch (contact.getChannel()) {
+                .contact(email.equals(contact.channel()) ? row.email() : contact.contact())
+                .channel(isNull(contact.channel()) ? null : switch (contact.channel()) {
                     case email -> Contact.Channel.EMAIL;
                     case telegram -> Contact.Channel.TELEGRAM;
                     case twitter -> Contact.Channel.TWITTER;
@@ -247,13 +233,13 @@ public class CustomUserRepository {
                     case linkedin -> Contact.Channel.LINKEDIN;
                     case whatsapp -> Contact.Channel.WHATSAPP;
                 })
-                .visibility(Boolean.TRUE.equals(contact.getIsPublic()) ? Contact.Visibility.PUBLIC :
+                .visibility(Boolean.TRUE.equals(contact.isPublic()) ? Contact.Visibility.PUBLIC :
                         Contact.Visibility.PRIVATE)
                 .build()
         ).collect(Collectors.toMap(Contact::getChannel, contact -> contact, (a, b) -> a));
 
         contacts.putIfAbsent(Contact.Channel.EMAIL, Contact.builder()
-                .contact(row.getEmail())
+                .contact(row.email())
                 .channel(Contact.Channel.EMAIL)
                 .visibility(Contact.Visibility.PRIVATE)
                 .build());
@@ -262,11 +248,11 @@ public class CustomUserRepository {
     }
 
     private HashMap<String, Long> getTechnologies(UserProfileEntity row) {
-        if (isNull(row.getLanguages())) {
+        if (isNull(row.languages())) {
             return new HashMap<>();
         }
         try {
-            return objectMapper.readValue(row.getLanguages(), typeRef);
+            return objectMapper.readValue(row.languages(), typeRef);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -278,32 +264,6 @@ public class CustomUserRepository {
                     (UserProfileEntity) entityManager.createNativeQuery(SELECT_USER_PROFILE_WHERE_ID,
                                     UserProfileEntity.class)
                             .setParameter("userId", userId)
-                            .getSingleResult();
-            return Optional.ofNullable(rowToUserProfile(row));
-        } catch (NoResultException e) {
-            return Optional.empty();
-        }
-    }
-
-    public Optional<UserProfileView> findProfileById(final Long githubUserId) {
-        try {
-            final UserProfileEntity row =
-                    (UserProfileEntity) entityManager.createNativeQuery(SELECT_USER_PROFILE_WHERE_GITHUB_ID,
-                                    UserProfileEntity.class)
-                            .setParameter("githubUserId", githubUserId)
-                            .getSingleResult();
-            return Optional.ofNullable(rowToUserProfile(row));
-        } catch (NoResultException e) {
-            return Optional.empty();
-        }
-    }
-
-    public Optional<UserProfileView> findProfileByLogin(String githubLogin) {
-        try {
-            final UserProfileEntity row =
-                    (UserProfileEntity) entityManager.createNativeQuery(SELECT_USER_PROFILE_WHERE_GITHUB_LOGIN,
-                                    UserProfileEntity.class)
-                            .setParameter("githubLogin", githubLogin)
                             .getSingleResult();
             return Optional.ofNullable(rowToUserProfile(row));
         } catch (NoResultException e) {

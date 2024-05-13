@@ -18,6 +18,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -40,11 +41,6 @@ public class UserViewEntity implements Serializable {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "githubUserId", referencedColumnName = "id", insertable = false, updatable = false)
     GithubAccountEntity githubUser;
-
-    @Getter(AccessLevel.NONE)
-    String githubLogin;
-    @Getter(AccessLevel.NONE)
-    String githubAvatarUrl;
 
     @Column(name = "email", nullable = false)
     String githubEmail;
@@ -78,6 +74,8 @@ public class UserViewEntity implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "sponsor_id")
     )
     List<SponsorViewEntity> sponsors;
+
+    @NonNull ZonedDateTime lastSeenAt;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

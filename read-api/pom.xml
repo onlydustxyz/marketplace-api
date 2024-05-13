@@ -9,7 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>bff-read</artifactId>
+    <artifactId>read-api</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -37,6 +37,16 @@
             <artifactId>annotations</artifactId>
             <version>24.0.1</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>kernel</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>postgres-adapter</artifactId>
         </dependency>
     </dependencies>
 </project>

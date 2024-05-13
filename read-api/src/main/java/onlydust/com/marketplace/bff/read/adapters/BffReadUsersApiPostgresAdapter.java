@@ -10,6 +10,7 @@ import onlydust.com.marketplace.bff.read.entities.UserProfileLanguagePageItemEnt
 import onlydust.com.marketplace.bff.read.repositories.PublicUserProfileResponseV2EntityRepository;
 import onlydust.com.marketplace.bff.read.repositories.UserProfileEcosystemPageItemEntityRepository;
 import onlydust.com.marketplace.bff.read.repositories.UserProfileLanguagePageItemEntityRepository;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,8 +27,9 @@ public class BffReadUsersApiPostgresAdapter implements BffReadUsersApi {
     final PublicUserProfileResponseV2EntityRepository publicUserProfileResponseV2EntityRepository;
 
     @Override
-    public ResponseEntity<PublicUserProfileResponseV2> getUserProfileBySlugV2(String slug) {
-        final var userProfile = publicUserProfileResponseV2EntityRepository.findByGithubUserLogin(slug);
+    public ResponseEntity<PublicUserProfileResponseV2> getUserProfileByLogin(String login) {
+        final var userProfile = publicUserProfileResponseV2EntityRepository.findByGithubUserLogin(login)
+                .orElseThrow(() -> OnlyDustException.notFound("User %s not found".formatted(login)));
         return ok(userProfile.toDto());
     }
 
@@ -56,8 +58,9 @@ public class BffReadUsersApiPostgresAdapter implements BffReadUsersApi {
     }
 
     @Override
-    public ResponseEntity<PublicUserProfileResponseV2> getUserProfileV2(Long githubId) {
-        final var userProfile = publicUserProfileResponseV2EntityRepository.findByGithubUserId(githubId);
+    public ResponseEntity<PublicUserProfileResponseV2> getUserProfile(Long githubId) {
+        final var userProfile = publicUserProfileResponseV2EntityRepository.findByGithubUserId(githubId)
+                .orElseThrow(() -> OnlyDustException.notFound("User %d not found".formatted(githubId)));
         return ok(userProfile.toDto());
     }
 }

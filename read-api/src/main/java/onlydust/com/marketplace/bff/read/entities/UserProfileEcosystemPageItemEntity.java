@@ -7,7 +7,10 @@ import jakarta.persistence.ManyToOne;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.UserProfileContributingStatus;
-import onlydust.com.marketplace.api.contract.model.UserProfileLanguagePageItem;
+import onlydust.com.marketplace.api.contract.model.UserProfileEcosystemPageItem;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.EcosystemViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLinkViewEntity;
+import onlydust.com.marketplace.bff.read.mapper.ProjectMapper;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -16,6 +19,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import static onlydust.com.marketplace.bff.read.mapper.EcosystemMapper.map;
+
 @Entity
 @Value
 @ToString
@@ -23,10 +28,10 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(force = true)
 @Accessors(fluent = true)
-public class UserProfileLanguagePageItemEntity {
+public class UserProfileEcosystemPageItemEntity {
     @Id
     @EqualsAndHashCode.Include
-    @NonNull UUID language_id;
+    @NonNull UUID ecosystem_id;
 
     @NonNull Integer rank;
     @NonNull String contributingStatus;
@@ -36,20 +41,20 @@ public class UserProfileLanguagePageItemEntity {
 
     @ManyToOne
     @JoinColumn(insertable = false, updatable = false)
-    @NonNull LanguageViewEntity language;
+    @NonNull EcosystemViewEntity ecosystem;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @NonNull List<ProjectLinkViewEntity> projects;
 
-    public UserProfileLanguagePageItem toDto() {
-        return new UserProfileLanguagePageItem()
+    public UserProfileEcosystemPageItem toDto() {
+        return new UserProfileEcosystemPageItem()
                 .rank(rank)
                 .contributingStatus(UserProfileContributingStatus.valueOf(contributingStatus))
                 .contributedProjectCount(projects.size())
                 .contributionCount(contributionCount)
                 .rewardCount(rewardCount)
                 .totalEarnedUsd(totalEarnedUsd)
-                .projects(projects.stream().map(ProjectLinkViewEntity::toDto).toList())
-                .language(language.toDto());
+                .projects(projects.stream().map(ProjectMapper::map).toList())
+                .ecosystem(map(ecosystem));
     }
 }

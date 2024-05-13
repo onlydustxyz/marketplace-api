@@ -10,9 +10,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributorSearchRes
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
 import onlydust.com.marketplace.project.domain.port.input.ContributorFacadePort;
-import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
-import onlydust.com.marketplace.project.domain.view.UserProfileView;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +21,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.userProfileToPublicResponse;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 
@@ -36,22 +33,7 @@ public class UsersRestApi implements UsersApi {
     private final static int DEFAULT_MAX_INTERNAL_CONTRIBUTOR_COUNT_TO_TRIGGER_EXTERNAL_SEARCH = 5;
     private final static int DEFAULT_MAX_INTERNAL_CONTRIBUTOR_COUNT_TO_RETURN = 50;
 
-    private final UserFacadePort userFacadePort;
     private final ContributorFacadePort contributorFacadePort;
-
-    @Override
-    public ResponseEntity<PublicUserProfileResponse> getUserProfile(Long githubId) {
-        final UserProfileView userProfileView = userFacadePort.getProfileById(githubId);
-        final PublicUserProfileResponse userProfileResponse = userProfileToPublicResponse(userProfileView);
-        return ResponseEntity.ok(userProfileResponse);
-    }
-
-    @Override
-    public ResponseEntity<PublicUserProfileResponse> getUserProfileByLogin(String githubLogin) {
-        final UserProfileView userProfileView = userFacadePort.getProfileByLogin(githubLogin);
-        final PublicUserProfileResponse userProfileResponse = userProfileToPublicResponse(userProfileView);
-        return ResponseEntity.ok(userProfileResponse);
-    }
 
     @Override
     public ResponseEntity<ContributorSearchResponse> searchContributors(UUID projectId,

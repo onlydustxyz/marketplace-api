@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.bff.read.entities;
+package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import jakarta.persistence.Column;
@@ -7,7 +7,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.api.contract.model.ProjectLinkResponse;
 import org.hibernate.annotations.Immutable;
 
 import java.util.UUID;
@@ -30,12 +29,4 @@ public class ProjectLinkViewEntity {
     @NonNull String name;
     @Column(name = "logo_url")
     @NonNull String logoUrl;
-
-    public ProjectLinkResponse toDto() {
-        return new ProjectLinkResponse()
-                .id(id)
-                .slug(slug)
-                .name(name)
-                .logoUrl(logoUrl);
-    }
 }

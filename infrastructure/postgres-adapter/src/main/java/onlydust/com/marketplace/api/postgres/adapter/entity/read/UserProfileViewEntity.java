@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.bff.read.entities;
+package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -6,7 +6,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.api.contract.model.ContactInformation;
 import org.hibernate.annotations.Immutable;
 
 import java.util.List;
@@ -34,7 +33,7 @@ public class UserProfileViewEntity {
     @Getter(AccessLevel.NONE)
     List<ContactInformationViewEntity> contacts;
 
-    Optional<List<ContactInformation>> contacts() {
-        return Optional.ofNullable(contacts).map(c -> c.stream().map(ContactInformationViewEntity::toDto).toList());
+    public Optional<List<ContactInformationViewEntity>> publicContacts() {
+        return Optional.ofNullable(contacts).map(c -> c.stream().filter(ContactInformationViewEntity::isPublic).toList());
     }
 }

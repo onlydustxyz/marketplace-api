@@ -82,16 +82,6 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
-    public UserProfileView getProfileById(Long githubUserId) {
-        return userStoragePort.getProfileById(githubUserId);
-    }
-
-    @Override
-    public UserProfileView getProfileByLogin(String githubLogin) {
-        return userStoragePort.getProfileByLogin(githubLogin);
-    }
-
-    @Override
     public UserProfileView updateProfile(UUID userId, UserProfile userProfile) {
         userStoragePort.saveProfile(userId, userProfile);
         return userStoragePort.getProfileById(userId);

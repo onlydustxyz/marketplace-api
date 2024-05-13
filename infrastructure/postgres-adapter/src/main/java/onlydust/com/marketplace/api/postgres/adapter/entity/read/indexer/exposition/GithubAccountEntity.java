@@ -1,20 +1,23 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import org.hibernate.annotations.Immutable;
 
-import jakarta.persistence.*;
-
+import java.time.ZonedDateTime;
 import java.util.Set;
 
-@Data
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
-@Table(schema = "indexer_exp", name = "github_accounts")
+@Table(name = "github_accounts", schema = "indexer_exp")
+@Value
+@ToString
 @Immutable
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@NoArgsConstructor(force = true)
+@Accessors(fluent = true)
 public class GithubAccountEntity {
     @Id
     @EqualsAndHashCode.Include
@@ -24,6 +27,14 @@ public class GithubAccountEntity {
     String htmlUrl;
     String avatarUrl;
     String name;
+    String bio;
+    String location;
+    String website;
+    String twitter;
+    String linkedin;
+    String telegram;
+    @NonNull ZonedDateTime createdAt;
+
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
     Set<GithubRepoEntity> repos;
     @OneToOne(mappedBy = "account", fetch = FetchType.LAZY)

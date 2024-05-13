@@ -774,61 +774,9 @@ paths:
   /api/v1/users/{githubId}:
     get:
       tags:
-        - Users
-      summary: Get user profile
-      operationId: getUserProfile
-      description: |
-        Get the publicly available user profile (ie. all data except private data)
-      parameters:
-        - in: path
-          name: githubId
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: 'User profile'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PublicUserProfileResponse'
-        "404":
-          $ref: '#/components/responses/UserNotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-  /api/v1/users/login/{githubLogin}:
-    get:
-      tags:
-        - Users
-      summary: Get user profile
-      operationId: getUserProfileByLogin
-      description: |
-        Get the publicly available user profile (ie. all data except private data)
-      parameters:
-        - in: path
-          name: githubLogin
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: 'User profile'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PublicUserProfileResponse'
-        "404":
-          $ref: '#/components/responses/UserNotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
-  /api/v2/users/{githubId}:
-    get:
-      tags:
         - BffReadUsers
       summary: Get user profile
-      operationId: getUserProfileV2
+      operationId: getUserProfile
       description: |
         Get the publicly available user profile
       parameters:
@@ -850,12 +798,12 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v2/users/slug/{slug}:
+  /api/v1/users/login/{slug}:
     get:
       tags:
         - BffReadUsers
       summary: Get user profile
-      operationId: getUserProfileBySlugV2
+      operationId: getUserProfileByLogin
       description: |
         Get the publicly available user profile
       parameters:
@@ -982,7 +930,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  /api/v2/users/{githubId}/stats:
+  /api/v1/users/{githubId}/stats:
     get:
       tags:
         - Users
@@ -1012,7 +960,7 @@ paths:
           $ref: '#/components/responses/UserNotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  /api/v2/users/{githubId}/languages:
+  /api/v1/users/{githubId}/languages:
     get:
       tags:
         - BffReadUsers
@@ -1048,7 +996,7 @@ paths:
           $ref: '#/components/responses/UserNotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  /api/v2/users/{githubId}/ecosystems:
+  /api/v1/users/{githubId}/ecosystems:
     get:
       tags:
         - BffReadUsers
@@ -3587,21 +3535,6 @@ components:
 
     PrivateUserProfileResponse:
       allOf:
-        - $ref: '#/components/schemas/PublicUserProfileResponse'
-        - type: object
-          properties:
-            allocatedTimeToContribute:
-              $ref: '#/components/schemas/AllocatedTime'
-            isLookingForAJob:
-              type: boolean
-              description: Whether the user is looking for a job or not
-
-    PublicUserProfileResponse:
-      discriminator:
-        propertyName: type
-        mapping:
-          privateUserProfileResponse: '#/components/schemas/PrivateUserProfileResponse'
-      allOf:
         - $ref: '#/components/schemas/GithubUserResponse'
         - type: object
           required:
@@ -3653,6 +3586,11 @@ components:
               type: string
             lastName:
               type: string
+            allocatedTimeToContribute:
+              $ref: '#/components/schemas/AllocatedTime'
+            isLookingForAJob:
+              type: boolean
+              description: Whether the user is looking for a job or not
 
     PublicUserProfileResponseV2:
       allOf:
