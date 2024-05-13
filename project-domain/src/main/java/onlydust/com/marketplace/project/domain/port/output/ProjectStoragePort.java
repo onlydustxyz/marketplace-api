@@ -22,10 +22,10 @@ public interface ProjectStoragePort {
                                                                        String search, ProjectCardView.SortBy sort,
                                                                        Integer pageIndex, Integer pageSize);
 
-    String createProject(UUID projectId, String slug, String name, String shortDescription, String longDescription,
-                         Boolean isLookingForContributors, List<NamedLink> moreInfos,
-                         List<Long> githubRepoIds, UUID firstProjectLeaderId, List<Long> githubUserIdsAsProjectLeads,
-                         ProjectVisibility visibility
+    void createProject(UUID projectId, String slug, String name, String shortDescription, String longDescription,
+                       Boolean isLookingForContributors, List<NamedLink> moreInfos,
+                       List<Long> githubRepoIds, UUID firstProjectLeaderId, List<Long> githubUserIdsAsProjectLeads,
+                       ProjectVisibility visibility
             , String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds);
 
     void updateProject(UUID id, String slug, String name, String shortDescription, String longDescription,
@@ -57,7 +57,7 @@ public interface ProjectStoragePort {
                                                                                            String search,
                                                                                            Boolean includeIgnoredItems);
 
-    String getProjectSlugById(UUID projectId);
+    Optional<UUID> getProjectIdBySlug(String slug);
 
     RewardableItemView getRewardableIssue(String repoOwner, String repoName, long issueNumber);
 

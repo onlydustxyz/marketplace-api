@@ -80,10 +80,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     @Override
-    public String getProjectSlugById(UUID projectId) {
-        return projectViewRepository.findById(projectId)
-                .orElseThrow(() -> notFound(format("Project %s not found", projectId)))
-                .getSlug();
+    public Optional<UUID> getProjectIdBySlug(String slug) {
+        return projectViewRepository.findBySlug(slug).map(ProjectViewEntity::getId);
     }
 
     @Override
@@ -211,11 +209,11 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional
-    public String createProject(UUID projectId, String slug, String name, String shortDescription, String longDescription,
-                                Boolean isLookingForContributors, List<NamedLink> moreInfos,
-                                List<Long> githubRepoIds, UUID firstProjectLeaderId,
-                                List<Long> githubUserIdsAsProjectLeads,
-                                ProjectVisibility visibility, String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds) {
+    public void createProject(UUID projectId, String slug, String name, String shortDescription, String longDescription,
+                              Boolean isLookingForContributors, List<NamedLink> moreInfos,
+                              List<Long> githubRepoIds, UUID firstProjectLeaderId,
+                              List<Long> githubUserIdsAsProjectLeads,
+                              ProjectVisibility visibility, String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds) {
         final ProjectEntity projectEntity =
                 ProjectEntity.builder()
                         .id(projectId)
@@ -246,8 +244,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         .build();
 
         this.projectRepository.saveAndFlush(projectEntity);
-
-        return projectRepository.getSlugById(projectId);
     }
 
     @Override

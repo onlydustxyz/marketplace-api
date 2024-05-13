@@ -664,7 +664,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.id").isEqualTo(projectId.toString())
                 .jsonPath("$.visibility").isEqualTo("PUBLIC")
                 .jsonPath("$.name").isEqualTo("Updated Project")
-                .jsonPath("$.shortDescription").isEqualTo("This is a updated super project")
+                .jsonPath("$.shortDescription").isEqualTo("This is a super updated project")
                 .jsonPath("$.longDescription").isEqualTo("This is a super awesome updated project with a nice description");
     }
 
@@ -738,7 +738,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.id").isEqualTo(projectId.toString())
                 .jsonPath("$.visibility").isEqualTo("PUBLIC")
                 .jsonPath("$.name").isEqualTo("Updated Project")
-                .jsonPath("$.shortDescription").isEqualTo("This is a updated super project")
+                .jsonPath("$.shortDescription").isEqualTo("This is a super updated project")
                 .jsonPath("$.longDescription").isEqualTo("This is a super awesome updated project with a nice description");
     }
 
