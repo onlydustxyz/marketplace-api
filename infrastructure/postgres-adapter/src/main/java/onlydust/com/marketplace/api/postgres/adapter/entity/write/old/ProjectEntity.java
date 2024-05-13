@@ -46,9 +46,9 @@ public class ProjectEntity {
     Boolean hiring;
     @Column(name = "rank", updatable = false)
     Integer rank;
-    @Column(name = "key", insertable = false, updatable = false)
+    @Column(name = "slug")
     @EqualsAndHashCode.Exclude
-    String key;
+    String slug;
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "visibility", updatable = false)
@@ -90,7 +90,7 @@ public class ProjectEntity {
     public Project toDomain() {
         return Project.builder()
                 .id(id)
-                .slug(key)
+                .slug(slug)
                 .name(name)
                 .shortDescription(shortDescription)
                 .longDescription(longDescription)
@@ -111,7 +111,7 @@ public class ProjectEntity {
 
     public ProjectShortView toView() {
         return ProjectShortView.builder()
-                .slug(key)
+                .slug(slug)
                 .name(name)
                 .logoUrl(logoUrl)
                 .shortDescription(shortDescription)

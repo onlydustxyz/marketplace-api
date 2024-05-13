@@ -277,3 +277,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000226_add_global_user_rank_percentile.sql
   - include:
       file: db/changelog/changelogs/00000227_add_global_user_rank_unique_index.sql
+  - include:
+      file: db/changelog/changelogs/00000228_refactor_project_slug.sql

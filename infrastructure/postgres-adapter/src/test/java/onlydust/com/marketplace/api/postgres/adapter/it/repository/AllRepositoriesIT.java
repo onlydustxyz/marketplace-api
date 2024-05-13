@@ -113,7 +113,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
         sponsorRepository.saveAll(sponsors);
         final UUID projectId = UUID.randomUUID();
         final ProjectEntity expected = ProjectEntity.builder()
-                .key(faker.address().fullAddress())
+                .slug(faker.address().fullAddress())
                 .name(faker.name().name())
                 .longDescription(faker.pokemon().location())
                 .shortDescription(faker.pokemon().name())

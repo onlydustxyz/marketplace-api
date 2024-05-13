@@ -142,22 +142,12 @@ public class ProjectServiceTest {
 
         // When
         when(uuidGeneratorPort.generate()).thenReturn(expectedProjectId);
-        when(projectStoragePort.createProject(expectedProjectId, command.getName(),
-                command.getShortDescription(),
-                command.getLongDescription(), command.getIsLookingForContributors(),
-                command.getMoreInfos(), command.getGithubRepoIds(),
-                command.getFirstProjectLeaderId(),
-                command.getGithubUserIdsAsProjectLeadersToInvite(),
-                ProjectVisibility.PUBLIC,
-                imageUrl,
-                ProjectRewardSettings.defaultSettings(dateProvider.now()), ecosystemIds
-        )).thenReturn("slug");
         final var projectIdentity = projectService.createProject(projectLeadId, command);
 
         // Then
         assertNotNull(projectIdentity);
         assertNotNull(projectIdentity.getLeft());
-        assertThat(projectIdentity.getRight()).isEqualTo("slug");
+        assertThat(projectIdentity.getRight()).isEqualTo(Project.slugOf(command.getName()));
         verify(indexerPort, times(1)).indexUsers(usersToInviteAsProjectLeaders);
         final ArgumentCaptor<UUID> uuidArgumentCaptor = ArgumentCaptor.forClass(UUID.class);
         verify(projectObserverPort).onProjectCreated(uuidArgumentCaptor.capture(), uuidArgumentCaptor.capture());
@@ -203,7 +193,9 @@ public class ProjectServiceTest {
 
         // Then
         verify(indexerPort, times(1)).indexUsers(usersToInviteAsProjectLeaders);
-        verify(projectStoragePort, times(1)).updateProject(command.getId(), command.getName(),
+        verify(projectStoragePort, times(1)).updateProject(command.getId(),
+                Project.slugOf(command.getName()),
+                command.getName(),
                 command.getShortDescription(),
                 command.getLongDescription(), command.getIsLookingForContributors(),
                 command.getMoreInfos(), command.getGithubRepoIds(),

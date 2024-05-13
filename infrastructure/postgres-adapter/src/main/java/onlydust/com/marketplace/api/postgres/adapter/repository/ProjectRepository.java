@@ -12,8 +12,8 @@ import java.util.UUID;
 
 public interface ProjectRepository extends JpaRepository<ProjectEntity, UUID>, JpaSpecificationExecutor<ProjectEntity> {
 
-    @Query(value = "SELECT key FROM projects WHERE id = ?1", nativeQuery = true)
-    String getKeyById(UUID id);
+    @Query(value = "SELECT slug FROM projects WHERE id = ?1", nativeQuery = true)
+    String getSlugById(UUID id);
 
     Page<ProjectEntity> findAllByNameContainingIgnoreCase(String name, Pageable pageable);
 }

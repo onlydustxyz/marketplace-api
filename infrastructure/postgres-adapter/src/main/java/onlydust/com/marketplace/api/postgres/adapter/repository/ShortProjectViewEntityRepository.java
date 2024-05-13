@@ -11,7 +11,7 @@ public interface ShortProjectViewEntityRepository extends JpaRepository<ShortPro
     @Query(value = """
             SELECT
                 p.id,
-                p.key,
+                p.slug,
                 p.name,
                 p.short_description,
                 p.long_description,
@@ -45,7 +45,7 @@ public interface ShortProjectViewEntityRepository extends JpaRepository<ShortPro
     @Query(value = """
             SELECT DISTINCT
                 p.id,
-                p.key,
+                p.slug,
                 p.name,
                 p.short_description,
                 p.long_description,

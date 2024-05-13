@@ -1,13 +1,13 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
-import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CustomIgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomIgnoredContributionsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IgnoredContributionsRepository;
+import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
+import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -574,7 +574,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
     private UUID createProject() {
         final UUID projectId = UUID.randomUUID();
         final UUID leadId = userAuthHelper.authenticatePierre().user().getId();
-        projectStoragePort.createProject(projectId,
+        projectStoragePort.createProject(projectId, "name-" + projectId,
                 "Name " + projectId, "a", "b", false, List.of(),
                 List.of(repo1, repo2),
                 leadId, List.of(), ProjectVisibility.PUBLIC, "",

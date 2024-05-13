@@ -44,10 +44,11 @@ public class PostgresProjectAdapterIT extends AbstractPostgresIT {
                         .build()
         );
         final UUID projectId = UUID.randomUUID();
+        final var slug = "slug-" + projectId;
 
         // When
-        final String slug = projectStoragePort.createProject(
-                projectId, faker.name().lastName(), faker.name().name(), faker.harryPotter().location(), false,
+        projectStoragePort.createProject(
+                projectId, slug, faker.name().lastName(), faker.name().name(), faker.harryPotter().location(), false,
                 namedLinks, null, userId
                 , null, ProjectVisibility.PUBLIC, null,
                 ProjectRewardSettings.defaultSettings(new Date()), null
@@ -69,7 +70,7 @@ public class PostgresProjectAdapterIT extends AbstractPostgresIT {
                         .build()
         );
         projectStoragePort.updateProject(
-                projectId, project.getName(), project.getShortDescription(), project.getLongDescription(), false,
+                projectId, slug, project.getName(), project.getShortDescription(), project.getLongDescription(), false,
                 namedLinksUpdated,
                 null, null, null, null, null, null
         );

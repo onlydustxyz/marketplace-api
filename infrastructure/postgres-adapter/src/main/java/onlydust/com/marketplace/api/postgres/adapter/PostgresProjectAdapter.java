@@ -74,16 +74,14 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     @Transactional(readOnly = true)
     public ProjectDetailsView getBySlug(String slug, User caller) {
-        final var projectEntity = projectViewRepository.findByKey(slug)
+        final var projectEntity = projectViewRepository.findBySlug(slug)
                 .orElseThrow(() -> notFound(format("Project '%s' not found", slug)));
         return getProjectDetails(projectEntity, caller);
     }
 
     @Override
-    public String getProjectSlugById(UUID projectId) {
-        return projectViewRepository.findById(projectId)
-                .orElseThrow(() -> notFound(format("Project %s not found", projectId)))
-                .getKey();
+    public Optional<UUID> getProjectIdBySlug(String slug) {
+        return projectViewRepository.findBySlug(slug).map(ProjectViewEntity::getId);
     }
 
     @Override
@@ -211,14 +209,15 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional
-    public String createProject(UUID projectId, String name, String shortDescription, String longDescription,
-                                Boolean isLookingForContributors, List<NamedLink> moreInfos,
-                                List<Long> githubRepoIds, UUID firstProjectLeaderId,
-                                List<Long> githubUserIdsAsProjectLeads,
-                                ProjectVisibility visibility, String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds) {
+    public void createProject(UUID projectId, String slug, String name, String shortDescription, String longDescription,
+                              Boolean isLookingForContributors, List<NamedLink> moreInfos,
+                              List<Long> githubRepoIds, UUID firstProjectLeaderId,
+                              List<Long> githubUserIdsAsProjectLeads,
+                              ProjectVisibility visibility, String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds) {
         final ProjectEntity projectEntity =
                 ProjectEntity.builder()
                         .id(projectId)
+                        .slug(slug)
                         .name(name)
                         .shortDescription(shortDescription)
                         .longDescription(longDescription)
@@ -245,13 +244,11 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         .build();
 
         this.projectRepository.saveAndFlush(projectEntity);
-
-        return projectRepository.getKeyById(projectId);
     }
 
     @Override
     @Transactional
-    public void updateProject(UUID projectId, String name, String shortDescription,
+    public void updateProject(UUID projectId, String slug, String name, String shortDescription,
                               String longDescription,
                               Boolean isLookingForContributors, List<NamedLink> moreInfos,
                               List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
@@ -259,6 +256,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                               ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds) {
         final var project = this.projectRepository.findById(projectId)
                 .orElseThrow(() -> notFound(format("Project %s not found", projectId)));
+        project.setSlug(slug);
         project.setName(name);
         project.setShortDescription(shortDescription);
         project.setLongDescription(longDescription);

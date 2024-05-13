@@ -34,7 +34,7 @@ public interface HackathonDetailsViewRepository extends JpaRepository<HackathonD
                  FROM sponsors s WHERE s.id = ANY(h.sponsor_ids)) as sponsors,
                 (SELECT jsonb_agg(jsonb_build_object(
                         'id', p.id,
-                        'slug', p.key,
+                        'slug', p.slug,
                         'name', p.name,
                         'logoUrl', p.logo_url,
                         'shortDescription', p.short_description,

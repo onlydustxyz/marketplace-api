@@ -65,7 +65,7 @@ public interface ProjectMapper {
                 .logoUrl(projectEntity.getLogoUrl())
                 .longDescription(projectEntity.getLongDescription())
                 .shortDescription(projectEntity.getShortDescription())
-                .slug(projectEntity.getKey())
+                .slug(projectEntity.getSlug())
                 .name(projectEntity.getName())
                 .createdAt(Date.from(projectEntity.getCreatedAt()))
                 .moreInfos(mapMoreInfosWithDefaultValue(projectEntity))
@@ -136,7 +136,7 @@ public interface ProjectMapper {
     static Project mapShortProjectViewToProject(ShortProjectViewEntity project) {
         return Project.builder()
                 .id(project.getId())
-                .slug(project.getKey())
+                .slug(project.getSlug())
                 .name(project.getName())
                 .shortDescription(project.getShortDescription())
                 .longDescription(project.getLongDescription())

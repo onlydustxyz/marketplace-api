@@ -33,7 +33,7 @@ public class ProjectPageItemViewEntity {
     Boolean hiring;
     @Column(name = "logo_url")
     String logoUrl;
-    String key;
+    String slug;
     String name;
     @Column(name = "short_description")
     String shortDescription;
@@ -79,7 +79,7 @@ public class ProjectPageItemViewEntity {
         final ProjectCardView view = ProjectCardView.builder()
                 .repoCount(this.repoCount)
                 .id(this.projectId)
-                .slug(this.key)
+                .slug(this.slug)
                 .name(this.name)
                 .shortDescription(this.shortDescription)
                 .logoUrl(this.logoUrl)

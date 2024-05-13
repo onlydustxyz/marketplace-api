@@ -91,7 +91,7 @@ public class SponsorAccountTransactionViewEntity {
                         .id(ProjectId.of(project.getId()))
                         .name(project.getName())
                         .logoUrl(project.getLogoUrl())
-                        .slug(project.getKey())
+                        .slug(project.getSlug())
                         .shortDescription(project.getShortDescription())
                         .build()
         );

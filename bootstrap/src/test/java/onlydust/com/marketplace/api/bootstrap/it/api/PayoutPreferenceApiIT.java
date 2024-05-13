@@ -108,19 +108,19 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.length()").isEqualTo(3)
                 .jsonPath("$[0].project.name").isEqualTo(projectEntities.get(0).getName())
-                .jsonPath("$[0].project.slug").isEqualTo(projectEntities.get(0).getKey())
+                .jsonPath("$[0].project.slug").isEqualTo(projectEntities.get(0).getSlug())
                 .jsonPath("$[0].project.logoUrl").isEqualTo(projectEntities.get(0).getLogoUrl())
                 .jsonPath("$[0].project.shortDescription").isEqualTo(projectEntities.get(0).getShortDescription())
                 .jsonPath("$[0].billingProfile").isEmpty()
 
                 .jsonPath("$[1].project.name").isEqualTo(projectEntities.get(1).getName())
-                .jsonPath("$[1].project.slug").isEqualTo(projectEntities.get(1).getKey())
+                .jsonPath("$[1].project.slug").isEqualTo(projectEntities.get(1).getSlug())
                 .jsonPath("$[1].project.logoUrl").isEqualTo(projectEntities.get(1).getLogoUrl())
                 .jsonPath("$[1].project.shortDescription").isEqualTo(projectEntities.get(1).getShortDescription())
                 .jsonPath("$[1].billingProfile").isEmpty()
 
                 .jsonPath("$[2].project.name").isEqualTo(projectEntities.get(2).getName())
-                .jsonPath("$[2].project.slug").isEqualTo(projectEntities.get(2).getKey())
+                .jsonPath("$[2].project.slug").isEqualTo(projectEntities.get(2).getSlug())
                 .jsonPath("$[2].project.logoUrl").isEqualTo(projectEntities.get(2).getLogoUrl())
                 .jsonPath("$[2].project.shortDescription").isEqualTo(projectEntities.get(2).getShortDescription())
                 .jsonPath("$[2].billingProfile").isEmpty();
@@ -155,7 +155,7 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.length()").isEqualTo(3)
                 .jsonPath("$[0].project.name").isEqualTo(projectEntities.get(0).getName())
-                .jsonPath("$[0].project.slug").isEqualTo(projectEntities.get(0).getKey())
+                .jsonPath("$[0].project.slug").isEqualTo(projectEntities.get(0).getSlug())
                 .jsonPath("$[0].project.logoUrl").isEqualTo(projectEntities.get(0).getLogoUrl())
                 .jsonPath("$[0].project.shortDescription").isEqualTo(projectEntities.get(0).getShortDescription())
                 .jsonPath("$[0].billingProfile.name").isEqualTo(companyBillingProfile.name())
@@ -163,13 +163,13 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$[0].billingProfile.type").isEqualTo(companyBillingProfile.type().name())
 
                 .jsonPath("$[1].project.name").isEqualTo(projectEntities.get(1).getName())
-                .jsonPath("$[1].project.slug").isEqualTo(projectEntities.get(1).getKey())
+                .jsonPath("$[1].project.slug").isEqualTo(projectEntities.get(1).getSlug())
                 .jsonPath("$[1].project.logoUrl").isEqualTo(projectEntities.get(1).getLogoUrl())
                 .jsonPath("$[1].project.shortDescription").isEqualTo(projectEntities.get(1).getShortDescription())
                 .jsonPath("$[1].billingProfile").isEmpty()
 
                 .jsonPath("$[2].project.name").isEqualTo(projectEntities.get(2).getName())
-                .jsonPath("$[2].project.slug").isEqualTo(projectEntities.get(2).getKey())
+                .jsonPath("$[2].project.slug").isEqualTo(projectEntities.get(2).getSlug())
                 .jsonPath("$[2].project.logoUrl").isEqualTo(projectEntities.get(2).getLogoUrl())
                 .jsonPath("$[2].project.shortDescription").isEqualTo(projectEntities.get(2).getShortDescription())
                 .jsonPath("$[2].billingProfile").isEmpty();
@@ -203,7 +203,7 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.length()").isEqualTo(3)
                 .jsonPath("$[0].project.name").isEqualTo(projectEntities.get(0).getName())
-                .jsonPath("$[0].project.slug").isEqualTo(projectEntities.get(0).getKey())
+                .jsonPath("$[0].project.slug").isEqualTo(projectEntities.get(0).getSlug())
                 .jsonPath("$[0].project.logoUrl").isEqualTo(projectEntities.get(0).getLogoUrl())
                 .jsonPath("$[0].project.shortDescription").isEqualTo(projectEntities.get(0).getShortDescription())
                 .jsonPath("$[0].billingProfile.name").isEqualTo(companyBillingProfile.name())
@@ -211,7 +211,7 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$[0].billingProfile.type").isEqualTo(companyBillingProfile.type().name())
 
                 .jsonPath("$[1].project.name").isEqualTo(projectEntities.get(1).getName())
-                .jsonPath("$[1].project.slug").isEqualTo(projectEntities.get(1).getKey())
+                .jsonPath("$[1].project.slug").isEqualTo(projectEntities.get(1).getSlug())
                 .jsonPath("$[1].project.logoUrl").isEqualTo(projectEntities.get(1).getLogoUrl())
                 .jsonPath("$[1].project.shortDescription").isEqualTo(projectEntities.get(1).getShortDescription())
                 .jsonPath("$[1].billingProfile.name").isEqualTo(selfEmployedBillingProfile.name())
@@ -219,7 +219,7 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$[1].billingProfile.type").isEqualTo(selfEmployedBillingProfile.type().name())
 
                 .jsonPath("$[2].project.name").isEqualTo(projectEntities.get(2).getName())
-                .jsonPath("$[2].project.slug").isEqualTo(projectEntities.get(2).getKey())
+                .jsonPath("$[2].project.slug").isEqualTo(projectEntities.get(2).getSlug())
                 .jsonPath("$[2].project.logoUrl").isEqualTo(projectEntities.get(2).getLogoUrl())
                 .jsonPath("$[2].project.shortDescription").isEqualTo(projectEntities.get(2).getShortDescription())
                 .jsonPath("$[2].billingProfile").isEmpty();
@@ -253,7 +253,7 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.length()").isEqualTo(3)
                 .jsonPath("$[0].project.name").isEqualTo(projectEntities.get(0).getName())
-                .jsonPath("$[0].project.slug").isEqualTo(projectEntities.get(0).getKey())
+                .jsonPath("$[0].project.slug").isEqualTo(projectEntities.get(0).getSlug())
                 .jsonPath("$[0].project.logoUrl").isEqualTo(projectEntities.get(0).getLogoUrl())
                 .jsonPath("$[0].project.shortDescription").isEqualTo(projectEntities.get(0).getShortDescription())
                 .jsonPath("$[0].billingProfile.name").isEqualTo(companyBillingProfile.name())
@@ -261,7 +261,7 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$[0].billingProfile.type").isEqualTo(companyBillingProfile.type().name())
 
                 .jsonPath("$[1].project.name").isEqualTo(projectEntities.get(1).getName())
-                .jsonPath("$[1].project.slug").isEqualTo(projectEntities.get(1).getKey())
+                .jsonPath("$[1].project.slug").isEqualTo(projectEntities.get(1).getSlug())
                 .jsonPath("$[1].project.logoUrl").isEqualTo(projectEntities.get(1).getLogoUrl())
                 .jsonPath("$[1].project.shortDescription").isEqualTo(projectEntities.get(1).getShortDescription())
                 .jsonPath("$[1].billingProfile.name").isEqualTo(selfEmployedBillingProfile.name())
@@ -269,7 +269,7 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$[1].billingProfile.type").isEqualTo(selfEmployedBillingProfile.type().name())
 
                 .jsonPath("$[2].project.name").isEqualTo(projectEntities.get(2).getName())
-                .jsonPath("$[2].project.slug").isEqualTo(projectEntities.get(2).getKey())
+                .jsonPath("$[2].project.slug").isEqualTo(projectEntities.get(2).getSlug())
                 .jsonPath("$[2].project.logoUrl").isEqualTo(projectEntities.get(2).getLogoUrl())
                 .jsonPath("$[2].project.shortDescription").isEqualTo(projectEntities.get(2).getShortDescription())
                 .jsonPath("$[2].billingProfile.name").isEqualTo(individualBillingProfile.name())
@@ -304,13 +304,13 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.length()").isEqualTo(3)
                 .jsonPath("$[0].project.name").isEqualTo(projectEntities.get(0).getName())
-                .jsonPath("$[0].project.slug").isEqualTo(projectEntities.get(0).getKey())
+                .jsonPath("$[0].project.slug").isEqualTo(projectEntities.get(0).getSlug())
                 .jsonPath("$[0].project.logoUrl").isEqualTo(projectEntities.get(0).getLogoUrl())
                 .jsonPath("$[0].project.shortDescription").isEqualTo(projectEntities.get(0).getShortDescription())
                 .jsonPath("$[0].billingProfile").isEmpty()
 
                 .jsonPath("$[1].project.name").isEqualTo(projectEntities.get(1).getName())
-                .jsonPath("$[1].project.slug").isEqualTo(projectEntities.get(1).getKey())
+                .jsonPath("$[1].project.slug").isEqualTo(projectEntities.get(1).getSlug())
                 .jsonPath("$[1].project.logoUrl").isEqualTo(projectEntities.get(1).getLogoUrl())
                 .jsonPath("$[1].project.shortDescription").isEqualTo(projectEntities.get(1).getShortDescription())
                 .jsonPath("$[1].billingProfile.name").isEqualTo(selfEmployedBillingProfile.name())
@@ -318,7 +318,7 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$[1].billingProfile.type").isEqualTo(selfEmployedBillingProfile.type().name())
 
                 .jsonPath("$[2].project.name").isEqualTo(projectEntities.get(2).getName())
-                .jsonPath("$[2].project.slug").isEqualTo(projectEntities.get(2).getKey())
+                .jsonPath("$[2].project.slug").isEqualTo(projectEntities.get(2).getSlug())
                 .jsonPath("$[2].project.logoUrl").isEqualTo(projectEntities.get(2).getLogoUrl())
                 .jsonPath("$[2].project.shortDescription").isEqualTo(projectEntities.get(2).getShortDescription())
                 .jsonPath("$[2].billingProfile.name").isEqualTo(individualBillingProfile.name())
@@ -431,7 +431,7 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
     private ProjectEntity generateStubForProject() {
         final ProjectEntity projectEntity = projectRepository.save(new ProjectEntity(UUID.randomUUID(),
                 faker.gameOfThrones().character() + faker.number().randomNumber(),
-                faker.rickAndMorty().character(), faker.pokemon().name(), null, faker.internet().url(), false, 0, null, ProjectVisibilityEnumEntity.PRIVATE,
+                faker.rickAndMorty().character(), faker.pokemon().name(), null, faker.internet().url(), false, 0, "slug-" + UUID.randomUUID(), ProjectVisibilityEnumEntity.PRIVATE,
                 false, false, false, new Date(), null, null, null, null, null, null, null));
         // To get the slug
         return projectRepository.findById(projectEntity.getId()).orElseThrow();

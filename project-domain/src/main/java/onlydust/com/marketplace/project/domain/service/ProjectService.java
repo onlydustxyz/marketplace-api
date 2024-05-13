@@ -6,10 +6,8 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
-import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.model.notification.ProjectCreated;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.*;
@@ -90,12 +88,19 @@ public class ProjectService implements ProjectFacadePort {
     @Override
     @Transactional
     public Pair<UUID, String> createProject(final UUID projectLeadId, final CreateProjectCommand command) {
+        final var slug = Project.slugOf(command.getName());
+        if (projectStoragePort.getProjectIdBySlug(slug).isPresent()) {
+            throw OnlyDustException.badRequest("Project with slug '%s' already exists".formatted(slug));
+        }
         if (command.getGithubUserIdsAsProjectLeadersToInvite() != null) {
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
         }
 
         final UUID projectId = uuidGeneratorPort.generate();
-        final String projectSlug = this.projectStoragePort.createProject(projectId, command.getName(),
+
+        this.projectStoragePort.createProject(projectId,
+                slug,
+                command.getName(),
                 command.getShortDescription(), command.getLongDescription(),
                 command.getIsLookingForContributors(), command.getMoreInfos(),
                 command.getGithubRepoIds(),
@@ -109,7 +114,7 @@ public class ProjectService implements ProjectFacadePort {
         if (nonNull(command.getGithubRepoIds())) {
             projectObserverPort.onLinkedReposChanged(projectId, Set.copyOf(command.getGithubRepoIds()), Set.of());
         }
-        return Pair.of(projectId, projectSlug);
+        return Pair.of(projectId, slug);
     }
 
     @Override
@@ -118,10 +123,15 @@ public class ProjectService implements ProjectFacadePort {
         if (!permissionService.isUserProjectLead(command.getId(), projectLeadId)) {
             throw OnlyDustException.forbidden("Only project leads can update their projects");
         }
+        final var slug = Project.slugOf(command.getName());
+        if (projectStoragePort.getProjectIdBySlug(slug).stream().anyMatch(id -> !id.equals(command.getId()))) {
+            throw OnlyDustException.badRequest("Project with slug '%s' already exists".formatted(slug));
+        }
+        checkProjectLeadersToKeep(command);
+        
         if (command.getGithubUserIdsAsProjectLeadersToInvite() != null) {
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
         }
-        final Set<UUID> unassignedLeaderIds = getUnassignedLeaderIds(command);
 
         final Set<Long> invitedLeaderGithubIds = new HashSet<>();
         final Set<Long> invitationCancelledLeaderGithubIds = new HashSet<>();
@@ -132,6 +142,7 @@ public class ProjectService implements ProjectFacadePort {
         getLinkedReposChanges(command, linkedRepoIds, unlinkedRepoIds);
 
         this.projectStoragePort.updateProject(command.getId(),
+                slug,
                 command.getName(),
                 command.getShortDescription(), command.getLongDescription(),
                 command.getIsLookingForContributors(), command.getMoreInfos(),
@@ -146,13 +157,12 @@ public class ProjectService implements ProjectFacadePort {
         if (!isNull(command.getRewardSettings())) {
             projectObserverPort.onRewardSettingsChanged(command.getId());
         }
-        final String slug = this.projectStoragePort.getProjectSlugById(command.getId());
         return Pair.of(command.getId(), slug);
     }
 
-    private Set<UUID> getUnassignedLeaderIds(UpdateProjectCommand command) {
+    private void checkProjectLeadersToKeep(UpdateProjectCommand command) {
         if (command.getProjectLeadersToKeep() == null) {
-            return Set.of();
+            return;
         }
 
         final var projectLeadIds = projectStoragePort.getProjectLeadIds(command.getId());
@@ -160,11 +170,8 @@ public class ProjectService implements ProjectFacadePort {
                 .anyMatch(userId -> projectLeadIds.stream()
                         .noneMatch(projectLeaderId -> projectLeaderId.equals(userId)))) {
             throw OnlyDustException.badRequest("Project leaders to keep must be a subset of current project " +
-                                               "leaders");
+                    "leaders");
         }
-        return projectLeadIds.stream()
-                .filter(leaderId -> !command.getProjectLeadersToKeep().contains(leaderId))
-                .collect(Collectors.toSet());
     }
 
     private void getLinkedReposChanges(UpdateProjectCommand command, Set<Long> linkedRepoIds,
@@ -268,7 +275,7 @@ public class ProjectService implements ProjectFacadePort {
                 return closedIssue;
             } else {
                 throw OnlyDustException.forbidden("Rewardable issue can only be created on repos linked to this " +
-                                                  "project");
+                        "project");
             }
         } else {
             throw OnlyDustException.forbidden("Only project leads can create rewardable issue on their projects");
