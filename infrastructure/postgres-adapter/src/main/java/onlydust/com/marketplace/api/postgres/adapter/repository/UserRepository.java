@@ -35,4 +35,11 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID>, JpaSpec
     @Modifying
     @Query(value = "REFRESH MATERIALIZED VIEW CONCURRENTLY global_users_ranks", nativeQuery = true)
     void refreshGlobalUsersRanks();
+
+    @Modifying
+    @Query(value = """
+            INSERT INTO historical_user_ranks (github_user_id, rank, timestamp)
+            SELECT github_user_id, rank, :date FROM global_users_ranks
+            """, nativeQuery = true)
+    void historizeGlobalUsersRanks(Date date);
 }

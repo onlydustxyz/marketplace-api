@@ -105,4 +105,10 @@ public class JobScheduler {
         userFacadePort.refreshUserRanks();
     }
 
+    @Scheduled(cron = "${application.cron.historize-user-ranks-cron-expression}")
+    public void historizeUserRanks() {
+        LOGGER.info("Historizing user ranks");
+        userFacadePort.historizeUserRanks();
+    }
+
 }
