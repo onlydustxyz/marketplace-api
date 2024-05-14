@@ -7,7 +7,6 @@ import jakarta.persistence.ManyToOne;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Value;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -24,7 +23,7 @@ public class BudgetStatsViewEntity {
     UUID currencyId;
     @ManyToOne
     @JoinColumn(name = "currencyId", insertable = false, updatable = false)
-    CurrencyEntity currency;
+    CurrencyViewEntity currency;
     BigDecimal spentAmount;
     BigDecimal spentUsdAmount;
     BigDecimal remainingAmount;

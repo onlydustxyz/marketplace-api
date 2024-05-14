@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
+package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
@@ -6,8 +6,6 @@ import lombok.NonNull;
 import lombok.Value;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.SponsorMapper;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 import onlydust.com.marketplace.project.domain.view.backoffice.BoSponsorView;
@@ -34,8 +32,8 @@ public class SponsorViewEntity {
     String logoUrl;
     String url;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "sponsorId")
-    Set<ProjectSponsorEntity> projects = Set.of();
+    @OneToMany(mappedBy = "sponsorId", fetch = FetchType.LAZY)
+    Set<ProjectSponsorViewEntity> projects = Set.of();
 
     @ManyToMany
     @JoinTable(

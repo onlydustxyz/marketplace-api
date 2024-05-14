@@ -12,6 +12,7 @@ import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 

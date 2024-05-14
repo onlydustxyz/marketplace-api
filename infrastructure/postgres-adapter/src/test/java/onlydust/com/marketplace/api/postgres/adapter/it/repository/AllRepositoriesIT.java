@@ -7,11 +7,11 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.AllocatedTimeEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactChanelEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactInformationIdEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -124,7 +124,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .hiring(false)
                 .id(projectId)
                 .rank(faker.number().randomDigit())
-                .visibility(ProjectVisibilityEnumEntity.PUBLIC)
+                .visibility(ProjectVisibility.PUBLIC)
                 .ignorePullRequests(true)
                 .ignoreCodeReviews(true)
                 .ignoreIssues(true)

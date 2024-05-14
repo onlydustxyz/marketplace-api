@@ -5,10 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileUserEntity;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -37,7 +37,7 @@ public class BillingProfileUserViewEntity {
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "billing_profile_role")
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    BillingProfileUserEntity.Role role;
+    BillingProfile.User.Role role;
 
     UUID userId;
     String email;
@@ -55,7 +55,7 @@ public class BillingProfileUserViewEntity {
     public BillingProfileCoworkerView toView() {
         return BillingProfileCoworkerView.builder()
                 .userId(userId != null ? UserId.of(userId) : null)
-                .role(role.toDomain())
+                .role(role)
                 .login(githubLogin)
                 .email(email)
                 .githubUserId(githubUserId != null ? GithubUserId.of(githubUserId) : null)

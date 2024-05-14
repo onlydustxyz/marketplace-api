@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataViewEntity;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.view.ContributionRewardView;

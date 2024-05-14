@@ -2,12 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
-import onlydust.com.marketplace.project.domain.model.ContributionStatus;
-import onlydust.com.marketplace.project.domain.model.ContributionType;
-import onlydust.com.marketplace.project.domain.model.GithubRepo;
-import onlydust.com.marketplace.project.domain.model.Project;
+import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.PullRequestReviewState;
@@ -66,7 +61,7 @@ public class ContributionViewEntity {
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "project_visibility")
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    ProjectVisibilityEnumEntity projectVisibility;
+    ProjectVisibility projectVisibility;
 
     Long repoId;
     String repoOwner;
@@ -91,7 +86,7 @@ public class ContributionViewEntity {
                 .name(projectName)
                 .shortDescription(projectShortDescription)
                 .logoUrl(projectLogoUrl)
-                .visibility(ProjectMapper.projectVisibilityToDomain(projectVisibility))
+                .visibility(projectVisibility)
                 .build();
 
         final var repo = GithubRepo.builder()

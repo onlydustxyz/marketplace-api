@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.write;
+package onlydust.com.marketplace.api.postgres.adapter.entity.enums;
 
 import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
@@ -21,7 +21,8 @@ public enum NetworkEnumEntity {
             case aptos -> Blockchain.APTOS;
             case starknet -> Blockchain.STARKNET;
             case optimism -> Blockchain.OPTIMISM;
-            default -> throw new IllegalStateException("No blockchain equivalent found for network %s".formatted(this.name()));
+            default ->
+                    throw new IllegalStateException("No blockchain equivalent found for network %s".formatted(this.name()));
         };
     }
 

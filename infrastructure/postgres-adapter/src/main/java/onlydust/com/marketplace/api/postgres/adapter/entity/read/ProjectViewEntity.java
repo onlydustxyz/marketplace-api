@@ -6,8 +6,8 @@ import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.project.domain.model.Project;
+import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.view.backoffice.ProjectView;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
@@ -50,7 +50,7 @@ public class ProjectViewEntity {
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "project_visibility")
-    ProjectVisibilityEnumEntity visibility;
+    ProjectVisibility visibility;
     @Column(name = "reward_ignore_pull_requests_by_default")
     Boolean ignorePullRequests;
     @Column(name = "reward_ignore_issues_by_default")
@@ -89,7 +89,7 @@ public class ProjectViewEntity {
                 .logoUrl(logoUrl)
                 .moreInfoUrl(moreInfos.stream().findFirst().map(ProjectMoreInfoViewEntity::getUrl).orElse(null))
                 .hiring(hiring)
-                .visibility(visibility.toDomain())
+                .visibility(visibility)
                 .build();
     }
 

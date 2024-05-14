@@ -6,14 +6,14 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmplo
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
+import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -431,7 +431,7 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
     private ProjectEntity generateStubForProject() {
         final ProjectEntity projectEntity = projectRepository.save(new ProjectEntity(UUID.randomUUID(),
                 faker.gameOfThrones().character() + faker.number().randomNumber(),
-                faker.rickAndMorty().character(), faker.pokemon().name(), null, faker.internet().url(), false, 0, "slug-" + UUID.randomUUID(), ProjectVisibilityEnumEntity.PRIVATE,
+                faker.rickAndMorty().character(), faker.pokemon().name(), null, faker.internet().url(), false, 0, "slug-" + UUID.randomUUID(), ProjectVisibility.PRIVATE,
                 false, false, false, new Date(), null, null, null, null, null, null, null));
         // To get the slug
         return projectRepository.findById(projectEntity.getId()).orElseThrow();

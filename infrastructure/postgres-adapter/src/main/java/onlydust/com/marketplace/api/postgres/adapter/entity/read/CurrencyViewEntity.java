@@ -5,9 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.ERC20ViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.LatestUsdQuoteViewEntity;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
@@ -36,7 +33,7 @@ public class CurrencyViewEntity {
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "currency_type")
-    private @NonNull CurrencyEntity.Type type;
+    private @NonNull Currency.Type type;
     private @NonNull String name;
     private @NonNull String code;
     private String logoUrl;
@@ -53,7 +50,7 @@ public class CurrencyViewEntity {
     public Currency toDomain() {
         return Currency.builder()
                 .id(Currency.Id.of(id))
-                .type(type.toDomain())
+                .type(type)
                 .name(name)
                 .code(Currency.Code.of(code))
                 .metadata(new Currency.Metadata(name, description, logoUrl == null ? null : URI.create(logoUrl)))

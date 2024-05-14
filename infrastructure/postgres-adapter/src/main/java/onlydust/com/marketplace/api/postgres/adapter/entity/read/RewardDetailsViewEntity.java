@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataViewEntity;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.Money;

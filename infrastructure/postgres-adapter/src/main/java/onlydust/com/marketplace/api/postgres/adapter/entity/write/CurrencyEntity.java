@@ -32,7 +32,7 @@ public class CurrencyEntity {
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "currency_type")
-    private @NonNull Type type;
+    private @NonNull Currency.Type type;
     private @NonNull String name;
     private @NonNull String code;
     private String logoUrl;
@@ -49,7 +49,7 @@ public class CurrencyEntity {
     public static CurrencyEntity of(Currency currency) {
         return CurrencyEntity.builder()
                 .id(currency.id().value())
-                .type(Type.of(currency.type()))
+                .type(currency.type())
                 .name(currency.name())
                 .code(currency.code().toString())
                 .logoUrl(currency.logoUri().map(Objects::toString).orElse(null))
@@ -62,7 +62,7 @@ public class CurrencyEntity {
     public Currency toDomain() {
         return Currency.builder()
                 .id(Currency.Id.of(id))
-                .type(type.toDomain())
+                .type(type)
                 .name(name)
                 .code(Currency.Code.of(code))
                 .metadata(new Currency.Metadata(name, description, logoUrl == null ? null : URI.create(logoUrl)))
@@ -83,22 +83,4 @@ public class CurrencyEntity {
                 .build();
     }
 
-
-    public enum Type {
-        FIAT, CRYPTO;
-
-        public static Type of(final @NonNull Currency.Type type) {
-            return switch (type) {
-                case FIAT -> FIAT;
-                case CRYPTO -> CRYPTO;
-            };
-        }
-
-        public Currency.Type toDomain() {
-            return switch (this) {
-                case FIAT -> Currency.Type.FIAT;
-                case CRYPTO -> Currency.Type.CRYPTO;
-            };
-        }
-    }
 }

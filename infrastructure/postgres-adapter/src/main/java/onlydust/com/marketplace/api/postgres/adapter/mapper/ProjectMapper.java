@@ -5,11 +5,9 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposit
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectMoreInfoEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
-import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.view.ProjectDetailsView;
 import onlydust.com.marketplace.project.domain.view.ProjectOrganizationView;
 
@@ -66,7 +64,7 @@ public interface ProjectMapper {
                 .name(projectEntity.getName())
                 .createdAt(Date.from(projectEntity.getCreatedAt()))
                 .moreInfos(mapMoreInfosWithDefaultValue(projectEntity))
-                .visibility(projectVisibilityToDomain(projectEntity.getVisibility()))
+                .visibility(projectEntity.getVisibility())
                 .rewardSettings(
                         new ProjectRewardSettings(
                                 projectEntity.getIgnorePullRequests(),
@@ -106,30 +104,6 @@ public interface ProjectMapper {
         return project;
     }
 
-    static ProjectVisibility projectVisibilityToDomain(ProjectVisibilityEnumEntity visibility) {
-        switch (visibility) {
-            case PUBLIC -> {
-                return ProjectVisibility.PUBLIC;
-            }
-            case PRIVATE -> {
-                return ProjectVisibility.PRIVATE;
-            }
-        }
-        throw new IllegalArgumentException("Could not map project visibility");
-    }
-
-    static ProjectVisibilityEnumEntity projectVisibilityToEntity(ProjectVisibility visibility) {
-        switch (visibility) {
-            case PUBLIC -> {
-                return ProjectVisibilityEnumEntity.PUBLIC;
-            }
-            case PRIVATE -> {
-                return ProjectVisibilityEnumEntity.PRIVATE;
-            }
-        }
-        throw new IllegalArgumentException("Could not map project visibility");
-    }
-
     static Project mapShortProjectViewToProject(ShortProjectViewEntity project) {
         return Project.builder()
                 .id(project.getId())
@@ -139,7 +113,7 @@ public interface ProjectMapper {
                 .longDescription(project.getLongDescription())
                 .logoUrl(project.getLogoUrl())
                 .hiring(project.getHiring())
-                .visibility(projectVisibilityToDomain(project.getVisibility()))
+                .visibility(project.getVisibility())
                 .build();
     }
 

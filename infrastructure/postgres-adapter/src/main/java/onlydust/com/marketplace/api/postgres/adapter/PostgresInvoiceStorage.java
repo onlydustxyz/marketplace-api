@@ -67,7 +67,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
                         RewardId.of(r.id()),
                         r.status(),
                         r.invoice() == null ? null : Invoice.Id.of(r.invoice().id()),
-                        r.invoice() == null ? null : r.invoice().status().toDomain(),
+                        r.invoice() == null ? null : r.invoice().status(),
                         r.billingProfileId() == null ? null : BillingProfile.Id.of(r.billingProfileId())
                 )).toList();
     }
@@ -85,7 +85,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     @Override
     @Transactional
     public void deleteDraftsOf(final @NonNull BillingProfile.Id billingProfileId) {
-        final var drafts = invoiceRepository.findAllByBillingProfileIdAndStatus(billingProfileId.value(), InvoiceEntity.Status.DRAFT);
+        final var drafts = invoiceRepository.findAllByBillingProfileIdAndStatus(billingProfileId.value(), Invoice.Status.DRAFT);
 
         drafts.forEach(invoice -> {
             final var rewards = rewardRepository.findAllByInvoiceId(invoice.id());
@@ -100,7 +100,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     @Transactional
     public Page<InvoiceView> invoicesOf(final @NonNull BillingProfile.Id billingProfileId, final @NonNull Integer pageNumber, final @NonNull Integer pageSize,
                                         final @NonNull Invoice.Sort sort, final @NonNull SortDirection direction) {
-        final var page = invoiceViewRepository.findAllByBillingProfileIdAndStatusNot(billingProfileId.value(), InvoiceEntity.Status.DRAFT,
+        final var page = invoiceViewRepository.findAllByBillingProfileIdAndStatusNot(billingProfileId.value(), Invoice.Status.DRAFT,
                 PageRequest.of(pageNumber, pageSize, sortBy(sort, direction == SortDirection.asc ? Sort.Direction.ASC : Sort.Direction.DESC)));
         return Page.<InvoiceView>builder()
                 .content(page.getContent().stream().map(InvoiceViewEntity::toView).toList())
@@ -126,7 +126,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
                                  @NonNull Integer pageIndex, @NonNull Integer pageSize) {
         final var page = invoiceRepository.findAllExceptDrafts(
                 ids.stream().map(Invoice.Id::value).toList(),
-                statuses.stream().map(InvoiceEntity.Status::of).map(Enum::toString).toList(),
+                statuses.stream().map(Enum::toString).toList(),
                 currencyIds.stream().map(Currency.Id::value).toList(),
                 billingProfileTypes.stream().map(BillingProfileEntity.Type::of).map(Enum::toString).toList(),
                 billingProfileIds.stream().map(BillingProfile.Id::value).toList(),
@@ -153,7 +153,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
 
     @Override
     public int getNextSequenceNumber(BillingProfile.Id billingProfileId) {
-        return invoiceRepository.countByBillingProfileIdAndStatusNot(billingProfileId.value(), InvoiceEntity.Status.DRAFT) + 1;
+        return invoiceRepository.countByBillingProfileIdAndStatusNot(billingProfileId.value(), Invoice.Status.DRAFT) + 1;
     }
 
     private Sort sortBy(Invoice.Sort sort, Sort.Direction direction) {
