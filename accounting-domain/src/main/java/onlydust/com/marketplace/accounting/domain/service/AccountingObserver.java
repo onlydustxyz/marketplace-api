@@ -75,7 +75,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
     @Override
     public void onRewardCreated(RewardId rewardId, AccountBookFacade accountBookFacade) {
         rewardStatusStorage.save(upToDateRewardStatus(accountBookFacade, new RewardStatusData(rewardId)));
-        rewardStatusStorage.updateBillingProfileFromRecipientPayoutPreferences(rewardId);
+        accountingRewardStoragePort.updateBillingProfileFromRecipientPayoutPreferences(rewardId);
         updateUsdEquivalent(rewardId);
         final RewardDetailsView rewardDetailsView = accountingRewardStoragePort.getReward(rewardId)
                 .orElseThrow(() -> internalServerError(("Reward %s not found").formatted(rewardId.value())));
@@ -186,14 +186,12 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
                                         .formatted(billingProfileVerificationUpdated.getParentExternalApplicantId()))).getBillingProfileId()
                         :
                         switch (billingProfileVerificationUpdated.getType()) {
-                            case KYB ->
-                                    billingProfileStoragePort.findKybById(billingProfileVerificationUpdated.getVerificationId())
-                                            .orElseThrow(() -> internalServerError("KYB %s not found"
-                                                    .formatted(billingProfileVerificationUpdated.getVerificationId()))).getBillingProfileId();
-                            case KYC ->
-                                    billingProfileStoragePort.findKycById(billingProfileVerificationUpdated.getVerificationId())
-                                            .orElseThrow(() -> internalServerError("KYC %s not found"
-                                                    .formatted(billingProfileVerificationUpdated.getVerificationId()))).getBillingProfileId();
+                            case KYB -> billingProfileStoragePort.findKybById(billingProfileVerificationUpdated.getVerificationId())
+                                    .orElseThrow(() -> internalServerError("KYB %s not found"
+                                            .formatted(billingProfileVerificationUpdated.getVerificationId()))).getBillingProfileId();
+                            case KYC -> billingProfileStoragePort.findKycById(billingProfileVerificationUpdated.getVerificationId())
+                                    .orElseThrow(() -> internalServerError("KYC %s not found"
+                                            .formatted(billingProfileVerificationUpdated.getVerificationId()))).getBillingProfileId();
                         };
 
 

@@ -201,6 +201,11 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     }
 
     @Override
+    public void updateBillingProfileFromRecipientPayoutPreferences(RewardId rewardId) {
+        rewardRepository.updateBillingProfileFromRecipientPayoutPreferences(rewardId.value());
+    }
+
+    @Override
     @Transactional
     public void markRewardsAsBoosted(List<UUID> rewardsBoosted, Long recipientId) {
         for (UUID rewardBoostedId : rewardsBoosted) {

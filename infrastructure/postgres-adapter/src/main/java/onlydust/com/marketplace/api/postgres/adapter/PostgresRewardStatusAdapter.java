@@ -73,11 +73,4 @@ public class PostgresRewardStatusAdapter implements RewardStatusStorage {
         rewardRepository.removeBillingProfileIdOf(rewardIds);
         return rewardIds.stream().map(RewardId::of).toList();
     }
-
-    @Override
-    @Transactional
-    public void updateBillingProfileFromRecipientPayoutPreferences(RewardId rewardId) {
-        rewardRepository.updateBillingProfileFromRecipientPayoutPreferences(rewardId.value());
-
-    }
 }

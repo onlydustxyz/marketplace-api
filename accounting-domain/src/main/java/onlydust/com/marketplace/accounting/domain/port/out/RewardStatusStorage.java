@@ -26,6 +26,4 @@ public interface RewardStatusStorage {
     void updateBillingProfileForRecipientUserIdAndProjectId(BillingProfile.Id billingProfileId, UserId userId, ProjectId projectId);
 
     List<RewardId> removeBillingProfile(BillingProfile.Id billingProfileId);
-
-    void updateBillingProfileFromRecipientPayoutPreferences(RewardId rewardId);
 }

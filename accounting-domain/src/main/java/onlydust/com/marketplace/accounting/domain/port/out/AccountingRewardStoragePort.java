@@ -53,4 +53,5 @@ public interface AccountingRewardStoragePort {
 
     Optional<ShortRewardDetailsView> getShortReward(RewardId rewardId);
 
+    void updateBillingProfileFromRecipientPayoutPreferences(RewardId rewardId);
 }
