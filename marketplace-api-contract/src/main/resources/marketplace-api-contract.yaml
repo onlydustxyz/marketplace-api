@@ -3639,9 +3639,9 @@ components:
           description: User rank on OnlyDust (the lower, the better)
           example: 42
         rankPercentile:
-          type: number
-          description: User rank percentile on OnlyDust (the lower, the better)
-          example: 0.10
+          type: integer
+          description: User rank percentile between 0 and 100 on OnlyDust (the lower, the better)
+          example: 10
         rankCategory:
           $ref: '#/components/schemas/UserRankCategory'
         contributedProjectCount:

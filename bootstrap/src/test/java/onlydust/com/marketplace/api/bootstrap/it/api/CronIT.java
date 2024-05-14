@@ -17,4 +17,8 @@ public class CronIT extends AbstractMarketplaceApiIT {
         assertDoesNotThrow(() -> userFacadePort.refreshUserRanks());
     }
 
+    @Test
+    void should_be_able_to_historize_ranks() {
+        assertDoesNotThrow(() -> userFacadePort.historizeUserRanks());
+    }
 }
