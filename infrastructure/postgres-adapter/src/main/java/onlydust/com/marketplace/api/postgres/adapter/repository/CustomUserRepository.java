@@ -25,17 +25,17 @@ import static onlydust.com.marketplace.api.postgres.adapter.entity.write.old.typ
 public class CustomUserRepository {
 
     private static final String SELECT_USER_PROFILE = """
-            select gu.id as                                github_user_id,
+            select u.github_user_id,
                    u.id,
-                   u.email as email,
+                   u.email,
                    u.last_seen_at,
                    u.created_at,
-                   gu.login,
+                   coalesce(gu.login, u.github_login)      login,
                    gu.html_url,
                    coalesce(upi.bio, gu.bio)               bio,
                    coalesce(upi.location, gu.location)     location,
                    coalesce(upi.website, gu.website)       website,
-                   coalesce(upi.avatar_url, gu.avatar_url) avatar_url,
+                   coalesce(upi.avatar_url, gu.avatar_url, u.github_avatar_url) avatar_url,
                    upi.languages,
                    upi.cover,
                    upi.looking_for_a_job,
@@ -65,7 +65,7 @@ public class CustomUserRepository {
                                  count(DISTINCT c.pull_request_id) FILTER (WHERE c.type = 'PULL_REQUEST')   AS pull_request_count
                           FROM indexer_exp.contributions c
                           where c.status = 'COMPLETED'
-                            and c.contributor_id = gu.id
+                            and c.contributor_id = u.github_user_id
                           GROUP BY year, week) as cc)      counts,
                         
                    (select count(pl.project_id)
@@ -75,7 +75,7 @@ public class CustomUserRepository {
                         
                    (select count(distinct pc.project_id)
                     from projects_contributors pc
-                    where pc.github_user_id = gu.id)       contributor_on_project,
+                    where pc.github_user_id = u.github_user_id)       contributor_on_project,
                         
                    (select jsonb_agg(jsonb_build_object(
                                    'total_amount', user_rewards.total_amount,
@@ -99,19 +99,19 @@ public class CustomUserRepository {
                           join accounting.reward_status_data rsd on rsd.reward_id = r.id
                           join currencies c on c.id = r.currency_id
                           left join accounting.latest_usd_quotes luq on luq.currency_id = c.id
-                          where r.recipient_id = gu.id
+                          where r.recipient_id = u.github_user_id
                           group by c.id, luq.price) as user_rewards)    totals_earned,
                         
                    (select sum(rc.completed_contribution_count)
                     from indexer_exp.repos_contributors rc
                     join indexer_exp.github_repos gr on gr.id = rc.repo_id and gr.visibility = 'PUBLIC'
-                    where rc.contributor_id = gu.id)           contributions_count
+                    where rc.contributor_id = u.github_user_id)           contributions_count
                 
             """;
 
     private final static String SELECT_USER_PROFILE_WHERE_ID = SELECT_USER_PROFILE + """
             from iam.users u
-                     join indexer_exp.github_accounts gu on gu.id = u.github_user_id
+                     left join indexer_exp.github_accounts gu on gu.id = u.github_user_id
                      left join public.user_profile_info upi on upi.id = u.id
             where u.id = :userId
             """;
