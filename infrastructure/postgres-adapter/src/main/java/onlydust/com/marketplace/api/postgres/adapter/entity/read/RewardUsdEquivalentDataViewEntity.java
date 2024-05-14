@@ -25,7 +25,7 @@ import static java.time.ZoneOffset.UTC;
 @EqualsAndHashCode
 @NoArgsConstructor(force = true)
 @Table(name = "reward_usd_equivalent_data", schema = "accounting")
-public class RewardUsdEquivalentDataEntity {
+public class RewardUsdEquivalentDataViewEntity {
     @Id
     @NonNull
     UUID rewardId;

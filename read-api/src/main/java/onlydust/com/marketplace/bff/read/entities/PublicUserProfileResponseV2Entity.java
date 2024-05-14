@@ -5,9 +5,9 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.AllUserViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileInfoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
 import onlydust.com.marketplace.bff.read.mapper.ContactMapper;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -60,13 +60,13 @@ public class PublicUserProfileResponseV2Entity {
                 .avatarUrl(user().avatarUrl())
                 .id(user.userId())
                 .htmlUrl(URI.create(user.github().htmlUrl()))
-                .location(Optional.ofNullable(user.profile()).map(UserProfileViewEntity::location).orElse(user.github().location()))
-                .bio(Optional.ofNullable(user.profile()).map(UserProfileViewEntity::bio).orElse(user.github().bio()))
-                .website(Optional.ofNullable(user.profile()).map(UserProfileViewEntity::website).orElse(user.github().website()))
+                .location(Optional.ofNullable(user.profile()).map(UserProfileInfoViewEntity::location).orElse(user.github().location()))
+                .bio(Optional.ofNullable(user.profile()).map(UserProfileInfoViewEntity::bio).orElse(user.github().bio()))
+                .website(Optional.ofNullable(user.profile()).map(UserProfileInfoViewEntity::website).orElse(user.github().website()))
                 .signedUpOnGithubAt(user.github().createdAt())
                 .signedUpAt(Optional.ofNullable(user.registered()).map(UserViewEntity::createdAt).map(d -> d.toInstant().atZone(ZoneOffset.UTC)).orElse(null))
                 .lastSeenAt(Optional.ofNullable(user.registered()).map(UserViewEntity::lastSeenAt).orElse(null))
-                .contacts(Optional.ofNullable(user.profile()).flatMap(UserProfileViewEntity::publicContacts).map(l -> l.stream().map(ContactMapper::map).toList()).orElse(contactsOf(user.github())))
+                .contacts(Optional.ofNullable(user.profile()).flatMap(UserProfileInfoViewEntity::publicContacts).map(l -> l.stream().map(ContactMapper::map).toList()).orElse(contactsOf(user.github())))
                 .statsSummary(new UserProfileStatsSummary()
                         .rank(rank)
                         .rankPercentile(prettyRankPercentile(rankPercentile))
@@ -87,7 +87,7 @@ public class PublicUserProfileResponseV2Entity {
                 .orElse(100);
     }
 
-    private static List<ContactInformation> contactsOf(GithubAccountEntity account) {
+    private static List<ContactInformation> contactsOf(GithubAccountViewEntity account) {
         return Stream.of(
                         account.twitter() == null ? null :
                                 new ContactInformation().channel(ContactInformationChannel.TWITTER).contact(account.twitter()).visibility(ContactInformation.VisibilityEnum.PUBLIC),

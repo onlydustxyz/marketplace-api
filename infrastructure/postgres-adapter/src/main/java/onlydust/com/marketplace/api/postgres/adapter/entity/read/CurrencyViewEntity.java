@@ -1,10 +1,13 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.write;
+package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ERC20ViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.LatestUsdQuoteViewEntity;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;

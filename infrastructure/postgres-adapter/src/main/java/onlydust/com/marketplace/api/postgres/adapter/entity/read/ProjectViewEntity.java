@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectTagEntity;
@@ -83,7 +83,7 @@ public class ProjectViewEntity {
             joinColumns = @JoinColumn(name = "project_id"),
             inverseJoinColumns = @JoinColumn(name = "github_repo_id")
     )
-    List<GithubRepoEntity> repos;
+    List<GithubRepoViewEntity> repos;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "projectId")
     Set<ProjectMoreInfoEntity> moreInfos;

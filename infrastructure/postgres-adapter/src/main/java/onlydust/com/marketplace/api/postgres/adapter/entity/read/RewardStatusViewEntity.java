@@ -1,7 +1,8 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.write;
+package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
 import lombok.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;

@@ -4,8 +4,8 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorView
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortProjectViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectMoreInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
@@ -33,12 +33,12 @@ public interface ProjectMapper {
                                                       final Boolean hasRemainingBudget,
                                                       ProjectDetailsView.Me me) {
 
-        final var organizationEntities = new HashMap<Long, GithubAccountEntity>();
+        final var organizationEntities = new HashMap<Long, GithubAccountViewEntity>();
         projectEntity.getRepos().forEach(repo -> organizationEntities.put(repo.getOwner().id(), repo.getOwner()));
         final var repoIdsIncludedInProject =
                 projectEntity.getRepos().stream()
-                        .filter(GithubRepoEntity::isPublic)
-                        .map(GithubRepoEntity::getId).collect(Collectors.toSet());
+                        .filter(GithubRepoViewEntity::isPublic)
+                        .map(GithubRepoViewEntity::getId).collect(Collectors.toSet());
 
         final var organizations = organizationEntities.values().stream().map(entity -> ProjectOrganizationView.builder()
                 .id(entity.id())
@@ -49,12 +49,12 @@ public interface ProjectMapper {
                 .installationId(isNull(entity.installation()) ? null : entity.installation().getId())
                 .isInstalled(nonNull(entity.installation()))
                 .repos(entity.repos().stream()
-                        .filter(GithubRepoEntity::isPublic)
+                        .filter(GithubRepoViewEntity::isPublic)
                         .map(repo -> RepoMapper.mapToDomain(repo,
                                 repoIdsIncludedInProject.contains(repo.getId()),
                                 entity.installation() != null &&
-                                entity.installation().getAuthorizedRepos().stream()
-                                        .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId())))
+                                        entity.installation().getAuthorizedRepos().stream()
+                                                .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId())))
                         )
                         .collect(Collectors.toSet()))
                 .build()).toList();

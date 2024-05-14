@@ -1,5 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -7,17 +10,13 @@ import lombok.Value;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import org.hibernate.annotations.Immutable;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-
 @Entity
 @Table(name = "iso_currencies", schema = "rfd")
 @Value
 @Immutable
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(force = true)
-public class IsoCurrencyEntity {
+public class IsoCurrencyViewEntity {
     @Id
     @EqualsAndHashCode.Include
     @NonNull

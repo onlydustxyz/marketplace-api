@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition;
 
-import lombok.*;
-import org.hibernate.annotations.Immutable;
-
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.Immutable;
 
 import java.time.ZonedDateTime;
 import java.util.Set;
@@ -13,13 +13,13 @@ import java.util.Set;
 @Entity
 @Table(schema = "indexer_exp", name = "github_app_installations")
 @Immutable
-public class GithubAppInstallationEntity {
+public class GithubAppInstallationViewEntity {
     @Id
     Long id;
     @OneToOne
-    GithubAccountEntity account;
+    GithubAccountViewEntity account;
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "installationId", referencedColumnName = "id", updatable = false, insertable = false)
-    Set<GithubAuthorizedRepoEntity> authorizedRepos;
+    Set<GithubAuthorizedRepoViewEntity> authorizedRepos;
     ZonedDateTime suspendedAt;
 }

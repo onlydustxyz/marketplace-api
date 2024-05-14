@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Value;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -16,7 +17,8 @@ import java.util.UUID;
 @Value
 @EqualsAndHashCode
 @NoArgsConstructor(force = true)
-public class RewardStatsEntity {
+@Immutable
+public class RewardStatsViewEntity {
     @Id
     @Column(name = "currency_id")
     UUID currencyId;

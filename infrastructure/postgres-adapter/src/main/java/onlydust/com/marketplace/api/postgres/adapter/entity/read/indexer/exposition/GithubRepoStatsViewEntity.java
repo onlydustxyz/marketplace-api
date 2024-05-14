@@ -14,7 +14,7 @@ import java.time.ZonedDateTime;
 @Entity
 @Table(schema = "indexer_exp", name = "github_repos_stats")
 @Immutable
-public class GithubRepoStatsEntity {
+public class GithubRepoStatsViewEntity {
     @Id
     Long id;
     ZonedDateTime lastIndexedAt;

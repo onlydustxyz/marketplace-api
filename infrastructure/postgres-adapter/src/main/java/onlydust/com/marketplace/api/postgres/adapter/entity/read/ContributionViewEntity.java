@@ -10,6 +10,7 @@ import onlydust.com.marketplace.project.domain.model.GithubRepo;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
+import onlydust.com.marketplace.project.domain.view.PullRequestReviewState;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -185,5 +186,18 @@ public class ContributionViewEntity {
     public static class PrimaryKey implements Serializable {
         String id;
         UUID projectId;
+    }
+
+    public enum GithubPullRequestReviewState {
+        PENDING_REVIEWER, UNDER_REVIEW, APPROVED, CHANGES_REQUESTED;
+
+        public PullRequestReviewState toView() {
+            return switch (this) {
+                case UNDER_REVIEW -> PullRequestReviewState.UNDER_REVIEW;
+                case APPROVED -> PullRequestReviewState.APPROVED;
+                case CHANGES_REQUESTED -> PullRequestReviewState.CHANGES_REQUESTED;
+                case PENDING_REVIEWER -> PullRequestReviewState.PENDING_REVIEWER;
+            };
+        }
     }
 }

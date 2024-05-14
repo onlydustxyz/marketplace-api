@@ -19,7 +19,7 @@ import java.util.UUID;
 @Value
 @EqualsAndHashCode
 @NoArgsConstructor(force = true)
-public class BudgetStatsEntity {
+public class BudgetStatsViewEntity {
     @Id
     UUID currencyId;
     @ManyToOne

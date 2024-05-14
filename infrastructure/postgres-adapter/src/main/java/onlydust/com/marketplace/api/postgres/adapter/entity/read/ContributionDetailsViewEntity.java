@@ -79,7 +79,7 @@ public class ContributionDetailsViewEntity {
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "github_pull_request_review_state")
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    GithubPullRequestReviewState prReviewState;
+    ContributionViewEntity.GithubPullRequestReviewState prReviewState;
 
     @EqualsAndHashCode
     public static class PrimaryKey implements Serializable {
@@ -136,7 +136,7 @@ public class ContributionDetailsViewEntity {
                 .project(project)
                 .githubRepo(repo)
                 .links(Optional.ofNullable(links).orElse(List.of()).stream().map(ContributionLinkViewEntity::toView).toList())
-                .prReviewState(Optional.ofNullable(prReviewState).map(GithubPullRequestReviewState::toView).orElse(null))
+                .prReviewState(Optional.ofNullable(prReviewState).map(ContributionViewEntity.GithubPullRequestReviewState::toView).orElse(null))
                 .build();
     }
 

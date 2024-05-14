@@ -18,12 +18,12 @@ import static java.util.Objects.nonNull;
 @Entity
 @Table(schema = "indexer_exp", name = "github_repos")
 @Immutable
-public class GithubRepoEntity {
+public class GithubRepoViewEntity {
     @Id
     @EqualsAndHashCode.Include
     Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    GithubAccountEntity owner;
+    GithubAccountViewEntity owner;
     String name;
     String htmlUrl;
     Date updatedAt;
@@ -33,10 +33,10 @@ public class GithubRepoEntity {
     Boolean hasIssues;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "repoId")
-    List<GithubRepoLanguageEntity> languages;
+    List<GithubRepoLanguageViewEntity> languages;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    GithubRepoEntity parent;
+    GithubRepoViewEntity parent;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinTable(
@@ -52,7 +52,7 @@ public class GithubRepoEntity {
 
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "id")
-    GithubRepoStatsEntity stats;
+    GithubRepoStatsViewEntity stats;
 
     public enum Visibility {
         PUBLIC, PRIVATE

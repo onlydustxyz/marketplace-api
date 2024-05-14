@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.Quote;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.BudgetStatsEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.BudgetStatsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardDetailsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HistoricalQuoteEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper;
@@ -68,9 +68,9 @@ public class PostgresProjectRewardAdapter implements ProjectRewardStoragePort {
                                         .dollarsEquivalentValue(budgetStatsEntity.getSpentUsdAmount())
                         ))
                         .toList())
-                .sentRewardsCount(budgetStats.stream().map(BudgetStatsEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
-                .rewardedContributionsCount(budgetStats.stream().map(BudgetStatsEntity::getRewardItemIds).flatMap(Collection::stream).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
-                .rewardedContributorsCount(budgetStats.stream().map(BudgetStatsEntity::getRewardRecipientIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
+                .sentRewardsCount(budgetStats.stream().map(BudgetStatsViewEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
+                .rewardedContributionsCount(budgetStats.stream().map(BudgetStatsViewEntity::getRewardItemIds).flatMap(Collection::stream).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
+                .rewardedContributorsCount(budgetStats.stream().map(BudgetStatsViewEntity::getRewardRecipientIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .build();
     }
 

@@ -18,7 +18,7 @@ import java.util.Set;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(force = true)
 @Accessors(fluent = true)
-public class GithubAccountEntity {
+public class GithubAccountViewEntity {
     @Id
     @EqualsAndHashCode.Include
     Long id;
@@ -36,9 +36,9 @@ public class GithubAccountEntity {
     @NonNull ZonedDateTime createdAt;
 
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
-    Set<GithubRepoEntity> repos;
+    Set<GithubRepoViewEntity> repos;
     @OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
-    GithubAppInstallationEntity installation;
+    GithubAppInstallationViewEntity installation;
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "githubUser")
     UserViewEntity user;

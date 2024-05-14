@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.Amount;
 import onlydust.com.marketplace.accounting.domain.model.ConvertedAmount;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardStatusData;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardStatusViewEntity;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
