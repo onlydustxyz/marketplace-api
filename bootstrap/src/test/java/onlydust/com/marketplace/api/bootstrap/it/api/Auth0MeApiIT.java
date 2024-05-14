@@ -87,6 +87,14 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .returnResult().getResponseBody();
 
         // Then
+        client.get()
+                .uri(getApiURI(ME_GET_PROFILE))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody().jsonPath("$.login").isEqualTo(login);
         assertMe(me);
         assertUserEntity(me.getId());
         runJobs();

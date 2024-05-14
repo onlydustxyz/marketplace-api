@@ -42,7 +42,7 @@ public class UserProfileEntity {
     String avatarUrl;
     @Column(name = "login", nullable = false)
     String login;
-    @Column(name = "html_url", nullable = false)
+    @Column(name = "html_url")
     String htmlUrl;
     @Column(name = "location")
     String location;
