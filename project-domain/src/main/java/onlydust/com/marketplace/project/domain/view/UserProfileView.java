@@ -33,7 +33,6 @@ public class UserProfileView {
     String github;
     String discord;
     Map<String, Long> technologies;
-    UserProfileCover cover;
     ProfileStats profileStats;
     UserAllocatedTimeToContribute allocatedTimeToContribute;
     Boolean isLookingForAJob;
@@ -57,7 +56,7 @@ public class UserProfileView {
     }
 
     public UserProfileCover getCover() {
-        return cover == null ? UserProfileCover.get(githubId) : cover;
+        return UserProfileCover.get(githubId);
     }
 
     @Data

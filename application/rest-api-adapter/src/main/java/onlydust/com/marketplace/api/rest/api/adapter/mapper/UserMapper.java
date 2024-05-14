@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.api.contract.model.ProjectVisibility;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.*;
@@ -9,7 +8,6 @@ import onlydust.com.marketplace.project.domain.view.Money;
 import onlydust.com.marketplace.project.domain.view.TotalsEarned;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
@@ -25,7 +23,6 @@ public interface UserMapper {
                 .bio(userProfileRequest.getBio())
                 .website(userProfileRequest.getWebsite())
                 .location(userProfileRequest.getLocation())
-                .cover(userProfileRequest.getCover() == null ? null : coverToUserProfileDomain(userProfileRequest.getCover()))
                 .contacts(contactToDomain(userProfileRequest.getContacts()))
                 .technologies(userProfileRequest.getTechnologies())
                 .allocatedTimeToContribute(allocatedTimeToDomain(userProfileRequest.getAllocatedTimeToContribute()))
@@ -58,39 +55,21 @@ public interface UserMapper {
                 }).toList();
     }
 
-    static UserProfileCover coverToUserProfileDomain(final @NonNull UserProfileCoverColor cover) {
-        return switch (cover) {
-            case BLUE -> UserProfileCover.BLUE;
-            case CYAN -> UserProfileCover.CYAN;
-            case MAGENTA -> UserProfileCover.MAGENTA;
-            case YELLOW -> UserProfileCover.YELLOW;
-        };
-    }
-
     static PrivateUserProfileResponse userProfileToPrivateResponse(UserProfileView userProfileView) {
-        final PrivateUserProfileResponse userProfileResponse = new PrivateUserProfileResponse();
-        userProfileResponse.setGithubUserId(userProfileView.getGithubId());
-        userProfileResponse.setId(userProfileView.getId());
-        userProfileResponse.setLogin(userProfileView.getLogin());
-        userProfileResponse.setAvatarUrl(userProfileView.getAvatarUrl());
-        userProfileResponse.setBio(userProfileView.getBio());
-        userProfileResponse.setWebsite(userProfileView.getWebsite());
-        userProfileResponse.setHtmlUrl((isNull(userProfileView.getHtmlUrl()) ? null :
-                URI.create(userProfileView.getHtmlUrl())));
-        userProfileResponse.setCover(coverToUserProfileResponse(userProfileView.getCover()));
-        userProfileResponse.setCreatedAt(toZoneDateTime(userProfileView.getCreateAt()));
-        userProfileResponse.setLastSeenAt(toZoneDateTime(userProfileView.getLastSeenAt()));
-        userProfileResponse.setLocation(userProfileView.getLocation());
-        userProfileResponse.setContacts(contactToResponse(userProfileView.getContacts()));
-        userProfileResponse.setStats(userStatsToResponse(userProfileView.getProfileStats()));
-        userProfileResponse.setProjects(userProjectsToResponse(userProfileView.getProjectsStats(), true));
-        userProfileResponse.setTechnologies(userProfileView.getTechnologies());
-        userProfileResponse.setAllocatedTimeToContribute(allocatedTimeToResponse(userProfileView.getAllocatedTimeToContribute()));
-        userProfileResponse.setIsLookingForAJob(userProfileView.getIsLookingForAJob());
-        userProfileResponse.setFirstContributedAt(toZoneDateTime(userProfileView.getFirstContributedAt()));
-        userProfileResponse.setFirstName(userProfileView.getFirstName());
-        userProfileResponse.setLastName(userProfileView.getLastName());
-        return userProfileResponse;
+        return new PrivateUserProfileResponse()
+                .githubUserId(userProfileView.getGithubId())
+                .id(userProfileView.getId())
+                .login(userProfileView.getLogin())
+                .avatarUrl(userProfileView.getAvatarUrl())
+                .bio(userProfileView.getBio())
+                .website(userProfileView.getWebsite())
+                .location(userProfileView.getLocation())
+                .contacts(contactToResponse(userProfileView.getContacts()))
+                .technologies(userProfileView.getTechnologies())
+                .allocatedTimeToContribute(allocatedTimeToResponse(userProfileView.getAllocatedTimeToContribute()))
+                .isLookingForAJob(userProfileView.getIsLookingForAJob())
+                .firstName(userProfileView.getFirstName())
+                .lastName(userProfileView.getLastName());
     }
 
     static AllocatedTime allocatedTimeToResponse(UserAllocatedTimeToContribute allocatedTimeToContribute) {
@@ -109,47 +88,6 @@ public interface UserMapper {
             case ONE_TO_THREE_DAYS -> UserAllocatedTimeToContribute.ONE_TO_THREE_DAYS;
             case GREATER_THAN_THREE_DAYS -> UserAllocatedTimeToContribute.GREATER_THAN_THREE_DAYS;
         };
-    }
-
-    static List<UserProfileProjects> userProjectsToResponse(final Set<UserProfileView.ProjectStats> projectStats,
-                                                            boolean includePrivateProjects) {
-        return projectStats.stream()
-                .filter(ps -> includePrivateProjects || ps.getVisibility() == onlydust.com.marketplace.project.domain.model.ProjectVisibility.PUBLIC)
-                .map(ps -> {
-                    final UserProfileProjects userProfileProjects = new UserProfileProjects();
-                    userProfileProjects.setUserContributionCount(ps.getUserContributionCount());
-                    userProfileProjects.setUserLastContributedAt(toZoneDateTime(ps.getUserLastContributedAt()));
-                    userProfileProjects.setId(ps.getId());
-                    userProfileProjects.setName(ps.getName());
-                    userProfileProjects.setTotalGranted(ps.getTotalGranted());
-                    userProfileProjects.setLogoUrl(ps.getLogoUrl());
-                    userProfileProjects.setContributorCount(ps.getContributorCount());
-                    userProfileProjects.setIsLead(ps.getIsProjectLead());
-                    userProfileProjects.setLeadSince(toZoneDateTime(ps.getProjectLeadSince()));
-                    userProfileProjects.setSlug(ps.getSlug());
-                    userProfileProjects.setVisibility(switch (ps.getVisibility()) {
-                        case PUBLIC -> ProjectVisibility.PUBLIC;
-                        case PRIVATE -> ProjectVisibility.PRIVATE;
-                    });
-                    return userProfileProjects;
-                })
-                .toList();
-    }
-
-    static UserProfileStats userStatsToResponse(final UserProfileView.ProfileStats profileStats) {
-        final UserProfileStats userProfileStats = new UserProfileStats();
-        userProfileStats.setContributedProjectCount(profileStats.getContributedProjectCount());
-        userProfileStats.setTotalsEarned(totalsEarnedToResponse(profileStats.getTotalsEarned()));
-        userProfileStats.setContributionCountVariationSinceLastWeek(profileStats
-                .getContributionCountVariationSinceLastWeek());
-        userProfileStats.setLeadedProjectCount(profileStats.getLeadedProjectCount());
-        userProfileStats.setContributionCount(profileStats.getContributionCount());
-        userProfileStats.setContributionCountPerWeeks(
-                profileStats.getContributionStats()
-                        .stream()
-                        .map(UserMapper::mapContributionStat).toList()
-        );
-        return userProfileStats;
     }
 
     static RewardTotalAmountsResponse totalsEarnedToResponse(TotalsEarned totalsEarned) {
@@ -225,14 +163,5 @@ public interface UserMapper {
         getMeResponse.setMissingPayoutPreference(authenticatedUser.isMissingPayoutPreference());
         getMeResponse.setSponsors(authenticatedUser.getSponsors().stream().map(SponsorMapper::map).toList());
         return getMeResponse;
-    }
-
-    static UserContributionStats mapContributionStat(UserProfileView.ProfileStats.ContributionStats contributionStats) {
-        return new UserContributionStats()
-                .codeReviewCount(contributionStats.getCodeReviewCount())
-                .issueCount(contributionStats.getIssueCount())
-                .pullRequestCount(contributionStats.getPullRequestCount())
-                .week(contributionStats.getWeek())
-                .year(contributionStats.getYear());
     }
 }

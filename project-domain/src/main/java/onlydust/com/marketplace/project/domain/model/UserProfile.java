@@ -19,7 +19,6 @@ public class UserProfile {
     private String website;
     @Builder.Default
     private Map<String, Long> technologies = new HashMap<>();
-    private UserProfileCover cover;
     @Builder.Default
     private List<Contact> contacts = new ArrayList<>();
     private UserAllocatedTimeToContribute allocatedTimeToContribute;

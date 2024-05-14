@@ -14,12 +14,11 @@ public class NewcomerView {
     String htmlUrl;
     String avatarUrl;
     Boolean isRegistered;
-    UserProfileCover cover;
     String location;
     String bio;
     ZonedDateTime firstContributedAt;
 
     public UserProfileCover getCover() {
-        return cover == null ? UserProfileCover.get(githubId) : cover;
+        return UserProfileCover.get(githubId);
     }
 }

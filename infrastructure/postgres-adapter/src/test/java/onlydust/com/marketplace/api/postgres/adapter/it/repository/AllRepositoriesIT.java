@@ -4,7 +4,10 @@ import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.AllocatedTimeEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactChanelEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactInformationIdEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
@@ -165,7 +168,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .allocatedTime(AllocatedTimeEnumEntity.one_to_three_days)
                 .avatarUrl(faker.pokemon().name())
                 .bio(faker.hacker().abbreviation())
-                .cover(ProfileCoverEnumEntity.yellow)
                 .isLookingForAJob(false)
                 .website(faker.harryPotter().location())
                 .location(faker.rickAndMorty().location())

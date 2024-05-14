@@ -189,7 +189,6 @@ public class CustomUserRepository {
                 .lastSeenAt(row.lastSeenAt())
                 .htmlUrl(row.htmlUrl())
                 .location(row.location())
-                .cover(isNull(row.cover()) ? null : row.cover().toDomain())
                 .website(row.website())
                 .technologies(getTechnologies(row))
                 .profileStats(UserProfileView.ProfileStats.builder()
