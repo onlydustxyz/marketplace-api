@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.GithubIssueViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubIssueViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.GithubAccountMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.GithubRepoMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GithubAppInstallationRepository;

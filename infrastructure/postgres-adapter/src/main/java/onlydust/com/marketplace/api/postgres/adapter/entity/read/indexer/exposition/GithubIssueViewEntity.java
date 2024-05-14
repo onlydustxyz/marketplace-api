@@ -1,11 +1,10 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.read;
+package onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition;
 
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
 import onlydust.com.marketplace.project.domain.view.GithubIssueView;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;

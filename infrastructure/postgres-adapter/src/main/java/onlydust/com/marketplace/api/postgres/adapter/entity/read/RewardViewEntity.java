@@ -9,7 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileRewardView;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.RewardShortView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataViewEntity;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.Money;
@@ -58,7 +58,7 @@ public class RewardViewEntity {
 
     @OneToMany(mappedBy = "rewardId", fetch = FetchType.EAGER)
     @NonNull
-    List<RewardItemEntity> rewardItems;
+    List<RewardItemViewEntity> rewardItems;
 
     @ManyToOne
     @JoinColumn(name = "invoiceId")

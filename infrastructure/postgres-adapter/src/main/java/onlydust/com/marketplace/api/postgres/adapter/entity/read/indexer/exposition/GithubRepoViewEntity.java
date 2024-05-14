@@ -3,7 +3,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposi
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
+import onlydust.com.marketplace.project.domain.view.ShortRepoView;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -27,7 +28,7 @@ public class GithubRepoViewEntity {
     String name;
     String htmlUrl;
     Date updatedAt;
-    String Description;
+    String description;
     Long starsCount;
     Long forksCount;
     Boolean hasIssues;
@@ -44,7 +45,7 @@ public class GithubRepoViewEntity {
             schema = "public",
             joinColumns = @JoinColumn(name = "github_repo_id"),
             inverseJoinColumns = @JoinColumn(name = "project_id"))
-    ProjectEntity project;
+    ProjectViewEntity project;
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "github_repo_visibility")
@@ -60,5 +61,15 @@ public class GithubRepoViewEntity {
 
     public Boolean isPublic() {
         return nonNull(this.visibility) && this.visibility.equals(Visibility.PUBLIC);
+    }
+
+    public ShortRepoView toShortView() {
+        return ShortRepoView.builder()
+                .id(id)
+                .owner(owner.login())
+                .name(name)
+                .htmlUrl(htmlUrl)
+                .description(description)
+                .build();
     }
 }

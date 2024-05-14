@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HackathonEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
@@ -65,7 +65,7 @@ public class HackathonDetailsViewEntity {
     List<NamedLink> links;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    List<SponsorEntity> sponsors;
+    List<SponsorViewEntity> sponsors;
 
     @JdbcTypeCode(SqlTypes.JSON)
     List<HackathonEntity.Track> tracks;
@@ -105,7 +105,7 @@ public class HackathonDetailsViewEntity {
                 ZonedDateTime.ofInstant(startDate.toInstant(), ZoneOffset.UTC),
                 ZonedDateTime.ofInstant(endDate.toInstant(), ZoneOffset.UTC),
                 isNull(links) ? List.of() : links,
-                isNull(sponsors) ? List.of() : sponsors.stream().map(SponsorEntity::toDomain).toList(),
+                isNull(sponsors) ? List.of() : sponsors.stream().map(SponsorViewEntity::toDomain).toList(),
                 isNull(tracks) ? List.of() : tracks.stream().map(track -> new HackathonDetailsView.Track(
                         track.name(),
                         track.subtitle(),

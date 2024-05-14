@@ -8,9 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.view.PayoutInfoView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.BankAccountEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.WalletEntity;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
@@ -50,11 +48,11 @@ public class PayoutInfoViewEntity {
     @OneToMany
     @JoinColumn(name = "billingProfileId", referencedColumnName = "billingProfileId")
     @Builder.Default
-    Set<WalletEntity> wallets = new HashSet<>();
+    Set<WalletViewEntity> wallets = new HashSet<>();
 
     @OneToOne
     @JoinColumn(name = "billingProfileId", referencedColumnName = "billingProfileId")
-    BankAccountEntity bankAccount;
+    BankAccountViewEntity bankAccount;
 
     public PayoutInfoView toDomain() {
         PayoutInfoView payoutInfo = PayoutInfoView.builder()
@@ -70,7 +68,7 @@ public class PayoutInfoViewEntity {
                     .build();
         }
         if (!this.getWallets().isEmpty()) {
-            for (WalletEntity wallet : this.getWallets()) {
+            for (final var wallet : this.getWallets()) {
                 switch (wallet.getNetwork()) {
                     case ethereum -> {
                         payoutInfo = switch (wallet.getType()) {

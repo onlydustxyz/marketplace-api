@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.read;
+package onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

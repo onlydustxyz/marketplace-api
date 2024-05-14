@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.GithubRepoViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.GithubRepoShortViewEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface GithubRepoViewEntityRepository extends JpaRepository<GithubRepoViewEntity, Long> {
+public interface GithubRepoViewEntityRepository extends JpaRepository<GithubRepoShortViewEntity, Long> {
     @Query(value = """
             SELECT
                 r.id,
@@ -38,9 +38,9 @@ public interface GithubRepoViewEntityRepository extends JpaRepository<GithubRepo
             ORDER BY 
                 r.name 
             """, nativeQuery = true)
-    List<GithubRepoViewEntity> listReposByContributor(Long rewardId,
-                                                      List<UUID> projectIds,
-                                                      List<Long> repoIds);
+    List<GithubRepoShortViewEntity> listReposByContributor(Long rewardId,
+                                                           List<UUID> projectIds,
+                                                           List<Long> repoIds);
 
     @Override
     @Query(value = """
@@ -60,5 +60,5 @@ public interface GithubRepoViewEntityRepository extends JpaRepository<GithubRepo
                 r.id = :repoId and r.visibility = 'PUBLIC'
             """, nativeQuery = true)
     @NonNull
-    Optional<GithubRepoViewEntity> findById(@NonNull Long repoId);
+    Optional<GithubRepoShortViewEntity> findById(@NonNull Long repoId);
 }

@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortProjectViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
@@ -148,7 +145,7 @@ public interface ProjectMapper {
 
     static List<NamedLink> mapMoreInfosWithDefaultValue(final ProjectViewEntity projectViewEntity) {
         return projectViewEntity.getMoreInfos().stream()
-                .sorted(Comparator.comparing(ProjectMoreInfoEntity::getRank))
+                .sorted(Comparator.comparing(ProjectMoreInfoViewEntity::getRank))
                 .map(projectMoreInfoEntity -> NamedLink.builder()
                         .value(projectMoreInfoEntity.getName())
                         .url(projectMoreInfoEntity.getUrl()).build())

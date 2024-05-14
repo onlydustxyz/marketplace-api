@@ -5,10 +5,7 @@ import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectTagEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectMoreInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.view.backoffice.ProjectView;
@@ -63,15 +60,6 @@ public class ProjectViewEntity {
     @Column(name = "reward_ignore_contributions_before_date_by_default")
     Date ignoreContributionsBefore;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "projects_ecosystems",
-            schema = "public",
-            joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "ecosystem_id")
-    )
-    List<EcosystemEntity> ecosystems;
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "projectId")
     @Builder.Default
     Set<ProjectSponsorEntity> sponsors = new HashSet<>();
@@ -86,10 +74,10 @@ public class ProjectViewEntity {
     List<GithubRepoViewEntity> repos;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "projectId")
-    Set<ProjectMoreInfoEntity> moreInfos;
+    Set<ProjectMoreInfoViewEntity> moreInfos;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "id.projectId")
-    Set<ProjectTagEntity> tags;
+    Set<ProjectTagViewEntity> tags;
 
     public Project toDomain() {
         return Project.builder()
@@ -99,7 +87,7 @@ public class ProjectViewEntity {
                 .shortDescription(shortDescription)
                 .longDescription(longDescription)
                 .logoUrl(logoUrl)
-                .moreInfoUrl(moreInfos.stream().findFirst().map(ProjectMoreInfoEntity::getUrl).orElse(null))
+                .moreInfoUrl(moreInfos.stream().findFirst().map(ProjectMoreInfoViewEntity::getUrl).orElse(null))
                 .hiring(hiring)
                 .visibility(visibility.toDomain())
                 .build();

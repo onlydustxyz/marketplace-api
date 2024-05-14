@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.GithubIssueViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubIssueViewEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

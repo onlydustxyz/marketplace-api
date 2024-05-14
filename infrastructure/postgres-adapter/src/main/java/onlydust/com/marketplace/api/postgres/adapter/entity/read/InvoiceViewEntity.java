@@ -10,7 +10,6 @@ import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
 import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.UserView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
@@ -65,7 +64,7 @@ public class InvoiceViewEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "currencyId")
     @NonNull
-    CurrencyEntity currency;
+    CurrencyViewEntity currency;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "invoiceId")
@@ -81,7 +80,7 @@ public class InvoiceViewEntity {
                 createdBy.githubEmail(),
                 UserId.of(createdBy.id()),
                 createdBy.profile() == null ? createdBy.login() :
-                        createdBy.profile().getFirstName() + " " + createdBy.profile().getLastName());
+                        createdBy.profile().firstName() + " " + createdBy.profile().lastName());
     }
 
     public InvoiceView toView() {
