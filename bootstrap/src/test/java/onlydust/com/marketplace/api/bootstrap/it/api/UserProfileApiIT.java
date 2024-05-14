@@ -883,7 +883,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
               ],
               "statsSummary": {
                 "rank": 1,
-                "rankPercentile": 0,
+                "rankPercentile": 1,
                 "rankCategory": "A",
                 "contributedProjectCount": 9,
                 "leadedProjectCount": 1,

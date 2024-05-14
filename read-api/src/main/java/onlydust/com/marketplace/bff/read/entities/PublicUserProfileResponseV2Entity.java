@@ -32,16 +32,19 @@ import java.util.stream.Stream;
 public class PublicUserProfileResponseV2Entity {
     @Id
     @EqualsAndHashCode.Include
-    @NonNull Long githubUserId;
+    @NonNull
+    Long githubUserId;
 
     @OneToOne
     @JoinColumn(name = "githubUserId", insertable = false, updatable = false)
-    @NonNull AllUserViewEntity user;
+    @NonNull
+    AllUserViewEntity user;
 
     @NonNull Integer rank;
     @NonNull BigDecimal rankPercentile;
     @Enumerated(EnumType.STRING)
-    @NonNull UserRankCategory rankCategory;
+    @NonNull
+    UserRankCategory rankCategory;
     @NonNull Integer contributedProjectCount;
     @NonNull Integer leadedProjectCount;
     @NonNull Integer contributionCount;
@@ -66,7 +69,7 @@ public class PublicUserProfileResponseV2Entity {
                 .contacts(Optional.ofNullable(user.profile()).flatMap(UserProfileViewEntity::publicContacts).map(l -> l.stream().map(ContactMapper::map).toList()).orElse(contactsOf(user.github())))
                 .statsSummary(new UserProfileStatsSummary()
                         .rank(rank)
-                        .rankPercentile(rankPercentile)
+                        .rankPercentile(prettyRankPercentile(rankPercentile))
                         .rankCategory(rankCategory)
                         .contributedProjectCount(contributedProjectCount)
                         .leadedProjectCount(leadedProjectCount)
@@ -74,6 +77,14 @@ public class PublicUserProfileResponseV2Entity {
                         .rewardCount(rewardCount))
                 .ecosystems(ecosystems)
                 ;
+    }
+
+    public static int prettyRankPercentile(BigDecimal rankPercentile) {
+        final var percent = rankPercentile.multiply(BigDecimal.valueOf(100)).doubleValue();
+        return List.of(1, 5, 10, 20).stream()
+                .filter(i -> percent <= i)
+                .min(Integer::compareTo)
+                .orElse(100);
     }
 
     private static List<ContactInformation> contactsOf(GithubAccountEntity account) {
