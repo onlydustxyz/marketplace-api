@@ -69,8 +69,8 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                 .title("Hackathon 3")
                 .subtitle("Subtitle 3")
                 .location("Location 3")
-                .startDate(startDate)
-                .endDate(startDate.plusDays(1))
+                .startDate(startDate.plusDays(3))
+                .endDate(startDate.plusDays(5))
                 .description("Description 3")
                 .status(Hackathon.Status.PUBLISHED)
                 .build();
@@ -290,16 +290,16 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                         {
                           "hackathons": [
                             {
-                              "slug": "hackathon-1",
-                              "title": "Hackathon 1",
-                              "location": null,
-                              "startDate": "2024-04-19T00:00:00Z",
-                              "endDate": "2024-04-20T00:00:00Z"
-                            },
-                            {
                               "slug": "hackathon-3",
                               "title": "Hackathon 3",
                               "location": "Location 3",
+                              "startDate": "2024-04-22T00:00:00Z",
+                              "endDate": "2024-04-24T00:00:00Z"
+                            },
+                            {
+                              "slug": "hackathon-1",
+                              "title": "Hackathon 1",
+                              "location": null,
                               "startDate": "2024-04-19T00:00:00Z",
                               "endDate": "2024-04-20T00:00:00Z"
                             }

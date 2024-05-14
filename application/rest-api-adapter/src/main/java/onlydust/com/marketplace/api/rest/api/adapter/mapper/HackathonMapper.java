@@ -158,15 +158,18 @@ public interface HackathonMapper {
                 ).toList());
     }
 
-    static HackathonsListResponse map(List<HackathonShortView> page) {
+    static HackathonsListResponse map(List<HackathonShortView> hackatons) {
         return new HackathonsListResponse()
-                .hackathons(page.stream().map(hackathon -> new HackathonsListItemResponse()
-                        .id(hackathon.id().value())
-                        .slug(hackathon.slug())
-                        .title(hackathon.title())
-                        .location(hackathon.location())
-                        .startDate(hackathon.startDate())
-                        .endDate(hackathon.endDate())
-                ).toList());
+                .hackathons(hackatons.stream()
+                        .map(hackathon -> new HackathonsListItemResponse()
+                                .id(hackathon.id().value())
+                                .slug(hackathon.slug())
+                                .title(hackathon.title())
+                                .location(hackathon.location())
+                                .startDate(hackathon.startDate())
+                                .endDate(hackathon.endDate())
+                        )
+                        .sorted((a, b) -> b.getStartDate().compareTo(a.getStartDate()))
+                        .toList());
     }
 }
