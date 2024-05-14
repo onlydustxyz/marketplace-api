@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.AllocatedTimeEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -39,10 +38,6 @@ public class UserProfileInfoEntity {
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "weekly_allocated", name = "weekly_allocated_time", nullable = false)
     AllocatedTimeEnumEntity allocatedTime;
-    @Enumerated(EnumType.STRING)
-    @JdbcType(PostgreSQLEnumJdbcType.class)
-    @Column(columnDefinition = "profile_cover")
-    ProfileCoverEnumEntity cover;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "languages", columnDefinition = "jsonb")
     Map<String, Long> languages;

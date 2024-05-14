@@ -6,7 +6,6 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.AllocatedTimeEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactChanelEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.project.domain.view.Money;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
@@ -50,10 +49,6 @@ public class UserProfileEntity {
     String website;
     @Column(name = "languages")
     String languages;
-    @Enumerated(EnumType.STRING)
-    @JdbcType(PostgreSQLEnumJdbcType.class)
-    @Column(columnDefinition = "profile_cover")
-    ProfileCoverEnumEntity cover;
     @Column(name = "last_seen_at")
     Date lastSeenAt;
     @Column(name = "created_at")

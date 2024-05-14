@@ -28,7 +28,6 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.website").isEqualTo("https://linktr.ee/abuisset")
                 .jsonPath("$.firstName").isEqualTo("Anthony")
                 .jsonPath("$.lastName").isEqualTo("BUISSET")
-                .jsonPath("$.cover").isEqualTo("BLUE")
                 .jsonPath("$.technologies.length()").isEqualTo(14)
                 .jsonPath("$.technologies['Rust']").isEqualTo(404344)
                 .jsonPath("$.allocatedTimeToContribute").isEqualTo("NONE")
@@ -61,7 +60,6 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                                 "Rust": 90,
                                 "Java": 20
                             },
-                            "cover": "YELLOW",
                             "contacts": [
                                 {
                                     "contact": "_____THIS-WONT-CHANGE-RETURNED-THE-EMAIL____@croute.com",
@@ -86,7 +84,6 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.bio").isEqualTo("FullStack engineer")
                 .jsonPath("$.avatarUrl").isEqualTo("https://foobar.org/plop.jpg")
                 .jsonPath("$.website").isEqualTo("https://croute.org")
-                .jsonPath("$.cover").isEqualTo("YELLOW")
                 .jsonPath("$.firstName").isEqualTo("AnthonyTest")
                 .jsonPath("$.lastName").isEqualTo("BuissetTest")
                 .jsonPath("$.technologies.length()").isEqualTo(3)

@@ -267,7 +267,6 @@ public class UserServiceTest {
                         .avatarUrl(faker.internet().avatar())
                         .bio(faker.lorem().sentence())
                         .website(faker.internet().url()).location(faker.address().city())
-                        .cover(UserProfileCover.CYAN)
                         .technologies(Map.of(faker.programmingLanguage().name(), faker.number().randomNumber(),
                                 faker.programmingLanguage().name(), faker.number().randomNumber()))
                         .contacts(List.of(Contact.builder().contact(faker.internet().url()).channel(Contact.Channel.WHATSAPP).visibility(Contact.Visibility.PUBLIC).build(), Contact.builder().contact(faker.internet().emailAddress()).channel(Contact.Channel.EMAIL).visibility(Contact.Visibility.PRIVATE).build())).build();

@@ -259,7 +259,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                               "login": "oscarwroche",
                               "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
                               "isRegistered": true,
-                              "cover": "CYAN",
+                              "cover": "MAGENTA",
                               "lastContribution": {
                                 "id": "39f0ee86f57fc94477f7525ca035800e54f79c7c20c8bc2774b916bcc514d921",
                                 "completedAt": "2023-07-13T16:38:18Z",

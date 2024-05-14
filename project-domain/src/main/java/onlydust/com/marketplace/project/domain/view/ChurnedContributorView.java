@@ -14,11 +14,10 @@ public class ChurnedContributorView {
     String htmlUrl;
     String avatarUrl;
     Boolean isRegistered;
-    UserProfileCover cover;
     Contribution lastContribution;
 
     public UserProfileCover getCover() {
-        return cover == null ? UserProfileCover.get(githubId) : cover;
+        return UserProfileCover.get(githubId);
     }
 
     @Data

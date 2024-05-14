@@ -12,9 +12,11 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserProfil
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.AllocatedTimeEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactChanelEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactInformationIdEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
-import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.Contact;
+import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.project.domain.model.UserAllocatedTimeToContribute;
+import onlydust.com.marketplace.project.domain.model.UserProfile;
 import onlydust.com.marketplace.project.domain.view.BillingProfileLinkView;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.ProjectLeaderLinkView;
@@ -129,7 +131,6 @@ public interface UserMapper {
                 .bio(userProfile.getBio())
                 .location(userProfile.getLocation())
                 .website(userProfile.getWebsite())
-                .cover(mapCoverToEntity(userProfile.getCover()))
                 .contactInformations(mapContactInformationsToEntity(userId, userProfile.getContacts()))
                 .languages(userProfile.getTechnologies())
                 .allocatedTime(mapAllocatedTimeToEntity(userProfile.getAllocatedTimeToContribute()))
@@ -169,14 +170,5 @@ public interface UserMapper {
                 })
                 .build()
         ).collect(Collectors.toList());
-    }
-
-    static ProfileCoverEnumEntity mapCoverToEntity(UserProfileCover cover) {
-        return isNull(cover) ? null : switch (cover) {
-            case MAGENTA -> ProfileCoverEnumEntity.magenta;
-            case CYAN -> ProfileCoverEnumEntity.cyan;
-            case BLUE -> ProfileCoverEnumEntity.blue;
-            case YELLOW -> ProfileCoverEnumEntity.yellow;
-        };
     }
 }

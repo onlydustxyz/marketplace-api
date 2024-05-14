@@ -1,18 +1,14 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
 import onlydust.com.marketplace.project.domain.view.ChurnedContributorView;
 import onlydust.com.marketplace.project.domain.view.ShortRepoView;
 import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.JdbcType;
-import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.ZonedDateTime;
-
-import static java.util.Objects.nonNull;
 
 @EqualsAndHashCode
 @Data
@@ -25,10 +21,6 @@ public class ChurnedContributorViewEntity {
     String htmlUrl;
     String avatarUrl;
     Boolean isRegistered;
-    @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "profile_cover")
-    @JdbcType(PostgreSQLEnumJdbcType.class)
-    ProfileCoverEnumEntity cover;
     String lastContributionId;
     ZonedDateTime lastContributionCompletedAt;
     Long lastContributedRepoId;
@@ -44,7 +36,6 @@ public class ChurnedContributorViewEntity {
                 .htmlUrl(htmlUrl)
                 .avatarUrl(avatarUrl)
                 .isRegistered(isRegistered)
-                .cover(nonNull(cover) ? cover.toDomain() : null)
                 .lastContribution(ChurnedContributorView.Contribution.builder()
                         .id(lastContributionId)
                         .completedAt(lastContributionCompletedAt)

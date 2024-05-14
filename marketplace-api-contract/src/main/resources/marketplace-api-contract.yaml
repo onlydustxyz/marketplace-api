@@ -3508,8 +3508,6 @@ components:
           description: User website as in Github profile
         technologies:
           $ref: '#/components/schemas/Technologies'
-        cover:
-          $ref: '#/components/schemas/UserProfileCoverColor'
         contacts:
           type: array
           items:
@@ -3542,9 +3540,6 @@ components:
           properties:
             id:
               $ref: '#/components/schemas/UserId'
-            htmlUrl:
-              type: string
-              format: uri
             location:
               type: string
               description: User location as in Github profile
@@ -3558,30 +3553,10 @@ components:
               description: User website as in Github profile
             technologies:
               $ref: '#/components/schemas/Technologies'
-            createdAt:
-              type: string
-              format: date-time
-              description: When the user signed up on OnlyDust
-            lastSeenAt:
-              type: string
-              format: date-time
-              description: The last time the user signed in on OnlyDust
-            firstContributedAt:
-              type: string
-              format: date-time
-              description: First contribution date to return if user not registered on OD
-            cover:
-              $ref: '#/components/schemas/UserProfileCoverColor'
             contacts:
               type: array
               items:
                 $ref: '#/components/schemas/ContactInformation'
-            projects:
-              type: array
-              items:
-                $ref: '#/components/schemas/UserProfileProjects'
-            stats:
-              $ref: '#/components/schemas/UserProfileStats'
             firstName:
               type: string
             lastName:
