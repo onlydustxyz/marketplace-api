@@ -12,7 +12,11 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.port.out.*;
+import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserverPort;
+import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.ProjectAccountingObserver;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
@@ -50,7 +54,7 @@ public class AccountingServiceTest {
     final ProjectAccountingObserver projectAccountingObserver = mock(ProjectAccountingObserver.class);
     final InvoiceStoragePort invoiceStoragePort = mock(InvoiceStoragePort.class);
     AccountBookObserver accountBookObserver = mock(AccountBookObserver.class);
-    final RewardStatusStorage rewardStatusStorage = mock(RewardStatusStorage.class);
+    final RewardStatusFacadePort rewardStatusFacadePort = mock(RewardStatusFacadePort.class);
     AccountBookEventStorageStub accountBookEventStorage;
     AccountingService accountingService;
     final Faker faker = new Faker();
@@ -115,12 +119,14 @@ public class AccountingServiceTest {
         }
         assertThat(accountBookFacade.networksOf(rewardId)).isEqualTo(networks);
         reset(accountingObserver);
+        verify(rewardStatusFacadePort).create(accountBookFacade, rewardId);
+        reset(rewardStatusFacadePort);
     }
 
     private void setupAccountingService() {
         accountBookEventStorage = new AccountBookEventStorageStub();
         accountingService = new AccountingService(new CachedAccountBookProvider(accountBookEventStorage), sponsorAccountStorage, currencyStorage,
-                accountingObserver, projectAccountingObserver, invoiceStoragePort, accountBookObserver, rewardStatusStorage);
+                accountingObserver, projectAccountingObserver, invoiceStoragePort, accountBookObserver, rewardStatusFacadePort);
     }
 
     @BeforeAll
@@ -596,7 +602,7 @@ public class AccountingServiceTest {
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
             events.forEach(e -> verify(accountBookObserver).on(e));
-            verify(rewardStatusStorage).delete(rewardId1);
+            verify(rewardStatusFacadePort).delete(rewardId1);
         }
 
         @Test
@@ -627,7 +633,7 @@ public class AccountingServiceTest {
             // Then
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
             assertThat(accountingService.getPayableRewards(Set.of(rewardId1))).hasSize(1);
-            verify(rewardStatusStorage, never()).delete(rewardId1);
+            verify(rewardStatusFacadePort, never()).delete(rewardId1);
         }
     }
 
@@ -1023,7 +1029,7 @@ public class AccountingServiceTest {
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
             events.forEach(e -> verify(accountBookObserver).on(e));
-            verify(rewardStatusStorage).delete(rewardId);
+            verify(rewardStatusFacadePort).delete(rewardId);
         }
 
         @ParameterizedTest
@@ -1042,7 +1048,7 @@ public class AccountingServiceTest {
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Reward %s cannot be cancelled because it is included in an invoice".formatted(rewardId));
 
-            verify(rewardStatusStorage, never()).delete(rewardId);
+            verify(rewardStatusFacadePort, never()).delete(rewardId);
         }
 
 
@@ -1060,7 +1066,7 @@ public class AccountingServiceTest {
             accountingService.cancel(rewardId, currency.id());
 
             // Then
-            verify(rewardStatusStorage).delete(rewardId);
+            verify(rewardStatusFacadePort).delete(rewardId);
         }
     }
 

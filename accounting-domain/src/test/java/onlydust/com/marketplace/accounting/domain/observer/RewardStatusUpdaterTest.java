@@ -4,17 +4,19 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.port.out.*;
+import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.ReceiptStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
 import onlydust.com.marketplace.accounting.domain.service.RewardStatusUpdater;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,58 +27,44 @@ import org.mockito.ArgumentCaptor;
 import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 import static onlydust.com.marketplace.accounting.domain.AccountBookTest.accountBookFromEvents;
 import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyb;
 import static onlydust.com.marketplace.accounting.domain.stubs.Currencies.ETH;
 import static onlydust.com.marketplace.accounting.domain.stubs.Currencies.USD;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 public class RewardStatusUpdaterTest {
+    private RewardStatusFacadePort rewardStatusFacadePort;
     private RewardStatusStorage rewardStatusStorage;
     private InvoiceStoragePort invoiceStorage;
     private AccountBookFacade accountBookFacade;
-    RewardUsdEquivalentStorage rewardUsdEquivalentStorage;
-    QuoteStorage quoteStorage;
-    CurrencyStorage currencyStorage;
-    RewardStatusUpdater rewardStatusUpdater;
-    ReceiptStoragePort receiptStorage;
-    AccountingRewardStoragePort accountingRewardStoragePort;
+    private RewardStatusUpdater rewardStatusUpdater;
+    private ReceiptStoragePort receiptStorage;
+    private AccountingRewardStoragePort accountingRewardStoragePort;
     final Faker faker = new Faker();
     final Currency currency = ETH;
-    final Currency usd = USD;
-    final BigDecimal rewardAmount = BigDecimal.valueOf(faker.number().randomNumber(3, true));
-    final RewardUsdEquivalent rewardUsdEquivalent = mock(RewardUsdEquivalent.class);
-    final ZonedDateTime equivalenceSealingDate = ZonedDateTime.now().minusDays(1);
-    final BigDecimal price = BigDecimal.valueOf(123.25);
 
     @BeforeEach
     void setUp() {
+        rewardStatusFacadePort = mock(RewardStatusFacadePort.class);
         rewardStatusStorage = mock(RewardStatusStorage.class);
         accountBookFacade = mock(AccountBookFacade.class);
-        rewardUsdEquivalentStorage = mock(RewardUsdEquivalentStorage.class);
-        quoteStorage = mock(QuoteStorage.class);
-        currencyStorage = mock(CurrencyStorage.class);
         invoiceStorage = mock(InvoiceStoragePort.class);
         receiptStorage = mock(ReceiptStoragePort.class);
         accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
-        when(currencyStorage.findByCode(usd.code())).thenReturn(Optional.of(usd));
-        rewardStatusUpdater = new RewardStatusUpdater(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage, invoiceStorage,
+        rewardStatusUpdater = new RewardStatusUpdater(rewardStatusFacadePort, rewardStatusStorage, invoiceStorage,
                 receiptStorage, accountingRewardStoragePort);
 
         when(rewardStatusStorage.get(any(RewardId.class))).then(invocation -> {
             final var rewardId = invocation.getArgument(0, RewardId.class);
             return Optional.of(new RewardStatusData(rewardId));
         });
-        when(rewardUsdEquivalentStorage.get(any())).thenReturn(Optional.of(rewardUsdEquivalent));
-        when(rewardUsdEquivalent.rewardAmount()).thenReturn(rewardAmount);
-        when(rewardUsdEquivalent.rewardCurrencyId()).thenReturn(currency.id());
-        when(rewardUsdEquivalent.equivalenceSealingDate()).thenReturn(Optional.of(equivalenceSealingDate));
-        when(quoteStorage.nearest(currency.id(), usd.id(), equivalenceSealingDate))
-                .thenReturn(Optional.of(new Quote(currency.id(), usd.id(), price, equivalenceSealingDate.minusSeconds(30).toInstant())));
     }
 
     @Nested
@@ -101,25 +89,11 @@ public class RewardStatusUpdaterTest {
 
         @Test
         public void should_create_status_and_update_usd_equivalent() {
-            // Given
-            final var rewardStatus = new RewardStatusData(rewardId)
-                    .sponsorHasEnoughFund(true)
-                    .unlockDate(ZonedDateTime.now().toInstant().atZone(ZoneOffset.UTC))
-                    .invoiceReceivedAt(null)
-                    .paidAt(null)
-                    .withAdditionalNetworks(Set.of(Network.ETHEREUM, Network.OPTIMISM));
-
-            when(accountBookFacade.isFunded(rewardId)).thenReturn(true);
-            when(accountBookFacade.unlockDateOf(rewardId)).thenReturn(rewardStatus.unlockDate().map(ZonedDateTime::toInstant));
-            when(accountBookFacade.networksOf(rewardId)).thenReturn(rewardStatus.networks());
-            when(rewardStatusStorage.get(rewardId)).thenReturn(Optional.of(rewardStatus));
-
             // When
             rewardStatusUpdater.onRewardCreated(rewardId, accountBookFacade);
 
             // Then
-            verify(rewardStatusStorage, times(2)).save(any());
-            assertThat(rewardStatus.usdAmount()).isPresent();
+            rewardStatusFacadePort.refreshRewardsUsdEquivalentOf(rewardId);
         }
     }
 
@@ -252,35 +226,11 @@ public class RewardStatusUpdaterTest {
 
         @Test
         public void should_update_reward_status_data() {
-            // Given
-            final var unlockDate = ZonedDateTime.now().plusDays(1);
-            when(sponsorAccountStatement.awaitingPayments()).thenReturn(Map.of(
-                    rewardId1, PositiveAmount.of(100L),
-                    rewardId2, PositiveAmount.of(2000L)
-            ));
-            when(sponsorAccountStatement.accountBookFacade()).thenReturn(accountBookFacade);
-            when(accountBookFacade.isFunded(rewardId1)).thenReturn(true);
-            when(accountBookFacade.isFunded(rewardId2)).thenReturn(false);
-            when(accountBookFacade.unlockDateOf(any())).thenReturn(Optional.of(unlockDate.toInstant()));
-            when(accountBookFacade.networksOf(any())).thenReturn(Set.of(Network.ETHEREUM, Network.OPTIMISM));
-
-            when(rewardStatusStorage.get(any(RewardId.class))).then(invocation -> {
-                final var rewardId = invocation.getArgument(0, RewardId.class);
-                return Optional.of(new RewardStatusData(rewardId));
-            });
-
             // When
             rewardStatusUpdater.onSponsorAccountBalanceChanged(sponsorAccountStatement);
 
             // Then
-            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
-            verify(rewardStatusStorage, times(2)).save(rewardStatusCaptor.capture());
-            final var rewardStatuses = rewardStatusCaptor.getAllValues();
-            assertThat(rewardStatuses).hasSize(2);
-            assertThat(rewardStatuses.stream().filter(r -> r.rewardId().equals(rewardId1)).findFirst().orElseThrow().sponsorHasEnoughFund()).isTrue();
-            assertThat(rewardStatuses.stream().filter(r -> r.rewardId().equals(rewardId2)).findFirst().orElseThrow().sponsorHasEnoughFund()).isFalse();
-            assertThat(rewardStatuses).allMatch(r -> r.networks().containsAll(Set.of(Network.ETHEREUM, Network.OPTIMISM)));
-            assertThat(rewardStatuses).allMatch(r -> r.unlockDate().orElseThrow().toInstant().equals(unlockDate.toInstant()));
+            verify(rewardStatusFacadePort).refreshRelatedRewardsStatuses(sponsorAccountStatement);
         }
     }
 
@@ -300,39 +250,11 @@ public class RewardStatusUpdaterTest {
 
         @Test
         public void should_update_reward_status_data() {
-            // Given
-            final var unlockDate = ZonedDateTime.now().plusDays(1);
-            when(sponsorAccountStatement.awaitingPayments()).thenReturn(Map.of(
-                    rewardId1, PositiveAmount.of(100L),
-                    rewardId2, PositiveAmount.of(2000L)
-            ));
-            when(sponsorAccountStatement.accountBookFacade()).thenReturn(accountBookFacade);
-            when(accountBookFacade.isFunded(rewardId1)).thenReturn(false);
-            when(accountBookFacade.isFunded(rewardId2)).thenReturn(true);
-            when(accountBookFacade.unlockDateOf(any())).thenReturn(Optional.of(unlockDate.plusDays(1).toInstant()));
-            when(accountBookFacade.networksOf(any())).thenReturn(Set.of(Network.APTOS, Network.OPTIMISM));
-
-            when(rewardStatusStorage.get(any(RewardId.class))).then(invocation -> {
-                final var rewardId = invocation.getArgument(0, RewardId.class);
-                return Optional.of(new RewardStatusData(rewardId)
-                        .sponsorHasEnoughFund(rewardId.equals(rewardId1))
-                        .unlockDate(unlockDate)
-                        .withAdditionalNetworks(Set.of(Network.ETHEREUM, Network.OPTIMISM)));
-            });
-
             // When
             rewardStatusUpdater.onSponsorAccountBalanceChanged(sponsorAccountStatement);
 
             // Then
-            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
-            verify(rewardStatusStorage, times(2)).save(rewardStatusCaptor.capture());
-            final var rewardStatuses = rewardStatusCaptor.getAllValues();
-            assertThat(rewardStatuses).hasSize(2);
-            assertThat(rewardStatuses.stream().filter(r -> r.rewardId().equals(rewardId1)).findFirst().orElseThrow().sponsorHasEnoughFund()).isFalse();
-            assertThat(rewardStatuses.stream().filter(r -> r.rewardId().equals(rewardId2)).findFirst().orElseThrow().sponsorHasEnoughFund()).isTrue();
-            assertThat(rewardStatuses).allMatch(r -> r.networks().containsAll(Set.of(Network.APTOS, Network.OPTIMISM)));
-            assertThat(rewardStatuses).allMatch(r -> r.unlockDate().orElseThrow().toInstant().equals(unlockDate.plusDays(1).toInstant()));
-            assertThat(rewardStatuses).allMatch(r -> r.usdAmount().isPresent());
+            verify(rewardStatusFacadePort).refreshRelatedRewardsStatuses(sponsorAccountStatement);
         }
     }
 
@@ -455,100 +377,6 @@ public class RewardStatusUpdaterTest {
     }
 
     @Nested
-    class UpdateUsdEquivalent {
-        final RewardId rewardId = RewardId.random();
-
-        @Nested
-        class GivenANonExistingReward {
-            @BeforeEach
-            void setup() {
-                when(rewardUsdEquivalentStorage.get(rewardId)).thenReturn(Optional.empty());
-                when(rewardStatusStorage.get(rewardId)).thenReturn(Optional.empty());
-            }
-
-            @Test
-            void should_fail_if_reward_does_not_exist() {
-                assertThatThrownBy(() -> rewardStatusUpdater.updateUsdEquivalent(rewardId))
-                        .isInstanceOf(OnlyDustException.class)
-                        .hasMessage("RewardStatus not found for reward %s".formatted(rewardId));
-            }
-        }
-
-        @Nested
-        class GivenAReward {
-            final RewardUsdEquivalent rewardUsdEquivalent = mock(RewardUsdEquivalent.class);
-            final BigDecimal rewardAmount = BigDecimal.valueOf(faker.number().randomNumber(3, true));
-
-            @BeforeEach
-            void setup() {
-                when(rewardStatusStorage.get(rewardId)).thenReturn(Optional.of(new RewardStatusData(rewardId)));
-                when(rewardUsdEquivalentStorage.get(rewardId)).thenReturn(Optional.of(rewardUsdEquivalent));
-                when(rewardUsdEquivalent.rewardAmount()).thenReturn(rewardAmount);
-                when(rewardUsdEquivalent.rewardCurrencyId()).thenReturn(currency.id());
-            }
-
-            @Test
-            void should_reset_usd_equivalent_if_no_equivalence_date_found() {
-                // Given
-                when(rewardUsdEquivalent.equivalenceSealingDate()).thenReturn(Optional.empty());
-
-                // When
-                rewardStatusUpdater.updateUsdEquivalent(rewardId);
-
-                // Then
-                final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
-                verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
-                final var rewardStatus = rewardStatusCaptor.getValue();
-                assertThat(rewardStatus.usdAmount()).isEmpty();
-            }
-
-            @Test
-            void should_update_usd_equivalent_if_equivalence_date_found() {
-                // Given
-                final var equivalenceSealingDate = ZonedDateTime.now().minusDays(1);
-                final var price = BigDecimal.valueOf(123.25);
-                when(rewardUsdEquivalent.equivalenceSealingDate()).thenReturn(Optional.of(equivalenceSealingDate));
-                when(quoteStorage.nearest(currency.id(), usd.id(), equivalenceSealingDate))
-                        .thenReturn(Optional.of(new Quote(currency.id(), usd.id(), price, equivalenceSealingDate.minusSeconds(30).toInstant())));
-
-                // When
-                rewardStatusUpdater.updateUsdEquivalent(rewardId);
-
-                // Then
-                final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
-                verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
-                final var rewardStatus = rewardStatusCaptor.getValue();
-                assertThat(rewardStatus.usdAmount().get().convertedAmount().getValue()).isEqualTo(price.multiply(rewardAmount));
-                assertThat(rewardStatus.usdAmount().get().conversionRate()).isEqualTo(price);
-            }
-        }
-    }
-
-    @Nested
-    class RefreshRewardsUsdEquivalent {
-        @Test
-        void should_refresh_usd_equivalent_for_all_rewards_not_paid() {
-            // Given
-            final var rewardId1 = RewardId.random();
-            final var rewardId2 = RewardId.random();
-            when(rewardStatusStorage.notRequested()).thenReturn(List.of(
-                    new RewardStatusData(rewardId1),
-                    new RewardStatusData(rewardId2)
-            ));
-
-            // When
-            rewardStatusUpdater.refreshRewardsUsdEquivalents();
-
-            // Then
-            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
-            verify(rewardStatusStorage, times(2)).save(rewardStatusCaptor.capture());
-            final var rewardStatuses = rewardStatusCaptor.getAllValues();
-            assertThat(rewardStatuses).hasSize(2);
-            assertThat(rewardStatuses).allMatch(r -> r.usdAmount().isPresent());
-        }
-    }
-
-    @Nested
     class OnBillingProfileUpdated {
 
         @Test
@@ -565,7 +393,7 @@ public class RewardStatusUpdaterTest {
             rewardStatusUpdater.onBillingProfileUpdated(billingProfileVerificationUpdated);
 
             // Then
-            verify(rewardStatusStorage).notRequested(kyc.getBillingProfileId());
+            verify(rewardStatusFacadePort).refreshRewardsUsdEquivalentOf(kyc.getBillingProfileId());
             verifyNoInteractions(accountingRewardStoragePort);
         }
 
@@ -583,7 +411,7 @@ public class RewardStatusUpdaterTest {
             rewardStatusUpdater.onBillingProfileUpdated(billingProfileVerificationUpdated);
 
             // Then
-            verify(rewardStatusStorage).notRequested(kyb.getBillingProfileId());
+            verify(rewardStatusFacadePort).refreshRewardsUsdEquivalentOf(kyb.getBillingProfileId());
             verifyNoInteractions(accountingRewardStoragePort);
         }
 
@@ -602,7 +430,7 @@ public class RewardStatusUpdaterTest {
             rewardStatusUpdater.onBillingProfileUpdated(billingProfileVerificationUpdated);
 
             // Then
-            verify(rewardStatusStorage).notRequested(kyb.getBillingProfileId());
+            verify(rewardStatusFacadePort).refreshRewardsUsdEquivalentOf(kyb.getBillingProfileId());
             verifyNoInteractions(accountingRewardStoragePort);
         }
     }
@@ -621,7 +449,7 @@ public class RewardStatusUpdaterTest {
 
             // Then
             verify(rewardStatusStorage).removeBillingProfile(billingProfileId);
-            verify(rewardStatusStorage).get(updatedRewardIds);
+            verify(rewardStatusFacadePort).refreshRewardsUsdEquivalentOf(updatedRewardIds);
         }
     }
 
@@ -639,7 +467,7 @@ public class RewardStatusUpdaterTest {
 
             // Then
             verify(rewardStatusStorage).removeBillingProfile(billingProfileId);
-            verify(rewardStatusStorage).get(updatedRewardIds);
+            verify(rewardStatusFacadePort).refreshRewardsUsdEquivalentOf(updatedRewardIds);
         }
     }
 

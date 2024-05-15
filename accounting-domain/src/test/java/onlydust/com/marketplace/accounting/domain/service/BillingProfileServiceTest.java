@@ -52,7 +52,7 @@ class BillingProfileServiceTest {
     final PdfStoragePort pdfStoragePort = mock(PdfStoragePort.class);
     final BillingProfileObserverPort billingProfileObserver = mock(BillingProfileObserverPort.class);
     final IndexerPort indexerPort = mock(IndexerPort.class);
-    final AccountingObserverPort accountingObserverPort = mock(RewardStatusUpdater.class);
+    final AccountingObserverPort accountingObserverPort = mock(AccountingObserverPort.class);
     final AccountingFacadePort accountingFacadePort = mock(AccountingFacadePort.class);
     final PayoutInfoValidator payoutInfoValidator = mock(PayoutInfoValidator.class);
     final BillingProfileService billingProfileService = new BillingProfileService(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort,
