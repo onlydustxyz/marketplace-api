@@ -186,8 +186,8 @@ public class ProjectConfiguration {
     @Bean
     public ProjectObserverPort projectObserverPort(final ContributionStoragePort contributionStoragePort,
                                                    final OutboxPort indexerOutbox,
-                                                   final NotificationPort notificationPort) {
-        return new ProjectObserver(contributionStoragePort, indexerOutbox, notificationPort);
+                                                   final NotificationPort slackNotificationPort) {
+        return new ProjectObserver(contributionStoragePort, indexerOutbox, slackNotificationPort);
     }
 
 
@@ -275,7 +275,7 @@ public class ProjectConfiguration {
 
 
     @Bean
-    public HackathonObserverPort hackathonObserverPort(final NotificationPort notificationPort){
-        return new HackathonObserver(notificationPort);
+    public HackathonObserverPort hackathonObserverPort(final NotificationPort slackNotificationPort) {
+        return new HackathonObserver(slackNotificationPort);
     }
 }

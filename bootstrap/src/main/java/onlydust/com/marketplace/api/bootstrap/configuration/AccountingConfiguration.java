@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.job.MailNotificationOutboxConsumer;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookObserver;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookProjector;
 import onlydust.com.marketplace.accounting.domain.port.in.*;
@@ -14,6 +13,7 @@ import onlydust.com.marketplace.api.infura.adapters.StarknetAccountValidatorAdap
 import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountingMailEventEntity;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
+import onlydust.com.marketplace.kernel.jobs.NotificationOutboxConsumer;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.observer.MailObserver;
 import onlydust.com.marketplace.kernel.port.output.*;
@@ -55,9 +55,9 @@ public class AccountingConfiguration {
                                                  final @NonNull BillingProfileStoragePort billingProfileStoragePort,
                                                  final @NonNull MailObserver accountingMailObserver,
                                                  final @NonNull AccountingRewardStoragePort accountingRewardStoragePort,
-                                                 final @NonNull NotificationPort notificationPort) {
+                                                 final @NonNull NotificationPort slackNotificationPort) {
         return new AccountingObserver(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage, invoiceStorage, receiptStorage,
-                billingProfileStoragePort, accountingMailObserver, accountingRewardStoragePort, notificationPort);
+                billingProfileStoragePort, accountingMailObserver, accountingRewardStoragePort, slackNotificationPort);
     }
 
     @Bean
@@ -137,7 +137,7 @@ public class AccountingConfiguration {
     }
 
     @Bean
-    public OutboxConsumer accountingMailOutboxConsumer(final MailPort mailPort) {
-        return new MailNotificationOutboxConsumer(mailPort);
+    public OutboxConsumer accountingMailOutboxConsumer(final NotificationPort mailNotificationPort) {
+        return new NotificationOutboxConsumer(mailNotificationPort);
     }
 }

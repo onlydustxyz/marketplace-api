@@ -20,8 +20,8 @@ public class SlackConfiguration {
     }
 
     @Bean
-    public NotificationPort notificationPort(final SlackProperties slackProperties, final UserStoragePort userStoragePort,
-                                             final ProjectStoragePort projectStoragePort, final HackathonStoragePort hackathonStoragePort) {
+    public NotificationPort slackNotificationPort(final SlackProperties slackProperties, final UserStoragePort userStoragePort,
+                                                  final ProjectStoragePort projectStoragePort, final HackathonStoragePort hackathonStoragePort) {
         return new SlackApiAdapter(slackProperties, userStoragePort, projectStoragePort, hackathonStoragePort);
     }
 }
