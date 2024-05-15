@@ -37,6 +37,7 @@ public class UserWeeklyStatsEntity {
                 .codeReviewCount(codeReviewCount)
                 .issueCount(issueCount)
                 .pullRequestCount(pullRequestCount)
+                .rewardCount(rewardCount)
                 ;
     }
 }
