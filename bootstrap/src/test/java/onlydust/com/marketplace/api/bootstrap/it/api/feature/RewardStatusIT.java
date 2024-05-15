@@ -1442,7 +1442,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .status(VerificationStatus.VERIFIED)
                 .build());
         billingProfileStoragePort.updateBillingProfileStatus(BillingProfile.Id.of(individualBPId), VerificationStatus.VERIFIED);
-        accountingObserver.onBillingProfileUpdated(new BillingProfileVerificationUpdated(kycId, VerificationType.KYC, VerificationStatus.VERIFIED, null,
+        accountingObserver.onBillingProfileUpdated(new BillingProfileVerificationUpdated(kycId, BillingProfile.Id.of(individualBPId),
+                VerificationType.KYC, VerificationStatus.VERIFIED, null,
                 UserId.of(individualBPId), null, faker.rickAndMorty().character(), null));
 
         assertGetProjectRewardsStatusOnProject(
@@ -1617,7 +1618,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .name(faker.name().fullName())
                 .build());
         billingProfileStoragePort.updateBillingProfileStatus(BillingProfile.Id.of(companyBPId), VerificationStatus.VERIFIED);
-        accountingObserver.onBillingProfileUpdated(new BillingProfileVerificationUpdated(companyKybId, VerificationType.KYB, VerificationStatus.VERIFIED, null,
+        accountingObserver.onBillingProfileUpdated(new BillingProfileVerificationUpdated(companyKybId, BillingProfile.Id.of(companyBPId),
+                VerificationType.KYB, VerificationStatus.VERIFIED, null,
                 UserId.of(companyBPAdmin1Id), null, faker.rickAndMorty().character(), null));
         // Then
         assertGetProjectRewardsStatusOnProject(
@@ -1793,8 +1795,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .name(faker.name().fullName())
                 .build());
         billingProfileStoragePort.updateBillingProfileStatus(BillingProfile.Id.of(selfEmployedBPId), VerificationStatus.VERIFIED);
-        accountingObserver.onBillingProfileUpdated(new BillingProfileVerificationUpdated(selfEmployedKybId, VerificationType.KYB, VerificationStatus.VERIFIED
-                , null,
+        accountingObserver.onBillingProfileUpdated(new BillingProfileVerificationUpdated(selfEmployedKybId, BillingProfile.Id.of(selfEmployedBPId),
+                VerificationType.KYB, VerificationStatus.VERIFIED, null,
                 UserId.of(selfEmployedBPId), null, faker.rickAndMorty().character(), null));
 
         // Then

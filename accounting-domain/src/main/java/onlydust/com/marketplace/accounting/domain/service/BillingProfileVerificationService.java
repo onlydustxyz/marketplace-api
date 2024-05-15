@@ -71,6 +71,7 @@ public class BillingProfileVerificationService implements BillingProfileVerifica
         billingProfileStoragePort.updateBillingProfileStatus(updatedKyb.getBillingProfileId(),
                 newVerificationStatus);
         return billingProfileVerificationUpdated.toBuilder()
+                .billingProfileId(updatedKyb.getBillingProfileId())
                 .verificationStatus(newVerificationStatus)
                 .userId(updatedKyb.getOwnerId())
                 .build();
@@ -104,6 +105,7 @@ public class BillingProfileVerificationService implements BillingProfileVerifica
         billingProfileStoragePort.saveKyc(updatedKyc);
         billingProfileStoragePort.updateBillingProfileStatus(updatedKyc.getBillingProfileId(), updatedKyc.getStatus());
         return billingProfileVerificationUpdated.toBuilder()
+                .billingProfileId(updatedKyc.getBillingProfileId())
                 .userId(updatedKyc.getOwnerId())
                 .verificationStatus(updatedKyc.getStatus())
                 .build();
@@ -121,6 +123,7 @@ public class BillingProfileVerificationService implements BillingProfileVerifica
         billingProfileStoragePort.updateBillingProfileStatus(parentKyb.getBillingProfileId(),
                 newVerificationStatus);
         return childrenBillingProfileUpdated.toBuilder()
+                .billingProfileId(parentKyb.getBillingProfileId())
                 .verificationStatus(newVerificationStatus)
                 .userId(parentKyb.getOwnerId())
                 .verificationId(parentKyb.getId())

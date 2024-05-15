@@ -678,10 +678,11 @@ public class AccountingObserverTest {
         void should_refresh_usd_equivalent_given_a_kyc() {
             // Given
             final UUID kycId = UUID.randomUUID();
-            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kycId, VerificationType.KYC,
-                    VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(), null);
+            final var billingProfileId = BillingProfile.Id.random();
+            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kycId, billingProfileId,
+                    VerificationType.KYC, VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(), null);
             final Kyc kyc =
-                    Kyc.builder().id(kycId).billingProfileId(BillingProfile.Id.random()).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();
+                    Kyc.builder().id(kycId).billingProfileId(billingProfileId).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();
 
             // When
             when(billingProfileStoragePort.findKycById(kycId)).thenReturn(Optional.of(kyc));
@@ -695,52 +696,14 @@ public class AccountingObserverTest {
         }
 
         @Test
-        void should_prevent_given_a_kyc_not_found() {
-            // Given
-            final UUID kycId = UUID.randomUUID();
-            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kycId, VerificationType.KYC,
-                    VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(), null);
-
-            // When
-            when(billingProfileStoragePort.findKycById(kycId)).thenReturn(Optional.empty());
-            assertThatThrownBy(() -> accountingObserver.onBillingProfileUpdated(billingProfileVerificationUpdated))
-                    // Then
-                    .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("KYC %s not found".formatted(kycId));
-            verifyNoInteractions(rewardStatusStorage);
-            verifyNoInteractions(accountingRewardStoragePort);
-            verifyNoInteractions(mailObserver);
-            verifyNoInteractions(notificationPort);
-        }
-
-        @Test
-        void should_prevent_given_a_kyb_not_found() {
-            // Given
-            final UUID kybId = UUID.randomUUID();
-            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, VerificationType.KYB,
-                    VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(), null);
-
-            // When
-            when(billingProfileStoragePort.findKybById(kybId)).thenReturn(Optional.empty());
-            assertThatThrownBy(() -> accountingObserver.onBillingProfileUpdated(billingProfileVerificationUpdated))
-                    // Then
-                    .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("KYB %s not found".formatted(kybId));
-            verifyNoInteractions(rewardStatusStorage);
-            verifyNoInteractions(accountingRewardStoragePort);
-            verifyNoInteractions(mailObserver);
-            verifyNoInteractions(notificationPort);
-        }
-
-
-        @Test
         void should_refresh_usd_equivalent_given_a_kyb() {
             // Given
             final UUID kybId = UUID.randomUUID();
-            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, VerificationType.KYB,
-                    VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(), null);
+            final var billingProfileId = BillingProfile.Id.random();
+            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, billingProfileId,
+                    VerificationType.KYB, VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(), null);
             final Kyb kyb =
-                    Kyb.builder().id(kybId).billingProfileId(BillingProfile.Id.random()).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();
+                    Kyb.builder().id(kybId).billingProfileId(billingProfileId).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();
 
             // When
             when(billingProfileStoragePort.findKybById(kybId)).thenReturn(Optional.of(kyb));
@@ -757,10 +720,12 @@ public class AccountingObserverTest {
         void should_refresh_usd_equivalent_given_a_kyc_children() {
             // Given
             final UUID kybId = UUID.randomUUID();
-            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, VerificationType.KYC,
-                    VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(), faker.gameOfThrones().character());
+            final var billingProfileId = BillingProfile.Id.random();
+            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, billingProfileId,
+                    VerificationType.KYC, VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(),
+                    faker.gameOfThrones().character());
             final Kyb kyb =
-                    Kyb.builder().id(kybId).billingProfileId(BillingProfile.Id.random()).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();
+                    Kyb.builder().id(kybId).billingProfileId(billingProfileId).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();
 
             // When
             when(billingProfileStoragePort.findKybByParentExternalId(billingProfileVerificationUpdated.getParentExternalApplicantId()))
@@ -775,35 +740,16 @@ public class AccountingObserverTest {
         }
 
         @Test
-        void should_prevent_given_a_children_kyc_not_found() {
-            // Given
-            final UUID kybId = UUID.randomUUID();
-            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, VerificationType.KYC,
-                    VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(), faker.chuckNorris().fact());
-
-            // When
-            when(billingProfileStoragePort.findKybByParentExternalId(billingProfileVerificationUpdated.getParentExternalApplicantId())).thenReturn(Optional.empty());
-            assertThatThrownBy(() -> accountingObserver.onBillingProfileUpdated(billingProfileVerificationUpdated))
-                    // Then
-                    .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("KYB not found for parentExternalApplicantId %s".formatted(billingProfileVerificationUpdated.getParentExternalApplicantId()));
-            verifyNoInteractions(rewardStatusStorage);
-            verifyNoInteractions(accountingRewardStoragePort);
-            verifyNoInteractions(mailObserver);
-            verifyNoInteractions(notificationPort);
-        }
-
-        @Test
         void should_notify_billing_profile_verification_failed() {
             // Given
             final UUID kybId = UUID.randomUUID();
-            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, VerificationType.KYC,
-                    VerificationStatus.CLOSED, null, UserId.random(), null, faker.rickAndMorty().character(), null);
+            final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
+            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, billingProfileId,
+                    VerificationType.KYC, VerificationStatus.CLOSED, null, UserId.random(), null, faker.rickAndMorty().character(), null);
             final UUID userId = UUID.randomUUID();
             final ShortContributorView shortContributorView = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
                     faker.rickAndMorty().character(), faker.gameOfThrones().character(),
                     UserId.of(userId), faker.internet().emailAddress());
-            final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
             final Kyc kyc =
                     Kyc.builder().id(billingProfileVerificationUpdated.getVerificationId())
                             .billingProfileId(billingProfileId).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();

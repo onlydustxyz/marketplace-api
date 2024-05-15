@@ -177,34 +177,18 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
     }
 
     @Override
-    public void onBillingProfileUpdated(BillingProfileVerificationUpdated billingProfileVerificationUpdated) {
-        final BillingProfile.Id billingProfileId =
-                billingProfileVerificationUpdated.isAChildrenKYC() ?
-                        billingProfileStoragePort.findKybByParentExternalId(billingProfileVerificationUpdated.getParentExternalApplicantId())
-                                .orElseThrow(() -> internalServerError("KYB not found for parentExternalApplicantId %s"
-                                        .formatted(billingProfileVerificationUpdated.getParentExternalApplicantId()))).getBillingProfileId()
-                        :
-                        switch (billingProfileVerificationUpdated.getType()) {
-                            case KYB -> billingProfileStoragePort.findKybById(billingProfileVerificationUpdated.getVerificationId())
-                                    .orElseThrow(() -> internalServerError("KYB %s not found"
-                                            .formatted(billingProfileVerificationUpdated.getVerificationId()))).getBillingProfileId();
-                            case KYC -> billingProfileStoragePort.findKycById(billingProfileVerificationUpdated.getVerificationId())
-                                    .orElseThrow(() -> internalServerError("KYC %s not found"
-                                            .formatted(billingProfileVerificationUpdated.getVerificationId()))).getBillingProfileId();
-                        };
-
-
-        refreshRewardsUsdEquivalentOf(billingProfileId);
-        notificationPort.notify(billingProfileVerificationUpdated);
-        if (billingProfileVerificationUpdated.failed()) {
-            final ShortContributorView owner = billingProfileStoragePort.getBillingProfileOwnerById(billingProfileVerificationUpdated.getUserId())
+    public void onBillingProfileUpdated(BillingProfileVerificationUpdated event) {
+        refreshRewardsUsdEquivalentOf(event.getBillingProfileId());
+        notificationPort.notify(event);
+        if (event.failed()) {
+            final ShortContributorView owner = billingProfileStoragePort.getBillingProfileOwnerById(event.getUserId())
                     .orElseThrow(() -> internalServerError(("Owner %s not found for billing profile %s")
-                            .formatted(billingProfileVerificationUpdated.getUserId().value(), billingProfileId.value())));
+                            .formatted(event.getUserId().value(), event.getBillingProfileId().value())));
             if (nonNull(owner.email())) {
-                accountingMailObserver.notify(new BillingProfileVerificationFailed(owner.email(), owner.userId(), billingProfileId, owner.login(),
-                        billingProfileVerificationUpdated.getVerificationStatus()));
+                accountingMailObserver.notify(new BillingProfileVerificationFailed(owner.email(), owner.userId(), event.getBillingProfileId(), owner.login(),
+                        event.getVerificationStatus()));
             } else {
-                LOGGER.warn("Unable to send billing profile verifcation failed mail to user %s".formatted(billingProfileVerificationUpdated.getUserId()));
+                LOGGER.warn("Unable to send billing profile verifcation failed mail to user %s".formatted(event.getUserId()));
             }
         }
     }
