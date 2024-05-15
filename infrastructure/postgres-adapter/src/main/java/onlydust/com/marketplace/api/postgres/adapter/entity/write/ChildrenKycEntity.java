@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import jakarta.persistence.*;
 import lombok.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -25,7 +26,7 @@ public class ChildrenKycEntity {
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "verification_status")
-    VerificationStatusEntity verificationStatus;
+    VerificationStatus verificationStatus;
     @CreationTimestamp
     @Column(name = "tech_created_at", nullable = false, updatable = false)
     @EqualsAndHashCode.Exclude

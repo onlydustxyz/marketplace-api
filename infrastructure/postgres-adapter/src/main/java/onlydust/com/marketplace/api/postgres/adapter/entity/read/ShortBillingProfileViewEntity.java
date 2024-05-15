@@ -3,9 +3,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import jakarta.persistence.*;
 import lombok.Data;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileUserEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.Where;
@@ -34,12 +33,12 @@ public class ShortBillingProfileViewEntity {
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "billing_profile_role")
-    BillingProfileUserEntity.Role role;
+    BillingProfile.User.Role role;
 
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "verification_status")
-    VerificationStatusEntity verificationStatus;
+    VerificationStatus verificationStatus;
 
     String name;
     Date invoiceMandateAcceptedAt;
@@ -70,8 +69,8 @@ public class ShortBillingProfileViewEntity {
         return ShortBillingProfileView.builder()
                 .id(BillingProfile.Id.of(this.id))
                 .type(this.type)
-                .role(this.role.toDomain())
-                .verificationStatus(this.verificationStatus.toDomain())
+                .role(this.role)
+                .verificationStatus(this.verificationStatus)
                 .name(this.name)
                 .enabled(this.enabled)
                 .pendingInvitationResponse(this.pendingInvitation)

@@ -2,10 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import jakarta.persistence.*;
 import lombok.*;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileStatsViewEntity;
 import org.hibernate.annotations.CreationTimestamp;
@@ -44,7 +41,7 @@ public class BillingProfileEntity {
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "verification_status")
-    VerificationStatusEntity verificationStatus;
+    VerificationStatus verificationStatus;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "billingProfileId")
     Set<BillingProfileUserEntity> users;
@@ -86,12 +83,12 @@ public class BillingProfileEntity {
         return BillingProfileEntity.builder()
                 .id(billingProfile.id().value())
                 .name(billingProfile.name())
-                .verificationStatus(VerificationStatusEntity.fromDomain(billingProfile.status()))
+                .verificationStatus(billingProfile.status())
                 .type(billingProfile.type())
                 .users(isNull(ownerId) ? Set.of() : Set.of(BillingProfileUserEntity.builder()
                         .billingProfileId(billingProfile.id().value())
                         .userId(ownerId.value())
-                        .role(BillingProfileUserEntity.Role.ADMIN)
+                        .role(BillingProfile.User.Role.ADMIN)
                         .joinedAt(Date.from(ownerJoinedAt.toInstant()))
                         .build())
                 )
@@ -104,26 +101,26 @@ public class BillingProfileEntity {
             case COMPANY -> CompanyBillingProfile.builder()
                     .id(BillingProfile.Id.of(id))
                     .name(name)
-                    .status(verificationStatus.toDomain())
+                    .status(verificationStatus)
                     .enabled(enabled)
                     .kyb(kyb.toDomain())
-                    .members(users.stream().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role.toDomain())).collect(toSet()))
+                    .members(users.stream().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role)).collect(toSet()))
                     .build();
             case SELF_EMPLOYED -> SelfEmployedBillingProfile.builder()
                     .id(BillingProfile.Id.of(id))
                     .name(name)
-                    .status(verificationStatus.toDomain())
+                    .status(verificationStatus)
                     .enabled(enabled)
                     .kyb(kyb.toDomain())
-                    .owner(users.stream().findFirst().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role.toDomain())).orElseThrow())
+                    .owner(users.stream().findFirst().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role)).orElseThrow())
                     .build();
             case INDIVIDUAL -> IndividualBillingProfile.builder()
                     .id(BillingProfile.Id.of(id))
                     .name(name)
-                    .status(verificationStatus.toDomain())
+                    .status(verificationStatus)
                     .enabled(enabled)
                     .kyc(kyc.toDomain())
-                    .owner(users.stream().findFirst().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role.toDomain())).orElseThrow())
+                    .owner(users.stream().findFirst().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role)).orElseThrow())
                     .build();
         };
     }

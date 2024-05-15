@@ -10,12 +10,12 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.bootstrap.helper.AccountingHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
@@ -79,12 +79,12 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
         billingProfileService.updatePayoutInfo(olivierBillingProfile.id(), this.olivier,
                 PayoutInfo.builder().ethWallet(new WalletLocator(new Name(this.olivier + ".eth")))
                         .bankAccount(new BankAccount("BIC", "FR76000111222333334444")).build());
-        accountingHelper.patchBillingProfile(olivierBillingProfile.id().value(), null, VerificationStatusEntity.VERIFIED);
+        accountingHelper.patchBillingProfile(olivierBillingProfile.id().value(), null, VerificationStatus.VERIFIED);
 
         anthonyBillingProfile = billingProfileService.getBillingProfilesForUser(this.anthony).get(0);
         billingProfileService.updatePayoutInfo(anthonyBillingProfile.getId(), this.anthony,
                 PayoutInfo.builder().ethWallet(new WalletLocator(new Name(this.anthony + ".eth"))).build());
-        accountingHelper.patchBillingProfile(anthonyBillingProfile.getId().value(), null, VerificationStatusEntity.VERIFIED);
+        accountingHelper.patchBillingProfile(anthonyBillingProfile.getId().value(), null, VerificationStatus.VERIFIED);
 
         kybRepository.findByBillingProfileId(olivierBillingProfile.id().value())
                 .map(kyb -> kybRepository.saveAndFlush(kyb.toBuilder()
@@ -96,7 +96,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                         .registrationNumber("123456789")
                         .usEntity(false)
                         .subjectToEuVAT(true)
-                        .verificationStatus(VerificationStatusEntity.VERIFIED).build()))
+                        .verificationStatus(VerificationStatus.VERIFIED).build()))
                 .orElseThrow();
         kycRepository.findByBillingProfileId(anthonyBillingProfile.getId().value())
                 .map(kyb -> kycRepository.saveAndFlush(kyb.toBuilder()
@@ -107,7 +107,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                         .consideredUsPersonQuestionnaire(false)
                         .idDocumentCountryCode("FRA")
                         .usCitizen(false)
-                        .verificationStatus(VerificationStatusEntity.VERIFIED).build()))
+                        .verificationStatus(VerificationStatus.VERIFIED).build()))
                 .orElseThrow();
 
         updatePayoutPreferences(595505L, olivierBillingProfile.id(), UUID.fromString("e41f44a2-464c-4c96-817f-81acb06b2523"));

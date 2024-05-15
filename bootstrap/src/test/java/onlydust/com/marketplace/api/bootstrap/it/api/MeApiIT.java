@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
@@ -14,7 +15,6 @@ import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.RewardItemRequest;
 import onlydust.com.marketplace.api.contract.model.RewardRequest;
 import onlydust.com.marketplace.api.contract.model.RewardType;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
@@ -540,7 +540,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                         """);
 
         // When the user gets his BP verification blocked
-        accountingHelper.patchBillingProfile(individualBillingProfile.id().value(), null, VerificationStatusEntity.CLOSED);
+        accountingHelper.patchBillingProfile(individualBillingProfile.id().value(), null, VerificationStatus.CLOSED);
         client.get()
                 .uri(ME_GET)
                 .header("Authorization", "Bearer " + authenticatedUser.jwt())
@@ -556,7 +556,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                         """);
 
         // When the user gets his BP verified
-        accountingHelper.patchBillingProfile(individualBillingProfile.id().value(), null, VerificationStatusEntity.VERIFIED);
+        accountingHelper.patchBillingProfile(individualBillingProfile.id().value(), null, VerificationStatus.VERIFIED);
         client.get()
                 .uri(ME_GET)
                 .header("Authorization", "Bearer " + authenticatedUser.jwt())

@@ -5,10 +5,10 @@ import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
@@ -93,7 +93,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
 
         final var billingProfile = billingProfileService.getBillingProfilesForUser(UserId.of(userId)).stream().findFirst().orElseThrow();
         final BillingProfile.Id billingProfileId = billingProfile.getId();
-        accountingHelper.patchBillingProfile(billingProfileId.value(), null, VerificationStatusEntity.VERIFIED);
+        accountingHelper.patchBillingProfile(billingProfileId.value(), null, VerificationStatus.VERIFIED);
         kybRepository.findByBillingProfileId(billingProfileId.value())
                 .ifPresent(kyb -> kybRepository.save(kyb.toBuilder()
                         .country("FRA")
@@ -104,7 +104,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
                         .registrationNumber("123456789")
                         .usEntity(false)
                         .subjectToEuVAT(true)
-                        .verificationStatus(VerificationStatusEntity.VERIFIED).build()));
+                        .verificationStatus(VerificationStatus.VERIFIED).build()));
         billingProfileService.updatePayoutInfo(billingProfileId, UserId.of(userId),
                 PayoutInfo.builder().ethWallet(new WalletLocator(new Name("foobar.eth")))
                         .bankAccount(new BankAccount("BIC", "FR76000111222333334444")).build());

@@ -45,7 +45,7 @@ public class BillingProfileUserEntity {
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "billing_profile_role")
-    Role role;
+    BillingProfile.User.Role role;
 
     Date joinedAt;
 
@@ -75,24 +75,6 @@ public class BillingProfileUserEntity {
                     case MEMBER -> BillingProfileLinkView.Role.MEMBER;
                 })
                 .build();
-    }
-
-    public enum Role {
-        ADMIN, MEMBER;
-
-        public static Role fromDomain(final BillingProfile.User.Role role) {
-            return switch (role) {
-                case ADMIN -> Role.ADMIN;
-                case MEMBER -> Role.MEMBER;
-            };
-        }
-
-        public BillingProfile.User.Role toDomain() {
-            return switch (this) {
-                case ADMIN -> BillingProfile.User.Role.ADMIN;
-                case MEMBER -> BillingProfile.User.Role.MEMBER;
-            };
-        }
     }
 
     @EqualsAndHashCode

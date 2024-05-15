@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
         final UUID rewardId = UUID.fromString("85f8358c-5339-42ac-a577-16d7760d1e28");
 
         final var billingProfile = billingProfileRepository.findById(UUID.fromString("20282367-56b0-42d3-81d3-5e4b38f67e3e")).orElseThrow();
-        accountingHelper.patchBillingProfile(billingProfile.getId(), null, VerificationStatusEntity.VERIFIED);
+        accountingHelper.patchBillingProfile(billingProfile.getId(), null, VerificationStatus.VERIFIED);
         billingProfileRepository.save(billingProfile);
 
         // When
