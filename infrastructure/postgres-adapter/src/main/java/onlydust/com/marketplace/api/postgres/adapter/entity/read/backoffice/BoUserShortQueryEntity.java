@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
+package onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -20,7 +20,7 @@ import java.util.UUID;
 @Data
 @Entity
 @Immutable
-public class BoUserShortViewEntity {
+public class BoUserShortQueryEntity {
     @Id
     UUID id;
     Long githubUserId;

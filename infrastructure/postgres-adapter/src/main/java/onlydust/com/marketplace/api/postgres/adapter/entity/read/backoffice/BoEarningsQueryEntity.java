@@ -1,10 +1,10 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
+package onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice;
 
 import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.view.EarningsView;
 import onlydust.com.marketplace.accounting.domain.view.TotalMoneyView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.CurrencyViewEntity;
 import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
@@ -16,7 +16,7 @@ import java.util.UUID;
 @Data
 @Entity
 @Immutable
-public class BoEarningsViewEntity {
+public class BoEarningsQueryEntity {
     @Id
     @NonNull
     @Column(name = "currency_id")
@@ -27,7 +27,7 @@ public class BoEarningsViewEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "currency_id", insertable = false, updatable = false)
-    CurrencyEntity currency;
+    CurrencyViewEntity currency;
 
     public EarningsView.EarningsPerCurrency toDomain() {
         return new EarningsView.EarningsPerCurrency(new TotalMoneyView(totalAmount, currency.toView(), totalDollarsEquivalent), rewardCount);

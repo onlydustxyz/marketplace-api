@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserViewQueryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserQueryEntity;
 import org.intellij.lang.annotations.Language;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface BillingProfileUserViewRepository extends JpaRepository<BillingProfileUserViewQueryEntity, BillingProfileUserViewQueryEntity.PrimaryKey> {
+public interface BillingProfileUserViewRepository extends JpaRepository<BillingProfileUserQueryEntity, BillingProfileUserQueryEntity.PrimaryKey> {
 
 
     @Language("PostgreSQL")
@@ -86,20 +86,20 @@ public interface BillingProfileUserViewRepository extends JpaRepository<BillingP
                      where coalesce(bpu.billing_profile_id, bpui.billing_profile_id) = :billingProfileId and
                         (coalesce(:roles) is null or cast(coalesce(bpu.role, bpui.role) as text) in (:roles))
                     """, nativeQuery = true)
-    Page<BillingProfileUserViewQueryEntity> findByBillingProfileId(UUID billingProfileId, List<String> roles, Pageable pageable);
+    Page<BillingProfileUserQueryEntity> findByBillingProfileId(UUID billingProfileId, List<String> roles, Pageable pageable);
 
     @Query(value = SELECT_INVITED_COWORKER +
             " WHERE bpui.billing_profile_id = :billingProfileId AND bpui.github_user_id = :githubUserId and bpui.accepted = false", nativeQuery = true)
-    Optional<BillingProfileUserViewQueryEntity> findInvitedUserByBillingProfileIdAndGithubId(UUID billingProfileId, Long githubUserId);
+    Optional<BillingProfileUserQueryEntity> findInvitedUserByBillingProfileIdAndGithubId(UUID billingProfileId, Long githubUserId);
 
     @Query(value = SELECT_COWORKER +
             " WHERE bpu.billing_profile_id = :billingProfileId AND u.github_user_id = :githubUserId " +
             " UNION " +
             SELECT_INVITED_COWORKER +
             " WHERE bpui.billing_profile_id = :billingProfileId AND bpui.github_user_id = :githubUserId and bpui.accepted = false", nativeQuery = true)
-    Optional<BillingProfileUserViewQueryEntity> findUserByBillingProfileIdAndGithubId(UUID billingProfileId, Long githubUserId);
+    Optional<BillingProfileUserQueryEntity> findUserByBillingProfileIdAndGithubId(UUID billingProfileId, Long githubUserId);
 
     @Query(value = SELECT_COWORKER +
             " WHERE u.id = :userId AND bpu.billing_profile_id = :billingProfileId AND bpu.role = 'ADMIN' ", nativeQuery = true)
-    Optional<BillingProfileUserViewQueryEntity> findBillingProfileAdminById(UUID userId, UUID billingProfileId);
+    Optional<BillingProfileUserQueryEntity> findBillingProfileAdminById(UUID userId, UUID billingProfileId);
 }

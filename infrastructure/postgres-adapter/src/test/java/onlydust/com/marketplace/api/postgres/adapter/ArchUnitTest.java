@@ -28,6 +28,10 @@ public class ArchUnitTest {
         final var readEntitiesAreImmutable = readEntityClasses()
                 .should().beAnnotatedWith(Immutable.class);
 
+        final var viewEntitiesAreLinkedToTables = readEntityClasses()
+                .and().haveSimpleNameEndingWith("ViewEntity")
+                .should().beAnnotatedWith(Table.class);
+
         final var queryEntitiesAreNotLinkedToTables = noQueryEntityClasses()
                 .should().beAnnotatedWith(Table.class)
                 .orShould().beAnnotatedWith(org.hibernate.annotations.Table.class);
@@ -48,6 +52,7 @@ public class ArchUnitTest {
         readWritePackagesRule.check(jc);
         readEntityNaming.check(jc);
         readEntitiesAreImmutable.check(jc);
+        viewEntitiesAreLinkedToTables.check(jc);
         writeEntityNaming.check(jc);
         queryEntitiesAreNotLinkedToTables.check(jc);
         queryEntitiesAreNotUsedInRelationships.check(jc);

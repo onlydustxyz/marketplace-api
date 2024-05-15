@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoEarningsViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoEarningsQueryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-public interface BackofficeEarningsViewRepository extends JpaRepository<BoEarningsViewEntity, Integer> {
+public interface BackofficeEarningsViewRepository extends JpaRepository<BoEarningsQueryEntity, Integer> {
 
     @Query(value = """
             SELECT  r.currency_id as currency_id,
@@ -29,11 +29,11 @@ public interface BackofficeEarningsViewRepository extends JpaRepository<BoEarnin
               AND (coalesce(:toProcessedAt)   is null or rsd.paid_at <= cast(cast(:toProcessedAt   as text) as timestamp))
             GROUP BY r.currency_id
             """, nativeQuery = true)
-    List<BoEarningsViewEntity> getEarnings(@NonNull List<String> statuses,
-                                           @NonNull List<Long> recipientIds,
-                                           @NonNull List<UUID> billingProfileIds,
-                                           @NonNull List<UUID> projectIds,
-                                           Date fromRequestedAt, Date toRequestedAt,
-                                           Date fromProcessedAt, Date toProcessedAt);
+    List<BoEarningsQueryEntity> getEarnings(@NonNull List<String> statuses,
+                                            @NonNull List<Long> recipientIds,
+                                            @NonNull List<UUID> billingProfileIds,
+                                            @NonNull List<UUID> projectIds,
+                                            Date fromRequestedAt, Date toRequestedAt,
+                                            Date fromProcessedAt, Date toProcessedAt);
 
 }
