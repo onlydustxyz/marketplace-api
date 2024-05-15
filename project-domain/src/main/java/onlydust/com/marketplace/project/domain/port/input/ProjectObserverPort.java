@@ -11,4 +11,6 @@ public interface ProjectObserverPort {
     void onUserApplied(UUID projectId, UUID userId, UUID applicationId);
 
     void onProjectCreated(UUID projectId, UUID projectLeadId);
+
+    void onProjectCategorySuggested(String categoryName, UUID userId);
 }

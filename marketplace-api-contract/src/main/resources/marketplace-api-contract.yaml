@@ -2254,6 +2254,29 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/projects/categories/suggest:
+    post:
+      security:
+        - apiKey: [ ]
+      tags:
+        - Projects
+      summary: Suggest project category
+      operationId: suggestProjectCategory
+      description: |
+        Project lead can suggest a new project category.
+      requestBody:
+        description: 'Project category'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuggestProjectCategoryRequest'
+      responses:
+        "204":
+          description: 'Category suggested'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
   /api/v1/events/on-contributions-change:
     post:
@@ -6762,3 +6785,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/HackathonsTrackResponse'
+    SuggestProjectCategoryRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string

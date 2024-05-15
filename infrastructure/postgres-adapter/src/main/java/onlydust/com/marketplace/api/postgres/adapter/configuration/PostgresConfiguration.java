@@ -59,7 +59,8 @@ public class PostgresConfiguration {
                                                  final ApplicationRepository applicationRepository,
                                                  final ContributionViewEntityRepository contributionViewEntityRepository,
                                                  final HiddenContributorRepository hiddenContributorRepository,
-                                                 final ProjectTagRepository projectTagRepository) {
+                                                 final ProjectTagRepository projectTagRepository,
+                                                 final ProjectCategoryRepository projectCategoryRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -78,7 +79,8 @@ public class PostgresConfiguration {
                 applicationRepository,
                 contributionViewEntityRepository,
                 hiddenContributorRepository,
-                projectTagRepository
+                projectTagRepository,
+                projectCategoryRepository
         );
     }
 
@@ -100,7 +102,8 @@ public class PostgresConfiguration {
                                                            final ApplicationRepository applicationRepository,
                                                            final ContributionViewEntityRepository contributionViewEntityRepository,
                                                            final HiddenContributorRepository hiddenContributorRepository,
-                                                           final ProjectTagRepository projectTagRepository) {
+                                                           final ProjectTagRepository projectTagRepository,
+                                                           final ProjectCategoryRepository projectCategoryRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -119,7 +122,8 @@ public class PostgresConfiguration {
                 applicationRepository,
                 contributionViewEntityRepository,
                 hiddenContributorRepository,
-                projectTagRepository
+                projectTagRepository,
+                projectCategoryRepository
         );
     }
 
@@ -373,7 +377,8 @@ public class PostgresConfiguration {
                                                                            final PayoutPreferenceViewRepository payoutPreferenceViewRepository,
                                                                            final RewardRepository rewardRepository,
                                                                            final ShortBillingProfileViewRepository shortBillingProfileViewRepository) {
-        return new PostgresPayoutPreferenceAdapter(payoutPreferenceRepository, payoutPreferenceViewRepository, rewardRepository, shortBillingProfileViewRepository);
+        return new PostgresPayoutPreferenceAdapter(payoutPreferenceRepository, payoutPreferenceViewRepository, rewardRepository,
+                shortBillingProfileViewRepository);
     }
 
     @Bean

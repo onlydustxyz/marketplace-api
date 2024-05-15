@@ -504,4 +504,11 @@ public class ProjectsRestApi implements ProjectsApi {
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response)
                 : ResponseEntity.ok(response);
     }
+
+    @Override
+    public ResponseEntity<Void> suggestProjectCategory(SuggestProjectCategoryRequest suggestProjectCategoryRequest) {
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        projectFacadePort.suggestCategory(suggestProjectCategoryRequest.getName(), authenticatedUser.getId());
+        return ResponseEntity.noContent().build();
+    }
 }

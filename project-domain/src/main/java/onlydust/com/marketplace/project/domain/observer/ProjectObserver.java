@@ -3,6 +3,8 @@ package onlydust.com.marketplace.project.domain.observer;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
+import onlydust.com.marketplace.project.domain.model.ProjectCategory;
+import onlydust.com.marketplace.project.domain.model.notification.ProjectCategorySuggestion;
 import onlydust.com.marketplace.project.domain.model.notification.ProjectCreated;
 import onlydust.com.marketplace.project.domain.model.notification.ProjectLinkedReposChanged;
 import onlydust.com.marketplace.project.domain.model.notification.UserAppliedOnProject;
@@ -38,5 +40,10 @@ public class ProjectObserver implements ProjectObserverPort {
     @Override
     public void onProjectCreated(UUID projectId, UUID projectLeadId) {
         notificationPort.notify(new ProjectCreated(projectId, projectLeadId));
+    }
+
+    @Override
+    public void onProjectCategorySuggested(String categoryName, UUID userId) {
+        notificationPort.notify(new ProjectCategorySuggestion(categoryName, userId));
     }
 }
