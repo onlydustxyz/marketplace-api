@@ -3,21 +3,21 @@ package onlydust.com.marketplace.api.posthog.adapters;
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.kernel.model.Event;
-import onlydust.com.marketplace.project.domain.model.notification.UserSignedUp;
-import onlydust.com.marketplace.kernel.port.output.WebhookPort;
 import onlydust.com.marketplace.api.posthog.client.PosthogHttpClient;
 import onlydust.com.marketplace.api.posthog.dto.EventDTO;
 import onlydust.com.marketplace.api.posthog.properties.PosthogProperties;
+import onlydust.com.marketplace.kernel.model.Event;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
+import onlydust.com.marketplace.project.domain.model.notification.UserSignedUp;
 
 @AllArgsConstructor
 @Slf4j
-public class PosthogApiClientAdapter implements WebhookPort {
+public class PosthogApiClientAdapter implements NotificationPort {
     PosthogProperties posthogProperties;
     PosthogHttpClient posthogHttpClient;
 
     @Override
-    public void send(Event event) {
+    public void notify(Event event) {
         if (event instanceof UserSignedUp userSignedUp) {
             posthogHttpClient.send("/capture/", HttpMethod.POST,
                     EventDTO.builder()

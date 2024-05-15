@@ -17,11 +17,11 @@ import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresRewardAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
+import onlydust.com.marketplace.kernel.jobs.NotificationOutboxConsumer;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.port.output.*;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.IndexerApiOutboxConsumer;
-import onlydust.com.marketplace.project.domain.job.WebhookNotificationOutboxConsumer;
 import onlydust.com.marketplace.project.domain.observer.ContributionObserver;
 import onlydust.com.marketplace.project.domain.observer.HackathonObserver;
 import onlydust.com.marketplace.project.domain.observer.ProjectObserver;
@@ -163,13 +163,8 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public OutboxConsumer webhookNotificationOutboxConsumer(final WebhookPort webhookNotificationPort) {
-        return new WebhookNotificationOutboxConsumer(webhookNotificationPort);
-    }
-
-    @Bean
-    public OutboxConsumer webhookTrackingOutboxConsumer(final WebhookPort webhookTrackingPort) {
-        return new WebhookNotificationOutboxConsumer(webhookTrackingPort);
+    public OutboxConsumer webhookTrackingOutboxConsumer(final NotificationPort webhookTrackingPort) {
+        return new NotificationOutboxConsumer(webhookTrackingPort);
     }
 
     @Bean
