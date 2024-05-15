@@ -71,7 +71,7 @@ public class PostgresUserAdapter implements UserStoragePort {
 
     private User getUserDetails(@NotNull UserViewEntity user) {
         final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(user.id()).stream()
-                .sorted(Comparator.comparing(ProjectLedIdViewEntity::getProjectSlug))
+                .sorted(Comparator.comparing(ProjectLedIdQueryEntity::getProjectSlug))
                 .toList();
         final var applications = applicationRepository.findAllByApplicantId(user.id());
         final var billingProfiles = billingProfileUserRepository.findByUserId(user.id()).stream()
@@ -115,7 +115,7 @@ public class PostgresUserAdapter implements UserStoragePort {
 
     private UserProfileView addProjectsStats(UserProfileView userProfileView) {
         final var projectsStats = customUserRepository.getProjectsStatsForUser(userProfileView.getGithubId());
-        for (ProjectStatsForUserViewEntity stats : projectsStats) {
+        for (ProjectStatsForUserQueryEntity stats : projectsStats) {
             userProfileView.addProjectStats(UserProfileView.ProjectStats.builder()
                     .id(stats.getId())
                     .slug(stats.getSlug())
@@ -232,7 +232,7 @@ public class PostgresUserAdapter implements UserStoragePort {
 
         return UserRewardsPageView.builder()
                 .rewards(Page.<UserRewardView>builder()
-                        .content(page.getContent().stream().map(RewardDetailsViewEntity::toUserReward).toList())
+                        .content(page.getContent().stream().map(RewardDetailsQueryEntity::toUserReward).toList())
                         .totalItemNumber((int) page.getTotalElements())
                         .totalPageNumber(page.getTotalPages())
                         .build())
@@ -244,10 +244,10 @@ public class PostgresUserAdapter implements UserStoragePort {
                                         .dollarsEquivalentValue(stats.getPendingUsdAmount())))
                         .toList())
                 .pendingRequestCount(rewardsStats.size() == 1 ? rewardsStats.get(0).getPendingRequestCount() :
-                        rewardsStats.stream().map(RewardStatsViewEntity::getPendingRequestCount).filter(Objects::nonNull).reduce(0, Integer::sum))
-                .receivedRewardsCount(rewardsStats.stream().map(RewardStatsViewEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
-                .rewardedContributionsCount(rewardsStats.stream().map(RewardStatsViewEntity::getRewardItemIds).flatMap(Collection::stream).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
-                .rewardingProjectsCount(rewardsStats.stream().map(RewardStatsViewEntity::getProjectIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
+                        rewardsStats.stream().map(RewardStatsQueryEntity::getPendingRequestCount).filter(Objects::nonNull).reduce(0, Integer::sum))
+                .receivedRewardsCount(rewardsStats.stream().map(RewardStatsQueryEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
+                .rewardedContributionsCount(rewardsStats.stream().map(RewardStatsQueryEntity::getRewardItemIds).flatMap(Collection::stream).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
+                .rewardingProjectsCount(rewardsStats.stream().map(RewardStatsQueryEntity::getProjectIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .build();
     }
 
@@ -279,7 +279,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Transactional(readOnly = true)
     public List<Contributor> searchContributorsByLogin(Set<Long> reposIds, String login,
                                                        int maxContributorCountToReturn) {
-        List<ContributorViewEntity> contributors;
+        List<ContributorQueryEntity> contributors;
         if (reposIds == null || reposIds.isEmpty()) {
             contributors = customContributorRepository.findAllContributorsByLogin(login, maxContributorCountToReturn);
         } else {

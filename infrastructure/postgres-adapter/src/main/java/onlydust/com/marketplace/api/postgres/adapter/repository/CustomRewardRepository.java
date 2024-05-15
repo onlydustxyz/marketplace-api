@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardItemDetailsViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardItemDetailsQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
 
 import java.util.List;
@@ -108,8 +108,8 @@ public class CustomRewardRepository {
         return ((Number) query.getSingleResult()).intValue();
     }
 
-    public List<RewardItemDetailsViewEntity> findRewardItemsByRewardId(UUID rewardId, int pageIndex, int pageSize) {
-        return entityManager.createNativeQuery(FIND_REWARD_ITEMS, RewardItemDetailsViewEntity.class)
+    public List<RewardItemDetailsQueryEntity> findRewardItemsByRewardId(UUID rewardId, int pageIndex, int pageSize) {
+        return entityManager.createNativeQuery(FIND_REWARD_ITEMS, RewardItemDetailsQueryEntity.class)
                 .setParameter("rewardId", rewardId)
                 .setParameter("offset", PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex))
                 .setParameter("limit", PaginationMapper.getPostgresLimitFromPagination(pageSize, pageIndex))

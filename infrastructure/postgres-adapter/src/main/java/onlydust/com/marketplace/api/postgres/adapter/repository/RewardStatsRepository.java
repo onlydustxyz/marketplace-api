@@ -1,13 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardStatsViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardStatsQueryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface RewardStatsRepository extends JpaRepository<RewardStatsViewEntity, UUID> {
+public interface RewardStatsRepository extends JpaRepository<RewardStatsQueryEntity, UUID> {
     @Query(value = """
             WITH reward_item_ids AS (SELECT ri.reward_id, JSONB_AGG(DISTINCT ri.id) as ids
                                      FROM reward_items ri
@@ -46,6 +46,6 @@ public interface RewardStatsRepository extends JpaRepository<RewardStatsViewEnti
               AND (:toDate IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
             GROUP BY r.currency_id
             """, nativeQuery = true)
-    List<RewardStatsViewEntity> findByUser(Long contributorId, List<UUID> currencyIds, List<UUID> projectIds, List<UUID> administratedBillingProfileIds,
-                                           String fromDate, String toDate);
+    List<RewardStatsQueryEntity> findByUser(Long contributorId, List<UUID> currencyIds, List<UUID> projectIds, List<UUID> administratedBillingProfileIds,
+                                            String fromDate, String toDate);
 }

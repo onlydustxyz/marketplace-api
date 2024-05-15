@@ -316,7 +316,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                             },
                             {
                               "type": "REFUND",
-                              "network": "ETHEREUM",
+                              "network": null,
                               "lockedUntil": null,
                               "project": {
                                 "name": "Bretzel",
@@ -337,7 +337,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                             },
                             {
                               "type": "TRANSFER",
-                              "network": "ETHEREUM",
+                              "network": null,
                               "lockedUntil": null,
                               "project": {
                                 "name": "Bretzel",
@@ -795,7 +795,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                           "transactions": [
                             {
                               "type": "TRANSFER",
-                              "network": "ETHEREUM",
+                              "network": null,
                               "lockedUntil": null,
                               "project": {
                                 "name": "kaaper",
@@ -1052,7 +1052,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                           "transactions": [
                             {
                               "type": "TRANSFER",
-                              "network": "STARKNET",
+                              "network": null,
                               "lockedUntil": null,
                               "project": {
                                 "name": "kaaper",
@@ -1265,7 +1265,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                           "transactions": [
                             {
                               "type": "TRANSFER",
-                              "network": "APTOS",
+                              "network": null,
                               "lockedUntil": null,
                               "project": {
                                 "name": "kaaper",

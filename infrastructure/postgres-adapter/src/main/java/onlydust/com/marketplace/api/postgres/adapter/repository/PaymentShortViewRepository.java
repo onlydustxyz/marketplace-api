@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.PaymentShortViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.PaymentShortQueryEntity;
 import org.intellij.lang.annotations.Language;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public interface PaymentShortViewRepository extends JpaRepository<PaymentShortViewEntity, UUID> {
+public interface PaymentShortViewRepository extends JpaRepository<PaymentShortQueryEntity, UUID> {
 
     @Language("PostgreSQL")
     String SELECT = """
@@ -61,10 +61,10 @@ public interface PaymentShortViewRepository extends JpaRepository<PaymentShortVi
     @Query(value = SELECT + """
             WHERE coalesce(:statuses) IS NULL OR cast(bp.status as text) IN (:statuses)
             """ + GROUP_BY, nativeQuery = true)
-    Page<PaymentShortViewEntity> findByStatuses(Set<String> statuses, Pageable pageable);
+    Page<PaymentShortQueryEntity> findByStatuses(Set<String> statuses, Pageable pageable);
 
     @Query(value = SELECT + """
             WHERE coalesce(:ids) IS NULL OR bp.id IN (:ids)
             """ + GROUP_BY, nativeQuery = true)
-    List<PaymentShortViewEntity> findByIds(Set<UUID> ids);
+    List<PaymentShortQueryEntity> findByIds(Set<UUID> ids);
 }

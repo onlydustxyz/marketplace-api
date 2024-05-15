@@ -1,13 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionRewardViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionRewardQueryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface ContributionRewardViewEntityRepository extends JpaRepository<ContributionRewardViewEntity, UUID> {
+public interface ContributionRewardViewEntityRepository extends JpaRepository<ContributionRewardQueryEntity, UUID> {
 
     @Query(value = """
             SELECT r.id                                                AS id,
@@ -31,5 +31,5 @@ public interface ContributionRewardViewEntityRepository extends JpaRepository<Co
             WHERE c.id = :contributionId
               AND r.project_id = :projectId
              """, nativeQuery = true)
-    List<ContributionRewardViewEntity> listByContributionId(UUID projectId, String contributionId);
+    List<ContributionRewardQueryEntity> listByContributionId(UUID projectId, String contributionId);
 }

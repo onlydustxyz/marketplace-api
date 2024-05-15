@@ -3,15 +3,14 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import io.hypersistence.utils.hibernate.type.array.EnumArrayType;
 import io.hypersistence.utils.hibernate.type.array.internal.AbstractArrayType;
+import jakarta.persistence.Table;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Parameter;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
@@ -29,6 +28,7 @@ import java.util.UUID;
 @Table(name = "users", schema = "iam")
 @EntityListeners(AuditingEntityListener.class)
 @Accessors(fluent = true)
+@Immutable
 public class UserViewEntity implements Serializable {
     @Id
     @Column(name = "id", nullable = false)

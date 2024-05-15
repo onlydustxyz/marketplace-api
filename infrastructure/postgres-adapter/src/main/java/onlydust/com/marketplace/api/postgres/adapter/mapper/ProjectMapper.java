@@ -21,9 +21,9 @@ import static java.util.Objects.nonNull;
 public interface ProjectMapper {
 
     static ProjectDetailsView mapToProjectDetailsView(ProjectViewEntity projectEntity,
-                                                      List<ContributorViewEntity> topContributors,
+                                                      List<ContributorQueryEntity> topContributors,
                                                       Integer contributorCount,
-                                                      List<ProjectLeadViewEntity> leaders,
+                                                      List<ProjectLeadQueryEntity> leaders,
                                                       List<EcosystemEntity> ecosystems,
                                                       final Boolean hasRemainingBudget,
                                                       ProjectDetailsView.Me me) {
@@ -96,7 +96,7 @@ public interface ProjectMapper {
         return project;
     }
 
-    static Project mapShortProjectViewToProject(ShortProjectViewEntity project) {
+    static Project mapShortProjectViewToProject(ShortProjectQueryEntity project) {
         return Project.builder()
                 .id(project.getId())
                 .slug(project.getSlug())

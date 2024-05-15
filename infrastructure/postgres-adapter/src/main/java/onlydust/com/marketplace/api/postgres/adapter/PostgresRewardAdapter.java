@@ -11,8 +11,8 @@ import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStora
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BackofficeRewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoEarningsViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.PaymentShortViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortRewardViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.PaymentShortQueryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortRewardQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentRewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NodeGuardianBoostRewardEntity;
@@ -95,7 +95,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
         final var page = paymentShortViewRepository.findByStatuses(statuses.stream().map(Enum::name).collect(Collectors.toSet()),
                 PageRequest.of(pageIndex, pageSize, Sort.by("created_at").descending()));
         return Page.<BatchPaymentShortView>builder()
-                .content(page.getContent().stream().map(PaymentShortViewEntity::toDomain).toList())
+                .content(page.getContent().stream().map(PaymentShortQueryEntity::toDomain).toList())
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())
                 .build();
@@ -105,7 +105,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     @Transactional(readOnly = true)
     public List<BatchPaymentShortView> findPaymentsByIds(Set<Payment.Id> paymentIds) {
         return paymentShortViewRepository.findByIds(paymentIds.stream().map(UuidWrapper::value).collect(Collectors.toSet()))
-                .stream().map(PaymentShortViewEntity::toDomain).toList();
+                .stream().map(PaymentShortQueryEntity::toDomain).toList();
     }
 
     @Override
@@ -197,7 +197,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
 
     @Override
     public Optional<ShortRewardDetailsView> getShortReward(RewardId rewardId) {
-        return shortRewardViewRepository.findById(rewardId.value()).map(ShortRewardViewEntity::toAccountingDomain);
+        return shortRewardViewRepository.findById(rewardId.value()).map(ShortRewardQueryEntity::toAccountingDomain);
     }
 
     @Override
@@ -220,7 +220,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     @Transactional(readOnly = true)
     public List<ShortProjectRewardView> getRewardsToBoostFromEcosystemNotLinkedToProject(UUID ecosystemId, UUID projectId) {
         return shortRewardViewRepository.findRewardsToBoosWithNodeGuardiansForEcosystemIdNotLinkedToProject(ecosystemId, projectId).stream()
-                .map(ShortRewardViewEntity::toProjectDomain).toList();
+                .map(ShortRewardQueryEntity::toProjectDomain).toList();
     }
 
     @Override

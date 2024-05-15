@@ -63,7 +63,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Transactional(readOnly = true)
     public Optional<ShortBillingProfileView> findIndividualBillingProfileForUser(UserId ownerId) {
         return shortBillingProfileViewRepository.findBillingProfilesForUserId(ownerId.value(), List.of(BillingProfile.Type.INDIVIDUAL.name()))
-                .stream().map(ShortBillingProfileViewEntity::toView).findFirst();
+                .stream().map(ShortBillingProfileQueryEntity::toView).findFirst();
     }
 
     @Override
@@ -73,7 +73,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
         final var billingProfiles = shortBillingProfileViewRepository.findBillingProfilesForUserId(userId.value(), List.of());
         final var billingProfilesInvitedOn = shortBillingProfileViewRepository.findBillingProfilesForUserIdInvited(userId.value());
         return Stream.concat(billingProfiles.stream(), billingProfilesInvitedOn.stream())
-                .map(ShortBillingProfileViewEntity::toView)
+                .map(ShortBillingProfileQueryEntity::toView)
                 .peek(bp -> bp.setInvoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate))
                 .toList();
     }
@@ -236,7 +236,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional(readOnly = true)
     public Optional<PayoutInfoView> findPayoutInfoByBillingProfile(BillingProfile.Id billingProfileId) {
-        return payoutInfoViewRepository.findByBillingProfileId(billingProfileId.value()).map(PayoutInfoViewEntity::toDomain);
+        return payoutInfoViewRepository.findByBillingProfileId(billingProfileId.value()).map(PayoutInfoQueryEntity::toDomain);
     }
 
     @Override
@@ -256,7 +256,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                 roles.stream().map(Enum::toString).toList(),
                 PageRequest.of(pageIndex, pageSize, Sort.by("user_id")));
         return Page.<BillingProfileCoworkerView>builder()
-                .content(page.getContent().stream().map(BillingProfileUserViewEntity::toView).toList())
+                .content(page.getContent().stream().map(BillingProfileUserViewQueryEntity::toView).toList())
                 .totalItemNumber(page.getNumberOfElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();
@@ -374,14 +374,14 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Transactional(readOnly = true)
     public Optional<BillingProfileCoworkerView> getInvitedCoworker(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId) {
         return billingProfileUserViewRepository.findInvitedUserByBillingProfileIdAndGithubId(billingProfileId.value(), invitedGithubUserId.value())
-                .map(BillingProfileUserViewEntity::toView);
+                .map(BillingProfileUserViewQueryEntity::toView);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<BillingProfileCoworkerView> getCoworker(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId) {
         return billingProfileUserViewRepository.findUserByBillingProfileIdAndGithubId(billingProfileId.value(), invitedGithubUserId.value())
-                .map(BillingProfileUserViewEntity::toView);
+                .map(BillingProfileUserViewQueryEntity::toView);
     }
 
     @Override
@@ -398,7 +398,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Transactional(readOnly = true)
     public Optional<BillingProfileCoworkerView> findBillingProfileAdmin(UserId userId, BillingProfile.Id billingProfileId) {
         return billingProfileUserViewRepository.findBillingProfileAdminById(userId.value(), billingProfileId.value())
-                .map(BillingProfileUserViewEntity::toView);
+                .map(BillingProfileUserViewQueryEntity::toView);
     }
 
     @Override
@@ -432,7 +432,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Transactional(readOnly = true)
     public Optional<BillingProfileUserRightsView> getUserRightsForBillingProfile(BillingProfile.Id billingProfileId, UserId userId) {
         return billingProfileUserRightsViewRepository.findForUserIdAndBillingProfileId(userId.value(), billingProfileId.value())
-                .map(BillingProfileUserRightsViewEntity::toDomain);
+                .map(BillingProfileUserRightsQueryEntity::toDomain);
     }
 
     @Override

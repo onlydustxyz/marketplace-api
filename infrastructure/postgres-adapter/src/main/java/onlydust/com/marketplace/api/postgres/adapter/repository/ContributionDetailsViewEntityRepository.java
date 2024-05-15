@@ -1,13 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionDetailsViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionDetailsQueryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ContributionDetailsViewEntityRepository extends JpaRepository<ContributionDetailsViewEntity, String> {
+public interface ContributionDetailsViewEntityRepository extends JpaRepository<ContributionDetailsQueryEntity, String> {
 
     @Query(value = """
                 SELECT 
@@ -157,5 +157,5 @@ public interface ContributionDetailsViewEntityRepository extends JpaRepository<C
                     c.id = :contributionId AND
                     p.id = :projectId
             """, nativeQuery = true)
-    Optional<ContributionDetailsViewEntity> findContributionById(UUID projectId, String contributionId);
+    Optional<ContributionDetailsQueryEntity> findContributionById(UUID projectId, String contributionId);
 }

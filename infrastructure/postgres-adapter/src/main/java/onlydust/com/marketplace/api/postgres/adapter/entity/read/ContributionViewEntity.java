@@ -32,11 +32,11 @@ public class ContributionViewEntity {
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "contribution_type")
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    Type type;
+    ContributionType type;
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "contribution_status")
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    Status status;
+    ContributionStatus status;
     Long contributorId;
     String contributorLogin;
     String contributorHtmlUrl;
@@ -69,7 +69,7 @@ public class ContributionViewEntity {
     String repoHtmlUrl;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    List<ContributionLinkViewEntity> links;
+    List<ContributionLinkJsonDto> links;
 
     @JdbcTypeCode(SqlTypes.JSON)
     List<UUID> rewardIds;
@@ -107,8 +107,8 @@ public class ContributionViewEntity {
                 .createdAt(createdAt)
                 .lastUpdatedAt(lastUpdatedAt)
                 .completedAt(completedAt)
-                .type(type.toView())
-                .status(status.toView())
+                .type(type)
+                .status(status)
                 .contributor(ContributorLinkView.builder()
                         .githubUserId(contributorId)
                         .login(contributorLogin)
@@ -123,58 +123,10 @@ public class ContributionViewEntity {
                 .githubAuthor(author)
                 .project(project)
                 .githubRepo(repo)
-                .links(Optional.ofNullable(links).orElse(List.of()).stream().map(ContributionLinkViewEntity::toView).toList())
+                .links(Optional.ofNullable(links).orElse(List.of()).stream().map(ContributionLinkJsonDto::toView).toList())
                 .rewardIds(Optional.ofNullable(rewardIds).orElse(List.of()))
                 .prReviewState(Optional.ofNullable(prReviewState).map(GithubPullRequestReviewState::toView).orElse(null))
                 .build();
-    }
-
-    public enum Type {
-        PULL_REQUEST, ISSUE, CODE_REVIEW;
-
-        public static Type fromView(ContributionType contributionType) {
-            return contributionType == null ? null : switch (contributionType) {
-                case PULL_REQUEST -> Type.PULL_REQUEST;
-                case ISSUE -> Type.ISSUE;
-                case CODE_REVIEW -> Type.CODE_REVIEW;
-            };
-        }
-
-        public static String fromViewToString(ContributionType contributionType) {
-            return Type.fromView(contributionType) != null ? Type.fromView(contributionType).name() : null;
-        }
-
-        public ContributionType toView() {
-            return switch (this) {
-                case PULL_REQUEST -> ContributionType.PULL_REQUEST;
-                case ISSUE -> ContributionType.ISSUE;
-                case CODE_REVIEW -> ContributionType.CODE_REVIEW;
-            };
-        }
-    }
-
-    public enum Status {
-        IN_PROGRESS, COMPLETED, CANCELLED;
-
-        public static Status fromView(ContributionStatus contributionStatus) {
-            return contributionStatus == null ? null : switch (contributionStatus) {
-                case IN_PROGRESS -> Status.IN_PROGRESS;
-                case COMPLETED -> Status.COMPLETED;
-                case CANCELLED -> Status.CANCELLED;
-            };
-        }
-
-        public static String fromViewToString(ContributionStatus contributionStatus) {
-            return Status.fromView(contributionStatus) != null ? Status.fromView(contributionStatus).name() : null;
-        }
-
-        public ContributionStatus toView() {
-            return switch (this) {
-                case IN_PROGRESS -> ContributionStatus.IN_PROGRESS;
-                case COMPLETED -> ContributionStatus.COMPLETED;
-                case CANCELLED -> ContributionStatus.CANCELLED;
-            };
-        }
     }
 
     @EqualsAndHashCode

@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorActivityViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorActivityQueryEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.UUID;
 
-public interface ContributorActivityViewEntityRepository extends JpaRepository<ContributorActivityViewEntity, Long> {
+public interface ContributorActivityViewEntityRepository extends JpaRepository<ContributorActivityQueryEntity, Long> {
     @Query(value = """
             WITH stats AS (SELECT c.contributor_id                 AS id,
                    c.contributor_login                             AS login,
@@ -62,5 +62,5 @@ public interface ContributorActivityViewEntityRepository extends JpaRepository<C
                         WHERE pgr.project_id = :projectId
                           AND c.status = 'COMPLETED'
                     """, nativeQuery = true)
-    Page<ContributorActivityViewEntity> findAllByProjectId(UUID projectId, String fromDate, Pageable pageable);
+    Page<ContributorActivityQueryEntity> findAllByProjectId(UUID projectId, String fromDate, Pageable pageable);
 }

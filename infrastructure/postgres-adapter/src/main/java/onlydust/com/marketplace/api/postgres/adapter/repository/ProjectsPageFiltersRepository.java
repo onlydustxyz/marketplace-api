@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectPageItemFiltersViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectPageItemFiltersQueryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.UUID;
 
-public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPageItemFiltersViewEntity, UUID> {
+public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPageItemFiltersQueryEntity, UUID> {
 
     @Query(value = """
             select t.technologies,
@@ -35,7 +35,7 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                    and gr.visibility = 'PUBLIC') > 0
               and p.visibility = 'PUBLIC'""",
             nativeQuery = true)
-    List<ProjectPageItemFiltersViewEntity> findFiltersForAnonymousUser();
+    List<ProjectPageItemFiltersQueryEntity> findFiltersForAnonymousUser();
 
     @Query(value = """
             select p.id,
@@ -90,6 +90,6 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                          coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_contributor.is_p_c, false))))
               and (coalesce(:mine) is null or case when :mine is true then (coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_pl.is_p_pl, false)) else true end)
                      """, nativeQuery = true)
-    List<ProjectPageItemFiltersViewEntity> findFiltersForUser(@Param("userId") UUID userId,
-                                                              @Param("mine") Boolean mine);
+    List<ProjectPageItemFiltersQueryEntity> findFiltersForUser(@Param("userId") UUID userId,
+                                                               @Param("mine") Boolean mine);
 }

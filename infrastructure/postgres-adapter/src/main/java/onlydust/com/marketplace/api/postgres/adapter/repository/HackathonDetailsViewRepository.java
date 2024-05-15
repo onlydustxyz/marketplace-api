@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.HackathonDetailsViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.HackathonDetailsQueryEntity;
 import org.intellij.lang.annotations.Language;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface HackathonDetailsViewRepository extends JpaRepository<HackathonDetailsViewEntity, UUID> {
+public interface HackathonDetailsViewRepository extends JpaRepository<HackathonDetailsQueryEntity, UUID> {
 
     @Language("PostgreSQL")
     String SELECT = """
@@ -57,8 +57,8 @@ public interface HackathonDetailsViewRepository extends JpaRepository<HackathonD
 
     @Query(value = SELECT + " WHERE h.id = :id ", nativeQuery = true)
     @NonNull
-    Optional<HackathonDetailsViewEntity> findById(@NonNull UUID id);
+    Optional<HackathonDetailsQueryEntity> findById(@NonNull UUID id);
 
     @Query(value = SELECT + " WHERE h.slug = :slug ", nativeQuery = true)
-    Optional<HackathonDetailsViewEntity> findBySlug(String slug);
+    Optional<HackathonDetailsQueryEntity> findBySlug(String slug);
 }

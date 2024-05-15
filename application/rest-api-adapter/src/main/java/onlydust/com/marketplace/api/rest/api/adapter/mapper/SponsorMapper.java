@@ -142,7 +142,7 @@ public interface SponsorMapper {
                 .date(historicalTransaction.timestamp())
                 .type(mapTransactionType(historicalTransaction))
                 .project(historicalTransaction.project() == null ? null : projectToResponse(historicalTransaction.project()))
-                .amount(toMoney(historicalTransaction.amount().getValue(), historicalTransaction.sponsorAccount().currency()));
+                .amount(toMoney(historicalTransaction.amount().getValue(), historicalTransaction.currency()));
     }
 
     static SponsorAccountTransactionType mapTransactionType(HistoricalTransaction transaction) {

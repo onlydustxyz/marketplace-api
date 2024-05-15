@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.HackathonDetailsViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.HackathonDetailsQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.HackathonShortViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HackathonEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HackathonRegistrationEntity;
@@ -45,13 +45,13 @@ public class PostgresHackathonAdapter implements HackathonStoragePort {
     @Override
     public Optional<HackathonDetailsView> findById(@NonNull Hackathon.Id id) {
         return hackathonDetailsViewRepository.findById(id.value())
-                .map(HackathonDetailsViewEntity::toDomain);
+                .map(HackathonDetailsQueryEntity::toDomain);
     }
 
     @Override
     public Optional<HackathonDetailsView> findBySlug(String hackathonSlug) {
         return hackathonDetailsViewRepository.findBySlug(hackathonSlug)
-                .map(HackathonDetailsViewEntity::toDomain);
+                .map(HackathonDetailsQueryEntity::toDomain);
     }
 
     @Override

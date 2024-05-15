@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardDetailsViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardDetailsQueryEntity;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import org.intellij.lang.annotations.Language;
 import org.springframework.data.domain.Page;
@@ -14,7 +14,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.UUID;
 
-public interface RewardDetailsViewRepository extends JpaRepository<RewardDetailsViewEntity, UUID> {
+public interface RewardDetailsViewRepository extends JpaRepository<RewardDetailsQueryEntity, UUID> {
 
     @Language("PostgreSQL")
     String SELECT = """
@@ -47,7 +47,8 @@ public interface RewardDetailsViewRepository extends JpaRepository<RewardDetails
 
     static Sort sortBy(final Reward.SortBy sortBy, final Sort.Direction direction) {
         return switch (sortBy) {
-            case AMOUNT -> JpaSort.unsafe(direction, "coalesce(rsd.amount_usd_equivalent, 0)").and(Sort.by("requested_at").descending());
+            case AMOUNT ->
+                    JpaSort.unsafe(direction, "coalesce(rsd.amount_usd_equivalent, 0)").and(Sort.by("requested_at").descending());
             case CONTRIBUTION -> Sort.by(direction, "contribution_count").and(Sort.by("requested_at").descending());
             case STATUS -> Sort.by(direction, "rs.status").and(Sort.by("requested_at").descending());
             case REQUESTED_AT -> Sort.by(direction, "requested_at");
@@ -61,8 +62,8 @@ public interface RewardDetailsViewRepository extends JpaRepository<RewardDetails
               AND (:fromDate IS NULL OR r.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD'))
               AND (:toDate IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
             """, nativeQuery = true)
-    Page<RewardDetailsViewEntity> findProjectRewards(UUID projectId, List<UUID> currencyIds, List<Long> contributorIds, String fromDate, String toDate,
-                                                     Pageable pageable);
+    Page<RewardDetailsQueryEntity> findProjectRewards(UUID projectId, List<UUID> currencyIds, List<Long> contributorIds, String fromDate, String toDate,
+                                                      Pageable pageable);
 
     @Query(value = SELECT + """
             WHERE (
@@ -75,8 +76,8 @@ public interface RewardDetailsViewRepository extends JpaRepository<RewardDetails
               AND (:fromDate IS NULL OR r.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD'))
               AND (:toDate IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
             """, nativeQuery = true)
-    Page<RewardDetailsViewEntity> findUserRewards(Long githubUserId, List<UUID> currencyIds, List<UUID> projectIds, List<UUID> administratedBillingProfileIds,
-                                                  String fromDate, String toDate, Pageable pageable);
+    Page<RewardDetailsQueryEntity> findUserRewards(Long githubUserId, List<UUID> currencyIds, List<UUID> projectIds, List<UUID> administratedBillingProfileIds,
+                                                   String fromDate, String toDate, Pageable pageable);
 
     @Modifying
     @Query(nativeQuery = true, value = """

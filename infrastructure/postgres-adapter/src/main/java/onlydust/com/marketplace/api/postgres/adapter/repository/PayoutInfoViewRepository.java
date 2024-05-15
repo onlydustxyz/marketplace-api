@@ -1,13 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.PayoutInfoViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.PayoutInfoQueryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public interface PayoutInfoViewRepository extends JpaRepository<PayoutInfoViewEntity, UUID> {
+public interface PayoutInfoViewRepository extends JpaRepository<PayoutInfoQueryEntity, UUID> {
 
     @Query(value = """
                 SELECT bp.id as billing_profile_id,
@@ -19,5 +19,5 @@ public interface PayoutInfoViewRepository extends JpaRepository<PayoutInfoViewEn
                 WHERE bp.id = :billingProfileId
                 GROUP BY bp.id
             """, nativeQuery = true)
-    Optional<PayoutInfoViewEntity> findByBillingProfileId(UUID billingProfileId);
+    Optional<PayoutInfoQueryEntity> findByBillingProfileId(UUID billingProfileId);
 }

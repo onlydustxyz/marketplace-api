@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectPageItemViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectPageItemQueryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.UUID;
 
-public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemViewEntity, UUID> {
+public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQueryEntity, UUID> {
 
     @Query(value = """
             select p.id,
@@ -79,13 +79,13 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                        end
               offset :offset limit :limit
               """, nativeQuery = true)
-    List<ProjectPageItemViewEntity> findProjectsForAnonymousUser(@Param("tagsJsonPath") String tagsJsonPath,
-                                                                 @Param("technologiesJsonPath") String technologiesJsonPath,
-                                                                 @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
-                                                                 @Param("search") String search,
-                                                                 @Param("orderBy") String orderBy,
-                                                                 @Param("offset") int offset,
-                                                                 @Param("limit") int limit);
+    List<ProjectPageItemQueryEntity> findProjectsForAnonymousUser(@Param("tagsJsonPath") String tagsJsonPath,
+                                                                  @Param("technologiesJsonPath") String technologiesJsonPath,
+                                                                  @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
+                                                                  @Param("search") String search,
+                                                                  @Param("orderBy") String orderBy,
+                                                                  @Param("offset") int offset,
+                                                                  @Param("limit") int limit);
 
     @Query(value = """
             select p.id,
@@ -182,15 +182,15 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                      end
                      offset :offset limit :limit
                      """, nativeQuery = true)
-    List<ProjectPageItemViewEntity> findProjectsForUserId(@Param("userId") UUID userId,
-                                                          @Param("mine") Boolean mine,
-                                                          @Param("tagsJsonPath") String tagsJsonPath,
-                                                          @Param("technologiesJsonPath") String technologiesJsonPath,
-                                                          @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
-                                                          @Param("search") String search,
-                                                          @Param("orderBy") String orderBy,
-                                                          @Param("offset") int offset,
-                                                          @Param("limit") int limit);
+    List<ProjectPageItemQueryEntity> findProjectsForUserId(@Param("userId") UUID userId,
+                                                           @Param("mine") Boolean mine,
+                                                           @Param("tagsJsonPath") String tagsJsonPath,
+                                                           @Param("technologiesJsonPath") String technologiesJsonPath,
+                                                           @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
+                                                           @Param("search") String search,
+                                                           @Param("orderBy") String orderBy,
+                                                           @Param("offset") int offset,
+                                                           @Param("limit") int limit);
 
     @Query(value = """
                         select count(p.id)

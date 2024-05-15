@@ -11,6 +11,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetAccountAddress;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -29,6 +30,7 @@ import java.util.UUID;
 @Table(name = "wallets", schema = "accounting")
 @IdClass(WalletViewEntity.PrimaryKey.class)
 @EntityListeners(AuditingEntityListener.class)
+@Immutable
 public class WalletViewEntity {
     @Id
     UUID billingProfileId;

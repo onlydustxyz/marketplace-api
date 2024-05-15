@@ -1,13 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserRightsViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserRightsQueryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public interface BillingProfileUserRightsViewRepository extends JpaRepository<BillingProfileUserRightsViewEntity, UUID> {
+public interface BillingProfileUserRightsViewRepository extends JpaRepository<BillingProfileUserRightsQueryEntity, UUID> {
 
     @Query(nativeQuery = true, value = """
             select u.id                                                 as user_id,
@@ -37,6 +37,6 @@ public interface BillingProfileUserRightsViewRepository extends JpaRepository<Bi
                      left join iam.users u_by on u_by.id = bpui.invited_by
             where u.id = :userId
             """)
-    Optional<BillingProfileUserRightsViewEntity> findForUserIdAndBillingProfileId(UUID userId, UUID billingProfileId);
+    Optional<BillingProfileUserRightsQueryEntity> findForUserIdAndBillingProfileId(UUID userId, UUID billingProfileId);
 
 }

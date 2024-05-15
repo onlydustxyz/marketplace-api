@@ -1,13 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.PayoutPreferenceViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.PayoutPreferenceQueryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface PayoutPreferenceViewRepository extends JpaRepository<PayoutPreferenceViewEntity, PayoutPreferenceViewEntity.PrimaryKey> {
+public interface PayoutPreferenceViewRepository extends JpaRepository<PayoutPreferenceQueryEntity, PayoutPreferenceQueryEntity.PrimaryKey> {
 
     @Query(value = """
             select u.id as user_id,
@@ -24,5 +24,5 @@ public interface PayoutPreferenceViewRepository extends JpaRepository<PayoutPref
             where u.id = :userId
             order by p.name
             """, nativeQuery = true)
-    List<PayoutPreferenceViewEntity> findAllForUser(UUID userId);
+    List<PayoutPreferenceQueryEntity> findAllForUser(UUID userId);
 }

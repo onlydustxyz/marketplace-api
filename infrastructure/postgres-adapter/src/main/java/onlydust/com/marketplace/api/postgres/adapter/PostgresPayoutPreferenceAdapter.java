@@ -7,8 +7,8 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.PayoutPreferenceStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.PayoutPreferenceView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.PayoutPreferenceViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortBillingProfileViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.PayoutPreferenceQueryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortBillingProfileQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.PayoutPreferenceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.PayoutPreferenceRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.PayoutPreferenceViewRepository;
@@ -37,9 +37,9 @@ public class PostgresPayoutPreferenceAdapter implements PayoutPreferenceStorageP
         final Map<BillingProfile.Id, ShortBillingProfileView> billingProfiles =
                 shortBillingProfileViewRepository.findBillingProfilesForUserId(userId.value(), List.of())
                         .stream()
-                        .map(ShortBillingProfileViewEntity::toView)
+                        .map(ShortBillingProfileQueryEntity::toView)
                         .collect(Collectors.toMap(ShortBillingProfileView::getId, Function.identity()));
-        final List<PayoutPreferenceViewEntity> allForUser = payoutPreferenceViewRepository.findAllForUser(userId.value());
+        final List<PayoutPreferenceQueryEntity> allForUser = payoutPreferenceViewRepository.findAllForUser(userId.value());
         return allForUser
                 .stream()
                 .map(preference -> preference.toDomain(

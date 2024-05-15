@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardableItemViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardableItemQueryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface RewardableItemRepository extends JpaRepository<RewardableItemViewEntity, String> {
+public interface RewardableItemRepository extends JpaRepository<RewardableItemQueryEntity, String> {
 
     @Query(value = """
             select c.id as contribution_id,
@@ -53,14 +53,14 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
              order by c.created_at desc
               offset :offset limit :limit
               """, nativeQuery = true)
-    List<RewardableItemViewEntity> findByProjectIdAndGithubUserId(final @Param("projectId") UUID projectId,
-                                                                  final @Param("githubUserId") Long githubUserId,
-                                                                  final @Param("contributionType") String contributionType,
-                                                                  final @Param("contributionStatus") String contributionStatus,
-                                                                  final @Param("search") String search,
-                                                                  final @Param("offset") int offset,
-                                                                  final @Param("limit") int limit,
-                                                                  final @Param("includeIgnoredItems") boolean includeIgnoredItems);
+    List<RewardableItemQueryEntity> findByProjectIdAndGithubUserId(final @Param("projectId") UUID projectId,
+                                                                   final @Param("githubUserId") Long githubUserId,
+                                                                   final @Param("contributionType") String contributionType,
+                                                                   final @Param("contributionStatus") String contributionStatus,
+                                                                   final @Param("search") String search,
+                                                                   final @Param("offset") int offset,
+                                                                   final @Param("limit") int limit,
+                                                                   final @Param("includeIgnoredItems") boolean includeIgnoredItems);
 
 
     @Query(value = """
@@ -151,7 +151,7 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                 and issue.repo_name = :repoName
                 and issue.number = :issueNumber
               """, nativeQuery = true)
-    Optional<RewardableItemViewEntity> findRewardableIssue(String repoOwner, String repoName, long issueNumber);
+    Optional<RewardableItemQueryEntity> findRewardableIssue(String repoOwner, String repoName, long issueNumber);
 
     @Query(value = """
             with get_pr as (select gpr.number,
@@ -198,6 +198,6 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                 and pr.repo_name = :repoName
                 and pr.number = :pullRequestNumber
               """, nativeQuery = true)
-    Optional<RewardableItemViewEntity> findRewardablePullRequest(String repoOwner, String repoName,
-                                                                 long pullRequestNumber);
+    Optional<RewardableItemQueryEntity> findRewardablePullRequest(String repoOwner, String repoName,
+                                                                  long pullRequestNumber);
 }

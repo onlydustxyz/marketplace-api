@@ -1,13 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLedIdViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLedIdQueryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface ProjectLedIdRepository extends JpaRepository<ProjectLedIdViewEntity, UUID> {
+public interface ProjectLedIdRepository extends JpaRepository<ProjectLedIdQueryEntity, UUID> {
 
     @Query(value = """
               (select pl.user_id,
@@ -54,5 +54,5 @@ public interface ProjectLedIdRepository extends JpaRepository<ProjectLedIdViewEn
                                            join indexer_exp.github_repos gr on pgr2.github_repo_id = gr.id
                                                 where pgr2.project_id = p.id
                                                 and gr.visibility = 'PUBLIC') > 0)""", nativeQuery = true)
-    List<ProjectLedIdViewEntity> findProjectLedIdsByUserId(final UUID userId);
+    List<ProjectLedIdQueryEntity> findProjectLedIdsByUserId(final UUID userId);
 }

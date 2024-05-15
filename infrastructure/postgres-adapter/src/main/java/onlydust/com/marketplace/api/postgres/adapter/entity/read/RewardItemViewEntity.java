@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.project.domain.model.Reward;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
@@ -18,6 +19,7 @@ import java.util.UUID;
 @Builder(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
 @IdClass(RewardItemViewEntity.PrimaryKey.class)
+@Immutable
 public class RewardItemViewEntity {
 
     @Id
