@@ -1,0 +1,126 @@
+package onlydust.com.marketplace.accounting.domain.service;
+
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.accounting.domain.events.*;
+import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
+import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserverPort;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserverPort;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
+import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
+
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
+
+@Slf4j
+@AllArgsConstructor
+public class AccountingNotifier implements AccountingObserverPort, BillingProfileObserverPort {
+    private final BillingProfileStoragePort billingProfileStoragePort;
+    private final AccountingRewardStoragePort accountingRewardStoragePort;
+    private final NotificationPort accountingMailObserver;
+    private final NotificationPort notificationPort;
+
+    @Override
+    public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
+
+    }
+
+    @Override
+    public void onSponsorAccountUpdated(SponsorAccountStatement sponsorAccount) {
+    }
+
+
+    @Override
+    public void onRewardCreated(RewardId rewardId, AccountBookFacade accountBookFacade) {
+        final var rewardDetailsView = accountingRewardStoragePort.getReward(rewardId)
+                .orElseThrow(() -> internalServerError(("Reward %s not found").formatted(rewardId.value())));
+        if (nonNull(rewardDetailsView.recipient().email())) {
+            accountingMailObserver.notify(new RewardCreated(rewardDetailsView.recipient().email(),
+                    rewardDetailsView.githubUrls().size(), rewardDetailsView.requester().login(), rewardDetailsView.recipient().login(), ShortReward.builder()
+                    .amount(rewardDetailsView.money().amount())
+                    .currencyCode(rewardDetailsView.money().currency().code().toString())
+                    .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
+                    .id(rewardId)
+                    .projectName(rewardDetailsView.project().name())
+                    .build(), isNull(rewardDetailsView.recipient().userId()) ? null : rewardDetailsView.recipient().userId().value()));
+
+        } else {
+            LOGGER.warn("Unable to send reward created email to contributor %s".formatted(rewardDetailsView.recipient().login()));
+        }
+    }
+
+    @Override
+    public void onRewardCancelled(RewardId rewardId) {
+        final var shortRewardDetailsView = accountingRewardStoragePort.getShortReward(rewardId)
+                .orElseThrow(() -> internalServerError("Reward %s not found".formatted(rewardId)));
+
+        if (nonNull(shortRewardDetailsView.recipient().email())) {
+            accountingMailObserver.notify(new RewardCanceled(
+                    shortRewardDetailsView.recipient().email(),
+                    shortRewardDetailsView.recipient().login(),
+                    ShortReward.builder()
+                            .amount(shortRewardDetailsView.money().amount())
+                            .currencyCode(shortRewardDetailsView.money().currency().code().toString())
+                            .dollarsEquivalent(shortRewardDetailsView.money().getDollarsEquivalentValue())
+                            .id(rewardId)
+                            .projectName(shortRewardDetailsView.project().name())
+                            .build(),
+                    isNull(shortRewardDetailsView.recipient().userId()) ? null : shortRewardDetailsView.recipient().userId().value()));
+        } else {
+            LOGGER.warn("Unable to send cancel reward mail to recipient %s due to missing email".formatted(shortRewardDetailsView.recipient().login()));
+        }
+    }
+
+    @Override
+    public void onRewardPaid(RewardId rewardId) {
+    }
+
+    @Override
+    public void onPaymentReceived(RewardId rewardId, Payment.Reference reference) {
+    }
+
+    @Override
+    public void onInvoiceUploaded(BillingProfile.Id billingProfileId, Invoice.Id invoiceId, boolean isExternal) {
+    }
+
+    @Override
+    public void onInvoiceRejected(@NonNull InvoiceRejected invoiceRejected) {
+        accountingMailObserver.notify(invoiceRejected);
+    }
+
+    @Override
+    public void onBillingProfileUpdated(BillingProfileVerificationUpdated event) {
+        notificationPort.notify(event);
+
+        if (event.failed()) {
+            final ShortContributorView owner = billingProfileStoragePort.getBillingProfileOwnerById(event.getUserId())
+                    .orElseThrow(() -> internalServerError(("Owner %s not found for billing profile %s")
+                            .formatted(event.getUserId().value(), event.getBillingProfileId().value())));
+            if (nonNull(owner.email())) {
+                accountingMailObserver.notify(new BillingProfileVerificationFailed(owner.email(), owner.userId(), event.getBillingProfileId(), owner.login(),
+                        event.getVerificationStatus()));
+            } else {
+                LOGGER.warn("Unable to send billing profile verifcation failed mail to user %s".formatted(event.getUserId()));
+            }
+        }
+    }
+
+    @Override
+    public void onPayoutPreferenceChanged(BillingProfile.Id billingProfileId, @NonNull UserId userId, @NonNull ProjectId projectId) {
+    }
+
+    @Override
+    public void onBillingProfileEnableChanged(BillingProfile.Id billingProfileId, Boolean enabled) {
+    }
+
+    @Override
+    public void onBillingProfileDeleted(BillingProfile.Id billingProfileId) {
+    }
+}

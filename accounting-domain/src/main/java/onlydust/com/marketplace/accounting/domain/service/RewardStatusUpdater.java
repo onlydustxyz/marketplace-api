@@ -2,55 +2,42 @@ package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.accounting.domain.events.*;
-import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
+import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
+import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
-import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
-import onlydust.com.marketplace.accounting.domain.view.ShortRewardDetailsView;
-import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @Slf4j
-public class AccountingObserver implements AccountingObserverPort, RewardStatusFacadePort, BillingProfileObserver {
+public class RewardStatusUpdater implements AccountingObserverPort, RewardStatusFacadePort, BillingProfileObserverPort {
     // TODO migrate rewards to accounting schema and merge all those storages as onetone dependencies of reward
     private final RewardStatusStorage rewardStatusStorage;
     private final RewardUsdEquivalentStorage rewardUsdEquivalentStorage;
     private final QuoteStorage quoteStorage;
     private final InvoiceStoragePort invoiceStorage;
     private final ReceiptStoragePort receiptStorage;
-    private final BillingProfileStoragePort billingProfileStoragePort;
     private final Currency usd;
-    private final NotificationPort accountingMailObserver;
     private final AccountingRewardStoragePort accountingRewardStoragePort;
-    private final NotificationPort notificationPort;
 
-    public AccountingObserver(RewardStatusStorage rewardStatusStorage, RewardUsdEquivalentStorage rewardUsdEquivalentStorage, QuoteStorage quoteStorage,
-                              CurrencyStorage currencyStorage, InvoiceStoragePort invoiceStorage, ReceiptStoragePort receiptStorage,
-                              BillingProfileStoragePort billingProfileStoragePort, NotificationPort accountingMailObserver,
-                              AccountingRewardStoragePort accountingRewardStoragePort, NotificationPort notificationPort) {
+    public RewardStatusUpdater(RewardStatusStorage rewardStatusStorage, RewardUsdEquivalentStorage rewardUsdEquivalentStorage, QuoteStorage quoteStorage,
+                               CurrencyStorage currencyStorage, InvoiceStoragePort invoiceStorage, ReceiptStoragePort receiptStorage,
+                               AccountingRewardStoragePort accountingRewardStoragePort) {
         this.rewardStatusStorage = rewardStatusStorage;
         this.rewardUsdEquivalentStorage = rewardUsdEquivalentStorage;
         this.quoteStorage = quoteStorage;
         this.invoiceStorage = invoiceStorage;
         this.receiptStorage = receiptStorage;
-        this.billingProfileStoragePort = billingProfileStoragePort;
-        this.accountingMailObserver = accountingMailObserver;
         this.accountingRewardStoragePort = accountingRewardStoragePort;
-        this.notificationPort = notificationPort;
         this.usd = currencyStorage.findByCode(Currency.Code.USD).orElseThrow(() -> internalServerError("Currency USD not found"));
     }
 
@@ -76,40 +63,10 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
         rewardStatusStorage.save(upToDateRewardStatus(accountBookFacade, new RewardStatusData(rewardId)));
         accountingRewardStoragePort.updateBillingProfileFromRecipientPayoutPreferences(rewardId);
         updateUsdEquivalent(rewardId);
-        final RewardDetailsView rewardDetailsView = accountingRewardStoragePort.getReward(rewardId)
-                .orElseThrow(() -> internalServerError(("Reward %s not found").formatted(rewardId.value())));
-        if (nonNull(rewardDetailsView.recipient().email())) {
-            accountingMailObserver.notify(new RewardCreated(rewardDetailsView.recipient().email(),
-                    rewardDetailsView.githubUrls().size(), rewardDetailsView.requester().login(), rewardDetailsView.recipient().login(), ShortReward.builder()
-                    .amount(rewardDetailsView.money().amount())
-                    .currencyCode(rewardDetailsView.money().currency().code().toString())
-                    .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
-                    .id(rewardId)
-                    .projectName(rewardDetailsView.project().name())
-                    .build(), isNull(rewardDetailsView.recipient().userId()) ? null : rewardDetailsView.recipient().userId().value()));
-
-        } else {
-            LOGGER.warn("Unable to send reward created email to contributor %s".formatted(rewardDetailsView.recipient().login()));
-        }
     }
 
     @Override
     public void onRewardCancelled(RewardId rewardId) {
-        final ShortRewardDetailsView shortRewardDetailsView = accountingRewardStoragePort.getShortReward(rewardId).orElseThrow(() -> internalServerError(
-                "Reward %s not found".formatted(rewardId)));
-        if (nonNull(shortRewardDetailsView.recipient().email())) {
-            accountingMailObserver.notify(new RewardCanceled(shortRewardDetailsView.recipient().email(), shortRewardDetailsView.recipient().login(),
-                    ShortReward.builder()
-                            .amount(shortRewardDetailsView.money().amount())
-                            .currencyCode(shortRewardDetailsView.money().currency().code().toString())
-                            .dollarsEquivalent(shortRewardDetailsView.money().getDollarsEquivalentValue())
-                            .id(rewardId)
-                            .projectName(shortRewardDetailsView.project().name())
-                            .build(),
-                    isNull(shortRewardDetailsView.recipient().userId()) ? null : shortRewardDetailsView.recipient().userId().value()));
-        } else {
-            LOGGER.warn("Unable to send cancel reward mail to recipient %s due to missing email".formatted(shortRewardDetailsView.recipient().login()));
-        }
         rewardStatusStorage.delete(rewardId);
     }
 
@@ -173,24 +130,11 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
                     rewardStatusStorage.get(reward.getId()).orElseThrow(() -> notFound("RewardStatus not found for reward %s".formatted(reward.getId().value())));
             rewardStatusStorage.save(rewardStatus.invoiceReceivedAt(null));
         });
-        accountingMailObserver.notify(invoiceRejected);
     }
 
     @Override
     public void onBillingProfileUpdated(BillingProfileVerificationUpdated event) {
         refreshRewardsUsdEquivalentOf(event.getBillingProfileId());
-        notificationPort.notify(event);
-        if (event.failed()) {
-            final ShortContributorView owner = billingProfileStoragePort.getBillingProfileOwnerById(event.getUserId())
-                    .orElseThrow(() -> internalServerError(("Owner %s not found for billing profile %s")
-                            .formatted(event.getUserId().value(), event.getBillingProfileId().value())));
-            if (nonNull(owner.email())) {
-                accountingMailObserver.notify(new BillingProfileVerificationFailed(owner.email(), owner.userId(), event.getBillingProfileId(), owner.login(),
-                        event.getVerificationStatus()));
-            } else {
-                LOGGER.warn("Unable to send billing profile verifcation failed mail to user %s".formatted(event.getUserId()));
-            }
-        }
     }
 
     @Override

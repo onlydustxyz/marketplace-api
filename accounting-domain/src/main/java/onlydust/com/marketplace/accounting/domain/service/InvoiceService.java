@@ -10,7 +10,7 @@ import onlydust.com.marketplace.accounting.domain.model.InvoiceDownload;
 import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserverPort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
@@ -29,7 +29,7 @@ public class InvoiceService implements InvoiceFacadePort {
     private final @NonNull InvoiceStoragePort invoiceStoragePort;
     private final @NonNull PdfStoragePort pdfStoragePort;
     private final @NonNull BillingProfileStoragePort billingProfileStoragePort;
-    private final @NonNull BillingProfileObserver billingProfileObserver;
+    private final @NonNull BillingProfileObserverPort billingProfileObserver;
 
     @Override
     public Optional<InvoiceView> find(Invoice.@NonNull Id id) {
@@ -37,8 +37,10 @@ public class InvoiceService implements InvoiceFacadePort {
     }
 
     @Override
-    public Page<Invoice> findAll(final @NonNull List<Invoice.Id> ids, final @NonNull List<Invoice.Status> statuses, final @NonNull List<Currency.Id> currencyIds,
-                                 final @NonNull List<BillingProfile.Type> billingProfileTypes, final @NonNull List<BillingProfile.Id> billingProfileIds, String search,
+    public Page<Invoice> findAll(final @NonNull List<Invoice.Id> ids, final @NonNull List<Invoice.Status> statuses,
+                                 final @NonNull List<Currency.Id> currencyIds,
+                                 final @NonNull List<BillingProfile.Type> billingProfileTypes, final @NonNull List<BillingProfile.Id> billingProfileIds,
+                                 String search,
                                  final @NonNull Integer pageIndex, final @NonNull Integer pageSize) {
         return invoiceStoragePort.findAll(ids, statuses, currencyIds, billingProfileTypes, billingProfileIds, search, pageIndex, pageSize);
     }

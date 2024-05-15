@@ -6,7 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileVerificationFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserverPort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileVerificationProviderPort;
 import onlydust.com.marketplace.kernel.jobs.OutboxSkippingException;
@@ -30,7 +30,7 @@ public class BillingProfileVerificationService implements BillingProfileVerifica
     private final Function<Event, BillingProfileVerificationUpdated> billingProfileVerificationExternalMapper;
     private final BillingProfileStoragePort billingProfileStoragePort;
     private final BillingProfileVerificationProviderPort billingProfileVerificationProviderPort;
-    private final BillingProfileObserver billingProfileObserver;
+    private final BillingProfileObserverPort billingProfileObserver;
 
     @Override
     public void consumeBillingProfileVerificationEvent(Event event) {

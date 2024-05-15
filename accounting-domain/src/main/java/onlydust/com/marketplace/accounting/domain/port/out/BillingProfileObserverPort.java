@@ -6,7 +6,7 @@ import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 
-public interface BillingProfileObserver {
+public interface BillingProfileObserverPort {
     void onInvoiceUploaded(BillingProfile.Id billingProfileId, Invoice.Id invoiceId, boolean isExternal);
 
     void onBillingProfileUpdated(BillingProfileVerificationUpdated billingProfileVerificationUpdated);

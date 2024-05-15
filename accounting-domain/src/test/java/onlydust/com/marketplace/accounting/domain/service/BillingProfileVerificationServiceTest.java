@@ -4,7 +4,7 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserverPort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileVerificationProviderPort;
 import onlydust.com.marketplace.kernel.jobs.OutboxSkippingException;
@@ -29,7 +29,7 @@ public class BillingProfileVerificationServiceTest {
     private BillingProfileStoragePort billingProfileStoragePort;
     private OutboxPort outboxPort;
     private Function<Event, BillingProfileVerificationUpdated> eventBillingProfileVerificationUpdatedFunction;
-    private BillingProfileObserver billingProfileObserver;
+    private BillingProfileObserverPort billingProfileObserver;
     private BillingProfileVerificationProviderPort billingProfileVerificationProviderPort;
     private final Faker faker = new Faker();
 
@@ -38,7 +38,7 @@ public class BillingProfileVerificationServiceTest {
         billingProfileStoragePort = mock(BillingProfileStoragePort.class);
         outboxPort = mock(OutboxPort.class);
         eventBillingProfileVerificationUpdatedFunction = mock(Function.class);
-        billingProfileObserver = mock(BillingProfileObserver.class);
+        billingProfileObserver = mock(BillingProfileObserverPort.class);
         billingProfileVerificationProviderPort = mock(BillingProfileVerificationProviderPort.class);
         billingProfileVerificationService = new BillingProfileVerificationService(outboxPort, eventBillingProfileVerificationUpdatedFunction,
                 billingProfileStoragePort,

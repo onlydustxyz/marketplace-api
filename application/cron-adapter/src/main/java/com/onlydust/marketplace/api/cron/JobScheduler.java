@@ -5,7 +5,7 @@ import com.onlydust.marketplace.api.cron.properties.NodeGuardiansBoostProperties
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
-import onlydust.com.marketplace.accounting.domain.service.AccountingObserver;
+import onlydust.com.marketplace.accounting.domain.service.RewardStatusUpdater;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.project.domain.port.input.BoostNodeGuardiansRewardsPort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
@@ -26,7 +26,7 @@ public class JobScheduler {
     private final UserFacadePort userFacadePort;
     private final CronProperties cronProperties;
     private final OutboxConsumerJob billingProfileVerificationOutboxJob;
-    private final AccountingObserver accountingObserver;
+    private final RewardStatusUpdater rewardStatusUpdater;
     private final OutboxConsumerJob accountingMailOutboxJob;
     private final BoostNodeGuardiansRewardsPort boostNodeGuardiansRewardsPort;
     private final NodeGuardiansBoostProperties nodeGuardiansBoostProperties;
@@ -77,7 +77,7 @@ public class JobScheduler {
     @Scheduled(fixedDelayString = "${application.cron.refresh-reward-usd-equivalents-job-delay}")
     public void refreshRewardUsdEquivalents() {
         LOGGER.info("Refreshing reward USD equivalents");
-        accountingObserver.refreshRewardsUsdEquivalents();
+        rewardStatusUpdater.refreshRewardsUsdEquivalents();
     }
 
     @Scheduled(fixedDelayString = "${application.cron.send-emails}")

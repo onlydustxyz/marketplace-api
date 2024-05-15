@@ -1,24 +1,22 @@
 package onlydust.com.marketplace.accounting.domain.observer;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.accounting.domain.events.*;
+import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
+import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
-import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
-import onlydust.com.marketplace.accounting.domain.service.AccountingObserver;
-import onlydust.com.marketplace.accounting.domain.view.*;
+import onlydust.com.marketplace.accounting.domain.service.RewardStatusUpdater;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
-import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -37,19 +35,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
-public class AccountingObserverTest {
+public class RewardStatusUpdaterTest {
     private RewardStatusStorage rewardStatusStorage;
     private InvoiceStoragePort invoiceStorage;
     private AccountBookFacade accountBookFacade;
     RewardUsdEquivalentStorage rewardUsdEquivalentStorage;
-    private BillingProfileStoragePort billingProfileStoragePort;
     QuoteStorage quoteStorage;
     CurrencyStorage currencyStorage;
-    AccountingObserver accountingObserver;
+    RewardStatusUpdater rewardStatusUpdater;
     ReceiptStoragePort receiptStorage;
-    NotificationPort mailObserver;
     AccountingRewardStoragePort accountingRewardStoragePort;
-    NotificationPort notificationPort;
     final Faker faker = new Faker();
     final Currency currency = ETH;
     final Currency usd = USD;
@@ -67,13 +62,10 @@ public class AccountingObserverTest {
         currencyStorage = mock(CurrencyStorage.class);
         invoiceStorage = mock(InvoiceStoragePort.class);
         receiptStorage = mock(ReceiptStoragePort.class);
-        billingProfileStoragePort = mock(BillingProfileStoragePort.class);
-        mailObserver = mock(NotificationPort.class);
         accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
-        notificationPort = mock(NotificationPort.class);
         when(currencyStorage.findByCode(usd.code())).thenReturn(Optional.of(usd));
-        accountingObserver = new AccountingObserver(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage, invoiceStorage,
-                receiptStorage, billingProfileStoragePort, mailObserver, accountingRewardStoragePort, notificationPort);
+        rewardStatusUpdater = new RewardStatusUpdater(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage, invoiceStorage,
+                receiptStorage, accountingRewardStoragePort);
 
         when(rewardStatusStorage.get(any(RewardId.class))).then(invocation -> {
             final var rewardId = invocation.getArgument(0, RewardId.class);
@@ -116,34 +108,6 @@ public class AccountingObserverTest {
                     .invoiceReceivedAt(null)
                     .paidAt(null)
                     .withAdditionalNetworks(Set.of(Network.ETHEREUM, Network.OPTIMISM));
-            final MoneyView moneyView = new MoneyView(BigDecimal.ONE, Currency.crypto("OP", Currency.Code.OP, 3));
-            final ProjectShortView shortProjectView = ProjectShortView.builder()
-                    .name(faker.name().fullName())
-                    .shortDescription(faker.rickAndMorty().character())
-                    .logoUrl(faker.internet().url())
-                    .id(ProjectId.random())
-                    .slug(faker.lorem().characters())
-                    .build();
-            final ShortContributorView recipient = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
-                    faker.rickAndMorty().character(), faker.gameOfThrones().character(),
-                    UserId.random(), faker.internet().emailAddress());
-            final ShortContributorView requester = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
-                    faker.rickAndMorty().character(), faker.gameOfThrones().character(),
-                    UserId.random(), faker.internet().emailAddress());
-            final RewardDetailsView rewardDetailsView = RewardDetailsView.builder()
-                    .money(moneyView)
-                    .id(rewardId)
-                    .project(shortProjectView)
-                    .recipient(recipient)
-                    .sponsors(List.of())
-                    .billingProfile(mock(BillingProfile.class))
-                    .status(mock(RewardStatus.class))
-                    .requestedAt(ZonedDateTime.now())
-                    .githubUrls(List.of("https://github.com/onlydust/onlydust"))
-                    .requester(requester)
-                    .build();
-            when(accountingRewardStoragePort.getReward(rewardId))
-                    .thenReturn(Optional.of(rewardDetailsView));
 
             when(accountBookFacade.isFunded(rewardId)).thenReturn(true);
             when(accountBookFacade.unlockDateOf(rewardId)).thenReturn(rewardStatus.unlockDate().map(ZonedDateTime::toInstant));
@@ -151,19 +115,11 @@ public class AccountingObserverTest {
             when(rewardStatusStorage.get(rewardId)).thenReturn(Optional.of(rewardStatus));
 
             // When
-            accountingObserver.onRewardCreated(rewardId, accountBookFacade);
+            rewardStatusUpdater.onRewardCreated(rewardId, accountBookFacade);
 
             // Then
             verify(rewardStatusStorage, times(2)).save(any());
             assertThat(rewardStatus.usdAmount()).isPresent();
-            verify(mailObserver).notify(new RewardCreated(recipient.email(), rewardDetailsView.githubUrls().size(),
-                    requester.login(), recipient.login(), ShortReward.builder()
-                    .amount(rewardDetailsView.money().amount())
-                    .currencyCode(rewardDetailsView.money().currency().code().toString())
-                    .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
-                    .id(rewardId)
-                    .projectName(shortProjectView.name())
-                    .build(), recipient.userId().value()));
         }
     }
 
@@ -174,75 +130,11 @@ public class AccountingObserverTest {
         @Test
         public void should_cancel_reward() {
             // When
-            final MoneyView moneyView = new MoneyView(BigDecimal.ONE, Currency.crypto("OP", Currency.Code.OP, 3));
-            final ProjectShortView shortProjectView = ProjectShortView.builder()
-                    .name(faker.name().fullName())
-                    .shortDescription(faker.rickAndMorty().character())
-                    .logoUrl(faker.internet().url())
-                    .id(ProjectId.random())
-                    .slug(faker.lorem().characters())
-                    .build();
-            final ShortContributorView recipient = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
-                    faker.rickAndMorty().character(), faker.gameOfThrones().character(),
-                    UserId.random(), faker.internet().emailAddress());
-            final ShortContributorView requester = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
-                    faker.rickAndMorty().character(), faker.gameOfThrones().character(),
-                    UserId.random(), faker.internet().emailAddress());
-            final ShortRewardDetailsView rewardDetailsView = ShortRewardDetailsView.builder()
-                    .money(moneyView)
-                    .id(rewardId)
-                    .project(shortProjectView)
-                    .recipient(recipient)
-                    .requester(requester)
-                    .build();
-            when(accountingRewardStoragePort.getShortReward(rewardId))
-                    .thenReturn(Optional.of(rewardDetailsView));
-            accountingObserver.onRewardCancelled(rewardId);
+            rewardStatusUpdater.onRewardCancelled(rewardId);
 
             // Then
             verify(rewardStatusStorage).delete(rewardId);
-            verify(mailObserver).notify(new RewardCanceled(recipient.email(), recipient.login(), ShortReward.builder()
-                    .amount(rewardDetailsView.money().amount())
-                    .currencyCode(rewardDetailsView.money().currency().code().toString())
-                    .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
-                    .id(rewardId)
-                    .projectName(shortProjectView.name())
-                    .build(), recipient.userId().value()));
         }
-
-        @Test
-        public void should_cancel_reward_and_not_notify_mail_given_a_recipient_not_signed_up() {
-            // When
-            final MoneyView moneyView = mock(MoneyView.class);
-            final ProjectShortView shortProjectView = ProjectShortView.builder()
-                    .name(faker.name().fullName())
-                    .shortDescription(faker.rickAndMorty().character())
-                    .logoUrl(faker.internet().url())
-                    .id(ProjectId.random())
-                    .slug(faker.lorem().characters())
-                    .build();
-            final ShortContributorView recipient = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
-                    faker.rickAndMorty().character(), faker.gameOfThrones().character(),
-                    UserId.random(), null);
-            final ShortContributorView requester = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
-                    faker.rickAndMorty().character(), faker.gameOfThrones().character(),
-                    UserId.random(), faker.internet().emailAddress());
-            when(accountingRewardStoragePort.getShortReward(rewardId))
-                    .thenReturn(Optional.of(ShortRewardDetailsView.builder()
-                            .money(moneyView)
-                            .id(rewardId)
-                            .project(shortProjectView)
-                            .recipient(recipient)
-                            .requester(requester)
-                            .build()));
-            accountingObserver.onRewardCancelled(rewardId);
-
-            // Then
-            verify(rewardStatusStorage).delete(rewardId);
-            verifyNoInteractions(mailObserver);
-        }
-
-
     }
 
     @Nested
@@ -295,7 +187,7 @@ public class AccountingObserverTest {
             when(invoiceStorage.invoiceOf(rewardId)).thenReturn(Optional.of(invoice));
             when(invoiceStorage.invoiceOf(rewardId2)).thenReturn(Optional.of(invoice));
 
-            accountingObserver.onRewardPaid(rewardId);
+            rewardStatusUpdater.onRewardPaid(rewardId);
             {
                 // Then
                 final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
@@ -307,7 +199,7 @@ public class AccountingObserverTest {
                 verify(invoiceStorage, never()).update(invoice.status(Invoice.Status.PAID));
             }
 
-            accountingObserver.onPaymentReceived(rewardId, reference);
+            rewardStatusUpdater.onPaymentReceived(rewardId, reference);
             {
                 // Then
                 final var receiptCaptor = ArgumentCaptor.forClass(Receipt.class);
@@ -329,7 +221,7 @@ public class AccountingObserverTest {
             when(invoiceStorage.invoiceOf(rewardId)).thenReturn(Optional.of(invoice));
             when(invoiceStorage.invoiceOf(rewardId2)).thenReturn(Optional.of(invoice));
 
-            accountingObserver.onRewardPaid(rewardId2);
+            rewardStatusUpdater.onRewardPaid(rewardId2);
             {
                 // Then
                 final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
@@ -341,7 +233,7 @@ public class AccountingObserverTest {
                 verify(invoiceStorage).update(invoice.status(Invoice.Status.PAID));
             }
 
-            accountingObserver.onPaymentReceived(rewardId2, reference);
+            rewardStatusUpdater.onPaymentReceived(rewardId2, reference);
             {
                 // Then
                 final var receiptCaptor = ArgumentCaptor.forClass(Receipt.class);
@@ -392,7 +284,7 @@ public class AccountingObserverTest {
             });
 
             // When
-            accountingObserver.onSponsorAccountBalanceChanged(sponsorAccountStatement);
+            rewardStatusUpdater.onSponsorAccountBalanceChanged(sponsorAccountStatement);
 
             // Then
             final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
@@ -443,7 +335,7 @@ public class AccountingObserverTest {
             });
 
             // When
-            accountingObserver.onSponsorAccountBalanceChanged(sponsorAccountStatement);
+            rewardStatusUpdater.onSponsorAccountBalanceChanged(sponsorAccountStatement);
 
             // Then
             final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
@@ -498,7 +390,7 @@ public class AccountingObserverTest {
             });
 
             // When
-            accountingObserver.onInvoiceUploaded(BillingProfile.Id.random(), invoice.id(), true);
+            rewardStatusUpdater.onInvoiceUploaded(BillingProfile.Id.random(), invoice.id(), true);
 
             // Then
             final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
@@ -565,7 +457,7 @@ public class AccountingObserverTest {
             );
 
             // When
-            accountingObserver.onInvoiceRejected(invalidInvoice);
+            rewardStatusUpdater.onInvoiceRejected(invalidInvoice);
 
             // Then
             final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
@@ -573,7 +465,6 @@ public class AccountingObserverTest {
             final var rewardStatuses = rewardStatusCaptor.getAllValues();
             assertThat(rewardStatuses).hasSize(3);
             assertThat(rewardStatuses).allMatch(r -> r.invoiceReceivedAt().isEmpty());
-            verify(mailObserver, times(1)).notify(invalidInvoice);
         }
     }
 
@@ -591,7 +482,7 @@ public class AccountingObserverTest {
 
             @Test
             void should_fail_if_reward_does_not_exist() {
-                assertThatThrownBy(() -> accountingObserver.updateUsdEquivalent(rewardId))
+                assertThatThrownBy(() -> rewardStatusUpdater.updateUsdEquivalent(rewardId))
                         .isInstanceOf(OnlyDustException.class)
                         .hasMessage("RewardStatus not found for reward %s".formatted(rewardId));
             }
@@ -616,7 +507,7 @@ public class AccountingObserverTest {
                 when(rewardUsdEquivalent.equivalenceSealingDate()).thenReturn(Optional.empty());
 
                 // When
-                accountingObserver.updateUsdEquivalent(rewardId);
+                rewardStatusUpdater.updateUsdEquivalent(rewardId);
 
                 // Then
                 final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
@@ -635,7 +526,7 @@ public class AccountingObserverTest {
                         .thenReturn(Optional.of(new Quote(currency.id(), usd.id(), price, equivalenceSealingDate.minusSeconds(30).toInstant())));
 
                 // When
-                accountingObserver.updateUsdEquivalent(rewardId);
+                rewardStatusUpdater.updateUsdEquivalent(rewardId);
 
                 // Then
                 final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
@@ -660,7 +551,7 @@ public class AccountingObserverTest {
             ));
 
             // When
-            accountingObserver.refreshRewardsUsdEquivalents();
+            rewardStatusUpdater.refreshRewardsUsdEquivalents();
 
             // Then
             final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
@@ -685,14 +576,11 @@ public class AccountingObserverTest {
                     Kyc.builder().id(kycId).billingProfileId(billingProfileId).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();
 
             // When
-            when(billingProfileStoragePort.findKycById(kycId)).thenReturn(Optional.of(kyc));
-            accountingObserver.onBillingProfileUpdated(billingProfileVerificationUpdated);
+            rewardStatusUpdater.onBillingProfileUpdated(billingProfileVerificationUpdated);
 
             // Then
             verify(rewardStatusStorage).notRequested(kyc.getBillingProfileId());
             verifyNoInteractions(accountingRewardStoragePort);
-            verifyNoInteractions(mailObserver);
-            verify(notificationPort).notify(billingProfileVerificationUpdated);
         }
 
         @Test
@@ -706,14 +594,11 @@ public class AccountingObserverTest {
                     Kyb.builder().id(kybId).billingProfileId(billingProfileId).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();
 
             // When
-            when(billingProfileStoragePort.findKybById(kybId)).thenReturn(Optional.of(kyb));
-            accountingObserver.onBillingProfileUpdated(billingProfileVerificationUpdated);
+            rewardStatusUpdater.onBillingProfileUpdated(billingProfileVerificationUpdated);
 
             // Then
             verify(rewardStatusStorage).notRequested(kyb.getBillingProfileId());
-            verify(notificationPort).notify(billingProfileVerificationUpdated);
             verifyNoInteractions(accountingRewardStoragePort);
-            verifyNoInteractions(mailObserver);
         }
 
         @Test
@@ -728,44 +613,11 @@ public class AccountingObserverTest {
                     Kyb.builder().id(kybId).billingProfileId(billingProfileId).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();
 
             // When
-            when(billingProfileStoragePort.findKybByParentExternalId(billingProfileVerificationUpdated.getParentExternalApplicantId()))
-                    .thenReturn(Optional.of(kyb));
-            accountingObserver.onBillingProfileUpdated(billingProfileVerificationUpdated);
+            rewardStatusUpdater.onBillingProfileUpdated(billingProfileVerificationUpdated);
 
             // Then
             verify(rewardStatusStorage).notRequested(kyb.getBillingProfileId());
-            verify(notificationPort).notify(billingProfileVerificationUpdated);
             verifyNoInteractions(accountingRewardStoragePort);
-            verifyNoInteractions(mailObserver);
-        }
-
-        @Test
-        void should_notify_billing_profile_verification_failed() {
-            // Given
-            final UUID kybId = UUID.randomUUID();
-            final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
-            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, billingProfileId,
-                    VerificationType.KYC, VerificationStatus.CLOSED, null, UserId.random(), null, faker.rickAndMorty().character(), null);
-            final UUID userId = UUID.randomUUID();
-            final ShortContributorView shortContributorView = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
-                    faker.rickAndMorty().character(), faker.gameOfThrones().character(),
-                    UserId.of(userId), faker.internet().emailAddress());
-            final Kyc kyc =
-                    Kyc.builder().id(billingProfileVerificationUpdated.getVerificationId())
-                            .billingProfileId(billingProfileId).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();
-
-            // When
-            when(billingProfileStoragePort.getBillingProfileOwnerById(billingProfileVerificationUpdated.getUserId()))
-                    .thenReturn(Optional.of(shortContributorView));
-            when(billingProfileStoragePort.findKycById(billingProfileVerificationUpdated.getVerificationId()))
-                    .thenReturn(Optional.of(kyc));
-            accountingObserver.onBillingProfileUpdated(billingProfileVerificationUpdated);
-
-            // Then
-            verify(mailObserver).notify(new BillingProfileVerificationFailed(shortContributorView.email(), UserId.of(userId), billingProfileId,
-                    shortContributorView.login(),
-                    billingProfileVerificationUpdated.getVerificationStatus()));
-            verify(notificationPort).notify(billingProfileVerificationUpdated);
         }
     }
 
@@ -779,7 +631,7 @@ public class AccountingObserverTest {
 
             // When
             when(rewardStatusStorage.removeBillingProfile(billingProfileId)).thenReturn(updatedRewardIds);
-            accountingObserver.onBillingProfileDeleted(billingProfileId);
+            rewardStatusUpdater.onBillingProfileDeleted(billingProfileId);
 
             // Then
             verify(rewardStatusStorage).removeBillingProfile(billingProfileId);
@@ -797,7 +649,7 @@ public class AccountingObserverTest {
 
             // When
             when(rewardStatusStorage.removeBillingProfile(billingProfileId)).thenReturn(updatedRewardIds);
-            accountingObserver.onBillingProfileEnableChanged(billingProfileId, false);
+            rewardStatusUpdater.onBillingProfileEnableChanged(billingProfileId, false);
 
             // Then
             verify(rewardStatusStorage).removeBillingProfile(billingProfileId);
@@ -813,7 +665,7 @@ public class AccountingObserverTest {
             final var billingProfileId = BillingProfile.Id.random();
 
             // When
-            accountingObserver.onBillingProfileEnableChanged(billingProfileId, true);
+            rewardStatusUpdater.onBillingProfileEnableChanged(billingProfileId, true);
 
             // Then
             verify(rewardStatusStorage, never()).removeBillingProfile(billingProfileId);
