@@ -12,7 +12,6 @@ import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
 import onlydust.com.marketplace.accounting.domain.view.ShortRewardDetailsView;
-import onlydust.com.marketplace.kernel.observer.MailObserver;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 
 import java.time.ZoneOffset;
@@ -35,13 +34,13 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
     private final ReceiptStoragePort receiptStorage;
     private final BillingProfileStoragePort billingProfileStoragePort;
     private final Currency usd;
-    private final MailObserver accountingMailObserver;
+    private final NotificationPort accountingMailObserver;
     private final AccountingRewardStoragePort accountingRewardStoragePort;
     private final NotificationPort notificationPort;
 
     public AccountingObserver(RewardStatusStorage rewardStatusStorage, RewardUsdEquivalentStorage rewardUsdEquivalentStorage, QuoteStorage quoteStorage,
                               CurrencyStorage currencyStorage, InvoiceStoragePort invoiceStorage, ReceiptStoragePort receiptStorage,
-                              BillingProfileStoragePort billingProfileStoragePort, MailObserver accountingMailObserver,
+                              BillingProfileStoragePort billingProfileStoragePort, NotificationPort accountingMailObserver,
                               AccountingRewardStoragePort accountingRewardStoragePort, NotificationPort notificationPort) {
         this.rewardStatusStorage = rewardStatusStorage;
         this.rewardUsdEquivalentStorage = rewardUsdEquivalentStorage;
@@ -80,7 +79,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
         final RewardDetailsView rewardDetailsView = accountingRewardStoragePort.getReward(rewardId)
                 .orElseThrow(() -> internalServerError(("Reward %s not found").formatted(rewardId.value())));
         if (nonNull(rewardDetailsView.recipient().email())) {
-            accountingMailObserver.send(new RewardCreated(rewardDetailsView.recipient().email(),
+            accountingMailObserver.notify(new RewardCreated(rewardDetailsView.recipient().email(),
                     rewardDetailsView.githubUrls().size(), rewardDetailsView.requester().login(), rewardDetailsView.recipient().login(), ShortReward.builder()
                     .amount(rewardDetailsView.money().amount())
                     .currencyCode(rewardDetailsView.money().currency().code().toString())
@@ -99,7 +98,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
         final ShortRewardDetailsView shortRewardDetailsView = accountingRewardStoragePort.getShortReward(rewardId).orElseThrow(() -> internalServerError(
                 "Reward %s not found".formatted(rewardId)));
         if (nonNull(shortRewardDetailsView.recipient().email())) {
-            accountingMailObserver.send(new RewardCanceled(shortRewardDetailsView.recipient().email(), shortRewardDetailsView.recipient().login(),
+            accountingMailObserver.notify(new RewardCanceled(shortRewardDetailsView.recipient().email(), shortRewardDetailsView.recipient().login(),
                     ShortReward.builder()
                             .amount(shortRewardDetailsView.money().amount())
                             .currencyCode(shortRewardDetailsView.money().currency().code().toString())
@@ -174,7 +173,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
                     rewardStatusStorage.get(reward.getId()).orElseThrow(() -> notFound("RewardStatus not found for reward %s".formatted(reward.getId().value())));
             rewardStatusStorage.save(rewardStatus.invoiceReceivedAt(null));
         });
-        accountingMailObserver.send(invoiceRejected);
+        accountingMailObserver.notify(invoiceRejected);
     }
 
     @Override
@@ -202,7 +201,7 @@ public class AccountingObserver implements AccountingObserverPort, RewardStatusF
                     .orElseThrow(() -> internalServerError(("Owner %s not found for billing profile %s")
                             .formatted(billingProfileVerificationUpdated.getUserId().value(), billingProfileId.value())));
             if (nonNull(owner.email())) {
-                accountingMailObserver.send(new BillingProfileVerificationFailed(owner.email(), owner.userId(), billingProfileId, owner.login(),
+                accountingMailObserver.notify(new BillingProfileVerificationFailed(owner.email(), owner.userId(), billingProfileId, owner.login(),
                         billingProfileVerificationUpdated.getVerificationStatus()));
             } else {
                 LOGGER.warn("Unable to send billing profile verifcation failed mail to user %s".formatted(billingProfileVerificationUpdated.getUserId()));

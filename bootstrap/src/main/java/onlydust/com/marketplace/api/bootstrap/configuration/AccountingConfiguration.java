@@ -15,8 +15,8 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountingMail
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
 import onlydust.com.marketplace.kernel.jobs.NotificationOutboxConsumer;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
-import onlydust.com.marketplace.kernel.observer.MailObserver;
 import onlydust.com.marketplace.kernel.port.output.*;
+import onlydust.com.marketplace.kernel.service.OutboxNotifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -53,11 +53,11 @@ public class AccountingConfiguration {
                                                  final @NonNull InvoiceStoragePort invoiceStorage,
                                                  final @NonNull ReceiptStoragePort receiptStorage,
                                                  final @NonNull BillingProfileStoragePort billingProfileStoragePort,
-                                                 final @NonNull MailObserver accountingMailObserver,
+                                                 final @NonNull NotificationPort accountingMailOutboxNotifier,
                                                  final @NonNull AccountingRewardStoragePort accountingRewardStoragePort,
                                                  final @NonNull NotificationPort slackNotificationPort) {
         return new AccountingObserver(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage, invoiceStorage, receiptStorage,
-                billingProfileStoragePort, accountingMailObserver, accountingRewardStoragePort, slackNotificationPort);
+                billingProfileStoragePort, accountingMailOutboxNotifier, accountingRewardStoragePort, slackNotificationPort);
     }
 
     @Bean
@@ -126,8 +126,8 @@ public class AccountingConfiguration {
     }
 
     @Bean
-    public MailObserver accountingMailObserver(final OutboxPort accountingMailOutbox) {
-        return new AccountingMailObserver(accountingMailOutbox);
+    public NotificationPort accountingMailOutboxNotifier(final OutboxPort accountingMailOutbox) {
+        return new OutboxNotifier(accountingMailOutbox);
     }
 
     @Bean
