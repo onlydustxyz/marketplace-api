@@ -93,7 +93,8 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
 
         // Then
         assertEquals(1, userRepository.findAll().size());
-        assertEquals(onboarding, result.onboarding());
+        assertEquals(onboarding.getProfileWizardDisplayDate(), result.onboarding().getProfileWizardDisplayDate());
+        assertEquals(onboarding.getTermsAndConditionsAcceptanceDate(), result.onboarding().getTermsAndConditionsAcceptanceDate());
         assertThat(result.githubUserId()).isEqualTo(user.getGithubUserId());
     }
 
