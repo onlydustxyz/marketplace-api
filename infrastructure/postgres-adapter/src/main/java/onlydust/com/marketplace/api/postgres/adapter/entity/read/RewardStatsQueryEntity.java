@@ -1,12 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Value;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -18,20 +16,23 @@ import java.util.UUID;
 @Value
 @EqualsAndHashCode
 @NoArgsConstructor(force = true)
-public class BudgetStatsViewEntity {
+@Immutable
+public class RewardStatsQueryEntity {
     @Id
+    @Column(name = "currency_id")
     UUID currencyId;
     @ManyToOne
-    @JoinColumn(name = "currencyId", insertable = false, updatable = false)
+    @JoinColumn(name = "currency_id", referencedColumnName = "id", insertable = false, updatable = false)
     CurrencyViewEntity currency;
-    BigDecimal spentAmount;
-    BigDecimal spentUsdAmount;
-    BigDecimal remainingAmount;
-    BigDecimal remainingUsdAmount;
+    BigDecimal processedAmount;
+    BigDecimal processedUsdAmount;
+    BigDecimal pendingAmount;
+    BigDecimal pendingUsdAmount;
+    Integer pendingRequestCount;
     @JdbcTypeCode(SqlTypes.JSON)
     Set<UUID> rewardIds;
     @JdbcTypeCode(SqlTypes.JSON)
     Set<Set<String>> rewardItemIds;
     @JdbcTypeCode(SqlTypes.JSON)
-    Set<Integer> rewardRecipientIds;
+    Set<UUID> projectIds;
 }

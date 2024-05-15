@@ -2,8 +2,8 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.Quote;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.BudgetStatsViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardDetailsViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.BudgetStatsQueryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardDetailsQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HistoricalQuoteEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
@@ -56,7 +56,7 @@ public class PostgresProjectRewardAdapter implements ProjectRewardStoragePort {
 
         return ProjectRewardsPageView.builder().
                 rewards(Page.<ProjectRewardView>builder()
-                        .content(page.getContent().stream().map(RewardDetailsViewEntity::toProjectReward).toList())
+                        .content(page.getContent().stream().map(RewardDetailsQueryEntity::toProjectReward).toList())
                         .totalItemNumber((int) page.getTotalElements())
                         .totalPageNumber(page.getTotalPages())
                         .build())
@@ -68,9 +68,9 @@ public class PostgresProjectRewardAdapter implements ProjectRewardStoragePort {
                                         .dollarsEquivalentValue(budgetStatsEntity.getSpentUsdAmount())
                         ))
                         .toList())
-                .sentRewardsCount(budgetStats.stream().map(BudgetStatsViewEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
-                .rewardedContributionsCount(budgetStats.stream().map(BudgetStatsViewEntity::getRewardItemIds).flatMap(Collection::stream).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
-                .rewardedContributorsCount(budgetStats.stream().map(BudgetStatsViewEntity::getRewardRecipientIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
+                .sentRewardsCount(budgetStats.stream().map(BudgetStatsQueryEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
+                .rewardedContributionsCount(budgetStats.stream().map(BudgetStatsQueryEntity::getRewardItemIds).flatMap(Collection::stream).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
+                .rewardedContributorsCount(budgetStats.stream().map(BudgetStatsQueryEntity::getRewardRecipientIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .build();
     }
 

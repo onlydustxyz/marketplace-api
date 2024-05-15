@@ -29,7 +29,7 @@ import static java.util.Objects.isNull;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Immutable
-public class PaymentShortViewEntity {
+public class PaymentShortQueryEntity {
 
     @Id
     UUID id;

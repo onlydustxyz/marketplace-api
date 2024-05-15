@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.SponsorAccountTransactionViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.SponsorAccountEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.SponsorAccountTransactionViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountTransactionViewRepository;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -65,7 +65,7 @@ public class PostgresSponsorAccountStorageAdapter implements SponsorAccountStora
 
         final var currencyIds = filters.getCurrencies().stream().map(Currency.Id::value).toList();
         final var projectIds = filters.getProjectIds().stream().map(ProjectId::value).toList();
-        final var types = filters.getTypes().stream().map(SponsorAccountTransactionViewEntity.TransactionType::of).map(Enum::name).toList();
+        final var types = filters.getTypes().stream().map(Enum::name).toList();
         final var fromDate = isNull(filters.getFrom()) ? null : format.format(filters.getFrom());
         final var toDate = isNull(filters.getTo()) ? null : format.format(filters.getTo());
         final var sortBy = SponsorAccountTransactionViewRepository.sortBy(sort, direction == SortDirection.asc ? Sort.Direction.ASC : Sort.Direction.DESC);

@@ -12,7 +12,7 @@ import org.hibernate.annotations.Immutable;
 @EqualsAndHashCode
 @NoArgsConstructor(force = true)
 @Immutable
-public class TechnologyViewEntity {
+public class TechnologyQueryEntity {
     @Id
     String technology;
 }

@@ -12,7 +12,7 @@ import java.util.Date;
 @Data
 @Entity
 @Immutable
-public class GithubRepoShortViewEntity {
+public class GithubRepoShortQueryEntity {
     @Id
     Long id;
     String ownerLogin;

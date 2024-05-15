@@ -16,7 +16,7 @@ import java.util.UUID;
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Immutable
-public class ContributionRewardViewEntity {
+public class ContributionRewardQueryEntity {
 
     @Id
     UUID id;

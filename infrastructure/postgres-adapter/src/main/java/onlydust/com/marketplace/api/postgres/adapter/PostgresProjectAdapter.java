@@ -159,17 +159,17 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                                                                                     ProjectCardView.SortBy sort,
                                                                                     Boolean mine, Integer pageIndex,
                                                                                     Integer pageSize) {
-        final String ecosystemsJsonPath = ProjectPageItemViewEntity.getEcosystemsJsonPath(sponsorIds);
-        final String technologiesJsonPath = ProjectPageItemViewEntity.getTechnologiesJsonPath(technologies);
-        final String tagsJsonPath = ProjectPageItemViewEntity.getTagsJsonPath(tags);
+        final String ecosystemsJsonPath = ProjectPageItemQueryEntity.getEcosystemsJsonPath(sponsorIds);
+        final String technologiesJsonPath = ProjectPageItemQueryEntity.getTechnologiesJsonPath(technologies);
+        final String tagsJsonPath = ProjectPageItemQueryEntity.getTagsJsonPath(tags);
         final Long count = projectsPageRepository.countProjectsForUserId(userId, mine, tagsJsonPath, technologiesJsonPath,
                 ecosystemsJsonPath, search);
-        final List<ProjectPageItemViewEntity> projectsForUserId =
+        final List<ProjectPageItemQueryEntity> projectsForUserId =
                 projectsPageRepository.findProjectsForUserId(userId, mine, tagsJsonPath,
                         technologiesJsonPath, ecosystemsJsonPath, search, isNull(sort) ?
                                 ProjectCardView.SortBy.NAME.name() : sort.name(),
                         PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex), pageSize);
-        final Map<String, Set<Object>> filters = ProjectPageItemFiltersViewEntity.entitiesToFilters(
+        final Map<String, Set<Object>> filters = ProjectPageItemFiltersQueryEntity.entitiesToFilters(
                 projectsPageFiltersRepository.findFiltersForUser(userId, mine));
         return Page.<ProjectCardView>builder()
                 .content(projectsForUserId.stream().map(p -> p.toView(userId)).toList())
@@ -187,17 +187,17 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                                                                               ProjectCardView.SortBy sort,
                                                                               Integer pageIndex, Integer pageSize) {
 
-        final String ecosystemsJsonPath = ProjectPageItemViewEntity.getEcosystemsJsonPath(sponsorIds);
-        final String technologiesJsonPath = ProjectPageItemViewEntity.getTechnologiesJsonPath(technologies);
-        final String tagsJsonPath = ProjectPageItemViewEntity.getTagsJsonPath(tags);
-        final List<ProjectPageItemViewEntity> projectsForAnonymousUser =
+        final String ecosystemsJsonPath = ProjectPageItemQueryEntity.getEcosystemsJsonPath(sponsorIds);
+        final String technologiesJsonPath = ProjectPageItemQueryEntity.getTechnologiesJsonPath(technologies);
+        final String tagsJsonPath = ProjectPageItemQueryEntity.getTagsJsonPath(tags);
+        final List<ProjectPageItemQueryEntity> projectsForAnonymousUser =
                 projectsPageRepository.findProjectsForAnonymousUser(tagsJsonPath, technologiesJsonPath, ecosystemsJsonPath, search,
                         isNull(sort) ?
                                 ProjectCardView.SortBy.NAME.name() : sort.name(),
                         PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex), pageSize);
         final Long count = projectsPageRepository.countProjectsForAnonymousUser(tagsJsonPath, technologiesJsonPath,
                 ecosystemsJsonPath, search);
-        final Map<String, Set<Object>> filters = ProjectPageItemFiltersViewEntity.entitiesToFilters(
+        final Map<String, Set<Object>> filters = ProjectPageItemFiltersQueryEntity.entitiesToFilters(
                 projectsPageFiltersRepository.findFiltersForAnonymousUser());
         return Page.<ProjectCardView>builder()
                 .content(projectsForAnonymousUser.stream().map(p -> p.toView(null)).toList())
@@ -384,7 +384,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     public List<UUID> getProjectLeadIds(UUID projectId) {
         return projectLeadViewRepository.findProjectLeaders(projectId)
                 .stream()
-                .map(ProjectLeadViewEntity::getId)
+                .map(ProjectLeadQueryEntity::getId)
                 .toList();
     }
 
@@ -408,8 +408,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
         final List<RewardableItemView> rewardableItemViews =
                 rewardableItemRepository.findByProjectIdAndGithubUserId(projectId, githubUserid,
-                                ContributionViewEntity.Type.fromViewToString(contributionType),
-                                ContributionViewEntity.Status.fromViewToString(contributionStatus),
+                                isNull(contributionType) ? null : contributionType.name(),
+                                isNull(contributionStatus) ? null : contributionStatus.name(),
                                 search,
                                 PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex),
                                 pageSize, includeIgnoredItems)
@@ -417,8 +417,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         .map(RewardableItemMapper::itemToDomain)
                         .toList();
         final Long count = rewardableItemRepository.countByProjectIdAndGithubUserId(projectId, githubUserid,
-                ContributionViewEntity.Type.fromViewToString(contributionType),
-                ContributionViewEntity.Status.fromViewToString(contributionStatus),
+                isNull(contributionType) ? null : contributionType.name(),
+                isNull(contributionStatus) ? null : contributionStatus.name(),
                 search, includeIgnoredItems);
         return Page.<RewardableItemView>builder()
                 .content(rewardableItemViews)
@@ -448,7 +448,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 projectId, CHURNED_CONTRIBUTOR_THRESHOLD_IN_DAYS,
                 PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "last_contribution_completed_at")));
         return Page.<ChurnedContributorView>builder()
-                .content(page.getContent().stream().map(ChurnedContributorViewEntity::toDomain).toList())
+                .content(page.getContent().stream().map(ChurnedContributorQueryEntity::toDomain).toList())
                 .totalItemNumber(page.getNumberOfElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();
@@ -460,7 +460,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 projectId, since, PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC,
                         "first_contribution_created_at")));
         return Page.<NewcomerView>builder()
-                .content(page.getContent().stream().map(NewcomerViewEntity::toDomain).toList())
+                .content(page.getContent().stream().map(NewcomerQueryEntity::toDomain).toList())
                 .totalItemNumber(page.getNumberOfElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();
@@ -477,7 +477,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 projectId, format.format(fromDate),
                 PageRequest.of(pageIndex, pageSize, JpaSort.unsafe(Sort.Direction.DESC, "completed_total_count")));
         return Page.<ContributorActivityView>builder()
-                .content(page.getContent().stream().map(ContributorActivityViewEntity::toDomain).toList())
+                .content(page.getContent().stream().map(ContributorActivityQueryEntity::toDomain).toList())
                 .totalItemNumber(page.getNumberOfElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();

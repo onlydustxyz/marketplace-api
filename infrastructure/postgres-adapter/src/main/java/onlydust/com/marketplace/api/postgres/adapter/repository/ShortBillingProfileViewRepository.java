@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortBillingProfileViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortBillingProfileQueryEntity;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ShortBillingProfileViewRepository extends JpaRepository<ShortBillingProfileViewEntity, UUID> {
+public interface ShortBillingProfileViewRepository extends JpaRepository<ShortBillingProfileQueryEntity, UUID> {
 
     @Query(value = """
             select bp.id,
@@ -29,7 +29,7 @@ public interface ShortBillingProfileViewRepository extends JpaRepository<ShortBi
             group by bp.id
             """, nativeQuery = true)
     @NotNull
-    Optional<ShortBillingProfileViewEntity> findById(@NotNull UUID billingProfileId);
+    Optional<ShortBillingProfileQueryEntity> findById(@NotNull UUID billingProfileId);
 
     @Query(value = """
             select bp.id,
@@ -48,7 +48,7 @@ public interface ShortBillingProfileViewRepository extends JpaRepository<ShortBi
             where coalesce(:billingProfileTypes) is null or cast(bp.type as text) in (:billingProfileTypes)
             group by bp.id, bpu.role
             """, nativeQuery = true)
-    List<ShortBillingProfileViewEntity> findBillingProfilesForUserId(@Param("userId") UUID userId, List<String> billingProfileTypes);
+    List<ShortBillingProfileQueryEntity> findBillingProfilesForUserId(@Param("userId") UUID userId, List<String> billingProfileTypes);
 
     @Query(value = """
             select bp.id,
@@ -68,6 +68,6 @@ public interface ShortBillingProfileViewRepository extends JpaRepository<ShortBi
             where u.id = :userId
             group by bp.id, bpui.role
             """, nativeQuery = true)
-    List<ShortBillingProfileViewEntity> findBillingProfilesForUserIdInvited(@Param("userId") UUID userId);
+    List<ShortBillingProfileQueryEntity> findBillingProfilesForUserIdInvited(@Param("userId") UUID userId);
 
 }

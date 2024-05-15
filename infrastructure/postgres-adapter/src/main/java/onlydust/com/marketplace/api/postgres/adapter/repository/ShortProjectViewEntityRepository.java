@@ -1,13 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortProjectViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortProjectQueryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface ShortProjectViewEntityRepository extends JpaRepository<ShortProjectViewEntity, UUID> {
+public interface ShortProjectViewEntityRepository extends JpaRepository<ShortProjectQueryEntity, UUID> {
     @Query(value = """
             SELECT
                 p.id,
@@ -38,9 +38,9 @@ public interface ShortProjectViewEntityRepository extends JpaRepository<ShortPro
             ORDER BY 
                 p.name 
             """, nativeQuery = true)
-    List<ShortProjectViewEntity> listProjectsByContributor(Long rewardId,
-                                                           List<UUID> projectIds,
-                                                           List<Long> repoIds);
+    List<ShortProjectQueryEntity> listProjectsByContributor(Long rewardId,
+                                                            List<UUID> projectIds,
+                                                            List<Long> repoIds);
 
     @Query(value = """
             SELECT DISTINCT
@@ -61,5 +61,5 @@ public interface ShortProjectViewEntityRepository extends JpaRepository<ShortPro
             ORDER BY 
                 p.name 
             """, nativeQuery = true)
-    List<ShortProjectViewEntity> listProjectsByRewardRecipient(Long rewardId);
+    List<ShortProjectQueryEntity> listProjectsByRewardRecipient(Long rewardId);
 }

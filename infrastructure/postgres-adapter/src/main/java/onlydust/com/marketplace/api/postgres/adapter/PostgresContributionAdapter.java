@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionRewardViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionRewardQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CustomIgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
@@ -80,7 +80,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
         final var rewards = contributionRewardViewEntityRepository.listByContributionId(projectId,
                 contributionId);
         return contribution.toView()
-                .withRewards(rewards.stream().map(ContributionRewardViewEntity::toView).toList());
+                .withRewards(rewards.stream().map(ContributionRewardQueryEntity::toView).toList());
     }
 
     private Sort sortBy(ContributionView.Sort sort, Sort.Direction direction) {

@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadQueryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -9,8 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.UUID;
 
-public interface ProjectLeadViewRepository extends JpaRepository<ProjectLeadViewEntity, Long>,
-        JpaSpecificationExecutor<ProjectLeadViewEntity> {
+public interface ProjectLeadViewRepository extends JpaRepository<ProjectLeadQueryEntity, Long>,
+        JpaSpecificationExecutor<ProjectLeadQueryEntity> {
 
     @Query(value = """
             select
@@ -24,7 +24,7 @@ public interface ProjectLeadViewRepository extends JpaRepository<ProjectLeadView
             join project_leads pl on pl.user_id = u.id and pl.project_id = :projectId
             left join indexer_exp.github_accounts ga on ga.id = u.github_user_id
             """, nativeQuery = true)
-    List<ProjectLeadViewEntity> findProjectLeaders(UUID projectId);
+    List<ProjectLeadQueryEntity> findProjectLeaders(UUID projectId);
 
     @Query(value = """
             (
@@ -52,6 +52,6 @@ public interface ProjectLeadViewRepository extends JpaRepository<ProjectLeadView
             join pending_project_leader_invitations pli on pli.github_user_id = ga.id and pli.project_id = :projectId
             )
             """, nativeQuery = true)
-    List<ProjectLeadViewEntity> findProjectLeadersAndInvitedLeaders(UUID projectId);
+    List<ProjectLeadQueryEntity> findProjectLeadersAndInvitedLeaders(UUID projectId);
 
 }

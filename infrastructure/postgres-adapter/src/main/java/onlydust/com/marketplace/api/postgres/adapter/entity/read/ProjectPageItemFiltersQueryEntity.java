@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.*;
 import onlydust.com.marketplace.project.domain.view.EcosystemView;
 import onlydust.com.marketplace.project.domain.view.ProjectCardView;
@@ -17,13 +16,12 @@ import java.util.stream.Collectors;
 import static java.util.Objects.nonNull;
 
 @Entity
-@Table(name = "projects", schema = "public")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Immutable
-public class ProjectPageItemFiltersViewEntity {
+public class ProjectPageItemFiltersQueryEntity {
     @Id
     UUID id;
     @JdbcTypeCode(SqlTypes.JSON)
@@ -43,11 +41,11 @@ public class ProjectPageItemFiltersViewEntity {
         String name;
     }
 
-    public static Map<String, Set<Object>> entitiesToFilters(final List<ProjectPageItemFiltersViewEntity> filtersViewEntities) {
+    public static Map<String, Set<Object>> entitiesToFilters(final List<ProjectPageItemFiltersQueryEntity> filtersViewEntities) {
         final Map<String, Set<Object>> filters = new HashMap<>();
         final Set<String> technologyNames = new HashSet<>();
         final Set<EcosystemView> ecosystems = new HashSet<>();
-        for (ProjectPageItemFiltersViewEntity filtersViewEntity : filtersViewEntities) {
+        for (ProjectPageItemFiltersQueryEntity filtersViewEntity : filtersViewEntities) {
             if (nonNull(filtersViewEntity.technologies)) {
                 filtersViewEntity.technologies.stream()
                         .filter(Objects::nonNull)

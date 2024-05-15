@@ -5,6 +5,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 import lombok.*;
+import org.hibernate.annotations.Immutable;
 
 import java.io.Serializable;
 
@@ -16,6 +17,7 @@ import java.io.Serializable;
 @EqualsAndHashCode
 @Table(name = "github_repo_languages", schema = "indexer_exp")
 @IdClass(GithubRepoLanguageViewEntity.PrimaryKey.class)
+@Immutable
 public class GithubRepoLanguageViewEntity {
     @Id
     Long repoId;

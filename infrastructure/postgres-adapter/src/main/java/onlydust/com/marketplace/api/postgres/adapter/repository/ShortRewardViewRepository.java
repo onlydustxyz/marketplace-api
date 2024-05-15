@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortRewardViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortRewardQueryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ShortRewardViewRepository extends JpaRepository<ShortRewardViewEntity, UUID> {
+public interface ShortRewardViewRepository extends JpaRepository<ShortRewardQueryEntity, UUID> {
 
     @Query(nativeQuery = true, value = """
             select r.id                                     id,
@@ -28,7 +28,7 @@ public interface ShortRewardViewRepository extends JpaRepository<ShortRewardView
                                              left join user_profile_info upi on upi.id = u.id
             where r.id = :rewardId
             """)
-    Optional<ShortRewardViewEntity> findById(UUID rewardId);
+    Optional<ShortRewardQueryEntity> findById(UUID rewardId);
 
 
     @Query(nativeQuery = true, value = """
@@ -60,7 +60,7 @@ public interface ShortRewardViewRepository extends JpaRepository<ShortRewardView
                        or (ngbr.boosted_reward_id is null and ecosystem_rewards.requested_at >= current_date - 7)
                 )
             """)
-    List<ShortRewardViewEntity> findRewardsToBoosWithNodeGuardiansForEcosystemIdNotLinkedToProject(UUID ecosystemId, UUID projectId);
+    List<ShortRewardQueryEntity> findRewardsToBoosWithNodeGuardiansForEcosystemIdNotLinkedToProject(UUID ecosystemId, UUID projectId);
 
     @Query(nativeQuery = true, value = """
             with sub as (select count(*), boost_reward_id

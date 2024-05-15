@@ -1,13 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.BudgetStatsViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.BudgetStatsQueryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface BudgetStatsRepository extends JpaRepository<BudgetStatsViewEntity, UUID> {
+public interface BudgetStatsRepository extends JpaRepository<BudgetStatsQueryEntity, UUID> {
     @Query(value = """
             WITH work_item_ids AS (SELECT ri.reward_id, JSONB_AGG(DISTINCT ri.id) as ids FROM reward_items ri GROUP BY ri.reward_id)
             SELECT
@@ -37,6 +37,6 @@ public interface BudgetStatsRepository extends JpaRepository<BudgetStatsViewEnti
                 pa.current_allowance, 
                 luq.price
             """, nativeQuery = true)
-    List<BudgetStatsViewEntity> findByProject(UUID projectId, List<UUID> currencies, List<Long> contributorIds,
-                                              String fromDate, String toDate);
+    List<BudgetStatsQueryEntity> findByProject(UUID projectId, List<UUID> currencies, List<Long> contributorIds,
+                                               String fromDate, String toDate);
 }

@@ -25,7 +25,7 @@ import java.util.UUID;
 @Entity
 @Value
 @Immutable
-public class ShortRewardViewEntity {
+public class ShortRewardQueryEntity {
     @Id
     @NonNull
     UUID id;

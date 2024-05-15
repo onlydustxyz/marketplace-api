@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
 @Data
 @Entity
 @Immutable
-public class NewcomerViewEntity {
+public class NewcomerQueryEntity {
     @Id
     Long id;
     String login;

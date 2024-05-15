@@ -35,7 +35,7 @@ import static java.util.Objects.isNull;
 @Builder
 @EntityListeners(AuditingEntityListener.class)
 @Immutable
-public class HackathonDetailsViewEntity {
+public class HackathonDetailsQueryEntity {
     @Id
     @EqualsAndHashCode.Include
     UUID id;

@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.GithubRepoShortViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.GithubRepoShortQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
 
@@ -18,7 +18,7 @@ public interface GithubRepoMapper {
                 .build();
     }
 
-    static GithubRepo map(GithubRepoShortViewEntity repo) {
+    static GithubRepo map(GithubRepoShortQueryEntity repo) {
         return GithubRepo.builder()
                 .id(repo.getId())
                 .owner(repo.getOwnerLogin())

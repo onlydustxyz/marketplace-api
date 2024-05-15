@@ -18,9 +18,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Entity
-@IdClass(ContributionDetailsViewEntity.PrimaryKey.class)
+@IdClass(ContributionDetailsQueryEntity.PrimaryKey.class)
 @Immutable
-public class ContributionDetailsViewEntity {
+public class ContributionDetailsQueryEntity {
     @Id
     String id;
     Date createdAt;
@@ -69,7 +69,7 @@ public class ContributionDetailsViewEntity {
     Boolean contributorIsRegistered;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    List<ContributionLinkViewEntity> links;
+    List<ContributionLinkJsonDto> links;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "github_pull_request_review_state")
@@ -130,7 +130,7 @@ public class ContributionDetailsViewEntity {
                 .githubAuthor(author)
                 .project(project)
                 .githubRepo(repo)
-                .links(Optional.ofNullable(links).orElse(List.of()).stream().map(ContributionLinkViewEntity::toView).toList())
+                .links(Optional.ofNullable(links).orElse(List.of()).stream().map(ContributionLinkJsonDto::toView).toList())
                 .prReviewState(Optional.ofNullable(prReviewState).map(ContributionViewEntity.GithubPullRequestReviewState::toView).orElse(null))
                 .build();
     }

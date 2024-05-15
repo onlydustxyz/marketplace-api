@@ -1,25 +1,27 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
+
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.util.Date;
-import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity
 @Immutable
-public class RewardItemDetailsViewEntity {
+public class RewardableItemQueryEntity {
 
     @Id
-    @Column(name = "reward_id")
+    @Column(name = "id")
     String id;
     @Column(name = "contribution_id")
     String contributionId;
@@ -30,7 +32,7 @@ public class RewardItemDetailsViewEntity {
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "contribution_type")
-    ContributionType type;
+    RewardableItemQueryEntity.ContributionType type;
     @Column(name = "status")
     String status;
     @Column(name = "number")
@@ -41,25 +43,20 @@ public class RewardItemDetailsViewEntity {
     String githubUrl;
     @Column(name = "repo_name")
     String repoName;
-    @Column(name = "author_id")
-    Long authorId;
-    @Column(name = "author_login")
-    String authorLogin;
-    @Column(name = "author_avatar_url")
-    String authorAvatarUrl;
-    @Column(name = "author_github_url")
-    String authorProfileUrl;
+    @Column(name = "repo_id")
+    Long repoId;
     @Column(name = "commits_count")
     Integer commitsCount;
     @Column(name = "user_commits_count")
     Integer userCommitsCount;
     @Column(name = "comments_count")
     Integer commentsCount;
-    @Column(name = "recipient_id")
-    Long recipientId;
-    @Column(name = "github_body")
+    @Column(name = "ignored")
+    Boolean ignored;
     String githubBody;
-    UUID billingProfileId;
+    Long githubAuthorId;
+    String githubAuthorLogin;
+    String githubAuthorAvatarUrl;
 
     public enum ContributionType {
         ISSUE, PULL_REQUEST, CODE_REVIEW

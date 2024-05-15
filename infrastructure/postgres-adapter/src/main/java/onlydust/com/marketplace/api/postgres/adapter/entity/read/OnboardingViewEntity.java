@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
+import org.hibernate.annotations.Immutable;
 
 import java.util.Date;
 import java.util.UUID;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @Data
 @Builder
 @Table(name = "onboardings", schema = "public")
+@Immutable
 public class OnboardingViewEntity {
 
     @Id

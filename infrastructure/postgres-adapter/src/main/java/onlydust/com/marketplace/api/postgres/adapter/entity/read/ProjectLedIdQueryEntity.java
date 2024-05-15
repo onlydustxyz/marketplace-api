@@ -16,7 +16,7 @@ import java.util.UUID;
 @Data
 @Entity
 @Immutable
-public class ProjectLedIdViewEntity {
+public class ProjectLedIdQueryEntity {
     @EmbeddedId
     Id id;
     String projectSlug;

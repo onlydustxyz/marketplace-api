@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.enums.ContactChanelE
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.project.domain.view.Money;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -26,7 +27,8 @@ import java.util.UUID;
 @Value
 @Entity
 @Accessors(fluent = true)
-public class UserProfileViewEntity {
+@Immutable
+public class UserProfileQueryEntity {
     @Id
     @Column(name = "github_user_id", nullable = false)
     Long githubId;

@@ -14,7 +14,7 @@ import java.time.ZonedDateTime;
 @Data
 @Entity
 @Immutable
-public class ChurnedContributorViewEntity {
+public class ChurnedContributorQueryEntity {
     @Id
     Long id;
     String login;

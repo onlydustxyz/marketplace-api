@@ -2,16 +2,15 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
+import onlydust.com.marketplace.project.domain.model.ContributionType;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
 import onlydust.com.marketplace.project.domain.view.ContributionLinkView;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
-import org.hibernate.annotations.Immutable;
 
 @EqualsAndHashCode
-@Immutable
-public class ContributionLinkViewEntity {
+public class ContributionLinkJsonDto {
     @JsonProperty("type")
-    ContributionViewEntity.Type type;
+    ContributionType type;
     @JsonProperty("github_number")
     Long githubNumber;
     @JsonProperty("github_status")
@@ -56,7 +55,7 @@ public class ContributionLinkViewEntity {
                 .build();
 
         return ContributionLinkView.builder()
-                .type(type.toView())
+                .type(type)
                 .githubNumber(githubNumber)
                 .githubStatus(githubStatus)
                 .githubTitle(githubTitle)

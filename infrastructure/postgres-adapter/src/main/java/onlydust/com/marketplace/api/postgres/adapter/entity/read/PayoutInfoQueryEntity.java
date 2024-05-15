@@ -31,7 +31,7 @@ import static java.util.Objects.nonNull;
 @Builder(toBuilder = true)
 @Entity
 @Immutable
-public class PayoutInfoViewEntity {
+public class PayoutInfoQueryEntity {
     @Id
     UUID billingProfileId;
 

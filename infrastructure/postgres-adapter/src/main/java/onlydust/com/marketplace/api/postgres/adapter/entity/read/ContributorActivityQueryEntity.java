@@ -15,7 +15,7 @@ import java.util.List;
 @Data
 @Entity
 @Immutable
-public class ContributorActivityViewEntity {
+public class ContributorActivityQueryEntity {
     @Id
     Long id;
     String login;
@@ -26,7 +26,7 @@ public class ContributorActivityViewEntity {
     Integer completedIssueCount;
     Integer completedCodeReviewCount;
     @JdbcTypeCode(SqlTypes.JSON)
-    List<UserProfileViewEntity.WeekCount> counts;
+    List<UserProfileQueryEntity.WeekCount> counts;
 
     public ContributorActivityView toDomain() {
         return ContributorActivityView.builder()
@@ -38,7 +38,7 @@ public class ContributorActivityViewEntity {
                 .completedPullRequestCount(completedPullRequestCount)
                 .completedIssueCount(completedIssueCount)
                 .completedCodeReviewCount(completedCodeReviewCount)
-                .contributionStats(counts.stream().map(UserProfileViewEntity.WeekCount::toDomain).toList())
+                .contributionStats(counts.stream().map(UserProfileQueryEntity.WeekCount::toDomain).toList())
                 .build();
     }
 }

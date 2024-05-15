@@ -20,7 +20,7 @@ import java.util.UUID;
 @NoArgsConstructor(force = true)
 @Entity
 @Immutable
-public class RewardDetailsViewEntity {
+public class RewardDetailsQueryEntity {
     @Id
     @NonNull
     UUID id;

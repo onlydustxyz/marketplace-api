@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.Immutable;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @Table(name = "projects_sponsors", schema = "public")
 @Accessors(fluent = true)
 @IdClass(ProjectSponsorViewEntity.PrimaryKey.class)
+@Immutable
 public class ProjectSponsorViewEntity {
     @Id
     @NonNull

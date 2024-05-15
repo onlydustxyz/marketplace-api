@@ -21,9 +21,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
-@IdClass(value = PayoutPreferenceViewEntity.PrimaryKey.class)
+@IdClass(value = PayoutPreferenceQueryEntity.PrimaryKey.class)
 @Immutable
-public class PayoutPreferenceViewEntity {
+public class PayoutPreferenceQueryEntity {
 
     @Id
     UUID userId;

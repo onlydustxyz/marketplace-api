@@ -20,7 +20,7 @@ import java.util.List;
 @Data
 @Entity
 @Immutable
-public class ProjectContributorViewEntity {
+public class ProjectContributorQueryEntity {
     @Id
     @Column(name = "id")
     Long githubUserId;
@@ -47,5 +47,5 @@ public class ProjectContributorViewEntity {
     Integer issuesToReward;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", name = "totals_earned")
-    private List<UserProfileViewEntity.TotalEarnedPerCurrency> totalEarnedPerCurrencies;
+    private List<UserProfileQueryEntity.TotalEarnedPerCurrency> totalEarnedPerCurrencies;
 }

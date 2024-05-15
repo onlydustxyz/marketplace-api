@@ -14,7 +14,7 @@ import org.hibernate.annotations.Immutable;
 @Data
 @Entity
 @Immutable
-public class ContributorViewEntity {
+public class ContributorQueryEntity {
     @Id
     Long githubUserId;
     String login;

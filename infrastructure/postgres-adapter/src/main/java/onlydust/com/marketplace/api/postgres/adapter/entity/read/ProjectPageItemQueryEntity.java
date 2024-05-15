@@ -23,9 +23,8 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Entity
-@Table(name = "projects", schema = "public")
 @Immutable
-public class ProjectPageItemViewEntity {
+public class ProjectPageItemQueryEntity {
     @Id
     @Column(name = "id")
     UUID projectId;

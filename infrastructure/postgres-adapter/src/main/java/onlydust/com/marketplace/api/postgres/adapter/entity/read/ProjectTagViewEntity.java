@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.project.domain.model.Project;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @Table(name = "projects_tags", schema = "public")
 @Getter
 @EntityListeners(AuditingEntityListener.class)
+@Immutable
 public class ProjectTagViewEntity {
 
     @EmbeddedId

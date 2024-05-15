@@ -1,5 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -7,10 +10,7 @@ import lombok.Value;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardUsdEquivalent;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -25,6 +25,7 @@ import static java.time.ZoneOffset.UTC;
 @EqualsAndHashCode
 @NoArgsConstructor(force = true)
 @Table(name = "reward_usd_equivalent_data", schema = "accounting")
+@Immutable
 public class RewardUsdEquivalentDataViewEntity {
     @Id
     @NonNull

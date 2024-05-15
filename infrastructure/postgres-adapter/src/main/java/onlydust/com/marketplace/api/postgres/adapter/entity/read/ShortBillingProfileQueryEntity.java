@@ -21,7 +21,7 @@ import static java.util.Objects.isNull;
 @Entity
 @Data
 @Immutable
-public class ShortBillingProfileViewEntity {
+public class ShortBillingProfileQueryEntity {
     @Id
     UUID id;
 

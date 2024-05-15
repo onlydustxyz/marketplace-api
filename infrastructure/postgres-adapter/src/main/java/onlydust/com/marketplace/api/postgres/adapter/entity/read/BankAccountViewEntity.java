@@ -5,6 +5,7 @@ import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -19,6 +20,7 @@ import java.util.UUID;
 @Builder
 @Table(name = "bank_accounts", schema = "accounting")
 @EntityListeners(AuditingEntityListener.class)
+@Immutable
 public class BankAccountViewEntity {
 
     @Id

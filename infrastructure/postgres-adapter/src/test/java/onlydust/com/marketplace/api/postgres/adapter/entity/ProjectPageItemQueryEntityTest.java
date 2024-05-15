@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.project.domain.model.Project;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectPageItemViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectPageItemQueryEntity;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +12,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class ProjectPageItemViewEntityTest {
+public class ProjectPageItemQueryEntityTest {
 
     protected static final Faker faker = new Faker();
 
@@ -25,7 +25,7 @@ public class ProjectPageItemViewEntityTest {
             final List<UUID> ecosystems = null;
 
             // When
-            final String ecosystemsJsonPath = ProjectPageItemViewEntity.getEcosystemsJsonPath(ecosystems);
+            final String ecosystemsJsonPath = ProjectPageItemQueryEntity.getEcosystemsJsonPath(ecosystems);
 
             // Then
             assertNull(ecosystemsJsonPath);
@@ -38,7 +38,7 @@ public class ProjectPageItemViewEntityTest {
             final List<UUID> ecosystems = List.of(ecosystemId1);
 
             // When
-            final String ecosystemsJsonPath = ProjectPageItemViewEntity.getEcosystemsJsonPath(ecosystems);
+            final String ecosystemsJsonPath = ProjectPageItemQueryEntity.getEcosystemsJsonPath(ecosystems);
 
             // Then
             assertEquals("$[*] ? (@.id == \"" + ecosystemId1 + "\")", ecosystemsJsonPath);
@@ -52,7 +52,7 @@ public class ProjectPageItemViewEntityTest {
             final List<UUID> ecosystemIds = List.of(ecosystemId1, ecosystemId2);
 
             // When
-            final String ecosystemsJsonPath = ProjectPageItemViewEntity.getEcosystemsJsonPath(ecosystemIds);
+            final String ecosystemsJsonPath = ProjectPageItemQueryEntity.getEcosystemsJsonPath(ecosystemIds);
 
             // Then
             assertEquals("$[*] ? (@.id == \"" + ecosystemId1 + "\" || @.id == \"" + ecosystemId2 + "\")", ecosystemsJsonPath);
@@ -70,7 +70,7 @@ public class ProjectPageItemViewEntityTest {
             final List<Project.Tag> tags = null;
 
             // When
-            final String tagsJsonPath = ProjectPageItemViewEntity.getTagsJsonPath(tags);
+            final String tagsJsonPath = ProjectPageItemQueryEntity.getTagsJsonPath(tags);
 
             // Then
             assertNull(tagsJsonPath);
@@ -82,7 +82,7 @@ public class ProjectPageItemViewEntityTest {
             final List<Project.Tag> tags = List.of(Project.Tag.NEWBIES_WELCOME);
 
             // When
-            final String tagsJsonPath = ProjectPageItemViewEntity.getTagsJsonPath(tags);
+            final String tagsJsonPath = ProjectPageItemQueryEntity.getTagsJsonPath(tags);
 
             // Then
             assertEquals("$[*] ? (@.name == \"NEWBIES_WELCOME\")", tagsJsonPath);
@@ -94,7 +94,7 @@ public class ProjectPageItemViewEntityTest {
             final List<Project.Tag> tags = List.of(Project.Tag.LIKELY_TO_REWARD, Project.Tag.FAST_AND_FURIOUS);
 
             // When
-            final String tagsJsonPath = ProjectPageItemViewEntity.getTagsJsonPath(tags);
+            final String tagsJsonPath = ProjectPageItemQueryEntity.getTagsJsonPath(tags);
 
             // Then
             assertEquals("$[*] ? (@.name == \"LIKELY_TO_REWARD\" || @.name == \"FAST_AND_FURIOUS\")", tagsJsonPath);
@@ -113,7 +113,7 @@ public class ProjectPageItemViewEntityTest {
             final List<String> technologies = null;
 
             // When
-            final String technologiesJsonPath = ProjectPageItemViewEntity.getTechnologiesJsonPath(technologies);
+            final String technologiesJsonPath = ProjectPageItemQueryEntity.getTechnologiesJsonPath(technologies);
 
             // Then
             assertNull(technologiesJsonPath);
@@ -126,7 +126,7 @@ public class ProjectPageItemViewEntityTest {
             final List<String> technologies = List.of(technology1);
 
             // When
-            final String technologiesJsonPath = ProjectPageItemViewEntity.getTechnologiesJsonPath(technologies);
+            final String technologiesJsonPath = ProjectPageItemQueryEntity.getTechnologiesJsonPath(technologies);
 
             // Then
             assertEquals("$[*] ? (@.\"" + technology1 + "\" > 0)", technologiesJsonPath);
@@ -140,7 +140,7 @@ public class ProjectPageItemViewEntityTest {
             final List<String> technologies = List.of(technology1, technology2);
 
             // When
-            final String technologiesJsonPath = ProjectPageItemViewEntity.getTechnologiesJsonPath(technologies);
+            final String technologiesJsonPath = ProjectPageItemQueryEntity.getTechnologiesJsonPath(technologies);
 
             // Then
             assertEquals("$[*] ? (@.\"" + technology1 + "\" > 0 || @.\"" + technology2 + "\" > 0)", technologiesJsonPath);

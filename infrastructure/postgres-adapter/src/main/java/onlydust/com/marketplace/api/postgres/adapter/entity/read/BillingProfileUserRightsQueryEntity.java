@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Entity
 @Immutable
-public class BillingProfileUserRightsViewEntity {
+public class BillingProfileUserRightsQueryEntity {
     @Id
     UUID userId;
     @Enumerated(EnumType.STRING)

@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ChurnedContributorViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ChurnedContributorQueryEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.UUID;
 
-public interface ChurnedContributorViewEntityRepository extends JpaRepository<ChurnedContributorViewEntity, Long> {
+public interface ChurnedContributorViewEntityRepository extends JpaRepository<ChurnedContributorQueryEntity, Long> {
     @Query(value = """
                 WITH latest_contributions_per_user AS
                          (SELECT DISTINCT ON (contributor_id) id,
@@ -50,5 +50,5 @@ public interface ChurnedContributorViewEntityRepository extends JpaRepository<Ch
                         completed_at < current_date - :threshold AND
                         pgr.project_id = :projectId
                     """, nativeQuery = true)
-    Page<ChurnedContributorViewEntity> findAllByProjectId(UUID projectId, Integer threshold, Pageable pageable);
+    Page<ChurnedContributorQueryEntity> findAllByProjectId(UUID projectId, Integer threshold, Pageable pageable);
 }

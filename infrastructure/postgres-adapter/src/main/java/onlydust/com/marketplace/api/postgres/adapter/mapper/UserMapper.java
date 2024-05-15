@@ -29,7 +29,7 @@ import static java.util.Objects.nonNull;
 
 public interface UserMapper {
 
-    static ContributorLinkView mapToContributorLinkView(ContributorViewEntity user) {
+    static ContributorLinkView mapToContributorLinkView(ContributorQueryEntity user) {
         return ContributorLinkView.builder()
                 .githubUserId(user.getGithubUserId())
                 .login(user.getLogin())
@@ -38,7 +38,7 @@ public interface UserMapper {
                 .build();
     }
 
-    static ProjectLeaderLinkView mapToProjectLeaderLinkView(ProjectLeadViewEntity user) {
+    static ProjectLeaderLinkView mapToProjectLeaderLinkView(ProjectLeadQueryEntity user) {
         return ProjectLeaderLinkView.builder()
                 .id(user.getId())
                 .githubUserId(user.getGithubId())
@@ -49,7 +49,7 @@ public interface UserMapper {
     }
 
     static User mapUserToDomain(UserViewEntity user, Date termsAndConditionsLatestVersionDate,
-                                List<ProjectLedIdViewEntity> projectLedIdViewEntities,
+                                List<ProjectLedIdQueryEntity> projectLedIdViewEntities,
                                 List<ApplicationEntity> applications,
                                 List<BillingProfileLinkView> billingProfiles,
                                 boolean hasAnyRewardPendingBillingProfile) {
@@ -69,24 +69,24 @@ public interface UserMapper {
                 .hasSeenOnboardingWizard(nonNull(user.onboarding())
                         && nonNull(user.onboarding().getProfileWizardDisplayDate()))
                 .projectsLed(projectLedIdViewEntities.stream()
-                        .filter(projectLedIdViewEntity -> !projectLedIdViewEntity.getPending())
-                        .map(projectLedIdViewEntity -> ProjectLedView.builder()
-                                .name(projectLedIdViewEntity.getName())
-                                .logoUrl(projectLedIdViewEntity.getLogoUrl())
-                                .slug(projectLedIdViewEntity.getProjectSlug())
-                                .id(projectLedIdViewEntity.getId().getProjectId())
-                                .contributorCount(projectLedIdViewEntity.getContributorCount())
-                                .hasMissingGithubAppInstallation(projectLedIdViewEntity.getIsMissingGithubAppInstallation())
+                        .filter(projectLedIdQueryEntity -> !projectLedIdQueryEntity.getPending())
+                        .map(projectLedIdQueryEntity -> ProjectLedView.builder()
+                                .name(projectLedIdQueryEntity.getName())
+                                .logoUrl(projectLedIdQueryEntity.getLogoUrl())
+                                .slug(projectLedIdQueryEntity.getProjectSlug())
+                                .id(projectLedIdQueryEntity.getId().getProjectId())
+                                .contributorCount(projectLedIdQueryEntity.getContributorCount())
+                                .hasMissingGithubAppInstallation(projectLedIdQueryEntity.getIsMissingGithubAppInstallation())
                                 .build()).toList())
                 .pendingProjectsLed(projectLedIdViewEntities.stream()
-                        .filter(ProjectLedIdViewEntity::getPending)
-                        .map(projectLedIdViewEntity -> ProjectLedView.builder()
-                                .name(projectLedIdViewEntity.getName())
-                                .logoUrl(projectLedIdViewEntity.getLogoUrl())
-                                .slug(projectLedIdViewEntity.getProjectSlug())
-                                .id(projectLedIdViewEntity.getId().getProjectId())
-                                .contributorCount(projectLedIdViewEntity.getContributorCount())
-                                .hasMissingGithubAppInstallation(projectLedIdViewEntity.getIsMissingGithubAppInstallation())
+                        .filter(ProjectLedIdQueryEntity::getPending)
+                        .map(projectLedIdQueryEntity -> ProjectLedView.builder()
+                                .name(projectLedIdQueryEntity.getName())
+                                .logoUrl(projectLedIdQueryEntity.getLogoUrl())
+                                .slug(projectLedIdQueryEntity.getProjectSlug())
+                                .id(projectLedIdQueryEntity.getId().getProjectId())
+                                .contributorCount(projectLedIdQueryEntity.getContributorCount())
+                                .hasMissingGithubAppInstallation(projectLedIdQueryEntity.getIsMissingGithubAppInstallation())
                                 .build()).toList())
                 .projectsAppliedTo(applications.stream().map(ApplicationEntity::getProjectId).toList())
                 .createdAt(user.createdAt())

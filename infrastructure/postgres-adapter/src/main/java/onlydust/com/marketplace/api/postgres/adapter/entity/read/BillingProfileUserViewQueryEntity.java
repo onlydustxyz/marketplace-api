@@ -25,9 +25,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Data
-@IdClass(BillingProfileUserViewEntity.PrimaryKey.class)
+@IdClass(BillingProfileUserViewQueryEntity.PrimaryKey.class)
 @Immutable
-public class BillingProfileUserViewEntity {
+public class BillingProfileUserViewQueryEntity {
 
     @Id
     UUID billingProfileId;

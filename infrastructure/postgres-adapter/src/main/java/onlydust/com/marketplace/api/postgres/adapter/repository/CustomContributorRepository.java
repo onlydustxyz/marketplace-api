@@ -3,8 +3,8 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectContributorViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorQueryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectContributorQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.view.ProjectContributorsLinkView;
@@ -186,9 +186,9 @@ public class CustomContributorRepository {
                 .replace("%order_by%", sortValue);
     }
 
-    public List<ContributorViewEntity> findProjectTopContributors(UUID projectId, int limit) {
+    public List<ContributorQueryEntity> findProjectTopContributors(UUID projectId, int limit) {
         return entityManager
-                .createNativeQuery(FIND_TOP_CONTRIBUTORS_BASE_QUERY, ContributorViewEntity.class)
+                .createNativeQuery(FIND_TOP_CONTRIBUTORS_BASE_QUERY, ContributorQueryEntity.class)
                 .setParameter("projectId", projectId)
                 .setParameter("limit", limit)
                 .getResultList();
@@ -202,12 +202,12 @@ public class CustomContributorRepository {
         return ((Number) query.getSingleResult()).intValue();
     }
 
-    public List<ProjectContributorViewEntity> getProjectContributorViewEntity(final UUID projectId, String login, final UUID projectLeadId, Boolean showHidden,
-                                                                              ProjectContributorsLinkView.SortBy sortBy,
-                                                                              SortDirection sortDirection,
-                                                                              int pageIndex, int pageSize) {
+    public List<ProjectContributorQueryEntity> getProjectContributorViewEntity(final UUID projectId, String login, final UUID projectLeadId, Boolean showHidden,
+                                                                               ProjectContributorsLinkView.SortBy sortBy,
+                                                                               SortDirection sortDirection,
+                                                                               int pageIndex, int pageSize) {
         return entityManager.createNativeQuery(buildQuery(sortBy, sortDirection),
-                        ProjectContributorViewEntity.class)
+                        ProjectContributorQueryEntity.class)
                 .setParameter("projectId", projectId)
                 .setParameter("projectLeadId", projectLeadId)
                 .setParameter("showHidden", showHidden)
@@ -217,18 +217,18 @@ public class CustomContributorRepository {
                 .getResultList();
     }
 
-    public List<ContributorViewEntity> findReposContributorsByLogin(Set<Long> reposIds, String login, int limit) {
+    public List<ContributorQueryEntity> findReposContributorsByLogin(Set<Long> reposIds, String login, int limit) {
         return entityManager
-                .createNativeQuery(FIND_REPOS_CONTRIBUTORS, ContributorViewEntity.class)
+                .createNativeQuery(FIND_REPOS_CONTRIBUTORS, ContributorQueryEntity.class)
                 .setParameter("reposIds", reposIds)
                 .setParameter("login", login != null ? login : "")
                 .setParameter("limit", limit)
                 .getResultList();
     }
 
-    public List<ContributorViewEntity> findAllContributorsByLogin(String login, int limit) {
+    public List<ContributorQueryEntity> findAllContributorsByLogin(String login, int limit) {
         return entityManager
-                .createNativeQuery(FIND_ALL_CONTRIBUTORS, ContributorViewEntity.class)
+                .createNativeQuery(FIND_ALL_CONTRIBUTORS, ContributorQueryEntity.class)
                 .setParameter("login", login != null ? login : "")
                 .setParameter("limit", limit)
                 .getResultList();

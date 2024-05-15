@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.NewcomerViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.NewcomerQueryEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-public interface NewcomerViewEntityRepository extends JpaRepository<NewcomerViewEntity, Long> {
+public interface NewcomerViewEntityRepository extends JpaRepository<NewcomerQueryEntity, Long> {
     @Query(value = """
             SELECT DISTINCT
                    c.contributor_id                    AS id,
@@ -33,5 +33,5 @@ public interface NewcomerViewEntityRepository extends JpaRepository<NewcomerView
             WHERE pgr.project_id = :projectId AND
                   first_contributions.created_at >= :since
             """, nativeQuery = true)
-    Page<NewcomerViewEntity> findAllByProjectId(UUID projectId, ZonedDateTime since, Pageable pageable);
+    Page<NewcomerQueryEntity> findAllByProjectId(UUID projectId, ZonedDateTime since, Pageable pageable);
 }

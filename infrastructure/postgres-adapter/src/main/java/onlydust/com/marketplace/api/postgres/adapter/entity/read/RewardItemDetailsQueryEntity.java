@@ -1,27 +1,25 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.util.Date;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity
 @Immutable
-public class RewardableItemViewEntity {
+public class RewardItemDetailsQueryEntity {
 
     @Id
-    @Column(name = "id")
+    @Column(name = "reward_id")
     String id;
     @Column(name = "contribution_id")
     String contributionId;
@@ -32,7 +30,7 @@ public class RewardableItemViewEntity {
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "contribution_type")
-    RewardableItemViewEntity.ContributionType type;
+    ContributionType type;
     @Column(name = "status")
     String status;
     @Column(name = "number")
@@ -43,20 +41,25 @@ public class RewardableItemViewEntity {
     String githubUrl;
     @Column(name = "repo_name")
     String repoName;
-    @Column(name = "repo_id")
-    Long repoId;
+    @Column(name = "author_id")
+    Long authorId;
+    @Column(name = "author_login")
+    String authorLogin;
+    @Column(name = "author_avatar_url")
+    String authorAvatarUrl;
+    @Column(name = "author_github_url")
+    String authorProfileUrl;
     @Column(name = "commits_count")
     Integer commitsCount;
     @Column(name = "user_commits_count")
     Integer userCommitsCount;
     @Column(name = "comments_count")
     Integer commentsCount;
-    @Column(name = "ignored")
-    Boolean ignored;
+    @Column(name = "recipient_id")
+    Long recipientId;
+    @Column(name = "github_body")
     String githubBody;
-    Long githubAuthorId;
-    String githubAuthorLogin;
-    String githubAuthorAvatarUrl;
+    UUID billingProfileId;
 
     public enum ContributionType {
         ISSUE, PULL_REQUEST, CODE_REVIEW

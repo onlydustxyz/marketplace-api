@@ -17,7 +17,7 @@ import java.util.UUID;
 @Data
 @Entity
 @Immutable
-public class ProjectLeadViewEntity {
+public class ProjectLeadQueryEntity {
     @Id
     @Column(name = "github_user_id", nullable = false)
     Long githubId;
