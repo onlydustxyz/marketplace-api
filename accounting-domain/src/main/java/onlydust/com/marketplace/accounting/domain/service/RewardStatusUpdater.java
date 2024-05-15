@@ -23,7 +23,6 @@ public class RewardStatusUpdater implements AccountingObserverPort, BillingProfi
     private final RewardStatusFacadePort rewardStatusFacadePort;
     private final RewardStatusStorage rewardStatusStorage;
     private final InvoiceStoragePort invoiceStorage;
-    private final ReceiptStoragePort receiptStorage;
     private final AccountingRewardStoragePort accountingRewardStoragePort;
 
     @Override
@@ -58,11 +57,6 @@ public class RewardStatusUpdater implements AccountingObserverPort, BillingProfi
                 invoiceStorage.update(invoice.status(Invoice.Status.PAID));
             }
         });
-    }
-
-    @Override
-    public void onPaymentReceived(RewardId rewardId, Payment.Reference reference) {
-        receiptStorage.save(Receipt.of(rewardId, reference));
     }
 
     @Override

@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
-import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
@@ -40,11 +39,6 @@ public class AccountingObserverComposite implements AccountingObserverPort {
     @Override
     public void onRewardPaid(RewardId rewardId) {
         observers.forEach(o -> o.onRewardPaid(rewardId));
-    }
-
-    @Override
-    public void onPaymentReceived(RewardId rewardId, Payment.Reference reference) {
-        observers.forEach(o -> o.onPaymentReceived(rewardId, reference));
     }
 
     @Override

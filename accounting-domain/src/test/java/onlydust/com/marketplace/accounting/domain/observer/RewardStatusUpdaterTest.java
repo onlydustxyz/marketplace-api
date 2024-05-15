@@ -12,7 +12,6 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.ReceiptStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
 import onlydust.com.marketplace.accounting.domain.service.RewardStatusUpdater;
@@ -45,7 +44,6 @@ public class RewardStatusUpdaterTest {
     private InvoiceStoragePort invoiceStorage;
     private AccountBookFacade accountBookFacade;
     private RewardStatusUpdater rewardStatusUpdater;
-    private ReceiptStoragePort receiptStorage;
     private AccountingRewardStoragePort accountingRewardStoragePort;
     final Faker faker = new Faker();
     final Currency currency = ETH;
@@ -56,10 +54,9 @@ public class RewardStatusUpdaterTest {
         rewardStatusStorage = mock(RewardStatusStorage.class);
         accountBookFacade = mock(AccountBookFacade.class);
         invoiceStorage = mock(InvoiceStoragePort.class);
-        receiptStorage = mock(ReceiptStoragePort.class);
         accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
         rewardStatusUpdater = new RewardStatusUpdater(rewardStatusFacadePort, rewardStatusStorage, invoiceStorage,
-                receiptStorage, accountingRewardStoragePort);
+                accountingRewardStoragePort);
 
         when(rewardStatusStorage.get(any(RewardId.class))).then(invocation -> {
             final var rewardId = invocation.getArgument(0, RewardId.class);
@@ -159,23 +156,8 @@ public class RewardStatusUpdaterTest {
                 verify(invoiceStorage, never()).update(invoice.status(Invoice.Status.PAID));
             }
 
-            rewardStatusUpdater.onPaymentReceived(rewardId, reference);
-            {
-                // Then
-                final var receiptCaptor = ArgumentCaptor.forClass(Receipt.class);
-                verify(receiptStorage).save(receiptCaptor.capture());
-                final var receipt = receiptCaptor.getValue();
-                assertThat(receipt.id()).isNotNull();
-                assertThat(receipt.rewardId()).isEqualTo(rewardId);
-                assertThat(receipt.network()).isEqualTo(reference.network());
-                assertThat(receipt.createdAt()).isBefore(ZonedDateTime.now());
-                assertThat(receipt.reference()).isEqualTo(reference.reference());
-                assertThat(receipt.thirdPartyName()).isEqualTo(reference.thirdPartyName());
-                assertThat(receipt.thirdPartyAccountNumber()).isEqualTo(reference.thirdPartyAccountNumber());
-            }
-
             // When
-            reset(rewardStatusStorage, invoiceStorage, receiptStorage);
+            reset(rewardStatusStorage, invoiceStorage);
             when(rewardStatusStorage.get(rewardId)).thenReturn(Optional.of(rewardStatus.paidAt(ZonedDateTime.now())));
             when(rewardStatusStorage.get(rewardId2)).thenReturn(Optional.of(rewardStatus2.paidAt(ZonedDateTime.now())));
             when(invoiceStorage.invoiceOf(rewardId)).thenReturn(Optional.of(invoice));
@@ -192,28 +174,11 @@ public class RewardStatusUpdaterTest {
 
                 verify(invoiceStorage).update(invoice.status(Invoice.Status.PAID));
             }
-
-            rewardStatusUpdater.onPaymentReceived(rewardId2, reference);
-            {
-                // Then
-                final var receiptCaptor = ArgumentCaptor.forClass(Receipt.class);
-                verify(receiptStorage).save(receiptCaptor.capture());
-                final var receipt = receiptCaptor.getValue();
-                assertThat(receipt.id()).isNotNull();
-                assertThat(receipt.rewardId()).isEqualTo(rewardId2);
-                assertThat(receipt.network()).isEqualTo(reference.network());
-                assertThat(receipt.createdAt()).isBefore(ZonedDateTime.now());
-                assertThat(receipt.reference()).isEqualTo(reference.reference());
-                assertThat(receipt.thirdPartyName()).isEqualTo(reference.thirdPartyName());
-                assertThat(receipt.thirdPartyAccountNumber()).isEqualTo(reference.thirdPartyAccountNumber());
-            }
         }
     }
 
     @Nested
     class OnSponsorAccountBalanceChanged {
-        RewardId rewardId1 = RewardId.random();
-        RewardId rewardId2 = RewardId.random();
         SponsorAccountStatement sponsorAccountStatement;
         SponsorAccount sponsorAccount;
 
@@ -236,8 +201,6 @@ public class RewardStatusUpdaterTest {
 
     @Nested
     class OnSponsorAccountUpdated {
-        RewardId rewardId1 = RewardId.random();
-        RewardId rewardId2 = RewardId.random();
         SponsorAccountStatement sponsorAccountStatement;
         SponsorAccount sponsorAccount;
 

@@ -35,10 +35,11 @@ public class AccountingConfiguration {
                                                      final @NonNull ProjectAccountingObserver projectAccountingObserver,
                                                      final @NonNull InvoiceStoragePort invoiceStoragePort,
                                                      final @NonNull AccountBookObserver accountBookObserver,
-                                                     final @NonNull RewardStatusService rewardStatusService
+                                                     final @NonNull RewardStatusService rewardStatusService,
+                                                     final @NonNull ReceiptStoragePort receiptStoragePort
     ) {
         return new AccountingService(cachedAccountBookProvider, sponsorAccountStorage, currencyStorage, accountingObserver, projectAccountingObserver,
-                invoiceStoragePort, accountBookObserver, rewardStatusService);
+                invoiceStoragePort, accountBookObserver, rewardStatusService, receiptStoragePort);
     }
 
     @Bean
@@ -58,9 +59,8 @@ public class AccountingConfiguration {
     public RewardStatusUpdater rewardStatusUpdater(final @NonNull RewardStatusFacadePort rewardStatusFacadePort,
                                                    final @NonNull RewardStatusStorage rewardStatusStorage,
                                                    final @NonNull InvoiceStoragePort invoiceStorage,
-                                                   final @NonNull ReceiptStoragePort receiptStorage,
                                                    final @NonNull AccountingRewardStoragePort accountingRewardStoragePort) {
-        return new RewardStatusUpdater(rewardStatusFacadePort, rewardStatusStorage, invoiceStorage, receiptStorage, accountingRewardStoragePort);
+        return new RewardStatusUpdater(rewardStatusFacadePort, rewardStatusStorage, invoiceStorage, accountingRewardStoragePort);
     }
 
     @Bean

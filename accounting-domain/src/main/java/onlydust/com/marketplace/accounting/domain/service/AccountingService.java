@@ -34,6 +34,7 @@ public class AccountingService implements AccountingFacadePort {
     private final InvoiceStoragePort invoiceStoragePort;
     private final AccountBookObserver accountBookObserver;
     private final RewardStatusFacadePort rewardStatusFacadePort;
+    private final ReceiptStoragePort receiptStorage;
 
     @Override
     @Transactional
@@ -242,7 +243,7 @@ public class AccountingService implements AccountingFacadePort {
                     modifiedSponsorAccounts.add(sponsorAccountStatement(account, accountBookState));
                 });
 
-        accountingObserver.onPaymentReceived(reward.id(), paymentReference);
+        receiptStorage.save(Receipt.of(reward.id(), paymentReference));
         if (isPaid(accountBookState, reward.id()))
             accountingObserver.onRewardPaid(reward.id());
 

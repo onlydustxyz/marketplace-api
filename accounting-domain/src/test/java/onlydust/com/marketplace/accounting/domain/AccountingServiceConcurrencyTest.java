@@ -13,10 +13,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInf
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserverPort;
-import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.ProjectAccountingObserver;
+import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.accounting.domain.stubs.AccountBookEventStorageStub;
@@ -45,6 +42,7 @@ public class AccountingServiceConcurrencyTest {
     final InvoiceStoragePort invoiceStoragePort = mock(InvoiceStoragePort.class);
     final AccountBookObserver accountBookObserver = mock(AccountBookObserver.class);
     final RewardStatusFacadePort rewardStatusFacadePort = mock(RewardStatusFacadePort.class);
+    final ReceiptStoragePort receiptStoragePort = mock(ReceiptStoragePort.class);
     SponsorAccount sponsorAccount;
     final Currency currency = Currencies.USDC;
     final SponsorId sponsorId = SponsorId.random();
@@ -79,7 +77,7 @@ public class AccountingServiceConcurrencyTest {
             accountBookEventStorage = new AccountBookEventStorageStub();
             cachedAccountBookProvider = new CachedAccountBookProvider(accountBookEventStorage);
             accountingService = new AccountingService(cachedAccountBookProvider, sponsorAccountStorage, currencyStorage, accountingObserver,
-                    projectAccountingObserver, invoiceStoragePort, accountBookObserver, rewardStatusFacadePort);
+                    projectAccountingObserver, invoiceStoragePort, accountBookObserver, rewardStatusFacadePort, receiptStoragePort);
         }
 
         @BeforeAll
@@ -157,7 +155,7 @@ public class AccountingServiceConcurrencyTest {
             for (int i = 0; i < INSTANCE_COUNT; i++) {
                 accountBookProviders.add(new CachedAccountBookProvider(accountBookEventStorage));
                 accountingServices.add(new AccountingService(accountBookProviders.get(i), sponsorAccountStorage, currencyStorage, accountingObserver,
-                        projectAccountingObserver, invoiceStoragePort, accountBookObserver, rewardStatusFacadePort));
+                        projectAccountingObserver, invoiceStoragePort, accountBookObserver, rewardStatusFacadePort, receiptStoragePort));
             }
         }
 

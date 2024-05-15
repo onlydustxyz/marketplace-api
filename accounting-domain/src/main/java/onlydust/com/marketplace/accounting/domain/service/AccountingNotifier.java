@@ -5,7 +5,10 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.*;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.ProjectId;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserverPort;
@@ -80,10 +83,6 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
 
     @Override
     public void onRewardPaid(RewardId rewardId) {
-    }
-
-    @Override
-    public void onPaymentReceived(RewardId rewardId, Payment.Reference reference) {
     }
 
     @Override
