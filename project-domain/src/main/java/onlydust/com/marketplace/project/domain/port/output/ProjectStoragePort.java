@@ -83,4 +83,5 @@ public interface ProjectStoragePort {
 
     void updateProjectsTags(Date now);
 
+    void createCategory(ProjectCategory projectCategory);
 }

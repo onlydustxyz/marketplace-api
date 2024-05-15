@@ -5,15 +5,13 @@ import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
-import onlydust.com.marketplace.api.slack.mapper.BillingProfileVerificationEventMapper;
-import onlydust.com.marketplace.api.slack.mapper.ProjectCreatedEventMapper;
-import onlydust.com.marketplace.api.slack.mapper.UserAppliedOnProjectEventMapper;
-import onlydust.com.marketplace.api.slack.mapper.UserRegisteredOnHackathonEventMapper;
+import onlydust.com.marketplace.api.slack.mapper.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.project.domain.model.notification.ProjectCategorySuggestion;
 import onlydust.com.marketplace.project.domain.model.notification.ProjectCreated;
 import onlydust.com.marketplace.project.domain.model.notification.UserAppliedOnProject;
 import onlydust.com.marketplace.project.domain.model.notification.UserRegisteredOnHackathon;
@@ -55,6 +53,8 @@ public class SlackApiAdapter implements NotificationPort {
             sendProjectCreatedNotification(projectCreated);
         } else if (event instanceof UserRegisteredOnHackathon userRegisteredOnHackathon) {
             sendUserRegisteredOnHackathonEvent(userRegisteredOnHackathon);
+        } else if (event instanceof ProjectCategorySuggestion projectCategorySuggestion) {
+            sendProjectCategorySuggestionNotification(projectCategorySuggestion);
         } else {
             LOGGER.warn("Unmanaged event class %s".formatted(event.getClass()));
         }
@@ -92,6 +92,14 @@ public class SlackApiAdapter implements NotificationPort {
         final ProjectDetailsView projectDetailsView = projectStoragePort.getById(userAppliedOnProject.getProjectId(), user);
         sendNotification(slackProperties.getDevRelChannel(), "New user application on project", UserAppliedOnProjectEventMapper.mapToSlackBlock(user,
                 projectDetailsView, slackProperties.getEnvironment()));
+    }
+
+    private void sendProjectCategorySuggestionNotification(final ProjectCategorySuggestion projectCategorySuggestion) {
+        final User user = userStoragePort.getUserById(projectCategorySuggestion.getUserId())
+                .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(projectCategorySuggestion.getUserId())));
+        sendNotification(slackProperties.getDevRelChannel(), "New project category suggested", ProjectCategorySuggestionEventMapper.mapToSlackBlock(user,
+                projectCategorySuggestion.getCategoryName(),
+                slackProperties.getEnvironment()));
     }
 
     private void sendNotification(final String slackChannel, final String slackDefaultMessage, final String slackBlock) {

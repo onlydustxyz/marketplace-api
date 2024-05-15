@@ -283,3 +283,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000229_rank_history.sql
   - include:
       file: db/changelog/changelogs/00000230_refactor_sponsor_account_transactions_view.sql
+  - include:
+      file: db/changelog/changelogs/00000231_add_project_categories_table.sql

@@ -128,7 +128,7 @@ public class ProjectService implements ProjectFacadePort {
             throw OnlyDustException.badRequest("Project with slug '%s' already exists".formatted(slug));
         }
         checkProjectLeadersToKeep(command);
-        
+
         if (command.getGithubUserIdsAsProjectLeadersToInvite() != null) {
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
         }
@@ -170,7 +170,7 @@ public class ProjectService implements ProjectFacadePort {
                 .anyMatch(userId -> projectLeadIds.stream()
                         .noneMatch(projectLeaderId -> projectLeaderId.equals(userId)))) {
             throw OnlyDustException.badRequest("Project leaders to keep must be a subset of current project " +
-                    "leaders");
+                                               "leaders");
         }
     }
 
@@ -275,7 +275,7 @@ public class ProjectService implements ProjectFacadePort {
                 return closedIssue;
             } else {
                 throw OnlyDustException.forbidden("Rewardable issue can only be created on repos linked to this " +
-                        "project");
+                                                  "project");
             }
         } else {
             throw OnlyDustException.forbidden("Only project leads can create rewardable issue on their projects");
@@ -395,5 +395,11 @@ public class ProjectService implements ProjectFacadePort {
     @Override
     public Page<GithubIssueView> findGoodFirstIssues(UUID projectId, Integer page, Integer pageSize) {
         return githubStoragePort.findGoodFirstIssuesForProject(projectId, page, pageSize);
+    }
+
+    @Override
+    public void suggestCategory(String categoryName, UUID userId) {
+        projectStoragePort.createCategory(ProjectCategory.suggest(categoryName));
+        projectObserverPort.onProjectCategorySuggested(categoryName, userId);
     }
 }
