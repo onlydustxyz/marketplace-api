@@ -32,6 +32,7 @@ public class AccountingService implements AccountingFacadePort {
     private final ProjectAccountingObserver projectAccountingObserver;
     private final InvoiceStoragePort invoiceStoragePort;
     private final AccountBookObserver accountBookObserver;
+    private final RewardStatusStorage rewardStatusStorage;
 
     @Override
     @Transactional
@@ -180,6 +181,7 @@ public class AccountingService implements AccountingFacadePort {
         accountingObserver.onRewardCancelled(rewardId);
         refundedAccounts.stream().filter(AccountId::isProject).map(AccountId::projectId)
                 .forEach(refundedProjectId -> onAllowanceUpdated(refundedProjectId, currencyId, accountBook.state()));
+        rewardStatusStorage.delete(rewardId);
     }
 
     @Override

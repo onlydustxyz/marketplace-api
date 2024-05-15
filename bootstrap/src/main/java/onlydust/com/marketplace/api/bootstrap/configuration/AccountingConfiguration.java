@@ -34,10 +34,11 @@ public class AccountingConfiguration {
                                                      final @NonNull AccountingObserverPort accountingObserver,
                                                      final @NonNull ProjectAccountingObserver projectAccountingObserver,
                                                      final @NonNull InvoiceStoragePort invoiceStoragePort,
-                                                     final @NonNull AccountBookObserver accountBookObserver
+                                                     final @NonNull AccountBookObserver accountBookObserver,
+                                                     final @NonNull RewardStatusStorage rewardStatusStorage
     ) {
         return new AccountingService(cachedAccountBookProvider, sponsorAccountStorage, currencyStorage, accountingObserver, projectAccountingObserver,
-                invoiceStoragePort, accountBookObserver);
+                invoiceStoragePort, accountBookObserver, rewardStatusStorage);
     }
 
     @Bean

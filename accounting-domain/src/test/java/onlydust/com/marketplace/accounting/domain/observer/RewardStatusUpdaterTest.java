@@ -124,20 +124,6 @@ public class RewardStatusUpdaterTest {
     }
 
     @Nested
-    class OnRewardCancelled {
-        RewardId rewardId = RewardId.random();
-
-        @Test
-        public void should_cancel_reward() {
-            // When
-            rewardStatusUpdater.onRewardCancelled(rewardId);
-
-            // Then
-            verify(rewardStatusStorage).delete(rewardId);
-        }
-    }
-
-    @Nested
     class OnRewardPaid {
         RewardId rewardId = RewardId.random();
 

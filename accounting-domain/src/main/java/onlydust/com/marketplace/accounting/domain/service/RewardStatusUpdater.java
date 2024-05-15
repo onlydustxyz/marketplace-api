@@ -67,7 +67,6 @@ public class RewardStatusUpdater implements AccountingObserverPort, RewardStatus
 
     @Override
     public void onRewardCancelled(RewardId rewardId) {
-        rewardStatusStorage.delete(rewardId);
     }
 
     @Override

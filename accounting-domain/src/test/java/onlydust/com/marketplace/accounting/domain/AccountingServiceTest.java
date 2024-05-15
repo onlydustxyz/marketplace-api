@@ -12,10 +12,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserverPort;
-import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.ProjectAccountingObserver;
+import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
@@ -53,6 +50,7 @@ public class AccountingServiceTest {
     final ProjectAccountingObserver projectAccountingObserver = mock(ProjectAccountingObserver.class);
     final InvoiceStoragePort invoiceStoragePort = mock(InvoiceStoragePort.class);
     AccountBookObserver accountBookObserver = mock(AccountBookObserver.class);
+    final RewardStatusStorage rewardStatusStorage = mock(RewardStatusStorage.class);
     AccountBookEventStorageStub accountBookEventStorage;
     AccountingService accountingService;
     final Faker faker = new Faker();
@@ -122,7 +120,7 @@ public class AccountingServiceTest {
     private void setupAccountingService() {
         accountBookEventStorage = new AccountBookEventStorageStub();
         accountingService = new AccountingService(new CachedAccountBookProvider(accountBookEventStorage), sponsorAccountStorage, currencyStorage,
-                accountingObserver, projectAccountingObserver, invoiceStoragePort, accountBookObserver);
+                accountingObserver, projectAccountingObserver, invoiceStoragePort, accountBookObserver, rewardStatusStorage);
     }
 
     @BeforeAll
@@ -598,6 +596,7 @@ public class AccountingServiceTest {
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
             events.forEach(e -> verify(accountBookObserver).on(e));
+            verify(rewardStatusStorage).delete(rewardId1);
         }
 
         @Test
@@ -628,6 +627,7 @@ public class AccountingServiceTest {
             // Then
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
             assertThat(accountingService.getPayableRewards(Set.of(rewardId1))).hasSize(1);
+            verify(rewardStatusStorage, never()).delete(rewardId1);
         }
     }
 
@@ -1023,6 +1023,7 @@ public class AccountingServiceTest {
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
             events.forEach(e -> verify(accountBookObserver).on(e));
+            verify(rewardStatusStorage).delete(rewardId);
         }
 
         @ParameterizedTest
@@ -1040,6 +1041,8 @@ public class AccountingServiceTest {
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Reward %s cannot be cancelled because it is included in an invoice".formatted(rewardId));
+
+            verify(rewardStatusStorage, never()).delete(rewardId);
         }
 
 
@@ -1055,6 +1058,9 @@ public class AccountingServiceTest {
 
             // When
             accountingService.cancel(rewardId, currency.id());
+
+            // Then
+            verify(rewardStatusStorage).delete(rewardId);
         }
     }
 
@@ -1349,8 +1355,10 @@ public class AccountingServiceTest {
                 final var payableRewards2 = accountingService.getPayableRewards(Set.of(rewardId2));
 
                 // Then
-                assertThat(payableRewards1).containsExactly(PayableReward.of(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), billingProfileSnapshot));
-                assertThat(payableRewards2).containsExactly(PayableReward.of(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L), billingProfileSnapshot));
+                assertThat(payableRewards1).containsExactly(PayableReward.of(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L),
+                        billingProfileSnapshot));
+                assertThat(payableRewards2).containsExactly(PayableReward.of(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L),
+                        billingProfileSnapshot));
             }
         }
 
@@ -1380,7 +1388,8 @@ public class AccountingServiceTest {
                 final var payableRewards = accountingService.getPayableRewards(Set.of(rewardId1, rewardId2, rewardId3, rewardId4, rewardId5, rewardId6));
 
                 // Then
-                assertThat(payableRewards).containsExactly(PayableReward.of(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L), billingProfileSnapshot));
+                assertThat(payableRewards).containsExactly(PayableReward.of(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L),
+                        billingProfileSnapshot));
             }
             {
                 // When
@@ -1388,7 +1397,8 @@ public class AccountingServiceTest {
                 final var payableRewards1 = accountingService.getPayableRewards(Set.of(rewardId1));
 
                 // Then
-                assertThat(payableRewards).containsExactly(PayableReward.of(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L), billingProfileSnapshot));
+                assertThat(payableRewards).containsExactly(PayableReward.of(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L),
+                        billingProfileSnapshot));
                 assertThat(payableRewards1).isEmpty();
             }
         }
