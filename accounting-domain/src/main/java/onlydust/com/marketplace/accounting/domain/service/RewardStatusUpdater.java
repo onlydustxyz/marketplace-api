@@ -13,7 +13,6 @@ import onlydust.com.marketplace.accounting.domain.port.out.*;
 
 import java.time.ZonedDateTime;
 
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @Slf4j
@@ -47,13 +46,10 @@ public class RewardStatusUpdater implements AccountingObserverPort, BillingProfi
 
     @Override
     public void onRewardPaid(RewardId rewardId) {
-        final var rewardStatus = rewardStatusStorage.get(rewardId)
-                .orElseThrow(() -> internalServerError("RewardStatus not found for reward %s".formatted(rewardId)));
-        rewardStatusStorage.save(rewardStatus.paidAt(ZonedDateTime.now()));
+        rewardStatusStorage.save(mustGetRewardStatus(rewardId).paidAt(ZonedDateTime.now()));
 
         invoiceStorage.invoiceOf(rewardId).ifPresent(invoice -> {
-            if (invoice.rewards().stream().allMatch(reward -> rewardStatusStorage.get(reward.id()).map(RewardStatusData::isPaid)
-                    .orElseThrow(() -> internalServerError("RewardStatus not found for reward %s".formatted(rewardId))))) {
+            if (invoice.rewards().stream().allMatch(reward -> mustGetRewardStatus(reward.id()).isPaid())) {
                 invoiceStorage.update(invoice.status(Invoice.Status.PAID));
             }
         });
@@ -63,19 +59,18 @@ public class RewardStatusUpdater implements AccountingObserverPort, BillingProfi
     public void onInvoiceUploaded(BillingProfile.Id billingProfileId, Invoice.Id invoiceId, boolean isExternal) {
         final var invoice = invoiceStorage.get(invoiceId).orElseThrow(() -> notFound("Invoice %s not found".formatted(invoiceId)));
         invoice.rewards().forEach(reward -> {
-            final var rewardStatus =
-                    rewardStatusStorage.get(reward.id()).orElseThrow(() -> notFound("RewardStatus not found for reward %s".formatted(reward.id())));
-            rewardStatusStorage.save(rewardStatus.invoiceReceivedAt(invoice.createdAt()));
+            rewardStatusStorage.save(mustGetRewardStatus(reward.id()).invoiceReceivedAt(invoice.createdAt()));
         });
     }
 
     @Override
     public void onInvoiceRejected(@NonNull InvoiceRejected invoiceRejected) {
-        invoiceRejected.rewards().forEach(reward -> {
-            final var rewardStatus =
-                    rewardStatusStorage.get(reward.getId()).orElseThrow(() -> notFound("RewardStatus not found for reward %s".formatted(reward.getId().value())));
-            rewardStatusStorage.save(rewardStatus.invoiceReceivedAt(null));
-        });
+        invoiceRejected.rewards().forEach(reward -> rewardStatusStorage.save(mustGetRewardStatus(reward.getId()).invoiceReceivedAt(null)));
+    }
+
+    private RewardStatusData mustGetRewardStatus(RewardId rewardId) {
+        return rewardStatusStorage.get(rewardId)
+                .orElseThrow(() -> notFound("RewardStatus not found for reward %s".formatted(rewardId.value())));
     }
 
     @Override
