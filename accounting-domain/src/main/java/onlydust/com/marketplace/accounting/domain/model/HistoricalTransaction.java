@@ -14,8 +14,10 @@ public record HistoricalTransaction(
         @NonNull UUID id,
         @NonNull ZonedDateTime timestamp,
         @NonNull Type type,
-        @NonNull SponsorAccount sponsorAccount,
         @NonNull Amount amount,
+        @NonNull Currency currency,
+        Network network,
+        ZonedDateTime lockedUntil,
         ConvertedAmount usdAmount,
         ProjectShortView project
 ) {
@@ -23,10 +25,6 @@ public record HistoricalTransaction(
         DEPOSIT, WITHDRAW, SPEND, // Balance transactions
         MINT, BURN, TRANSFER, REFUND // Allowance transactions
         ;
-
-        public boolean isDebit() {
-            return List.of(WITHDRAW, SPEND, BURN, TRANSFER).contains(this);
-        }
     }
 
     @Data

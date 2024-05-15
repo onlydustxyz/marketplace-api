@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.HistoricalTransaction;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.SponsorAccountTransactionViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.SponsorAccountTransactionViewEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

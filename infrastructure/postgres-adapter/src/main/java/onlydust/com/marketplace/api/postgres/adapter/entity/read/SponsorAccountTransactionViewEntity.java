@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.write;
+package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,14 +7,19 @@ import onlydust.com.marketplace.accounting.domain.model.ConvertedAmount;
 import onlydust.com.marketplace.accounting.domain.model.HistoricalTransaction;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.math.BigDecimal;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.UUID;
+
+import static java.util.Objects.isNull;
+
 
 @Entity
 @Value
@@ -35,57 +40,35 @@ public class SponsorAccountTransactionViewEntity {
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "transaction_type")
     @NonNull
-    TransactionType type;
+    HistoricalTransaction.Type type;
 
     @ManyToOne
     @NonNull
-    SponsorAccountEntity sponsorAccount;
+    SponsorAccountViewEntity sponsorAccount;
 
     @ManyToOne
-    ProjectEntity project;
+    ProjectViewEntity project;
 
     @NonNull
     BigDecimal amount;
 
-    public enum TransactionType {
-        DEPOSIT, WITHDRAW, SPEND, MINT, BURN, TRANSFER, REFUND;
-
-        public HistoricalTransaction.Type toDomain() {
-            return switch (this) {
-                case DEPOSIT -> HistoricalTransaction.Type.DEPOSIT;
-                case WITHDRAW -> HistoricalTransaction.Type.WITHDRAW;
-                case SPEND -> HistoricalTransaction.Type.SPEND;
-                case MINT -> HistoricalTransaction.Type.MINT;
-                case BURN -> HistoricalTransaction.Type.BURN;
-                case TRANSFER -> HistoricalTransaction.Type.TRANSFER;
-                case REFUND -> HistoricalTransaction.Type.REFUND;
-            };
-        }
-
-        public static TransactionType of(HistoricalTransaction.Type type) {
-            return switch (type) {
-                case DEPOSIT -> DEPOSIT;
-                case WITHDRAW -> WITHDRAW;
-                case SPEND -> SPEND;
-                case MINT -> MINT;
-                case BURN -> BURN;
-                case TRANSFER -> TRANSFER;
-                case REFUND -> REFUND;
-            };
-        }
-    }
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "network")
+    NetworkEnumEntity network;
 
     public HistoricalTransaction toDomain() {
-        final var sponsorAccount = this.sponsorAccount.toDomain();
 
         return new HistoricalTransaction(
                 id,
                 timestamp,
-                type.toDomain(),
-                sponsorAccount,
+                type,
                 Amount.of(amount),
-                sponsorAccount.currency().latestUsdQuote()
-                        .map(usdConversionRate -> new ConvertedAmount(Amount.of(amount.multiply(usdConversionRate)), usdConversionRate))
+                sponsorAccount.getCurrency().toDomain(),
+                isNull(network) ? null : network.toNetwork(),
+                isNull(sponsorAccount.getLockedUntil()) ? null : ZonedDateTime.ofInstant(sponsorAccount.getLockedUntil(), ZoneOffset.UTC),
+                Optional.ofNullable(sponsorAccount.getCurrency().latestUsdQuote())
+                        .map(usdConversionRate -> new ConvertedAmount(Amount.of(amount.multiply(usdConversionRate.getPrice())), usdConversionRate.getPrice()))
                         .orElse(null),
                 project == null ? null : ProjectShortView.builder()
                         .id(ProjectId.of(project.getId()))
