@@ -1,17 +1,17 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
+import onlydust.com.marketplace.api.postgres.adapter.entity.enums.AllocatedTimeEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.enums.ContactChanelEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.AllocatedTimeEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactChanelEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactInformationIdEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -93,7 +93,8 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
 
         // Then
         assertEquals(1, userRepository.findAll().size());
-        assertEquals(onboarding, result.onboarding());
+        assertEquals(onboarding.getProfileWizardDisplayDate(), result.onboarding().getProfileWizardDisplayDate());
+        assertEquals(onboarding.getTermsAndConditionsAcceptanceDate(), result.onboarding().getTermsAndConditionsAcceptanceDate());
         assertThat(result.githubUserId()).isEqualTo(user.getGithubUserId());
     }
 
@@ -124,7 +125,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .hiring(false)
                 .id(projectId)
                 .rank(faker.number().randomDigit())
-                .visibility(ProjectVisibilityEnumEntity.PUBLIC)
+                .visibility(ProjectVisibility.PUBLIC)
                 .ignorePullRequests(true)
                 .ignoreCodeReviews(true)
                 .ignoreIssues(true)

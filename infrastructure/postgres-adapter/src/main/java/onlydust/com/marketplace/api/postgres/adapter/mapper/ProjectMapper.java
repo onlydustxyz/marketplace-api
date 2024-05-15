@@ -1,18 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortProjectViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectMoreInfoEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
-import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.view.ProjectDetailsView;
 import onlydust.com.marketplace.project.domain.view.ProjectOrganizationView;
 
@@ -33,12 +28,12 @@ public interface ProjectMapper {
                                                       final Boolean hasRemainingBudget,
                                                       ProjectDetailsView.Me me) {
 
-        final var organizationEntities = new HashMap<Long, GithubAccountEntity>();
+        final var organizationEntities = new HashMap<Long, GithubAccountViewEntity>();
         projectEntity.getRepos().forEach(repo -> organizationEntities.put(repo.getOwner().id(), repo.getOwner()));
         final var repoIdsIncludedInProject =
                 projectEntity.getRepos().stream()
-                        .filter(GithubRepoEntity::isPublic)
-                        .map(GithubRepoEntity::getId).collect(Collectors.toSet());
+                        .filter(GithubRepoViewEntity::isPublic)
+                        .map(GithubRepoViewEntity::getId).collect(Collectors.toSet());
 
         final var organizations = organizationEntities.values().stream().map(entity -> ProjectOrganizationView.builder()
                 .id(entity.id())
@@ -49,12 +44,12 @@ public interface ProjectMapper {
                 .installationId(isNull(entity.installation()) ? null : entity.installation().getId())
                 .isInstalled(nonNull(entity.installation()))
                 .repos(entity.repos().stream()
-                        .filter(GithubRepoEntity::isPublic)
+                        .filter(GithubRepoViewEntity::isPublic)
                         .map(repo -> RepoMapper.mapToDomain(repo,
                                 repoIdsIncludedInProject.contains(repo.getId()),
                                 entity.installation() != null &&
-                                entity.installation().getAuthorizedRepos().stream()
-                                        .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId())))
+                                        entity.installation().getAuthorizedRepos().stream()
+                                                .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId())))
                         )
                         .collect(Collectors.toSet()))
                 .build()).toList();
@@ -69,7 +64,7 @@ public interface ProjectMapper {
                 .name(projectEntity.getName())
                 .createdAt(Date.from(projectEntity.getCreatedAt()))
                 .moreInfos(mapMoreInfosWithDefaultValue(projectEntity))
-                .visibility(projectVisibilityToDomain(projectEntity.getVisibility()))
+                .visibility(projectEntity.getVisibility())
                 .rewardSettings(
                         new ProjectRewardSettings(
                                 projectEntity.getIgnorePullRequests(),
@@ -92,45 +87,13 @@ public interface ProjectMapper {
                 .hasRemainingBudget(hasRemainingBudget)
                 .me(me)
                 .tags(projectEntity.getTags().stream()
-                        .map(projectTagEntity -> switch (projectTagEntity.getId().getTag()) {
-                            case HOT_COMMUNITY -> Project.Tag.HOT_COMMUNITY;
-                            case FAST_AND_FURIOUS -> Project.Tag.FAST_AND_FURIOUS;
-                            case LIKELY_TO_REWARD -> Project.Tag.LIKELY_TO_REWARD;
-                            case NEWBIES_WELCOME -> Project.Tag.NEWBIES_WELCOME;
-                            case UPDATED_ROADMAP -> Project.Tag.UPDATED_ROADMAP;
-                            case WORK_IN_PROGRESS -> Project.Tag.WORK_IN_PROGRESS;
-                            case BIG_WHALE -> Project.Tag.BIG_WHALE;
-                        }).collect(Collectors.toSet()))
+                        .map(projectTagEntity -> projectTagEntity.getId().getTag()).collect(Collectors.toSet()))
                 .build();
 
         for (ProjectOrganizationView organization : organizations) {
             project.addOrganization(organization);
         }
         return project;
-    }
-
-    static ProjectVisibility projectVisibilityToDomain(ProjectVisibilityEnumEntity visibility) {
-        switch (visibility) {
-            case PUBLIC -> {
-                return ProjectVisibility.PUBLIC;
-            }
-            case PRIVATE -> {
-                return ProjectVisibility.PRIVATE;
-            }
-        }
-        throw new IllegalArgumentException("Could not map project visibility");
-    }
-
-    static ProjectVisibilityEnumEntity projectVisibilityToEntity(ProjectVisibility visibility) {
-        switch (visibility) {
-            case PUBLIC -> {
-                return ProjectVisibilityEnumEntity.PUBLIC;
-            }
-            case PRIVATE -> {
-                return ProjectVisibilityEnumEntity.PRIVATE;
-            }
-        }
-        throw new IllegalArgumentException("Could not map project visibility");
     }
 
     static Project mapShortProjectViewToProject(ShortProjectViewEntity project) {
@@ -142,13 +105,13 @@ public interface ProjectMapper {
                 .longDescription(project.getLongDescription())
                 .logoUrl(project.getLogoUrl())
                 .hiring(project.getHiring())
-                .visibility(projectVisibilityToDomain(project.getVisibility()))
+                .visibility(project.getVisibility())
                 .build();
     }
 
     static List<NamedLink> mapMoreInfosWithDefaultValue(final ProjectViewEntity projectViewEntity) {
         return projectViewEntity.getMoreInfos().stream()
-                .sorted(Comparator.comparing(ProjectMoreInfoEntity::getRank))
+                .sorted(Comparator.comparing(ProjectMoreInfoViewEntity::getRank))
                 .map(projectMoreInfoEntity -> NamedLink.builder()
                         .value(projectMoreInfoEntity.getName())
                         .url(projectMoreInfoEntity.getUrl()).build())

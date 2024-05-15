@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.PayableReward;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -36,7 +37,7 @@ public class BatchPaymentEntity {
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "batch_payment_status")
-    Status status;
+    Payment.Status status;
     @OneToMany(mappedBy = "batchPayment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     List<BatchPaymentRewardEntity> rewards;
 
@@ -55,30 +56,9 @@ public class BatchPaymentEntity {
                 .csv(payment.csv())
                 .transactionHash(payment.transactionHash())
                 .network(NetworkEnumEntity.of(payment.network()))
-                .status(switch (payment.status()) {
-                    case PAID -> Status.PAID;
-                    case TO_PAY -> Status.TO_PAY;
-                })
+                .status(payment.status())
                 .rewards(payment.rewards().stream().map(r -> BatchPaymentRewardEntity.from(payment.id(), r)).toList())
                 .build();
-    }
-
-    public enum Status {
-        TO_PAY, PAID;
-
-        public static Status of(Payment.Status status) {
-            return switch (status) {
-                case TO_PAY -> TO_PAY;
-                case PAID -> PAID;
-            };
-        }
-
-        public Payment.Status toDomain() {
-            return switch (this) {
-                case TO_PAY -> Payment.Status.TO_PAY;
-                case PAID -> Payment.Status.PAID;
-            };
-        }
     }
 
     public Payment toDomain() {
@@ -94,7 +74,7 @@ public class BatchPaymentEntity {
                                 PositiveAmount.of(r.amount()),
                                 r.reward().invoice().toView().billingProfileSnapshot()
                         )).toList())
-                .status(this.status.toDomain())
+                .status(this.status)
                 .createdAt(this.createdAt)
                 .build();
     }

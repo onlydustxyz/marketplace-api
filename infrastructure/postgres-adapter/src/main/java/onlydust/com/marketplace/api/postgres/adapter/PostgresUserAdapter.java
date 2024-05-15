@@ -115,7 +115,7 @@ public class PostgresUserAdapter implements UserStoragePort {
 
     private UserProfileView addProjectsStats(UserProfileView userProfileView) {
         final var projectsStats = customUserRepository.getProjectsStatsForUser(userProfileView.getGithubId());
-        for (ProjectStatsForUserEntity stats : projectsStats) {
+        for (ProjectStatsForUserViewEntity stats : projectsStats) {
             userProfileView.addProjectStats(UserProfileView.ProjectStats.builder()
                     .id(stats.getId())
                     .slug(stats.getSlug())
@@ -244,10 +244,10 @@ public class PostgresUserAdapter implements UserStoragePort {
                                         .dollarsEquivalentValue(stats.getPendingUsdAmount())))
                         .toList())
                 .pendingRequestCount(rewardsStats.size() == 1 ? rewardsStats.get(0).getPendingRequestCount() :
-                        rewardsStats.stream().map(RewardStatsEntity::getPendingRequestCount).filter(Objects::nonNull).reduce(0, Integer::sum))
-                .receivedRewardsCount(rewardsStats.stream().map(RewardStatsEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
-                .rewardedContributionsCount(rewardsStats.stream().map(RewardStatsEntity::getRewardItemIds).flatMap(Collection::stream).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
-                .rewardingProjectsCount(rewardsStats.stream().map(RewardStatsEntity::getProjectIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
+                        rewardsStats.stream().map(RewardStatsViewEntity::getPendingRequestCount).filter(Objects::nonNull).reduce(0, Integer::sum))
+                .receivedRewardsCount(rewardsStats.stream().map(RewardStatsViewEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
+                .rewardedContributionsCount(rewardsStats.stream().map(RewardStatsViewEntity::getRewardItemIds).flatMap(Collection::stream).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
+                .rewardingProjectsCount(rewardsStats.stream().map(RewardStatsViewEntity::getProjectIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .build();
     }
 

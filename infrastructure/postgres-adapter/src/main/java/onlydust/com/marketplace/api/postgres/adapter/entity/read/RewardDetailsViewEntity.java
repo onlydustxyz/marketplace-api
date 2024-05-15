@@ -4,11 +4,6 @@ import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.ReceiptEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.Money;
@@ -34,12 +29,12 @@ public class RewardDetailsViewEntity {
     @ManyToOne
     @JoinColumn(name = "project_id", referencedColumnName = "id")
     @NonNull
-    ProjectEntity project;
+    ProjectViewEntity project;
     @NonNull
     BigDecimal amount;
     @ManyToOne
     @NonNull
-    CurrencyEntity currency;
+    CurrencyViewEntity currency;
     Integer contributionCount;
     @NonNull
     Long recipientId;
@@ -54,11 +49,11 @@ public class RewardDetailsViewEntity {
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
     @NonNull
-    RewardStatusEntity status;
+    RewardStatusViewEntity status;
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
     @NonNull
-    RewardStatusDataEntity statusData;
+    RewardStatusDataViewEntity statusData;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
@@ -66,7 +61,7 @@ public class RewardDetailsViewEntity {
             schema = "accounting",
             joinColumns = @JoinColumn(name = "reward_id"),
             inverseJoinColumns = @JoinColumn(name = "receipt_id"))
-    Set<ReceiptEntity> receipts = Set.of();
+    Set<ReceiptViewEntity> receipts = Set.of();
 
     private ContributorLinkView to() {
         return ContributorLinkView.builder()
@@ -74,15 +69,6 @@ public class RewardDetailsViewEntity {
                 .login(recipientLogin)
                 .githubUserId(recipientId)
                 .isRegistered(recipientIsRegistered)
-                .build();
-    }
-
-    private ContributorLinkView from() {
-        return ContributorLinkView.builder()
-                .githubUserId(requestorId)
-                .login(requestorLogin)
-                .avatarUrl(requestorAvatarUrl)
-                .isRegistered(true)
                 .build();
     }
 

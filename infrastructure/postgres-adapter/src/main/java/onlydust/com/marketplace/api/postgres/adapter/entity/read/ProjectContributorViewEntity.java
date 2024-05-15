@@ -47,5 +47,5 @@ public class ProjectContributorViewEntity {
     Integer issuesToReward;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", name = "totals_earned")
-    private List<UserProfileEntity.TotalEarnedPerCurrency> totalEarnedPerCurrencies;
+    private List<UserProfileViewEntity.TotalEarnedPerCurrency> totalEarnedPerCurrencies;
 }

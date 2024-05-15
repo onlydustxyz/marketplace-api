@@ -1,12 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardItemViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardItemDetailsViewEntity;
 import onlydust.com.marketplace.project.domain.model.ContributionType;
 import onlydust.com.marketplace.project.domain.view.RewardItemStatus;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
 
 public interface RewardMapper {
-    static RewardItemView itemToDomain(RewardItemViewEntity rewardItemViewEntity) {
+    static RewardItemView itemToDomain(RewardItemDetailsViewEntity rewardItemViewEntity) {
         return RewardItemView.builder()
                 .id(rewardItemViewEntity.getId())
                 .contributionId(rewardItemViewEntity.getContributionId())

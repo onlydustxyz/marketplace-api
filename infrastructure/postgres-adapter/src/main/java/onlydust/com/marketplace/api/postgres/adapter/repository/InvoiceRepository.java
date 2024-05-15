@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface InvoiceRepository extends JpaRepository<InvoiceEntity, UUID> {
-    List<InvoiceEntity> findAllByBillingProfileIdAndStatus(final @NonNull UUID billingProfileId, final @NonNull InvoiceEntity.Status status);
+    List<InvoiceEntity> findAllByBillingProfileIdAndStatus(final @NonNull UUID billingProfileId, final @NonNull Invoice.Status status);
 
     @Query(value = """
             SELECT
@@ -48,7 +49,7 @@ public interface InvoiceRepository extends JpaRepository<InvoiceEntity, UUID> {
                                             final @NonNull String search,
                                             final @NonNull Pageable pageable);
 
-    Integer countByBillingProfileIdAndStatusNot(final @NonNull UUID billingProfileId, final @NonNull InvoiceEntity.Status exceptStatus);
+    Integer countByBillingProfileIdAndStatusNot(final @NonNull UUID billingProfileId, final @NonNull Invoice.Status exceptStatus);
 
     @Query(value = """
             SELECT

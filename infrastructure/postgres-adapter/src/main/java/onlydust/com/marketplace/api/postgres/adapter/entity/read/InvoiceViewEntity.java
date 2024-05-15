@@ -10,8 +10,7 @@ import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
 import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.UserView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.json.InvoiceInnerData;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -46,7 +45,7 @@ public class InvoiceViewEntity {
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "invoice_status")
     @NonNull
-    InvoiceEntity.Status status;
+    Invoice.Status status;
     @NonNull
     BigDecimal amount;
     URL url;
@@ -55,7 +54,7 @@ public class InvoiceViewEntity {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @NonNull
-    InvoiceEntity.Data data;
+    InvoiceInnerData data;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "createdBy")
@@ -65,7 +64,7 @@ public class InvoiceViewEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "currencyId")
     @NonNull
-    CurrencyEntity currency;
+    CurrencyViewEntity currency;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "invoiceId")
@@ -81,7 +80,7 @@ public class InvoiceViewEntity {
                 createdBy.githubEmail(),
                 UserId.of(createdBy.id()),
                 createdBy.profile() == null ? createdBy.login() :
-                        createdBy.profile().getFirstName() + " " + createdBy.profile().getLastName());
+                        createdBy.profile().firstName() + " " + createdBy.profile().lastName());
     }
 
     public InvoiceView toView() {
@@ -93,7 +92,7 @@ public class InvoiceViewEntity {
                 Money.of(amount, currency.toDomain()),
                 data.dueAt(),
                 Invoice.Number.fromString(number),
-                status.toDomain(),
+                status,
                 rewards.stream().map(RewardViewEntity::toShortView).toList(),
                 url,
                 originalFileName,

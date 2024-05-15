@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
@@ -16,7 +17,6 @@ import onlydust.com.marketplace.api.bootstrap.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.contract.model.RewardItemRequest;
 import onlydust.com.marketplace.api.contract.model.RewardRequest;
 import onlydust.com.marketplace.api.contract.model.RewardType;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,7 +129,7 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
                 .build()), 1);
 
         // When the user gets his BP verification blocked
-        accountingHelper.patchBillingProfile(individualBillingProfile.id().value(), null, VerificationStatusEntity.CLOSED);
+        accountingHelper.patchBillingProfile(individualBillingProfile.id().value(), null, VerificationStatus.CLOSED);
         assertAlerting(List.of(MeDatum.builder()
                 .githubUserId(authenticatedUser.user().getGithubUserId())
                 .missingPayoutPreference(false)
@@ -149,7 +149,7 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
                 .build()), 1);
 
         // When the user gets his BP verified
-        accountingHelper.patchBillingProfile(individualBillingProfile.id().value(), null, VerificationStatusEntity.VERIFIED);
+        accountingHelper.patchBillingProfile(individualBillingProfile.id().value(), null, VerificationStatus.VERIFIED);
         assertAlerting(List.of(MeDatum.builder()
                 .githubUserId(authenticatedUser.user().getGithubUserId())
                 .missingPayoutPreference(false)

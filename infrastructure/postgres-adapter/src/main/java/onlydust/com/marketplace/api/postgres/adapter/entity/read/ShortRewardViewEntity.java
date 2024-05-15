@@ -10,7 +10,6 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.accounting.domain.view.ShortRewardDetailsView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.Money;
@@ -51,7 +50,7 @@ public class ShortRewardViewEntity {
     BigDecimal amount;
     @ManyToOne
     @NonNull
-    CurrencyEntity currency;
+    CurrencyViewEntity currency;
 
     public ShortRewardDetailsView toAccountingDomain() {
         return ShortRewardDetailsView.builder()

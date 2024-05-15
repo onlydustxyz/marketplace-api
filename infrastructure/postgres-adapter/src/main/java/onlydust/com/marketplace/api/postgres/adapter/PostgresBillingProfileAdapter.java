@@ -9,12 +9,10 @@ import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserRightsViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortBillingProfileViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -132,7 +130,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Transactional(readOnly = true)
     public boolean isAdmin(BillingProfile.Id billingProfileId, UserId userId) {
         return billingProfileUserRepository.findByBillingProfileIdAndUserId(billingProfileId.value(), userId.value())
-                .map(billingProfileUserEntity -> billingProfileUserEntity.getRole().equals(BillingProfileUserEntity.Role.ADMIN))
+                .map(billingProfileUserEntity -> billingProfileUserEntity.getRole().equals(BillingProfile.User.Role.ADMIN))
                 .orElse(false);
     }
 
@@ -153,7 +151,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .id(billingProfileId)
                             .name(billingProfileEntity.getName())
                             .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
-                            .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
+                            .verificationStatus(billingProfileEntity.getVerificationStatus())
                             .missingPayoutInfo(billingProfileCustomData.getStats().missingPayoutInfo())
                             .missingVerification(billingProfileCustomData.getStats().missingVerification())
                             .individualLimitReached(billingProfileCustomData.getIndividualLimitReached())
@@ -183,7 +181,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .name(billingProfileEntity.getName())
                             .enabled(billingProfileEntity.getEnabled())
                             .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
-                            .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
+                            .verificationStatus(billingProfileEntity.getVerificationStatus())
                             .missingPayoutInfo(billingProfileCustomData.getStats().missingPayoutInfo())
                             .missingVerification(billingProfileCustomData.getStats().missingVerification())
                             .rewardCount(billingProfileCustomData.getStats().rewardCount())
@@ -212,7 +210,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                             .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                             .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
-                            .verificationStatus(billingProfileEntity.getVerificationStatus().toDomain())
+                            .verificationStatus(billingProfileEntity.getVerificationStatus())
                             .missingPayoutInfo(billingProfileCustomData.getStats().missingPayoutInfo())
                             .missingVerification(billingProfileCustomData.getStats().missingVerification())
                             .rewardCount(billingProfileCustomData.getStats().rewardCount())
@@ -255,7 +253,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                                                                           @NonNull Set<BillingProfile.User.Role> roles,
                                                                           int pageIndex, int pageSize) {
         final var page = billingProfileUserViewRepository.findByBillingProfileId(billingProfileId.value(),
-                roles.stream().map(BillingProfileUserEntity.Role::fromDomain).map(Enum::toString).toList(),
+                roles.stream().map(Enum::toString).toList(),
                 PageRequest.of(pageIndex, pageSize, Sort.by("user_id")));
         return Page.<BillingProfileCoworkerView>builder()
                 .content(page.getContent().stream().map(BillingProfileUserViewEntity::toView).toList())
@@ -279,7 +277,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional
     public void updateBillingProfileStatus(BillingProfile.Id billingProfileId, VerificationStatus status) {
-        billingProfileRepository.updateBillingProfileVerificationStatus(billingProfileId.value(), VerificationStatusEntity.fromDomain(status).name());
+        billingProfileRepository.updateBillingProfileVerificationStatus(billingProfileId.value(), status.name());
     }
 
     @Override
@@ -299,7 +297,6 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     public List<VerificationStatus> findAllChildrenKycStatuesFromParentKyb(Kyb parentKyb) {
         return childrenKycRepository.findAllByParentApplicantId(parentKyb.getExternalApplicantId()).stream()
                 .map(ChildrenKycEntity::getVerificationStatus)
-                .map(VerificationStatusEntity::toDomain)
                 .toList();
     }
 
@@ -315,7 +312,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
         childrenKycRepository.saveAndFlush(ChildrenKycEntity.builder()
                 .applicantId(externalApplicantId)
                 .parentApplicantId(parentExternalApplicantId)
-                .verificationStatus(VerificationStatusEntity.fromDomain(verificationStatus))
+                .verificationStatus(verificationStatus)
                 .build());
     }
 
@@ -328,7 +325,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                 .invitedBy(invitedBy.value())
                 .githubUserId(invitedUser.value())
                 .invitedAt(Date.from(invitedAt.toInstant()))
-                .role(BillingProfileUserEntity.Role.fromDomain(role))
+                .role(role)
                 .accepted(false)
                 .build());
     }
@@ -350,7 +347,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
         billingProfileUserRepository.saveAndFlush(BillingProfileUserEntity.builder()
                 .billingProfileId(billingProfileId.value())
                 .userId(invitedUser.value())
-                .role(BillingProfileUserEntity.Role.fromDomain(role))
+                .role(role)
                 .joinedAt(Date.from(acceptedAt.toInstant()))
                 .build());
     }
@@ -360,7 +357,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     public void updateCoworkerRole(BillingProfile.Id billingProfileId, UserId userId, BillingProfile.User.Role role) {
         final var user = billingProfileUserRepository.findByBillingProfileIdAndUserId(billingProfileId.value(), userId.value())
                 .orElseThrow(() -> notFound("User %s is not a member of billing profile %s".formatted(userId, billingProfileId)));
-        billingProfileUserRepository.saveAndFlush(user.toBuilder().role(BillingProfileUserEntity.Role.fromDomain(role)).build());
+        billingProfileUserRepository.saveAndFlush(user.toBuilder().role(role).build());
     }
 
     @Override
@@ -369,7 +366,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                         new BillingProfileUserInvitationEntity.PrimaryKey(billingProfileId.value(), invitedUser.value()))
                 .orElseThrow(() -> notFound("User %s is not invited to billing profile %s".formatted(invitedUser, billingProfileId)));
 
-        billingProfileUserInvitationRepository.saveAndFlush(invitation.toBuilder().role(BillingProfileUserEntity.Role.fromDomain(role)).build());
+        billingProfileUserInvitationRepository.saveAndFlush(invitation.toBuilder().role(role).build());
     }
 
 
@@ -447,7 +444,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional
     public List<BillingProfileRewardView> findInvoiceableRewardsForBillingProfile(BillingProfile.Id billingProfileId) {
-        return rewardViewRepository.findByBillingProfileIdAndStatusStatus(billingProfileId.value(), RewardStatusEntity.Status.PENDING_REQUEST)
+        return rewardViewRepository.findByBillingProfileIdAndStatusStatus(billingProfileId.value(), RewardStatus.Input.PENDING_REQUEST)
                 .stream().map(RewardViewEntity::toBillingProfileReward).toList();
     }
 

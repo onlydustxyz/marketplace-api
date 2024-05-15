@@ -5,6 +5,7 @@ import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcType;
@@ -37,7 +38,7 @@ public class KycEntity {
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "verification_status")
-    VerificationStatusEntity verificationStatus;
+    VerificationStatus verificationStatus;
     String firstName;
     String lastName;
     Date birthdate;
@@ -93,7 +94,7 @@ public class KycEntity {
         return Kyc.builder()
                 .id(this.id)
                 .billingProfileId(BillingProfile.Id.of(this.billingProfileId))
-                .status(this.verificationStatus.toDomain())
+                .status(this.verificationStatus)
                 .idDocumentType(isNull(this.idDocumentType) ? null : this.idDocumentType.toDomain())
                 .address(this.address)
                 .country(this.country == null ? null : Country.fromIso3(this.country))
@@ -124,7 +125,7 @@ public class KycEntity {
                 .idDocumentType(IdDocumentTypeEnumEntity.fromDomain(kyc.getIdDocumentType()))
                 .ownerId(kyc.getOwnerId().value())
                 .consideredUsPersonQuestionnaire(kyc.getConsideredUsPersonQuestionnaire())
-                .verificationStatus(VerificationStatusEntity.fromDomain(kyc.getStatus()))
+                .verificationStatus(kyc.getStatus())
                 .idDocumentCountryCode(kyc.getIdDocumentCountry().map(Country::iso3Code).orElse(null))
                 .reviewMessage(kyc.getReviewMessageForApplicant())
                 .applicantId(kyc.getExternalApplicantId())

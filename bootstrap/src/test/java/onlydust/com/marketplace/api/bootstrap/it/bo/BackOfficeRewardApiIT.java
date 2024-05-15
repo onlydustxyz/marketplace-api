@@ -12,7 +12,6 @@ import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.accounting.domain.service.PayoutPreferenceService;
 import onlydust.com.marketplace.api.bootstrap.helper.AccountingHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeAccountingManagementRestApi;
@@ -69,7 +68,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
         olivierBillingProfile = billingProfileService.createCompanyBillingProfile(this.olivier, "Apple Inc.", null);
         billingProfileService.updatePayoutInfo(olivierBillingProfile.id(), this.olivier,
                 PayoutInfo.builder().bankAccount(new BankAccount("BOURS123", "FR7600111222333444")).build());
-        accountingHelper.patchBillingProfile(olivierBillingProfile.id().value(), null, VerificationStatusEntity.VERIFIED);
+        accountingHelper.patchBillingProfile(olivierBillingProfile.id().value(), null, VerificationStatus.VERIFIED);
 
         anthonyBillingProfile = billingProfileService.createSelfEmployedBillingProfile(this.anthony, "Olivier SASU", null);
         billingProfileService.updatePayoutInfo(anthonyBillingProfile.id(), this.anthony,
@@ -77,12 +76,12 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         .ethWallet(new WalletLocator(new Name(this.anthony + ".eth")))
                         .bankAccount(new BankAccount("BNPAFRPPXXX", "FR7630004000031234567890143"))
                         .build());
-        accountingHelper.patchBillingProfile(anthonyBillingProfile.id().value(), null, VerificationStatusEntity.VERIFIED);
+        accountingHelper.patchBillingProfile(anthonyBillingProfile.id().value(), null, VerificationStatus.VERIFIED);
 
         pierreBillingProfile = billingProfileService.createIndividualBillingProfile(this.pierre, "Olivier", null);
         billingProfileService.updatePayoutInfo(pierreBillingProfile.id(), this.pierre,
                 PayoutInfo.builder().ethWallet(new WalletLocator(new Name(this.pierre + ".eth"))).build());
-        accountingHelper.patchBillingProfile(pierreBillingProfile.id().value(), null, VerificationStatusEntity.VERIFIED);
+        accountingHelper.patchBillingProfile(pierreBillingProfile.id().value(), null, VerificationStatus.VERIFIED);
 
         kybRepository.findByBillingProfileId(olivierBillingProfile.id().value())
                 .ifPresent(kyb -> kybRepository.save(kyb.toBuilder()
@@ -94,7 +93,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         .registrationNumber("123456789")
                         .usEntity(false)
                         .subjectToEuVAT(true)
-                        .verificationStatus(VerificationStatusEntity.VERIFIED).build()));
+                        .verificationStatus(VerificationStatus.VERIFIED).build()));
         kybRepository.findByBillingProfileId(anthonyBillingProfile.id().value())
                 .ifPresent(kyb -> kybRepository.save(kyb.toBuilder()
                         .country("FRA")
@@ -105,7 +104,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         .registrationNumber("ABC123456789")
                         .usEntity(false)
                         .subjectToEuVAT(true)
-                        .verificationStatus(VerificationStatusEntity.VERIFIED).build()));
+                        .verificationStatus(VerificationStatus.VERIFIED).build()));
         kycRepository.findByBillingProfileId(pierreBillingProfile.id().value())
                 .ifPresent(kyc -> kycRepository.save(kyc.toBuilder()
                         .country("FRA")
@@ -116,7 +115,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         .consideredUsPersonQuestionnaire(false)
                         .idDocumentCountryCode("FRA")
                         .usCitizen(false)
-                        .verificationStatus(VerificationStatusEntity.VERIFIED).build()));
+                        .verificationStatus(VerificationStatus.VERIFIED).build()));
 
         updatePayoutPreferences(595505L, olivierBillingProfile.id(), UUID.fromString("e41f44a2-464c-4c96-817f-81acb06b2523"));
         updatePayoutPreferences(43467246L, anthonyBillingProfile.id(), UUID.fromString("298a547f-ecb6-4ab2-8975-68f4e9bf7b39"));
@@ -219,9 +218,9 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         .registrationNumber("123456789")
                         .usEntity(false)
                         .subjectToEuVAT(false)
-                        .verificationStatus(VerificationStatusEntity.VERIFIED).build()));
+                        .verificationStatus(VerificationStatus.VERIFIED).build()));
 
-        accountingHelper.patchBillingProfile(onlyDustBillingProfileId.value(), null, VerificationStatusEntity.VERIFIED);
+        accountingHelper.patchBillingProfile(onlyDustBillingProfileId.value(), null, VerificationStatus.VERIFIED);
 
         billingProfileService.previewInvoice(gregoire, onlyDustBillingProfileId, List.of(RewardId.of("5f9060a7-6f9e-4ef7-a1e4-1aaa4c85f03c"))).id();
 

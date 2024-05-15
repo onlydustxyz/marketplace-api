@@ -37,7 +37,7 @@ public class UnlockOpOnProjectApiIT extends AbstractMarketplaceApiIT {
 //        final UUID billingProfileId = userService.getCompanyBillingProfile(authenticatedUser.user().getId()).getId();
 //        final CompanyBillingProfileEntity companyBillingProfileEntity = companyBillingProfileRepository.findById(billingProfileId).orElseThrow();
 //        companyBillingProfileRepository.save(companyBillingProfileEntity.toBuilder()
-//                .verificationStatus(OldVerificationStatusEntity.VERIFIED)
+//                .verificationStatus(OldVerificationStatus.VERIFIED)
 //                .build());
 //        userService.updateBillingProfileType(authenticatedUser.user().getId(), OldBillingProfileType.COMPANY);
 //        walletRepository.save(OldWalletEntity.builder()

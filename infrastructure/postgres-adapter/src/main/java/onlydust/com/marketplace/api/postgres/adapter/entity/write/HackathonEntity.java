@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import io.hypersistence.utils.hibernate.type.array.UUIDArrayType;
 import jakarta.persistence.*;
 import lombok.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.json.HackathonTrack;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
 import org.hibernate.annotations.JdbcType;
@@ -57,7 +58,7 @@ public class HackathonEntity {
     UUID[] sponsorIds;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    List<Track> tracks;
+    List<HackathonTrack> tracks;
 
     public static HackathonEntity of(Hackathon hackathon) {
         return HackathonEntity.builder()
@@ -73,19 +74,8 @@ public class HackathonEntity {
                 .endDate(Date.from(hackathon.endDate().toInstant()))
                 .links(hackathon.links())
                 .sponsorIds(hackathon.sponsorIds().toArray(UUID[]::new))
-                .tracks(hackathon.tracks().stream().map(Track::of).toList())
+                .tracks(hackathon.tracks().stream().map(HackathonTrack::of).toList())
                 .build();
     }
 
-    public record Track(
-            @NonNull String name,
-            String subtitle,
-            String description,
-            String iconSlug,
-            @NonNull List<UUID> projectIds
-    ) {
-        public static Track of(Hackathon.Track track) {
-            return new Track(track.name(), track.subtitle(), track.description(), track.iconSlug(), track.projectIds());
-        }
-    }
 }

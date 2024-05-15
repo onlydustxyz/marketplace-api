@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Country;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
@@ -955,7 +956,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     @Order(103)
     void should_order_invoices_by_status() {
         final var invoice = invoiceRepository.findAll().stream().filter(i -> i.billingProfileId().equals(companyBillingProfileId)).findFirst().orElseThrow();
-        invoiceRepository.save(invoice.status(InvoiceEntity.Status.PAID));
+        invoiceRepository.save(invoice.status(Invoice.Status.PAID));
 
         {
             // When
@@ -1020,7 +1021,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.id").value(invoiceOnCompanyId::setValue);
 
         var invoiceOnCompany = em.find(InvoiceEntity.class, UUID.fromString(invoiceOnCompanyId.getValue()));
-        assertThat(invoiceOnCompany.status()).isEqualTo(InvoiceEntity.Status.DRAFT);
+        assertThat(invoiceOnCompany.status()).isEqualTo(Invoice.Status.DRAFT);
         assertThat(invoiceOnCompany.data().rewards().stream().anyMatch(r -> r.id().equals(UUID.fromString(rewardId)))).isTrue();
         var reward = entityManagerFactory.createEntityManager().find(RewardEntity.class, UUID.fromString(rewardId));
         assertThat(reward.invoiceId().toString()).isEqualTo(invoiceOnCompanyId.getValue());
@@ -1066,7 +1067,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful();
 
         final var invoice = em.find(InvoiceEntity.class, UUID.fromString(invoiceId.getValue()));
-        assertThat(invoice.status()).isEqualTo(InvoiceEntity.Status.APPROVED);
+        assertThat(invoice.status()).isEqualTo(Invoice.Status.APPROVED);
 
         // Check that the reward is part of the approved invoice
         reward = em.find(RewardEntity.class, UUID.fromString(rewardId));

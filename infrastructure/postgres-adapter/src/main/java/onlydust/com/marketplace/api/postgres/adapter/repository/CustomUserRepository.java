@@ -7,8 +7,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsForUserEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsForUserViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileViewEntity;
 import onlydust.com.marketplace.project.domain.model.Contact;
 import onlydust.com.marketplace.project.domain.model.UserAllocatedTimeToContribute;
 import onlydust.com.marketplace.project.domain.view.TotalsEarned;
@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactChanelEnumEntity.email;
+import static onlydust.com.marketplace.api.postgres.adapter.entity.enums.ContactChanelEnumEntity.email;
 
 @AllArgsConstructor
 @Slf4j
@@ -178,7 +178,7 @@ public class CustomUserRepository {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final EntityManager entityManager;
 
-    private UserProfileView rowToUserProfile(UserProfileEntity row) {
+    private UserProfileView rowToUserProfile(UserProfileViewEntity row) {
         return UserProfileView.builder()
                 .id(row.id())
                 .login(row.login())
@@ -194,13 +194,13 @@ public class CustomUserRepository {
                 .profileStats(UserProfileView.ProfileStats.builder()
                         .totalsEarned(new TotalsEarned(isNull(row.totalEarnedPerCurrencies())
                                 ? List.of()
-                                : row.totalEarnedPerCurrencies().stream().map(UserProfileEntity.TotalEarnedPerCurrency::toDomain).toList())
+                                : row.totalEarnedPerCurrencies().stream().map(UserProfileViewEntity.TotalEarnedPerCurrency::toDomain).toList())
                         )
                         .leadedProjectCount(row.numberOfLeadingProject())
                         .contributedProjectCount(row.numberOfOwnContributorOnProject())
                         .contributionCount(row.contributionsCount())
                         .contributionStats(isNull(row.counts()) ? List.of() :
-                                row.counts().stream().map(UserProfileEntity.WeekCount::toDomain)
+                                row.counts().stream().map(UserProfileViewEntity.WeekCount::toDomain)
                                         .sorted(new UserProfileView.ProfileStats.ContributionStatsComparator())
                                         .collect(Collectors.toList())
                         )
@@ -219,8 +219,8 @@ public class CustomUserRepository {
                 .build();
     }
 
-    private Set<Contact> getContacts(UserProfileEntity row) {
-        final List<UserProfileEntity.Contact> contactEntities = row.contacts() != null ? row.contacts() : List.of();
+    private Set<Contact> getContacts(UserProfileViewEntity row) {
+        final List<UserProfileViewEntity.Contact> contactEntities = row.contacts() != null ? row.contacts() : List.of();
 
         final var contacts = contactEntities.stream().map(contact -> Contact.builder()
                 .contact(email.equals(contact.channel()) ? row.email() : contact.contact())
@@ -246,7 +246,7 @@ public class CustomUserRepository {
         return new HashSet<>(contacts.values());
     }
 
-    private HashMap<String, Long> getTechnologies(UserProfileEntity row) {
+    private HashMap<String, Long> getTechnologies(UserProfileViewEntity row) {
         if (isNull(row.languages())) {
             return new HashMap<>();
         }
@@ -259,9 +259,9 @@ public class CustomUserRepository {
 
     public Optional<UserProfileView> findProfileById(final UUID userId) {
         try {
-            final UserProfileEntity row =
-                    (UserProfileEntity) entityManager.createNativeQuery(SELECT_USER_PROFILE_WHERE_ID,
-                                    UserProfileEntity.class)
+            final UserProfileViewEntity row =
+                    (UserProfileViewEntity) entityManager.createNativeQuery(SELECT_USER_PROFILE_WHERE_ID,
+                                    UserProfileViewEntity.class)
                             .setParameter("userId", userId)
                             .getSingleResult();
             return Optional.ofNullable(rowToUserProfile(row));
@@ -270,8 +270,8 @@ public class CustomUserRepository {
         }
     }
 
-    public List<ProjectStatsForUserEntity> getProjectsStatsForUser(final Long githubUserId) {
-        return entityManager.createNativeQuery(GET_PROJECT_STATS_BY_USER, ProjectStatsForUserEntity.class)
+    public List<ProjectStatsForUserViewEntity> getProjectsStatsForUser(final Long githubUserId) {
+        return entityManager.createNativeQuery(GET_PROJECT_STATS_BY_USER, ProjectStatsForUserViewEntity.class)
                 .setParameter("githubUserId", githubUserId)
                 .getResultList();
     }

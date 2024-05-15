@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileUserRightsView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileUserEntity;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -11,8 +11,6 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.UUID;
-
-import static java.util.Objects.isNull;
 
 @Entity
 @Immutable
@@ -22,13 +20,13 @@ public class BillingProfileUserRightsViewEntity {
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "billing_profile_role")
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    BillingProfileUserEntity.Role userRole;
+    BillingProfile.User.Role userRole;
     Long billingProfileProcessingRewardsCount;
     Long userProcessingRewardsCount;
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "billing_profile_role")
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    BillingProfileUserEntity.Role invitedRole;
+    BillingProfile.User.Role invitedRole;
     ZonedDateTime invitedAt;
     Long invitedByGithubUserId;
     String invitedByGithubLogin;
@@ -40,13 +38,13 @@ public class BillingProfileUserRightsViewEntity {
         return BillingProfileUserRightsView.builder()
                 .billingProfileProcessingRewardsCount(this.billingProfileProcessingRewardsCount)
                 .userProcessingRewardsCount(this.userProcessingRewardsCount)
-                .role(isNull(this.userRole) ? null : this.userRole.toDomain())
+                .role(this.userRole)
                 .invitation(Objects.isNull(this.invitedByGithubUserId) ? null : BillingProfileUserRightsView.InvitationView.builder()
                         .githubUserId(GithubUserId.of(this.invitedByGithubUserId))
                         .githubAvatarUrl(this.invitedByGithubAvatarUrl)
                         .githubLogin(this.invitedByGithubLogin)
                         .invitedAt(this.invitedAt)
-                        .role(this.invitedRole.toDomain())
+                        .role(this.invitedRole)
                         .build())
                 .billingProfileCoworkersCount(this.billingProfileCoworkersCount)
                 .build();

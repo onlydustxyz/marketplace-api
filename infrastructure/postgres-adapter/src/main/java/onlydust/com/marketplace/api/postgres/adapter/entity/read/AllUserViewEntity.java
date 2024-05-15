@@ -9,7 +9,7 @@ import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
 import org.hibernate.annotations.Immutable;
 
 import java.util.UUID;
@@ -41,11 +41,12 @@ public class AllUserViewEntity {
 
     @OneToOne
     @JoinColumn(name = "githubUserId", insertable = false, updatable = false)
-    @NonNull GithubAccountEntity github;
+    @NonNull
+    GithubAccountViewEntity github;
 
     @OneToOne
     @JoinColumn(name = "userId", insertable = false, updatable = false)
-    UserProfileViewEntity profile;
+    UserProfileInfoViewEntity profile;
 
     public Boolean isRegistered() {
         return userId != null;

@@ -7,9 +7,14 @@ import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.model.Quote;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.port.out.QuoteStorage;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.json.InvoiceInnerData;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -130,13 +135,13 @@ public class AccountingHelper {
                 Invoice.Number.of(12, lastName, firstName).toString(),
                 UUID.randomUUID(),
                 ZonedDateTime.now().minusDays(1),
-                InvoiceEntity.Status.TO_REVIEW,
+                Invoice.Status.TO_REVIEW,
                 rewards.stream().map(InvoiceRewardEntity::targetAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add),
                 rewards.get(0).targetCurrency().id(),
                 new URL("https://s3.storage.com/invoice.pdf"),
                 null,
                 null,
-                new InvoiceEntity.Data(
+                new InvoiceInnerData(
                         ZonedDateTime.now().plusDays(9),
                         BigDecimal.ZERO,
                         new Invoice.BillingProfileSnapshot(
@@ -159,8 +164,8 @@ public class AccountingHelper {
     }
 
     public void patchBillingProfile(@NonNull UUID billingProfileId,
-                                    BillingProfileEntity.Type type,
-                                    VerificationStatusEntity status) {
+                                    BillingProfile.Type type,
+                                    VerificationStatus status) {
 
         final var billingProfile = billingProfileRepository.findById(billingProfileId).orElseThrow();
 

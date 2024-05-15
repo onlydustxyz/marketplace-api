@@ -1,16 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLedIdViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.enums.AllocatedTimeEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.enums.ContactChanelEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ContactInformationEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserProfileInfoEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.AllocatedTimeEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactChanelEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactInformationIdEntity;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.Contact;
@@ -62,16 +58,16 @@ public interface UserMapper {
                 .githubUserId(user.githubUserId())
                 .githubLogin(user.login())
                 .githubEmail(user.githubEmail())
-                .githubAvatarUrl(user.profile() != null && user.profile().getAvatarUrl() != null ?
-                        user.profile().getAvatarUrl() : user.avatarUrl())
-                .firstName(nonNull(user.profile()) ? user.profile().getFirstName() : null)
-                .lastName(nonNull(user.profile()) ? user.profile().getLastName() : null)
+                .githubAvatarUrl(user.profile() != null && user.profile().avatarUrl() != null ?
+                        user.profile().avatarUrl() : user.avatarUrl())
+                .firstName(nonNull(user.profile()) ? user.profile().firstName() : null)
+                .lastName(nonNull(user.profile()) ? user.profile().lastName() : null)
                 .roles(Arrays.stream(user.roles()).toList())
                 .hasAcceptedLatestTermsAndConditions(nonNull(user.onboarding())
-                                                     && nonNull(user.onboarding().getTermsAndConditionsAcceptanceDate())
-                                                     && user.onboarding().getTermsAndConditionsAcceptanceDate().after(termsAndConditionsLatestVersionDate))
+                        && nonNull(user.onboarding().getTermsAndConditionsAcceptanceDate())
+                        && user.onboarding().getTermsAndConditionsAcceptanceDate().after(termsAndConditionsLatestVersionDate))
                 .hasSeenOnboardingWizard(nonNull(user.onboarding())
-                                         && nonNull(user.onboarding().getProfileWizardDisplayDate()))
+                        && nonNull(user.onboarding().getProfileWizardDisplayDate()))
                 .projectsLed(projectLedIdViewEntities.stream()
                         .filter(projectLedIdViewEntity -> !projectLedIdViewEntity.getPending())
                         .map(projectLedIdViewEntity -> ProjectLedView.builder()

@@ -4,17 +4,13 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.AccountingHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserProfileInfoRepository;
@@ -100,7 +96,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
 
         billingProfileService.updatePayoutInfo(billingProfile.id(), ownerId,
                 PayoutInfo.builder().ethWallet(new WalletLocator(new Name(ownerId + ".eth"))).build());
-        accountingHelper.patchBillingProfile(billingProfile.id().value(), null, VerificationStatusEntity.VERIFIED);
+        accountingHelper.patchBillingProfile(billingProfile.id().value(), null, VerificationStatus.VERIFIED);
 
         kybRepository.findByBillingProfileId(billingProfile.id().value())
                 .ifPresent(kyb -> kybRepository.save(kyb.toBuilder()
@@ -112,7 +108,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         .registrationNumber("123456789")
                         .usEntity(false)
                         .subjectToEuVAT(true)
-                        .verificationStatus(VerificationStatusEntity.VERIFIED).build()));
+                        .verificationStatus(VerificationStatus.VERIFIED).build()));
 
         return billingProfile;
     }
@@ -145,7 +141,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     private IndividualBillingProfile createIndividualBillingProfileFor(UserId ownerId, ProjectId projectId) {
         final var billingProfile = billingProfileService.createIndividualBillingProfile(ownerId, "My billing profile", Set.of(projectId));
 
-        accountingHelper.patchBillingProfile(billingProfile.id().value(), null, VerificationStatusEntity.VERIFIED);
+        accountingHelper.patchBillingProfile(billingProfile.id().value(), null, VerificationStatus.VERIFIED);
 
         billingProfileService.updatePayoutInfo(billingProfile.id(), ownerId, PayoutInfo.builder()
                 .ethWallet(Ethereum.wallet("abuisset.eth"))
@@ -160,7 +156,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         .consideredUsPersonQuestionnaire(false)
                         .idDocumentCountryCode("FRA")
                         .usCitizen(false)
-                        .verificationStatus(VerificationStatusEntity.VERIFIED)
+                        .verificationStatus(VerificationStatus.VERIFIED)
                         .build()));
 
         return billingProfile;

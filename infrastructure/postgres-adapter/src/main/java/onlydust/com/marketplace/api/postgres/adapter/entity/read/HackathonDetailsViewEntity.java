@@ -2,11 +2,10 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
 import lombok.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.HackathonEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.json.HackathonTrack;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
+import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.view.HackathonDetailsView;
 import onlydust.com.marketplace.project.domain.view.ProjectShortView;
 import onlydust.com.marketplace.project.domain.view.RegisteredContributorLinkView;
@@ -65,10 +64,10 @@ public class HackathonDetailsViewEntity {
     List<NamedLink> links;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    List<SponsorEntity> sponsors;
+    List<SponsorViewEntity> sponsors;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    List<HackathonEntity.Track> tracks;
+    List<HackathonTrack> tracks;
 
     @JdbcTypeCode(SqlTypes.JSON)
     List<Project> projects;
@@ -81,10 +80,10 @@ public class HackathonDetailsViewEntity {
                           @NonNull String name,
                           String logoUrl,
                           @NonNull String shortDescription,
-                          @NonNull ProjectVisibilityEnumEntity visibility
+                          @NonNull ProjectVisibility visibility
     ) {
         public ProjectShortView toDomain() {
-            return new ProjectShortView(id, slug, name, logoUrl, shortDescription, visibility.toDomain());
+            return new ProjectShortView(id, slug, name, logoUrl, shortDescription, visibility);
         }
     }
 
@@ -105,7 +104,7 @@ public class HackathonDetailsViewEntity {
                 ZonedDateTime.ofInstant(startDate.toInstant(), ZoneOffset.UTC),
                 ZonedDateTime.ofInstant(endDate.toInstant(), ZoneOffset.UTC),
                 isNull(links) ? List.of() : links,
-                isNull(sponsors) ? List.of() : sponsors.stream().map(SponsorEntity::toDomain).toList(),
+                isNull(sponsors) ? List.of() : sponsors.stream().map(SponsorViewEntity::toDomain).toList(),
                 isNull(tracks) ? List.of() : tracks.stream().map(track -> new HackathonDetailsView.Track(
                         track.name(),
                         track.subtitle(),

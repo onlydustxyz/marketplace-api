@@ -6,10 +6,7 @@ import io.hypersistence.utils.hibernate.type.array.internal.AbstractArrayType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserProfileInfoEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Parameter;
@@ -40,7 +37,7 @@ public class UserViewEntity implements Serializable {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "githubUserId", referencedColumnName = "id", insertable = false, updatable = false)
-    GithubAccountEntity githubUser;
+    GithubAccountViewEntity githubUser;
 
     @Column(name = "email", nullable = false)
     String githubEmail;
@@ -56,11 +53,11 @@ public class UserViewEntity implements Serializable {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id", referencedColumnName = "user_id", insertable = false, updatable = false)
-    OnboardingEntity onboarding;
+    OnboardingViewEntity onboarding;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
-    UserProfileInfoEntity profile;
+    UserProfileInfoViewEntity profile;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "githubUserId", referencedColumnName = "githubUserId", insertable = false, updatable = false)

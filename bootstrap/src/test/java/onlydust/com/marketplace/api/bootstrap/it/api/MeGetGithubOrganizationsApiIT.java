@@ -2,8 +2,8 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAppInstallationEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAuthorizedRepoEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAppInstallationViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAuthorizedRepoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GithubAppInstallationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GithubAuthorizedRepoRepository;
 import org.junit.jupiter.api.Test;
@@ -691,7 +691,7 @@ public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_user_organizations() {
         // Given
-        final GithubAppInstallationEntity githubAppInstallationEntity = new GithubAppInstallationEntity();
+        final GithubAppInstallationViewEntity githubAppInstallationEntity = new GithubAppInstallationViewEntity();
         githubAppInstallationEntity.setId(123456L);
         githubAppInstallationRepository.delete(githubAppInstallationEntity);
         final String githubPAT = faker.rickAndMorty().character() + faker.random().nextLong();
@@ -780,7 +780,7 @@ public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
                                 ]
                         """)));
         githubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(String.format("/orgs/%s/memberships/%s", "symeo" +
-                                                                                                               "-io",
+                                "-io",
                         "PierreOucif")))
                 .withHeader("Authorization", WireMock.equalTo("Bearer " + githubPAT))
                 .willReturn(okJson("""
@@ -873,23 +873,23 @@ public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
 
 
         githubAuthorizedRepoRepository.deleteAll(List.of(
-                new GithubAuthorizedRepoEntity(GithubAuthorizedRepoEntity.Id.builder()
+                new GithubAuthorizedRepoViewEntity(GithubAuthorizedRepoViewEntity.Id.builder()
                         .installationId(44300036L)
                         .repoId(498695724L)
                         .build()),
-                new GithubAuthorizedRepoEntity(GithubAuthorizedRepoEntity.Id.builder()
+                new GithubAuthorizedRepoViewEntity(GithubAuthorizedRepoViewEntity.Id.builder()
                         .installationId(44300036L)
                         .repoId(470103674L)
                         .build()),
-                new GithubAuthorizedRepoEntity(GithubAuthorizedRepoEntity.Id.builder()
+                new GithubAuthorizedRepoViewEntity(GithubAuthorizedRepoViewEntity.Id.builder()
                         .installationId(44300036L)
                         .repoId(470901963L)
                         .build()),
-                new GithubAuthorizedRepoEntity(GithubAuthorizedRepoEntity.Id.builder()
+                new GithubAuthorizedRepoViewEntity(GithubAuthorizedRepoViewEntity.Id.builder()
                         .installationId(44300036L)
                         .repoId(471286458L)
                         .build()),
-                new GithubAuthorizedRepoEntity(GithubAuthorizedRepoEntity.Id.builder()
+                new GithubAuthorizedRepoViewEntity(GithubAuthorizedRepoViewEntity.Id.builder()
                         .installationId(44300036L)
                         .repoId(476359452L)
                         .build())

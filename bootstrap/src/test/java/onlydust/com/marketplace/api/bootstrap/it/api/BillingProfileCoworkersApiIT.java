@@ -5,12 +5,11 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.persistence.EntityManagerFactory;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
@@ -747,8 +746,8 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
         final var pierre = userAuthHelper.authenticatePierre();
         final var companyBillingProfile = BillingProfile.Id.of(UUID.fromString("20282367-56b0-42d3-81d3-5e4b38f67e3e"));
 
-        accountingHelper.patchBillingProfile(companyBillingProfile.value(), BillingProfileEntity.Type.COMPANY,
-                VerificationStatusEntity.VERIFIED);
+        accountingHelper.patchBillingProfile(companyBillingProfile.value(), BillingProfile.Type.COMPANY,
+                VerificationStatus.VERIFIED);
 
         accountingHelper.patchReward("40fda3c6-2a3f-4cdd-ba12-0499dd232d53", 10, "ETH", 15000, null, "2023-07-12");
         accountingHelper.patchReward("e1498a17-5090-4071-a88a-6f0b0c337c3a", 50, "ETH", 75000, null, "2023-08-12");

@@ -38,16 +38,16 @@ public class PostgresQuoteAdapterIT extends AbstractPostgresIT {
         // Given
         currencyRepository.saveAllAndFlush(List.of(
                 new CurrencyEntity(currencyId1.value(),
-                        CurrencyEntity.Type.CRYPTO,
+                        Currency.Type.CRYPTO,
                         "USD Coin", "USDC", "logo", 4, "foo", null, Set.of()),
                 new CurrencyEntity(currencyId2.value(),
-                        CurrencyEntity.Type.CRYPTO,
+                        Currency.Type.CRYPTO,
                         "Starknet", "STRK", "logo", 4, "foo", null, Set.of()),
                 new CurrencyEntity(baseId1.value(),
-                        CurrencyEntity.Type.FIAT,
+                        Currency.Type.FIAT,
                         "US Dollar", "USD", "logo", 4, "foo", null, Set.of()),
                 new CurrencyEntity(baseId2.value(),
-                        CurrencyEntity.Type.FIAT,
+                        Currency.Type.FIAT,
                         "Euro", "EUR", "logo", 4, "foo", null, Set.of())
         ));
         postgresQuoteAdapter.save(List.of(

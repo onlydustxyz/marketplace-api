@@ -13,7 +13,10 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.Back
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoEarningsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.PaymentShortViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortRewardViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentRewardEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.NodeGuardianBoostRewardEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
@@ -130,7 +133,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
                                                Date fromRequestedAt, Date toRequestedAt,
                                                Date fromProcessedAt, Date toProcessedAt) {
         final var page = backofficeRewardViewRepository.findAllByStatusesAndDates(
-                statuses.stream().map(RewardStatusEntity::from).map(RewardStatusEntity.Status::toString).toList(),
+                statuses.stream().map(Enum::name).toList(),
                 billingProfileIds.stream().map(BillingProfile.Id::value).toList(),
                 recipients.stream().map(GithubUserId::value).toList(),
                 fromRequestedAt, toRequestedAt,
@@ -154,7 +157,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
                                     Date fromProcessedAt, Date toProcessedAt) {
         return new EarningsView(
                 backofficeEarningsViewRepository.getEarnings(
-                        statuses.stream().map(RewardStatusEntity::from).map(RewardStatusEntity.Status::toString).toList(),
+                        statuses.stream().map(Enum::name).toList(),
                         recipientIds.stream().map(GithubUserId::value).toList(),
                         billingProfileIds.stream().map(BillingProfile.Id::value).toList(),
                         projectIds.stream().map(ProjectId::value).toList(),

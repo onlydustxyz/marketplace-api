@@ -223,7 +223,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         .longDescription(longDescription)
                         .hiring(isLookingForContributors)
                         .logoUrl(imageUrl)
-                        .visibility(ProjectMapper.projectVisibilityToEntity(visibility))
+                        .visibility(visibility)
                         .ignorePullRequests(rewardSettings.getIgnorePullRequests())
                         .ignoreIssues(rewardSettings.getIgnoreIssues())
                         .ignoreCodeReviews(rewardSettings.getIgnoreCodeReviews())

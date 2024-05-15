@@ -2,66 +2,85 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Immutable;
+import onlydust.com.marketplace.project.domain.model.Reward;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
-import java.util.Date;
+import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Data
 @Entity
-@Immutable
+@Value
+@Table(name = "reward_items", schema = "public")
+@NoArgsConstructor(force = true)
+@AllArgsConstructor
+@Builder(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode
+@IdClass(RewardItemViewEntity.PrimaryKey.class)
 public class RewardItemViewEntity {
 
     @Id
-    @Column(name = "reward_id")
+    @NonNull
+    UUID rewardId;
+    @Id
+    @NonNull
+    Long number;
+    @Id
+    @NonNull
+    Long repoId;
+
+    @NonNull
     String id;
-    @Column(name = "contribution_id")
-    String contributionId;
-    @Column(name = "start_date")
-    Date createdAt;
-    @Column(name = "end_date")
-    Date completedAt;
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "contribution_type")
+    @NonNull
     ContributionType type;
-    @Column(name = "status")
-    String status;
-    @Column(name = "number")
-    Long number;
-    @Column(name = "title")
-    String title;
-    @Column(name = "html_url")
-    String githubUrl;
-    @Column(name = "repo_name")
-    String repoName;
-    @Column(name = "author_id")
-    Long authorId;
-    @Column(name = "author_login")
-    String authorLogin;
-    @Column(name = "author_avatar_url")
-    String authorAvatarUrl;
-    @Column(name = "author_github_url")
-    String authorProfileUrl;
-    @Column(name = "commits_count")
-    Integer commitsCount;
-    @Column(name = "user_commits_count")
-    Integer userCommitsCount;
-    @Column(name = "comments_count")
-    Integer commentsCount;
-    @Column(name = "recipient_id")
+    @NonNull
+    UUID projectId;
+    @NonNull
     Long recipientId;
-    @Column(name = "github_body")
-    String githubBody;
-    UUID billingProfileId;
 
     public enum ContributionType {
         ISSUE, PULL_REQUEST, CODE_REVIEW
+    }
+
+    @Builder
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PrimaryKey implements Serializable {
+        UUID rewardId;
+        Long number;
+        Long repoId;
+    }
+
+    public static List<RewardItemViewEntity> of(Reward reward) {
+        return reward.rewardItems().stream().map(item -> RewardItemViewEntity.builder()
+                .rewardId(reward.id())
+                .number(item.number())
+                .repoId(item.repoId())
+                .id(item.id())
+                .type(switch (item.type()) {
+                    case ISSUE -> ContributionType.ISSUE;
+                    case PULL_REQUEST -> ContributionType.PULL_REQUEST;
+                    case CODE_REVIEW -> ContributionType.CODE_REVIEW;
+                })
+                .projectId(reward.projectId())
+                .recipientId(reward.recipientId())
+                .build()).toList();
+    }
+
+    public Reward.Item toRewardItem() {
+        return Reward.Item.builder()
+                .id(id)
+                .number(number)
+                .repoId(repoId)
+                .type(switch (type) {
+                    case ISSUE -> Reward.Item.Type.ISSUE;
+                    case PULL_REQUEST -> Reward.Item.Type.PULL_REQUEST;
+                    case CODE_REVIEW -> Reward.Item.Type.CODE_REVIEW;
+                }).build();
     }
 }

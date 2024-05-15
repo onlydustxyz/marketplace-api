@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository.old;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.SponsorViewEntity;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -26,7 +26,7 @@ public class ContributorActivityViewEntity {
     Integer completedIssueCount;
     Integer completedCodeReviewCount;
     @JdbcTypeCode(SqlTypes.JSON)
-    List<UserProfileEntity.WeekCount> counts;
+    List<UserProfileViewEntity.WeekCount> counts;
 
     public ContributorActivityView toDomain() {
         return ContributorActivityView.builder()
@@ -38,7 +38,7 @@ public class ContributorActivityViewEntity {
                 .completedPullRequestCount(completedPullRequestCount)
                 .completedIssueCount(completedIssueCount)
                 .completedCodeReviewCount(completedCodeReviewCount)
-                .contributionStats(counts.stream().map(UserProfileEntity.WeekCount::toDomain).toList())
+                .contributionStats(counts.stream().map(UserProfileViewEntity.WeekCount::toDomain).toList())
                 .build();
     }
 }

@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcType;
@@ -35,7 +36,7 @@ public class KybEntity {
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "verification_status")
-    VerificationStatusEntity verificationStatus;
+    VerificationStatus verificationStatus;
     UUID ownerId;
     String name;
     String registrationNumber;
@@ -62,7 +63,7 @@ public class KybEntity {
         return Kyb.builder()
                 .id(this.id)
                 .billingProfileId(BillingProfile.Id.of(this.billingProfileId))
-                .status(this.verificationStatus.toDomain())
+                .status(this.verificationStatus)
                 .usEntity(this.usEntity)
                 .address(this.address)
                 .euVATNumber(this.euVATNumber)
@@ -85,7 +86,7 @@ public class KybEntity {
                 .address(kyb.getAddress())
                 .country(kyb.getCountry() == null ? null : kyb.getCountry().iso3Code())
                 .name(kyb.getName())
-                .verificationStatus(VerificationStatusEntity.fromDomain(kyb.getStatus()))
+                .verificationStatus(kyb.getStatus())
                 .subjectToEuVAT(kyb.getSubjectToEuropeVAT())
                 .euVATNumber(kyb.getEuVATNumber())
                 .registrationDate(kyb.getRegistrationDate())
