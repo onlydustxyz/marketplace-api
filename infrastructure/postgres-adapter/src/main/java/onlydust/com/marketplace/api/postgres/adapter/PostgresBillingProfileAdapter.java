@@ -12,6 +12,7 @@ import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -443,7 +444,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional
     public List<BillingProfileRewardView> findInvoiceableRewardsForBillingProfile(BillingProfile.Id billingProfileId) {
-        return rewardViewRepository.findByBillingProfileIdAndStatusStatus(billingProfileId.value(), RewardStatusEntity.Status.PENDING_REQUEST)
+        return rewardViewRepository.findByBillingProfileIdAndStatusStatus(billingProfileId.value(), RewardStatus.Input.PENDING_REQUEST)
                 .stream().map(RewardViewEntity::toBillingProfileReward).toList();
     }
 

@@ -141,7 +141,7 @@ public class BackofficeRewardViewEntity {
                 .projectId(projectId)
                 .billingProfileId(billingProfile == null ? null : billingProfile.getId())
                 .recipientId(recipient.githubUserId())
-                .status(this.status.toDomain())
+                .status(this.status.status())
                 .build();
     }
 }

@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactChanelEnumEntity.email;
+import static onlydust.com.marketplace.api.postgres.adapter.entity.enums.ContactChanelEnumEntity.email;
 
 @AllArgsConstructor
 @Slf4j

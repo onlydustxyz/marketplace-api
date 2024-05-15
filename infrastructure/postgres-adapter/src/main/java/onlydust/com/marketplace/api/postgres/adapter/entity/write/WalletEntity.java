@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.WalletTypeEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.enums.WalletTypeEnumEntity;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmAccountAddress;

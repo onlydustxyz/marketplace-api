@@ -1,11 +1,11 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
+import onlydust.com.marketplace.api.postgres.adapter.entity.enums.AllocatedTimeEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.enums.ContactChanelEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.AllocatedTimeEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactChanelEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactInformationIdEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
