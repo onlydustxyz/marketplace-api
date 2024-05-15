@@ -5,7 +5,6 @@ import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.view.backoffice.ProjectView;
@@ -62,7 +61,7 @@ public class ProjectViewEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "projectId")
     @Builder.Default
-    Set<ProjectSponsorEntity> sponsors = new HashSet<>();
+    Set<ProjectSponsorViewEntity> sponsors = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinTable(

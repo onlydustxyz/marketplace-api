@@ -87,15 +87,7 @@ public interface ProjectMapper {
                 .hasRemainingBudget(hasRemainingBudget)
                 .me(me)
                 .tags(projectEntity.getTags().stream()
-                        .map(projectTagEntity -> switch (projectTagEntity.getId().getTag()) {
-                            case HOT_COMMUNITY -> Project.Tag.HOT_COMMUNITY;
-                            case FAST_AND_FURIOUS -> Project.Tag.FAST_AND_FURIOUS;
-                            case LIKELY_TO_REWARD -> Project.Tag.LIKELY_TO_REWARD;
-                            case NEWBIES_WELCOME -> Project.Tag.NEWBIES_WELCOME;
-                            case UPDATED_ROADMAP -> Project.Tag.UPDATED_ROADMAP;
-                            case WORK_IN_PROGRESS -> Project.Tag.WORK_IN_PROGRESS;
-                            case BIG_WHALE -> Project.Tag.BIG_WHALE;
-                        }).collect(Collectors.toSet()))
+                        .map(projectTagEntity -> projectTagEntity.getId().getTag()).collect(Collectors.toSet()))
                 .build();
 
         for (ProjectOrganizationView organization : organizations) {

@@ -9,7 +9,6 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
@@ -747,7 +746,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
         final var pierre = userAuthHelper.authenticatePierre();
         final var companyBillingProfile = BillingProfile.Id.of(UUID.fromString("20282367-56b0-42d3-81d3-5e4b38f67e3e"));
 
-        accountingHelper.patchBillingProfile(companyBillingProfile.value(), BillingProfileEntity.Type.COMPANY,
+        accountingHelper.patchBillingProfile(companyBillingProfile.value(), BillingProfile.Type.COMPANY,
                 VerificationStatusEntity.VERIFIED);
 
         accountingHelper.patchReward("40fda3c6-2a3f-4cdd-ba12-0499dd232d53", 10, "ETH", 15000, null, "2023-07-12");

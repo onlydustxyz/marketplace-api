@@ -5,16 +5,14 @@ import com.github.tomakehurst.wiremock.stubbing.Scenario;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubApiClientAdapter;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubClientProperties;
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
-import com.onlydust.marketplace.api.cron.JobScheduler;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.api.bootstrap.helper.SlackNotificationStub;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubSignatureVerifier;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookProperties;
-import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -27,7 +25,6 @@ import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.responseDefinition;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookApiAdapter.X_OD_API;
 import static onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookApiAdapter.X_SUMSUB_PAYLOAD_DIGEST;
@@ -87,7 +84,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.id").isNotEmpty();
 
         final UUID billingProfileId = billingProfileRepository.findBillingProfilesForUserId(userId).stream()
-                .filter(billingProfileEntity -> billingProfileEntity.getType().equals(BillingProfileEntity.Type.INDIVIDUAL))
+                .filter(billingProfileEntity -> billingProfileEntity.getType().equals(BillingProfile.Type.INDIVIDUAL))
                 .findFirst()
                 .orElseThrow()
                 .getId();
@@ -161,8 +158,8 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
         assertEquals(1, slackNotificationStub.getBillingProfileNotifications().size());
 
         final String reviewMessage = "We could not verify your profile. If you have any questions, please contact the Company where you try to verify your " +
-                                     "profile tech@onlydust.xyz\\n\\nTemporary we could not verify your profile via doc-free method. Please try again " +
-                                     "later or contact the company where you're verifying your profile tech@onlydust.xyz, if error persists.";
+                "profile tech@onlydust.xyz\\n\\nTemporary we could not verify your profile via doc-free method. Please try again " +
+                "later or contact the company where you're verifying your profile tech@onlydust.xyz, if error persists.";
         final byte[] sumsubPayloadRejection = String.format("""
                 {
                   "type": "applicantPending",
@@ -285,7 +282,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.id").isNotEmpty();
 
         final UUID billingProfileId = billingProfileRepository.findBillingProfilesForUserId(userId).stream()
-                .filter(billingProfileEntity -> billingProfileEntity.getType().equals(BillingProfileEntity.Type.COMPANY))
+                .filter(billingProfileEntity -> billingProfileEntity.getType().equals(BillingProfile.Type.COMPANY))
                 .findFirst()
                 .orElseThrow()
                 .getId();
@@ -386,7 +383,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
         assertEquals(3, slackNotificationStub.getBillingProfileNotifications().size());
 
         final String reviewMessage = "Enter your date of birth exactly as it is on your identity document.\\n\\n - Tax number is incorrect. Provide a correct" +
-                                     " tax number.\\n - SSN is incorrect. Provide a correct SSN.";
+                " tax number.\\n - SSN is incorrect. Provide a correct SSN.";
         final byte[] sumsubPayloadRejection = String.format("""
                 {
                   "type": "applicantPending",
@@ -589,7 +586,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.id").isNotEmpty();
 
         final UUID billingProfileId = billingProfileRepository.findBillingProfilesForUserId(userId).stream()
-                .filter(billingProfileEntity -> billingProfileEntity.getType().equals(BillingProfileEntity.Type.COMPANY))
+                .filter(billingProfileEntity -> billingProfileEntity.getType().equals(BillingProfile.Type.COMPANY))
                 .findFirst()
                 .orElseThrow()
                 .getId();

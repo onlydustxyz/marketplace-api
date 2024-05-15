@@ -11,7 +11,10 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.port.out.QuoteStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.json.InvoiceInnerData;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -161,7 +164,7 @@ public class AccountingHelper {
     }
 
     public void patchBillingProfile(@NonNull UUID billingProfileId,
-                                    BillingProfileEntity.Type type,
+                                    BillingProfile.Type type,
                                     VerificationStatusEntity status) {
 
         final var billingProfile = billingProfileRepository.findById(billingProfileId).orElseThrow();

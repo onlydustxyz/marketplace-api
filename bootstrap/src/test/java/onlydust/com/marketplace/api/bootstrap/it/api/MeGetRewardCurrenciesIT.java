@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import org.junit.jupiter.api.Test;
 
@@ -52,7 +52,7 @@ public class MeGetRewardCurrenciesIT extends AbstractMarketplaceApiIT {
         final var pierre = userAuthHelper.authenticatePierre();
         final var olivier = userAuthHelper.authenticateOlivier();
 
-        accountingHelper.patchBillingProfile(UUID.fromString("20282367-56b0-42d3-81d3-5e4b38f67e3e"), BillingProfileEntity.Type.COMPANY,
+        accountingHelper.patchBillingProfile(UUID.fromString("20282367-56b0-42d3-81d3-5e4b38f67e3e"), BillingProfile.Type.COMPANY,
                 VerificationStatusEntity.VERIFIED);
         accountingHelper.patchReward("40fda3c6-2a3f-4cdd-ba12-0499dd232d53", 10, "ETH", 15000, null, "2023-07-12");
 

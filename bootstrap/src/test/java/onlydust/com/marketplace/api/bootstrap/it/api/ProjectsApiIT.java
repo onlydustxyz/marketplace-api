@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectSponsorRe
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectTagRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
+import onlydust.com.marketplace.project.domain.model.Project;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -3248,21 +3249,21 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                 .id(
                                         ProjectTagEntity.Id.builder()
                                                 .projectId(UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"))
-                                                .tag(ProjectTagEntity.ProjectTagEnumEntity.NEWBIES_WELCOME)
+                                                .tag(Project.Tag.NEWBIES_WELCOME)
                                                 .build()
                                 ).build(),
                         ProjectTagEntity.builder()
                                 .id(
                                         ProjectTagEntity.Id.builder()
                                                 .projectId(UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"))
-                                                .tag(ProjectTagEntity.ProjectTagEnumEntity.FAST_AND_FURIOUS)
+                                                .tag(Project.Tag.FAST_AND_FURIOUS)
                                                 .build()
                                 ).build(),
                         ProjectTagEntity.builder()
                                 .id(
                                         ProjectTagEntity.Id.builder()
                                                 .projectId(UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"))
-                                                .tag(ProjectTagEntity.ProjectTagEnumEntity.FAST_AND_FURIOUS)
+                                                .tag(Project.Tag.FAST_AND_FURIOUS)
                                                 .build()
                                 ).build()
                 )

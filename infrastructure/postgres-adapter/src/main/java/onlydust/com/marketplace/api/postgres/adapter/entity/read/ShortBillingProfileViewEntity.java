@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import org.hibernate.annotations.Immutable;
@@ -30,7 +29,7 @@ public class ShortBillingProfileViewEntity {
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "billing_profile_type")
-    BillingProfileEntity.Type type;
+    BillingProfile.Type type;
 
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
@@ -70,7 +69,7 @@ public class ShortBillingProfileViewEntity {
     public ShortBillingProfileView toView() {
         return ShortBillingProfileView.builder()
                 .id(BillingProfile.Id.of(this.id))
-                .type(this.type.toDomain())
+                .type(this.type)
                 .role(this.role.toDomain())
                 .verificationStatus(this.verificationStatus.toDomain())
                 .name(this.name)

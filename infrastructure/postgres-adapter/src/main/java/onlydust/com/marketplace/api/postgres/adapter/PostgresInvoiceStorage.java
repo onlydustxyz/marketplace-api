@@ -10,7 +10,6 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.RewardAssociations;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.InvoiceViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
@@ -128,7 +127,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
                 ids.stream().map(Invoice.Id::value).toList(),
                 statuses.stream().map(Enum::toString).toList(),
                 currencyIds.stream().map(Currency.Id::value).toList(),
-                billingProfileTypes.stream().map(BillingProfileEntity.Type::of).map(Enum::toString).toList(),
+                billingProfileTypes.stream().map(Enum::toString).toList(),
                 billingProfileIds.stream().map(BillingProfile.Id::value).toList(),
                 search == null ? "" : search,
                 PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "created_at")));

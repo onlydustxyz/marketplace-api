@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
 import lombok.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectTagEntity;
+import onlydust.com.marketplace.project.domain.model.Project;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -37,7 +37,7 @@ public class ProjectTagViewEntity {
         @Enumerated(EnumType.STRING)
         @JdbcType(PostgreSQLEnumJdbcType.class)
         @Column(columnDefinition = "project_tag")
-        ProjectTagEntity.ProjectTagEnumEntity tag;
+        Project.Tag tag;
     }
 
 

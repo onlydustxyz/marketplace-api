@@ -39,7 +39,7 @@ public class BillingProfileEntity {
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "billing_profile_type")
-    Type type;
+    BillingProfile.Type type;
     Date invoiceMandateAcceptedAt;
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
@@ -78,28 +78,6 @@ public class BillingProfileEntity {
     @EqualsAndHashCode.Exclude
     private Date updatedAt;
 
-    public enum Type {
-        INDIVIDUAL,
-        COMPANY,
-        SELF_EMPLOYED;
-
-        public BillingProfile.Type toDomain() {
-            return switch (this) {
-                case INDIVIDUAL -> BillingProfile.Type.INDIVIDUAL;
-                case COMPANY -> BillingProfile.Type.COMPANY;
-                case SELF_EMPLOYED -> BillingProfile.Type.SELF_EMPLOYED;
-            };
-        }
-
-        public static Type of(final BillingProfile.Type type) {
-            return switch (type) {
-                case INDIVIDUAL -> INDIVIDUAL;
-                case COMPANY -> COMPANY;
-                case SELF_EMPLOYED -> SELF_EMPLOYED;
-            };
-        }
-    }
-
     public ZonedDateTime getInvoiceMandateAcceptedAt() {
         return isNull(invoiceMandateAcceptedAt) ? null : new Date(invoiceMandateAcceptedAt.getTime()).toInstant().atZone(ZoneOffset.UTC);
     }
@@ -109,11 +87,7 @@ public class BillingProfileEntity {
                 .id(billingProfile.id().value())
                 .name(billingProfile.name())
                 .verificationStatus(VerificationStatusEntity.fromDomain(billingProfile.status()))
-                .type(switch (billingProfile.type()) {
-                    case COMPANY -> Type.COMPANY;
-                    case SELF_EMPLOYED -> Type.SELF_EMPLOYED;
-                    case INDIVIDUAL -> Type.INDIVIDUAL;
-                })
+                .type(billingProfile.type())
                 .users(isNull(ownerId) ? Set.of() : Set.of(BillingProfileUserEntity.builder()
                         .billingProfileId(billingProfile.id().value())
                         .userId(ownerId.value())
