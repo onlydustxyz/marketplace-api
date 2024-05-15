@@ -407,11 +407,11 @@ public class RewardStatusUpdaterTest {
             final var updatedRewardIds = List.of(RewardId.random(), RewardId.random());
 
             // When
-            when(rewardStatusStorage.removeBillingProfile(billingProfileId)).thenReturn(updatedRewardIds);
+            when(accountingRewardStoragePort.removeBillingProfile(billingProfileId)).thenReturn(updatedRewardIds);
             rewardStatusUpdater.onBillingProfileDeleted(billingProfileId);
 
             // Then
-            verify(rewardStatusStorage).removeBillingProfile(billingProfileId);
+            verify(accountingRewardStoragePort).removeBillingProfile(billingProfileId);
             verify(rewardStatusFacadePort).refreshRewardsUsdEquivalentOf(updatedRewardIds);
         }
     }
@@ -425,11 +425,11 @@ public class RewardStatusUpdaterTest {
             final var updatedRewardIds = List.of(RewardId.random(), RewardId.random());
 
             // When
-            when(rewardStatusStorage.removeBillingProfile(billingProfileId)).thenReturn(updatedRewardIds);
+            when(accountingRewardStoragePort.removeBillingProfile(billingProfileId)).thenReturn(updatedRewardIds);
             rewardStatusUpdater.onBillingProfileEnableChanged(billingProfileId, false);
 
             // Then
-            verify(rewardStatusStorage).removeBillingProfile(billingProfileId);
+            verify(accountingRewardStoragePort).removeBillingProfile(billingProfileId);
             verify(rewardStatusFacadePort).refreshRewardsUsdEquivalentOf(updatedRewardIds);
         }
     }
@@ -445,7 +445,7 @@ public class RewardStatusUpdaterTest {
             rewardStatusUpdater.onBillingProfileEnableChanged(billingProfileId, true);
 
             // Then
-            verify(rewardStatusStorage, never()).removeBillingProfile(billingProfileId);
+            verify(accountingRewardStoragePort, never()).removeBillingProfile(billingProfileId);
             verify(rewardStatusStorage, never()).get(any(List.class));
         }
     }

@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BackofficeRewardViewEntity;
@@ -232,5 +233,20 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     @Transactional(readOnly = true)
     public Optional<Integer> getBoostedRewardsCountByRecipientId(Long recipientId) {
         return shortRewardViewRepository.countNumberOfBoostByRecipientId(recipientId);
+    }
+
+
+    @Override
+    @Transactional
+    public void updateBillingProfileForRecipientUserIdAndProjectId(BillingProfile.Id billingProfileId, UserId userId, ProjectId projectId) {
+        rewardRepository.updateBillingProfileForRecipientUserIdAndProjectId(billingProfileId.value(), userId.value(), projectId.value());
+    }
+
+    @Override
+    @Transactional
+    public List<RewardId> removeBillingProfile(BillingProfile.Id billingProfileId) {
+        final var rewardIds = rewardRepository.getRewardIdsToBeRemovedFromBillingProfile(billingProfileId.value()).stream().map(RewardEntity::id).toList();
+        rewardRepository.removeBillingProfileIdOf(rewardIds);
+        return rewardIds.stream().map(RewardId::of).toList();
     }
 }

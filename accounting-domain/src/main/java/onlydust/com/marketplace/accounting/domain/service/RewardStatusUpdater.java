@@ -80,22 +80,21 @@ public class RewardStatusUpdater implements AccountingObserverPort, BillingProfi
 
     @Override
     public void onPayoutPreferenceChanged(BillingProfile.Id billingProfileId, @NonNull UserId userId, @NonNull ProjectId projectId) {
-        rewardStatusStorage.updateBillingProfileForRecipientUserIdAndProjectId(billingProfileId, userId, projectId);
+        accountingRewardStoragePort.updateBillingProfileForRecipientUserIdAndProjectId(billingProfileId, userId, projectId);
         rewardStatusFacadePort.refreshRewardsUsdEquivalentOf(billingProfileId);
     }
 
     @Override
     public void onBillingProfileEnableChanged(BillingProfile.Id billingProfileId, Boolean enabled) {
         if (!enabled) {
-            final var updatedRewardIds = rewardStatusStorage.removeBillingProfile(billingProfileId);
+            final var updatedRewardIds = accountingRewardStoragePort.removeBillingProfile(billingProfileId);
             rewardStatusFacadePort.refreshRewardsUsdEquivalentOf(updatedRewardIds);
         }
     }
 
     @Override
     public void onBillingProfileDeleted(BillingProfile.Id billingProfileId) {
-        // TODO move or rename method ?
-        final var updatedRewardIds = rewardStatusStorage.removeBillingProfile(billingProfileId);
+        final var updatedRewardIds = accountingRewardStoragePort.removeBillingProfile(billingProfileId);
         rewardStatusFacadePort.refreshRewardsUsdEquivalentOf(updatedRewardIds);
     }
 }
