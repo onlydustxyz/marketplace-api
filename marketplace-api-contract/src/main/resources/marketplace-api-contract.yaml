@@ -3633,7 +3633,7 @@ components:
               type: array
               description: List of ecosystems on which the user contributed
               items:
-                $ref: '#/components/schemas/EcosystemId'
+                $ref: '#/components/schemas/EcosystemResponse'
 
     UserRankCategory:
       type: string

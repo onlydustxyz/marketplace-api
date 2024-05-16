@@ -51,7 +51,7 @@ public class PublicUserProfileResponseV2Entity {
     @NonNull Integer rewardCount;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    List<UUID> ecosystems;
+    List<Ecosystem> ecosystems;
 
     public PublicUserProfileResponseV2 toDto() {
         return new PublicUserProfileResponseV2()
@@ -75,8 +75,14 @@ public class PublicUserProfileResponseV2Entity {
                         .leadedProjectCount(leadedProjectCount)
                         .contributionCount(contributionCount)
                         .rewardCount(rewardCount))
-                .ecosystems(ecosystems)
-                ;
+                .ecosystems(ecosystems.stream()
+                        .map(ecosystem -> new EcosystemResponse()
+                                .id(ecosystem.id())
+                                .name(ecosystem.name())
+                                .url(ecosystem.url())
+                                .logoUrl(ecosystem.logoUrl())
+                                .bannerUrl(ecosystem.bannerUrl())
+                        ).toList());
     }
 
     public static int prettyRankPercentile(BigDecimal rankPercentile) {
@@ -97,5 +103,8 @@ public class PublicUserProfileResponseV2Entity {
                                 new ContactInformation().channel(ContactInformationChannel.TELEGRAM).contact(account.telegram()).visibility(ContactInformation.VisibilityEnum.PUBLIC)
                 ).filter(Objects::nonNull)
                 .toList();
+    }
+
+    record Ecosystem(UUID id, String name, String url, String logoUrl, String bannerUrl) {
     }
 }

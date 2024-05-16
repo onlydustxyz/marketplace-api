@@ -24,7 +24,13 @@ public interface PublicUserProfileResponseV2EntityRepository extends Repository<
                     when gur.rank_percentile < 0.8333 then 'E'
                     else 'F'
                 end                                                                                              as rank_category,
-                coalesce(jsonb_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null ), '[]') as ecosystems,
+                coalesce(jsonb_agg(distinct jsonb_build_object(
+                                'id', e.id,
+                                'name', e.name,
+                                'url', e.url,
+                                'logoUrl', e.logo_url,
+                                'bannerUrl', e.banner_url
+                                )) filter ( where pe.ecosystem_id is not null ), '[]')                           as ecosystems,
                 count(distinct c.id)                                                                             as contribution_count,
                 count(distinct pgr.project_id)                                                                   as contributed_project_count,
                 count(distinct pgr.project_id) filter ( where pl.project_id is not null )                        as leaded_project_count,
@@ -36,6 +42,7 @@ public interface PublicUserProfileResponseV2EntityRepository extends Repository<
                 left join project_github_repos pgr on c.repo_id = pgr.github_repo_id
                 left join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id and gr.visibility = 'PUBLIC'
                 left join projects_ecosystems pe on pe.project_id = pgr.project_id
+                left join ecosystems e on e.id = pe.ecosystem_id
                 left join projects p on p.id = pgr.project_id and p.visibility = 'PUBLIC'
                 left join project_leads pl on pl.project_id = pgr.project_id and pl.user_id = u.id
                 left join rewards r on r.recipient_id = gur.github_user_id
