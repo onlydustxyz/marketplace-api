@@ -74,7 +74,7 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                                     "visibility": "private"
                                 }
                             ],
-                            "allocatedTimeToContribute": null,
+                            "allocatedTimeToContribute": "ONE_TO_THREE_DAYS",
                             "isLookingForAJob": true
                         }
                         """)
@@ -93,7 +93,7 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.technologies['C++']").isEqualTo(100)
                 .jsonPath("$.technologies['Rust']").isEqualTo(90)
                 .jsonPath("$.technologies['Java']").isEqualTo(20)
-                .jsonPath("$.allocatedTimeToContribute").isEmpty()
+                .jsonPath("$.allocatedTimeToContribute").isEqualTo("ONE_TO_THREE_DAYS")
                 .jsonPath("$.isLookingForAJob").isEqualTo(true)
                 .jsonPath("$.contacts.length()").isEqualTo(2)
                 .jsonPath("$.contacts[?(@.contact=='abuisset@gmail.com')].visibility").isEqualTo("public")
@@ -103,6 +103,36 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')]").doesNotExist()
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/yolocroute')].visibility").isEqualTo("private")
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/yolocroute')].channel").isEqualTo("TELEGRAM");
+    }
+
+    @Test
+    void should_create_user_profile_with_minimal_info() {
+        // Given
+        final String jwt = userAuthHelper.authenticateHayden().jwt();
+
+        // When
+        client.put()
+                .uri(getApiURI(ME_PUT_PROFILE))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "firstName": null,
+                          "lastName": null,
+                          "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
+                          "location": null,
+                          "bio": null,
+                          "website": null,
+                          "contacts": [],
+                          "technologies": {},
+                          "allocatedTimeToContribute": null,
+                          "isLookingForAJob": null
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus().is2xxSuccessful()
+        ;
     }
 
     @Test

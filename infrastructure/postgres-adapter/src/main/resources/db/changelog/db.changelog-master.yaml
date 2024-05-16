@@ -269,3 +269,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000222_update_backoffice_users_roles.sql
   - include:
       file: db/changelog/changelogs/00000232_make_weekly_allocated_time_optional.sql
+  - include:
+      file: db/changelog/changelogs/00000233_make_looking_for_a_job_optional.sql
