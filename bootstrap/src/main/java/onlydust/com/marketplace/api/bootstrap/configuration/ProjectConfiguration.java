@@ -24,9 +24,8 @@ import onlydust.com.marketplace.kernel.port.output.*;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.IndexerApiOutboxConsumer;
 import onlydust.com.marketplace.project.domain.observer.HackathonObserverComposite;
-import onlydust.com.marketplace.project.domain.observer.ProjectObserver;
 import onlydust.com.marketplace.project.domain.observer.ProjectObserverComposite;
-import onlydust.com.marketplace.project.domain.observer.UserObserver;
+import onlydust.com.marketplace.project.domain.observer.UserObserverComposite;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.service.*;
@@ -97,7 +96,7 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public UserFacadePort userFacadePort(final UserObserverPort userObserverPort,
+    public UserFacadePort userFacadePort(final UserObserverPort userObservers,
                                          final PostgresUserAdapter postgresUserAdapter,
                                          final DateProvider dateProvider,
                                          final ProjectStoragePort projectStoragePort,
@@ -105,7 +104,7 @@ public class ProjectConfiguration {
                                          final ImageStoragePort imageStoragePort,
                                          final ProjectObserverPort projectObservers) {
         return new UserService(
-                userObserverPort,
+                userObservers,
                 postgresUserAdapter,
                 dateProvider,
                 projectStoragePort,
@@ -144,7 +143,6 @@ public class ProjectConfiguration {
         return new AccountingServiceAdapter(accountingFacadePort);
     }
 
-
     @Bean
     public GithubAccountService githubAccountService(final GithubSearchPort githubSearchPort,
                                                      final GithubStoragePort githubStoragePort) {
@@ -179,22 +177,22 @@ public class ProjectConfiguration {
         return new TechnologiesService(trackingIssuePort, technologyStoragePort);
     }
 
-    // TODO remove and replace with dedicated implementations
     @Bean
-    public ProjectObserverPort projectObserverPort(final OutboxPort indexerOutbox) {
-        return new ProjectObserver(indexerOutbox);
+    public OutboxService outboxService(final OutboxPort indexerOutbox,
+                                       final OutboxPort trackingOutbox) {
+        return new OutboxService(indexerOutbox, trackingOutbox);
     }
 
     @Bean
-    public ProjectObserverPort projectObservers(final ProjectObserverPort projectObserverPort,
+    public ProjectObserverPort projectObservers(final OutboxService outboxService,
                                                 final SlackApiAdapter slackApiAdapter,
                                                 final ContributionService contributionService) {
-        return new ProjectObserverComposite(projectObserverPort, contributionService, slackApiAdapter);
+        return new ProjectObserverComposite(outboxService, contributionService, slackApiAdapter);
     }
 
     @Bean
-    public UserObserverPort userObserverPort(final OutboxPort indexerOutbox, final OutboxPort trackingOutbox) {
-        return new UserObserver(indexerOutbox, trackingOutbox);
+    public UserObserverPort userObservers(final OutboxService outboxService) {
+        return new UserObserverComposite(outboxService);
     }
 
     @Bean

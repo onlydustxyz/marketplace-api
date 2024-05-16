@@ -1,17 +1,21 @@
-package onlydust.com.marketplace.project.domain.observer;
+package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
+import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.model.notification.ProjectLinkedReposChanged;
+import onlydust.com.marketplace.project.domain.model.notification.UserSignedUp;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
+import onlydust.com.marketplace.project.domain.port.input.UserObserverPort;
 
+import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
-public class ProjectObserver implements ProjectObserverPort {
-
+public class OutboxService implements ProjectObserverPort, UserObserverPort {
     private final OutboxPort indexerOutbox;
+    private final OutboxPort trackingOutbox;
 
     @Override
     public void onLinkedReposChanged(UUID projectId, Set<Long> linkedRepoIds, Set<Long> unlinkedRepoIds) {
@@ -32,5 +36,12 @@ public class ProjectObserver implements ProjectObserverPort {
 
     @Override
     public void onProjectCategorySuggested(String categoryName, UUID userId) {
+    }
+
+    @Override
+    public void onUserSignedUp(User user) {
+        final var event = new UserSignedUp(user.getId(), user.getGithubUserId(), user.getGithubLogin(), new Date());
+        indexerOutbox.push(event);
+        trackingOutbox.push(event);
     }
 }
