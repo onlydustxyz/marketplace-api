@@ -3,18 +3,18 @@ package onlydust.com.marketplace.api.slack;
 import com.slack.api.Slack;
 import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.response.chat.ChatPostMessageResponse;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserverPort;
 import onlydust.com.marketplace.api.slack.mapper.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.kernel.model.Event;
-import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.User;
-import onlydust.com.marketplace.project.domain.model.notification.ProjectCategorySuggestion;
-import onlydust.com.marketplace.project.domain.model.notification.ProjectCreated;
-import onlydust.com.marketplace.project.domain.model.notification.UserAppliedOnProject;
-import onlydust.com.marketplace.project.domain.model.notification.UserRegisteredOnHackathon;
+import onlydust.com.marketplace.project.domain.port.input.HackathonObserverPort;
+import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
@@ -22,10 +22,13 @@ import onlydust.com.marketplace.project.domain.view.HackathonDetailsView;
 import onlydust.com.marketplace.project.domain.view.ProjectDetailsView;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
 
+import java.util.Set;
+import java.util.UUID;
+
 import static java.util.Objects.nonNull;
 
 @Slf4j
-public class SlackApiAdapter implements NotificationPort {
+public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObserverPort, HackathonObserverPort {
 
     private final SlackProperties slackProperties;
     private final MethodsClient slackClient;
@@ -44,25 +47,8 @@ public class SlackApiAdapter implements NotificationPort {
     }
 
     @Override
-    public void notify(Event event) {
-        if (event instanceof BillingProfileVerificationUpdated billingProfileVerificationUpdated) {
-            sendBillingProfileVerificationNotification(billingProfileVerificationUpdated);
-        } else if (event instanceof UserAppliedOnProject userAppliedOnProject) {
-            sendUserAppliedOnProjectNotification(userAppliedOnProject);
-        } else if (event instanceof ProjectCreated projectCreated) {
-            sendProjectCreatedNotification(projectCreated);
-        } else if (event instanceof UserRegisteredOnHackathon userRegisteredOnHackathon) {
-            sendUserRegisteredOnHackathonEvent(userRegisteredOnHackathon);
-        } else if (event instanceof ProjectCategorySuggestion projectCategorySuggestion) {
-            sendProjectCategorySuggestionNotification(projectCategorySuggestion);
-        } else {
-            LOGGER.warn("Unmanaged event class %s".formatted(event.getClass()));
-        }
-    }
-
-    private void sendUserRegisteredOnHackathonEvent(final UserRegisteredOnHackathon userRegisteredOnHackathon) {
-        final UserProfileView userProfileView = userStoragePort.getProfileById(userRegisteredOnHackathon.getUserId());
-        final Hackathon.Id hackathonId = userRegisteredOnHackathon.getHackathonId();
+    public void onUserRegistration(Hackathon.Id hackathonId, UUID userId) {
+        final UserProfileView userProfileView = userStoragePort.getProfileById(userId);
         final HackathonDetailsView hackathonDetailsView =
                 hackathonStoragePort.findById(hackathonId).orElseThrow(() -> OnlyDustException.internalServerError(
                         "Hackathon %s not found".formatted(hackathonId.value())));
@@ -70,15 +56,17 @@ public class SlackApiAdapter implements NotificationPort {
                 UserRegisteredOnHackathonEventMapper.mapToSlackBlock(userProfileView, hackathonDetailsView, slackProperties.getEnvironment()));
     }
 
-    private void sendProjectCreatedNotification(final ProjectCreated projectCreated) {
-        final User user = userStoragePort.getUserById(projectCreated.getUserId())
-                .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(projectCreated.getUserId())));
-        final ProjectDetailsView projectDetailsView = projectStoragePort.getById(projectCreated.getProjectId(), user);
+    @Override
+    public void onProjectCreated(UUID projectId, UUID projectLeadId) {
+        final User user = userStoragePort.getUserById(projectLeadId)
+                .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(projectLeadId)));
+        final ProjectDetailsView projectDetailsView = projectStoragePort.getById(projectId, user);
         sendNotification(slackProperties.getDevRelChannel(), "New project created", ProjectCreatedEventMapper.mapToSlackBlock(user,
                 projectDetailsView, slackProperties.getEnvironment()));
     }
 
-    private void sendBillingProfileVerificationNotification(final BillingProfileVerificationUpdated billingProfileVerificationUpdated) {
+    @Override
+    public void onBillingProfileUpdated(BillingProfileVerificationUpdated billingProfileVerificationUpdated) {
         final User user = userStoragePort.getUserById(billingProfileVerificationUpdated.getUserId().value())
                 .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(billingProfileVerificationUpdated.getUserId().value())));
         sendNotification(slackProperties.getKycKybChannel(), "New KYC/KYB event",
@@ -86,20 +74,21 @@ public class SlackApiAdapter implements NotificationPort {
                         slackProperties.getTagAllChannel()));
     }
 
-    private void sendUserAppliedOnProjectNotification(final UserAppliedOnProject userAppliedOnProject) {
-        final User user = userStoragePort.getUserById(userAppliedOnProject.getUserId())
-                .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(userAppliedOnProject.getUserId())));
-        final ProjectDetailsView projectDetailsView = projectStoragePort.getById(userAppliedOnProject.getProjectId(), user);
+    @Override
+    public void onUserApplied(UUID projectId, UUID userId, UUID applicationId) {
+        final User user = userStoragePort.getUserById(userId)
+                .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(userId)));
+        final ProjectDetailsView projectDetailsView = projectStoragePort.getById(projectId, user);
         sendNotification(slackProperties.getDevRelChannel(), "New user application on project", UserAppliedOnProjectEventMapper.mapToSlackBlock(user,
                 projectDetailsView, slackProperties.getEnvironment()));
     }
 
-    private void sendProjectCategorySuggestionNotification(final ProjectCategorySuggestion projectCategorySuggestion) {
-        final User user = userStoragePort.getUserById(projectCategorySuggestion.getUserId())
-                .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(projectCategorySuggestion.getUserId())));
+    @Override
+    public void onProjectCategorySuggested(String categoryName, UUID userId) {
+        final User user = userStoragePort.getUserById(userId)
+                .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(userId)));
         sendNotification(slackProperties.getDevRelChannel(), "New project category suggested", ProjectCategorySuggestionEventMapper.mapToSlackBlock(user,
-                projectCategorySuggestion.getCategoryName(),
-                slackProperties.getEnvironment()));
+                categoryName, slackProperties.getEnvironment()));
     }
 
     private void sendNotification(final String slackChannel, final String slackDefaultMessage, final String slackBlock) {
@@ -121,5 +110,24 @@ public class SlackApiAdapter implements NotificationPort {
         } catch (Exception e) {
             LOGGER.warn("Failed to send slack notification %s".formatted(slackDefaultMessage), e);
         }
+    }
+
+    @Override
+    public void onInvoiceUploaded(BillingProfile.Id billingProfileId, Invoice.Id invoiceId, boolean isExternal) {
+    }
+
+    @Override
+    public void onInvoiceRejected(Invoice.@NonNull Id invoiceId, @NonNull String rejectionReason) {
+
+    }
+
+    @Override
+    public void onLinkedReposChanged(UUID projectId, Set<Long> linkedRepoIds, Set<Long> unlinkedRepoIds) {
+
+    }
+
+    @Override
+    public void onRewardSettingsChanged(UUID projectId) {
+
     }
 }

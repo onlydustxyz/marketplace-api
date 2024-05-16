@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.slack.SlackProperties;
-import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
@@ -20,8 +19,10 @@ public class SlackConfiguration {
     }
 
     @Bean
-    public NotificationPort slackNotificationPort(final SlackProperties slackProperties, final UserStoragePort userStoragePort,
-                                                  final ProjectStoragePort projectStoragePort, final HackathonStoragePort hackathonStoragePort) {
+    public SlackApiAdapter slackApiAdapter(final SlackProperties slackProperties,
+                                           final UserStoragePort userStoragePort,
+                                           final ProjectStoragePort projectStoragePort,
+                                           final HackathonStoragePort hackathonStoragePort) {
         return new SlackApiAdapter(slackProperties, userStoragePort, projectStoragePort, hackathonStoragePort);
     }
 }

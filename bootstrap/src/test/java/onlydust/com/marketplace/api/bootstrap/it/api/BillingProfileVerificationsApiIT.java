@@ -6,17 +6,18 @@ import com.onlydust.api.sumsub.api.client.adapter.SumsubApiClientAdapter;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubClientProperties;
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.api.bootstrap.helper.SlackNotificationStub;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
+import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubSignatureVerifier;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookProperties;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
@@ -28,7 +29,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookApiAdapter.X_OD_API;
 import static onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookApiAdapter.X_SUMSUB_PAYLOAD_DIGEST;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.times;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
@@ -38,7 +39,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     SumsubClientProperties sumsubClientProperties;
     @Autowired
-    SlackNotificationStub slackNotificationStub;
+    SlackApiAdapter slackApiAdapter;
     @Autowired
     KycRepository kycRepository;
     @Autowired
@@ -52,7 +53,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
     @Order(1)
     void should_verify_individual_billing_profile() throws InterruptedException {
         // Given
-        slackNotificationStub.reset();
+        Mockito.reset(slackApiAdapter);
         final var githubUserId = faker.number().randomNumber() + faker.number().randomNumber();
         final var login = faker.name().username();
         final var avatarUrl = faker.internet().avatar();
@@ -155,11 +156,11 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.status").isEqualTo("UNDER_REVIEW")
                 .jsonPath("$.id").isNotEmpty();
 
-        assertEquals(1, slackNotificationStub.getBillingProfileNotifications().size());
+        Mockito.verify(slackApiAdapter).onBillingProfileUpdated(Mockito.any());
 
         final String reviewMessage = "We could not verify your profile. If you have any questions, please contact the Company where you try to verify your " +
-                "profile tech@onlydust.xyz\\n\\nTemporary we could not verify your profile via doc-free method. Please try again " +
-                "later or contact the company where you're verifying your profile tech@onlydust.xyz, if error persists.";
+                                     "profile tech@onlydust.xyz\\n\\nTemporary we could not verify your profile via doc-free method. Please try again " +
+                                     "later or contact the company where you're verifying your profile tech@onlydust.xyz, if error persists.";
         final byte[] sumsubPayloadRejection = String.format("""
                 {
                   "type": "applicantPending",
@@ -229,14 +230,15 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.kyc.idDocumentCountryCode").isEqualTo("FRA")
                 .jsonPath("$.kyc.validUntil").isEqualTo("2025-04-19T00:00:00Z")
                 .jsonPath("$.kyc.usCitizen").isEqualTo(false);
-        assertEquals(2, slackNotificationStub.getBillingProfileNotifications().size());
+        Mockito.verify(slackApiAdapter, times(2)).onBillingProfileUpdated(Mockito.any());
 
         accountingMailOutboxJob.run();
         customerIOWireMockServer.verify(1,
                 postRequestedFor(urlEqualTo("/send/email"))
                         .withHeader("Content-Type", equalTo("application/json"))
                         .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
-                        .withRequestBody(matchingJsonPath("$.transactional_message_id", equalTo(customerIOProperties.getVerificationFailedEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id",
+                                equalTo(customerIOProperties.getVerificationFailedEmailId().toString())))
                         .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(userId.toString())))
                         .withRequestBody(matchingJsonPath("$.message_data.status", equalTo("CLOSED")))
                         .withRequestBody(matchingJsonPath("$.message_data.username", equalTo(login)))
@@ -380,10 +382,10 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.kyb.subjectToEuropeVAT").isEqualTo(true)
                 .jsonPath("$.kyb.euVATNumber").isEqualTo("FR26908233638")
                 .jsonPath("$.kyb.usEntity").isEqualTo(false);
-        assertEquals(3, slackNotificationStub.getBillingProfileNotifications().size());
+        Mockito.verify(slackApiAdapter, times(3)).onBillingProfileUpdated(Mockito.any());
 
         final String reviewMessage = "Enter your date of birth exactly as it is on your identity document.\\n\\n - Tax number is incorrect. Provide a correct" +
-                " tax number.\\n - SSN is incorrect. Provide a correct SSN.";
+                                     " tax number.\\n - SSN is incorrect. Provide a correct SSN.";
         final byte[] sumsubPayloadRejection = String.format("""
                 {
                   "type": "applicantPending",
@@ -451,7 +453,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.kyb.subjectToEuropeVAT").isEqualTo(true)
                 .jsonPath("$.kyb.euVATNumber").isEqualTo("FR26908233638")
                 .jsonPath("$.kyb.usEntity").isEqualTo(false);
-        assertEquals(4, slackNotificationStub.getBillingProfileNotifications().size());
+        Mockito.verify(slackApiAdapter, times(4)).onBillingProfileUpdated(Mockito.any());
 
         final byte[] sumsubPayloadChildrenKycUnderReview = String.format("""
                 {
@@ -548,7 +550,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.status").isEqualTo("REJECTED");
-        assertEquals(6, slackNotificationStub.getBillingProfileNotifications().size());
+        Mockito.verify(slackApiAdapter, times(6)).onBillingProfileUpdated(Mockito.any());
     }
 
     @Test

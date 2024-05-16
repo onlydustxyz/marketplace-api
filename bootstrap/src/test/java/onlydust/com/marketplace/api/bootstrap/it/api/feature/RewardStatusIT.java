@@ -32,7 +32,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.BackofficeAccountingManagem
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
-import onlydust.com.marketplace.kernel.port.output.NotificationPort;
+import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.service.RewardService;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
@@ -3860,7 +3860,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     @Autowired
     AccountingRewardStoragePort accountingRewardStoragePort;
     @Autowired
-    NotificationPort accountingMailOutboxNotifier;
+    OutboxConsumer accountingMailOutboxConsumer;
     @Autowired
     InvoiceStoragePort invoiceStoragePort;
 
@@ -3877,7 +3877,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         final var backofficeAccountingManagementRestApi = new BackofficeAccountingManagementRestApi(
                 accountingService,
                 new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, accountingService,
-                        sponsorStoragePort, accountingMailOutboxNotifier),
+                        sponsorStoragePort, accountingMailOutboxConsumer),
                 new PaymentService(accountingRewardStoragePort, invoiceStoragePort, accountingService, blockchainFacadePort),
                 billingProfileService,
                 authenticatedBackofficeUserService,

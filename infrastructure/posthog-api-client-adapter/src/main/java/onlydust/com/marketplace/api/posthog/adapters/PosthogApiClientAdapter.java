@@ -7,17 +7,17 @@ import onlydust.com.marketplace.api.posthog.client.PosthogHttpClient;
 import onlydust.com.marketplace.api.posthog.dto.EventDTO;
 import onlydust.com.marketplace.api.posthog.properties.PosthogProperties;
 import onlydust.com.marketplace.kernel.model.Event;
-import onlydust.com.marketplace.kernel.port.output.NotificationPort;
+import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.notification.UserSignedUp;
 
 @AllArgsConstructor
 @Slf4j
-public class PosthogApiClientAdapter implements NotificationPort {
+public class PosthogApiClientAdapter implements OutboxConsumer {
     PosthogProperties posthogProperties;
     PosthogHttpClient posthogHttpClient;
 
     @Override
-    public void notify(Event event) {
+    public void process(Event event) {
         if (event instanceof UserSignedUp userSignedUp) {
             posthogHttpClient.send("/capture/", HttpMethod.POST,
                     EventDTO.builder()
@@ -34,5 +34,4 @@ public class PosthogApiClientAdapter implements NotificationPort {
             LOGGER.warn("Event type {} not handle by Posthog event tracking consumer", event.getClass());
         }
     }
-
 }

@@ -10,7 +10,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
-import onlydust.com.marketplace.kernel.port.output.NotificationPort;
+import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.HackathonFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.LanguageFacadePort;
@@ -75,11 +75,11 @@ public class BackofficeConfiguration {
 
     @Bean
     public AccountingRewardPort accountingRewardPort(final AccountingRewardStoragePort accountingRewardStoragePort,
-                                                     final NotificationPort accountingMailOutboxNotifier,
+                                                     final OutboxConsumer accountingMailOutboxConsumer,
                                                      final AccountingFacadePort accountingFacadePort,
                                                      final SponsorStoragePort sponsorStoragePort) {
         return new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, accountingFacadePort,
-                sponsorStoragePort, accountingMailOutboxNotifier);
+                sponsorStoragePort, accountingMailOutboxConsumer);
     }
 
     @Bean

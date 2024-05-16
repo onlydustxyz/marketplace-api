@@ -2,7 +2,6 @@ package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
-import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserverPort;
@@ -27,7 +26,7 @@ public class BillingProfileObserverComposite implements BillingProfileObserverPo
     }
 
     @Override
-    public void onInvoiceRejected(@NonNull InvoiceRejected invoiceRejected) {
-        observers.forEach(o -> o.onInvoiceRejected(invoiceRejected));
+    public void onInvoiceRejected(final @NonNull Invoice.Id invoiceId, final @NonNull String reason) {
+        observers.forEach(o -> o.onInvoiceRejected(invoiceId, reason));
     }
 }

@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class PosthogConfiguration {
-
     @Bean
     @ConfigurationProperties(value = "infrastructure.posthog")
     public PosthogProperties posthogProperties() {
@@ -17,7 +16,7 @@ public class PosthogConfiguration {
     }
 
     @Bean
-    public PosthogApiClientAdapter webhookTrackingPort(final PosthogProperties posthogProperties) {
+    public PosthogApiClientAdapter posthogApiClientAdapter(final PosthogProperties posthogProperties) {
         return new PosthogApiClientAdapter(posthogProperties, new PosthogHttpClient(posthogProperties));
     }
 }

@@ -2,7 +2,6 @@ package onlydust.com.marketplace.accounting.domain.service;
 
 import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
-import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Money;
@@ -10,13 +9,11 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
-import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserverPort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
@@ -118,20 +115,6 @@ class InvoiceServiceTest {
     }
 
     @Test
-    void should_update_if_rejected_status_and_not_send_notification_given_a_billing_profile_admin_not_found() {
-        // Given
-        when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
-        Invoice.Status status = Invoice.Status.REJECTED;
-        final String rejectionReason = faker.rickAndMorty().character();
-
-        // When
-        assertThatThrownBy(() -> invoiceService.update(invoice.id(), status, rejectionReason))
-                // Then
-                .isInstanceOf(OnlyDustException.class)
-                .hasMessage("Billing profile admin not found for billing profile %s".formatted(invoice.billingProfileSnapshot().id()));
-    }
-
-    @Test
     void should_update_if_rejected_status() {
         // Given
         final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
@@ -145,31 +128,17 @@ class InvoiceServiceTest {
                 .kyc(newKyc(billingProfileId, UserId.random()))
                 .build();
 
-        final var invoiceCreatorId = UserId.random();
-        final var invoiceCreator = BillingProfileCoworkerView.builder()
-                .userId(UserId.random())
-                .login(faker.name().username())
-                .email(faker.internet().emailAddress())
-                .firstName(faker.name().firstName())
-                .githubUserId(GithubUserId.of(faker.number().randomNumber(10, true)))
-                .role(BillingProfile.User.Role.ADMIN)
-                .joinedAt(ZonedDateTime.now())
-                .invitedAt(null)
-                .rewardCount(0)
-                .billingProfileAdminCount(1)
-                .build();
-        final var invoice = Invoice.of(individualBillingProfile, 1, invoiceCreatorId);
+        final var invoice = Invoice.of(individualBillingProfile, 1, UserId.random());
         invoice.rewards(List.of(
                 new Invoice.Reward(RewardId.random(), ZonedDateTime.now(), faker.rickAndMorty().character(),
                         Money.of(BigDecimal.TEN, Currency.crypto("dustyCrypto", Currency.Code.of("DSTC"), 10)),
                         Money.of(BigDecimal.TEN, Currency.crypto("dustyCrypto", Currency.Code.of("DSTC"), 10)), invoice.id(), List.of())));
         when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
+
         Invoice.Status status = Invoice.Status.REJECTED;
         final String rejectionReason = faker.rickAndMorty().character();
 
         // When
-        when(billingProfileStoragePort.findBillingProfileAdmin(invoiceCreatorId, invoice.billingProfileSnapshot().id()))
-                .thenReturn(Optional.of(invoiceCreator));
         invoiceService.update(invoice.id(), status, rejectionReason);
 
         // Then
@@ -177,17 +146,7 @@ class InvoiceServiceTest {
         verify(invoiceStoragePort).update(invoiceCaptor.capture());
         final var updatedInvoice = invoiceCaptor.getValue();
         assertThat(updatedInvoice.status()).isEqualTo(status);
-        final ArgumentCaptor<InvoiceRejected> rejectedArgumentCaptor = ArgumentCaptor.forClass(InvoiceRejected.class);
-        verify(billingProfileObserver).onInvoiceRejected(rejectedArgumentCaptor.capture());
-        assertThat(rejectedArgumentCaptor.getValue().rejectionReason()).isEqualTo(rejectionReason);
-        assertThat(rejectedArgumentCaptor.getValue().invoiceName()).isEqualTo(invoice.number().value());
-        assertThat(rejectedArgumentCaptor.getValue().billingProfileAdminEmail()).isEqualTo(invoiceCreator.email());
-        assertThat(rejectedArgumentCaptor.getValue().billingProfileAdminFirstName()).isEqualTo(invoiceCreator.firstName());
-        assertThat(rejectedArgumentCaptor.getValue().billingProfileAdminGithubLogin()).isEqualTo(invoiceCreator.login());
-        assertThat(rejectedArgumentCaptor.getValue().rewardCount()).isEqualTo(invoice.rewards().size());
-        assertThat(rejectedArgumentCaptor.getValue().rewards().get(0).getProjectName()).isEqualTo(invoice.rewards().get(0).projectName());
-        assertThat(rejectedArgumentCaptor.getValue().rewards().get(0).getAmount()).isEqualTo(invoice.rewards().get(0).amount().getValue());
-        assertThat(rejectedArgumentCaptor.getValue().rewards().get(0).getCurrencyCode()).isEqualTo(invoice.rewards().get(0).amount().getCurrency().code().toString());
+        verify(billingProfileObserver).onInvoiceRejected(invoice.id(), rejectionReason);
     }
 
 
