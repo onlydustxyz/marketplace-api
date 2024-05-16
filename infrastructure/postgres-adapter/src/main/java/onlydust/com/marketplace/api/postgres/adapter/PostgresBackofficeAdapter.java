@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoEcosystemEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoProjectEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoUserShortViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.SponsorViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoEcosystemQueryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoProjectQueryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoUserShortQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
@@ -68,7 +68,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
         final var page = boEcosystemRepository.findAll(filters.getProjects(), filters.getEcosystems(),
                 PageRequest.of(pageIndex, pageSize, Sort.by("name")));
         return Page.<EcosystemView>builder()
-                .content(page.getContent().stream().map(BoEcosystemEntity::toView).toList())
+                .content(page.getContent().stream().map(BoEcosystemQueryEntity::toView).toList())
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();
@@ -98,7 +98,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
         final var page = boUserShortViewRepository.findAll(filters.loginLike().orElse(null), PageRequest.of(pageIndex, pageSize,
                 Sort.by(Sort.Direction.DESC, "created_at")));
         return Page.<UserShortView>builder()
-                .content(page.getContent().stream().map(BoUserShortViewEntity::toDomain).toList())
+                .content(page.getContent().stream().map(BoUserShortQueryEntity::toDomain).toList())
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();
@@ -109,7 +109,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
         final var page = boProjectRepository.findAll(isNull(projectIds) ? List.of() : projectIds,
                 PageRequest.of(pageIndex, pageSize));
         return Page.<OldProjectView>builder()
-                .content(page.getContent().stream().map(BoProjectEntity::toView).toList())
+                .content(page.getContent().stream().map(BoProjectQueryEntity::toView).toList())
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();

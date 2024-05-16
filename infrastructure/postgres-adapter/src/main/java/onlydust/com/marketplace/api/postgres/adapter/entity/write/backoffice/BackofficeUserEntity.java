@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.write;
+package onlydust.com.marketplace.api.postgres.adapter.entity.write.backoffice;
 
 import io.hypersistence.utils.hibernate.type.array.EnumArrayType;
 import io.hypersistence.utils.hibernate.type.array.internal.AbstractArrayType;

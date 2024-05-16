@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import onlydust.com.backoffice.api.contract.model.EcosystemRequest;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoEcosystemEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoEcosystemQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoEcosystemRepository;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import org.junit.jupiter.api.BeforeEach;
@@ -137,9 +137,9 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
         client.get()
                 .uri(getApiURI(GET_GITHUB_REPOS, Map.of("pageIndex", "0", "pageSize", "5", "projectIds", "467cb27c" +
-                                                                                                         "-9726-4f94" +
-                                                                                                         "-818e" +
-                                                                                                         "-6aa49bbf5e75,b0f54343-3732-4118-8054-dba40f1ffb85")))
+                        "-9726-4f94" +
+                        "-818e" +
+                        "-6aa49bbf5e75,b0f54343-3732-4118-8054-dba40f1ffb85")))
                 .header("Authorization", "Bearer " + pierre.jwt())
                 // Then
                 .exchange()
@@ -339,8 +339,8 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                              }
                         """);
 
-        final Page<BoEcosystemEntity> ecosystems = ecosystemRepository.findAll(List.of(), List.of(), Pageable.ofSize(100));
-        final BoEcosystemEntity zama = ecosystems.stream().filter(e -> e.getName().equals("Zama")).findFirst().orElseThrow();
+        final Page<BoEcosystemQueryEntity> ecosystems = ecosystemRepository.findAll(List.of(), List.of(), Pageable.ofSize(100));
+        final BoEcosystemQueryEntity zama = ecosystems.stream().filter(e -> e.getName().equals("Zama")).findFirst().orElseThrow();
 
         client.get()
                 .uri(getApiURI(GET_ECOSYSTEMS, Map.of(

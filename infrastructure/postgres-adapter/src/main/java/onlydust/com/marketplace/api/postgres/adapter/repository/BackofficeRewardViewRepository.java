@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BackofficeRewardViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoRewardQueryEntity;
 import org.intellij.lang.annotations.Language;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-public interface BackofficeRewardViewRepository extends JpaRepository<BackofficeRewardViewEntity, UUID> {
+public interface BackofficeRewardViewRepository extends JpaRepository<BoRewardQueryEntity, UUID> {
 
     @Language("PostgreSQL")
     String SELECT = """
@@ -98,18 +98,18 @@ public interface BackofficeRewardViewRepository extends JpaRepository<Backoffice
                 and (coalesce(:billingProfileIds) is null or i.billing_profile_id in (:billingProfileIds))
                 and (coalesce(:recipients) is null or r.recipient_id in (:recipients))
             """, nativeQuery = true)
-    Page<BackofficeRewardViewEntity> findAllByStatusesAndDates(@NonNull List<String> statuses,
-                                                               @NonNull List<UUID> billingProfileIds,
-                                                               @NonNull List<Long> recipients,
-                                                               Date fromRequestedAt, Date toRequestedAt,
-                                                               Date fromProcessedAt, Date toProcessedAt,
-                                                               Pageable pageable);
+    Page<BoRewardQueryEntity> findAllByStatusesAndDates(@NonNull List<String> statuses,
+                                                        @NonNull List<UUID> billingProfileIds,
+                                                        @NonNull List<Long> recipients,
+                                                        Date fromRequestedAt, Date toRequestedAt,
+                                                        Date fromProcessedAt, Date toProcessedAt,
+                                                        Pageable pageable);
 
     @Query(value = SELECT + """
             where r.id in (:rewardIds)
             """, nativeQuery = true)
-    List<BackofficeRewardViewEntity> findAllByRewardIds(@NonNull List<UUID> rewardIds);
+    List<BoRewardQueryEntity> findAllByRewardIds(@NonNull List<UUID> rewardIds);
 
     @Query(nativeQuery = true, value = SELECT + " where rsd.paid_at is not null and r.payment_notified_at is null")
-    List<BackofficeRewardViewEntity> findPaidRewardsToNotify();
+    List<BoRewardQueryEntity> findPaidRewardsToNotify();
 }

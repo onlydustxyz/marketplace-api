@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
+package onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.view.backoffice.OldProjectView;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -22,7 +23,8 @@ import java.util.UUID;
 @EqualsAndHashCode
 @Data
 @Entity
-public class BoProjectEntity {
+@Immutable
+public class BoProjectQueryEntity {
     @Id
     UUID id;
     String name;

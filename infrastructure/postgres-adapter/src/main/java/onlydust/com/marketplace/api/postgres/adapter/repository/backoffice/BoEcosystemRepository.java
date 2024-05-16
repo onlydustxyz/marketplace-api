@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository.backoffice;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoEcosystemEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoEcosystemQueryEntity;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.UUID;
 
-public interface BoEcosystemRepository extends JpaRepository<BoEcosystemEntity, UUID> {
+public interface BoEcosystemRepository extends JpaRepository<BoEcosystemQueryEntity, UUID> {
 
     @Query(value = """
             SELECT
@@ -36,5 +36,5 @@ public interface BoEcosystemRepository extends JpaRepository<BoEcosystemEntity, 
                 COALESCE(:ecosystemIds) IS NULL OR s.id IN (:ecosystemIds)
             """, nativeQuery = true)
     @NotNull
-    Page<BoEcosystemEntity> findAll(final List<UUID> projectIds, final List<UUID> ecosystemIds, final @NotNull Pageable pageable);
+    Page<BoEcosystemQueryEntity> findAll(final List<UUID> projectIds, final List<UUID> ecosystemIds, final @NotNull Pageable pageable);
 }

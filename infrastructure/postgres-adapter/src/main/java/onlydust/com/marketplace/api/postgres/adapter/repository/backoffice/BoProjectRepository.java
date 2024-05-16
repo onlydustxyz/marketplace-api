@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository.backoffice;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoProjectEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoProjectQueryEntity;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.UUID;
 
-public interface BoProjectRepository extends JpaRepository<BoProjectEntity, UUID> {
+public interface BoProjectRepository extends JpaRepository<BoProjectQueryEntity, UUID> {
 
     @Query(value = """
             SELECT p.id,
@@ -95,5 +95,5 @@ public interface BoProjectRepository extends JpaRepository<BoProjectEntity, UUID
             ORDER BY p.name
             """, nativeQuery = true)
     @NotNull
-    Page<BoProjectEntity> findAll(final List<UUID> projectIds, final @NotNull Pageable pageable);
+    Page<BoProjectQueryEntity> findAll(final List<UUID> projectIds, final @NotNull Pageable pageable);
 }

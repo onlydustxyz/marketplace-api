@@ -1,9 +1,10 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
+package onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice;
 
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import lombok.*;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -16,7 +17,8 @@ import java.util.UUID;
 @EqualsAndHashCode
 @Data
 @Entity
-public class GithubRepositoryLinkedToProjectEntity {
+@Immutable
+public class BoGithubRepositoryLinkedToProjectQueryEntity {
     @EmbeddedId
     Id id;
     String name;

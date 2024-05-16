@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
+package onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,9 +9,7 @@ import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.ShortSponsorView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.AllUserViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.InvoiceViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import org.hibernate.annotations.Immutable;
@@ -33,7 +31,7 @@ import static java.util.Objects.isNull;
 @Entity
 @Value
 @Immutable
-public class BackofficeRewardViewEntity {
+public class BoRewardQueryEntity {
     @Id
     @NonNull
     UUID id;
@@ -68,14 +66,18 @@ public class BackofficeRewardViewEntity {
 
     @NonNull
     BigDecimal amount;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @NonNull
-    CurrencyEntity currency;
+    @JoinColumn(name = "currency_id", referencedColumnName = "id", insertable = false, updatable = false)
+    CurrencyViewEntity currency;
 
-    @ManyToOne
-    BillingProfileEntity billingProfile;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "billing_profile_id", referencedColumnName = "id", insertable = false, updatable = false)
+    BillingProfileViewEntity billingProfile;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "invoice_id", referencedColumnName = "id", insertable = false, updatable = false)
     InvoiceViewEntity invoice;
 
     UUID batchPaymentId;
@@ -84,16 +86,17 @@ public class BackofficeRewardViewEntity {
     @JoinTable(schema = "accounting", name = "rewards_receipts",
             joinColumns = @JoinColumn(name = "reward_id"),
             inverseJoinColumns = @JoinColumn(name = "receipt_id"))
-    List<ReceiptEntity> receipts;
+    List<ReceiptViewEntity> receipts;
 
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "reward_id", insertable = false, updatable = false)
     @NonNull
-    RewardStatusEntity status;
+    RewardStatusViewEntity status;
+
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "reward_id", insertable = false, updatable = false)
     @NonNull
-    RewardStatusDataEntity statusData;
+    RewardStatusDataViewEntity statusData;
 
     @Data
     public static class SponsorLinkView {
@@ -141,7 +144,7 @@ public class BackofficeRewardViewEntity {
                 .projectId(projectId)
                 .billingProfileId(billingProfile == null ? null : billingProfile.getId())
                 .recipientId(recipient.githubUserId())
-                .status(this.status.status())
+                .status(this.status.toDomain())
                 .build();
     }
 }

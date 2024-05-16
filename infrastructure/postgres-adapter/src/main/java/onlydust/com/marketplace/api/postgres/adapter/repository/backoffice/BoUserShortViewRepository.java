@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository.backoffice;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoUserShortViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoUserShortQueryEntity;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.UUID;
 
-public interface BoUserShortViewRepository extends JpaRepository<BoUserShortViewEntity, UUID> {
+public interface BoUserShortViewRepository extends JpaRepository<BoUserShortQueryEntity, UUID> {
 
     @Query(value = """
             SELECT
@@ -29,5 +29,5 @@ public interface BoUserShortViewRepository extends JpaRepository<BoUserShortView
             """,
             nativeQuery = true)
     @NotNull
-    Page<BoUserShortViewEntity> findAll(final String login, final @NotNull Pageable pageable);
+    Page<BoUserShortQueryEntity> findAll(final String login, final @NotNull Pageable pageable);
 }

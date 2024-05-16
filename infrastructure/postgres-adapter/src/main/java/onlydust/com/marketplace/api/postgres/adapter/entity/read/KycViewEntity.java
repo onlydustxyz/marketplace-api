@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.write;
+package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -7,9 +7,8 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -24,13 +23,15 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 @Table(name = "kyc", schema = "accounting")
 @EntityListeners(AuditingEntityListener.class)
-public class KycEntity {
+@Immutable
+public class KycViewEntity {
     @Id
     UUID id;
     UUID billingProfileId;
-    @OneToOne
+
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "billingProfileId", insertable = false, updatable = false)
-    BillingProfileEntity billingProfile;
+    BillingProfileViewEntity billingProfile;
 
     UUID ownerId;
     @Enumerated(EnumType.STRING)
@@ -54,15 +55,6 @@ public class KycEntity {
     String applicantId;
     Boolean usCitizen;
 
-    @CreationTimestamp
-    @Column(name = "tech_created_at", nullable = false, updatable = false)
-    @EqualsAndHashCode.Exclude
-    private Date createdAt;
-    @UpdateTimestamp
-    @Column(name = "tech_updated_at", nullable = false)
-    @EqualsAndHashCode.Exclude
-    private Date updatedAt;
-
 
     public Kyc toDomain() {
         return Kyc.builder()
@@ -82,28 +74,6 @@ public class KycEntity {
                 .ownerId(UserId.of(this.ownerId))
                 .reviewMessageForApplicant(this.reviewMessage)
                 .externalApplicantId(this.applicantId)
-                .build();
-    }
-
-    public static KycEntity fromDomain(final Kyc kyc) {
-        return KycEntity.builder()
-                .id(kyc.getId())
-                .billingProfileId(kyc.getBillingProfileId().value())
-                .address(kyc.getAddress())
-                .birthdate(kyc.getBirthdate())
-                .country(kyc.getCountry().map(Country::iso3Code).orElse(null))
-                .firstName(kyc.getFirstName())
-                .lastName(kyc.getLastName())
-                .validUntil(kyc.getValidUntil())
-                .idDocumentNumber(kyc.getIdDocumentNumber())
-                .idDocumentType(kyc.getIdDocumentType())
-                .ownerId(kyc.getOwnerId().value())
-                .consideredUsPersonQuestionnaire(kyc.getConsideredUsPersonQuestionnaire())
-                .verificationStatus(kyc.getStatus())
-                .idDocumentCountryCode(kyc.getIdDocumentCountry().map(Country::iso3Code).orElse(null))
-                .reviewMessage(kyc.getReviewMessageForApplicant())
-                .applicantId(kyc.getExternalApplicantId())
-                .usCitizen(kyc.isUsCitizen())
                 .build();
     }
 }

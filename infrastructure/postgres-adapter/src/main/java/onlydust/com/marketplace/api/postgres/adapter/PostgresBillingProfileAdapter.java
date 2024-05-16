@@ -256,7 +256,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                 roles.stream().map(Enum::toString).toList(),
                 PageRequest.of(pageIndex, pageSize, Sort.by("user_id")));
         return Page.<BillingProfileCoworkerView>builder()
-                .content(page.getContent().stream().map(BillingProfileUserViewQueryEntity::toView).toList())
+                .content(page.getContent().stream().map(BillingProfileUserQueryEntity::toView).toList())
                 .totalItemNumber(page.getNumberOfElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();
@@ -374,14 +374,14 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Transactional(readOnly = true)
     public Optional<BillingProfileCoworkerView> getInvitedCoworker(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId) {
         return billingProfileUserViewRepository.findInvitedUserByBillingProfileIdAndGithubId(billingProfileId.value(), invitedGithubUserId.value())
-                .map(BillingProfileUserViewQueryEntity::toView);
+                .map(BillingProfileUserQueryEntity::toView);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<BillingProfileCoworkerView> getCoworker(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId) {
         return billingProfileUserViewRepository.findUserByBillingProfileIdAndGithubId(billingProfileId.value(), invitedGithubUserId.value())
-                .map(BillingProfileUserViewQueryEntity::toView);
+                .map(BillingProfileUserQueryEntity::toView);
     }
 
     @Override
@@ -398,7 +398,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Transactional(readOnly = true)
     public Optional<BillingProfileCoworkerView> findBillingProfileAdmin(UserId userId, BillingProfile.Id billingProfileId) {
         return billingProfileUserViewRepository.findBillingProfileAdminById(userId.value(), billingProfileId.value())
-                .map(BillingProfileUserViewQueryEntity::toView);
+                .map(BillingProfileUserQueryEntity::toView);
     }
 
     @Override
