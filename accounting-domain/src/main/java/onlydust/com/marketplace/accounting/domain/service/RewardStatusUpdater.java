@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
-import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
@@ -13,6 +12,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.*;
 
 import java.time.ZonedDateTime;
 
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @Slf4j
@@ -64,8 +64,10 @@ public class RewardStatusUpdater implements AccountingObserverPort, BillingProfi
     }
 
     @Override
-    public void onInvoiceRejected(@NonNull InvoiceRejected invoiceRejected) {
-        invoiceRejected.rewards().forEach(reward -> rewardStatusStorage.save(mustGetRewardStatus(reward.getId()).invoiceReceivedAt(null)));
+    public void onInvoiceRejected(final @NonNull Invoice.Id invoiceId, final @NonNull String rejectionReason) {
+        final var invoice = invoiceStorage.get(invoiceId)
+                .orElseThrow(() -> internalServerError("Invoice %s not found".formatted(invoiceId)));
+        invoice.rewards().forEach(reward -> rewardStatusStorage.save(mustGetRewardStatus(reward.id()).invoiceReceivedAt(null)));
     }
 
     private RewardStatusData mustGetRewardStatus(RewardId rewardId) {

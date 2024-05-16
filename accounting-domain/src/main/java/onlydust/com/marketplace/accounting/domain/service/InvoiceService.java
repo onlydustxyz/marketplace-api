@@ -2,8 +2,6 @@ package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
-import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.InvoiceDownload;
@@ -47,33 +45,19 @@ public class InvoiceService implements InvoiceFacadePort {
 
     @Override
     public void update(Invoice.@NonNull Id id, Invoice.@NonNull Status status, String rejectionReason) {
-        final var invoice = invoiceStoragePort.get(id).orElseThrow(() -> OnlyDustException.notFound("Invoice %s not found".formatted(id)));
+        final var invoice = invoiceStoragePort.get(id)
+                .orElseThrow(() -> OnlyDustException.notFound("Invoice %s not found".formatted(id)));
+
         if (status != Invoice.Status.APPROVED && status != Invoice.Status.REJECTED)
             throw forbidden("Cannot update invoice to status %s".formatted(status));
-        if (nonNull(rejectionReason) && status != Invoice.Status.REJECTED) {
-            throw forbidden("Only rejected invoice can have a rejection reason");
-        }
-        invoiceStoragePort.update(invoice.status(status).rejectionReason(rejectionReason));
-        if (status == Invoice.Status.REJECTED) {
-            final var billingProfileAdmin = billingProfileStoragePort.findBillingProfileAdmin(invoice.createdBy(), invoice.billingProfileSnapshot().id())
-                    .orElseThrow(() -> notFound("Billing profile admin not found for billing profile %s".formatted(invoice.billingProfileSnapshot().id())));
 
-            billingProfileObserver.onInvoiceRejected(new InvoiceRejected(billingProfileAdmin.email(),
-                    (long) invoice.rewards().size(), billingProfileAdmin.login(),
-                    billingProfileAdmin.firstName(),
-                    billingProfileAdmin.userId().value(),
-                    invoice.number().value(),
-                    invoice.rewards().stream()
-                            .map(reward -> ShortReward.builder()
-                                    .id(reward.id())
-                                    .amount(reward.amount().getValue())
-                                    .currencyCode(reward.amount().getCurrency().code().toString())
-                                    .projectName(reward.projectName())
-                                    .dollarsEquivalent(reward.target().getValue())
-                                    .build()
-                            ).toList(),
-                    rejectionReason));
-        }
+        if (nonNull(rejectionReason) && status != Invoice.Status.REJECTED)
+            throw forbidden("Only rejected invoice can have a rejection reason");
+
+        invoiceStoragePort.update(invoice.status(status).rejectionReason(rejectionReason));
+
+        if (status == Invoice.Status.REJECTED)
+            billingProfileObserver.onInvoiceRejected(id, rejectionReason);
     }
 
     @Override

@@ -2,8 +2,6 @@ package onlydust.com.marketplace.accounting.domain.observer;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
-import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
-import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
@@ -310,25 +308,9 @@ public class RewardStatusUpdaterTest {
                 final var rewardId = invocation.getArgument(0, RewardId.class);
                 return Optional.of(new RewardStatusData(rewardId).invoiceReceivedAt(invoice.createdAt()));
             });
-            final InvoiceRejected invalidInvoice = new InvoiceRejected(
-                    faker.internet().emailAddress(),
-                    3L,
-                    faker.internet().slug(),
-                    faker.name().firstName(),
-                    UUID.randomUUID(),
-                    invoice.number().toString(),
-                    invoice.rewards().stream().map(r -> ShortReward.builder()
-                            .id(r.id())
-                            .projectName(r.projectName())
-                            .currencyCode(currency.code().toString())
-                            .amount(r.amount().getValue())
-                            .dollarsEquivalent(r.amount().getValue())
-                            .build()).toList(),
-                    "Invalid invoice"
-            );
 
             // When
-            rewardStatusUpdater.onInvoiceRejected(invalidInvoice);
+            rewardStatusUpdater.onInvoiceRejected(invoice.id(), "Invalid invoice");
 
             // Then
             final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);

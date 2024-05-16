@@ -2,7 +2,6 @@ package onlydust.com.marketplace.accounting.domain.port.out;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
-import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 
@@ -11,5 +10,5 @@ public interface BillingProfileObserverPort {
 
     void onBillingProfileUpdated(BillingProfileVerificationUpdated billingProfileVerificationUpdated);
 
-    void onInvoiceRejected(@NonNull InvoiceRejected invoiceRejected);
+    void onInvoiceRejected(final @NonNull Invoice.Id invoiceId, final @NonNull String rejectionReason);
 }

@@ -11,22 +11,22 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserverPort;
-import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserverPort;
-import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @Slf4j
 @AllArgsConstructor
 public class AccountingNotifier implements AccountingObserverPort, BillingProfileObserverPort {
     private final BillingProfileStoragePort billingProfileStoragePort;
     private final AccountingRewardStoragePort accountingRewardStoragePort;
+    private final InvoiceStoragePort invoiceStoragePort;
     private final NotificationPort accountingMailObserver;
     private final NotificationPort notificationPort;
 
@@ -90,8 +90,27 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
     }
 
     @Override
-    public void onInvoiceRejected(@NonNull InvoiceRejected invoiceRejected) {
-        accountingMailObserver.notify(invoiceRejected);
+    public void onInvoiceRejected(final @NonNull Invoice.Id id, final @NonNull String rejectionReason) {
+        final var invoice = invoiceStoragePort.get(id).orElseThrow(() -> OnlyDustException.notFound("Invoice %s not found".formatted(id)));
+
+        final var billingProfileAdmin = billingProfileStoragePort.findBillingProfileAdmin(invoice.createdBy(), invoice.billingProfileSnapshot().id())
+                .orElseThrow(() -> notFound("Billing profile admin not found for billing profile %s".formatted(invoice.billingProfileSnapshot().id())));
+
+        accountingMailObserver.notify(new InvoiceRejected(billingProfileAdmin.email(),
+                (long) invoice.rewards().size(), billingProfileAdmin.login(),
+                billingProfileAdmin.firstName(),
+                billingProfileAdmin.userId().value(),
+                invoice.number().value(),
+                invoice.rewards().stream()
+                        .map(reward -> ShortReward.builder()
+                                .id(reward.id())
+                                .amount(reward.amount().getValue())
+                                .currencyCode(reward.amount().getCurrency().code().toString())
+                                .projectName(reward.projectName())
+                                .dollarsEquivalent(reward.target().getValue())
+                                .build()
+                        ).toList(),
+                rejectionReason));
     }
 
     @Override
