@@ -24,7 +24,6 @@ import java.util.UUID;
 import static java.util.Objects.isNull;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data

@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Value

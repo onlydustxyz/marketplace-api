@@ -15,7 +15,6 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.UUID;
 
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 @Data
@@ -31,7 +30,6 @@ public class BoGithubRepositoryLinkedToProjectQueryEntity {
 
     @Embeddable
     @Data
-    @AllArgsConstructor
     @NoArgsConstructor
     public static class Id implements Serializable {
         Long id;

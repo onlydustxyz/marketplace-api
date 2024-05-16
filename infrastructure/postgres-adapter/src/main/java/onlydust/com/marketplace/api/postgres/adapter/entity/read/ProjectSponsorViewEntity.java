@@ -40,7 +40,6 @@ public class ProjectSponsorViewEntity {
     ProjectViewEntity project;
 
     @EqualsAndHashCode
-    @AllArgsConstructor
     @Data
     @NoArgsConstructor(force = true)
     public static class PrimaryKey implements Serializable {

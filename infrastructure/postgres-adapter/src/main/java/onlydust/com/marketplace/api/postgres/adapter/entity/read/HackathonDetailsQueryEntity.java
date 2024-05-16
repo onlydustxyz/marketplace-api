@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 import static java.util.Objects.isNull;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data

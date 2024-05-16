@@ -10,7 +10,6 @@ import org.hibernate.annotations.Immutable;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 @Data

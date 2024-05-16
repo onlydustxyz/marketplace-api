@@ -8,7 +8,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Immutable;
 
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 @Data

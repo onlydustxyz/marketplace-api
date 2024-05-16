@@ -14,7 +14,6 @@ import org.hibernate.type.SqlTypes;
 import java.math.BigDecimal;
 import java.util.List;
 
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data

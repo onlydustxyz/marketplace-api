@@ -18,7 +18,6 @@ import java.util.UUID;
 import static java.util.stream.Collectors.toSet;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data

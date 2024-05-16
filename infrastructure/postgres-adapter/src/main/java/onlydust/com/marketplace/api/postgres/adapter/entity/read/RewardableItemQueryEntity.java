@@ -11,7 +11,6 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.util.Date;
 
-@AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Entity

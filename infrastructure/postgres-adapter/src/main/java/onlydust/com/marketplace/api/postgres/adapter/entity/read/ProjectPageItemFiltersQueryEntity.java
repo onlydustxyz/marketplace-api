@@ -20,7 +20,6 @@ import static java.util.Objects.nonNull;
 
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
 @Data
 @Immutable
 public class ProjectPageItemFiltersQueryEntity {

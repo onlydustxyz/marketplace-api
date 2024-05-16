@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "currencies", schema = "public")
 @NoArgsConstructor(force = true)
-@AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @Accessors(fluent = true)

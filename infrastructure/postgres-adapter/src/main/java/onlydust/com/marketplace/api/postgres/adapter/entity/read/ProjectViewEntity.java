@@ -20,7 +20,6 @@ import java.util.*;
 
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 @Data

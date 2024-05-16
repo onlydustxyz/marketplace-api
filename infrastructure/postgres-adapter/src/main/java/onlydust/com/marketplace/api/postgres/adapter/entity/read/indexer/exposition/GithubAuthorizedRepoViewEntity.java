@@ -14,7 +14,6 @@ import java.io.Serializable;
 @Entity
 @Immutable
 @Table(name = "authorized_github_repos", schema = "indexer_exp")
-@AllArgsConstructor
 @NoArgsConstructor
 public class GithubAuthorizedRepoViewEntity {
     @EmbeddedId

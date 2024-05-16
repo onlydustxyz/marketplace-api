@@ -14,7 +14,6 @@ import java.io.Serializable;
 
 @Entity
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 @Table(name = "github_repo_languages", schema = "indexer_exp")

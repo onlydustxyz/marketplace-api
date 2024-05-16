@@ -28,7 +28,6 @@ import static java.util.Objects.isNull;
 @Data
 @Table(name = "reward_status_data", schema = "accounting")
 @NoArgsConstructor(force = true)
-@AllArgsConstructor
 @EqualsAndHashCode
 @Accessors(fluent = true, chain = true)
 @Immutable

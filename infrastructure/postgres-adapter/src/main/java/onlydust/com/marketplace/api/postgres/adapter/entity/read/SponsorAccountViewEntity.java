@@ -11,7 +11,6 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor(force = true)
 @Data
 @Table(name = "sponsor_accounts", schema = "accounting")

@@ -13,7 +13,6 @@ import java.util.UUID;
 @Value
 @Table(name = "reward_items", schema = "public")
 @NoArgsConstructor(force = true)
-@AllArgsConstructor
 @EqualsAndHashCode
 @IdClass(RewardItemViewEntity.PrimaryKey.class)
 @Immutable
@@ -47,7 +46,6 @@ public class RewardItemViewEntity {
 
     @Data
     @NoArgsConstructor
-    @AllArgsConstructor
     public static class PrimaryKey implements Serializable {
         UUID rewardId;
         Long number;

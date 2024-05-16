@@ -12,7 +12,6 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.util.UUID;
 
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data

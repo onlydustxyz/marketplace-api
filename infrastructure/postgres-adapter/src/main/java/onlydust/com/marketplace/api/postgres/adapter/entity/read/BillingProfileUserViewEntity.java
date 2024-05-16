@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 @Data
@@ -70,7 +69,6 @@ public class BillingProfileUserViewEntity {
     }
 
     @EqualsAndHashCode
-    @AllArgsConstructor
     @NoArgsConstructor
     public static class PrimaryKey implements Serializable {
         UUID userId;

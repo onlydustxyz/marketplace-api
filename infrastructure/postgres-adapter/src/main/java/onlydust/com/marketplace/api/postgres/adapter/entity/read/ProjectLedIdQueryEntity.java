@@ -12,7 +12,6 @@ import org.hibernate.annotations.Immutable;
 import java.io.Serializable;
 import java.util.UUID;
 
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
@@ -29,7 +28,6 @@ public class ProjectLedIdQueryEntity {
     Boolean isMissingGithubAppInstallation;
 
     @Embeddable
-    @AllArgsConstructor
     @NoArgsConstructor
     @Data
     public static class Id implements Serializable {

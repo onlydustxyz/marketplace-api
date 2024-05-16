@@ -19,7 +19,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "erc20", schema = "public")
 @NoArgsConstructor(force = true)
-@AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @IdClass(ERC20ViewEntity.PrimaryKey.class)
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
@@ -56,7 +55,6 @@ public class ERC20ViewEntity {
     }
 
     @EqualsAndHashCode
-    @AllArgsConstructor
     @Data
     @NoArgsConstructor(force = true)
     public static class PrimaryKey implements Serializable {

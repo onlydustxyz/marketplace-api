@@ -19,7 +19,6 @@ import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode
 @Table(name = "projects_tags", schema = "public")
 @Getter
@@ -33,7 +32,6 @@ public class ProjectTagViewEntity {
     @Embeddable
     @Getter
     @NoArgsConstructor
-    @AllArgsConstructor
     @EqualsAndHashCode
     public static class Id implements Serializable {
         UUID projectId;
