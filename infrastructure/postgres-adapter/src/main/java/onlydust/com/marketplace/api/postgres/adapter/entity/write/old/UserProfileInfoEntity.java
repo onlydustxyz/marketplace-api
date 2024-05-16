@@ -23,36 +23,26 @@ import java.util.UUID;
 public class UserProfileInfoEntity {
 
     @Id
-    @Column(name = "id")
     UUID id;
-    @Column(name = "bio")
     String bio;
-    @Column(name = "location")
     String location;
-    @Column(name = "website")
     String website;
-    @Column(name = "looking_for_a_job", nullable = false)
+    @Column(name = "looking_for_a_job")
     Boolean isLookingForAJob;
-    @Column(name = "avatar_url")
     String avatarUrl;
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    @Column(columnDefinition = "weekly_allocated", name = "weekly_allocated_time", nullable = false)
-    AllocatedTimeEnumEntity allocatedTime;
+    AllocatedTimeEnumEntity weeklyAllocatedTime;
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "profile_cover")
     ProfileCoverEnumEntity cover;
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "languages", columnDefinition = "jsonb")
     Map<String, Long> languages;
+    String firstName;
+    String lastName;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", updatable = false, insertable = false)
     List<ContactInformationEntity> contactInformations;
-
-    @Column(name = "first_name")
-    String firstName;
-    @Column(name = "last_name")
-    String lastName;
 }

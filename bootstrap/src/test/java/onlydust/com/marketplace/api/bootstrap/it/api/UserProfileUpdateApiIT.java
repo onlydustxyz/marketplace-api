@@ -74,7 +74,7 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                                     "visibility": "private"
                                 }
                             ],
-                            "allocatedTimeToContribute": "ONE_TO_THREE_DAYS",
+                            "allocatedTimeToContribute": null,
                             "isLookingForAJob": true
                         }
                         """)
@@ -93,7 +93,7 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.technologies['C++']").isEqualTo(100)
                 .jsonPath("$.technologies['Rust']").isEqualTo(90)
                 .jsonPath("$.technologies['Java']").isEqualTo(20)
-                .jsonPath("$.allocatedTimeToContribute").isEqualTo("ONE_TO_THREE_DAYS")
+                .jsonPath("$.allocatedTimeToContribute").isEmpty()
                 .jsonPath("$.isLookingForAJob").isEqualTo(true)
                 .jsonPath("$.contacts.length()").isEqualTo(2)
                 .jsonPath("$.contacts[?(@.contact=='abuisset@gmail.com')].visibility").isEqualTo("public")

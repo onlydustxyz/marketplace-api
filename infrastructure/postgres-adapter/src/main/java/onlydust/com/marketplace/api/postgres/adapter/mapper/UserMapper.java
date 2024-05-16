@@ -132,7 +132,7 @@ public interface UserMapper {
                 .cover(mapCoverToEntity(userProfile.getCover()))
                 .contactInformations(mapContactInformationsToEntity(userId, userProfile.getContacts()))
                 .languages(userProfile.getTechnologies())
-                .allocatedTime(mapAllocatedTimeToEntity(userProfile.getAllocatedTimeToContribute()))
+                .weeklyAllocatedTime(mapAllocatedTimeToEntity(userProfile.getAllocatedTimeToContribute()))
                 .isLookingForAJob(userProfile.getIsLookingForAJob())
                 .lastName(userProfile.getLastName())
                 .firstName(userProfile.getFirstName())
