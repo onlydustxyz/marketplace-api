@@ -31,16 +31,16 @@ public interface PublicUserProfileResponseV2EntityRepository extends Repository<
                                 'logoUrl', e.logo_url,
                                 'bannerUrl', e.banner_url
                                 )) filter ( where pe.ecosystem_id is not null ), '[]')                           as ecosystems,
-                count(distinct c.id)                                                                             as contribution_count,
+                sum(rc.completed_contribution_count)                                                                  as contribution_count,
                 count(distinct pgr.project_id)                                                                   as contributed_project_count,
                 count(distinct pgr.project_id) filter ( where pl.project_id is not null )                        as leaded_project_count,
                 count(distinct r.id )                                                                            as reward_count
             from
                 global_users_ranks gur
                 left join iam.users u on u.github_user_id = gur.github_user_id
-                left join indexer_exp.contributions c on c.contributor_id = gur.github_user_id
-                left join project_github_repos pgr on c.repo_id = pgr.github_repo_id
-                left join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id and gr.visibility = 'PUBLIC'
+                left join indexer_exp.repos_contributors rc on rc.contributor_id = gur.github_user_id
+                left join indexer_exp.github_repos gr on gr.id = rc.repo_id and gr.visibility = 'PUBLIC'
+                left join project_github_repos pgr on pgr.github_repo_id = rc.repo_id
                 left join projects_ecosystems pe on pe.project_id = pgr.project_id
                 left join ecosystems e on e.id = pe.ecosystem_id
                 left join projects p on p.id = pgr.project_id and p.visibility = 'PUBLIC'
