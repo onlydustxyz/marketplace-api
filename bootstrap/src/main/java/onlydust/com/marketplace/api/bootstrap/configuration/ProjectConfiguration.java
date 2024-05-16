@@ -23,7 +23,10 @@ import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.port.output.*;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.IndexerApiOutboxConsumer;
-import onlydust.com.marketplace.project.domain.observer.*;
+import onlydust.com.marketplace.project.domain.observer.HackathonObserverComposite;
+import onlydust.com.marketplace.project.domain.observer.ProjectObserver;
+import onlydust.com.marketplace.project.domain.observer.ProjectObserverComposite;
+import onlydust.com.marketplace.project.domain.observer.UserObserver;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.service.*;
@@ -43,8 +46,8 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public ContributionFacadePort contributionFacadePort(final ContributionStoragePort contributionStoragePort,
-                                                         final PermissionService permissionService) {
+    public ContributionService contributionService(final ContributionStoragePort contributionStoragePort,
+                                                   final PermissionService permissionService) {
         return new ContributionService(contributionStoragePort, permissionService);
     }
 
@@ -178,20 +181,15 @@ public class ProjectConfiguration {
 
     // TODO remove and replace with dedicated implementations
     @Bean
-    public ProjectObserverPort projectObserverPort(final ContributionStoragePort contributionStoragePort,
-                                                   final OutboxPort indexerOutbox) {
-        return new ProjectObserver(contributionStoragePort, indexerOutbox);
+    public ProjectObserverPort projectObserverPort(final OutboxPort indexerOutbox) {
+        return new ProjectObserver(indexerOutbox);
     }
 
     @Bean
     public ProjectObserverPort projectObservers(final ProjectObserverPort projectObserverPort,
-                                                final SlackApiAdapter slackApiAdapter) {
-        return new ProjectObserverComposite(projectObserverPort, slackApiAdapter);
-    }
-
-    @Bean
-    public ContributionObserverPort contributionObserverPort(final ContributionStoragePort contributionStoragePort) {
-        return new ContributionObserver(contributionStoragePort);
+                                                final SlackApiAdapter slackApiAdapter,
+                                                final ContributionService contributionService) {
+        return new ProjectObserverComposite(projectObserverPort, contributionService, slackApiAdapter);
     }
 
     @Bean

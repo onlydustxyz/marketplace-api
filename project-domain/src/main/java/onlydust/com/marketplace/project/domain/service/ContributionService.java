@@ -4,14 +4,17 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.ContributionFacadePort;
+import onlydust.com.marketplace.project.domain.port.input.ContributionObserverPort;
+import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.ContributionStoragePort;
 import onlydust.com.marketplace.project.domain.view.ContributionDetailsView;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
-public class ContributionService implements ContributionFacadePort {
+public class ContributionService implements ContributionFacadePort, ContributionObserverPort, ProjectObserverPort {
     final ContributionStoragePort contributionStoragePort;
     final PermissionService permissionService;
 
@@ -36,5 +39,32 @@ public class ContributionService implements ContributionFacadePort {
         if (!permissionService.isUserProjectLead(projectId, projectLeadId))
             throw OnlyDustException.forbidden("Only project leaders can edit the list of ignored contributions");
         contributionStoragePort.unignoreContributions(projectId, contributionIds);
+    }
+
+    @Override
+    public void onContributionsChanged(List<Long> repoIds) {
+        contributionStoragePort.refreshIgnoredContributions(repoIds);
+    }
+
+    @Override
+    public void onLinkedReposChanged(UUID projectId, Set<Long> linkedRepoIds, Set<Long> unlinkedRepoIds) {
+        contributionStoragePort.refreshIgnoredContributions(projectId);
+    }
+
+    @Override
+    public void onRewardSettingsChanged(UUID projectId) {
+        contributionStoragePort.refreshIgnoredContributions(projectId);
+    }
+
+    @Override
+    public void onUserApplied(UUID projectId, UUID userId, UUID applicationId) {
+    }
+
+    @Override
+    public void onProjectCreated(UUID projectId, UUID projectLeadId) {
+    }
+
+    @Override
+    public void onProjectCategorySuggested(String categoryName, UUID userId) {
     }
 }

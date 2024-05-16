@@ -34,5 +34,4 @@ public class PosthogApiClientAdapter implements NotificationPort {
             LOGGER.warn("Event type {} not handle by Posthog event tracking consumer", event.getClass());
         }
     }
-
 }
