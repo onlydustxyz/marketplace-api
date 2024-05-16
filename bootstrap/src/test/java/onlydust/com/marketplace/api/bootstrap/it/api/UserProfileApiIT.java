@@ -94,9 +94,9 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                 "rank": 1,
                 "rankPercentile": 1,
                 "rankCategory": "A",
-                "contributedProjectCount": 9,
-                "leadedProjectCount": 1,
-                "contributionCount": 1700,
+                "contributedProjectCount": 8,
+                "leadedProjectCount": 2,
+                "contributionCount": 1098,
                 "rewardCount": 21
               },
               "ecosystems": [
@@ -136,24 +136,10 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                   "bannerUrl": null
                 },
                 {
-                  "id": "dd6f737e-2a9d-40b9-be62-8f64ec157989",
-                  "name": "Optimism",
-                  "url": "https://www.optimism.io/",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12058007825795511084.png",
-                  "bannerUrl": null
-                },
-                {
                   "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
                   "name": "Aztec",
                   "url": "https://aztec.network/",
                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg",
-                  "bannerUrl": null
-                },
-                {
-                  "id": "f7821bfb-df73-464c-9d87-a94dfb4f5aef",
-                  "name": "Lava",
-                  "url": "https://www.lavanet.xyz/",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15939879525439639427.jpg",
                   "bannerUrl": null
                 }
               ]
