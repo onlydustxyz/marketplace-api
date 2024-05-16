@@ -11,7 +11,6 @@ import org.hibernate.annotations.Immutable;
 
 import java.util.UUID;
 
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data

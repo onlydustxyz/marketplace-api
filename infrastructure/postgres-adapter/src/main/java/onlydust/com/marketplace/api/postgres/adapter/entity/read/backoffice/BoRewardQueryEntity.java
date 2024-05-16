@@ -25,7 +25,6 @@ import java.util.UUID;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 
-@AllArgsConstructor
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode
 @Entity

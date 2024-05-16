@@ -14,7 +14,6 @@ import java.io.Serializable;
 @Entity
 @Immutable
 @Table(name = "authorized_github_repos", schema = "indexer_exp")
-@AllArgsConstructor
 @NoArgsConstructor
 public class GithubAuthorizedRepoViewEntity {
     @EmbeddedId
@@ -23,10 +22,10 @@ public class GithubAuthorizedRepoViewEntity {
 
     @Embeddable
     @Data
-    @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     @EqualsAndHashCode
+    @Builder
     public static class Id implements Serializable {
         Long repoId;
         Long installationId;

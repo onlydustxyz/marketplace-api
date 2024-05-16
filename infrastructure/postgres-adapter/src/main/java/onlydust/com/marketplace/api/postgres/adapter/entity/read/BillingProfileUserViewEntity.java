@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
@@ -18,11 +20,9 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 @Data
-@Builder(toBuilder = true)
 @Table(name = "billing_profiles_users", schema = "accounting")
 @EntityListeners(AuditingEntityListener.class)
 @IdClass(BillingProfileUserViewEntity.PrimaryKey.class)
@@ -38,7 +38,7 @@ public class BillingProfileUserViewEntity {
     UUID userId;
 
     @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     UserViewEntity user;
 
     @Enumerated(EnumType.STRING)
@@ -68,7 +68,6 @@ public class BillingProfileUserViewEntity {
     }
 
     @EqualsAndHashCode
-    @AllArgsConstructor
     @NoArgsConstructor
     public static class PrimaryKey implements Serializable {
         UUID userId;

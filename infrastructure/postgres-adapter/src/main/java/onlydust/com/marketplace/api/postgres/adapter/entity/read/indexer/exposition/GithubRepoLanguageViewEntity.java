@@ -4,15 +4,16 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Immutable;
 
 import java.io.Serializable;
 
 @Entity
 @Data
-@Builder(toBuilder = true)
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 @Table(name = "github_repo_languages", schema = "indexer_exp")

@@ -1,7 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
@@ -17,12 +20,10 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 @Data
 @Accessors(chain = true, fluent = true)
-@Builder(toBuilder = true)
 @Table(name = "kyb", schema = "accounting")
 @EntityListeners(AuditingEntityListener.class)
 @Immutable

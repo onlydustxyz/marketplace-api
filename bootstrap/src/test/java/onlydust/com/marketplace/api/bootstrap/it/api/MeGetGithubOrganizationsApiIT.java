@@ -872,27 +872,27 @@ public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
                         """)));
 
 
-        githubAuthorizedRepoRepository.deleteAll(List.of(
-                new GithubAuthorizedRepoViewEntity(GithubAuthorizedRepoViewEntity.Id.builder()
+        githubAuthorizedRepoRepository.deleteAllById(List.of(
+                GithubAuthorizedRepoViewEntity.Id.builder()
                         .installationId(44300036L)
                         .repoId(498695724L)
-                        .build()),
-                new GithubAuthorizedRepoViewEntity(GithubAuthorizedRepoViewEntity.Id.builder()
+                        .build(),
+                GithubAuthorizedRepoViewEntity.Id.builder()
                         .installationId(44300036L)
                         .repoId(470103674L)
-                        .build()),
-                new GithubAuthorizedRepoViewEntity(GithubAuthorizedRepoViewEntity.Id.builder()
+                        .build(),
+                GithubAuthorizedRepoViewEntity.Id.builder()
                         .installationId(44300036L)
                         .repoId(470901963L)
-                        .build()),
-                new GithubAuthorizedRepoViewEntity(GithubAuthorizedRepoViewEntity.Id.builder()
+                        .build(),
+                GithubAuthorizedRepoViewEntity.Id.builder()
                         .installationId(44300036L)
                         .repoId(471286458L)
-                        .build()),
-                new GithubAuthorizedRepoViewEntity(GithubAuthorizedRepoViewEntity.Id.builder()
+                        .build(),
+                GithubAuthorizedRepoViewEntity.Id.builder()
                         .installationId(44300036L)
                         .repoId(476359452L)
-                        .build())
+                        .build()
         ));
 
         // When

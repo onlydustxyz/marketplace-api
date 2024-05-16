@@ -1,16 +1,17 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import lombok.*;
-import org.hibernate.annotations.Immutable;
-
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Immutable;
 
 import java.io.Serializable;
 import java.util.UUID;
 
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
@@ -27,8 +28,6 @@ public class ProjectLedIdQueryEntity {
     Boolean isMissingGithubAppInstallation;
 
     @Embeddable
-    @Builder
-    @AllArgsConstructor
     @NoArgsConstructor
     @Data
     public static class Id implements Serializable {

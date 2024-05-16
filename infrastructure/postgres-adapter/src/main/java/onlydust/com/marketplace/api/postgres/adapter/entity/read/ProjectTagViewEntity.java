@@ -1,7 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.project.domain.model.Project;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Immutable;
@@ -16,8 +19,6 @@ import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
-@Builder
-@AllArgsConstructor
 @EqualsAndHashCode
 @Table(name = "projects_tags", schema = "public")
 @Getter
@@ -29,10 +30,8 @@ public class ProjectTagViewEntity {
     Id id;
 
     @Embeddable
-    @Builder
     @Getter
     @NoArgsConstructor
-    @AllArgsConstructor
     @EqualsAndHashCode
     public static class Id implements Serializable {
         UUID projectId;

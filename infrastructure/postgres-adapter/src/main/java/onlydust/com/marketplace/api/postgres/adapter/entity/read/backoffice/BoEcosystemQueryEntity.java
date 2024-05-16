@@ -14,7 +14,6 @@ import org.hibernate.type.SqlTypes;
 import java.util.List;
 import java.util.UUID;
 
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 @Data

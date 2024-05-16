@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Immutable;
@@ -12,9 +11,7 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.util.Date;
 
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Data
 @Entity
 @Immutable

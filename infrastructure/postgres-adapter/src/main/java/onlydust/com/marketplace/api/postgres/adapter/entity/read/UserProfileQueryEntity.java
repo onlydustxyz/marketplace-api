@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-@AllArgsConstructor
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Value
@@ -88,7 +87,6 @@ public class UserProfileQueryEntity {
 
     @Data
     @NoArgsConstructor
-    @AllArgsConstructor
     public static class WeekCount {
         @JsonProperty("code_review_count")
         Integer codeReviewCount;
@@ -114,7 +112,6 @@ public class UserProfileQueryEntity {
 
     @Data
     @NoArgsConstructor
-    @AllArgsConstructor
     public static class TotalEarnedPerCurrency {
         @JsonProperty("total_dollars_equivalent")
         BigDecimal totalDollarsEquivalent;
@@ -148,7 +145,6 @@ public class UserProfileQueryEntity {
 
     @Data
     @NoArgsConstructor
-    @AllArgsConstructor
     public static class Contact {
         @JsonProperty("is_public")
         Boolean isPublic;

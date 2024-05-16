@@ -1,7 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -9,9 +12,7 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import java.util.Date;
 import java.util.UUID;
 
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity

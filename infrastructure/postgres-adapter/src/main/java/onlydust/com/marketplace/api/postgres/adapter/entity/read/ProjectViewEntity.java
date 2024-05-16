@@ -1,7 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
@@ -17,11 +20,9 @@ import java.util.*;
 
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 @Data
-@Builder
 @Table(name = "projects", schema = "public")
 @Immutable
 public class ProjectViewEntity {
@@ -60,7 +61,6 @@ public class ProjectViewEntity {
     Date ignoreContributionsBefore;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "projectId")
-    @Builder.Default
     Set<ProjectSponsorViewEntity> sponsors = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY)

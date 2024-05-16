@@ -20,7 +20,6 @@ import java.util.UUID;
 @Value
 @Table(name = "receipts", schema = "accounting")
 @NoArgsConstructor(force = true)
-@AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Accessors(fluent = true, chain = true)
 @Immutable
