@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.events;
 
 import lombok.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationType;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
@@ -21,6 +22,7 @@ import static java.util.Objects.nonNull;
 @EventType("BillingProfileVerificationUpdated")
 public class BillingProfileVerificationUpdated extends Event {
     UUID verificationId;
+    BillingProfile.Id billingProfileId;
     @NonNull
     VerificationType type;
     @NonNull

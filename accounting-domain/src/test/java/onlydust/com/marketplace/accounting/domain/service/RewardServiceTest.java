@@ -14,7 +14,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
-import onlydust.com.marketplace.kernel.observer.MailObserver;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +33,7 @@ public class RewardServiceTest {
     private final AccountingRewardStoragePort accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
     private final AccountingFacadePort accountingFacadePort = mock(AccountingFacadePort.class);
     private final SponsorStoragePort sponsorStoragePort = mock(SponsorStoragePort.class);
-    private final MailObserver mailObserver = mock(MailObserver.class);
+    private final NotificationPort mailObserver = mock(NotificationPort.class);
     private final RewardService rewardService = new RewardService(accountingRewardStoragePort, accountingFacadePort, sponsorStoragePort, mailObserver);
 
 
@@ -45,9 +45,11 @@ public class RewardServiceTest {
     @Test
     void should_notify_new_rewards_were_paid() {
         // Given
-        final ShortContributorView recipient1 = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)), faker.rickAndMorty().character(), faker.gameOfThrones().character(),
+        final ShortContributorView recipient1 = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
+                faker.rickAndMorty().character(), faker.gameOfThrones().character(),
                 UserId.random(), faker.internet().emailAddress());
-        final ShortContributorView recipient2 = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)), faker.rickAndMorty().character(), faker.gameOfThrones().character(),
+        final ShortContributorView recipient2 = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
+                faker.rickAndMorty().character(), faker.gameOfThrones().character(),
                 null, faker.internet().emailAddress());
         final var r11 = generateRewardStubForCurrencyAndEmail(Currencies.USD, recipient1);
         final var r21 = generateRewardStubForCurrencyAndEmail(Currencies.STRK, recipient2);
@@ -66,7 +68,7 @@ public class RewardServiceTest {
         rewardService.notifyAllNewPaidRewards();
 
         // Then
-        verify(mailObserver, times(1)).send(new RewardsPaid(recipient1.email(), recipient1.login(), recipient1.userId().value(),
+        verify(mailObserver, times(1)).notify(new RewardsPaid(recipient1.email(), recipient1.login(), recipient1.userId().value(),
                 Stream.of(r11, r12).map(rewardDetailsView -> ShortReward.builder().
                         id(rewardDetailsView.id())
                         .amount(rewardDetailsView.money().amount())
@@ -74,7 +76,7 @@ public class RewardServiceTest {
                         .currencyCode(rewardDetailsView.money().currency().code().toString())
                         .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
                         .build()).toList()));
-        verify(mailObserver, times(1)).send(new RewardsPaid(recipient2.email(), recipient2.login(), null,
+        verify(mailObserver, times(1)).notify(new RewardsPaid(recipient2.email(), recipient2.login(), null,
                 Stream.of(r21, r22).map(rewardDetailsView -> ShortReward.builder().
                         id(rewardDetailsView.id())
                         .amount(rewardDetailsView.money().amount())
@@ -89,7 +91,8 @@ public class RewardServiceTest {
     private RewardDetailsView generateRewardStubForCurrencyAndEmail(final Currency currency, final ShortContributorView recipient) {
         return RewardDetailsView.builder()
                 .id(RewardId.random())
-                .requester(new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)), faker.rickAndMorty().character(), faker.gameOfThrones().character(),
+                .requester(new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)), faker.rickAndMorty().character(),
+                        faker.gameOfThrones().character(),
                         UserId.random(), faker.internet().emailAddress()))
                 .recipient(recipient)
                 .status(RewardStatus.builder()

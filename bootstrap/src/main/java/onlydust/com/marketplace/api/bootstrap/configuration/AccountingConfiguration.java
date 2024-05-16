@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.job.MailNotificationOutboxConsumer;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookObserver;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookProjector;
 import onlydust.com.marketplace.accounting.domain.port.in.*;
@@ -14,9 +13,10 @@ import onlydust.com.marketplace.api.infura.adapters.StarknetAccountValidatorAdap
 import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountingMailEventEntity;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
+import onlydust.com.marketplace.kernel.jobs.NotificationOutboxConsumer;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
-import onlydust.com.marketplace.kernel.observer.MailObserver;
 import onlydust.com.marketplace.kernel.port.output.*;
+import onlydust.com.marketplace.kernel.service.OutboxNotifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -31,13 +31,15 @@ public class AccountingConfiguration {
     public AccountingFacadePort accountingFacadePort(final @NonNull CachedAccountBookProvider cachedAccountBookProvider,
                                                      final @NonNull SponsorAccountStorage sponsorAccountStorage,
                                                      final @NonNull CurrencyStorage currencyStorage,
-                                                     final @NonNull AccountingObserver accountingObserver,
+                                                     final @NonNull AccountingObserverPort accountingObserver,
                                                      final @NonNull ProjectAccountingObserver projectAccountingObserver,
                                                      final @NonNull InvoiceStoragePort invoiceStoragePort,
-                                                     final @NonNull AccountBookObserver accountBookObserver
+                                                     final @NonNull AccountBookObserver accountBookObserver,
+                                                     final @NonNull RewardStatusService rewardStatusService,
+                                                     final @NonNull ReceiptStoragePort receiptStoragePort
     ) {
         return new AccountingService(cachedAccountBookProvider, sponsorAccountStorage, currencyStorage, accountingObserver, projectAccountingObserver,
-                invoiceStoragePort, accountBookObserver);
+                invoiceStoragePort, accountBookObserver, rewardStatusService, receiptStoragePort);
     }
 
     @Bean
@@ -46,32 +48,41 @@ public class AccountingConfiguration {
     }
 
     @Bean
-    public AccountingObserver accountingObserver(final @NonNull RewardStatusStorage rewardStatusStorage,
-                                                 final @NonNull RewardUsdEquivalentStorage rewardUsdEquivalentStorage,
-                                                 final @NonNull QuoteStorage quoteStorage,
-                                                 final @NonNull CurrencyStorage currencyStorage,
-                                                 final @NonNull InvoiceStoragePort invoiceStorage,
-                                                 final @NonNull ReceiptStoragePort receiptStorage,
-                                                 final @NonNull BillingProfileStoragePort billingProfileStoragePort,
-                                                 final @NonNull MailObserver accountingMailObserver,
+    public RewardStatusService rewardStatusService(final @NonNull RewardStatusStorage rewardStatusStorage,
+                                                   final @NonNull RewardUsdEquivalentStorage rewardUsdEquivalentStorage,
+                                                   final @NonNull QuoteStorage quoteStorage,
+                                                   final @NonNull CurrencyStorage currencyStorage) {
+        return new RewardStatusService(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage);
+    }
+
+    @Bean
+    public RewardStatusUpdater rewardStatusUpdater(final @NonNull RewardStatusFacadePort rewardStatusFacadePort,
+                                                   final @NonNull RewardStatusStorage rewardStatusStorage,
+                                                   final @NonNull InvoiceStoragePort invoiceStorage,
+                                                   final @NonNull AccountingRewardStoragePort accountingRewardStoragePort) {
+        return new RewardStatusUpdater(rewardStatusFacadePort, rewardStatusStorage, invoiceStorage, accountingRewardStoragePort);
+    }
+
+    @Bean
+    public AccountingNotifier accountingNotifier(final @NonNull BillingProfileStoragePort billingProfileStoragePort,
+                                                 final @NonNull NotificationPort accountingMailOutboxNotifier,
                                                  final @NonNull AccountingRewardStoragePort accountingRewardStoragePort,
-                                                 final @NonNull NotificationPort notificationPort) {
-        return new AccountingObserver(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage, invoiceStorage, receiptStorage,
-                billingProfileStoragePort, accountingMailObserver, accountingRewardStoragePort, notificationPort);
+                                                 final @NonNull NotificationPort slackNotificationPort) {
+        return new AccountingNotifier(billingProfileStoragePort, accountingRewardStoragePort, accountingMailOutboxNotifier, slackNotificationPort);
     }
 
     @Bean
     public BillingProfileFacadePort billingProfileFacadePort(final @NonNull InvoiceStoragePort invoiceStoragePort,
                                                              final @NonNull BillingProfileStoragePort billingProfileStoragePort,
                                                              final @NonNull PdfStoragePort pdfStoragePort,
-                                                             final @NonNull BillingProfileObserver billingProfileObservers,
+                                                             final @NonNull BillingProfileObserverPort billingProfileObserver,
                                                              final @NonNull IndexerPort indexerPort,
-                                                             final @NonNull AccountingObserverPort accountingObserverPort,
+                                                             final @NonNull AccountingObserverPort accountingObserver,
                                                              final @NonNull AccountingFacadePort accountingFacadePort,
                                                              final @NonNull PayoutInfoValidator payoutInfoValidator
     ) {
-        return new BillingProfileService(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort, billingProfileObservers,
-                indexerPort, accountingObserverPort, accountingFacadePort, payoutInfoValidator);
+        return new BillingProfileService(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort, billingProfileObserver,
+                indexerPort, accountingObserver, accountingFacadePort, payoutInfoValidator);
     }
 
     @Bean
@@ -86,25 +97,36 @@ public class AccountingConfiguration {
     @Bean
     public InvoiceFacadePort invoiceFacadePort(final @NonNull InvoiceStoragePort invoiceStoragePort,
                                                final @NonNull PdfStoragePort pdfStoragePort,
-                                               final @NonNull BillingProfileObserver billingProfileObservers,
+                                               final @NonNull BillingProfileObserverPort billingProfileObserver,
                                                final @NonNull BillingProfileStoragePort billingProfileStoragePort
     ) {
-        return new InvoiceService(invoiceStoragePort, pdfStoragePort, billingProfileStoragePort, billingProfileObservers);
+        return new InvoiceService(invoiceStoragePort, pdfStoragePort, billingProfileStoragePort, billingProfileObserver);
     }
 
     @Bean
     public PayoutPreferenceFacadePort payoutPreferenceFacadePort(final PayoutPreferenceStoragePort payoutPreferenceStoragePort,
                                                                  final BillingProfileStoragePort billingProfileStoragePort,
-                                                                 final AccountingObserverPort accountingObserverPort) {
-        return new PayoutPreferenceService(payoutPreferenceStoragePort, billingProfileStoragePort, accountingObserverPort);
+                                                                 final AccountingObserverPort accountingObserver) {
+        return new PayoutPreferenceService(payoutPreferenceStoragePort, billingProfileStoragePort, accountingObserver);
     }
 
+    @Bean
+    public AccountingObserverPort accountingObserver(final RewardStatusUpdater rewardStatusUpdater,
+                                                     final AccountingNotifier accountingNotifier) {
+        return new AccountingObserverComposite(accountingNotifier, rewardStatusUpdater);
+    }
+
+    @Bean
+    public BillingProfileObserverPort billingProfileObserver(final RewardStatusUpdater rewardStatusUpdater,
+                                                             final AccountingNotifier accountingNotifier) {
+        return new BillingProfileObserverComposite(rewardStatusUpdater, accountingNotifier);
+    }
 
     @Bean
     public BillingProfileVerificationFacadePort billingProfileVerificationFacadePort(final OutboxPort billingProfileVerificationOutbox,
                                                                                      final BillingProfileStoragePort billingProfileStoragePort,
                                                                                      final BillingProfileVerificationProviderPort billingProfileVerificationProviderPort,
-                                                                                     final BillingProfileObserver billingProfileObserver) {
+                                                                                     final BillingProfileObserverPort billingProfileObserver) {
         return new BillingProfileVerificationService(billingProfileVerificationOutbox, new SumsubMapper(), billingProfileStoragePort,
                 billingProfileVerificationProviderPort,
                 billingProfileObserver);
@@ -114,7 +136,7 @@ public class AccountingConfiguration {
     public OutboxConsumer billingProfileVerificationOutboxConsumer(final OutboxPort billingProfileVerificationOutbox,
                                                                    final BillingProfileStoragePort billingProfileStoragePort,
                                                                    final BillingProfileVerificationProviderPort billingProfileVerificationProviderPort,
-                                                                   final BillingProfileObserver billingProfileObserver) {
+                                                                   final BillingProfileObserverPort billingProfileObserver) {
         return new BillingProfileVerificationService(billingProfileVerificationOutbox, new SumsubMapper(), billingProfileStoragePort,
                 billingProfileVerificationProviderPort,
                 billingProfileObserver);
@@ -126,8 +148,8 @@ public class AccountingConfiguration {
     }
 
     @Bean
-    public MailObserver accountingMailObserver(final OutboxPort accountingMailOutbox) {
-        return new AccountingMailObserver(accountingMailOutbox);
+    public NotificationPort accountingMailOutboxNotifier(final OutboxPort accountingMailOutbox) {
+        return new OutboxNotifier(accountingMailOutbox);
     }
 
     @Bean
@@ -137,7 +159,7 @@ public class AccountingConfiguration {
     }
 
     @Bean
-    public OutboxConsumer accountingMailOutboxConsumer(final MailPort mailPort) {
-        return new MailNotificationOutboxConsumer(mailPort);
+    public OutboxConsumer accountingMailOutboxConsumer(final NotificationPort mailNotificationPort) {
+        return new NotificationOutboxConsumer(mailNotificationPort);
     }
 }

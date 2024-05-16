@@ -4,14 +4,12 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserverPort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileVerificationProviderPort;
 import onlydust.com.marketplace.kernel.jobs.OutboxSkippingException;
 import onlydust.com.marketplace.kernel.model.Event;
-import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
-import onlydust.com.marketplace.kernel.port.output.WebhookPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,7 +29,7 @@ public class BillingProfileVerificationServiceTest {
     private BillingProfileStoragePort billingProfileStoragePort;
     private OutboxPort outboxPort;
     private Function<Event, BillingProfileVerificationUpdated> eventBillingProfileVerificationUpdatedFunction;
-    private BillingProfileObserver billingProfileObserver;
+    private BillingProfileObserverPort billingProfileObserver;
     private BillingProfileVerificationProviderPort billingProfileVerificationProviderPort;
     private final Faker faker = new Faker();
 
@@ -40,7 +38,7 @@ public class BillingProfileVerificationServiceTest {
         billingProfileStoragePort = mock(BillingProfileStoragePort.class);
         outboxPort = mock(OutboxPort.class);
         eventBillingProfileVerificationUpdatedFunction = mock(Function.class);
-        billingProfileObserver = mock(BillingProfileObserver.class);
+        billingProfileObserver = mock(BillingProfileObserverPort.class);
         billingProfileVerificationProviderPort = mock(BillingProfileVerificationProviderPort.class);
         billingProfileVerificationService = new BillingProfileVerificationService(outboxPort, eventBillingProfileVerificationUpdatedFunction,
                 billingProfileStoragePort,
@@ -92,9 +90,10 @@ public class BillingProfileVerificationServiceTest {
                     .reviewMessageForApplicant(faker.gameOfThrones().character())
                     .build();
             final Event event = mock(Event.class);
+            final var billingProfileId = BillingProfile.Id.random();
             final Kyc initialKyc = Kyc.builder()
                     .ownerId(UserId.random())
-                    .billingProfileId(BillingProfile.Id.random())
+                    .billingProfileId(billingProfileId)
                     .id(verificationId)
                     .status(VerificationStatus.NOT_STARTED)
                     .build();
@@ -106,6 +105,7 @@ public class BillingProfileVerificationServiceTest {
                     .build();
             final BillingProfileVerificationUpdated updatedEvent = billingProfileVerificationUpdated.toBuilder()
                     .userId(initialKyc.getOwnerId())
+                    .billingProfileId(billingProfileId)
                     .build();
 
             // When
@@ -170,10 +170,11 @@ public class BillingProfileVerificationServiceTest {
                     .type(VerificationType.KYB)
                     .build();
             final Event event = mock(Event.class);
+            final var billingProfileId = BillingProfile.Id.random();
             final Kyb initialKyb = Kyb.builder()
                     .ownerId(UserId.random())
                     .id(verificationId)
-                    .billingProfileId(BillingProfile.Id.random())
+                    .billingProfileId(billingProfileId)
                     .status(VerificationStatus.NOT_STARTED)
                     .build();
             final Kyb kybWithDataFromExternalSource = initialKyb.toBuilder()
@@ -185,6 +186,7 @@ public class BillingProfileVerificationServiceTest {
                     .build();
             final BillingProfileVerificationUpdated updatedEvent = billingProfileVerificationUpdated.toBuilder()
                     .userId(initialKyb.getOwnerId())
+                    .billingProfileId(billingProfileId)
                     .build();
 
             // When
@@ -215,10 +217,11 @@ public class BillingProfileVerificationServiceTest {
                     .reviewMessageForApplicant(faker.gameOfThrones().character())
                     .build();
             final Event event = mock(Event.class);
+            final var billingProfileId = BillingProfile.Id.random();
             final Kyb initialKyb = Kyb.builder()
                     .ownerId(UserId.random())
                     .id(verificationId)
-                    .billingProfileId(BillingProfile.Id.random())
+                    .billingProfileId(billingProfileId)
                     .status(VerificationStatus.NOT_STARTED)
                     .build();
             final Kyb kybWithDataFromExternalSource = initialKyb.toBuilder()
@@ -231,6 +234,7 @@ public class BillingProfileVerificationServiceTest {
             final BillingProfileVerificationUpdated updatedEvent = billingProfileVerificationUpdated.toBuilder()
                     .userId(updateKyb.getOwnerId())
                     .verificationStatus(VerificationStatus.CLOSED)
+                    .billingProfileId(billingProfileId)
                     .build();
 
             // When

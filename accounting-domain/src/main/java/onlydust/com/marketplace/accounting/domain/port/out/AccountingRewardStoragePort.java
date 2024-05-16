@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -53,4 +54,9 @@ public interface AccountingRewardStoragePort {
 
     Optional<ShortRewardDetailsView> getShortReward(RewardId rewardId);
 
+    void updateBillingProfileFromRecipientPayoutPreferences(RewardId rewardId);
+
+    void updateBillingProfileForRecipientUserIdAndProjectId(BillingProfile.Id billingProfileId, UserId userId, ProjectId projectId);
+
+    List<RewardId> removeBillingProfile(BillingProfile.Id billingProfileId);
 }

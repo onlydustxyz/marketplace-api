@@ -12,7 +12,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInf
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserverPort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
@@ -43,7 +43,7 @@ class InvoiceServiceTest {
     private final InvoiceStoragePort invoiceStoragePort = mock(InvoiceStoragePort.class);
     private final PdfStoragePort pdfStoragePort = mock(PdfStoragePort.class);
     private final BillingProfileStoragePort billingProfileStoragePort = mock(BillingProfileStoragePort.class);
-    private final BillingProfileObserver billingProfileObserver = mock(BillingProfileObserver.class);
+    private final BillingProfileObserverPort billingProfileObserver = mock(BillingProfileObserverPort.class);
     private final InvoiceService invoiceService = new InvoiceService(invoiceStoragePort, pdfStoragePort, billingProfileStoragePort, billingProfileObserver);
     private final Faker faker = new Faker();
     final InputStream pdf = new ByteArrayInputStream(faker.lorem().paragraph().getBytes());

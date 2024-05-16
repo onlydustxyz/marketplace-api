@@ -30,7 +30,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     private final @NonNull InvoiceStoragePort invoiceStoragePort;
     private final @NonNull BillingProfileStoragePort billingProfileStoragePort;
     private final @NonNull PdfStoragePort pdfStoragePort;
-    private final @NonNull BillingProfileObserver billingProfileObserver;
+    private final @NonNull BillingProfileObserverPort billingProfileObserver;
     private final @NonNull IndexerPort indexerPort;
     private final @NonNull AccountingObserverPort accountingObserverPort;
     private final @NonNull AccountingFacadePort accountingFacadePort;
@@ -224,7 +224,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     @Override
     public BillingProfileView getBillingProfile(BillingProfile.Id billingProfileId, UserId userId, GithubUserId githubUserId) {
         if (!billingProfileStoragePort.isUserMemberOf(billingProfileId, userId) &&
-                !billingProfileStoragePort.isUserInvitedTo(billingProfileId, githubUserId)) {
+            !billingProfileStoragePort.isUserInvitedTo(billingProfileId, githubUserId)) {
             throw unauthorized("User %s is not a member of billing profile %s".formatted(userId, billingProfileId));
         }
         return getBillingProfileViewWithUserRights(billingProfileId, userId);

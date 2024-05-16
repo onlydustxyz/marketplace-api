@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.accounting.domain.port.out;
 
-import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
@@ -18,8 +17,6 @@ public interface AccountingObserverPort {
     void onRewardCancelled(RewardId rewardId);
 
     void onRewardPaid(RewardId rewardId);
-
-    void onPaymentReceived(RewardId rewardId, Payment.Reference reference);
 
     void onPayoutPreferenceChanged(BillingProfile.Id billingProfileId, UserId userId, ProjectId projectId);
 

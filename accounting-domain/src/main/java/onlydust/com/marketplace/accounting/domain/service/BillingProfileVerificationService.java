@@ -6,15 +6,13 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileVerificationFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserverPort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileVerificationProviderPort;
 import onlydust.com.marketplace.kernel.jobs.OutboxSkippingException;
 import onlydust.com.marketplace.kernel.model.Event;
-import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
-import onlydust.com.marketplace.kernel.port.output.WebhookPort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
@@ -32,7 +30,7 @@ public class BillingProfileVerificationService implements BillingProfileVerifica
     private final Function<Event, BillingProfileVerificationUpdated> billingProfileVerificationExternalMapper;
     private final BillingProfileStoragePort billingProfileStoragePort;
     private final BillingProfileVerificationProviderPort billingProfileVerificationProviderPort;
-    private final BillingProfileObserver billingProfileObserver;
+    private final BillingProfileObserverPort billingProfileObserver;
 
     @Override
     public void consumeBillingProfileVerificationEvent(Event event) {
@@ -73,6 +71,7 @@ public class BillingProfileVerificationService implements BillingProfileVerifica
         billingProfileStoragePort.updateBillingProfileStatus(updatedKyb.getBillingProfileId(),
                 newVerificationStatus);
         return billingProfileVerificationUpdated.toBuilder()
+                .billingProfileId(updatedKyb.getBillingProfileId())
                 .verificationStatus(newVerificationStatus)
                 .userId(updatedKyb.getOwnerId())
                 .build();
@@ -106,6 +105,7 @@ public class BillingProfileVerificationService implements BillingProfileVerifica
         billingProfileStoragePort.saveKyc(updatedKyc);
         billingProfileStoragePort.updateBillingProfileStatus(updatedKyc.getBillingProfileId(), updatedKyc.getStatus());
         return billingProfileVerificationUpdated.toBuilder()
+                .billingProfileId(updatedKyc.getBillingProfileId())
                 .userId(updatedKyc.getOwnerId())
                 .verificationStatus(updatedKyc.getStatus())
                 .build();
@@ -123,6 +123,7 @@ public class BillingProfileVerificationService implements BillingProfileVerifica
         billingProfileStoragePort.updateBillingProfileStatus(parentKyb.getBillingProfileId(),
                 newVerificationStatus);
         return childrenBillingProfileUpdated.toBuilder()
+                .billingProfileId(parentKyb.getBillingProfileId())
                 .verificationStatus(newVerificationStatus)
                 .userId(parentKyb.getOwnerId())
                 .verificationId(parentKyb.getId())

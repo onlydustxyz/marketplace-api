@@ -52,8 +52,7 @@ public class MarketplaceApiApplicationIT {
 
 
     @Bean
-    @Primary
-    public NotificationPort notificationPort() {
+    public NotificationPort slackNotificationPort() {
         return new SlackNotificationStub();
     }
 }

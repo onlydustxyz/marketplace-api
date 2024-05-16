@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookA
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookObserver;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.ReadOnlyAccountBookState;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
@@ -32,6 +33,8 @@ public class AccountingService implements AccountingFacadePort {
     private final ProjectAccountingObserver projectAccountingObserver;
     private final InvoiceStoragePort invoiceStoragePort;
     private final AccountBookObserver accountBookObserver;
+    private final RewardStatusFacadePort rewardStatusFacadePort;
+    private final ReceiptStoragePort receiptStorage;
 
     @Override
     @Transactional
@@ -119,7 +122,9 @@ public class AccountingService implements AccountingFacadePort {
     @Transactional
     public void createReward(ProjectId from, RewardId to, PositiveAmount amount, Currency.Id currencyId) {
         final var accountBookState = transfer(from, to, amount, currencyId);
-        accountingObserver.onRewardCreated(to, new AccountBookFacade(sponsorAccountStorage, accountBookState));
+        final var accountBookFacade = new AccountBookFacade(sponsorAccountStorage, accountBookState);
+        rewardStatusFacadePort.create(accountBookFacade, to);
+        accountingObserver.onRewardCreated(to, accountBookFacade);
         onAllowanceUpdated(from, currencyId, accountBookState);
     }
 
@@ -180,6 +185,7 @@ public class AccountingService implements AccountingFacadePort {
         accountingObserver.onRewardCancelled(rewardId);
         refundedAccounts.stream().filter(AccountId::isProject).map(AccountId::projectId)
                 .forEach(refundedProjectId -> onAllowanceUpdated(refundedProjectId, currencyId, accountBook.state()));
+        rewardStatusFacadePort.delete(rewardId);
     }
 
     @Override
@@ -237,7 +243,7 @@ public class AccountingService implements AccountingFacadePort {
                     modifiedSponsorAccounts.add(sponsorAccountStatement(account, accountBookState));
                 });
 
-        accountingObserver.onPaymentReceived(reward.id(), paymentReference);
+        receiptStorage.save(Receipt.of(reward.id(), paymentReference));
         if (isPaid(accountBookState, reward.id()))
             accountingObserver.onRewardPaid(reward.id());
 

@@ -32,7 +32,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.BackofficeAccountingManagem
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
-import onlydust.com.marketplace.kernel.observer.MailObserver;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.service.RewardService;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
@@ -84,7 +84,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     @Autowired
     AccountingHelper accountingHelper;
     @Autowired
-    AccountingObserver accountingObserver;
+    RewardStatusUpdater rewardStatusUpdater;
     @Autowired
     InvoiceService invoiceService;
     @Autowired
@@ -1442,7 +1442,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .status(VerificationStatus.VERIFIED)
                 .build());
         billingProfileStoragePort.updateBillingProfileStatus(BillingProfile.Id.of(individualBPId), VerificationStatus.VERIFIED);
-        accountingObserver.onBillingProfileUpdated(new BillingProfileVerificationUpdated(kycId, VerificationType.KYC, VerificationStatus.VERIFIED, null,
+        rewardStatusUpdater.onBillingProfileUpdated(new BillingProfileVerificationUpdated(kycId, BillingProfile.Id.of(individualBPId),
+                VerificationType.KYC, VerificationStatus.VERIFIED, null,
                 UserId.of(individualBPId), null, faker.rickAndMorty().character(), null));
 
         assertGetProjectRewardsStatusOnProject(
@@ -1617,7 +1618,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .name(faker.name().fullName())
                 .build());
         billingProfileStoragePort.updateBillingProfileStatus(BillingProfile.Id.of(companyBPId), VerificationStatus.VERIFIED);
-        accountingObserver.onBillingProfileUpdated(new BillingProfileVerificationUpdated(companyKybId, VerificationType.KYB, VerificationStatus.VERIFIED, null,
+        rewardStatusUpdater.onBillingProfileUpdated(new BillingProfileVerificationUpdated(companyKybId, BillingProfile.Id.of(companyBPId),
+                VerificationType.KYB, VerificationStatus.VERIFIED, null,
                 UserId.of(companyBPAdmin1Id), null, faker.rickAndMorty().character(), null));
         // Then
         assertGetProjectRewardsStatusOnProject(
@@ -1793,8 +1795,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .name(faker.name().fullName())
                 .build());
         billingProfileStoragePort.updateBillingProfileStatus(BillingProfile.Id.of(selfEmployedBPId), VerificationStatus.VERIFIED);
-        accountingObserver.onBillingProfileUpdated(new BillingProfileVerificationUpdated(selfEmployedKybId, VerificationType.KYB, VerificationStatus.VERIFIED
-                , null,
+        rewardStatusUpdater.onBillingProfileUpdated(new BillingProfileVerificationUpdated(selfEmployedKybId, BillingProfile.Id.of(selfEmployedBPId),
+                VerificationType.KYB, VerificationStatus.VERIFIED, null,
                 UserId.of(selfEmployedBPId), null, faker.rickAndMorty().character(), null));
 
         // Then
@@ -3858,7 +3860,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     @Autowired
     AccountingRewardStoragePort accountingRewardStoragePort;
     @Autowired
-    MailObserver accountingMailObserver;
+    NotificationPort accountingMailOutboxNotifier;
     @Autowired
     InvoiceStoragePort invoiceStoragePort;
 
@@ -3875,7 +3877,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         final var backofficeAccountingManagementRestApi = new BackofficeAccountingManagementRestApi(
                 accountingService,
                 new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, accountingService,
-                        sponsorStoragePort, accountingMailObserver),
+                        sponsorStoragePort, accountingMailOutboxNotifier),
                 new PaymentService(accountingRewardStoragePort, invoiceStoragePort, accountingService, blockchainFacadePort),
                 billingProfileService,
                 authenticatedBackofficeUserService,
