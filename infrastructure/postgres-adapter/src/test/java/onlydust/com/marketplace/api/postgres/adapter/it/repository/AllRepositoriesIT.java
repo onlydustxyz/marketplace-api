@@ -166,10 +166,9 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     void should_create_user_profile_info() {
         // Given
         final UserProfileInfoEntity expected = UserProfileInfoEntity.builder()
-                .allocatedTime(AllocatedTimeEnumEntity.one_to_three_days)
+                .weeklyAllocatedTime(AllocatedTimeEnumEntity.one_to_three_days)
                 .avatarUrl(faker.pokemon().name())
                 .bio(faker.hacker().abbreviation())
-                .isLookingForAJob(false)
                 .website(faker.harryPotter().location())
                 .location(faker.rickAndMorty().location())
                 .languages(Map.of(faker.rickAndMorty().location(), 5L, faker.hacker().adjective(), 10L))

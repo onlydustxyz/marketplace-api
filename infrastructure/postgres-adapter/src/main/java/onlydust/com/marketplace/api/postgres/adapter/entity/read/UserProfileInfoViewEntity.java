@@ -1,6 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.Immutable;
@@ -26,11 +29,8 @@ public class UserProfileInfoViewEntity {
     String location;
     String bio;
     String website;
-    @Column(name = "avatar_url")
     String avatarUrl;
-    @Column(name = "first_name")
     String firstName;
-    @Column(name = "last_name")
     String lastName;
 
     @OneToMany(mappedBy = "userId")
