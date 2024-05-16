@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -39,7 +38,7 @@ public class BillingProfileUserViewEntity {
     UUID userId;
 
     @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     UserViewEntity user;
 
     @Enumerated(EnumType.STRING)

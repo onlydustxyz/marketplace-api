@@ -1,11 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -22,7 +20,6 @@ import java.util.UUID;
 @EntityListeners(AuditingEntityListener.class)
 @Immutable
 public class BankAccountViewEntity {
-
     @Id
     @EqualsAndHashCode.Include
     UUID billingProfileId;
@@ -34,8 +31,4 @@ public class BankAccountViewEntity {
     @UpdateTimestamp
     @Column(name = "tech_updated_at", nullable = false)
     private Date updatedAt;
-
-    public BankAccount toDomain() {
-        return new BankAccount(bic, number);
-    }
 }

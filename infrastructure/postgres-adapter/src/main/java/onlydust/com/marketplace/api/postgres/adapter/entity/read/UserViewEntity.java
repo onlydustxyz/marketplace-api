@@ -5,7 +5,10 @@ import io.hypersistence.utils.hibernate.type.array.EnumArrayType;
 import io.hypersistence.utils.hibernate.type.array.internal.AbstractArrayType;
 import jakarta.persistence.Table;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Value;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
@@ -62,7 +65,7 @@ public class UserViewEntity implements Serializable {
     @NonNull
     AllUserViewEntity allUserView;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "sponsors_users",
             joinColumns = @JoinColumn(name = "user_id"),
