@@ -1,7 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -15,7 +18,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Data
-@Builder
 @Table(name = "project_more_infos", schema = "public")
 @IdClass(ProjectMoreInfoViewEntity.PrimaryKey.class)
 @Immutable

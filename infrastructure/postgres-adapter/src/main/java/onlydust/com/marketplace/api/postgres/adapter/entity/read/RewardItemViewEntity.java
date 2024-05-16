@@ -2,13 +2,11 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
 import lombok.*;
-import onlydust.com.marketplace.project.domain.model.Reward;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -16,7 +14,6 @@ import java.util.UUID;
 @Table(name = "reward_items", schema = "public")
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
-@Builder(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
 @IdClass(RewardItemViewEntity.PrimaryKey.class)
 @Immutable
@@ -48,7 +45,6 @@ public class RewardItemViewEntity {
         ISSUE, PULL_REQUEST, CODE_REVIEW
     }
 
-    @Builder
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -56,33 +52,5 @@ public class RewardItemViewEntity {
         UUID rewardId;
         Long number;
         Long repoId;
-    }
-
-    public static List<RewardItemViewEntity> of(Reward reward) {
-        return reward.rewardItems().stream().map(item -> RewardItemViewEntity.builder()
-                .rewardId(reward.id())
-                .number(item.number())
-                .repoId(item.repoId())
-                .id(item.id())
-                .type(switch (item.type()) {
-                    case ISSUE -> ContributionType.ISSUE;
-                    case PULL_REQUEST -> ContributionType.PULL_REQUEST;
-                    case CODE_REVIEW -> ContributionType.CODE_REVIEW;
-                })
-                .projectId(reward.projectId())
-                .recipientId(reward.recipientId())
-                .build()).toList();
-    }
-
-    public Reward.Item toRewardItem() {
-        return Reward.Item.builder()
-                .id(id)
-                .number(number)
-                .repoId(repoId)
-                .type(switch (type) {
-                    case ISSUE -> Reward.Item.Type.ISSUE;
-                    case PULL_REQUEST -> Reward.Item.Type.PULL_REQUEST;
-                    case CODE_REVIEW -> Reward.Item.Type.CODE_REVIEW;
-                }).build();
     }
 }

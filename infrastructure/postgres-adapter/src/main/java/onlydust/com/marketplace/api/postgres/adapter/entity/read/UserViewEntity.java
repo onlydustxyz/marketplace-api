@@ -24,7 +24,6 @@ import java.util.UUID;
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Value
-@Builder(toBuilder = true)
 @Table(name = "users", schema = "iam")
 @EntityListeners(AuditingEntityListener.class)
 @Accessors(fluent = true)

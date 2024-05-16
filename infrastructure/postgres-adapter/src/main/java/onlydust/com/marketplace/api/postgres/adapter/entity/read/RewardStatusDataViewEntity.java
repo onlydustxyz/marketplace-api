@@ -29,7 +29,6 @@ import static java.util.Objects.isNull;
 @Table(name = "reward_status_data", schema = "accounting")
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
-@Builder(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
 @Accessors(fluent = true, chain = true)
 @Immutable

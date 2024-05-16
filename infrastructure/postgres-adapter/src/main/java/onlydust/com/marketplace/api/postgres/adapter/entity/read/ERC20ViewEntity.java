@@ -18,7 +18,6 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "erc20", schema = "public")
-@Builder(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)

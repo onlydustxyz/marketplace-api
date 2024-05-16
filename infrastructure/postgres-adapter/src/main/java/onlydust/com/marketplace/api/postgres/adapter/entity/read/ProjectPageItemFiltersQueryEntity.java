@@ -3,7 +3,10 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.project.domain.view.EcosystemView;
 import onlydust.com.marketplace.project.domain.view.ProjectCardView;
 import org.hibernate.annotations.Immutable;
@@ -16,7 +19,6 @@ import java.util.stream.Collectors;
 import static java.util.Objects.nonNull;
 
 @Entity
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data

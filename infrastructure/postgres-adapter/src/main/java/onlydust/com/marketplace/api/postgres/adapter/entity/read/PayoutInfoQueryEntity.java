@@ -4,7 +4,6 @@ import io.hypersistence.utils.hibernate.type.array.EnumArrayType;
 import io.hypersistence.utils.hibernate.type.array.internal.AbstractArrayType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.view.PayoutInfoView;
@@ -28,7 +27,6 @@ import static java.util.Objects.nonNull;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder(toBuilder = true)
 @Entity
 @Immutable
 public class PayoutInfoQueryEntity {
@@ -47,7 +45,6 @@ public class PayoutInfoQueryEntity {
 
     @OneToMany
     @JoinColumn(name = "billingProfileId", referencedColumnName = "billingProfileId")
-    @Builder.Default
     Set<WalletViewEntity> wallets = new HashSet<>();
 
     @OneToOne

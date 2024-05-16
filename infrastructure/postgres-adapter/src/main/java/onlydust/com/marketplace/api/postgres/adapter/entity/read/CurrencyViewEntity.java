@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "currencies", schema = "public")
-@Builder(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)

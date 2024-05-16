@@ -1,8 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
-import lombok.*;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.WalletTypeEnumEntity;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
@@ -26,7 +28,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Data
-@Builder(access = AccessLevel.PRIVATE)
 @Table(name = "wallets", schema = "accounting")
 @IdClass(WalletViewEntity.PrimaryKey.class)
 @EntityListeners(AuditingEntityListener.class)
@@ -63,15 +64,6 @@ public class WalletViewEntity {
         NetworkEnumEntity network;
     }
 
-    public static WalletViewEntity ethereum(@NonNull BillingProfile.Id billingProfileId, @NonNull WalletLocator wallet) {
-        return WalletViewEntity.builder()
-                .billingProfileId(billingProfileId.value())
-                .network(NetworkEnumEntity.ethereum)
-                .address(wallet.asString())
-                .type(wallet.accountAddress().isPresent() ? WalletTypeEnumEntity.address : WalletTypeEnumEntity.name)
-                .build();
-    }
-
     public WalletLocator ethereum() {
         assert network == NetworkEnumEntity.ethereum;
         return switch (type) {
@@ -80,41 +72,14 @@ public class WalletViewEntity {
         };
     }
 
-    public static WalletViewEntity optimism(@NonNull BillingProfile.Id billingProfileId, @NonNull EvmAccountAddress address) {
-        return WalletViewEntity.builder()
-                .billingProfileId(billingProfileId.value())
-                .network(NetworkEnumEntity.optimism)
-                .address(address.toString())
-                .type(WalletTypeEnumEntity.address)
-                .build();
-    }
-
     public EvmAccountAddress optimism() {
         assert network == NetworkEnumEntity.optimism;
         return new EvmAccountAddress(address);
     }
 
-    public static WalletViewEntity aptos(@NonNull BillingProfile.Id billingProfileId, @NonNull AptosAccountAddress address) {
-        return WalletViewEntity.builder()
-                .billingProfileId(billingProfileId.value())
-                .network(NetworkEnumEntity.aptos)
-                .address(address.toString())
-                .type(WalletTypeEnumEntity.address)
-                .build();
-    }
-
     public AptosAccountAddress aptos() {
         assert network == NetworkEnumEntity.aptos;
         return new AptosAccountAddress(address);
-    }
-
-    public static WalletViewEntity starknet(@NonNull BillingProfile.Id billingProfileId, @NonNull StarknetAccountAddress address) {
-        return WalletViewEntity.builder()
-                .billingProfileId(billingProfileId.value())
-                .network(NetworkEnumEntity.starknet)
-                .address(address.toString())
-                .type(WalletTypeEnumEntity.address)
-                .build();
     }
 
     public StarknetAccountAddress starknet() {

@@ -23,10 +23,10 @@ public class GithubAuthorizedRepoViewEntity {
 
     @Embeddable
     @Data
-    @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     @EqualsAndHashCode
+    @Builder
     public static class Id implements Serializable {
         Long repoId;
         Long installationId;

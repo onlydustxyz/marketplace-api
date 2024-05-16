@@ -19,7 +19,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
-@Builder
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "hackathons", schema = "public")
 @Immutable
