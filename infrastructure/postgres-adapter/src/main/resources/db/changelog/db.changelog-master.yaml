@@ -289,3 +289,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000232_make_weekly_allocated_time_optional.sql
   - include:
       file: db/changelog/changelogs/00000233_make_looking_for_a_job_optional.sql
+  - include:
+      file: db/changelog/changelogs/00000233_improve_global_ranks_view.sql
