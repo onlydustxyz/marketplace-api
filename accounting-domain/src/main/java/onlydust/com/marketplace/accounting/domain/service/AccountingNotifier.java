@@ -28,7 +28,6 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
     private final AccountingRewardStoragePort accountingRewardStoragePort;
     private final InvoiceStoragePort invoiceStoragePort;
     private final NotificationPort accountingMailObserver;
-    private final NotificationPort notificationPort;
 
     @Override
     public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
@@ -115,8 +114,6 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
 
     @Override
     public void onBillingProfileUpdated(BillingProfileVerificationUpdated event) {
-        notificationPort.notify(event);
-
         if (event.failed()) {
             final ShortContributorView owner = billingProfileStoragePort.getBillingProfileOwnerById(event.getUserId())
                     .orElseThrow(() -> internalServerError(("Owner %s not found for billing profile %s")

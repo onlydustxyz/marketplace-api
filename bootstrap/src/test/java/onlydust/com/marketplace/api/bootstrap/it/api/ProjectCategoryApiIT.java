@@ -5,7 +5,6 @@ import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategoryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectCategoryRepository;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
-import onlydust.com.marketplace.project.domain.model.notification.ProjectCategorySuggestion;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

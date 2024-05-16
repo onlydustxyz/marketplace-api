@@ -4,8 +4,6 @@ import lombok.Getter;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
-import onlydust.com.marketplace.project.domain.model.notification.ProjectCategorySuggestion;
-import onlydust.com.marketplace.project.domain.model.notification.UserRegisteredOnHackathon;
 
 import java.util.ArrayList;
 import java.util.Collections;

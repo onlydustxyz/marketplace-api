@@ -17,15 +17,13 @@ import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresRewardAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
+import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.kernel.jobs.NotificationOutboxConsumer;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.port.output.*;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.IndexerApiOutboxConsumer;
-import onlydust.com.marketplace.project.domain.observer.ContributionObserver;
-import onlydust.com.marketplace.project.domain.observer.HackathonObserver;
-import onlydust.com.marketplace.project.domain.observer.ProjectObserver;
-import onlydust.com.marketplace.project.domain.observer.UserObserver;
+import onlydust.com.marketplace.project.domain.observer.*;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.service.*;
@@ -51,7 +49,7 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public ProjectFacadePort projectFacadePort(final ProjectObserverPort projectObserverPort,
+    public ProjectFacadePort projectFacadePort(final ProjectObserverPort projectObservers,
                                                final ProjectStoragePort projectStoragePort,
                                                final ImageStoragePort imageStoragePort,
                                                final UUIDGeneratorPort uuidGeneratorPort,
@@ -61,7 +59,7 @@ public class ProjectConfiguration {
                                                final ContributionStoragePort contributionStoragePort,
                                                final DustyBotStoragePort dustyBotStoragePort,
                                                final GithubStoragePort githubStoragePort) {
-        return new ProjectService(projectObserverPort,
+        return new ProjectService(projectObservers,
                 projectStoragePort,
                 imageStoragePort,
                 uuidGeneratorPort,
@@ -102,7 +100,7 @@ public class ProjectConfiguration {
                                          final ProjectStoragePort projectStoragePort,
                                          final GithubSearchPort githubSearchPort,
                                          final ImageStoragePort imageStoragePort,
-                                         final ProjectObserverPort projectObserverPort) {
+                                         final ProjectObserverPort projectObservers) {
         return new UserService(
                 userObserverPort,
                 postgresUserAdapter,
@@ -110,7 +108,7 @@ public class ProjectConfiguration {
                 projectStoragePort,
                 githubSearchPort,
                 imageStoragePort,
-                projectObserverPort);
+                projectObservers);
     }
 
     @Bean
@@ -178,13 +176,18 @@ public class ProjectConfiguration {
         return new TechnologiesService(trackingIssuePort, technologyStoragePort);
     }
 
+    // TODO remove and replace with dedicated implementations
     @Bean
     public ProjectObserverPort projectObserverPort(final ContributionStoragePort contributionStoragePort,
-                                                   final OutboxPort indexerOutbox,
-                                                   final NotificationPort slackNotificationPort) {
-        return new ProjectObserver(contributionStoragePort, indexerOutbox, slackNotificationPort);
+                                                   final OutboxPort indexerOutbox) {
+        return new ProjectObserver(contributionStoragePort, indexerOutbox);
     }
 
+    @Bean
+    public ProjectObserverPort projectObservers(final ProjectObserverPort projectObserverPort,
+                                                final SlackApiAdapter slackApiAdapter) {
+        return new ProjectObserverComposite(projectObserverPort, slackApiAdapter);
+    }
 
     @Bean
     public ContributionObserverPort contributionObserverPort(final ContributionStoragePort contributionStoragePort) {
@@ -231,8 +234,8 @@ public class ProjectConfiguration {
 
     @Bean
     public HackathonFacadePort hackathonFacadePort(final HackathonStoragePort hackathonStoragePort,
-                                                   final HackathonObserverPort hackathonObserverPort) {
-        return new HackathonService(hackathonStoragePort, hackathonObserverPort);
+                                                   final HackathonObserverPort hackathonObservers) {
+        return new HackathonService(hackathonStoragePort, hackathonObservers);
     }
 
     @Bean
@@ -268,9 +271,8 @@ public class ProjectConfiguration {
         return new OutboxConsumerJob(boostNodeGuardiansRewardsOutbox, nodeGuardiansOutboxConsumer);
     }
 
-
     @Bean
-    public HackathonObserverPort hackathonObserverPort(final NotificationPort slackNotificationPort) {
-        return new HackathonObserver(slackNotificationPort);
+    public HackathonObserverPort hackathonObservers(final SlackApiAdapter slackApiAdapter) {
+        return new HackathonObserverComposite(slackApiAdapter);
     }
 }

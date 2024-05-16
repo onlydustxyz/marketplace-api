@@ -45,7 +45,6 @@ public class AccountingNotifierTest {
     NotificationPort mailObserver;
     InvoiceStoragePort invoiceStoragePort;
     AccountingRewardStoragePort accountingRewardStoragePort;
-    NotificationPort notificationPort;
     final Faker faker = new Faker();
 
     @BeforeEach
@@ -53,9 +52,8 @@ public class AccountingNotifierTest {
         billingProfileStoragePort = mock(BillingProfileStoragePort.class);
         mailObserver = mock(NotificationPort.class);
         accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
-        notificationPort = mock(NotificationPort.class);
         invoiceStoragePort = mock(InvoiceStoragePort.class);
-        accountingNotifier = new AccountingNotifier(billingProfileStoragePort, accountingRewardStoragePort, invoiceStoragePort, mailObserver, notificationPort);
+        accountingNotifier = new AccountingNotifier(billingProfileStoragePort, accountingRewardStoragePort, invoiceStoragePort, mailObserver);
     }
 
     @Nested
@@ -305,7 +303,6 @@ public class AccountingNotifierTest {
             verify(mailObserver).notify(new BillingProfileVerificationFailed(shortContributorView.email(), UserId.of(userId), billingProfileId,
                     shortContributorView.login(),
                     billingProfileVerificationUpdated.getVerificationStatus()));
-            verify(notificationPort).notify(billingProfileVerificationUpdated);
         }
     }
 }
