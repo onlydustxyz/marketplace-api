@@ -14,7 +14,7 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.kernel.port.output.NotificationPort;
+import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -23,11 +23,11 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 
 @Slf4j
 @AllArgsConstructor
-public class AccountingNotifier implements AccountingObserverPort, BillingProfileObserverPort {
+public class AccountingMailNotifier implements AccountingObserverPort, BillingProfileObserverPort {
     private final BillingProfileStoragePort billingProfileStoragePort;
     private final AccountingRewardStoragePort accountingRewardStoragePort;
     private final InvoiceStoragePort invoiceStoragePort;
-    private final NotificationPort accountingMailObserver;
+    private final OutboxPort accountingOutbox;
 
     @Override
     public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
@@ -44,7 +44,7 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
         final var rewardDetailsView = accountingRewardStoragePort.getReward(rewardId)
                 .orElseThrow(() -> internalServerError(("Reward %s not found").formatted(rewardId.value())));
         if (nonNull(rewardDetailsView.recipient().email())) {
-            accountingMailObserver.notify(new RewardCreated(rewardDetailsView.recipient().email(),
+            accountingOutbox.push(new RewardCreated(rewardDetailsView.recipient().email(),
                     rewardDetailsView.githubUrls().size(), rewardDetailsView.requester().login(), rewardDetailsView.recipient().login(), ShortReward.builder()
                     .amount(rewardDetailsView.money().amount())
                     .currencyCode(rewardDetailsView.money().currency().code().toString())
@@ -64,7 +64,7 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
                 .orElseThrow(() -> internalServerError("Reward %s not found".formatted(rewardId)));
 
         if (nonNull(shortRewardDetailsView.recipient().email())) {
-            accountingMailObserver.notify(new RewardCanceled(
+            accountingOutbox.push(new RewardCanceled(
                     shortRewardDetailsView.recipient().email(),
                     shortRewardDetailsView.recipient().login(),
                     ShortReward.builder()
@@ -95,7 +95,7 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
         final var billingProfileAdmin = billingProfileStoragePort.findBillingProfileAdmin(invoice.createdBy(), invoice.billingProfileSnapshot().id())
                 .orElseThrow(() -> notFound("Billing profile admin not found for billing profile %s".formatted(invoice.billingProfileSnapshot().id())));
 
-        accountingMailObserver.notify(new InvoiceRejected(billingProfileAdmin.email(),
+        accountingOutbox.push(new InvoiceRejected(billingProfileAdmin.email(),
                 (long) invoice.rewards().size(), billingProfileAdmin.login(),
                 billingProfileAdmin.firstName(),
                 billingProfileAdmin.userId().value(),
@@ -119,7 +119,7 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
                     .orElseThrow(() -> internalServerError(("Owner %s not found for billing profile %s")
                             .formatted(event.getUserId().value(), event.getBillingProfileId().value())));
             if (nonNull(owner.email())) {
-                accountingMailObserver.notify(new BillingProfileVerificationFailed(owner.email(), owner.userId(), event.getBillingProfileId(), owner.login(),
+                accountingOutbox.push(new BillingProfileVerificationFailed(owner.email(), owner.userId(), event.getBillingProfileId(), owner.login(),
                         event.getVerificationStatus()));
             } else {
                 LOGGER.warn("Unable to send billing profile verifcation failed mail to user %s".formatted(event.getUserId()));

@@ -17,10 +17,14 @@ import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresRewardAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
+import onlydust.com.marketplace.api.posthog.adapters.PosthogApiClientAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
-import onlydust.com.marketplace.kernel.jobs.NotificationOutboxConsumer;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
-import onlydust.com.marketplace.kernel.port.output.*;
+import onlydust.com.marketplace.kernel.jobs.RetriedOutboxConsumer;
+import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
+import onlydust.com.marketplace.kernel.port.output.IndexerPort;
+import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
+import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.IndexerApiOutboxConsumer;
 import onlydust.com.marketplace.project.domain.observer.HackathonObserverComposite;
@@ -162,8 +166,8 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public OutboxConsumer webhookTrackingOutboxConsumer(final NotificationPort webhookTrackingPort) {
-        return new NotificationOutboxConsumer(webhookTrackingPort);
+    public OutboxConsumer webhookTrackingOutboxConsumer(final PosthogApiClientAdapter posthogApiClientAdapter) {
+        return new RetriedOutboxConsumer(posthogApiClientAdapter);
     }
 
     @Bean

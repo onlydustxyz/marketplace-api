@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
+import com.onlydust.customer.io.adapter.CustomerIOAdapter;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookObserver;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookProjector;
@@ -14,10 +15,12 @@ import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountingMailEventEntity;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
-import onlydust.com.marketplace.kernel.jobs.NotificationOutboxConsumer;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
-import onlydust.com.marketplace.kernel.port.output.*;
-import onlydust.com.marketplace.kernel.service.OutboxNotifier;
+import onlydust.com.marketplace.kernel.jobs.RetriedOutboxConsumer;
+import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
+import onlydust.com.marketplace.kernel.port.output.IndexerPort;
+import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
+import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -65,11 +68,11 @@ public class AccountingConfiguration {
     }
 
     @Bean
-    public AccountingNotifier accountingNotifier(final @NonNull BillingProfileStoragePort billingProfileStoragePort,
-                                                 final @NonNull AccountingRewardStoragePort accountingRewardStoragePort,
-                                                 final @NonNull InvoiceStoragePort invoiceStoragePort,
-                                                 final @NonNull NotificationPort accountingMailOutboxNotifier) {
-        return new AccountingNotifier(billingProfileStoragePort, accountingRewardStoragePort, invoiceStoragePort, accountingMailOutboxNotifier);
+    public AccountingMailNotifier accountingMailNotifier(final @NonNull BillingProfileStoragePort billingProfileStoragePort,
+                                                         final @NonNull AccountingRewardStoragePort accountingRewardStoragePort,
+                                                         final @NonNull InvoiceStoragePort invoiceStoragePort,
+                                                         final @NonNull OutboxPort accountingMailOutbox) {
+        return new AccountingMailNotifier(billingProfileStoragePort, accountingRewardStoragePort, invoiceStoragePort, accountingMailOutbox);
     }
 
     @Bean
@@ -113,15 +116,15 @@ public class AccountingConfiguration {
 
     @Bean
     public AccountingObserverPort accountingObserver(final RewardStatusUpdater rewardStatusUpdater,
-                                                     final AccountingNotifier accountingNotifier) {
-        return new AccountingObserverComposite(accountingNotifier, rewardStatusUpdater);
+                                                     final AccountingMailNotifier accountingMailNotifier) {
+        return new AccountingObserverComposite(accountingMailNotifier, rewardStatusUpdater);
     }
 
     @Bean
     public BillingProfileObserverPort billingProfileObservers(final RewardStatusUpdater rewardStatusUpdater,
-                                                              final AccountingNotifier accountingNotifier,
+                                                              final AccountingMailNotifier accountingMailNotifier,
                                                               final SlackApiAdapter slackApiAdapter) {
-        return new BillingProfileObserverComposite(rewardStatusUpdater, accountingNotifier, slackApiAdapter);
+        return new BillingProfileObserverComposite(rewardStatusUpdater, accountingMailNotifier, slackApiAdapter);
     }
 
     @Bean
@@ -150,18 +153,13 @@ public class AccountingConfiguration {
     }
 
     @Bean
-    public NotificationPort accountingMailOutboxNotifier(final OutboxPort accountingMailOutbox) {
-        return new OutboxNotifier(accountingMailOutbox);
-    }
-
-    @Bean
     public OutboxConsumerJob accountingMailOutboxJob(final PostgresOutboxAdapter<AccountingMailEventEntity> accountingMailOutbox,
                                                      final OutboxConsumer accountingMailOutboxConsumer) {
         return new OutboxConsumerJob(accountingMailOutbox, accountingMailOutboxConsumer);
     }
 
     @Bean
-    public OutboxConsumer accountingMailOutboxConsumer(final NotificationPort mailNotificationPort) {
-        return new NotificationOutboxConsumer(mailNotificationPort);
+    public OutboxConsumer accountingMailOutboxConsumer(final CustomerIOAdapter customerIOAdapter) {
+        return new RetriedOutboxConsumer(customerIOAdapter);
     }
 }

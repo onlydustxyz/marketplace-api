@@ -9,17 +9,17 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.*;
 import onlydust.com.marketplace.kernel.model.Event;
-import onlydust.com.marketplace.kernel.port.output.NotificationPort;
+import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 
 @AllArgsConstructor
 @Slf4j
-public class CustomerIOAdapter implements NotificationPort {
+public class CustomerIOAdapter implements OutboxConsumer {
 
     private final CustomerIOHttpClient customerIOHttpClient;
     private CustomerIOProperties customerIOProperties;
 
     @Override
-    public void notify(@NonNull Event event) {
+    public void process(@NonNull Event event) {
         if (event instanceof InvoiceRejected invoiceRejected) {
             sendEmail(MailDTO.fromInvoiceRejected(customerIOProperties, invoiceRejected));
         } else if (event instanceof RewardCreated rewardCreated) {

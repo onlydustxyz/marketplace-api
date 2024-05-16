@@ -19,7 +19,7 @@ import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.kernel.port.output.NotificationPort;
+import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,7 +35,7 @@ public class RewardService implements AccountingRewardPort {
     private final AccountingRewardStoragePort accountingRewardStoragePort;
     private final AccountingFacadePort accountingFacadePort;
     private final SponsorStoragePort sponsorStoragePort;
-    private final NotificationPort notificationPort;
+    private final OutboxConsumer mailOutboxConsumer;
 
     @Override
     public Page<RewardDetailsView> getRewards(int pageIndex, int pageSize,
@@ -89,7 +89,7 @@ public class RewardService implements AccountingRewardPort {
                 rewardViews.stream().collect(groupingBy(rewardView -> rewardView.recipient().email())).entrySet()) {
             final ShortContributorView recipient = listOfPaidRewardsMapToAdminEmail.getValue().get(0).recipient();
 
-            notificationPort.notify(new RewardsPaid(listOfPaidRewardsMapToAdminEmail.getKey(), recipient.login(), isNull(recipient.userId()) ? null :
+            mailOutboxConsumer.process(new RewardsPaid(listOfPaidRewardsMapToAdminEmail.getKey(), recipient.login(), isNull(recipient.userId()) ? null :
                     recipient.userId().value(),
                     listOfPaidRewardsMapToAdminEmail.getValue().stream()
                             .map(rewardDetailsView -> ShortReward.builder().

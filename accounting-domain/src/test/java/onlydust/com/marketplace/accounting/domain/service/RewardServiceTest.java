@@ -14,7 +14,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
-import onlydust.com.marketplace.kernel.port.output.NotificationPort;
+import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -33,13 +33,13 @@ public class RewardServiceTest {
     private final AccountingRewardStoragePort accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
     private final AccountingFacadePort accountingFacadePort = mock(AccountingFacadePort.class);
     private final SponsorStoragePort sponsorStoragePort = mock(SponsorStoragePort.class);
-    private final NotificationPort mailObserver = mock(NotificationPort.class);
-    private final RewardService rewardService = new RewardService(accountingRewardStoragePort, accountingFacadePort, sponsorStoragePort, mailObserver);
+    private final OutboxConsumer mailOutboxConsumer = mock(OutboxConsumer.class);
+    private final RewardService rewardService = new RewardService(accountingRewardStoragePort, accountingFacadePort, sponsorStoragePort, mailOutboxConsumer);
 
 
     @BeforeEach
     void setUp() {
-        reset(accountingRewardStoragePort, mailObserver);
+        reset(accountingRewardStoragePort, mailOutboxConsumer);
     }
 
     @Test
@@ -68,7 +68,7 @@ public class RewardServiceTest {
         rewardService.notifyAllNewPaidRewards();
 
         // Then
-        verify(mailObserver, times(1)).notify(new RewardsPaid(recipient1.email(), recipient1.login(), recipient1.userId().value(),
+        verify(mailOutboxConsumer, times(1)).process(new RewardsPaid(recipient1.email(), recipient1.login(), recipient1.userId().value(),
                 Stream.of(r11, r12).map(rewardDetailsView -> ShortReward.builder().
                         id(rewardDetailsView.id())
                         .amount(rewardDetailsView.money().amount())
@@ -76,7 +76,7 @@ public class RewardServiceTest {
                         .currencyCode(rewardDetailsView.money().currency().code().toString())
                         .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
                         .build()).toList()));
-        verify(mailObserver, times(1)).notify(new RewardsPaid(recipient2.email(), recipient2.login(), null,
+        verify(mailOutboxConsumer, times(1)).process(new RewardsPaid(recipient2.email(), recipient2.login(), null,
                 Stream.of(r21, r22).map(rewardDetailsView -> ShortReward.builder().
                         id(rewardDetailsView.id())
                         .amount(rewardDetailsView.money().amount())
