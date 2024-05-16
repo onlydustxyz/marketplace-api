@@ -346,7 +346,6 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     void should_list_invoices_with_kyc_without_lastname() throws IOException {
         // Given
         final var ofux = UserId.of(userAuthHelper.authenticateOlivier().user().getId());
-        final String jwt = userAuthHelper.authenticateBackofficeUser("pierre.oucif@gadz.org", List.of(BackofficeUser.Role.BO_READER)).jwt();
         final var individualBillingProfile = createIndividualBillingProfileFor(ofux, ProjectId.of("e41f44a2-464c-4c96-817f-81acb06b2523"));
         final Invoice.Id invoiceId = billingProfileService.previewInvoice(ofux, individualBillingProfile.id(), List.of(
                 RewardId.of("5c668b61-e42c-4f0e-b31f-44c4e50dc2f4")

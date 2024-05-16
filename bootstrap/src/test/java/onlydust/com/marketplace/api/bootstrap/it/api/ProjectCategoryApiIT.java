@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.bootstrap.helper.SlackNotificationStub;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategoryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectCategoryRepository;
+import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +12,14 @@ import org.springframework.http.MediaType;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
 
 public class ProjectCategoryApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     ProjectCategoryRepository projectCategoryRepository;
     @Autowired
-    SlackNotificationStub slackNotificationStub;
+    SlackApiAdapter slackApiAdapter;
 
     @Test
     void should_suggest_project_category() {
@@ -47,9 +48,6 @@ public class ProjectCategoryApiIT extends AbstractMarketplaceApiIT {
         assertEquals(categoryName, projectCategoryEntity.getName());
         assertEquals(ProjectCategory.Status.SUGGESTED.name(), projectCategoryEntity.getStatus().name());
 
-        final List<ProjectCategorySuggestion> projectCategorySuggestionNotifications = slackNotificationStub.getProjectCategorySuggestionNotifications();
-        assertEquals(1, projectCategorySuggestionNotifications.size());
-        assertEquals(categoryName, projectCategorySuggestionNotifications.get(0).getCategoryName());
-        assertEquals(pierre.user().getId(), projectCategorySuggestionNotifications.get(0).getUserId());
+        verify(slackApiAdapter).onProjectCategorySuggested(categoryName, pierre.user().getId());
     }
 }
