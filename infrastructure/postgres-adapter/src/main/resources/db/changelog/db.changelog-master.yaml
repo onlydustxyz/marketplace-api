@@ -285,3 +285,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000230_refactor_sponsor_account_transactions_view.sql
   - include:
       file: db/changelog/changelogs/00000231_add_project_categories_table.sql
+  - include:
+      file: db/changelog/changelogs/00000232_make_weekly_allocated_time_optional.sql
