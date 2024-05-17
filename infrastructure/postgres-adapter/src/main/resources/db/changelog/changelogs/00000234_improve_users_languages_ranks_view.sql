@@ -1,12 +1,13 @@
 DROP MATERIALIZED VIEW global_users_ranks;
-DROP VIEW users_rank_per_contribution;
+DROP VIEW users_ecosystems_ranks;
 DROP VIEW users_languages_ranks;
+DROP VIEW users_rank_per_contribution;
 DROP VIEW users_rank_per_reward_received;
 
 
 -- CONTRIBUTIONS #######################################################################################################
 
-CREATE OR REPLACE VIEW public_contributions AS
+CREATE VIEW public_contributions AS
 select c.*,
        array_agg(distinct p.id) as project_ids
 from indexer_exp.contributions c
@@ -18,7 +19,7 @@ group by c.id
 
 
 
-CREATE OR REPLACE VIEW contributions_stats_per_user AS
+CREATE MATERIALIZED VIEW contributions_stats_per_user AS
 SELECT c.contributor_id,
        count(DISTINCT c.id)                                   AS contribution_count,
        array_agg(DISTINCT f.project_ids)                      AS project_ids,
@@ -28,10 +29,12 @@ FROM public_contributions c
          CROSS JOIN unnest(c.project_ids) f(project_ids)
 GROUP BY c.contributor_id
 ;
+CREATE UNIQUE INDEX contributions_stats_per_user_pk ON contributions_stats_per_user (contributor_id);
+REFRESH MATERIALIZED VIEW contributions_stats_per_user;
 
 
 
-CREATE OR REPLACE VIEW contributions_stats_per_ecosystem_per_user AS
+CREATE MATERIALIZED VIEW contributions_stats_per_ecosystem_per_user AS
 SELECT c.contributor_id,
        pe.ecosystem_id,
        count(DISTINCT c.id)                                      AS contribution_count,
@@ -44,10 +47,13 @@ FROM public_contributions c
               on pe.project_id = any (c.project_ids)
 GROUP BY pe.ecosystem_id, c.contributor_id
 ;
+CREATE UNIQUE INDEX contributions_stats_per_ecosystem_per_user_pk ON contributions_stats_per_ecosystem_per_user (ecosystem_id, contributor_id);
+CREATE UNIQUE INDEX contributions_stats_per_ecosystem_per_user_rpk ON contributions_stats_per_ecosystem_per_user (contributor_id, ecosystem_id);
+REFRESH MATERIALIZED VIEW contributions_stats_per_ecosystem_per_user;
 
 
 
-CREATE OR REPLACE VIEW contributions_stats_per_language_per_user AS
+CREATE MATERIALIZED VIEW contributions_stats_per_language_per_user AS
 SELECT c.contributor_id,
        lfe.language_id,
        count(DISTINCT c.id)                                      AS contribution_count,
@@ -60,6 +66,9 @@ FROM public_contributions c
               on lfe.extension = any (c.main_file_extensions)
 GROUP BY lfe.language_id, c.contributor_id
 ;
+CREATE UNIQUE INDEX contributions_stats_per_language_per_user_pk ON contributions_stats_per_language_per_user (language_id, contributor_id);
+CREATE UNIQUE INDEX contributions_stats_per_language_per_user_rpk ON contributions_stats_per_language_per_user (contributor_id, language_id);
+REFRESH MATERIALIZED VIEW contributions_stats_per_language_per_user;
 
 
 
@@ -95,7 +104,7 @@ from contributions_stats_per_language_per_user stats
 
 
 
-CREATE OR REPLACE VIEW users_ecosystems_ranks AS
+CREATE VIEW users_ecosystems_ranks AS
 select stats.ecosystem_id                                                                       as ecosystem_id,
        stats.contributor_id                                                                     as contributor_id,
        rank()
@@ -108,7 +117,7 @@ from contributions_stats_per_ecosystem_per_user stats
 
 -- REWARDS #############################################################################################################
 
-CREATE OR REPLACE VIEW public_received_rewards AS
+CREATE VIEW public_received_rewards AS
 select r.*,
        rsd.amount_usd_equivalent,
        rsd.usd_conversion_rate,
@@ -131,7 +140,7 @@ group by r.id, rsd.reward_id;
 ;
 
 
-CREATE OR REPLACE VIEW received_rewards_stats_per_user AS
+CREATE MATERIALIZED VIEW received_rewards_stats_per_user AS
 SELECT r.recipient_id,
        count(r.id)                                               AS reward_count,
        count(DISTINCT r.project_id)                              AS project_count,
@@ -140,10 +149,12 @@ SELECT r.recipient_id,
 FROM public_received_rewards r
 GROUP BY r.recipient_id
 ;
+CREATE UNIQUE INDEX received_rewards_stats_per_user_pk ON received_rewards_stats_per_user (recipient_id);
+REFRESH MATERIALIZED VIEW received_rewards_stats_per_user;
 
 
 
-CREATE OR REPLACE VIEW received_rewards_stats_per_ecosystem_per_user AS
+CREATE MATERIALIZED VIEW received_rewards_stats_per_ecosystem_per_user AS
 SELECT r.recipient_id,
        pe.ecosystem_id,
        count(r.id)                                               AS reward_count,
@@ -155,10 +166,13 @@ FROM public_received_rewards r
               on pe.project_id = r.project_id
 GROUP BY pe.ecosystem_id, r.recipient_id
 ;
+CREATE UNIQUE INDEX received_rewards_stats_per_ecosystem_per_user_pk ON received_rewards_stats_per_ecosystem_per_user (ecosystem_id, recipient_id);
+CREATE UNIQUE INDEX received_rewards_stats_per_ecosystem_per_user_rpk ON received_rewards_stats_per_ecosystem_per_user (recipient_id, ecosystem_id);
+REFRESH MATERIALIZED VIEW received_rewards_stats_per_ecosystem_per_user;
 
 
 
-CREATE OR REPLACE VIEW received_rewards_stats_per_language_per_user AS
+CREATE MATERIALIZED VIEW received_rewards_stats_per_language_per_user AS
 SELECT r.recipient_id,
        lfe.language_id,
        count(distinct r.id)                                      AS reward_count,
@@ -170,6 +184,27 @@ FROM public_received_rewards r
                    on lfe.extension = any (r.main_file_extensions)
 GROUP BY lfe.language_id, r.recipient_id
 ;
+CREATE UNIQUE INDEX received_rewards_stats_per_language_per_user_pk ON received_rewards_stats_per_language_per_user (language_id, recipient_id);
+CREATE UNIQUE INDEX received_rewards_stats_per_language_per_user_rpk ON received_rewards_stats_per_language_per_user (recipient_id, language_id);
+REFRESH MATERIALIZED VIEW received_rewards_stats_per_language_per_user;
+
+
+
+CREATE MATERIALIZED VIEW received_rewards_stats_per_project_per_user AS
+SELECT r.recipient_id,
+       r.project_id,
+       coalesce(array_agg(distinct pe.ecosystem_id)
+                filter (where pe.ecosystem_id is not null), '{}') AS ecosystem_ids,
+       count(r.id)                                                AS reward_count,
+       round(sum(r.amount_usd_equivalent), 2)                     AS usd_total,
+       count(DISTINCT date_trunc('month'::text, r.requested_at))  AS rewarded_month_count
+FROM public_received_rewards r
+         LEFT JOIN projects_ecosystems pe ON pe.project_id = r.project_id
+GROUP BY r.project_id, r.recipient_id
+;
+CREATE UNIQUE INDEX received_rewards_stats_per_project_per_user_pk ON received_rewards_stats_per_project_per_user (project_id, recipient_id);
+CREATE UNIQUE INDEX received_rewards_stats_per_project_per_user_rpk ON received_rewards_stats_per_project_per_user (recipient_id, project_id);
+REFRESH MATERIALIZED VIEW received_rewards_stats_per_project_per_user;
 
 
 
@@ -194,23 +229,8 @@ FROM ranks r
 ORDER BY rank;
 
 
-
-CREATE OR REPLACE VIEW received_rewards_stats_per_project_per_user AS
-SELECT r.recipient_id,
-       r.project_id,
-       coalesce(array_agg(distinct pe.ecosystem_id)
-                filter (where pe.ecosystem_id is not null), '{}') AS ecosystem_ids,
-       count(r.id)                                                AS reward_count,
-       round(sum(r.amount_usd_equivalent), 2)                     AS usd_total,
-       count(DISTINCT date_trunc('month'::text, r.requested_at))  AS rewarded_month_count
-FROM public_received_rewards r
-         LEFT JOIN projects_ecosystems pe ON pe.project_id = r.project_id
-GROUP BY r.project_id, r.recipient_id
-;
-
-
 -- RE-CREATE global_users_ranks without any modification
-create materialized view global_users_ranks AS
+CREATE MATERIALIZED VIEW global_users_ranks AS
 with ranks as (select coalesce(c.github_user_id, rr.github_user_id, rs.github_user_id) as github_user_id,
                       rank() over (order by c.rank)                                    as contributions_rank,
                       rank() over (order by rs.rank)                                   as rewards_sent_rank,
@@ -250,8 +270,5 @@ from normalized_ranks r
          left join leaded_projects lp on lp.github_user_id = r.github_user_id
 order by rank
 ;
-
-CREATE UNIQUE INDEX global_users_ranks_github_user_id_uindex
-    ON global_users_ranks (github_user_id);
-
+CREATE UNIQUE INDEX global_users_ranks_pk ON global_users_ranks (github_user_id);
 REFRESH MATERIALIZED VIEW global_users_ranks;

@@ -33,8 +33,17 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID>, JpaSpec
     void tryInsert(UserEntity userEntity);
 
     @Modifying
-    @Query(value = "REFRESH MATERIALIZED VIEW CONCURRENTLY global_users_ranks", nativeQuery = true)
-    void refreshGlobalUsersRanks();
+    @Query(value = """
+            REFRESH MATERIALIZED VIEW CONCURRENTLY contributions_stats_per_user;
+            REFRESH MATERIALIZED VIEW CONCURRENTLY contributions_stats_per_ecosystem_per_user;
+            REFRESH MATERIALIZED VIEW CONCURRENTLY contributions_stats_per_language_per_user;
+            REFRESH MATERIALIZED VIEW CONCURRENTLY received_rewards_stats_per_user;
+            REFRESH MATERIALIZED VIEW CONCURRENTLY received_rewards_stats_per_ecosystem_per_user;
+            REFRESH MATERIALIZED VIEW CONCURRENTLY received_rewards_stats_per_language_per_user;
+            REFRESH MATERIALIZED VIEW CONCURRENTLY received_rewards_stats_per_project_per_user;
+            REFRESH MATERIALIZED VIEW CONCURRENTLY global_users_ranks;
+            """, nativeQuery = true)
+    void refreshUsersRanksAndStats();
 
     @Modifying
     @Query(value = """

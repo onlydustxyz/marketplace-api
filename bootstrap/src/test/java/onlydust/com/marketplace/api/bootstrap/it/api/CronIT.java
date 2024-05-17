@@ -14,7 +14,7 @@ public class CronIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_be_able_to_refresh_materialized_views() {
-        assertDoesNotThrow(() -> userFacadePort.refreshUserRanks());
+        assertDoesNotThrow(() -> userFacadePort.refreshUserRanksAndStats());
     }
 
     @Test
