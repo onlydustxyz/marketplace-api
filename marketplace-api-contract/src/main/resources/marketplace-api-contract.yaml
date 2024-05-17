@@ -3257,13 +3257,14 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/ProjectId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommitteeApplicationRequest'
       responses:
-        "200":
+        "204":
           description: 'Create/Update project application for committee'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CommitteeApplicationRequest'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":

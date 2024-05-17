@@ -4567,9 +4567,13 @@ components:
         totalAssignments:
           type: integer
         juryMembers:
-          $ref: '#/components/schemas/JuryMemberResponse'
+          type: array
+          items:
+            $ref: '#/components/schemas/JuryMemberResponse'
         applications:
-          $ref: '#/components/schemas/ApplicationResponse'
+          type: array
+          items:
+            $ref: '#/components/schemas/ApplicationResponse'
         projectQuestions:
           type: array
           items:
@@ -4617,7 +4621,7 @@ components:
         applicant:
           $ref: '#/components/schemas/UserLinkResponse'
         score:
-          type: string
+          type: integer
         allocatedBudget:
           type: number
           format: int64

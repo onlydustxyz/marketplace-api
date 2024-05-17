@@ -119,5 +119,10 @@ public class BackofficeConfiguration {
                                                  final ImageStoragePort imageStoragePort) {
         return new onlydust.com.marketplace.project.domain.service.LanguageService(languageStorage, imageStoragePort);
     }
+
+    @Bean
+    public BackofficeCommitteeManagementRestApi backofficeCommitteeManagementRestApi(){
+        return new BackofficeCommitteeManagementRestApi();
+    }
 }
 
