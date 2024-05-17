@@ -198,6 +198,21 @@ FROM ranks r
 ORDER BY rank;
 
 
+
+CREATE OR REPLACE VIEW received_rewards_stats_per_project_per_user AS
+SELECT r.recipient_id,
+       r.project_id,
+       coalesce(array_agg(distinct pe.ecosystem_id)
+                filter (where pe.ecosystem_id is not null), '{}') AS ecosystem_ids,
+       count(r.id)                                                AS reward_count,
+       round(sum(r.amount_usd_equivalent), 2)                     AS usd_total,
+       count(DISTINCT date_trunc('month'::text, r.requested_at))  AS rewarded_month_count
+FROM public_received_rewards r
+         LEFT JOIN projects_ecosystems pe ON pe.project_id = r.project_id
+GROUP BY r.project_id, r.recipient_id
+;
+
+
 -- RE-CREATE global_users_ranks without any modification
 create materialized view global_users_ranks AS
 with ranks as (select coalesce(c.github_user_id, rr.github_user_id, rs.github_user_id) as github_user_id,

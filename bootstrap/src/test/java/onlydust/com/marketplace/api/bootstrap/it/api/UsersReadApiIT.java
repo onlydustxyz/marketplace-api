@@ -986,15 +986,15 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             }
                           ],
                           "earnings": {
-                            "totalEarnedUsd": 2692632.50,
+                            "totalEarnedUsd": 906865.00,
                             "perProject": [
                               {
                                 "projectName": "kaaper",
-                                "totalEarnedUsd": 1792080.00
+                                "totalEarnedUsd": 9090.00
                               },
                               {
                                 "projectName": "kaaper 3",
-                                "totalEarnedUsd": 2525.00
+                                "totalEarnedUsd": 1515.00
                               },
                               {
                                 "projectName": "Pizzeria Yoshi !",
@@ -1003,10 +1003,6 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               {
                                 "projectName": "Marketplace 2",
                                 "totalEarnedUsd": 890990.00
-                              },
-                              {
-                                "projectName": "Aldébaran du Taureau",
-                                "totalEarnedUsd": 1767.50
                               },
                               {
                                 "projectName": "oscar's awesome project",
