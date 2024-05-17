@@ -9,6 +9,7 @@ import onlydust.com.marketplace.bff.read.entities.UserProfileProjectEarningsEnti
 import onlydust.com.marketplace.bff.read.entities.UserWeeklyStatsEntity;
 import onlydust.com.marketplace.bff.read.repositories.*;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
@@ -56,7 +57,7 @@ public class ReadUsersApiPostgresAdapter implements ReadUsersApi {
 
     @Override
     public ResponseEntity<UserProfileEcosystemPage> getUserProfileStatsPerEcosystems(Long githubId, Integer pageIndex, Integer pageSize) {
-        final var page = userProfileEcosystemPageItemEntityRepository.findByContributorId(githubId, PageRequest.of(pageIndex, pageSize));
+        final var page = userProfileEcosystemPageItemEntityRepository.findByContributorId(githubId, PageRequest.of(pageIndex, pageSize, Sort.by("rank")));
         return ok(new UserProfileEcosystemPage()
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
@@ -68,7 +69,7 @@ public class ReadUsersApiPostgresAdapter implements ReadUsersApi {
 
     @Override
     public ResponseEntity<UserProfileLanguagePage> getUserProfileStatsPerLanguages(Long githubId, Integer pageIndex, Integer pageSize) {
-        final var page = userProfileLanguagePageItemEntityRepository.findByContributorId(githubId, PageRequest.of(pageIndex, pageSize));
+        final var page = userProfileLanguagePageItemEntityRepository.findByContributorId(githubId, PageRequest.of(pageIndex, pageSize, Sort.by("rank")));
         return ok(new UserProfileLanguagePage()
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())

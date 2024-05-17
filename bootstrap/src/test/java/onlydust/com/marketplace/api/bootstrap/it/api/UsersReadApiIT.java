@@ -34,7 +34,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "totalPageNumber": 1,
-                          "totalItemNumber": 2,
+                          "totalItemNumber": 3,
                           "hasMore": false,
                           "nextPageIndex": 0,
                           "languages": [
@@ -42,9 +42,9 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "rank": 2,
                               "contributingStatus": "GREEN",
                               "contributedProjectCount": 4,
-                              "contributionCount": 28,
+                              "contributionCount": 207,
                               "rewardCount": 12,
-                              "totalEarnedUsd": 882740.00,
+                              "totalEarnedUsd": 10605.00,
                               "projects": [
                                 {
                                   "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
@@ -83,9 +83,9 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "rank": 3,
                               "contributingStatus": "GREEN",
                               "contributedProjectCount": 4,
-                              "contributionCount": 42,
+                              "contributionCount": 225,
                               "rewardCount": 10,
-                              "totalEarnedUsd": 8461120.00,
+                              "totalEarnedUsd": 1799150.00,
                               "projects": [
                                 {
                                   "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
@@ -119,6 +119,29 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": null,
                                 "bannerUrl": null
                               }
+                            },
+                            {
+                              "rank": 16,
+                              "contributingStatus": "GREEN",
+                              "contributedProjectCount": 1,
+                              "contributionCount": 9,
+                              "rewardCount": 0,
+                              "totalEarnedUsd": 0,
+                              "projects": [
+                                {
+                                  "id": "00490be6-2c03-4720-993b-aea3e07edd81",
+                                  "slug": "zama",
+                                  "name": "Zama",
+                                  "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M"
+                                }
+                              ],
+                              "language": {
+                                "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
+                                "name": "Cairo",
+                                "url": null,
+                                "logoUrl": null,
+                                "bannerUrl": null
+                              }
                             }
                           ]
                         }
@@ -140,23 +163,47 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 3,
-                          "hasMore": false,
-                          "nextPageIndex": 0,
+                          "totalPageNumber": 2,
+                          "totalItemNumber": 6,
+                          "hasMore": true,
+                          "nextPageIndex": 1,
                           "ecosystems": [
                             {
                               "rank": 1,
                               "contributingStatus": "GREEN",
-                              "contributedProjectCount": 1,
-                              "contributionCount": 88,
-                              "rewardCount": 14,
-                              "totalEarnedUsd": 1564155.00,
+                              "contributedProjectCount": 5,
+                              "contributionCount": 1045,
+                              "rewardCount": 0,
+                              "totalEarnedUsd": 0,
                               "projects": [
+                                {
+                                  "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                  "slug": "kaaper",
+                                  "name": "kaaper",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                  "slug": "mooooooonlight",
+                                  "name": "Mooooooonlight",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                },
                                 {
                                   "id": "90fb751a-1137-4815-b3c4-54927a5db059",
                                   "slug": "no-sponsors",
                                   "name": "No sponsors",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "dc60d963-4b5f-4a96-928c-8440b4657138",
+                                  "slug": "zero-title-4",
+                                  "name": "Zero title 4",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                                  "slug": "qa-new-contributions",
+                                  "name": "QA new contributions",
                                   "logoUrl": null
                                 }
                               ],
@@ -169,41 +216,42 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               }
                             },
                             {
-                              "rank": 10,
-                              "contributingStatus": "GREEN",
-                              "contributedProjectCount": 1,
-                              "contributionCount": 88,
-                              "rewardCount": 14,
-                              "totalEarnedUsd": 1564155.00,
-                              "projects": [
-                                {
-                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                                  "slug": "mooooooonlight",
-                                  "name": "Mooooooonlight",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
-                                }
-                              ],
-                              "ecosystem": {
-                                "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
-                                "name": "Starknet",
-                                "url": "https://www.starknet.io/en",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png",
-                                "bannerUrl": null
-                              }
-                            },
-                            {
                               "rank": 1,
                               "contributingStatus": "GREEN",
-                              "contributedProjectCount": 1,
-                              "contributionCount": 88,
-                              "rewardCount": 14,
-                              "totalEarnedUsd": 1564155.00,
+                              "contributedProjectCount": 5,
+                              "contributionCount": 1045,
+                              "rewardCount": 0,
+                              "totalEarnedUsd": 0,
                               "projects": [
+                                {
+                                  "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                  "slug": "kaaper",
+                                  "name": "kaaper",
+                                  "logoUrl": null
+                                },
                                 {
                                   "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
                                   "slug": "mooooooonlight",
                                   "name": "Mooooooonlight",
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                },
+                                {
+                                  "id": "90fb751a-1137-4815-b3c4-54927a5db059",
+                                  "slug": "no-sponsors",
+                                  "name": "No sponsors",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "dc60d963-4b5f-4a96-928c-8440b4657138",
+                                  "slug": "zero-title-4",
+                                  "name": "Zero title 4",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                                  "slug": "qa-new-contributions",
+                                  "name": "QA new contributions",
+                                  "logoUrl": null
                                 }
                               ],
                               "ecosystem": {
@@ -213,10 +261,79 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg",
                                 "bannerUrl": null
                               }
+                            },
+                            {
+                              "rank": 3,
+                              "contributingStatus": "ORANGE",
+                              "contributedProjectCount": 1,
+                              "contributionCount": 1,
+                              "rewardCount": 0,
+                              "totalEarnedUsd": 0,
+                              "projects": [
+                                {
+                                  "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                                  "slug": "bretzel",
+                                  "name": "Bretzel",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                                }
+                              ],
+                              "ecosystem": {
+                                "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                                "name": "Ethereum",
+                                "url": "https://ethereum.foundation/",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png",
+                                "bannerUrl": null
+                              }
+                            },
+                            {
+                              "rank": 3,
+                              "contributingStatus": "ORANGE",
+                              "contributedProjectCount": 1,
+                              "contributionCount": 1,
+                              "rewardCount": 0,
+                              "totalEarnedUsd": 0,
+                              "projects": [
+                                {
+                                  "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                                  "slug": "bretzel",
+                                  "name": "Bretzel",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                                }
+                              ],
+                              "ecosystem": {
+                                "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                                "name": "Aptos",
+                                "url": "https://aptosfoundation.org/",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png",
+                                "bannerUrl": null
+                              }
+                            },
+                            {
+                              "rank": 3,
+                              "contributingStatus": "ORANGE",
+                              "contributedProjectCount": 1,
+                              "contributionCount": 1,
+                              "rewardCount": 0,
+                              "totalEarnedUsd": 0,
+                              "projects": [
+                                {
+                                  "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                                  "slug": "bretzel",
+                                  "name": "Bretzel",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                                }
+                              ],
+                              "ecosystem": {
+                                "id": "b599313c-a074-440f-af04-a466529ab2e7",
+                                "name": "Zama",
+                                "url": "https://www.zama.ai/",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png",
+                                "bannerUrl": null
+                              }
                             }
                           ]
                         }
-                        """);
+                        """, true);
     }
 
     @Test
