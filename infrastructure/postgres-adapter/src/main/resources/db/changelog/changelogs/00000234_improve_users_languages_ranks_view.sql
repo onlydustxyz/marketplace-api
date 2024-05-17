@@ -115,21 +115,17 @@ select r.*,
        rsd.invoice_received_at,
        rsd.paid_at,
        rsd.networks,
-       array_agg(distinct c.id)                                                 as contribution_ids,
-       array_agg(distinct gr.id)                                                as repo_ids,
        coalesce(array_agg(distinct unnested.main_file_extensions)
                 filter (where unnested.main_file_extensions is not null), '{}') as main_file_extensions
 from rewards r
          join reward_items ri on ri.reward_id = r.id
-         join indexer_exp.contributions c
-              on ((CAST(c.pull_request_id AS TEXT) = ri.id
-                  or CAST(c.issue_id AS TEXT) = ri.id
-                  or c.code_review_id = ri.id)
-                  and c.contributor_id = ri.recipient_id)
-         join indexer_exp.github_repos gr on gr.id = c.repo_id and gr.visibility = 'PUBLIC'
-         join project_github_repos pgr on pgr.github_repo_id = gr.id
-         join projects p on p.id = pgr.project_id and p.visibility = 'PUBLIC'
+         join projects p on p.id = r.project_id and p.visibility = 'PUBLIC'
          join accounting.reward_status_data rsd ON rsd.reward_id = r.id
+         left join indexer_exp.contributions c
+                   on ((CAST(c.pull_request_id AS TEXT) = ri.id
+                       or CAST(c.issue_id AS TEXT) = ri.id
+                       or c.code_review_id = ri.id)
+                       and c.contributor_id = ri.recipient_id)
          left join unnest(c.main_file_extensions) unnested(main_file_extensions) on true
 group by r.id, rsd.reward_id;
 ;
