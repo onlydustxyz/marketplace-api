@@ -2112,6 +2112,237 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/committees:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackOfficeCommitteeManagement
+      summary: Get all committees
+      operationId: getCommittees
+      description: |
+        Get all committees.
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'List of committees'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommitteePageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackOfficeCommitteeManagement
+      summary: Create a committee
+      operationId: createCommittee
+      description: |
+        Create a committee.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommitteeRequest'
+      responses:
+        "200":
+          description: 'List of committees'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommitteeResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /bo/v1/committees/{committeeId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackOfficeCommitteeManagement
+      summary: Get a committee by id
+      operationId: getCommittee
+      description: |
+        Get a committee by id.
+      parameters:
+        - in: path
+          name: committeeId
+          required: true
+          schema:
+            $ref: '#/components/schemas/CommitteeId'
+      responses:
+        "200":
+          description: ' Get a committee by id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommitteeResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackOfficeCommitteeManagement
+      summary: Update committee
+      operationId: updateCommittee
+      description: |
+        Update committee.
+      parameters:
+        - in: path
+          name: committeeId
+          required: true
+          schema:
+            $ref: '#/components/schemas/CommitteeId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCommitteeRequest'
+      responses:
+        "200":
+          description: 'Updated committee'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommitteeResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /bo/v1/committees/{committeeId}/status:
+    patch:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackOfficeCommitteeManagement
+      summary: Update committee status
+      operationId: updateCommitteeStatus
+      description: |
+        Update committee status.
+      parameters:
+        - in: path
+          name: committeeId
+          required: true
+          schema:
+            $ref: '#/components/schemas/CommitteeId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCommitteeStatusRequest'
+      responses:
+        "204":
+          description: 'Committee updated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/committees/{committeeId}/allocations:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackOfficeCommitteeManagement
+      summary: Get committee budget allocations
+      operationId: getBudgetAllocations
+      description: |
+        Get committee budget allocations
+      parameters:
+        - in: path
+          name: committeeId
+          required: true
+          schema:
+            $ref: '#/components/schemas/CommitteeId'
+      responses:
+        "200":
+          description: 'Get committee budget allocations'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommitteeBudgetAllocationsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackOfficeCommitteeManagement
+      summary: Allocate budget to committee
+      operationId: allocateBudget
+      description: |
+        Allocate budget to committee
+      parameters:
+        - in: path
+          name: committeeId
+          required: true
+          schema:
+            $ref: '#/components/schemas/CommitteeId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommitteeBudgetAllocationsRequest'
+      responses:
+        "204":
+          description: 'Budget allocated to committee projects'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/committees/{committeeId}/projects/{projectId}/applications:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackOfficeCommitteeManagement
+      summary: Get project application for committee
+      operationId: getProjectApplication
+      description: |
+        Get project application for committee
+      parameters:
+        - in: path
+          name: committeeId
+          required: true
+          schema:
+            $ref: '#/components/schemas/CommitteeId'
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      responses:
+        "200":
+          description: 'Get project application for committee'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommitteeProjectApplicationResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
 components:
   securitySchemes:
@@ -4227,3 +4458,383 @@ components:
         endDate:
           type: string
           format: date-time
+
+    CommitteePageResponse:
+      required:
+        - totalPageNumber
+        - totalItemNumber
+        - hasMore
+        - nextPageIndex
+        - committees
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        committees:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommitteeLinkResponse'
+
+    CommitteeLinkResponse:
+      type: object
+      required:
+        - id
+        - name
+        - projectCount
+        - startDate
+        - endDate
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        projectCount:
+          type: integer
+        startDate:
+          type: string
+          format: 'date-time'
+        endDate:
+          type: string
+          format: 'date-time'
+        status:
+          $ref: '#/components/schemas/CommitteeStatus'
+
+    CommitteeStatus:
+      type: string
+      enum:
+        - DRAFT
+        - OPEN_TO_VOTES
+        - OPEN_FOR_REGISTRATIONS
+        - CLOSED
+
+    CreateCommitteeRequest:
+      type: object
+      required:
+        - name
+        - startDate
+        - endDate
+      properties:
+        name:
+          type: string
+        startDate:
+          type: string
+          format: 'date-time'
+        endDate:
+          type: string
+          format: 'date-time'
+
+    CommitteeId:
+      type: string
+      format: uuid
+
+    CommitteeResponse:
+      type: object
+      required:
+        - id
+        - name
+        - startDate
+        - endDate
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        startDate:
+          type: string
+          format: 'date-time'
+        endDate:
+          type: string
+          format: 'date-time'
+        sponsor:
+          $ref: '#/components/schemas/SponsorLinkResponse'
+        juryCount:
+          type: integer
+        voteCount:
+          type: integer
+        projectCount:
+          type: integer
+        completedAssignments:
+          type: integer
+        totalAssignments:
+          type: integer
+        juryMembers:
+          $ref: '#/components/schemas/JuryMemberResponse'
+        applications:
+          $ref: '#/components/schemas/ApplicationResponse'
+        projectQuestions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectQuestionResponse'
+        juryCriteria:
+          type: array
+          items:
+            $ref: '#/components/schemas/JuryCriteriaResponse'
+        allocationCurrency:
+          $ref: '#/components/schemas/ShortCurrencyResponse'
+        totalAllocationAmount:
+          type: number
+          format: int64
+        minimumAllocationAmount:
+          type: number
+          format: int64
+        maximumAllocationAmount:
+          type: number
+          format: int64
+
+    JuryMemberResponse:
+      type: object
+      required:
+        - user
+      properties:
+        user:
+          $ref: '#/components/schemas/UserLinkResponse'
+        projectAssigned:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectLinkResponse'
+        completedAssignments:
+          type: integer
+        totalAssignments:
+          type: integer
+
+    ApplicationResponse:
+      type: object
+      required:
+        - project
+        - applicant
+      properties:
+        project:
+          $ref: '#/components/schemas/ProjectLinkResponse'
+        applicant:
+          $ref: '#/components/schemas/UserLinkResponse'
+        score:
+          type: string
+        allocatedBudget:
+          type: number
+          format: int64
+
+    ProjectQuestionResponse:
+      type: object
+      required:
+        - id
+        - question
+        - required
+      properties:
+        id:
+          type: string
+          format: uuid
+        question:
+          type: string
+        required:
+          type: boolean
+
+    JuryCriteriaResponse:
+      type: object
+      required:
+        - id
+        - criteria
+      properties:
+        id:
+          type: string
+          format: uuid
+        criteria:
+          type: string
+
+    ProjectQuestionRequest:
+      type: object
+      required:
+        - question
+        - required
+      properties:
+        id:
+          type: string
+          format: uuid
+        question:
+          type: string
+        required:
+          type: boolean
+
+    JuryCriteriaRequest:
+      type: object
+      required:
+        - criteria
+      properties:
+        id:
+          type: string
+          format: uuid
+        criteria:
+          type: string
+
+    UpdateCommitteeRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        startDate:
+          type: string
+          format: 'date-time'
+        endDate:
+          type: string
+          format: 'date-time'
+        sponsorId:
+          $ref: '#/components/schemas/SponsorId'
+        voteCount:
+          type: integer
+        juryMemberIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserId'
+        projectQuestions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectQuestionRequest'
+        juryCriteria:
+          type: array
+          items:
+            $ref: '#/components/schemas/JuryCriteriaRequest'
+        allocationCurrencyId:
+          $ref: '#/components/schemas/CurrencyId'
+        totalAllocationAmount:
+          type: number
+          format: int64
+        minimumAllocationAmount:
+          type: number
+          format: int64
+        maximumAllocationAmount:
+          type: number
+          format: int64
+
+    UpdateCommitteeStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/CommitteeStatus'
+
+    CommitteeBudgetAllocationsResponse:
+      type: object
+      required:
+        - currency
+        - totalAllocationAmount
+        - projectAllocations
+      properties:
+        currency:
+          $ref: '#/components/schemas/ShortCurrencyResponse'
+        totalAllocationAmount:
+          type: number
+          format: int64
+        projectAllocations:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommitteeProjectAllocationLinkResponse'
+
+    CommitteeProjectAllocationLinkResponse:
+      type: object
+      required:
+        - project
+        - score
+        - allocation
+      properties:
+        project:
+          $ref: '#/components/schemas/ProjectLinkResponse'
+        score:
+          type: number
+        allocation:
+          type: number
+          format: int64
+
+    CommitteeBudgetAllocationsRequest:
+      type: object
+      required:
+        - currencyId
+        - allocations
+      properties:
+        currencyId:
+          $ref: '#/components/schemas/CurrencyId'
+        allocations:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommitteeProjectAllocationRequest'
+
+    CommitteeProjectAllocationRequest:
+      type: object
+      required:
+        - projectId
+        - amount
+      properties:
+        projectId:
+          $ref: '#/components/schemas/ProjectId'
+        amount:
+          type: number
+          format: int64
+
+    CommitteeProjectApplicationResponse:
+      type: object
+      required:
+        - project
+        - projectQuestions
+      properties:
+        project:
+          $ref: '#/components/schemas/ProjectLinkResponse'
+        allocatedAmount:
+          type: number
+          format: int64
+        allocationCurrency:
+          $ref: '#/components/schemas/ShortCurrencyResponse'
+        juryAnswers:
+          type: array
+          items:
+            $ref: '#/components/schemas/JuryAnswerResponse'
+        projectQuestions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectAnswerResponse'
+
+    ProjectAnswerResponse:
+      type: object
+      required:
+        - question
+      properties:
+        question:
+          type: string
+        answer:
+          type: string
+
+    JuryAnswerResponse:
+      type: object
+      required:
+        - jury
+      properties:
+        jury:
+          $ref: '#/components/schemas/UserLinkResponse'
+        totalScore:
+          type: number
+        answers:
+          $ref: '#/components/schemas/AnswerResponse'
+
+    AnswerResponse:
+      type: object
+      required:
+        - criteria
+        - score
+      properties:
+        criteria:
+          type: string
+        score:
+          type: number
+
+
+
