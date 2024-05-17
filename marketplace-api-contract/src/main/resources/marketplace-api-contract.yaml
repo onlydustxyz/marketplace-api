@@ -665,6 +665,68 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/me/committees/{committeeId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Get my committee assignments
+      operationId: getCommitteeAssignments
+      description: |
+        Get my committee assignments
+      parameters:
+        - in: path
+          name: committeeId
+          required: true
+          schema:
+            $ref: '#/components/schemas/CommitteeId'
+      responses:
+        "200":
+          description: 'Get my committee assignments.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyCommitteeAssignmentsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/me/committees/{committeeId}/projects/{projectId}:
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Vote for committee assignment
+      operationId: voteForCommitteeAssignment
+      description: |
+        Vote for committee assignment
+      parameters:
+        - in: path
+          name: committeeId
+          required: true
+          schema:
+            $ref: '#/components/schemas/CommitteeId'
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoteForCommitteeAssignmentRequest'
+      responses:
+        "204":
+          description: 'Vote for committee assignment.'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/technologies:
     get:
       tags:
@@ -3141,6 +3203,72 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/committees/{committeeId}/projects/applications:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Committees
+      summary: Get committee application
+      operationId: getApplication
+      description: |
+        Get committee application
+      parameters:
+        - in: path
+          name: committeeId
+          required: true
+          schema:
+            $ref: '#/components/schemas/CommitteeId'
+        - in: query
+          name: projectId
+          required: false
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      responses:
+        "200":
+          description: 'Committee application response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommitteeApplicationResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/committees/{committeeId}/projects/{projectId}/applications:
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Committees
+      summary: Create/Update project application for committee
+      operationId: createUpdateApplicationForCommittee
+      description: |
+        Create/Update project application for committee
+      parameters:
+        - in: path
+          name: committeeId
+          required: true
+          schema:
+            $ref: '#/components/schemas/CommitteeId'
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      responses:
+        "200":
+          description: 'Create/Update project application for committee'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommitteeApplicationRequest'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -3349,6 +3477,16 @@ components:
       format: int64
       description: Github installation ID
       example: 123456
+
+    CommitteeId:
+      type: string
+      format: uuid
+      description: OnlyDust committee ID
+
+    CommitteeQuestionId:
+      type: string
+      format: uuid
+      description: OnlyDust committee question ID
 
     Money:
       type: object
@@ -6792,3 +6930,147 @@ components:
       properties:
         name:
           type: string
+
+    CommitteeApplicationResponse:
+      type: object
+      required:
+        - projectQuestions
+        - status
+      properties:
+        projectQuestions:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommitteeProjectQuestionResponse'
+        projectInfos:
+          $ref: '#/components/schemas/CommitteeProjectInfosResponse'
+        status:
+          $ref: '#/components/schemas/CommitteeStatus'
+
+    CommitteeStatus:
+      type: string
+      enum:
+        - OPEN_TO_APPLICATIONS
+        - OPEN_TO_VOTES
+        - CLOSED
+
+    CommitteeProjectInfosResponse:
+      type: object
+      properties:
+        projectLeads:
+          type: array
+          items:
+            $ref: '#/components/schemas/RegisteredUserResponse'
+        longDescription:
+          type: string
+        shortDescription:
+          type: string
+        last3monthsMetrics:
+          $ref: '#/components/schemas/ProjectLast3MonthsMetricsResponse'
+
+    ProjectLast3MonthsMetricsResponse:
+      type: object
+      properties:
+        activeContributors:
+          type: integer
+        newContributors:
+          type: integer
+        contributorsRewarded:
+          type: integer
+        openIssues:
+          type: integer
+        contributionsCompleted:
+          type: integer
+        amountSentInUsd:
+          type: number
+          format: int64
+
+    CommitteeProjectQuestionResponse:
+      type: object
+      required:
+        - id
+        - question
+        - required
+      properties:
+        id:
+          type: string
+          format: uuid
+        question:
+          type: string
+        answer:
+          type: string
+        required:
+          type: boolean
+
+    CommitteeProjectAnswerRequest:
+      type: object
+      required:
+        - questionId
+        - answer
+      properties:
+        questionId:
+          $ref: '#/components/schemas/CommitteeQuestionId'
+        answer:
+          type: string
+
+    CommitteeApplicationRequest:
+      type: object
+      required:
+        - answers
+      properties:
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommitteeProjectAnswerRequest'
+
+    MyCommitteeAssignmentsResponse:
+      type: object
+      required:
+        - projectAssignments
+      properties:
+        projectAssignments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommitteeAssignmentResponse'
+
+    CommitteeAssignmentResponse:
+      type: object
+      required:
+        - project
+        - answers
+      properties:
+        score:
+          type: integer
+        project:
+          $ref: '#/components/schemas/CommitteeProjectInfosResponse'
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommitteeProjectQuestionResponse'
+        votes:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommitteeJuryVoteResponse'
+
+    CommitteeJuryVoteResponse:
+      type: object
+      required:
+        - question
+        - questionId
+      properties:
+        questionId:
+          $ref: '#/components/schemas/CommitteeQuestionId'
+        question:
+          type: string
+        vote:
+          type: integer
+
+    VoteForCommitteeAssignmentRequest:
+      type: object
+      required:
+        - questionId
+        - vote
+      properties:
+        questionId:
+          $ref: '#/components/schemas/CommitteeQuestionId'
+        vote:
+          type: integer
