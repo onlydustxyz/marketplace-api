@@ -60,4 +60,8 @@ public class Committee {
 
     public record ProjectQuestion(@NonNull String question, @NonNull Boolean required) {
     }
+
+    public record ProjectAnswer(@NonNull ProjectQuestion projectQuestion, String answer){}
+
+    public record Application(@NonNull UUID userId, @NonNull UUID projectId, @NonNull List<ProjectAnswer> answers){}
 }

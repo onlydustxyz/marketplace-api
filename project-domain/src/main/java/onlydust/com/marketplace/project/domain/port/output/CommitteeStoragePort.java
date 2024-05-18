@@ -15,4 +15,6 @@ public interface CommitteeStoragePort {
     Optional<CommitteeView> findById(Committee.Id committeeId);
 
     void updateStatus(Committee.Id committeeId, Committee.Status status);
+
+    void saveApplication(Committee.Id committeeId, Committee.Application application);
 }

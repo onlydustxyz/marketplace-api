@@ -3,7 +3,9 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.CommitteeStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoCommitteeQueryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeApplicationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoCommitteeQueryRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -22,6 +24,7 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
 
     private final CommitteeRepository committeeRepository;
     private final BoCommitteeQueryRepository boCommitteeQueryRepository;
+    private final CommitteeApplicationRepository committeeApplicationRepository;
 
     @Override
     @Transactional
@@ -50,5 +53,11 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     @Transactional
     public void updateStatus(Committee.Id committeeId, Committee.Status status) {
         committeeRepository.updateStatus(committeeId.value(), CommitteeStatusEntity.fromDomain(status).name());
+    }
+
+    @Override
+    @Transactional
+    public void saveApplication(Committee.Id committeeId, Committee.Application application) {
+        committeeApplicationRepository.save(CommitteeApplicationEntity.fromDomain(committeeId, application));
     }
 }

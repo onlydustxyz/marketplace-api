@@ -25,7 +25,6 @@ import java.util.UUID;
 @Data
 @Builder
 @Table(name = "committees", schema = "public")
-@EntityListeners(AuditingEntityListener.class)
 public class CommitteeEntity {
     @Id
     @EqualsAndHashCode.Include

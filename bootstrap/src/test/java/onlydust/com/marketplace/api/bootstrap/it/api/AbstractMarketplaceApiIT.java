@@ -153,6 +153,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String USER_LANGUAGES = "/api/v1/users/%d/languages";
     protected static final String USER_ECOSYSTEMS = "/api/v1/users/%d/ecosystems";
     protected static final String USER_STATS = "/api/v1/users/%d/stats";
+    protected static final String PUT_COMMITTEES_APPLICATIONS = "/api/v1/committees/%s/projects/%s/applications";
 
     private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
             .withDatabaseName("marketplace_db")

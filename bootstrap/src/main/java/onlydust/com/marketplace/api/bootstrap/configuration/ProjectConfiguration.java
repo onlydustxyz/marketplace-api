@@ -277,7 +277,9 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public CommitteeService committeeService(final CommitteeStoragePort committeeStoragePort){
-        return new CommitteeService(committeeStoragePort);
+    public CommitteeService committeeService(final CommitteeStoragePort committeeStoragePort,
+                                             final ProjectStoragePort projectStoragePort,
+                                             final PermissionService permissionService){
+        return new CommitteeService(committeeStoragePort, permissionService, projectStoragePort);
     }
 }

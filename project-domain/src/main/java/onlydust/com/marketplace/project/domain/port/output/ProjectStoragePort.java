@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
+import lombok.NonNull;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.model.*;
@@ -84,4 +85,6 @@ public interface ProjectStoragePort {
     void updateProjectsTags(Date now);
 
     void createCategory(ProjectCategory projectCategory);
+
+    boolean exists(UUID projectId);
 }

@@ -20,4 +20,6 @@ public interface CommitteeFacadePort {
     CommitteeView getCommitteeById(Committee.Id committeeId);
 
     void updateStatus(Committee.Id committeeId, Committee.Status status);
+
+    void createUpdateApplicationForCommittee(Committee.Id committeeId, Committee.Application application);
 }
