@@ -16,10 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
 import java.net.URI;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,33 +34,11 @@ public class BackofficeCommitteeManagementRestApi implements BackOfficeCommittee
             .logoUrl(URI.create("https://s2.coinmarketcap.com/static/img/coins/64x64/22691.png"))
             .decimals(5);
 
-    final UserLinkResponse pierre = new UserLinkResponse()
-            .githubUserId(16590657L)
-            .userId(UUID.fromString("fc92397c-3431-4a84-8054-845376b630a0"))
-            .avatarUrl("https://avatars.githubusercontent.com/u/16590657?v=4")
-            .login("PierreOucif");
-
-    final UserLinkResponse olivier = new UserLinkResponse()
-            .githubUserId(595505L)
-            .userId(UUID.fromString("e461c019-ba23-4671-9b6c-3a5a18748af9"))
-            .avatarUrl("https://avatars.githubusercontent.com/u/595505?v=4")
-            .login("ofux");
-
     final ProjectLinkResponse bretzel = new ProjectLinkResponse()
             .id(UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"))
             .name("Bretzel")
             .logoUrl("Bretzel")
             .slug("bretzel");
-
-    final ProjectLinkResponse barbicane = new ProjectLinkResponse()
-            .id(UUID.fromString("545a2fb2-0b2e-4b14-ac64-c750b338a685"))
-            .logoUrl("https://staging-onlydust-app-images.s3.eu-west-1.amazonaws.com/db1f4c8752147890915b764bf3db1baa.png")
-            .name("Barbicane")
-            .slug("barbicane");
-
-    final SponsorLinkResponse starknet = new SponsorLinkResponse()
-            .avatarUrl("https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png")
-            .name("Starknet Foundation");
 
     private final CommitteeFacadePort committeeFacadePort;
 
@@ -118,51 +93,8 @@ public class BackofficeCommitteeManagementRestApi implements BackOfficeCommittee
 
     @Override
     public ResponseEntity<Void> updateCommitteeStatus(UUID committeeId, UpdateCommitteeStatusRequest updateCommitteeStatusRequest) {
+        committeeFacadePort.updateStatus(Committee.Id.of(committeeId), BackOfficeCommitteeMapper.statusToDomain(updateCommitteeStatusRequest.getStatus()));
         return ResponseEntity.noContent().build();
-    }
-
-    private CommitteeResponse getCommitteeResponse() {
-        final CommitteeResponse committeeResponse = new CommitteeResponse();
-        committeeResponse.setAllocationCurrency(allocationCurrency);
-        committeeResponse.setApplications(List.of(
-                new ApplicationResponse()
-                        .applicant(pierre)
-                        .project(barbicane)
-                        .score(3)
-                        .allocatedBudget(BigDecimal.valueOf(10.2)),
-                new ApplicationResponse()
-                        .applicant(olivier)
-                        .project(bretzel)
-                        .score(2)
-                        .allocatedBudget(null)
-        ));
-        committeeResponse.setId(UUID.randomUUID());
-        committeeResponse.setEndDate(ZonedDateTime.of(2024, 6, 23, 0, 0, 0, 0, ZoneId.systemDefault()));
-        committeeResponse.setStartDate(ZonedDateTime.of(2024, 5, 31, 0, 0, 0, 0, ZoneId.systemDefault()));
-        committeeResponse.setCompletedAssignments(0);
-        committeeResponse.setName("Committee mock");
-        committeeResponse.setProjectCount(2);
-        committeeResponse.setProjectQuestions(getProjectQuestions());
-        committeeResponse.setTotalAssignments(2);
-        committeeResponse.setSponsor(starknet);
-        return committeeResponse;
-    }
-
-    private static List<ProjectQuestionResponse> getProjectQuestions() {
-        return List.of(
-                new ProjectQuestionResponse()
-                        .id(UUID.randomUUID())
-                        .required(false)
-                        .question("Quel est le meilleur langage de programmation ?"),
-                new ProjectQuestionResponse()
-                        .id(UUID.randomUUID())
-                        .required(true)
-                        .question("Mettons des merguez dans les couscous marocain ?"),
-                new ProjectQuestionResponse()
-                        .id(UUID.randomUUID())
-                        .required(true)
-                        .question("Trouves-tu les blagues de Grég drôles ?")
-        );
     }
 
     private static List<ProjectAnswerResponse> getProjectAnswers() {

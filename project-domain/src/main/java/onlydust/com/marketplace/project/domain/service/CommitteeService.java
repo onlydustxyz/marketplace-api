@@ -37,4 +37,9 @@ public class CommitteeService implements CommitteeFacadePort {
         return committeeStoragePort.findById(committeeId)
                 .orElseThrow(() -> OnlyDustException.notFound("Committee %s was not found".formatted(committeeId.value().toString())));
     }
+
+    @Override
+    public void updateStatus(Committee.Id committeeId, Committee.Status status) {
+        committeeStoragePort.updateStatus(committeeId, status);
+    }
 }

@@ -13,4 +13,6 @@ public interface CommitteeStoragePort {
     Page<CommitteeLinkView> findAll(Integer pageIndex, Integer pageSize);
 
     Optional<CommitteeView> findById(Committee.Id committeeId);
+
+    void updateStatus(Committee.Id committeeId, Committee.Status status);
 }

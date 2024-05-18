@@ -254,9 +254,24 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
     @Order(4)
     void should_update_committee_status() {
         // Given
+        final CommitteeEntity committeeEntity = committeeRepository.findAll().get(1);
 
         // When
+        client.patch()
+                .uri(getApiURI(COMMITTEES_STATUS.formatted(committeeEntity.getId())))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                            {
+                              "status": "OPEN_TO_VOTES"
+                            }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(204);
 
-        // Then
+        final CommitteeEntity updatedCommitteeEntity = committeeRepository.findById(committeeEntity.getId()).orElseThrow();
+        assertEquals("OPEN_TO_VOTES", updatedCommitteeEntity.getStatus().name());
     }
 }
