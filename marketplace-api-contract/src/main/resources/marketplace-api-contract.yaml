@@ -6988,13 +6988,9 @@ components:
     CommitteeProjectQuestionResponse:
       type: object
       required:
-        - id
         - question
         - required
       properties:
-        id:
-          type: string
-          format: uuid
         question:
           type: string
         answer:

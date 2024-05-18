@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.CommitteeApplicationRequest;
+import onlydust.com.marketplace.api.contract.model.CommitteeApplicationResponse;
 import onlydust.com.marketplace.api.contract.model.CommitteeProjectAnswerRequest;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
@@ -17,8 +18,11 @@ import org.springframework.web.reactive.function.BodyInserters;
 
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CommitteeApiIT extends AbstractMarketplaceApiIT {
@@ -33,16 +37,38 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
     @Order(1)
     void should_get_not_existing_application() {
         // Given
-        final Committee committee = committeeFacadePort.createCommittee(faker.rickAndMorty().character(),
+        Committee committee = committeeFacadePort.createCommittee(faker.rickAndMorty().character(),
                 faker.date().past(5, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()),
                 faker.date().future(5, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()));
         committeeId = committee.id();
-        committeeFacadePort.updateStatus(committeeId, Committee.Status.OPEN_TO_APPLICATIONS);
+        committee = committee.toBuilder().status(Committee.Status.OPEN_TO_APPLICATIONS).build();
+        committee.projectQuestions().addAll(
+                List.of(
+                        new Committee.ProjectQuestion("Q1", false),
+                        new Committee.ProjectQuestion("Q2", true)
+                )
+        );
+        committeeFacadePort.update(committee);
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
 
         // When
+        final CommitteeApplicationResponse committeeApplicationResponse = client.get()
+                .uri(getApiURI(COMMITTEES_APPLICATIONS.formatted(committeeId)))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(CommitteeApplicationResponse.class)
+                .returnResult().getResponseBody();
 
-        // Then
+        assertEquals(Committee.Status.OPEN_TO_APPLICATIONS.name(), committeeApplicationResponse.getStatus().name());
+        assertEquals("Q1", committeeApplicationResponse.getProjectQuestions().get(0).getQuestion());
+        assertEquals(false, committeeApplicationResponse.getProjectQuestions().get(0).getRequired());
+        assertEquals(null, committeeApplicationResponse.getProjectQuestions().get(0).getAnswer());
+        assertEquals("Q2", committeeApplicationResponse.getProjectQuestions().get(1).getQuestion());
+        assertEquals(true, committeeApplicationResponse.getProjectQuestions().get(1).getRequired());
+        assertEquals(null, committeeApplicationResponse.getProjectQuestions().get(1).getAnswer());
     }
 
     @Autowired
@@ -55,19 +81,22 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         projectLeadRepository.save(new ProjectLeadEntity(bretzel, pierre.user().getId()));
         final CommitteeApplicationRequest committeeApplicationRequest = new CommitteeApplicationRequest();
+        final CommitteeProjectAnswerRequest answerRequest1 = new CommitteeProjectAnswerRequest()
+                .answer(faker.pokemon().name())
+                .question(faker.lordOfTheRings().character())
+                .required(false);
+        final CommitteeProjectAnswerRequest answerRequest2 = new CommitteeProjectAnswerRequest()
+                .answer(faker.pokemon().name())
+                .question(faker.lordOfTheRings().character())
+                .required(true);
+        final CommitteeProjectAnswerRequest answerRequest3 = new CommitteeProjectAnswerRequest()
+                .answer(null)
+                .question(faker.lordOfTheRings().character())
+                .required(false);
         committeeApplicationRequest.setAnswers(List.of(
-                new CommitteeProjectAnswerRequest()
-                        .answer(faker.pokemon().name())
-                        .question(faker.lordOfTheRings().character())
-                        .required(false),
-                new CommitteeProjectAnswerRequest()
-                        .answer(faker.pokemon().name())
-                        .question(faker.lordOfTheRings().character())
-                        .required(true),
-                new CommitteeProjectAnswerRequest()
-                        .answer(null)
-                        .question(faker.lordOfTheRings().character())
-                        .required(false)
+                answerRequest1,
+                answerRequest2,
+                answerRequest3
         ));
 
         // When
@@ -81,6 +110,73 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(204);
 
+        // When
+        final CommitteeApplicationResponse committeeApplicationResponse = client.get()
+                .uri(getApiURI(COMMITTEES_APPLICATIONS.formatted(committeeId), Map.of("projectId", bretzel.toString())))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(CommitteeApplicationResponse.class)
+                .returnResult().getResponseBody();
+
+        assertEquals(Committee.Status.OPEN_TO_APPLICATIONS.name(), committeeApplicationResponse.getStatus().name());
+        assertEquals(answerRequest1.getQuestion(), committeeApplicationResponse.getProjectQuestions().get(0).getQuestion());
+        assertEquals(answerRequest1.getRequired(), committeeApplicationResponse.getProjectQuestions().get(0).getRequired());
+        assertEquals(answerRequest1.getAnswer(), committeeApplicationResponse.getProjectQuestions().get(0).getAnswer());
+        assertEquals(answerRequest2.getQuestion(), committeeApplicationResponse.getProjectQuestions().get(1).getQuestion());
+        assertEquals(answerRequest2.getRequired(), committeeApplicationResponse.getProjectQuestions().get(1).getRequired());
+        assertEquals(answerRequest2.getAnswer(), committeeApplicationResponse.getProjectQuestions().get(1).getAnswer());
+        assertEquals(answerRequest3.getQuestion(), committeeApplicationResponse.getProjectQuestions().get(2).getQuestion());
+        assertEquals(answerRequest3.getRequired(), committeeApplicationResponse.getProjectQuestions().get(2).getRequired());
+        assertEquals(answerRequest3.getAnswer(), committeeApplicationResponse.getProjectQuestions().get(2).getAnswer());
+
+
+        client.get()
+                .uri(getApiURI(COMMITTEES_APPLICATIONS.formatted(committeeId), Map.of("projectId", bretzel.toString())))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                          {
+                           "projectInfos": {
+                              "projectLeads": [
+                                {
+                                  "githubUserId": 98735421,
+                                  "login": "pacovilletard",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/98735421?v=4",
+                                  "id": "f20e6812-8de8-432b-9c31-2920434fe7d0"
+                                },
+                                {
+                                  "githubUserId": 8642470,
+                                  "login": "gregcha",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                                  "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                                },
+                                {
+                                  "githubUserId": 16590657,
+                                  "login": "PierreOucif",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                  "id": "fc92397c-3431-4a84-8054-845376b630a0"
+                                }
+                              ],
+                              "longDescription": "[Bretzel](http://bretzel.club/) is your best chance to match with your secret crush      \\nEver liked someone but never dared to tell them?      \\n      \\n**Bretzel** is your chance to match with your secret crush      \\nAll you need is a LinkedIn profile.      \\n      \\n1. **Turn LinkedIn into a bretzel party:** Switch the bretzel mode ON — you'll see bretzels next to everyone. Switch it OFF anytime.      \\n2. **Give your bretzels under the radar:** Give a bretzel to your crush, they will never know about it, unless they give you a bretzel too. Maybe they already have?      \\n3. **Ooh la la, it's a match!**  You just got bretzel’d! See all your matches in a dedicated space, and start chatting!",
+                              "shortDescription": "A project for people who love fruits",
+                              "last3monthsMetrics": {
+                                "activeContributors": 0,
+                                "newContributors": 0,
+                                "contributorsRewarded": 0,
+                                "openIssues": 0,
+                                "contributionsCompleted": 0,
+                                "amountSentInUsd": 0.0
+                              }
+                            }
+                        }
+                          """);
     }
 
 

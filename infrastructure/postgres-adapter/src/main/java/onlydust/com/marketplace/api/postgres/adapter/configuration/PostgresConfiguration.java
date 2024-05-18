@@ -60,7 +60,8 @@ public class PostgresConfiguration {
                                                  final ContributionViewEntityRepository contributionViewEntityRepository,
                                                  final HiddenContributorRepository hiddenContributorRepository,
                                                  final ProjectTagRepository projectTagRepository,
-                                                 final ProjectCategoryRepository projectCategoryRepository) {
+                                                 final ProjectCategoryRepository projectCategoryRepository,
+                                                 final ProjectInfosViewRepository projectInfosViewRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -80,7 +81,8 @@ public class PostgresConfiguration {
                 contributionViewEntityRepository,
                 hiddenContributorRepository,
                 projectTagRepository,
-                projectCategoryRepository
+                projectCategoryRepository,
+                projectInfosViewRepository
         );
     }
 
@@ -103,7 +105,8 @@ public class PostgresConfiguration {
                                                            final ContributionViewEntityRepository contributionViewEntityRepository,
                                                            final HiddenContributorRepository hiddenContributorRepository,
                                                            final ProjectTagRepository projectTagRepository,
-                                                           final ProjectCategoryRepository projectCategoryRepository) {
+                                                           final ProjectCategoryRepository projectCategoryRepository,
+                                                           final ProjectInfosViewRepository projectInfosViewRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -123,7 +126,8 @@ public class PostgresConfiguration {
                 contributionViewEntityRepository,
                 hiddenContributorRepository,
                 projectTagRepository,
-                projectCategoryRepository
+                projectCategoryRepository,
+                projectInfosViewRepository
         );
     }
 

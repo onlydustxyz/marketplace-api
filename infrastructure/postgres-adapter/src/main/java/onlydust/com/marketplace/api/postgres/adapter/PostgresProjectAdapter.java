@@ -64,6 +64,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final HiddenContributorRepository hiddenContributorRepository;
     private final ProjectTagRepository projectTagRepository;
     private final ProjectCategoryRepository projectCategoryRepository;
+    private final ProjectInfosViewRepository projectInfosViewRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -525,5 +526,10 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Transactional(readOnly = true)
     public boolean exists(UUID projectId) {
         return projectRepository.existsById(projectId);
+    }
+
+    @Override
+    public CommitteeApplicationView.ProjectInfosView getProjectInfos(UUID projectId) {
+        return projectInfosViewRepository.findByProjectId(projectId).toView();
     }
 }

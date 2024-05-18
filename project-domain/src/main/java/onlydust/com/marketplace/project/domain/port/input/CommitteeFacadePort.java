@@ -3,10 +3,13 @@ package onlydust.com.marketplace.project.domain.port.input;
 import lombok.NonNull;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.view.CommitteeApplicationView;
 import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
 import onlydust.com.marketplace.project.domain.view.CommitteeView;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface CommitteeFacadePort {
     Committee createCommittee(@NonNull String name,
@@ -22,4 +25,6 @@ public interface CommitteeFacadePort {
     void updateStatus(Committee.Id committeeId, Committee.Status status);
 
     void createUpdateApplicationForCommittee(Committee.Id committeeId, Committee.Application application);
+
+    CommitteeApplicationView getCommitteeApplication(Committee.Id committeeId, Optional<UUID> projectId, UUID userId);
 }

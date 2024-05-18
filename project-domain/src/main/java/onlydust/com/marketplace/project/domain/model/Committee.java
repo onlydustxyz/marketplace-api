@@ -13,7 +13,7 @@ import java.util.UUID;
 @Value
 @Accessors(fluent = true)
 @EqualsAndHashCode
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Committee {
 

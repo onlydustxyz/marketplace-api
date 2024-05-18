@@ -5,6 +5,7 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
+import onlydust.com.marketplace.project.domain.view.CommitteeApplicationView;
 import onlydust.com.marketplace.project.domain.view.CommitteeView;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -119,7 +121,7 @@ public class CommitteeServiceTest {
             when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
                     .name(faker.rickAndMorty().location())
                     .id(committeeId)
-                    .status(Committee.Status.DRAFT)
+                    .status(Committee.Status.OPEN_TO_APPLICATIONS)
                     .startDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .endDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .build()));
@@ -143,7 +145,7 @@ public class CommitteeServiceTest {
             when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
                     .name(faker.rickAndMorty().location())
                     .id(committeeId)
-                    .status(Committee.Status.DRAFT)
+                    .status(Committee.Status.OPEN_TO_APPLICATIONS)
                     .startDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .endDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .build()));
@@ -208,5 +210,129 @@ public class CommitteeServiceTest {
         }
 
 
+    }
+
+    @Test
+    void should_get_applications_given_creation() {
+        // Given
+        final Committee.Id committeeId = Committee.Id.random();
+        final UUID userId = UUID.randomUUID();
+        final UUID projectId = UUID.randomUUID();
+        final CommitteeApplicationView.ProjectInfosView projectInfosView = new CommitteeApplicationView.ProjectInfosView(faker.rickAndMorty().character(),
+                faker.rickAndMorty().location(), List.of(), 1,
+                BigDecimal.ONE, 2, 4, 6, 8);
+        final CommitteeView committeeView = CommitteeView.builder()
+                .name(faker.rickAndMorty().location())
+                .id(committeeId)
+                .status(Committee.Status.OPEN_TO_APPLICATIONS)
+                .startDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .endDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .projectQuestions(List.of(
+                        new Committee.ProjectQuestion("Q1", false),
+                        new Committee.ProjectQuestion("Q2", true)
+                ))
+                .build();
+
+        // When
+        when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(committeeView));
+        when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(true);
+        when(projectStoragePort.exists(projectId)).thenReturn(true);
+        when(committeeStoragePort.getApplicationAnswers(committeeId, projectId, userId))
+                .thenReturn(List.of());
+        when(projectStoragePort.getProjectInfos(projectId))
+                .thenReturn(projectInfosView);
+        final CommitteeApplicationView committeeApplication = committeeService.getCommitteeApplication(committeeId, Optional.of(projectId), userId);
+
+        // Then
+        assertEquals(projectInfosView, committeeApplication.projectInfosView());
+        assertEquals(committeeView.status(), committeeApplication.status());
+        assertEquals(2, committeeApplication.answers().size());
+        assertEquals("Q1", committeeApplication.answers().get(0).projectQuestion().question());
+        assertEquals(false, committeeApplication.answers().get(0).projectQuestion().required());
+        assertNull(committeeApplication.answers().get(0).answer());
+        assertEquals("Q2", committeeApplication.answers().get(1).projectQuestion().question());
+        assertEquals(true, committeeApplication.answers().get(1).projectQuestion().required());
+        assertNull(committeeApplication.answers().get(1).answer());
+    }
+
+    @Test
+    void should_get_applications_given_update() {
+        // Given
+        final Committee.Id committeeId = Committee.Id.random();
+        final UUID userId = UUID.randomUUID();
+        final UUID projectId = UUID.randomUUID();
+        final CommitteeApplicationView.ProjectInfosView projectInfosView = new CommitteeApplicationView.ProjectInfosView(faker.rickAndMorty().character(),
+                faker.rickAndMorty().location(), List.of(), 1,
+                BigDecimal.ONE, 2, 4, 6, 8);
+        final CommitteeView committeeView = CommitteeView.builder()
+                .name(faker.rickAndMorty().location())
+                .id(committeeId)
+                .status(Committee.Status.OPEN_TO_APPLICATIONS)
+                .startDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .endDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .projectQuestions(List.of(
+                        new Committee.ProjectQuestion("Q1", false),
+                        new Committee.ProjectQuestion("Q2", true)
+                ))
+                .build();
+
+        // When
+        when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(committeeView));
+        when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(true);
+        when(projectStoragePort.exists(projectId)).thenReturn(true);
+        when(committeeStoragePort.getApplicationAnswers(committeeId, projectId, userId))
+                .thenReturn(List.of(
+                        new Committee.ProjectAnswer(new Committee.ProjectQuestion("Q3", true), "A3"),
+                        new Committee.ProjectAnswer(new Committee.ProjectQuestion("Q4", false), "A4")
+                ));
+        when(projectStoragePort.getProjectInfos(projectId))
+                .thenReturn(projectInfosView);
+        final CommitteeApplicationView committeeApplication = committeeService.getCommitteeApplication(committeeId, Optional.of(projectId), userId);
+
+        // Then
+        assertEquals(projectInfosView, committeeApplication.projectInfosView());
+        assertEquals(committeeView.status(), committeeApplication.status());
+        assertEquals(2, committeeApplication.answers().size());
+        assertEquals("Q3", committeeApplication.answers().get(0).projectQuestion().question());
+        assertEquals(true, committeeApplication.answers().get(0).projectQuestion().required());
+        assertEquals("A3", committeeApplication.answers().get(0).answer());
+        assertEquals("Q4", committeeApplication.answers().get(1).projectQuestion().question());
+        assertEquals(false, committeeApplication.answers().get(1).projectQuestion().required());
+        assertEquals("A4", committeeApplication.answers().get(1).answer());
+    }
+
+
+    @Test
+    void should_get_application_project_questions() {
+        // Given
+        final Committee.Id committeeId = Committee.Id.random();
+        final UUID userId = UUID.randomUUID();
+        final CommitteeView committeeView = CommitteeView.builder()
+                .name(faker.rickAndMorty().location())
+                .id(committeeId)
+                .status(Committee.Status.OPEN_TO_APPLICATIONS)
+                .startDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .endDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .projectQuestions(List.of(
+                        new Committee.ProjectQuestion("Q1", false),
+                        new Committee.ProjectQuestion("Q2", true)
+                ))
+                .build();
+
+        // When
+        when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(committeeView));
+        final CommitteeApplicationView committeeApplication = committeeService.getCommitteeApplication(committeeId, Optional.empty(), userId);
+
+        // Then
+        assertNull(committeeApplication.projectInfosView());
+        assertEquals(committeeView.status(), committeeApplication.status());
+        assertEquals(2, committeeApplication.answers().size());
+        assertEquals("Q1", committeeApplication.answers().get(0).projectQuestion().question());
+        assertEquals(false, committeeApplication.answers().get(0).projectQuestion().required());
+        assertNull(committeeApplication.answers().get(0).answer());
+        assertEquals("Q2", committeeApplication.answers().get(1).projectQuestion().question());
+        assertEquals(true, committeeApplication.answers().get(1).projectQuestion().required());
+        assertNull(committeeApplication.answers().get(1).answer());
+        verifyNoInteractions(projectStoragePort);
     }
 }

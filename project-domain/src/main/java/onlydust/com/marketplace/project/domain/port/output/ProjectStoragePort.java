@@ -87,4 +87,6 @@ public interface ProjectStoragePort {
     void createCategory(ProjectCategory projectCategory);
 
     boolean exists(UUID projectId);
+
+    CommitteeApplicationView.ProjectInfosView getProjectInfos(UUID projectId);
 }

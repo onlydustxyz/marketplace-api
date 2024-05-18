@@ -17,7 +17,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @AllArgsConstructor
 public class PostgresCommitteeAdapter implements CommitteeStoragePort {
@@ -59,5 +61,16 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     @Transactional
     public void saveApplication(Committee.Id committeeId, Committee.Application application) {
         committeeApplicationRepository.save(CommitteeApplicationEntity.fromDomain(committeeId, application));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Committee.ProjectAnswer> getApplicationAnswers(Committee.Id committeeId, UUID projectId, UUID userId) {
+        return committeeApplicationRepository.findByCommitteeIdAndProjectIdAndUserId(committeeId.value(), projectId, userId)
+                .map(committeeApplicationEntity -> committeeApplicationEntity.getAnswers()
+                        .stream().map(applicationAnswerJsonEntity -> new Committee.ProjectAnswer(
+                                new Committee.ProjectQuestion(applicationAnswerJsonEntity.question(), applicationAnswerJsonEntity.required()),
+                                applicationAnswerJsonEntity.answer())).toList())
+                .orElse(List.of());
     }
 }
