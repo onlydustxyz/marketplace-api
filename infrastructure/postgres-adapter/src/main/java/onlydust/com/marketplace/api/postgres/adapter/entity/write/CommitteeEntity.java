@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -35,6 +36,8 @@ public class CommitteeEntity {
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "committee_status")
     Status status;
+    @Column(insertable = false, updatable = false)
+    Date techCreatedAt;
 
     public static CommitteeEntity fromDomain(final Committee committee) {
         return CommitteeEntity.builder()
@@ -56,15 +59,25 @@ public class CommitteeEntity {
                 .build();
     }
 
+    public CommitteeLinkView toLink() {
+        return CommitteeLinkView.builder()
+                .id(Committee.Id.of(this.id))
+                .name(this.name)
+                .startDate(ZonedDateTime.ofInstant(startDate.toInstant(), ZoneOffset.UTC))
+                .endDate(ZonedDateTime.ofInstant(endDate.toInstant(), ZoneOffset.UTC))
+                .status(this.status.toDomain())
+                .build();
+    }
+
     public enum Status {
-        DRAFT, OPEN_FOR_APPLICATIONS, OPEN_FOR_VOTES, CLOSED;
+        DRAFT, OPEN_TO_APPLICATIONS, OPEN_TO_VOTES, CLOSED;
 
         public static Status fromDomain(final Committee.Status status) {
             return switch (status) {
                 case DRAFT -> DRAFT;
                 case CLOSED -> CLOSED;
-                case OPEN_FOR_VOTES -> OPEN_FOR_VOTES;
-                case OPEN_FOR_APPLICATIONS -> OPEN_FOR_APPLICATIONS;
+                case OPEN_TO_VOTES -> OPEN_TO_VOTES;
+                case OPEN_TO_APPLICATIONS -> OPEN_TO_APPLICATIONS;
             };
         }
 
@@ -72,8 +85,8 @@ public class CommitteeEntity {
             return switch (this) {
                 case DRAFT -> Committee.Status.DRAFT;
                 case CLOSED -> Committee.Status.CLOSED;
-                case OPEN_FOR_VOTES -> Committee.Status.OPEN_FOR_VOTES;
-                case OPEN_FOR_APPLICATIONS -> Committee.Status.OPEN_FOR_APPLICATIONS;
+                case OPEN_TO_VOTES -> Committee.Status.OPEN_TO_VOTES;
+                case OPEN_TO_APPLICATIONS -> Committee.Status.OPEN_TO_APPLICATIONS;
             };
         }
     }

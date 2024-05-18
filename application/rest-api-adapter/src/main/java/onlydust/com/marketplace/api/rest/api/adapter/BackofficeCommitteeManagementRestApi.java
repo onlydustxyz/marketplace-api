@@ -5,8 +5,13 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackOfficeCommitteeManagementApi;
 import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeCommitteeMapper;
+import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
+import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,7 +22,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.CommitteeMapper.toCommitteeResponse;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeCommitteeMapper.toCommitteeResponse;
 
 @RestController
 @Tags(@Tag(name = "BackofficeCommitteeManagement"))
@@ -85,45 +90,13 @@ public class BackofficeCommitteeManagementRestApi implements BackOfficeCommittee
 
     @Override
     public ResponseEntity<CommitteePageResponse> getCommittees(Integer pageIndex, Integer pageSize) {
-        if (pageIndex == 0) {
-            return ResponseEntity.ok(new CommitteePageResponse()
-                    .committees(List.of(
-                            new CommitteeLinkResponse()
-                                    .name("Committee 1")
-                                    .id(UUID.randomUUID())
-                                    .status(CommitteeStatus.DRAFT)
-                                    .projectCount(3)
-                                    .endDate(ZonedDateTime.of(2024, 6, 23, 0, 0, 0, 0, ZoneId.systemDefault()))
-                                    .startDate(ZonedDateTime.of(2024, 2, 23, 0, 0, 0, 0, ZoneId.systemDefault())),
-                            new CommitteeLinkResponse()
-                                    .name("Committee 2")
-                                    .id(UUID.randomUUID())
-                                    .status(CommitteeStatus.OPEN_FOR_REGISTRATIONS)
-                                    .projectCount(1)
-                                    .endDate(ZonedDateTime.of(2024, 7, 23, 0, 0, 0, 0, ZoneId.systemDefault()))
-                                    .startDate(ZonedDateTime.of(2024, 5, 23, 0, 0, 0, 0, ZoneId.systemDefault()))
-                    ))
-                    .hasMore(true)
-                    .nextPageIndex(1)
-                    .totalItemNumber(3)
-                    .totalPageNumber(2)
-            );
-        } else {
-            return ResponseEntity.ok(new CommitteePageResponse()
-                    .committees(List.of(
-                            new CommitteeLinkResponse()
-                                    .name("Committee 3")
-                                    .id(UUID.randomUUID())
-                                    .status(CommitteeStatus.CLOSED)
-                                    .projectCount(5)
-                                    .endDate(ZonedDateTime.of(2024, 6, 23, 0, 0, 0, 0, ZoneId.systemDefault()))
-                                    .startDate(ZonedDateTime.of(2024, 2, 23, 0, 0, 0, 0, ZoneId.systemDefault()))
-                    ))
-                    .hasMore(false)
-                    .nextPageIndex(1)
-                    .totalItemNumber(3)
-                    .totalPageNumber(2));
-        }
+        final int sanitizePageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
+        final int sanitizePageSize = PaginationHelper.sanitizePageSize(pageSize);
+        final Page<CommitteeLinkView> page = committeeFacadePort.getCommittees(sanitizePageIndex, sanitizePageSize);
+        final CommitteePageResponse committeePageResponse = BackOfficeCommitteeMapper.toCommitteePageResponse(page, sanitizePageIndex);
+        return committeePageResponse.getTotalPageNumber() > 1 ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(committeePageResponse) :
+                ResponseEntity.ok(committeePageResponse);
     }
 
     @Override

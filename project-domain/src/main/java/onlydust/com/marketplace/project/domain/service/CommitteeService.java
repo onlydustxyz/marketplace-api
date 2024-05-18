@@ -2,9 +2,11 @@ package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
+import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
 
 import java.time.ZonedDateTime;
 
@@ -16,5 +18,10 @@ public class CommitteeService implements CommitteeFacadePort {
     @Override
     public Committee createCommittee(@NonNull String name, @NonNull ZonedDateTime startDate, @NonNull ZonedDateTime endDate) {
         return committeeStoragePort.save(new Committee(name, startDate, endDate));
+    }
+
+    @Override
+    public Page<CommitteeLinkView> getCommittees(Integer pageIndex, Integer pageSize) {
+        return committeeStoragePort.findAll(pageIndex, pageSize);
     }
 }

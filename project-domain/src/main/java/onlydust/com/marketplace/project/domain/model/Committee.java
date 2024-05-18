@@ -49,6 +49,6 @@ public class Committee {
 
 
     public enum Status {
-        DRAFT, OPEN_FOR_APPLICATIONS, OPEN_FOR_VOTES, CLOSED
+        DRAFT, OPEN_TO_APPLICATIONS, OPEN_TO_VOTES, CLOSED
     }
 }

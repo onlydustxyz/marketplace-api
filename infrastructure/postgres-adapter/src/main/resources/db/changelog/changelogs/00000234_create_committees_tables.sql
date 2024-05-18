@@ -1,7 +1,7 @@
 CREATE TYPE committee_status AS ENUM (
     'DRAFT',
-    'OPEN_FOR_APPLICATIONS',
-    'OPEN_FOR_VOTES',
+    'OPEN_TO_APPLICATIONS',
+    'OPEN_TO_VOTES',
     'CLOSED'
     );
 

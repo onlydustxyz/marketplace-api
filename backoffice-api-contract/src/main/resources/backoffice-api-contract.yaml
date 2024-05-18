@@ -4512,7 +4512,7 @@ components:
       enum:
         - DRAFT
         - OPEN_TO_VOTES
-        - OPEN_FOR_REGISTRATIONS
+        - OPEN_TO_APPLICATIONS
         - CLOSED
 
     CreateCommitteeRequest:
