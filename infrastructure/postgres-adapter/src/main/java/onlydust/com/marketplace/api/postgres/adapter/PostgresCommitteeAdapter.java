@@ -1,20 +1,25 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoCommitteeQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoCommitteeQueryRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
+import onlydust.com.marketplace.project.domain.view.CommitteeView;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.JpaSort;
+
+import java.util.Optional;
 
 @AllArgsConstructor
 public class PostgresCommitteeAdapter implements CommitteeStoragePort {
 
     private final CommitteeRepository committeeRepository;
+    private final BoCommitteeQueryRepository boCommitteeQueryRepository;
 
     @Override
     public Committee save(Committee committee) {
@@ -29,5 +34,10 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
                 .totalPageNumber(committees.getTotalPages())
                 .totalItemNumber((int) committees.getTotalElements())
                 .build();
+    }
+
+    @Override
+    public Optional<CommitteeView> findById(Committee.Id committeeId) {
+        return boCommitteeQueryRepository.findById(committeeId.value()).map(BoCommitteeQueryEntity::toView);
     }
 }

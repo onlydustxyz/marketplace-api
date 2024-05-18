@@ -11,6 +11,7 @@ import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
 import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
+import onlydust.com.marketplace.project.domain.view.CommitteeView;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -85,7 +86,8 @@ public class BackofficeCommitteeManagementRestApi implements BackOfficeCommittee
 
     @Override
     public ResponseEntity<CommitteeResponse> getCommittee(UUID committeeId) {
-        return ResponseEntity.ok(getCommitteeResponse());
+        final CommitteeView committeeView = committeeFacadePort.getCommitteeById(Committee.Id.of(committeeId));
+        return ResponseEntity.ok(BackOfficeCommitteeMapper.toCommitteeResponse(committeeView));
     }
 
     @Override
@@ -109,8 +111,9 @@ public class BackofficeCommitteeManagementRestApi implements BackOfficeCommittee
     }
 
     @Override
-    public ResponseEntity<CommitteeResponse> updateCommittee(UUID committeeId, UpdateCommitteeRequest updateCommitteeRequest) {
-        return ResponseEntity.ok(getCommitteeResponse());
+    public ResponseEntity<Void> updateCommittee(UUID committeeId, UpdateCommitteeRequest updateCommitteeRequest) {
+        committeeFacadePort.update(BackOfficeCommitteeMapper.updateCommitteeRequestToDomain(committeeId, updateCommitteeRequest));
+        return ResponseEntity.noContent().build();
     }
 
     @Override

@@ -6,6 +6,8 @@ import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Value
@@ -25,6 +27,9 @@ public class Committee {
     ZonedDateTime endDate;
     @NonNull
     Status status;
+    @NonNull
+    List<ProjectQuestion> projectQuestions = new ArrayList<>();
+    UUID sponsorId;
 
     public Committee(@NonNull String name, @NonNull ZonedDateTime startDate, @NonNull ZonedDateTime endDate) {
         this.name = name;
@@ -32,6 +37,7 @@ public class Committee {
         this.endDate = endDate;
         this.id = Id.random();
         this.status = Status.DRAFT;
+        this.sponsorId = null;
     }
 
     @NoArgsConstructor(staticName = "random")
@@ -50,5 +56,8 @@ public class Committee {
 
     public enum Status {
         DRAFT, OPEN_TO_APPLICATIONS, OPEN_TO_VOTES, CLOSED
+    }
+
+    public record ProjectQuestion(@NonNull String question, @NonNull Boolean required) {
     }
 }

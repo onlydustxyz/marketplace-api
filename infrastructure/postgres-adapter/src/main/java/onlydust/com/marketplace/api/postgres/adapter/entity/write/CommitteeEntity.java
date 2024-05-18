@@ -2,15 +2,20 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import jakarta.persistence.*;
 import lombok.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.enums.CommitteeStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.json.ProjectQuestionJsonEntity;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
 import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -35,9 +40,12 @@ public class CommitteeEntity {
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "committee_status")
-    Status status;
+    CommitteeStatusEntity status;
     @Column(insertable = false, updatable = false)
     Date techCreatedAt;
+    @JdbcTypeCode(SqlTypes.JSON)
+    List<ProjectQuestionJsonEntity> projectQuestions;
+    UUID sponsorId;
 
     public static CommitteeEntity fromDomain(final Committee committee) {
         return CommitteeEntity.builder()
@@ -45,7 +53,11 @@ public class CommitteeEntity {
                 .name(committee.name())
                 .endDate(Date.from(committee.endDate().toInstant()))
                 .startDate(Date.from(committee.startDate().toInstant()))
-                .status(Status.fromDomain(committee.status()))
+                .status(CommitteeStatusEntity.fromDomain(committee.status()))
+                .projectQuestions(committee.projectQuestions().stream()
+                        .map(projectQuestion -> ProjectQuestionJsonEntity.builder().question(projectQuestion.question()).required(projectQuestion.required()).build())
+                        .toList())
+                .sponsorId(committee.sponsorId())
                 .build();
     }
 
@@ -69,25 +81,4 @@ public class CommitteeEntity {
                 .build();
     }
 
-    public enum Status {
-        DRAFT, OPEN_TO_APPLICATIONS, OPEN_TO_VOTES, CLOSED;
-
-        public static Status fromDomain(final Committee.Status status) {
-            return switch (status) {
-                case DRAFT -> DRAFT;
-                case CLOSED -> CLOSED;
-                case OPEN_TO_VOTES -> OPEN_TO_VOTES;
-                case OPEN_TO_APPLICATIONS -> OPEN_TO_APPLICATIONS;
-            };
-        }
-
-        public Committee.Status toDomain() {
-            return switch (this) {
-                case DRAFT -> Committee.Status.DRAFT;
-                case CLOSED -> Committee.Status.CLOSED;
-                case OPEN_TO_VOTES -> Committee.Status.OPEN_TO_VOTES;
-                case OPEN_TO_APPLICATIONS -> Committee.Status.OPEN_TO_APPLICATIONS;
-            };
-        }
-    }
 }

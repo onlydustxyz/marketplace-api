@@ -413,7 +413,8 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    PostgresCommitteeAdapter postgresCommitteeAdapter(final CommitteeRepository committeeRepository){
-        return new PostgresCommitteeAdapter(committeeRepository);
+    PostgresCommitteeAdapter postgresCommitteeAdapter(final CommitteeRepository committeeRepository,
+                                                      final BoCommitteeQueryRepository boCommitteeQueryRepository) {
+        return new PostgresCommitteeAdapter(committeeRepository, boCommitteeQueryRepository);
     }
 }
