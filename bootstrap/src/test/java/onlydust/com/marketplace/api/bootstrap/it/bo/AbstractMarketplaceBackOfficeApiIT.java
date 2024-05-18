@@ -185,6 +185,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String LANGUAGES = "/bo/v1/languages";
     protected static final String LANGUAGES_BY_ID = "/bo/v1/languages/%s";
     protected static final String LANGUAGES_EXTENSIONS = "/bo/v1/languages/extensions";
+    protected static final String POST_COMMITTEES = "/bo/v1/committees";
 
     protected URI getApiURI(final String path) {
         return UriComponentsBuilder.newInstance()

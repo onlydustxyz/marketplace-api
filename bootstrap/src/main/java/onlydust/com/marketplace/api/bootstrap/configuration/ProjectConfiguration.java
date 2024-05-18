@@ -275,4 +275,9 @@ public class ProjectConfiguration {
     public HackathonObserverPort hackathonObservers(final SlackApiAdapter slackApiAdapter) {
         return new HackathonObserverComposite(slackApiAdapter);
     }
+
+    @Bean
+    public CommitteeService committeeService(final CommitteeStoragePort committeeStoragePort){
+        return new CommitteeService(committeeStoragePort);
+    }
 }

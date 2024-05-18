@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackOfficeCommitteeManagementApi;
 import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,6 +16,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
+
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.CommitteeMapper.toCommitteeResponse;
 
 @RestController
 @Tags(@Tag(name = "BackofficeCommitteeManagement"))
@@ -55,6 +59,8 @@ public class BackofficeCommitteeManagementRestApi implements BackOfficeCommittee
             .avatarUrl("https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png")
             .name("Starknet Foundation");
 
+    private final CommitteeFacadePort committeeFacadePort;
+
     @Override
     public ResponseEntity<Void> allocateBudget(UUID committeeId, CommitteeBudgetAllocationsRequest committeeBudgetAllocationsRequest) {
         return ResponseEntity.noContent().build();
@@ -62,8 +68,9 @@ public class BackofficeCommitteeManagementRestApi implements BackOfficeCommittee
 
     @Override
     public ResponseEntity<CommitteeResponse> createCommittee(CreateCommitteeRequest createCommitteeRequest) {
-        final CommitteeResponse committeeResponse = getCommitteeResponse();
-        return ResponseEntity.ok(committeeResponse);
+        final Committee committee = committeeFacadePort.createCommittee(createCommitteeRequest.getName(), createCommitteeRequest.getStartDate(),
+                createCommitteeRequest.getEndDate());
+        return ResponseEntity.ok(toCommitteeResponse(committee));
     }
 
     @Override

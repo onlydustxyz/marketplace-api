@@ -411,4 +411,9 @@ public class PostgresConfiguration {
                                                            final LanguageExtensionRepository languageExtensionRepository) {
         return new PostgresLanguageAdapter(languageRepository, languageExtensionRepository);
     }
+
+    @Bean
+    PostgresCommitteeAdapter postgresCommitteeAdapter(final CommitteeRepository committeeRepository){
+        return new PostgresCommitteeAdapter(committeeRepository);
+    }
 }
