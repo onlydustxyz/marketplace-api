@@ -10,13 +10,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface BackofficeStoragePort {
-    Page<ProjectRepositoryView> findProjectRepositoryPage(Integer pageIndex, Integer pageSize, List<UUID> projectIds);
-
-    Page<ProjectLeadInvitationView> findProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids, List<UUID> projectIds);
 
     Page<UserShortView> listUsers(int pageIndex, int pageSize, UserShortView.Filters filters);
-
-    Page<OldProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds);
 
     Page<ProjectView> searchProjects(int pageIndex, int pageSize, String search);
 

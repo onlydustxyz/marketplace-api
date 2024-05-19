@@ -23,7 +23,10 @@ import onlydust.com.marketplace.project.domain.model.Contact;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.model.Language;
 import onlydust.com.marketplace.project.domain.view.ProjectSponsorView;
-import onlydust.com.marketplace.project.domain.view.backoffice.*;
+import onlydust.com.marketplace.project.domain.view.backoffice.BoSponsorView;
+import onlydust.com.marketplace.project.domain.view.backoffice.EcosystemView;
+import onlydust.com.marketplace.project.domain.view.backoffice.ProjectView;
+import onlydust.com.marketplace.project.domain.view.backoffice.UserShortView;
 
 import java.math.BigDecimal;
 import java.net.URI;
@@ -255,27 +258,6 @@ public interface BackOfficeMapper {
                 .nextPageIndex(nextPageIndex(pageIndex, ecosystemViewPage.getTotalPageNumber()));
     }
 
-
-    static GithubRepositoryPage mapGithubRepositoryPageToResponse(Page<ProjectRepositoryView> projectRepositoryViewPage,
-                                                                  int sanitizedPageIndex) {
-        final GithubRepositoryPage githubRepositoryPage = new GithubRepositoryPage();
-        for (ProjectRepositoryView projectRepositoryView : projectRepositoryViewPage.getContent()) {
-            githubRepositoryPage.addGithubRepositoriesItem(new GithubRepositoryResponse()
-                    .id(projectRepositoryView.getId())
-                    .projectId(projectRepositoryView.getProjectId())
-                    .owner(projectRepositoryView.getOwner())
-                    .technologies(projectRepositoryView.getTechnologies())
-                    .name(projectRepositoryView.getName()));
-        }
-        githubRepositoryPage.setNextPageIndex(nextPageIndex(sanitizedPageIndex,
-                projectRepositoryViewPage.getTotalPageNumber()));
-        githubRepositoryPage.setTotalPageNumber(projectRepositoryViewPage.getTotalPageNumber());
-        githubRepositoryPage.setTotalItemNumber(projectRepositoryViewPage.getTotalItemNumber());
-        githubRepositoryPage.setHasMore(hasMore(sanitizedPageIndex,
-                projectRepositoryViewPage.getTotalPageNumber()));
-        return githubRepositoryPage;
-    }
-
     static ShortCurrencyResponse toShortCurrency(final Currency currency) {
         return new ShortCurrencyResponse()
                 .id(currency.id().value())
@@ -292,24 +274,6 @@ public interface BackOfficeMapper {
                 .name(currency.name())
                 .logoUrl(currency.logoUrl())
                 .decimals(currency.decimals());
-    }
-
-    static ProjectLeadInvitationPage mapProjectLeadInvitationPageToContract(final Page<ProjectLeadInvitationView> projectLeadInvitationViewPage,
-                                                                            int sanitizedPageIndex) {
-        final ProjectLeadInvitationPage projectLeadInvitationPage = new ProjectLeadInvitationPage();
-        for (ProjectLeadInvitationView view : projectLeadInvitationViewPage.getContent()) {
-            projectLeadInvitationPage.addProjectLeadInvitationsItem(new ProjectLeadInvitationResponse()
-                    .id(view.getId())
-                    .projectId(view.getProjectId())
-                    .githubUserId(view.getGithubUserId()));
-        }
-        projectLeadInvitationPage.setNextPageIndex(nextPageIndex(sanitizedPageIndex,
-                projectLeadInvitationViewPage.getTotalPageNumber()));
-        projectLeadInvitationPage.setTotalPageNumber(projectLeadInvitationViewPage.getTotalPageNumber());
-        projectLeadInvitationPage.setTotalItemNumber(projectLeadInvitationViewPage.getTotalItemNumber());
-        projectLeadInvitationPage.setHasMore(hasMore(sanitizedPageIndex,
-                projectLeadInvitationViewPage.getTotalPageNumber()));
-        return projectLeadInvitationPage;
     }
 
     static UserPage mapUserPageToContract(final Page<UserShortView> userPage, int pageIndex) {
@@ -642,34 +606,6 @@ public interface BackOfficeMapper {
         };
     }
 
-    static OldProjectPage mapOldProjectPageToContract(final Page<OldProjectView> projectViewPage, int pageIndex) {
-        return new OldProjectPage()
-                .projects(projectViewPage.getContent().stream().map(project -> new OldProjectPageItemResponse()
-                        .id(project.getId())
-                        .name(project.getName())
-                        .shortDescription(project.getShortDescription())
-                        .longDescription(project.getLongDescription())
-                        .moreInfoLinks(project.getMoreInfoLinks())
-                        .logoUrl(project.getLogoUrl())
-                        .hiring(project.getHiring())
-                        .rank(project.getRank())
-                        .visibility(mapProjectVisibility(project.getVisibility()))
-                        .projectLeads(project.getProjectLeadIds())
-                        .createdAt(project.getCreatedAt())
-                        .activeContributors(project.getActiveContributors())
-                        .newContributors(project.getNewContributors())
-                        .uniqueRewardedContributors(project.getUniqueRewardedContributors())
-                        .openedIssues(project.getOpenedIssues())
-                        .contributions(project.getContributions())
-                        .dollarsEquivalentAmountSent(project.getDollarsEquivalentAmountSent())
-                        .strkAmountSent(project.getStrkAmountSent())
-                ).toList())
-                .totalPageNumber(projectViewPage.getTotalPageNumber())
-                .totalItemNumber(projectViewPage.getTotalItemNumber())
-                .hasMore(hasMore(pageIndex, projectViewPage.getTotalPageNumber()))
-                .nextPageIndex(nextPageIndex(pageIndex, projectViewPage.getTotalPageNumber()));
-    }
-
     static ProjectPage mapProjectPageToContract(final Page<ProjectView> projectViewPage, int pageIndex) {
         return new ProjectPage()
                 .projects(projectViewPage.getContent().stream().map(project -> new ProjectPageItemResponse()
@@ -683,12 +619,6 @@ public interface BackOfficeMapper {
                 .nextPageIndex(nextPageIndex(pageIndex, projectViewPage.getTotalPageNumber()));
     }
 
-    static ProjectVisibility mapProjectVisibility(onlydust.com.marketplace.project.domain.model.ProjectVisibility visibility) {
-        return switch (visibility) {
-            case PUBLIC -> ProjectVisibility.PUBLIC;
-            case PRIVATE -> ProjectVisibility.PRIVATE;
-        };
-    }
 
     static Blockchain mapBlockchain(BlockchainContract blockchain) {
         return switch (blockchain) {
