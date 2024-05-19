@@ -656,9 +656,9 @@ public class UserServiceTest {
         // Given
         final var since = ZonedDateTime.now().minusDays(30);
         final var users = List.of(
-                User.builder().githubUserId(faker.number().randomNumber()).build(),
-                User.builder().githubUserId(faker.number().randomNumber()).build(),
-                User.builder().githubUserId(faker.number().randomNumber()).build()
+                User.builder().githubUserId(faker.number().randomNumber() + faker.number().randomNumber()).build(),
+                User.builder().githubUserId(faker.number().randomNumber() + faker.number().randomNumber()).build(),
+                User.builder().githubUserId(faker.number().randomNumber() + faker.number().randomNumber()).build()
         );
         final var githubUserIdentities = List.of(
                 GithubUserIdentity.builder().githubUserId(users.get(0).getGithubUserId()).email(faker.internet().emailAddress()).build(),
