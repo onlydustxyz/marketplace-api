@@ -3,19 +3,14 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.CommitteeStatusEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.json.ProjectQuestionJsonEntity;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
 import org.hibernate.annotations.JdbcType;
-import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
-import org.hibernate.type.SqlTypes;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -42,8 +37,6 @@ public class CommitteeEntity {
     CommitteeStatusEntity status;
     @Column(insertable = false, updatable = false)
     Date techCreatedAt;
-    @JdbcTypeCode(SqlTypes.JSON)
-    List<ProjectQuestionJsonEntity> projectQuestions;
     UUID sponsorId;
 
     public static CommitteeEntity fromDomain(final Committee committee) {
@@ -53,9 +46,6 @@ public class CommitteeEntity {
                 .endDate(Date.from(committee.endDate().toInstant()))
                 .startDate(Date.from(committee.startDate().toInstant()))
                 .status(CommitteeStatusEntity.fromDomain(committee.status()))
-                .projectQuestions(committee.projectQuestions().stream()
-                        .map(projectQuestion -> ProjectQuestionJsonEntity.builder().question(projectQuestion.question()).required(projectQuestion.required()).build())
-                        .toList())
                 .sponsorId(committee.sponsorId())
                 .build();
     }

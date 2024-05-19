@@ -7,7 +7,10 @@ import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
-import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoCommitteeQueryRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoEcosystemRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoUserShortViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.project.domain.port.input.TechnologyStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
@@ -416,7 +419,10 @@ public class PostgresConfiguration {
     @Bean
     PostgresCommitteeAdapter postgresCommitteeAdapter(final CommitteeRepository committeeRepository,
                                                       final BoCommitteeQueryRepository boCommitteeQueryRepository,
-                                                      final CommitteeApplicationRepository committeeApplicationRepository) {
-        return new PostgresCommitteeAdapter(committeeRepository, boCommitteeQueryRepository, committeeApplicationRepository);
+                                                      final CommitteeApplicationRepository committeeApplicationRepository,
+                                                      final CommitteeProjectQuestionRepository committeeProjectQuestionRepository,
+                                                      final CommitteeProjectAnswerViewRepository committeeProjectAnswerViewRepository) {
+        return new PostgresCommitteeAdapter(committeeRepository, boCommitteeQueryRepository, committeeApplicationRepository,
+                committeeProjectQuestionRepository, committeeProjectAnswerViewRepository);
     }
 }

@@ -4,10 +4,10 @@ import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
 import onlydust.com.marketplace.project.domain.view.CommitteeView;
 
-import java.util.Objects;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -74,8 +74,10 @@ public interface BackOfficeCommitteeMapper {
         return committee;
     }
 
-    private static Committee.ProjectQuestion getProjectQuestion(ProjectQuestionRequest projectQuestionRequest) {
-        return new Committee.ProjectQuestion(projectQuestionRequest.getQuestion(),
+    private static ProjectQuestion getProjectQuestion(ProjectQuestionRequest projectQuestionRequest) {
+        return isNull(projectQuestionRequest.getId()) ? new ProjectQuestion(projectQuestionRequest.getQuestion(),
+                projectQuestionRequest.getRequired()) : new ProjectQuestion(ProjectQuestion.Id.of(projectQuestionRequest.getId()),
+                projectQuestionRequest.getQuestion(),
                 projectQuestionRequest.getRequired());
     }
 

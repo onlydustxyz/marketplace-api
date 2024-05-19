@@ -6988,9 +6988,13 @@ components:
     CommitteeProjectQuestionResponse:
       type: object
       required:
+        - id
         - question
         - required
       properties:
+        id:
+          type: string
+          format: uuid
         question:
           type: string
         answer:
@@ -7001,11 +7005,12 @@ components:
     CommitteeProjectAnswerRequest:
       type: object
       required:
-        - question
+        - questionId
         - required
       properties:
-        question:
+        questionId:
           type: string
+          format: uuid
         required:
           type: boolean
         answer:

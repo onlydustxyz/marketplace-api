@@ -58,10 +58,10 @@ public class Committee {
         DRAFT, OPEN_TO_APPLICATIONS, OPEN_TO_VOTES, CLOSED
     }
 
-    public record ProjectQuestion(@NonNull String question, @NonNull Boolean required) {
+
+    public record ProjectAnswer(@NonNull ProjectQuestion.Id projectQuestionId, String answer) {
     }
 
-    public record ProjectAnswer(@NonNull ProjectQuestion projectQuestion, String answer){}
-
-    public record Application(@NonNull UUID userId, @NonNull UUID projectId, @NonNull List<ProjectAnswer> answers){}
+    public record Application(@NonNull UUID userId, @NonNull UUID projectId, @NonNull List<ProjectAnswer> answers) {
+    }
 }

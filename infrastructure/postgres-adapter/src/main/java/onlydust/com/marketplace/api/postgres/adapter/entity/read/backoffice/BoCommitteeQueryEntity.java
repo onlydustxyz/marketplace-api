@@ -6,8 +6,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.CommitteeStatusEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.json.ProjectQuestionJsonEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeProjectQuestionEntity;
 import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.view.CommitteeView;
 import onlydust.com.marketplace.project.domain.view.ShortSponsorView;
 import org.hibernate.annotations.Immutable;
@@ -20,6 +21,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -46,7 +48,7 @@ public class BoCommitteeQueryEntity {
     @Column(columnDefinition = "committee_status")
     CommitteeStatusEntity status;
     @JdbcTypeCode(SqlTypes.JSON)
-    List<ProjectQuestionJsonEntity> projectQuestions;
+    Set<ProjectQuestionJson> projectQuestions;
     String sponsorName;
     String sponsorLogoUrl;
 
@@ -57,11 +59,19 @@ public class BoCommitteeQueryEntity {
                 .status(this.status.toDomain())
                 .startDate(ZonedDateTime.ofInstant(startDate.toInstant(), ZoneOffset.UTC))
                 .endDate(ZonedDateTime.ofInstant(endDate.toInstant(), ZoneOffset.UTC))
-                .projectQuestions(this.projectQuestions.stream()
-                        .map(projectQuestionJsonEntity -> new Committee.ProjectQuestion(projectQuestionJsonEntity.question(),
-                                projectQuestionJsonEntity.required())).toList())
+                .projectQuestions(isNull(this.projectQuestions) ? List.of() : this.projectQuestions.stream()
+                        .map(projectQuestionEntity -> new ProjectQuestion(ProjectQuestion.Id.of(projectQuestionEntity.getId()),
+                                projectQuestionEntity.getQuestion(),
+                                projectQuestionEntity.getRequired())).toList())
                 .sponsor(isNull(this.sponsorName) ? null : new ShortSponsorView(this.sponsorName, this.sponsorLogoUrl))
                 .build();
+    }
+
+    @Data
+    public static class ProjectQuestionJson {
+        @NonNull UUID id;
+        @NonNull String question;
+        @NonNull Boolean required;
     }
 
 }

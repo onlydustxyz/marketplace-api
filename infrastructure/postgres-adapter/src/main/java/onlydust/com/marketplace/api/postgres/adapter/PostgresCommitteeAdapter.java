@@ -1,18 +1,24 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.CommitteeStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoCommitteeQueryEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeProjectAnswerEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeProjectQuestionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeApplicationRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeProjectAnswerViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeProjectQuestionRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoCommitteeQueryRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
 import onlydust.com.marketplace.project.domain.view.CommitteeView;
+import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,11 +33,26 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     private final CommitteeRepository committeeRepository;
     private final BoCommitteeQueryRepository boCommitteeQueryRepository;
     private final CommitteeApplicationRepository committeeApplicationRepository;
+    private final CommitteeProjectQuestionRepository committeeProjectQuestionRepository;
+    private final CommitteeProjectAnswerViewRepository committeeProjectAnswerViewRepository;
 
     @Override
     @Transactional
     public Committee save(Committee committee) {
         return committeeRepository.save(CommitteeEntity.fromDomain(committee)).toDomain();
+    }
+
+    @Override
+    @Transactional
+    public void saveProjectQuestions(Committee.Id committeeId, List<ProjectQuestion> projectQuestions) {
+        committeeProjectQuestionRepository.saveAll(projectQuestions.stream().map(projectQuestion -> CommitteeProjectQuestionEntity.fromDomain(committeeId,
+                projectQuestion)).toList());
+    }
+
+    @Override
+    @Transactional
+    public void deleteAllProjectQuestions(Committee.@NonNull Id committeeId) {
+        committeeProjectQuestionRepository.deleteAllByCommitteeId(committeeId.value());
     }
 
     @Override
@@ -60,17 +81,16 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     @Override
     @Transactional
     public void saveApplication(Committee.Id committeeId, Committee.Application application) {
-        committeeApplicationRepository.save(CommitteeApplicationEntity.fromDomain(committeeId, application));
+        committeeApplicationRepository.saveAll(CommitteeProjectAnswerEntity.fromDomain(committeeId, application));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Committee.ProjectAnswer> getApplicationAnswers(Committee.Id committeeId, UUID projectId, UUID userId) {
-        return committeeApplicationRepository.findByCommitteeIdAndProjectIdAndUserId(committeeId.value(), projectId, userId)
-                .map(committeeApplicationEntity -> committeeApplicationEntity.getAnswers()
-                        .stream().map(applicationAnswerJsonEntity -> new Committee.ProjectAnswer(
-                                new Committee.ProjectQuestion(applicationAnswerJsonEntity.question(), applicationAnswerJsonEntity.required()),
-                                applicationAnswerJsonEntity.answer())).toList())
-                .orElse(List.of());
+    public List<ProjectAnswerView> getApplicationAnswers(Committee.Id committeeId, UUID projectId) {
+        return committeeProjectAnswerViewRepository.findByCommitteeIdAndAndProjectId(committeeId.value(), projectId).stream()
+                .map(committeeProjectAnswerView -> new ProjectAnswerView(ProjectQuestion.Id.of(committeeProjectAnswerView.getQuestionId()),
+                        committeeProjectAnswerView.getProjectQuestion().getQuestion(), committeeProjectAnswerView.getProjectQuestion().getRequired(),
+                        committeeProjectAnswerView.getAnswer()))
+                .toList();
     }
 }

@@ -11,6 +11,8 @@ import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.view.CommitteeApplicationView;
 import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
 import onlydust.com.marketplace.project.domain.view.CommitteeView;
+import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -37,13 +39,19 @@ public class CommitteeService implements CommitteeFacadePort {
     }
 
     @Override
+    @Transactional
     public void update(Committee committee) {
         committeeStoragePort.save(committee);
+        if (committee.status() == Committee.Status.DRAFT && !committee.projectQuestions().isEmpty()) {
+            committeeStoragePort.deleteAllProjectQuestions(committee.id());
+            committeeStoragePort.saveProjectQuestions(committee.id(), committee.projectQuestions());
+        }
     }
 
     @Override
     public CommitteeView getCommitteeById(Committee.Id committeeId) {
-        return committeeStoragePort.findById(committeeId).orElseThrow(() -> OnlyDustException.notFound("Committee %s was not found".formatted(committeeId.value().toString())));
+        return committeeStoragePort.findById(committeeId)
+                .orElseThrow(() -> OnlyDustException.notFound("Committee %s was not found".formatted(committeeId.value().toString())));
     }
 
     @Override
@@ -64,7 +72,7 @@ public class CommitteeService implements CommitteeFacadePort {
         if (optionalProjectId.isPresent()) {
             final UUID projectId = optionalProjectId.get();
             checkApplicationPermission(projectId, userId);
-            List<Committee.ProjectAnswer> projectAnswers = committeeStoragePort.getApplicationAnswers(committeeId, projectId, userId);
+            List<ProjectAnswerView> projectAnswers = committeeStoragePort.getApplicationAnswers(committeeId, projectId);
             if (isNull(projectAnswers) || projectAnswers.isEmpty()) {
                 projectAnswers = getCommitteeAnswersWithOnlyQuestions(committeeView);
 
@@ -76,8 +84,9 @@ public class CommitteeService implements CommitteeFacadePort {
     }
 
 
-    private List<Committee.ProjectAnswer> getCommitteeAnswersWithOnlyQuestions(CommitteeView committeeView) {
-        return committeeView.projectQuestions().stream().map(projectQuestion -> new Committee.ProjectAnswer(projectQuestion, null)).toList();
+    private List<ProjectAnswerView> getCommitteeAnswersWithOnlyQuestions(CommitteeView committeeView) {
+        return committeeView.projectQuestions().stream()
+                .map(projectQuestion -> new ProjectAnswerView(projectQuestion.id(), projectQuestion.question(), projectQuestion.required(), null)).toList();
     }
 
     private void checkApplicationPermission(final UUID projectId, final UUID userId) {

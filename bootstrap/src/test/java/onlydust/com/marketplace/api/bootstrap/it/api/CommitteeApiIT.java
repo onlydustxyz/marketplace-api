@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.contract.model.CommitteeProjectAnswerRequest
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
 import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -32,6 +33,8 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     CommitteeFacadePort committeeFacadePort;
     static Committee.Id committeeId;
+    static ProjectQuestion.Id projectQuestionId1;
+    static ProjectQuestion.Id projectQuestionId2;
 
     @Test
     @Order(1)
@@ -41,14 +44,19 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                 faker.date().past(5, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()),
                 faker.date().future(5, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()));
         committeeId = committee.id();
-        committee = committee.toBuilder().status(Committee.Status.OPEN_TO_APPLICATIONS).build();
+        committee = committee.toBuilder().status(Committee.Status.DRAFT).build();
+        final ProjectQuestion q1 = new ProjectQuestion("Q1", false);
+        final ProjectQuestion q2 = new ProjectQuestion("Q2", true);
+        projectQuestionId1 = q1.id();
+        projectQuestionId2 = q2.id();
         committee.projectQuestions().addAll(
                 List.of(
-                        new Committee.ProjectQuestion("Q1", false),
-                        new Committee.ProjectQuestion("Q2", true)
+                        q1,
+                        q2
                 )
         );
         committeeFacadePort.update(committee);
+        committeeFacadePort.updateStatus(committeeId, Committee.Status.OPEN_TO_APPLICATIONS);
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
 
         // When
@@ -66,9 +74,11 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
         assertEquals("Q1", committeeApplicationResponse.getProjectQuestions().get(0).getQuestion());
         assertEquals(false, committeeApplicationResponse.getProjectQuestions().get(0).getRequired());
         assertEquals(null, committeeApplicationResponse.getProjectQuestions().get(0).getAnswer());
+        assertEquals(q1.id().value(), committeeApplicationResponse.getProjectQuestions().get(0).getId());
         assertEquals("Q2", committeeApplicationResponse.getProjectQuestions().get(1).getQuestion());
         assertEquals(true, committeeApplicationResponse.getProjectQuestions().get(1).getRequired());
         assertEquals(null, committeeApplicationResponse.getProjectQuestions().get(1).getAnswer());
+        assertEquals(q2.id().value(), committeeApplicationResponse.getProjectQuestions().get(1).getId());
     }
 
     @Autowired
@@ -83,20 +93,15 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
         final CommitteeApplicationRequest committeeApplicationRequest = new CommitteeApplicationRequest();
         final CommitteeProjectAnswerRequest answerRequest1 = new CommitteeProjectAnswerRequest()
                 .answer(faker.pokemon().name())
-                .question(faker.lordOfTheRings().character())
+                .questionId(projectQuestionId1.value())
                 .required(false);
         final CommitteeProjectAnswerRequest answerRequest2 = new CommitteeProjectAnswerRequest()
                 .answer(faker.pokemon().name())
-                .question(faker.lordOfTheRings().character())
+                .questionId(projectQuestionId2.value())
                 .required(true);
-        final CommitteeProjectAnswerRequest answerRequest3 = new CommitteeProjectAnswerRequest()
-                .answer(null)
-                .question(faker.lordOfTheRings().character())
-                .required(false);
         committeeApplicationRequest.setAnswers(List.of(
                 answerRequest1,
-                answerRequest2,
-                answerRequest3
+                answerRequest2
         ));
 
         // When
@@ -122,15 +127,12 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                 .returnResult().getResponseBody();
 
         assertEquals(Committee.Status.OPEN_TO_APPLICATIONS.name(), committeeApplicationResponse.getStatus().name());
-        assertEquals(answerRequest1.getQuestion(), committeeApplicationResponse.getProjectQuestions().get(0).getQuestion());
+        assertEquals(answerRequest1.getQuestionId(), committeeApplicationResponse.getProjectQuestions().get(0).getId());
         assertEquals(answerRequest1.getRequired(), committeeApplicationResponse.getProjectQuestions().get(0).getRequired());
         assertEquals(answerRequest1.getAnswer(), committeeApplicationResponse.getProjectQuestions().get(0).getAnswer());
-        assertEquals(answerRequest2.getQuestion(), committeeApplicationResponse.getProjectQuestions().get(1).getQuestion());
+        assertEquals(answerRequest2.getQuestionId(), committeeApplicationResponse.getProjectQuestions().get(1).getId());
         assertEquals(answerRequest2.getRequired(), committeeApplicationResponse.getProjectQuestions().get(1).getRequired());
         assertEquals(answerRequest2.getAnswer(), committeeApplicationResponse.getProjectQuestions().get(1).getAnswer());
-        assertEquals(answerRequest3.getQuestion(), committeeApplicationResponse.getProjectQuestions().get(2).getQuestion());
-        assertEquals(answerRequest3.getRequired(), committeeApplicationResponse.getProjectQuestions().get(2).getRequired());
-        assertEquals(answerRequest3.getAnswer(), committeeApplicationResponse.getProjectQuestions().get(2).getAnswer());
 
 
         client.get()

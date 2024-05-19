@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.view.CommitteeApplicationView;
 
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ public interface CommitteeMapper {
                                                                      final UUID userId, final UUID projectId) {
         final List<Committee.ProjectAnswer> projectAnswers = new ArrayList<>();
         for (CommitteeProjectAnswerRequest answer : committeeApplicationRequest.getAnswers()) {
-            projectAnswers.add(new Committee.ProjectAnswer(new Committee.ProjectQuestion(answer.getQuestion(), answer.getRequired()), answer.getAnswer()));
+            projectAnswers.add(new Committee.ProjectAnswer(ProjectQuestion.Id.of(answer.getQuestionId()), answer.getAnswer()));
         }
         return new Committee.Application(userId, projectId, projectAnswers);
     }
@@ -25,8 +26,9 @@ public interface CommitteeMapper {
     static CommitteeApplicationResponse committeeApplicationViewToResponse(CommitteeApplicationView committeeApplicationView) {
         final CommitteeApplicationResponse committeeApplicationResponse = new CommitteeApplicationResponse();
         committeeApplicationResponse.setProjectQuestions(committeeApplicationView.answers().stream().map(projectAnswer -> new CommitteeProjectQuestionResponse()
-                .question(projectAnswer.projectQuestion().question())
-                .required(projectAnswer.projectQuestion().required())
+                .question(projectAnswer.question())
+                .required(projectAnswer.required())
+                .id(projectAnswer.questionId().value())
                 .answer(projectAnswer.answer())
         ).toList());
         committeeApplicationResponse.setStatus(statusToResponse(committeeApplicationView.status()));

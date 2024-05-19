@@ -141,7 +141,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .startDate(faker.date().past(10, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()))
                 .endDate(faker.date().future(10, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()))
                 .allocationCurrencyId(CurrencyHelper.STRK.value())
-                .status(CommitteeStatus.OPEN_TO_APPLICATIONS)
+                .status(CommitteeStatus.DRAFT)
                 .maximumAllocationAmount(BigDecimal.valueOf(111.212))
                 .minimumAllocationAmount(BigDecimal.valueOf(95.47))
                 .projectQuestions(
@@ -181,10 +181,9 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .returnResult().getResponseBody();
 
         assertEquals(2, committeeResponse1.getProjectQuestions().size());
-        assertEquals(projectQuestionRequest1.getQuestion(), committeeResponse1.getProjectQuestions().get(0).getQuestion());
-        assertEquals(projectQuestionRequest1.getRequired(), committeeResponse1.getProjectQuestions().get(0).getRequired());
-        assertEquals(projectQuestionRequest2.getQuestion(), committeeResponse1.getProjectQuestions().get(1).getQuestion());
-        assertEquals(projectQuestionRequest2.getRequired(), committeeResponse1.getProjectQuestions().get(1).getRequired());
+        for (ProjectQuestionResponse projectQuestion : committeeResponse1.getProjectQuestions()) {
+            assertTrue(List.of(projectQuestionRequest1.getQuestion(), projectQuestionRequest2.getQuestion()).contains(projectQuestion.getQuestion()));
+        }
         assertEquals(updateCommitteeRequest1.getName(), committeeResponse1.getName());
         assertEquals(updateCommitteeRequest1.getStartDate().toInstant(), committeeResponse1.getStartDate().toInstant());
         assertEquals(updateCommitteeRequest1.getEndDate().toInstant(), committeeResponse1.getEndDate().toInstant());

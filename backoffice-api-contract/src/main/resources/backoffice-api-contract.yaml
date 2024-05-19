@@ -4416,6 +4416,9 @@ components:
         - question
         - required
       properties:
+        id:
+          type: string
+          format: uuid
         question:
           type: string
         required:
