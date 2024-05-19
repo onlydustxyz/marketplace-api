@@ -16,8 +16,7 @@ import java.util.UUID;
 
 @Entity
 @Immutable
-@Table(name = "projects", schema = "public")
-public class ProjectInfosViewEntity {
+public class ProjectInfosQueryEntity {
     @Id
     UUID id;
     @NonNull
