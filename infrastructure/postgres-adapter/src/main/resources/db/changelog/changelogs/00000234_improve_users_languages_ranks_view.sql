@@ -129,12 +129,8 @@ from rewards r
          join reward_items ri on ri.reward_id = r.id
          join projects p on p.id = r.project_id and p.visibility = 'PUBLIC'
          join accounting.reward_status_data rsd ON rsd.reward_id = r.id
-         left join indexer_exp.contributions c
-                   on ((CAST(c.pull_request_id AS TEXT) = ri.id
-                       or CAST(c.issue_id AS TEXT) = ri.id
-                       or c.code_review_id = ri.id)
-                       and c.contributor_id = ri.recipient_id)
-         left join unnest(c.main_file_extensions) unnested(main_file_extensions) on true
+         left join indexer_exp.github_pull_requests gpr on CAST(gpr.id AS TEXT) = ri.id
+         left join unnest(gpr.main_file_extensions) unnested(main_file_extensions) on true
 group by r.id, rsd.reward_id;
 ;
 
