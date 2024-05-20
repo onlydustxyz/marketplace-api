@@ -295,3 +295,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000234_create_committees_tables.sql
   - include:
       file: db/changelog/changelogs/00000234_improve_users_languages_ranks_view.sql
+  - include:
+      file: db/changelog/changelogs/00000235_improve_perf.sql

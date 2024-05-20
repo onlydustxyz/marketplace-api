@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS github_accounts_login_uidx ON indexer_exp.github_accounts (login);
