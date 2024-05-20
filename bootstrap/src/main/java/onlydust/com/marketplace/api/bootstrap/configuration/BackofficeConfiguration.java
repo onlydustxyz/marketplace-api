@@ -11,10 +11,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.Authenticate
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
-import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
-import onlydust.com.marketplace.project.domain.port.input.HackathonFacadePort;
-import onlydust.com.marketplace.project.domain.port.input.LanguageFacadePort;
-import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.LanguageStorage;
 import onlydust.com.marketplace.project.domain.service.BackofficeService;
@@ -121,8 +118,8 @@ public class BackofficeConfiguration {
     }
 
     @Bean
-    public BackofficeCommitteeManagementRestApi backofficeCommitteeManagementRestApi(){
-        return new BackofficeCommitteeManagementRestApi();
+    public BackofficeCommitteeManagementRestApi backofficeCommitteeManagementRestApi(final CommitteeFacadePort committeeFacadePort){
+        return new BackofficeCommitteeManagementRestApi(committeeFacadePort);
     }
 }
 

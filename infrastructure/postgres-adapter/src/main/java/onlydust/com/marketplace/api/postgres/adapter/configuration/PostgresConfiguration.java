@@ -7,7 +7,10 @@ import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
-import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoCommitteeQueryRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoEcosystemRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoUserShortViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.project.domain.port.input.TechnologyStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
@@ -60,7 +63,8 @@ public class PostgresConfiguration {
                                                  final ContributionViewEntityRepository contributionViewEntityRepository,
                                                  final HiddenContributorRepository hiddenContributorRepository,
                                                  final ProjectTagRepository projectTagRepository,
-                                                 final ProjectCategoryRepository projectCategoryRepository) {
+                                                 final ProjectCategoryRepository projectCategoryRepository,
+                                                 final ProjectInfosViewRepository projectInfosViewRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -80,7 +84,8 @@ public class PostgresConfiguration {
                 contributionViewEntityRepository,
                 hiddenContributorRepository,
                 projectTagRepository,
-                projectCategoryRepository
+                projectCategoryRepository,
+                projectInfosViewRepository
         );
     }
 
@@ -103,7 +108,8 @@ public class PostgresConfiguration {
                                                            final ContributionViewEntityRepository contributionViewEntityRepository,
                                                            final HiddenContributorRepository hiddenContributorRepository,
                                                            final ProjectTagRepository projectTagRepository,
-                                                           final ProjectCategoryRepository projectCategoryRepository) {
+                                                           final ProjectCategoryRepository projectCategoryRepository,
+                                                           final ProjectInfosViewRepository projectInfosViewRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -123,7 +129,8 @@ public class PostgresConfiguration {
                 contributionViewEntityRepository,
                 hiddenContributorRepository,
                 projectTagRepository,
-                projectCategoryRepository
+                projectCategoryRepository,
+                projectInfosViewRepository
         );
     }
 
@@ -235,17 +242,14 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresBackofficeAdapter postgresBackofficeAdapter(final GithubRepositoryLinkedToProjectRepository githubRepositoryLinkedToProjectRepository,
-                                                               final SponsorRepository sponsorRepository,
+    public PostgresBackofficeAdapter postgresBackofficeAdapter(final SponsorRepository sponsorRepository,
                                                                final SponsorViewRepository sponsorViewRepository,
-                                                               final ProjectLeadInvitationRepository projectLeadInvitationRepository,
                                                                final BoUserShortViewRepository boUserShortViewRepository,
-                                                               final BoProjectRepository boProjectRepository,
                                                                final BoEcosystemRepository boEcosystemRepository,
                                                                final EcosystemRepository ecosystemRepository,
                                                                final ProjectRepository projectRepository) {
-        return new PostgresBackofficeAdapter(githubRepositoryLinkedToProjectRepository, sponsorRepository, sponsorViewRepository,
-                projectLeadInvitationRepository, boUserShortViewRepository, boProjectRepository, boEcosystemRepository, ecosystemRepository, projectRepository);
+        return new PostgresBackofficeAdapter(sponsorRepository, sponsorViewRepository, boUserShortViewRepository, boEcosystemRepository, ecosystemRepository,
+                projectRepository);
     }
 
     @Bean
@@ -410,5 +414,15 @@ public class PostgresConfiguration {
     public PostgresLanguageAdapter postgresLanguageAdapter(final LanguageRepository languageRepository,
                                                            final LanguageExtensionRepository languageExtensionRepository) {
         return new PostgresLanguageAdapter(languageRepository, languageExtensionRepository);
+    }
+
+    @Bean
+    PostgresCommitteeAdapter postgresCommitteeAdapter(final CommitteeRepository committeeRepository,
+                                                      final BoCommitteeQueryRepository boCommitteeQueryRepository,
+                                                      final CommitteeApplicationRepository committeeApplicationRepository,
+                                                      final CommitteeProjectQuestionRepository committeeProjectQuestionRepository,
+                                                      final CommitteeProjectAnswerViewRepository committeeProjectAnswerViewRepository) {
+        return new PostgresCommitteeAdapter(committeeRepository, boCommitteeQueryRepository, committeeApplicationRepository,
+                committeeProjectQuestionRepository, committeeProjectAnswerViewRepository);
     }
 }

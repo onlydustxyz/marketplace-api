@@ -10,15 +10,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface BackofficeFacadePort {
-    Page<ProjectRepositoryView> getProjectRepositoryPage(Integer pageIndex, Integer pageSize, List<UUID> projectIds);
-
-    Page<ProjectLeadInvitationView> getProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids, List<UUID> projectIds);
 
     Page<UserShortView> listUsers(int pageIndex, int pageSize, UserShortView.Filters filters);
 
     Page<EcosystemView> listEcosystems(int pageIndex, int pageSize, EcosystemView.Filters filters);
-
-    Page<OldProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds);
 
     Page<ProjectView> searchProjects(int pageIndex, int pageSize, String search);
 

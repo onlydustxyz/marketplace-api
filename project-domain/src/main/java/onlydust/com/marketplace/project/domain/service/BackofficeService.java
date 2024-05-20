@@ -21,28 +21,13 @@ public class BackofficeService implements BackofficeFacadePort {
     final BackofficeStoragePort backofficeStoragePort;
 
     @Override
-    public Page<ProjectRepositoryView> getProjectRepositoryPage(Integer pageIndex, Integer pageSize, List<UUID> projectIds) {
-        return backofficeStoragePort.findProjectRepositoryPage(pageIndex, pageSize, projectIds);
-    }
-
-    @Override
     public Page<EcosystemView> listEcosystems(int pageIndex, int pageSize, EcosystemView.Filters filters) {
         return backofficeStoragePort.listEcosystems(pageIndex, pageSize, filters);
     }
 
     @Override
-    public Page<ProjectLeadInvitationView> getProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids, List<UUID> projectIds) {
-        return backofficeStoragePort.findProjectLeadInvitationPage(pageIndex, pageSize, ids, projectIds);
-    }
-
-    @Override
     public Page<UserShortView> listUsers(int pageIndex, int pageSize, UserShortView.Filters filters) {
         return backofficeStoragePort.listUsers(pageIndex, pageSize, filters);
-    }
-
-    @Override
-    public Page<OldProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds) {
-        return backofficeStoragePort.listProjects(pageIndex, pageSize, projectIds);
     }
 
     @Override

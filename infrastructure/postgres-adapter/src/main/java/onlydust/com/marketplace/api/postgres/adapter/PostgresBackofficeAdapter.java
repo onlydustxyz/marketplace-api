@@ -3,65 +3,40 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.SponsorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoEcosystemQueryEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoProjectQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoUserShortQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.EcosystemRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoEcosystemRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoUserShortViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorViewRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
-import onlydust.com.marketplace.project.domain.view.backoffice.*;
+import onlydust.com.marketplace.project.domain.view.backoffice.BoSponsorView;
+import onlydust.com.marketplace.project.domain.view.backoffice.EcosystemView;
+import onlydust.com.marketplace.project.domain.view.backoffice.ProjectView;
+import onlydust.com.marketplace.project.domain.view.backoffice.UserShortView;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import static java.util.Objects.isNull;
 
 @AllArgsConstructor
 public class PostgresBackofficeAdapter implements BackofficeStoragePort {
 
-    private final GithubRepositoryLinkedToProjectRepository githubRepositoryLinkedToProjectRepository;
     private final SponsorRepository sponsorRepository;
     private final SponsorViewRepository sponsorViewRepository;
-    private final ProjectLeadInvitationRepository projectLeadInvitationRepository;
     private final BoUserShortViewRepository boUserShortViewRepository;
-    private final BoProjectRepository boProjectRepository;
     private final BoEcosystemRepository boEcosystemRepository;
     private final EcosystemRepository ecosystemRepository;
     private final ProjectRepository projectRepository;
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<ProjectRepositoryView> findProjectRepositoryPage(Integer pageIndex, Integer pageSize,
-                                                                 List<UUID> projectIds) {
-        final var page =
-                githubRepositoryLinkedToProjectRepository.findAllPublicForProjectsIds(PageRequest.of(pageIndex,
-                        pageSize, Sort.by("owner", "name")), isNull(projectIds) ? List.of() : projectIds);
-        return Page.<ProjectRepositoryView>builder()
-                .content(page.getContent().stream().map(entity ->
-                        ProjectRepositoryView.builder()
-                                .projectId(entity.getId().getProjectId())
-                                .id(entity.getId().getId())
-                                .name(entity.getName())
-                                .owner(entity.getOwner())
-                                .technologies(entity.getTechnologies())
-                                .build()
-                ).toList())
-                .totalItemNumber((int) page.getTotalElements())
-                .totalPageNumber(page.getTotalPages())
-                .build();
-    }
 
     @Override
     public Page<EcosystemView> listEcosystems(int pageIndex, int pageSize, EcosystemView.Filters filters) {
@@ -75,41 +50,11 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Page<ProjectLeadInvitationView> findProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids,
-                                                                         List<UUID> projectIds) {
-        final var page = projectLeadInvitationRepository.findAllByIds(PageRequest.of(pageIndex, pageSize, Sort.by("id")),
-                isNull(ids) ? List.of() : ids, isNull(projectIds) ? List.of() : projectIds);
-        return Page.<ProjectLeadInvitationView>builder()
-                .content(page.getContent().stream().map(entity ->
-                        ProjectLeadInvitationView.builder()
-                                .projectId(entity.getProjectId())
-                                .id(entity.getId())
-                                .githubUserId(entity.getGithubUserId())
-                                .build()
-                ).toList())
-                .totalItemNumber((int) page.getTotalElements())
-                .totalPageNumber(page.getTotalPages())
-                .build();
-    }
-
-    @Override
     public Page<UserShortView> listUsers(int pageIndex, int pageSize, UserShortView.Filters filters) {
         final var page = boUserShortViewRepository.findAll(filters.loginLike().orElse(null), PageRequest.of(pageIndex, pageSize,
                 Sort.by(Sort.Direction.DESC, "created_at")));
         return Page.<UserShortView>builder()
                 .content(page.getContent().stream().map(BoUserShortQueryEntity::toDomain).toList())
-                .totalItemNumber((int) page.getTotalElements())
-                .totalPageNumber(page.getTotalPages())
-                .build();
-    }
-
-    @Override
-    public Page<OldProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds) {
-        final var page = boProjectRepository.findAll(isNull(projectIds) ? List.of() : projectIds,
-                PageRequest.of(pageIndex, pageSize));
-        return Page.<OldProjectView>builder()
-                .content(page.getContent().stream().map(BoProjectQueryEntity::toView).toList())
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();

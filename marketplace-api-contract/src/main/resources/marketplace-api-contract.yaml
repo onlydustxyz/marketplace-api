@@ -3484,11 +3484,6 @@ components:
       format: uuid
       description: OnlyDust committee ID
 
-    CommitteeQuestionId:
-      type: string
-      format: uuid
-      description: OnlyDust committee question ID
-
     CommitteeCriteriaId:
       type: string
       format: uuid
@@ -7011,10 +7006,13 @@ components:
       type: object
       required:
         - questionId
-        - answer
+        - required
       properties:
         questionId:
-          $ref: '#/components/schemas/CommitteeQuestionId'
+          type: string
+          format: uuid
+        required:
+          type: boolean
         answer:
           type: string
 

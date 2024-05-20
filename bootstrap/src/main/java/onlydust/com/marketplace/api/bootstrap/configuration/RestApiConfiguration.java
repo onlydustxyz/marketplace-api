@@ -85,7 +85,8 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public CommitteeRestApi committeeRestApi(){
-        return new CommitteeRestApi();
+    public CommitteeRestApi committeeRestApi(final AuthenticatedAppUserService authenticatedAppUserService,
+                                             final CommitteeFacadePort committeeFacadePort){
+        return new CommitteeRestApi(authenticatedAppUserService, committeeFacadePort);
     }
 }

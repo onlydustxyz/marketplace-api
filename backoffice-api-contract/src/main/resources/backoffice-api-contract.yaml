@@ -1287,102 +1287,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
   # Backoffice ===============================================================
-  /bo/v1/repositories:
-    get:
-      security:
-        - apiKey: [ ]
-        - bearerAuth: [ ]
-      tags:
-        - Backoffice
-      summary: Get github repository page
-      operationId: getGithubRepositoryPage
-      description: |
-        Get github repository page
-      parameters:
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: projectIds
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-              format: uuid
-          style: form
-      responses:
-        "200":
-          description: 'Github repository page'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GithubRepositoryPage'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
-  /bo/v1/project-lead-invitations:
-    get:
-      security:
-        - apiKey: [ ]
-        - bearerAuth: [ ]
-      tags:
-        - Backoffice
-      summary: Get project lead invitations page
-      operationId: getProjectLeadInvitationPage
-      description: |
-        Get project lead invitations page
-      parameters:
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: ids
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-              format: uuid
-          style: form
-        - in: query
-          name: projectIds
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-              format: uuid
-          style: form
-      responses:
-        "200":
-          description: 'Project Lead Invitation page'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProjectLeadInvitationPage'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
-
   /bo/v1/users:
     get:
       security:
@@ -1533,49 +1437,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /bo/v1/projects:
-    get:
-      security:
-        - apiKey: [ ]
-        - bearerAuth: [ ]
-      tags:
-        - Backoffice
-      summary: Get project page
-      operationId: getOldProjectPage
-      description: |
-        Get project page
-      parameters:
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: projectIds
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-              format: uuid
-          style: form
-      responses:
-        "200":
-          description: 'Project page'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OldProjectPage'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
-  /bo/v2/projects:
     get:
       security:
         - apiKey: [ ]
@@ -2217,12 +2078,8 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateCommitteeRequest'
       responses:
-        "200":
+        "206":
           description: 'Updated committee'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CommitteeResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -2445,29 +2302,6 @@ components:
         - BO_MARKETING_ADMIN
         - BO_ADMIN
         - BO_READER
-
-    GithubRepositoryPage:
-      type: object
-      required:
-        - contributors
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-        - hasMore
-      properties:
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        hasMore:
-          type: boolean
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
-        githubRepositories:
-          type: array
-          items:
-            $ref: '#/components/schemas/GithubRepositoryResponse'
 
     OldSponsorPage:
       type: object
@@ -3561,80 +3395,6 @@ components:
           items:
             $ref: '#/components/schemas/ProjectPageItemResponse'
 
-    OldProjectPage:
-      type: object
-      required:
-        - projects
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-        - hasMore
-      properties:
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        hasMore:
-          type: boolean
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
-        projects:
-          type: array
-          items:
-            $ref: '#/components/schemas/OldProjectPageItemResponse'
-
-    OldProjectPageItemResponse:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        shortDescription:
-          type: string
-        longDescription:
-          type: string
-        moreInfoLinks:
-          type: array
-          items:
-            type: string
-        logoUrl:
-          type: string
-        hiring:
-          type: boolean
-        rank:
-          type: integer
-        visibility:
-          $ref: '#/components/schemas/ProjectVisibility'
-        projectLeads:
-          type: array
-          items:
-            type: string
-            format: uuid
-        createdAt:
-          type: string
-          format: date-time
-        activeContributors:
-          type: integer
-          format: int64
-        newContributors:
-          type: integer
-          format: int64
-        uniqueRewardedContributors:
-          type: integer
-          format: int64
-        openedIssues:
-          type: integer
-          format: int64
-        contributions:
-          type: integer
-          format: int64
-        dollarsEquivalentAmountSent:
-          type: number
-        strkAmountSent:
-          type: number
 
     ProjectPageItemResponse:
       type: object
@@ -3646,12 +3406,6 @@ components:
           type: string
         logoUrl:
           type: string
-
-    ProjectVisibility:
-      type: string
-      enum:
-        - PUBLIC
-        - PRIVATE
 
     LanguageCreateRequest:
       type: object
@@ -4512,7 +4266,7 @@ components:
       enum:
         - DRAFT
         - OPEN_TO_VOTES
-        - OPEN_FOR_REGISTRATIONS
+        - OPEN_TO_APPLICATIONS
         - CLOSED
 
     CreateCommitteeRequest:
@@ -4542,6 +4296,7 @@ components:
         - name
         - startDate
         - endDate
+        - status
       properties:
         id:
           type: string
@@ -4554,6 +4309,8 @@ components:
         endDate:
           type: string
           format: 'date-time'
+        status:
+          $ref: '#/components/schemas/CommitteeStatus'
         sponsor:
           $ref: '#/components/schemas/SponsorLinkResponse'
         juryCount:
@@ -4672,18 +4429,17 @@ components:
       required:
         - criteria
       properties:
-        id:
-          type: string
-          format: uuid
         criteria:
           type: string
 
     UpdateCommitteeRequest:
       type: object
+      required:
+        - name
+        - startDate
+        - endDate
+        - status
       properties:
-        id:
-          type: string
-          format: uuid
         name:
           type: string
         startDate:
@@ -4719,6 +4475,8 @@ components:
         maximumAllocationAmount:
           type: number
           format: int64
+        status:
+          $ref: '#/components/schemas/CommitteeStatus'
 
     UpdateCommitteeStatusRequest:
       type: object

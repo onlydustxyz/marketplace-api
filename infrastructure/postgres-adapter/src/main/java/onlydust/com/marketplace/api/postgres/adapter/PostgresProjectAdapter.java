@@ -64,6 +64,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final HiddenContributorRepository hiddenContributorRepository;
     private final ProjectTagRepository projectTagRepository;
     private final ProjectCategoryRepository projectCategoryRepository;
+    private final ProjectInfosViewRepository projectInfosViewRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -117,13 +118,13 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     public boolean hasUserAccessToProject(UUID projectId, UUID userId) {
         return customProjectRepository.isProjectPublic(projectId) ||
-                (userId != null && customProjectRepository.hasUserAccessToProject(projectId, userId));
+               (userId != null && customProjectRepository.hasUserAccessToProject(projectId, userId));
     }
 
     @Override
     public boolean hasUserAccessToProject(String projectSlug, UUID userId) {
         return customProjectRepository.isProjectPublic(projectSlug) ||
-                (userId != null && customProjectRepository.hasUserAccessToProject(projectSlug, userId));
+               (userId != null && customProjectRepository.hasUserAccessToProject(projectSlug, userId));
     }
 
     private ProjectDetailsView getProjectDetails(ProjectViewEntity projectView, User caller) {
@@ -288,12 +289,12 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
             if (nonNull(projectLeaderInvitations)) {
                 projectLeaderInvitations.removeIf(invitation -> githubUserIdsAsProjectLeadersToInvite.stream()
                         .noneMatch(githubUserId -> invitation.getGithubUserId().equals(githubUserId) &&
-                                invitation.getProjectId().equals(projectId)));
+                                                   invitation.getProjectId().equals(projectId)));
 
                 projectLeaderInvitations.addAll(githubUserIdsAsProjectLeadersToInvite.stream()
                         .filter(githubUserId -> projectLeaderInvitations.stream()
                                 .noneMatch(invitation -> invitation.getGithubUserId().equals(githubUserId) &&
-                                        invitation.getProjectId().equals(projectId)))
+                                                         invitation.getProjectId().equals(projectId)))
                         .map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId,
                                 githubUserId)).toList());
             } else {
@@ -516,7 +517,19 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     @Override
+    @Transactional
     public void createCategory(ProjectCategory projectCategory) {
         projectCategoryRepository.save(ProjectCategoryEntity.fromDomain(projectCategory));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean exists(UUID projectId) {
+        return projectRepository.existsById(projectId);
+    }
+
+    @Override
+    public CommitteeApplicationView.ProjectInfosView getProjectInfos(UUID projectId) {
+        return projectInfosViewRepository.findByProjectId(projectId).toView();
     }
 }
