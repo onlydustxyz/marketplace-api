@@ -2145,7 +2145,7 @@ paths:
         - bearerAuth: [ ]
       tags:
         - BackOfficeCommitteeManagement
-      summary: Allocate budget to committee
+      summary: Allocate budget to projects
       operationId: allocateBudget
       description: |
         Allocate budget to committee

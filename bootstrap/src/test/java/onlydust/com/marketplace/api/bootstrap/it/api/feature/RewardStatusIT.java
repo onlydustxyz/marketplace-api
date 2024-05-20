@@ -232,11 +232,11 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         final var em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("""
-                        INSERT INTO indexer_exp.github_accounts (id, login, type, html_url, avatar_url, name, tech_created_at, tech_updated_at, bio, location, website, twitter, linkedin, telegram) VALUES (1, 'mmaderic', 'USER', 'https://github.com/mmaderic', 'https://avatars.githubusercontent.com/u/39437117?v=4', 'Mateo Mađerić', '2023-11-21 12:12:48.074041', '2023-11-22 17:33:48.497915', null, 'Croatia', '', null, null, null);
-                        INSERT INTO indexer_exp.github_accounts (id, login, type, html_url, avatar_url, name, tech_created_at, tech_updated_at, bio, location, website, twitter, linkedin, telegram) VALUES (2, 'jannesblobel', 'USER', 'https://github.com/jannesblobel', 'https://avatars.githubusercontent.com/u/72493222?v=4', 'Jannes Blobel', '2023-11-09 22:11:21.150640', '2023-11-22 19:47:47.779641', null, null, '', null, null, null);
-                        INSERT INTO indexer_exp.github_accounts (id, login, type, html_url, avatar_url, name, tech_created_at, tech_updated_at, bio, location, website, twitter, linkedin, telegram) VALUES (3, 'nickdbush', 'USER', 'https://github.com/nickdbush', 'https://avatars.githubusercontent.com/u/10998201?v=4', 'Nicholas Bush', '2023-11-21 12:12:48.709373', '2023-11-22 17:33:48.580450', 'Building a digital news platform at The Student, Europe''s oldest student newspaper.', 'Edinburgh, UK', 'https://nickdbush.com/', 'https://twitter.com/nickdbush', null, null);
-                        INSERT INTO indexer_exp.github_accounts (id, login, type, html_url, avatar_url, name, tech_created_at, tech_updated_at, bio, location, website, twitter, linkedin, telegram) VALUES (4, 'acomminos', 'USER', 'https://github.com/acomminos', 'https://avatars.githubusercontent.com/u/628035?v=4', 'Andrew Comminos', '2023-11-09 22:11:21.150640', '2023-11-22 17:10:10.039392', null, 'San Francisco', 'comminos.com', 'https://twitter.com/acomminos', null, null);
-                        INSERT INTO indexer_exp.github_accounts (id, login, type, html_url, avatar_url, name, tech_created_at, tech_updated_at, bio, location, website, twitter, linkedin, telegram) VALUES (5, 'yanns', 'USER', 'https://github.com/yanns', 'https://avatars.githubusercontent.com/u/51669?v=4', 'Yann Simon', '2023-11-09 22:11:21.150640', '2023-11-22 17:13:06.290191', null, 'Berlin', 'https://yanns.github.io/', 'https://twitter.com/simon_yann', null, null);
+                        INSERT INTO indexer_exp.github_accounts (id, login, type, html_url, avatar_url, name, tech_created_at, tech_updated_at, bio, location, website, twitter, linkedin, telegram) VALUES (1, 'mmaderic_test', 'USER', 'https://github.com/mmaderic_test', 'https://avatars.githubusercontent.com/u/39437117?v=4', 'Mateo Mađerić', '2023-11-21 12:12:48.074041', '2023-11-22 17:33:48.497915', null, 'Croatia', '', null, null, null);
+                        INSERT INTO indexer_exp.github_accounts (id, login, type, html_url, avatar_url, name, tech_created_at, tech_updated_at, bio, location, website, twitter, linkedin, telegram) VALUES (2, 'jannesblobel_test', 'USER', 'https://github.com/jannesblobel_test', 'https://avatars.githubusercontent.com/u/72493222?v=4', 'Jannes Blobel', '2023-11-09 22:11:21.150640', '2023-11-22 19:47:47.779641', null, null, '', null, null, null);
+                        INSERT INTO indexer_exp.github_accounts (id, login, type, html_url, avatar_url, name, tech_created_at, tech_updated_at, bio, location, website, twitter, linkedin, telegram) VALUES (3, 'nickdbush_test', 'USER', 'https://github.com/nickdbush_test', 'https://avatars.githubusercontent.com/u/10998201?v=4', 'Nicholas Bush', '2023-11-21 12:12:48.709373', '2023-11-22 17:33:48.580450', 'Building a digital news platform at The Student, Europe''s oldest student newspaper.', 'Edinburgh, UK', 'https://nickdbush_test.com/', 'https://twitter.com/nickdbush_test', null, null);
+                        INSERT INTO indexer_exp.github_accounts (id, login, type, html_url, avatar_url, name, tech_created_at, tech_updated_at, bio, location, website, twitter, linkedin, telegram) VALUES (4, 'acomminos_test', 'USER', 'https://github.com/acomminos_test', 'https://avatars.githubusercontent.com/u/628035?v=4', 'Andrew Comminos', '2023-11-09 22:11:21.150640', '2023-11-22 17:10:10.039392', null, 'San Francisco', 'comminos.com', 'https://twitter.com/acomminos_test', null, null);
+                        INSERT INTO indexer_exp.github_accounts (id, login, type, html_url, avatar_url, name, tech_created_at, tech_updated_at, bio, location, website, twitter, linkedin, telegram) VALUES (5, 'yanns_test', 'USER', 'https://github.com/yanns_test', 'https://avatars.githubusercontent.com/u/51669?v=4', 'Yann Simon', '2023-11-09 22:11:21.150640', '2023-11-22 17:13:06.290191', null, 'Berlin', 'https://yanns_test.github.io/', 'https://twitter.com/simon_yann', null, null);
                         INSERT INTO indexer_exp.github_repos (id, owner_id, name, html_url, updated_at, description, stars_count, forks_count, has_issues, parent_id, tech_created_at, tech_updated_at, owner_login, visibility) VALUES (11223344, 98735558, 'account-obstr-2', 'https://github.com/onlydustxyz/account-obstr', '2022-11-01 18:27:14.000000', null, 0, 0, true, null, '2023-11-22 14:19:27.975872', '2023-12-04 14:24:00.541641', 'onlydustxyz', 'PUBLIC');
                         INSERT INTO indexer_exp.github_repos (id, owner_id, name, html_url, updated_at, description, stars_count, forks_count, has_issues, parent_id, tech_created_at, tech_updated_at, owner_login, visibility) VALUES (55223344, 98735558, 'marketplace-provisionning-2', 'https://github.com/onlydustxyz/marketplace-provisionning', '2023-07-31 08:56:57.000000', null, 0, 0, true, null, '2023-11-22 14:19:27.975893', '2023-12-04 14:24:01.809884', 'onlydustxyz', 'PUBLIC');
                         INSERT INTO indexer_exp.github_pull_requests (id, repo_id, number, title, status, created_at, closed_at, merged_at, author_id, html_url, body, comments_count, tech_created_at, tech_updated_at, draft, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url, review_state, commit_count) VALUES (0011051356, 55223344, 1, 'fix issue link query', 'MERGED', '2023-11-21 14:13:35.000000', '2023-11-21 14:27:21.000000', '2023-11-21 14:27:21.000000', 1, 'https://github.com/onlydustxyz/marketplace-api/pull/128', null, 0, '2023-11-21 15:17:17.139895', '2023-11-22 17:49:23.008254', false, 'onlydustxyz', 'marketplace-api', 'https://github.com/onlydustxyz/marketplace-api', 'AnthonyBuisset', 'https://github.com/AnthonyBuisset', 'https://avatars.githubusercontent.com/u/43467246?v=4', 'PENDING_REVIEWER', 1);
@@ -268,11 +268,11 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
     public void setupPendingBillingProfile() {
         setUp();
-        userAuthHelper.signUpUser(UUID.randomUUID(), 1L, "mmaderic", "https://avatars.githubusercontent.com/u/39437117?v=4", false);
-        userAuthHelper.signUpUser(UUID.randomUUID(), 2L, "jannesblobel", "https://avatars.githubusercontent.com/u/72493222?v=4", false);
-        userAuthHelper.signUpUser(UUID.randomUUID(), 3L, "nickdbush", "https://avatars.githubusercontent.com/u/628035?v=4", false);
-        userAuthHelper.signUpUser(UUID.randomUUID(), 4L, "acomminos", "https://avatars.githubusercontent.com/u/628035?v=4", false);
-        userAuthHelper.signUpUser(UUID.randomUUID(), 5L, "yanns", "https://avatars.githubusercontent.com/u/51669?v=4", false);
+        userAuthHelper.signUpUser(UUID.randomUUID(), 1L, "mmaderic_test", "https://avatars.githubusercontent.com/u/39437117?v=4", false);
+        userAuthHelper.signUpUser(UUID.randomUUID(), 2L, "jannesblobel_test", "https://avatars.githubusercontent.com/u/72493222?v=4", false);
+        userAuthHelper.signUpUser(UUID.randomUUID(), 3L, "nickdbush_test", "https://avatars.githubusercontent.com/u/628035?v=4", false);
+        userAuthHelper.signUpUser(UUID.randomUUID(), 4L, "acomminos_test", "https://avatars.githubusercontent.com/u/628035?v=4", false);
+        userAuthHelper.signUpUser(UUID.randomUUID(), 5L, "yanns_test", "https://avatars.githubusercontent.com/u/51669?v=4", false);
     }
 
     private void updatePayoutPreferences(final Long githubUserId, BillingProfile.Id billingProfileId, final UUID projectId) {
@@ -4243,7 +4243,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
               },
               "to": {
                 "githubUserId": 1,
-                "login": "mmaderic",
+                "login": "mmaderic_test",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/39437117?v=4"
               },
               "project": {
@@ -4276,7 +4276,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
               },
               "to": {
                 "githubUserId": 1,
-                "login": "mmaderic",
+                "login": "mmaderic_test",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/39437117?v=4"
               },
               
@@ -4312,7 +4312,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                },
                "to": {
                  "githubUserId": 2,
-                 "login": "jannesblobel",
+                 "login": "jannesblobel_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/72493222?v=4"
                },
                
@@ -4348,7 +4348,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                },
                "to": {
                  "githubUserId": 2,
-                 "login": "jannesblobel",
+                 "login": "jannesblobel_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/72493222?v=4"
                },
                
@@ -4384,7 +4384,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                },
                "to": {
                  "githubUserId": 3,
-                 "login": "nickdbush",
+                 "login": "nickdbush_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/10998201?v=4"
                },
                
@@ -4420,7 +4420,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                },
                "to": {
                  "githubUserId": 3,
-                 "login": "nickdbush",
+                 "login": "nickdbush_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/10998201?v=4"
                },
                
@@ -4456,7 +4456,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                },
                "to": {
                  "githubUserId": 5,
-                 "login": "yanns",
+                 "login": "yanns_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/51669?v=4"
                },
                
@@ -4492,7 +4492,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                },
                "to": {
                  "githubUserId": 5,
-                 "login": "yanns",
+                 "login": "yanns_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/51669?v=4"
                },
                
@@ -4528,7 +4528,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                },
                "to": {
                  "githubUserId": 5,
-                 "login": "yanns",
+                 "login": "yanns_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/51669?v=4"
                },
                
@@ -4565,7 +4565,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
               },
               "to": {
                 "githubUserId": 4,
-                "login": "acomminos",
+                "login": "acomminos_test",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/628035?v=4"
               },
               
@@ -4600,7 +4600,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
               },
               "to": {
                 "githubUserId": 4,
-                "login": "acomminos",
+                "login": "acomminos_test",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/628035?v=4"
               },
               
