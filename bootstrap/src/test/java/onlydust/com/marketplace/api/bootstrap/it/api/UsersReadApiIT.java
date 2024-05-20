@@ -41,7 +41,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "rank": 2,
                               "contributingStatus": "GREEN",
-                              "contributedProjectCount": 4,
+                              "contributedProjectCount": 5,
                               "contributionCount": 207,
                               "rewardCount": 12,
                               "totalEarnedUsd": 10605.00,
@@ -50,6 +50,12 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                                   "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
                                   "slug": "kaaper",
                                   "name": "kaaper",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "29cdf359-f60c-41a0-8b11-18d6841311f6",
+                                  "slug": "kaaper-3",
+                                  "name": "kaaper 3",
                                   "logoUrl": null
                                 },
                                 {
@@ -82,7 +88,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "rank": 3,
                               "contributingStatus": "GREEN",
-                              "contributedProjectCount": 4,
+                              "contributedProjectCount": 6,
                               "contributionCount": 225,
                               "rewardCount": 10,
                               "totalEarnedUsd": 1799150.00,
@@ -100,9 +106,21 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
                                 },
                                 {
+                                  "id": "5aabf0f1-7495-4bff-8de2-4396837ce6b4",
+                                  "slug": "marketplace-2",
+                                  "name": "Marketplace 2",
+                                  "logoUrl": null
+                                },
+                                {
                                   "id": "90fb751a-1137-4815-b3c4-54927a5db059",
                                   "slug": "no-sponsors",
                                   "name": "No sponsors",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "d4e8ab3b-a4a8-493d-83bd-a4c8283b94f9",
+                                  "slug": "oscars-awesome-project",
+                                  "name": "oscar's awesome project",
                                   "logoUrl": null
                                 },
                                 {
@@ -145,7 +163,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             }
                           ]
                         }
-                        """, true);
+                        """);
     }
 
     @Test

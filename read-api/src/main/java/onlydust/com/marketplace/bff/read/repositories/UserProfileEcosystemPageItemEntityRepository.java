@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface UserProfileEcosystemPageItemEntityRepository extends Repository<UserProfileEcosystemPageItemEntity, UUID> {
     @Query(value = """
-            select uer.ecosystem_id                     as ecosystem_id,
+            select uer.ecosystem_id                       as ecosystem_id,
                    uer.rank                               as rank,
                    case
                        when uer.rank_percentile < 0.33 THEN 'GREEN'
