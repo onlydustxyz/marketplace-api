@@ -94,9 +94,9 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                 "rank": 1,
                 "rankPercentile": 1,
                 "rankCategory": "A",
-                "contributedProjectCount": 8,
+                "contributedProjectCount": 7,
                 "leadedProjectCount": 2,
-                "contributionCount": 1098,
+                "contributionCount": 938,
                 "rewardCount": 21
               },
               "ecosystems": [
@@ -108,31 +108,10 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                   "bannerUrl": null
                 },
                 {
-                  "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
-                  "name": "Ethereum",
-                  "url": "https://ethereum.foundation/",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png",
-                  "bannerUrl": null
-                },
-                {
                   "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
                   "name": "Starknet",
                   "url": "https://www.starknet.io/en",
                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png",
-                  "bannerUrl": null
-                },
-                {
-                  "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
-                  "name": "Aptos",
-                  "url": "https://aptosfoundation.org/",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png",
-                  "bannerUrl": null
-                },
-                {
-                  "id": "b599313c-a074-440f-af04-a466529ab2e7",
-                  "name": "Zama",
-                  "url": "https://www.zama.ai/",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png",
                   "bannerUrl": null
                 },
                 {
