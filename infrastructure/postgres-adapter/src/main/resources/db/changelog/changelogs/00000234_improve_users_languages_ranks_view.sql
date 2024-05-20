@@ -37,6 +37,25 @@ REFRESH MATERIALIZED VIEW contributions_stats_per_user;
 
 
 
+CREATE MATERIALIZED VIEW contributions_stats_per_user_per_week AS
+SELECT c.contributor_id,
+       date_trunc('week', c.created_at)                              AS created_at_week,
+       count(DISTINCT c.id)                                          AS contribution_count,
+       array_agg(DISTINCT unnested.project_ids)                      AS project_ids,
+       array_length(array_agg(DISTINCT unnested.project_ids), 1)     AS project_count,
+       count(DISTINCT c.id) FILTER ( WHERE c.type = 'CODE_REVIEW' )  AS code_review_count,
+       count(DISTINCT c.id) FILTER ( WHERE c.type = 'ISSUE' )        AS issue_count,
+       count(DISTINCT c.id) FILTER ( WHERE c.type = 'PULL_REQUEST' ) AS pull_request_count
+FROM public_contributions c
+         CROSS JOIN unnest(c.project_ids) unnested(project_ids)
+GROUP BY c.contributor_id, date_trunc('week', c.created_at)
+;
+CREATE UNIQUE INDEX contributions_stats_per_user_per_week_pk ON contributions_stats_per_user_per_week (contributor_id, created_at_week);
+CREATE UNIQUE INDEX contributions_stats_per_user_per_week_rpk ON contributions_stats_per_user_per_week (created_at_week, contributor_id);
+REFRESH MATERIALIZED VIEW contributions_stats_per_user_per_week;
+
+
+
 CREATE MATERIALIZED VIEW contributions_stats_per_ecosystem_per_user AS
 SELECT c.contributor_id,
        pe.ecosystem_id,
@@ -55,6 +74,27 @@ GROUP BY pe.ecosystem_id, c.contributor_id
 CREATE UNIQUE INDEX contributions_stats_per_ecosystem_per_user_pk ON contributions_stats_per_ecosystem_per_user (ecosystem_id, contributor_id);
 CREATE UNIQUE INDEX contributions_stats_per_ecosystem_per_user_rpk ON contributions_stats_per_ecosystem_per_user (contributor_id, ecosystem_id);
 REFRESH MATERIALIZED VIEW contributions_stats_per_ecosystem_per_user;
+
+
+
+CREATE MATERIALIZED VIEW contributions_stats_per_ecosystem_per_user_per_week AS
+SELECT c.contributor_id,
+       pe.ecosystem_id,
+       date_trunc('week', c.created_at)                              AS created_at_week,
+       count(DISTINCT c.id)                                          AS contribution_count,
+       array_agg(DISTINCT pe.project_id)                             AS project_ids,
+       array_length(array_agg(DISTINCT pe.project_id), 1)            AS project_count,
+       count(DISTINCT c.id) FILTER ( WHERE c.type = 'CODE_REVIEW' )  AS code_review_count,
+       count(DISTINCT c.id) FILTER ( WHERE c.type = 'ISSUE' )        AS issue_count,
+       count(DISTINCT c.id) FILTER ( WHERE c.type = 'PULL_REQUEST' ) AS pull_request_count
+FROM public_contributions c
+         JOIN projects_ecosystems pe
+              on pe.project_id = any (c.project_ids)
+GROUP BY pe.ecosystem_id, c.contributor_id, date_trunc('week', c.created_at)
+;
+CREATE UNIQUE INDEX contributions_stats_per_ecosystem_per_user_per_week_pk ON contributions_stats_per_ecosystem_per_user_per_week (ecosystem_id, contributor_id, created_at_week);
+CREATE UNIQUE INDEX contributions_stats_per_ecosystem_per_user_per_week_rpk ON contributions_stats_per_ecosystem_per_user_per_week (contributor_id, ecosystem_id, created_at_week);
+REFRESH MATERIALIZED VIEW contributions_stats_per_ecosystem_per_user_per_week;
 
 
 
@@ -159,6 +199,22 @@ REFRESH MATERIALIZED VIEW received_rewards_stats_per_user;
 
 
 
+CREATE MATERIALIZED VIEW received_rewards_stats_per_user_per_week AS
+SELECT r.recipient_id,
+       date_trunc('week', r.requested_at)     AS requested_at_week,
+       count(DISTINCT r.id)                   AS reward_count,
+       count(DISTINCT r.project_id)           AS project_count,
+       round(sum(r.amount_usd_equivalent), 2) AS usd_total,
+       array_agg(DISTINCT r.project_id)       AS project_ids
+FROM public_received_rewards r
+GROUP BY r.recipient_id, date_trunc('week', r.requested_at)
+;
+CREATE UNIQUE INDEX received_rewards_stats_per_user_per_week_pk ON received_rewards_stats_per_user_per_week (recipient_id, requested_at_week);
+CREATE UNIQUE INDEX received_rewards_stats_per_user_per_week_rpk ON received_rewards_stats_per_user_per_week (requested_at_week, recipient_id);
+REFRESH MATERIALIZED VIEW received_rewards_stats_per_user_per_week;
+
+
+
 CREATE MATERIALIZED VIEW received_rewards_stats_per_ecosystem_per_user AS
 SELECT r.recipient_id,
        pe.ecosystem_id,
@@ -175,6 +231,25 @@ GROUP BY pe.ecosystem_id, r.recipient_id
 CREATE UNIQUE INDEX received_rewards_stats_per_ecosystem_per_user_pk ON received_rewards_stats_per_ecosystem_per_user (ecosystem_id, recipient_id);
 CREATE UNIQUE INDEX received_rewards_stats_per_ecosystem_per_user_rpk ON received_rewards_stats_per_ecosystem_per_user (recipient_id, ecosystem_id);
 REFRESH MATERIALIZED VIEW received_rewards_stats_per_ecosystem_per_user;
+
+
+
+CREATE MATERIALIZED VIEW received_rewards_stats_per_ecosystem_per_user_per_week AS
+SELECT r.recipient_id,
+       pe.ecosystem_id,
+       date_trunc('week', r.requested_at)     AS requested_at_week,
+       count(DISTINCT r.id)                   AS reward_count,
+       count(DISTINCT r.project_id)           AS project_count,
+       round(sum(r.amount_usd_equivalent), 2) AS usd_total,
+       array_agg(DISTINCT r.project_id)       AS project_ids
+FROM public_received_rewards r
+         JOIN projects_ecosystems pe
+              on pe.project_id = r.project_id
+GROUP BY pe.ecosystem_id, r.recipient_id, date_trunc('week', r.requested_at)
+;
+CREATE UNIQUE INDEX received_rewards_stats_per_ecosystem_per_user_per_week_pk ON received_rewards_stats_per_ecosystem_per_user_per_week (ecosystem_id, recipient_id, requested_at_week);
+CREATE UNIQUE INDEX received_rewards_stats_per_ecosystem_per_user_per_week_rpk ON received_rewards_stats_per_ecosystem_per_user_per_week (recipient_id, ecosystem_id, requested_at_week);
+REFRESH MATERIALIZED VIEW received_rewards_stats_per_ecosystem_per_user_per_week;
 
 
 
