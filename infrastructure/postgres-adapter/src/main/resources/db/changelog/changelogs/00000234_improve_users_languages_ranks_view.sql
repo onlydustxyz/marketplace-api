@@ -182,8 +182,8 @@ SELECT r.recipient_id,
        count(DISTINCT date_trunc('month'::text, r.requested_at)) AS rewarded_month_count,
        array_agg(distinct r.project_id)                          AS project_ids
 FROM public_received_rewards r
-         left JOIN language_file_extensions lfe
-                   on lfe.extension = any (r.main_file_extensions)
+         JOIN language_file_extensions lfe
+              on lfe.extension = any (r.main_file_extensions)
 GROUP BY lfe.language_id, r.recipient_id
 ;
 CREATE UNIQUE INDEX received_rewards_stats_per_language_per_user_pk ON received_rewards_stats_per_language_per_user (language_id, recipient_id);
@@ -195,13 +195,13 @@ REFRESH MATERIALIZED VIEW received_rewards_stats_per_language_per_user;
 CREATE MATERIALIZED VIEW received_rewards_stats_per_project_per_user AS
 SELECT r.recipient_id,
        r.project_id,
-       coalesce(array_agg(distinct pe.ecosystem_id)
-                filter (where pe.ecosystem_id is not null), '{}') AS ecosystem_ids,
-       count(r.id)                                                AS reward_count,
-       round(sum(r.amount_usd_equivalent), 2)                     AS usd_total,
-       count(DISTINCT date_trunc('month'::text, r.requested_at))  AS rewarded_month_count
+       coalesce((select array_agg(distinct pe.ecosystem_id) filter (where pe.ecosystem_id is not null)
+                 from projects_ecosystems pe
+                 where pe.project_id = r.project_id), '{}')      AS ecosystem_ids,
+       count(r.id)                                               AS reward_count,
+       round(sum(r.amount_usd_equivalent), 2)                    AS usd_total,
+       count(DISTINCT date_trunc('month'::text, r.requested_at)) AS rewarded_month_count
 FROM public_received_rewards r
-         LEFT JOIN projects_ecosystems pe ON pe.project_id = r.project_id
 GROUP BY r.project_id, r.recipient_id
 ;
 CREATE UNIQUE INDEX received_rewards_stats_per_project_per_user_pk ON received_rewards_stats_per_project_per_user (project_id, recipient_id);
