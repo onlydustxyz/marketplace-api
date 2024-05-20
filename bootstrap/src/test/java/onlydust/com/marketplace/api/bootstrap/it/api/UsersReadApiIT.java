@@ -41,55 +41,8 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "rank": 2,
                               "contributingStatus": "GREEN",
-                              "contributedProjectCount": 5,
-                              "contributionCount": 207,
-                              "rewardCount": 12,
-                              "totalEarnedUsd": 10605.00,
-                              "projects": [
-                                {
-                                  "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
-                                  "slug": "kaaper",
-                                  "name": "kaaper",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "id": "29cdf359-f60c-41a0-8b11-18d6841311f6",
-                                  "slug": "kaaper-3",
-                                  "name": "kaaper 3",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                                  "slug": "mooooooonlight",
-                                  "name": "Mooooooonlight",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
-                                },
-                                {
-                                  "id": "90fb751a-1137-4815-b3c4-54927a5db059",
-                                  "slug": "no-sponsors",
-                                  "name": "No sponsors",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "id": "f39b827f-df73-498c-8853-99bc3f562723",
-                                  "slug": "qa-new-contributions",
-                                  "name": "QA new contributions",
-                                  "logoUrl": null
-                                }
-                              ],
-                              "language": {
-                                "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
-                                "name": "Rust",
-                                "url": null,
-                                "logoUrl": null,
-                                "bannerUrl": null
-                              }
-                            },
-                            {
-                              "rank": 3,
-                              "contributingStatus": "GREEN",
                               "contributedProjectCount": 6,
-                              "contributionCount": 225,
+                              "contributionCount": 217,
                               "rewardCount": 10,
                               "totalEarnedUsd": 1799150.00,
                               "projects": [
@@ -139,6 +92,53 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               }
                             },
                             {
+                              "rank": 2,
+                              "contributingStatus": "GREEN",
+                              "contributedProjectCount": 5,
+                              "contributionCount": 192,
+                              "rewardCount": 12,
+                              "totalEarnedUsd": 10605.00,
+                              "projects": [
+                                {
+                                  "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                  "slug": "kaaper",
+                                  "name": "kaaper",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "29cdf359-f60c-41a0-8b11-18d6841311f6",
+                                  "slug": "kaaper-3",
+                                  "name": "kaaper 3",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                  "slug": "mooooooonlight",
+                                  "name": "Mooooooonlight",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                },
+                                {
+                                  "id": "90fb751a-1137-4815-b3c4-54927a5db059",
+                                  "slug": "no-sponsors",
+                                  "name": "No sponsors",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                                  "slug": "qa-new-contributions",
+                                  "name": "QA new contributions",
+                                  "logoUrl": null
+                                }
+                              ],
+                              "language": {
+                                "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
+                                "name": "Rust",
+                                "url": null,
+                                "logoUrl": null,
+                                "bannerUrl": null
+                              }
+                            },
+                            {
                               "rank": 16,
                               "contributingStatus": "GREEN",
                               "contributedProjectCount": 1,
@@ -178,16 +178,16 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 2,
-                          "totalItemNumber": 6,
-                          "hasMore": true,
-                          "nextPageIndex": 1,
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 3,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
                           "ecosystems": [
                             {
                               "rank": 1,
                               "contributingStatus": "GREEN",
                               "contributedProjectCount": 1,
-                              "contributionCount": 1045,
+                              "contributionCount": 888,
                               "rewardCount": 0,
                               "totalEarnedUsd": 0,
                               "projects": [
@@ -210,7 +210,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "rank": 1,
                               "contributingStatus": "GREEN",
                               "contributedProjectCount": 1,
-                              "contributionCount": 1045,
+                              "contributionCount": 888,
                               "rewardCount": 0,
                               "totalEarnedUsd": 0,
                               "projects": [
@@ -230,71 +230,25 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               }
                             },
                             {
-                              "rank": 3,
-                              "contributingStatus": "ORANGE",
+                              "rank": 8,
+                              "contributingStatus": "GREEN",
                               "contributedProjectCount": 1,
-                              "contributionCount": 1,
+                              "contributionCount": 888,
                               "rewardCount": 0,
                               "totalEarnedUsd": 0,
                               "projects": [
                                 {
-                                  "id": "7d04163c-4187-4313-8066-61504d34fc56",
-                                  "slug": "bretzel",
-                                  "name": "Bretzel",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                  "slug": "mooooooonlight",
+                                  "name": "Mooooooonlight",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
                                 }
                               ],
                               "ecosystem": {
-                                "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
-                                "name": "Ethereum",
-                                "url": "https://ethereum.foundation/",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png",
-                                "bannerUrl": null
-                              }
-                            },
-                            {
-                              "rank": 3,
-                              "contributingStatus": "ORANGE",
-                              "contributedProjectCount": 1,
-                              "contributionCount": 1,
-                              "rewardCount": 0,
-                              "totalEarnedUsd": 0,
-                              "projects": [
-                                {
-                                  "id": "7d04163c-4187-4313-8066-61504d34fc56",
-                                  "slug": "bretzel",
-                                  "name": "Bretzel",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
-                                }
-                              ],
-                              "ecosystem": {
-                                "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
-                                "name": "Aptos",
-                                "url": "https://aptosfoundation.org/",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png",
-                                "bannerUrl": null
-                              }
-                            },
-                            {
-                              "rank": 3,
-                              "contributingStatus": "ORANGE",
-                              "contributedProjectCount": 1,
-                              "contributionCount": 1,
-                              "rewardCount": 0,
-                              "totalEarnedUsd": 0,
-                              "projects": [
-                                {
-                                  "id": "7d04163c-4187-4313-8066-61504d34fc56",
-                                  "slug": "bretzel",
-                                  "name": "Bretzel",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
-                                }
-                              ],
-                              "ecosystem": {
-                                "id": "b599313c-a074-440f-af04-a466529ab2e7",
-                                "name": "Zama",
-                                "url": "https://www.zama.ai/",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png",
+                                "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                                "name": "Starknet",
+                                "url": "https://www.starknet.io/en",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png",
                                 "bannerUrl": null
                               }
                             }
@@ -321,30 +275,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "rank": 4,
                               "contributingStatus": "GREEN",
                               "contributedProjectCount": 1,
-                              "contributionCount": 269,
-                              "rewardCount": 1,
-                              "totalEarnedUsd": 10100.00,
-                              "projects": [
-                                {
-                                  "id": "90fb751a-1137-4815-b3c4-54927a5db059",
-                                  "slug": "no-sponsors",
-                                  "name": "No sponsors",
-                                  "logoUrl": null
-                                }
-                              ],
-                              "ecosystem": {
-                                "id": "397df411-045d-4d9f-8d65-8284c88f9208",
-                                "name": "Avail",
-                                "url": "https://www.availproject.org/",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png",
-                                "bannerUrl": null
-                              }
-                            },
-                            {
-                              "rank": 4,
-                              "contributingStatus": "GREEN",
-                              "contributedProjectCount": 1,
-                              "contributionCount": 269,
+                              "contributionCount": 213,
                               "rewardCount": 1,
                               "totalEarnedUsd": 1010.00,
                               "projects": [
@@ -364,10 +295,33 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               }
                             },
                             {
-                              "rank": 29,
+                              "rank": 4,
                               "contributingStatus": "GREEN",
                               "contributedProjectCount": 1,
-                              "contributionCount": 269,
+                              "contributionCount": 213,
+                              "rewardCount": 1,
+                              "totalEarnedUsd": 10100.00,
+                              "projects": [
+                                {
+                                  "id": "90fb751a-1137-4815-b3c4-54927a5db059",
+                                  "slug": "no-sponsors",
+                                  "name": "No sponsors",
+                                  "logoUrl": null
+                                }
+                              ],
+                              "ecosystem": {
+                                "id": "397df411-045d-4d9f-8d65-8284c88f9208",
+                                "name": "Avail",
+                                "url": "https://www.availproject.org/",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png",
+                                "bannerUrl": null
+                              }
+                            },
+                            {
+                              "rank": 27,
+                              "contributingStatus": "GREEN",
+                              "contributedProjectCount": 1,
+                              "contributionCount": 213,
                               "rewardCount": 1,
                               "totalEarnedUsd": 1010.00,
                               "projects": [
@@ -457,14 +411,6 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "year": 2022,
-                              "week": 21,
-                              "codeReviewCount": 1,
-                              "issueCount": 0,
-                              "pullRequestCount": 0,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
                               "week": 22,
                               "codeReviewCount": 1,
                               "issueCount": 0,
@@ -498,15 +444,15 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 27,
-                              "codeReviewCount": 10,
+                              "codeReviewCount": 8,
                               "issueCount": 3,
-                              "pullRequestCount": 11,
+                              "pullRequestCount": 10,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 28,
-                              "codeReviewCount": 9,
+                              "codeReviewCount": 8,
                               "issueCount": 5,
                               "pullRequestCount": 8,
                               "rewardCount": 0
@@ -514,7 +460,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 29,
-                              "codeReviewCount": 9,
+                              "codeReviewCount": 8,
                               "issueCount": 0,
                               "pullRequestCount": 1,
                               "rewardCount": 0
@@ -524,13 +470,13 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "week": 30,
                               "codeReviewCount": 7,
                               "issueCount": 0,
-                              "pullRequestCount": 2,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 31,
-                              "codeReviewCount": 11,
+                              "codeReviewCount": 6,
                               "issueCount": 0,
                               "pullRequestCount": 15,
                               "rewardCount": 0
@@ -546,7 +492,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 33,
-                              "codeReviewCount": 3,
+                              "codeReviewCount": 2,
                               "issueCount": 0,
                               "pullRequestCount": 2,
                               "rewardCount": 0
@@ -554,7 +500,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 34,
-                              "codeReviewCount": 5,
+                              "codeReviewCount": 3,
                               "issueCount": 0,
                               "pullRequestCount": 5,
                               "rewardCount": 0
@@ -562,15 +508,15 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 35,
-                              "codeReviewCount": 8,
+                              "codeReviewCount": 6,
                               "issueCount": 0,
-                              "pullRequestCount": 12,
+                              "pullRequestCount": 11,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 36,
-                              "codeReviewCount": 11,
+                              "codeReviewCount": 8,
                               "issueCount": 0,
                               "pullRequestCount": 13,
                               "rewardCount": 0
@@ -578,17 +524,17 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 37,
-                              "codeReviewCount": 7,
+                              "codeReviewCount": 5,
                               "issueCount": 0,
-                              "pullRequestCount": 6,
+                              "pullRequestCount": 5,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 38,
-                              "codeReviewCount": 7,
+                              "codeReviewCount": 6,
                               "issueCount": 0,
-                              "pullRequestCount": 6,
+                              "pullRequestCount": 5,
                               "rewardCount": 0
                             },
                             {
@@ -602,15 +548,15 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 40,
-                              "codeReviewCount": 10,
+                              "codeReviewCount": 8,
                               "issueCount": 0,
-                              "pullRequestCount": 8,
+                              "pullRequestCount": 7,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 41,
-                              "codeReviewCount": 6,
+                              "codeReviewCount": 3,
                               "issueCount": 0,
                               "pullRequestCount": 2,
                               "rewardCount": 0
@@ -618,7 +564,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 42,
-                              "codeReviewCount": 3,
+                              "codeReviewCount": 2,
                               "issueCount": 0,
                               "pullRequestCount": 7,
                               "rewardCount": 0
@@ -626,7 +572,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 43,
-                              "codeReviewCount": 6,
+                              "codeReviewCount": 5,
                               "issueCount": 0,
                               "pullRequestCount": 2,
                               "rewardCount": 0
@@ -634,7 +580,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 44,
-                              "codeReviewCount": 2,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 3,
                               "rewardCount": 0
@@ -642,7 +588,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 45,
-                              "codeReviewCount": 5,
+                              "codeReviewCount": 4,
                               "issueCount": 0,
                               "pullRequestCount": 4,
                               "rewardCount": 0
@@ -650,7 +596,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 46,
-                              "codeReviewCount": 20,
+                              "codeReviewCount": 14,
                               "issueCount": 0,
                               "pullRequestCount": 8,
                               "rewardCount": 0
@@ -658,7 +604,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 47,
-                              "codeReviewCount": 13,
+                              "codeReviewCount": 10,
                               "issueCount": 0,
                               "pullRequestCount": 10,
                               "rewardCount": 0
@@ -666,7 +612,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 48,
-                              "codeReviewCount": 11,
+                              "codeReviewCount": 7,
                               "issueCount": 0,
                               "pullRequestCount": 6,
                               "rewardCount": 0
@@ -674,23 +620,23 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 49,
-                              "codeReviewCount": 11,
+                              "codeReviewCount": 6,
                               "issueCount": 0,
-                              "pullRequestCount": 11,
+                              "pullRequestCount": 10,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 50,
-                              "codeReviewCount": 8,
+                              "codeReviewCount": 7,
                               "issueCount": 0,
-                              "pullRequestCount": 5,
+                              "pullRequestCount": 4,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 51,
-                              "codeReviewCount": 9,
+                              "codeReviewCount": 8,
                               "issueCount": 0,
                               "pullRequestCount": 12,
                               "rewardCount": 0
@@ -698,15 +644,15 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 52,
-                              "codeReviewCount": 8,
+                              "codeReviewCount": 5,
                               "issueCount": 0,
-                              "pullRequestCount": 9,
+                              "pullRequestCount": 8,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 1,
-                              "codeReviewCount": 11,
+                              "codeReviewCount": 9,
                               "issueCount": 0,
                               "pullRequestCount": 9,
                               "rewardCount": 1
@@ -714,7 +660,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 2,
-                              "codeReviewCount": 12,
+                              "codeReviewCount": 10,
                               "issueCount": 0,
                               "pullRequestCount": 7,
                               "rewardCount": 0
@@ -722,7 +668,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 3,
-                              "codeReviewCount": 16,
+                              "codeReviewCount": 13,
                               "issueCount": 0,
                               "pullRequestCount": 8,
                               "rewardCount": 0
@@ -730,7 +676,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 4,
-                              "codeReviewCount": 23,
+                              "codeReviewCount": 18,
                               "issueCount": 0,
                               "pullRequestCount": 11,
                               "rewardCount": 2
@@ -738,7 +684,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 5,
-                              "codeReviewCount": 30,
+                              "codeReviewCount": 19,
                               "issueCount": 0,
                               "pullRequestCount": 19,
                               "rewardCount": 1
@@ -746,7 +692,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 6,
-                              "codeReviewCount": 17,
+                              "codeReviewCount": 9,
                               "issueCount": 0,
                               "pullRequestCount": 9,
                               "rewardCount": 1
@@ -754,9 +700,9 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 8,
-                              "codeReviewCount": 15,
+                              "codeReviewCount": 10,
                               "issueCount": 0,
-                              "pullRequestCount": 10,
+                              "pullRequestCount": 7,
                               "rewardCount": 0
                             },
                             {
@@ -770,9 +716,9 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 10,
-                              "codeReviewCount": 14,
+                              "codeReviewCount": 11,
                               "issueCount": 0,
-                              "pullRequestCount": 24,
+                              "pullRequestCount": 20,
                               "rewardCount": 0
                             },
                             {
@@ -780,21 +726,21 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "week": 11,
                               "codeReviewCount": 10,
                               "issueCount": 0,
-                              "pullRequestCount": 10,
+                              "pullRequestCount": 9,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 12,
-                              "codeReviewCount": 8,
+                              "codeReviewCount": 6,
                               "issueCount": 0,
-                              "pullRequestCount": 17,
+                              "pullRequestCount": 16,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 13,
-                              "codeReviewCount": 6,
+                              "codeReviewCount": 5,
                               "issueCount": 4,
                               "pullRequestCount": 7,
                               "rewardCount": 0
@@ -818,7 +764,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 16,
-                              "codeReviewCount": 7,
+                              "codeReviewCount": 6,
                               "issueCount": 0,
                               "pullRequestCount": 10,
                               "rewardCount": 1
@@ -826,14 +772,6 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 17,
-                              "codeReviewCount": 8,
-                              "issueCount": 0,
-                              "pullRequestCount": 20,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 18,
                               "codeReviewCount": 7,
                               "issueCount": 0,
                               "pullRequestCount": 18,
@@ -841,10 +779,18 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "year": 2023,
+                              "week": 18,
+                              "codeReviewCount": 7,
+                              "issueCount": 0,
+                              "pullRequestCount": 17,
+                              "rewardCount": 0
+                            },
+                            {
+                              "year": 2023,
                               "week": 19,
                               "codeReviewCount": 10,
                               "issueCount": 0,
-                              "pullRequestCount": 10,
+                              "pullRequestCount": 9,
                               "rewardCount": 0
                             },
                             {
@@ -858,9 +804,9 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 21,
-                              "codeReviewCount": 4,
+                              "codeReviewCount": 2,
                               "issueCount": 0,
-                              "pullRequestCount": 17,
+                              "pullRequestCount": 14,
                               "rewardCount": 0
                             },
                             {
@@ -882,15 +828,15 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 24,
-                              "codeReviewCount": 5,
+                              "codeReviewCount": 4,
                               "issueCount": 0,
-                              "pullRequestCount": 6,
+                              "pullRequestCount": 5,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 25,
-                              "codeReviewCount": 4,
+                              "codeReviewCount": 3,
                               "issueCount": 0,
                               "pullRequestCount": 8,
                               "rewardCount": 2
@@ -922,7 +868,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 29,
-                              "codeReviewCount": 4,
+                              "codeReviewCount": 3,
                               "issueCount": 0,
                               "pullRequestCount": 4,
                               "rewardCount": 0
@@ -932,13 +878,13 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "week": 30,
                               "codeReviewCount": 5,
                               "issueCount": 0,
-                              "pullRequestCount": 3,
+                              "pullRequestCount": 2,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 31,
-                              "codeReviewCount": 7,
+                              "codeReviewCount": 2,
                               "issueCount": 0,
                               "pullRequestCount": 4,
                               "rewardCount": 0
@@ -946,23 +892,15 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 32,
-                              "codeReviewCount": 6,
+                              "codeReviewCount": 4,
                               "issueCount": 0,
-                              "pullRequestCount": 13,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 33,
-                              "codeReviewCount": 0,
-                              "issueCount": 0,
-                              "pullRequestCount": 1,
+                              "pullRequestCount": 12,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 35,
-                              "codeReviewCount": 6,
+                              "codeReviewCount": 2,
                               "issueCount": 0,
                               "pullRequestCount": 3,
                               "rewardCount": 0
@@ -970,31 +908,31 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 36,
-                              "codeReviewCount": 7,
+                              "codeReviewCount": 2,
                               "issueCount": 0,
-                              "pullRequestCount": 7,
+                              "pullRequestCount": 5,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 37,
-                              "codeReviewCount": 3,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 4,
+                              "pullRequestCount": 3,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 38,
-                              "codeReviewCount": 5,
+                              "codeReviewCount": 4,
                               "issueCount": 0,
-                              "pullRequestCount": 11,
+                              "pullRequestCount": 10,
                               "rewardCount": 10
                             },
                             {
                               "year": 2023,
                               "week": 39,
-                              "codeReviewCount": 2,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
                               "pullRequestCount": 2,
                               "rewardCount": 0
@@ -1013,30 +951,6 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "codeReviewCount": 1,
                               "issueCount": 0,
                               "pullRequestCount": 0,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 42,
-                              "codeReviewCount": 0,
-                              "issueCount": 0,
-                              "pullRequestCount": 1,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 43,
-                              "codeReviewCount": 0,
-                              "issueCount": 0,
-                              "pullRequestCount": 1,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 48,
-                              "codeReviewCount": 1,
-                              "issueCount": 0,
-                              "pullRequestCount": 1,
                               "rewardCount": 0
                             }
                           ],
@@ -1070,9 +984,9 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             ]
                           },
                           "workDistribution": {
-                            "codeReviewCount": 530,
+                            "codeReviewCount": 406,
                             "issueCount": 15,
-                            "pullRequestCount": 553
+                            "pullRequestCount": 517
                           }
                         }
                         """);
@@ -1123,15 +1037,15 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 27,
-                              "codeReviewCount": 10,
+                              "codeReviewCount": 8,
                               "issueCount": 3,
-                              "pullRequestCount": 11,
+                              "pullRequestCount": 10,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 28,
-                              "codeReviewCount": 4,
+                              "codeReviewCount": 3,
                               "issueCount": 5,
                               "pullRequestCount": 8,
                               "rewardCount": 0
@@ -1139,7 +1053,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 29,
-                              "codeReviewCount": 8,
+                              "codeReviewCount": 7,
                               "issueCount": 0,
                               "pullRequestCount": 1,
                               "rewardCount": 0
@@ -1149,13 +1063,13 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "week": 30,
                               "codeReviewCount": 6,
                               "issueCount": 0,
-                              "pullRequestCount": 2,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 31,
-                              "codeReviewCount": 10,
+                              "codeReviewCount": 5,
                               "issueCount": 0,
                               "pullRequestCount": 15,
                               "rewardCount": 0
@@ -1171,7 +1085,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 33,
-                              "codeReviewCount": 3,
+                              "codeReviewCount": 2,
                               "issueCount": 0,
                               "pullRequestCount": 2,
                               "rewardCount": 0
@@ -1179,7 +1093,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 34,
-                              "codeReviewCount": 5,
+                              "codeReviewCount": 3,
                               "issueCount": 0,
                               "pullRequestCount": 5,
                               "rewardCount": 0
@@ -1187,15 +1101,15 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 35,
-                              "codeReviewCount": 8,
+                              "codeReviewCount": 6,
                               "issueCount": 0,
-                              "pullRequestCount": 12,
+                              "pullRequestCount": 11,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 36,
-                              "codeReviewCount": 11,
+                              "codeReviewCount": 8,
                               "issueCount": 0,
                               "pullRequestCount": 13,
                               "rewardCount": 0
@@ -1203,17 +1117,17 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 37,
-                              "codeReviewCount": 7,
+                              "codeReviewCount": 5,
                               "issueCount": 0,
-                              "pullRequestCount": 6,
+                              "pullRequestCount": 5,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 38,
-                              "codeReviewCount": 7,
+                              "codeReviewCount": 6,
                               "issueCount": 0,
-                              "pullRequestCount": 6,
+                              "pullRequestCount": 5,
                               "rewardCount": 0
                             },
                             {
@@ -1227,15 +1141,15 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 40,
-                              "codeReviewCount": 10,
+                              "codeReviewCount": 8,
                               "issueCount": 0,
-                              "pullRequestCount": 8,
+                              "pullRequestCount": 7,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 41,
-                              "codeReviewCount": 6,
+                              "codeReviewCount": 3,
                               "issueCount": 0,
                               "pullRequestCount": 2,
                               "rewardCount": 0
@@ -1243,7 +1157,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 42,
-                              "codeReviewCount": 3,
+                              "codeReviewCount": 2,
                               "issueCount": 0,
                               "pullRequestCount": 7,
                               "rewardCount": 0
@@ -1251,7 +1165,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 43,
-                              "codeReviewCount": 5,
+                              "codeReviewCount": 4,
                               "issueCount": 0,
                               "pullRequestCount": 2,
                               "rewardCount": 0
@@ -1259,7 +1173,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 44,
-                              "codeReviewCount": 2,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 3,
                               "rewardCount": 0
@@ -1267,7 +1181,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 45,
-                              "codeReviewCount": 5,
+                              "codeReviewCount": 4,
                               "issueCount": 0,
                               "pullRequestCount": 4,
                               "rewardCount": 0
@@ -1275,7 +1189,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 46,
-                              "codeReviewCount": 17,
+                              "codeReviewCount": 11,
                               "issueCount": 0,
                               "pullRequestCount": 8,
                               "rewardCount": 0
@@ -1283,7 +1197,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 47,
-                              "codeReviewCount": 13,
+                              "codeReviewCount": 10,
                               "issueCount": 0,
                               "pullRequestCount": 10,
                               "rewardCount": 0
@@ -1291,7 +1205,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 48,
-                              "codeReviewCount": 11,
+                              "codeReviewCount": 7,
                               "issueCount": 0,
                               "pullRequestCount": 6,
                               "rewardCount": 0
@@ -1299,23 +1213,23 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 49,
-                              "codeReviewCount": 11,
+                              "codeReviewCount": 6,
                               "issueCount": 0,
-                              "pullRequestCount": 11,
+                              "pullRequestCount": 10,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 50,
-                              "codeReviewCount": 8,
+                              "codeReviewCount": 7,
                               "issueCount": 0,
-                              "pullRequestCount": 5,
+                              "pullRequestCount": 4,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 51,
-                              "codeReviewCount": 9,
+                              "codeReviewCount": 8,
                               "issueCount": 0,
                               "pullRequestCount": 12,
                               "rewardCount": 0
@@ -1323,15 +1237,15 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2022,
                               "week": 52,
-                              "codeReviewCount": 8,
+                              "codeReviewCount": 5,
                               "issueCount": 0,
-                              "pullRequestCount": 9,
+                              "pullRequestCount": 8,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 1,
-                              "codeReviewCount": 11,
+                              "codeReviewCount": 9,
                               "issueCount": 0,
                               "pullRequestCount": 9,
                               "rewardCount": 0
@@ -1339,7 +1253,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 2,
-                              "codeReviewCount": 12,
+                              "codeReviewCount": 10,
                               "issueCount": 0,
                               "pullRequestCount": 7,
                               "rewardCount": 0
@@ -1347,7 +1261,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 3,
-                              "codeReviewCount": 16,
+                              "codeReviewCount": 13,
                               "issueCount": 0,
                               "pullRequestCount": 8,
                               "rewardCount": 0
@@ -1355,7 +1269,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 4,
-                              "codeReviewCount": 22,
+                              "codeReviewCount": 17,
                               "issueCount": 0,
                               "pullRequestCount": 11,
                               "rewardCount": 0
@@ -1363,7 +1277,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 5,
-                              "codeReviewCount": 29,
+                              "codeReviewCount": 18,
                               "issueCount": 0,
                               "pullRequestCount": 19,
                               "rewardCount": 0
@@ -1371,7 +1285,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 6,
-                              "codeReviewCount": 17,
+                              "codeReviewCount": 9,
                               "issueCount": 0,
                               "pullRequestCount": 9,
                               "rewardCount": 0
@@ -1379,9 +1293,9 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 8,
-                              "codeReviewCount": 14,
+                              "codeReviewCount": 9,
                               "issueCount": 0,
-                              "pullRequestCount": 8,
+                              "pullRequestCount": 6,
                               "rewardCount": 0
                             },
                             {
@@ -1395,9 +1309,9 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 10,
-                              "codeReviewCount": 14,
+                              "codeReviewCount": 11,
                               "issueCount": 0,
-                              "pullRequestCount": 24,
+                              "pullRequestCount": 20,
                               "rewardCount": 0
                             },
                             {
@@ -1405,21 +1319,21 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "week": 11,
                               "codeReviewCount": 10,
                               "issueCount": 0,
-                              "pullRequestCount": 10,
+                              "pullRequestCount": 9,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 12,
-                              "codeReviewCount": 8,
+                              "codeReviewCount": 6,
                               "issueCount": 0,
-                              "pullRequestCount": 17,
+                              "pullRequestCount": 16,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 13,
-                              "codeReviewCount": 6,
+                              "codeReviewCount": 5,
                               "issueCount": 0,
                               "pullRequestCount": 7,
                               "rewardCount": 0
@@ -1443,7 +1357,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 16,
-                              "codeReviewCount": 7,
+                              "codeReviewCount": 6,
                               "issueCount": 0,
                               "pullRequestCount": 10,
                               "rewardCount": 0
@@ -1451,9 +1365,9 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 17,
-                              "codeReviewCount": 8,
+                              "codeReviewCount": 7,
                               "issueCount": 0,
-                              "pullRequestCount": 19,
+                              "pullRequestCount": 17,
                               "rewardCount": 0
                             },
                             {
@@ -1461,7 +1375,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "week": 18,
                               "codeReviewCount": 7,
                               "issueCount": 0,
-                              "pullRequestCount": 18,
+                              "pullRequestCount": 17,
                               "rewardCount": 0
                             },
                             {
@@ -1469,7 +1383,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "week": 19,
                               "codeReviewCount": 10,
                               "issueCount": 0,
-                              "pullRequestCount": 10,
+                              "pullRequestCount": 9,
                               "rewardCount": 0
                             },
                             {
@@ -1483,9 +1397,9 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 21,
-                              "codeReviewCount": 4,
+                              "codeReviewCount": 2,
                               "issueCount": 0,
-                              "pullRequestCount": 17,
+                              "pullRequestCount": 14,
                               "rewardCount": 0
                             },
                             {
@@ -1507,15 +1421,15 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 24,
-                              "codeReviewCount": 5,
+                              "codeReviewCount": 4,
                               "issueCount": 0,
-                              "pullRequestCount": 6,
+                              "pullRequestCount": 5,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 25,
-                              "codeReviewCount": 4,
+                              "codeReviewCount": 3,
                               "issueCount": 0,
                               "pullRequestCount": 8,
                               "rewardCount": 0
@@ -1547,7 +1461,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 29,
-                              "codeReviewCount": 4,
+                              "codeReviewCount": 3,
                               "issueCount": 0,
                               "pullRequestCount": 4,
                               "rewardCount": 0
@@ -1557,13 +1471,13 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "week": 30,
                               "codeReviewCount": 5,
                               "issueCount": 0,
-                              "pullRequestCount": 3,
+                              "pullRequestCount": 2,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 31,
-                              "codeReviewCount": 7,
+                              "codeReviewCount": 2,
                               "issueCount": 0,
                               "pullRequestCount": 4,
                               "rewardCount": 0
@@ -1571,23 +1485,15 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 32,
-                              "codeReviewCount": 6,
+                              "codeReviewCount": 4,
                               "issueCount": 0,
-                              "pullRequestCount": 13,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 33,
-                              "codeReviewCount": 0,
-                              "issueCount": 0,
-                              "pullRequestCount": 1,
+                              "pullRequestCount": 12,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 35,
-                              "codeReviewCount": 6,
+                              "codeReviewCount": 2,
                               "issueCount": 0,
                               "pullRequestCount": 3,
                               "rewardCount": 0
@@ -1595,25 +1501,25 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 36,
-                              "codeReviewCount": 7,
+                              "codeReviewCount": 2,
                               "issueCount": 0,
-                              "pullRequestCount": 7,
+                              "pullRequestCount": 5,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 37,
-                              "codeReviewCount": 3,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 4,
+                              "pullRequestCount": 3,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 38,
-                              "codeReviewCount": 5,
+                              "codeReviewCount": 4,
                               "issueCount": 0,
-                              "pullRequestCount": 11,
+                              "pullRequestCount": 10,
                               "rewardCount": 0
                             },
                             {
@@ -1639,30 +1545,6 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "issueCount": 0,
                               "pullRequestCount": 0,
                               "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 42,
-                              "codeReviewCount": 0,
-                              "issueCount": 0,
-                              "pullRequestCount": 1,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 43,
-                              "codeReviewCount": 0,
-                              "issueCount": 0,
-                              "pullRequestCount": 1,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 48,
-                              "codeReviewCount": 1,
-                              "issueCount": 0,
-                              "pullRequestCount": 1,
-                              "rewardCount": 0
                             }
                           ],
                           "earnings": {
@@ -1670,9 +1552,9 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             "perProject": []
                           },
                           "workDistribution": {
-                            "codeReviewCount": 494,
+                            "codeReviewCount": 372,
                             "issueCount": 11,
-                            "pullRequestCount": 540
+                            "pullRequestCount": 505
                           }
                         }
                         """);
