@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface UserProfileEcosystemPageItemEntityRepository extends Repository<UserProfileEcosystemPageItemEntity, UUID> {
     @Query(value = """
-            select stats.ecosystem_id                     as ecosystem_id,
+            select uer.ecosystem_id                     as ecosystem_id,
                    uer.rank                               as rank,
                    case
                        when uer.rank_percentile < 0.33 THEN 'GREEN'
@@ -26,22 +26,21 @@ public interface UserProfileEcosystemPageItemEntityRepository extends Repository
                            'name', p.name,
                            'logoUrl', p.logo_url))
                     from projects p
-                    where p.id = any (stats.project_ids)) as projects
-            from contributions_stats_per_ecosystem_per_user stats
-                     join users_ecosystems_ranks uer
-                          on uer.ecosystem_id = stats.ecosystem_id and uer.contributor_id = stats.contributor_id
+                    where p.id = any (stats.project_ids)
+                    or p.id = any (reward_stats.project_ids)) as projects
+            from users_ecosystems_ranks uer 
+                     left join contributions_stats_per_ecosystem_per_user stats
+                          on stats.ecosystem_id = uer.ecosystem_id and 
+                             stats.contributor_id = uer.contributor_id
                      left join received_rewards_stats_per_ecosystem_per_user reward_stats
-                               on reward_stats.ecosystem_id = stats.ecosystem_id and
-                                  reward_stats.recipient_id = stats.contributor_id
-            where stats.contributor_id = :githubUserId
+                               on reward_stats.ecosystem_id = uer.ecosystem_id and
+                                  reward_stats.recipient_id = uer.contributor_id
+            where uer.contributor_id = :githubUserId
             """,
             countQuery = """
-                    select stats.ecosystem_id                     as ecosystem_id,
-                           uer.rank                               as rank
-                    from contributions_stats_per_ecosystem_per_user stats
-                             join users_ecosystems_ranks uer
-                                  on uer.ecosystem_id = stats.ecosystem_id and uer.contributor_id = stats.contributor_id
-                    where stats.contributor_id = :githubUserId
+                    select uer.ecosystem_id                     as ecosystem_id
+                    from users_ecosystems_ranks uer
+                    where uer.contributor_id = :githubUserId
                     """,
             nativeQuery = true)
     Page<UserProfileEcosystemPageItemEntity> findByContributorId(Long githubUserId, Pageable pageable);

@@ -21,12 +21,12 @@ group by c.id
 
 CREATE MATERIALIZED VIEW contributions_stats_per_user AS
 SELECT c.contributor_id,
-       count(DISTINCT c.id)                                   AS contribution_count,
-       array_agg(DISTINCT f.project_ids)                      AS project_ids,
-       array_length(array_agg(DISTINCT f.project_ids), 1)     AS project_count,
-       count(DISTINCT date_trunc('week'::text, c.created_at)) AS contributed_week_count
+       count(DISTINCT c.id)                                      AS contribution_count,
+       array_agg(DISTINCT unnested.project_ids)                  AS project_ids,
+       array_length(array_agg(DISTINCT unnested.project_ids), 1) AS project_count,
+       count(DISTINCT date_trunc('week'::text, c.created_at))    AS contributed_week_count
 FROM public_contributions c
-         CROSS JOIN unnest(c.project_ids) f(project_ids)
+         CROSS JOIN unnest(c.project_ids) unnested(project_ids)
 GROUP BY c.contributor_id
 ;
 CREATE UNIQUE INDEX contributions_stats_per_user_pk ON contributions_stats_per_user (contributor_id);
@@ -37,12 +37,11 @@ REFRESH MATERIALIZED VIEW contributions_stats_per_user;
 CREATE MATERIALIZED VIEW contributions_stats_per_ecosystem_per_user AS
 SELECT c.contributor_id,
        pe.ecosystem_id,
-       count(DISTINCT c.id)                                      AS contribution_count,
-       array_agg(DISTINCT unnested.project_ids)                  AS project_ids,
-       array_length(array_agg(DISTINCT unnested.project_ids), 1) AS project_count,
-       count(DISTINCT date_trunc('week'::text, c.created_at))    AS contributed_week_count
+       count(DISTINCT c.id)                                   AS contribution_count,
+       array_agg(DISTINCT pe.project_id)                      AS project_ids,
+       array_length(array_agg(DISTINCT pe.project_id), 1)     AS project_count,
+       count(DISTINCT date_trunc('week'::text, c.created_at)) AS contributed_week_count
 FROM public_contributions c
-         CROSS JOIN unnest(c.project_ids) unnested(project_ids)
          JOIN projects_ecosystems pe
               on pe.project_id = any (c.project_ids)
 GROUP BY pe.ecosystem_id, c.contributor_id
@@ -145,7 +144,8 @@ SELECT r.recipient_id,
        count(r.id)                                               AS reward_count,
        count(DISTINCT r.project_id)                              AS project_count,
        round(sum(r.amount_usd_equivalent), 2)                    AS usd_total,
-       count(DISTINCT date_trunc('month'::text, r.requested_at)) AS rewarded_month_count
+       count(DISTINCT date_trunc('month'::text, r.requested_at)) AS rewarded_month_count,
+       array_agg(distinct r.project_id)                          AS project_ids
 FROM public_received_rewards r
 GROUP BY r.recipient_id
 ;
@@ -160,7 +160,8 @@ SELECT r.recipient_id,
        count(r.id)                                               AS reward_count,
        count(DISTINCT r.project_id)                              AS project_count,
        round(sum(r.amount_usd_equivalent), 2)                    AS usd_total,
-       count(DISTINCT date_trunc('month'::text, r.requested_at)) AS rewarded_month_count
+       count(DISTINCT date_trunc('month'::text, r.requested_at)) AS rewarded_month_count,
+       array_agg(distinct r.project_id)                          AS project_ids
 FROM public_received_rewards r
          JOIN projects_ecosystems pe
               on pe.project_id = r.project_id
@@ -178,7 +179,8 @@ SELECT r.recipient_id,
        count(distinct r.id)                                      AS reward_count,
        count(DISTINCT r.project_id)                              AS project_count,
        round(sum(r.amount_usd_equivalent), 2)                    AS usd_total,
-       count(DISTINCT date_trunc('month'::text, r.requested_at)) AS rewarded_month_count
+       count(DISTINCT date_trunc('month'::text, r.requested_at)) AS rewarded_month_count,
+       array_agg(distinct r.project_id)                          AS project_ids
 FROM public_received_rewards r
          left JOIN language_file_extensions lfe
                    on lfe.extension = any (r.main_file_extensions)
