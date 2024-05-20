@@ -49,7 +49,7 @@ public interface UserFacadePort {
 
     void updateGithubProfile(User authenticatedUser);
 
-    void refreshUserRanks();
+    void refreshUserRanksAndStats();
 
     void historizeUserRanks();
 }

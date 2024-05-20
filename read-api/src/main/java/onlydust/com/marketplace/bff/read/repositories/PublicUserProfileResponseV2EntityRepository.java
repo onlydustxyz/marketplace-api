@@ -39,11 +39,14 @@ public interface PublicUserProfileResponseV2EntityRepository extends Repository<
                                         'bannerUrl', e.banner_url
                                         )) as ecosystems
                                    from ecosystems e
-                                        join indexer_exp.repos_contributors rc on rc.contributor_id = gur.github_user_id
-                                        join indexer_exp.github_repos gr on gr.id = rc.repo_id and gr.visibility = 'PUBLIC'
-                                        join project_github_repos pgr on pgr.github_repo_id = gr.id
-                                        join projects p on p.id = pgr.project_id and p.visibility = 'PUBLIC'
-                                        join projects_ecosystems pe on pe.ecosystem_id = e.id and pe.project_id = p.id) user_ecosystems on true
+                                   where e.id in (select stats_pe.ecosystem_id
+                                                  from contributions_stats_per_ecosystem_per_user stats_pe
+                                                  where stats_pe.contributor_id = gur.github_user_id
+                                                  union
+                                                  select reward_stats_pe.ecosystem_id
+                                                  from received_rewards_stats_per_ecosystem_per_user reward_stats_pe
+                                                  where reward_stats_pe.recipient_id = gur.github_user_id)
+                                   ) user_ecosystems on true
             """;
 
     @Language("PostgreSQL")

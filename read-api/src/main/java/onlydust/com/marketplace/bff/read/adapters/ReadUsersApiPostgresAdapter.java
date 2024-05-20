@@ -9,6 +9,7 @@ import onlydust.com.marketplace.bff.read.entities.UserProfileProjectEarningsEnti
 import onlydust.com.marketplace.bff.read.entities.UserWeeklyStatsEntity;
 import onlydust.com.marketplace.bff.read.repositories.*;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,10 +40,18 @@ public class ReadUsersApiPostgresAdapter implements ReadUsersApi {
 
     @Override
     public ResponseEntity<UserProfileStatsV2> getUserProfileStats(Long githubId, UUID ecosystem) {
-        final var workDistribution = userWorkDistributionEntityRepository.findByContributorIdAndEcosystem(githubId, ecosystem)
-                .orElseThrow(() -> notFound("User %d not found".formatted(githubId)));
+
+        final var workDistribution = ecosystem != null ?
+                userWorkDistributionEntityRepository.findByContributorIdAndEcosystem(githubId, ecosystem)
+                        .orElseThrow(() -> notFound("User %d not found".formatted(githubId))) :
+                userWorkDistributionEntityRepository.findByContributorId(githubId)
+                        .orElseThrow(() -> notFound("User %d not found".formatted(githubId)));
+
+        final var userWeeklyStats = ecosystem != null ?
+                userWeeklyStatsEntityRepository.findByContributorIdAndEcosystem(githubId, ecosystem) :
+                userWeeklyStatsEntityRepository.findByContributorId(githubId);
+
         final var perProjectsStats = userProfileProjectEarningsEntityRepository.findByContributorIdAndEcosystem(githubId, ecosystem);
-        final var userWeeklyStats = userWeeklyStatsEntityRepository.findByContributorIdAndEcosystem(githubId, ecosystem);
 
         return ok(new UserProfileStatsV2()
                 .earnings(new UserProfileStatsV2Earnings()
@@ -56,7 +65,7 @@ public class ReadUsersApiPostgresAdapter implements ReadUsersApi {
 
     @Override
     public ResponseEntity<UserProfileEcosystemPage> getUserProfileStatsPerEcosystems(Long githubId, Integer pageIndex, Integer pageSize) {
-        final var page = userProfileEcosystemPageItemEntityRepository.findByContributorId(githubId, PageRequest.of(pageIndex, pageSize));
+        final var page = userProfileEcosystemPageItemEntityRepository.findByContributorId(githubId, PageRequest.of(pageIndex, pageSize, Sort.by("rank")));
         return ok(new UserProfileEcosystemPage()
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
@@ -68,7 +77,7 @@ public class ReadUsersApiPostgresAdapter implements ReadUsersApi {
 
     @Override
     public ResponseEntity<UserProfileLanguagePage> getUserProfileStatsPerLanguages(Long githubId, Integer pageIndex, Integer pageSize) {
-        final var page = userProfileLanguagePageItemEntityRepository.findByContributorId(githubId, PageRequest.of(pageIndex, pageSize));
+        final var page = userProfileLanguagePageItemEntityRepository.findByContributorId(githubId, PageRequest.of(pageIndex, pageSize, Sort.by("rank")));
         return ok(new UserProfileLanguagePage()
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())

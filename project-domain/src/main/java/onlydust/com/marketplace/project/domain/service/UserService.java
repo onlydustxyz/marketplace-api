@@ -124,8 +124,8 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
-    public void refreshUserRanks() {
-        userStoragePort.refreshUserRanks();
+    public void refreshUserRanksAndStats() {
+        userStoragePort.refreshUserRanksAndStats();
     }
 
     @Override

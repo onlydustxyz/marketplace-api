@@ -100,9 +100,9 @@ public class JobScheduler {
     }
 
     @Scheduled(fixedDelayString = "${application.cron.refresh-user-ranks}")
-    public void refreshUserRanks() {
+    public void refreshUserRanksAndStats() {
         LOGGER.info("Refreshing user ranks");
-        userFacadePort.refreshUserRanks();
+        userFacadePort.refreshUserRanksAndStats();
     }
 
     @Scheduled(cron = "${application.cron.historize-user-ranks-cron-expression}")

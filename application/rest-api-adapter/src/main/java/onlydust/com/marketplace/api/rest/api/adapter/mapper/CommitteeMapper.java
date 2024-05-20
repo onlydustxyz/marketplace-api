@@ -7,6 +7,7 @@ import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.view.CommitteeApplicationView;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,12 +26,14 @@ public interface CommitteeMapper {
 
     static CommitteeApplicationResponse committeeApplicationViewToResponse(CommitteeApplicationView committeeApplicationView) {
         final CommitteeApplicationResponse committeeApplicationResponse = new CommitteeApplicationResponse();
-        committeeApplicationResponse.setProjectQuestions(committeeApplicationView.answers().stream().map(projectAnswer -> new CommitteeProjectQuestionResponse()
-                .question(projectAnswer.question())
-                .required(projectAnswer.required())
-                .id(projectAnswer.questionId().value())
-                .answer(projectAnswer.answer())
-        ).toList());
+        committeeApplicationResponse.setProjectQuestions(committeeApplicationView.answers().stream()
+                .sorted(Comparator.comparing(projectAnswer -> projectAnswer.question()))
+                .map(projectAnswer -> new CommitteeProjectQuestionResponse()
+                        .question(projectAnswer.question())
+                        .required(projectAnswer.required())
+                        .id(projectAnswer.questionId().value())
+                        .answer(projectAnswer.answer())
+                ).toList());
         committeeApplicationResponse.setStatus(statusToResponse(committeeApplicationView.status()));
         committeeApplicationResponse.setProjectInfos(isNull(committeeApplicationView.projectInfosView()) ? null : new CommitteeProjectInfosResponse()
                 .shortDescription(committeeApplicationView.projectInfosView().shortDescription())
