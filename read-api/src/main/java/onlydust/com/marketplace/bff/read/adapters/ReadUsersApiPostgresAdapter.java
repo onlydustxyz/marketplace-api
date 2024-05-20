@@ -40,8 +40,13 @@ public class ReadUsersApiPostgresAdapter implements ReadUsersApi {
 
     @Override
     public ResponseEntity<UserProfileStatsV2> getUserProfileStats(Long githubId, UUID ecosystem) {
-        final var workDistribution = userWorkDistributionEntityRepository.findByContributorIdAndEcosystem(githubId, ecosystem)
-                .orElseThrow(() -> notFound("User %d not found".formatted(githubId)));
+        
+        final var workDistribution = ecosystem != null ?
+                userWorkDistributionEntityRepository.findByContributorIdAndEcosystem(githubId, ecosystem)
+                        .orElseThrow(() -> notFound("User %d not found".formatted(githubId))) :
+                userWorkDistributionEntityRepository.findByContributorId(githubId)
+                        .orElseThrow(() -> notFound("User %d not found".formatted(githubId)));
+
         final var perProjectsStats = userProfileProjectEarningsEntityRepository.findByContributorIdAndEcosystem(githubId, ecosystem);
         final var userWeeklyStats = userWeeklyStatsEntityRepository.findByContributorIdAndEcosystem(githubId, ecosystem);
 

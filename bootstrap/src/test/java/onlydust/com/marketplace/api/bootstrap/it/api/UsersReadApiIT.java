@@ -1070,9 +1070,9 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             ]
                           },
                           "workDistribution": {
-                            "codeReviewCount": 2010,
-                            "issueCount": 48,
-                            "pullRequestCount": 2172
+                            "codeReviewCount": 530,
+                            "issueCount": 15,
+                            "pullRequestCount": 553
                           }
                         }
                         """);

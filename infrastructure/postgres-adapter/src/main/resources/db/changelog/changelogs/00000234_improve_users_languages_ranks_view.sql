@@ -21,10 +21,13 @@ group by c.id
 
 CREATE MATERIALIZED VIEW contributions_stats_per_user AS
 SELECT c.contributor_id,
-       count(DISTINCT c.id)                                      AS contribution_count,
-       array_agg(DISTINCT unnested.project_ids)                  AS project_ids,
-       array_length(array_agg(DISTINCT unnested.project_ids), 1) AS project_count,
-       count(DISTINCT date_trunc('week'::text, c.created_at))    AS contributed_week_count
+       count(DISTINCT c.id)                                          AS contribution_count,
+       array_agg(DISTINCT unnested.project_ids)                      AS project_ids,
+       array_length(array_agg(DISTINCT unnested.project_ids), 1)     AS project_count,
+       count(DISTINCT date_trunc('week'::text, c.created_at))        AS contributed_week_count,
+       count(DISTINCT c.id) FILTER ( WHERE c.type = 'CODE_REVIEW' )  AS code_review_count,
+       count(DISTINCT c.id) FILTER ( WHERE c.type = 'ISSUE' )        AS issue_count,
+       count(DISTINCT c.id) FILTER ( WHERE c.type = 'PULL_REQUEST' ) AS pull_request_count
 FROM public_contributions c
          CROSS JOIN unnest(c.project_ids) unnested(project_ids)
 GROUP BY c.contributor_id
@@ -37,10 +40,13 @@ REFRESH MATERIALIZED VIEW contributions_stats_per_user;
 CREATE MATERIALIZED VIEW contributions_stats_per_ecosystem_per_user AS
 SELECT c.contributor_id,
        pe.ecosystem_id,
-       count(DISTINCT c.id)                                   AS contribution_count,
-       array_agg(DISTINCT pe.project_id)                      AS project_ids,
-       array_length(array_agg(DISTINCT pe.project_id), 1)     AS project_count,
-       count(DISTINCT date_trunc('week'::text, c.created_at)) AS contributed_week_count
+       count(DISTINCT c.id)                                          AS contribution_count,
+       array_agg(DISTINCT pe.project_id)                             AS project_ids,
+       array_length(array_agg(DISTINCT pe.project_id), 1)            AS project_count,
+       count(DISTINCT date_trunc('week'::text, c.created_at))        AS contributed_week_count,
+       count(DISTINCT c.id) FILTER ( WHERE c.type = 'CODE_REVIEW' )  AS code_review_count,
+       count(DISTINCT c.id) FILTER ( WHERE c.type = 'ISSUE' )        AS issue_count,
+       count(DISTINCT c.id) FILTER ( WHERE c.type = 'PULL_REQUEST' ) AS pull_request_count
 FROM public_contributions c
          JOIN projects_ecosystems pe
               on pe.project_id = any (c.project_ids)
@@ -55,10 +61,13 @@ REFRESH MATERIALIZED VIEW contributions_stats_per_ecosystem_per_user;
 CREATE MATERIALIZED VIEW contributions_stats_per_language_per_user AS
 SELECT c.contributor_id,
        lfe.language_id,
-       count(DISTINCT c.id)                                      AS contribution_count,
-       array_agg(DISTINCT unnested.project_ids)                  AS project_ids,
-       array_length(array_agg(DISTINCT unnested.project_ids), 1) AS project_count,
-       count(DISTINCT date_trunc('week'::text, c.created_at))    AS contributed_week_count
+       count(DISTINCT c.id)                                          AS contribution_count,
+       array_agg(DISTINCT unnested.project_ids)                      AS project_ids,
+       array_length(array_agg(DISTINCT unnested.project_ids), 1)     AS project_count,
+       count(DISTINCT date_trunc('week'::text, c.created_at))        AS contributed_week_count,
+       count(DISTINCT c.id) FILTER ( WHERE c.type = 'CODE_REVIEW' )  AS code_review_count,
+       count(DISTINCT c.id) FILTER ( WHERE c.type = 'ISSUE' )        AS issue_count,
+       count(DISTINCT c.id) FILTER ( WHERE c.type = 'PULL_REQUEST' ) AS pull_request_count
 FROM public_contributions c
          CROSS JOIN unnest(c.project_ids) unnested(project_ids)
          JOIN language_file_extensions lfe
@@ -137,11 +146,11 @@ group by r.id, rsd.reward_id;
 
 CREATE MATERIALIZED VIEW received_rewards_stats_per_user AS
 SELECT r.recipient_id,
-       count(r.id)                                               AS reward_count,
+       count(DISTINCT r.id)                                      AS reward_count,
        count(DISTINCT r.project_id)                              AS project_count,
        round(sum(r.amount_usd_equivalent), 2)                    AS usd_total,
        count(DISTINCT date_trunc('month'::text, r.requested_at)) AS rewarded_month_count,
-       array_agg(distinct r.project_id)                          AS project_ids
+       array_agg(DISTINCT r.project_id)                          AS project_ids
 FROM public_received_rewards r
 GROUP BY r.recipient_id
 ;
@@ -153,11 +162,11 @@ REFRESH MATERIALIZED VIEW received_rewards_stats_per_user;
 CREATE MATERIALIZED VIEW received_rewards_stats_per_ecosystem_per_user AS
 SELECT r.recipient_id,
        pe.ecosystem_id,
-       count(r.id)                                               AS reward_count,
+       count(DISTINCT r.id)                                      AS reward_count,
        count(DISTINCT r.project_id)                              AS project_count,
        round(sum(r.amount_usd_equivalent), 2)                    AS usd_total,
        count(DISTINCT date_trunc('month'::text, r.requested_at)) AS rewarded_month_count,
-       array_agg(distinct r.project_id)                          AS project_ids
+       array_agg(DISTINCT r.project_id)                          AS project_ids
 FROM public_received_rewards r
          JOIN projects_ecosystems pe
               on pe.project_id = r.project_id
@@ -172,11 +181,11 @@ REFRESH MATERIALIZED VIEW received_rewards_stats_per_ecosystem_per_user;
 CREATE MATERIALIZED VIEW received_rewards_stats_per_language_per_user AS
 SELECT r.recipient_id,
        lfe.language_id,
-       count(distinct r.id)                                      AS reward_count,
+       count(DISTINCT r.id)                                      AS reward_count,
        count(DISTINCT r.project_id)                              AS project_count,
        round(sum(r.amount_usd_equivalent), 2)                    AS usd_total,
        count(DISTINCT date_trunc('month'::text, r.requested_at)) AS rewarded_month_count,
-       array_agg(distinct r.project_id)                          AS project_ids
+       array_agg(DISTINCT r.project_id)                          AS project_ids
 FROM public_received_rewards r
          JOIN language_file_extensions lfe
               on lfe.extension = any (r.main_file_extensions)
