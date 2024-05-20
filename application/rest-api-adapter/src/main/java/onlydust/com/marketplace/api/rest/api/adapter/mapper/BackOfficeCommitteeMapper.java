@@ -8,6 +8,7 @@ import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
 import onlydust.com.marketplace.project.domain.view.CommitteeView;
 
+import java.util.Comparator;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -89,6 +90,7 @@ public interface BackOfficeCommitteeMapper {
                 .endDate(committeeView.endDate())
                 .status(statusToResponse(committeeView.status()))
                 .projectQuestions(committeeView.projectQuestions().stream()
+                        .sorted(Comparator.comparing(projectQuestion -> projectQuestion.question()))
                         .map(projectQuestion -> new ProjectQuestionResponse().question(projectQuestion.question()).required(projectQuestion.required()))
                         .toList())
                 .sponsor(isNull(committeeView.sponsor()) ? null :
