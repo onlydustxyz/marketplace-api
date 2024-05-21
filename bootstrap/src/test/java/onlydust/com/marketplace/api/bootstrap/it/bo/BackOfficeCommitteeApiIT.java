@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -237,6 +238,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .returnResult().getResponseBody();
 
         assertEquals(2, committeeResponse1.getProjectQuestions().size());
+        assertThat(committeeResponse2.getProjectQuestions()).allMatch(q -> q.getId() != null);
         assertEquals(projectQuestionRequest3.getQuestion(), committeeResponse2.getProjectQuestions().get(0).getQuestion());
         assertEquals(projectQuestionRequest3.getRequired(), committeeResponse2.getProjectQuestions().get(0).getRequired());
         assertEquals(projectQuestionRequest2.getQuestion(), committeeResponse2.getProjectQuestions().get(1).getQuestion());
