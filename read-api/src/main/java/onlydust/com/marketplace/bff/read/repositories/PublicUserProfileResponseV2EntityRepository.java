@@ -17,11 +17,11 @@ public interface PublicUserProfileResponseV2EntityRepository extends Repository<
                 gur.rank                                                                                        as rank,
                 gur.rank_percentile                                                                             as rank_percentile,
                 case
-                    when gur.rank_percentile < 0.1666 then 'A'
-                    when gur.rank_percentile < 0.3333 then 'B'
-                    when gur.rank_percentile < 0.4999 then 'C'
-                    when gur.rank_percentile < 0.6666 then 'D'
-                    when gur.rank_percentile < 0.8333 then 'E'
+                    when gur.rank_percentile <= 0.02 then 'A'
+                    when gur.rank_percentile <= 0.04 then 'B'
+                    when gur.rank_percentile <= 0.06 then 'C'
+                    when gur.rank_percentile <= 0.08 then 'D'
+                    when gur.rank_percentile <= 0.10 then 'E'
                     else 'F'
                 end                                                                                             as rank_category,
                 coalesce(user_ecosystems.ecosystems, '[]')                                                      as ecosystems,
