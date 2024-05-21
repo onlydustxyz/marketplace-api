@@ -5,6 +5,7 @@ import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
@@ -99,11 +100,13 @@ public class BoRewardQueryEntity {
 
     @Data
     public static class SponsorLinkView {
+        UUID id;
         String name;
         String logoUrl;
 
         public ShortSponsorView toDomain() {
             return ShortSponsorView.builder()
+                    .id(SponsorId.of(id))
                     .logoUrl(this.logoUrl)
                     .name(this.name)
                     .build();

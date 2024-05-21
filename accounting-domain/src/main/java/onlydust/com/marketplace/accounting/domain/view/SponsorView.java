@@ -12,6 +12,7 @@ import java.util.List;
 public record SponsorView(@NonNull SponsorId id, @NonNull String name, @NonNull String logoUrl, String url, List<ProjectShortView> projects) {
     public ShortSponsorView toShortView() {
         return ShortSponsorView.builder()
+                .id(id)
                 .name(name)
                 .logoUrl(logoUrl)
                 .build();
