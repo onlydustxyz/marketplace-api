@@ -11,15 +11,15 @@ class PublicUserProfileResponseV2EntityTest {
 
     @ParameterizedTest
     @CsvSource({
-            "0, 1",
-            "0.005, 1",
-            "0.01, 1",
-            "0.011, 5",
-            "0.06, 10",
-            "0.11, 20",
+            "0, 0.1",
+            "0.005, 1.0",
+            "0.01, 1.0",
+            "0.011, 5.0",
+            "0.06, 10.0",
+            "0.11, 100",
             "0.21, 100",
     })
-    void prettyRankPercentile(BigDecimal rankPercentile, Integer expectedPrettyRankPercentile) {
+    void prettyRankPercentile(BigDecimal rankPercentile, BigDecimal expectedPrettyRankPercentile) {
         final var prettyPercentile = PublicUserProfileResponseV2Entity.prettyRankPercentile(rankPercentile);
         assertThat(prettyPercentile).isEqualTo(expectedPrettyRankPercentile);
     }

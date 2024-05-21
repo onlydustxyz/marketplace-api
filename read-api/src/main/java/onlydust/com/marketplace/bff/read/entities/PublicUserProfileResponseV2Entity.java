@@ -85,12 +85,13 @@ public class PublicUserProfileResponseV2Entity {
                         ).toList());
     }
 
-    public static int prettyRankPercentile(BigDecimal rankPercentile) {
+    public static BigDecimal prettyRankPercentile(BigDecimal rankPercentile) {
         final var percent = rankPercentile.multiply(BigDecimal.valueOf(100)).doubleValue();
-        return List.of(1, 5, 10, 20).stream()
+        return List.of(0.1D, 1D, 5D, 10D).stream()
                 .filter(i -> percent <= i)
-                .min(Integer::compareTo)
-                .orElse(100);
+                .map(BigDecimal::valueOf)
+                .min(BigDecimal::compareTo)
+                .orElse(BigDecimal.valueOf(100));
     }
 
     private static List<ContactInformation> contactsOf(GithubAccountViewEntity account) {
