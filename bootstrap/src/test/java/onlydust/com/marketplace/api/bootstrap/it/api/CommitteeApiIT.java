@@ -93,12 +93,10 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
         final CommitteeApplicationRequest committeeApplicationRequest = new CommitteeApplicationRequest();
         final CommitteeProjectAnswerRequest answerRequest1 = new CommitteeProjectAnswerRequest()
                 .answer(faker.pokemon().name())
-                .questionId(projectQuestionId1.value())
-                .required(false);
+                .questionId(projectQuestionId1.value());
         final CommitteeProjectAnswerRequest answerRequest2 = new CommitteeProjectAnswerRequest()
                 .answer(faker.pokemon().name())
-                .questionId(projectQuestionId2.value())
-                .required(true);
+                .questionId(projectQuestionId2.value());
         committeeApplicationRequest.setAnswers(List.of(
                 answerRequest1,
                 answerRequest2
@@ -128,10 +126,8 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
 
         assertEquals(Committee.Status.OPEN_TO_APPLICATIONS.name(), committeeApplicationResponse.getStatus().name());
         assertEquals(answerRequest1.getQuestionId(), committeeApplicationResponse.getProjectQuestions().get(0).getId());
-        assertEquals(answerRequest1.getRequired(), committeeApplicationResponse.getProjectQuestions().get(0).getRequired());
         assertEquals(answerRequest1.getAnswer(), committeeApplicationResponse.getProjectQuestions().get(0).getAnswer());
         assertEquals(answerRequest2.getQuestionId(), committeeApplicationResponse.getProjectQuestions().get(1).getId());
-        assertEquals(answerRequest2.getRequired(), committeeApplicationResponse.getProjectQuestions().get(1).getRequired());
         assertEquals(answerRequest2.getAnswer(), committeeApplicationResponse.getProjectQuestions().get(1).getAnswer());
 
 

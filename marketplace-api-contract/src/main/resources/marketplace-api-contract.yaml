@@ -7011,8 +7011,6 @@ components:
         questionId:
           type: string
           format: uuid
-        required:
-          type: boolean
         answer:
           type: string
 
