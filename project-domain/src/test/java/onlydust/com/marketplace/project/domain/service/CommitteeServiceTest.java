@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
+import java.net.URI;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -220,7 +221,9 @@ public class CommitteeServiceTest {
         final Committee.Id committeeId = Committee.Id.random();
         final UUID userId = UUID.randomUUID();
         final UUID projectId = UUID.randomUUID();
-        final CommitteeApplicationView.ProjectInfosView projectInfosView = new CommitteeApplicationView.ProjectInfosView(faker.rickAndMorty().character(),
+        final CommitteeApplicationView.ProjectInfosView projectInfosView = new CommitteeApplicationView.ProjectInfosView(
+                UUID.randomUUID(), faker.lordOfTheRings().character(), faker.internet().slug(), URI.create(faker.internet().url()),
+                faker.rickAndMorty().character(),
                 faker.rickAndMorty().location(), List.of(), 1,
                 BigDecimal.ONE, 2, 4, 6, 8);
         final ProjectQuestion q1 = new ProjectQuestion("Q1", false);
@@ -267,7 +270,9 @@ public class CommitteeServiceTest {
         final Committee.Id committeeId = Committee.Id.random();
         final UUID userId = UUID.randomUUID();
         final UUID projectId = UUID.randomUUID();
-        final CommitteeApplicationView.ProjectInfosView projectInfosView = new CommitteeApplicationView.ProjectInfosView(faker.rickAndMorty().character(),
+        final CommitteeApplicationView.ProjectInfosView projectInfosView = new CommitteeApplicationView.ProjectInfosView(
+                UUID.randomUUID(), faker.lordOfTheRings().character(), faker.internet().slug(), URI.create(faker.internet().url()),
+                faker.rickAndMorty().character(),
                 faker.rickAndMorty().location(), List.of(), 1,
                 BigDecimal.ONE, 2, 4, 6, 8);
         final CommitteeView committeeView = CommitteeView.builder()

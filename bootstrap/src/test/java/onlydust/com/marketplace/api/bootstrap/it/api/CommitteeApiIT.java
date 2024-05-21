@@ -146,6 +146,10 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                           {
                            "projectInfos": {
+                              "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                              "slug": "bretzel",
+                              "name": "Bretzel",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
                               "projectLeads": [
                                 {
                                   "githubUserId": 98735421,

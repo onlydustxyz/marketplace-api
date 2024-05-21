@@ -10,6 +10,9 @@ public interface ProjectInfosViewRepository extends JpaRepository<ProjectInfosQu
 
     @Query(nativeQuery = true, value = """
             select p.id,
+                   p.slug,
+                   p.name,
+                   p.logo_url,
                    p.short_description,
                    p.long_description,
                    (select jsonb_agg(jsonb_build_object('id', pl.user_id,

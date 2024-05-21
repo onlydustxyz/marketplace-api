@@ -6955,18 +6955,20 @@ components:
         - CLOSED
 
     CommitteeProjectInfosResponse:
-      type: object
-      properties:
-        projectLeads:
-          type: array
-          items:
-            $ref: '#/components/schemas/RegisteredUserResponse'
-        longDescription:
-          type: string
-        shortDescription:
-          type: string
-        last3monthsMetrics:
-          $ref: '#/components/schemas/ProjectLast3MonthsMetricsResponse'
+      allOf:
+        - $ref: '#/components/schemas/ProjectLinkResponse'
+        - type: object
+          properties:
+            projectLeads:
+              type: array
+              items:
+                $ref: '#/components/schemas/RegisteredUserResponse'
+            longDescription:
+              type: string
+            shortDescription:
+              type: string
+            last3monthsMetrics:
+              $ref: '#/components/schemas/ProjectLast3MonthsMetricsResponse'
 
     ProjectLast3MonthsMetricsResponse:
       type: object

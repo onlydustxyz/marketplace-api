@@ -36,6 +36,10 @@ public interface CommitteeMapper {
                 ).toList());
         committeeApplicationResponse.setStatus(statusToResponse(committeeApplicationView.status()));
         committeeApplicationResponse.setProjectInfos(isNull(committeeApplicationView.projectInfosView()) ? null : new CommitteeProjectInfosResponse()
+                .id(committeeApplicationView.projectInfosView().projectId())
+                .name(committeeApplicationView.projectInfosView().name())
+                .slug(committeeApplicationView.projectInfosView().slug())
+                .logoUrl(committeeApplicationView.projectInfosView().logoUri().toString())
                 .shortDescription(committeeApplicationView.projectInfosView().shortDescription())
                 .projectLeads(committeeApplicationView.projectInfosView().projectLeads().stream()
                         .map(projectLeaderLinkView -> new RegisteredUserResponse()

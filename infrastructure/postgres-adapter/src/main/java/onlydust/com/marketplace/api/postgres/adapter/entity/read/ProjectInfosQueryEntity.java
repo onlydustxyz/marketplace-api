@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.NonNull;
 import onlydust.com.marketplace.project.domain.view.CommitteeApplicationView;
 import onlydust.com.marketplace.project.domain.view.ProjectLeaderLinkView;
@@ -11,6 +10,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,6 +19,9 @@ import java.util.UUID;
 public class ProjectInfosQueryEntity {
     @Id
     UUID id;
+    @NonNull String slug;
+    @NonNull String name;
+    @NonNull String logoUrl;
     @NonNull
     String shortDescription;
     @NonNull
@@ -41,6 +44,10 @@ public class ProjectInfosQueryEntity {
 
     public CommitteeApplicationView.ProjectInfosView toView() {
         return new CommitteeApplicationView.ProjectInfosView(
+                id,
+                name,
+                slug,
+                URI.create(logoUrl),
                 shortDescription,
                 longDescription,
                 projectLeads.stream().map(projectLead -> ProjectLeaderLinkView.builder()
