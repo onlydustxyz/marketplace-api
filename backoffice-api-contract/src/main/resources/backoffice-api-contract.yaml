@@ -3888,9 +3888,12 @@ components:
     SponsorLinkResponse:
       type: object
       required:
+        - id
         - name
         - avatarUrl
       properties:
+        id:
+          $ref: '#/components/schemas/SponsorId'
         name:
           type: string
         avatarUrl:

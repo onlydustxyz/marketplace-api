@@ -97,6 +97,9 @@ public interface BackOfficeCommitteeMapper {
                                 .required(projectQuestion.required()))
                         .toList())
                 .sponsor(isNull(committeeView.sponsor()) ? null :
-                        new SponsorLinkResponse().avatarUrl(committeeView.sponsor().logoUrl()).name(committeeView.sponsor().name()));
+                        new SponsorLinkResponse()
+                                .id(committeeView.sponsor().id())
+                                .avatarUrl(committeeView.sponsor().logoUrl())
+                                .name(committeeView.sponsor().name()));
     }
 }

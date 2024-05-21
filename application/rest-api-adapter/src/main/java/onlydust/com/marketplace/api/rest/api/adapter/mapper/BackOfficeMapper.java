@@ -479,6 +479,7 @@ public interface BackOfficeMapper {
                         .logoUrl(view.project().logoUrl()))
                 .sponsors(view.sponsors().stream()
                         .map(shortSponsorView -> new SponsorLinkResponse()
+                                .id(shortSponsorView.id().value())
                                 .name(shortSponsorView.name())
                                 .avatarUrl(shortSponsorView.logoUrl()))
                         .toList())

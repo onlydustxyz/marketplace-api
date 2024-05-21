@@ -247,6 +247,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
         assertEquals(updateCommitteeRequest2.getStartDate().toInstant(), committeeResponse2.getStartDate().toInstant());
         assertEquals(updateCommitteeRequest2.getEndDate().toInstant(), committeeResponse2.getEndDate().toInstant());
         assertEquals(updateCommitteeRequest2.getStatus().name(), committeeResponse2.getStatus().name());
+        assertEquals(cocaColax, committeeResponse2.getSponsor().getId());
         assertEquals("Coca Colax", committeeResponse2.getSponsor().getName());
         assertEquals("https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg", committeeResponse2.getSponsor().getAvatarUrl());
     }

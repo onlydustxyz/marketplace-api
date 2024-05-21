@@ -434,6 +434,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           },
                           "sponsors": [
                             {
+                              "id": "01bc5c57-9b7c-4521-b7be-8a12861ae5f4",
                               "name": "No Sponsor",
                               "avatarUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
                             }
