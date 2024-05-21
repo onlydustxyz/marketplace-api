@@ -91,7 +91,10 @@ public interface BackOfficeCommitteeMapper {
                 .status(statusToResponse(committeeView.status()))
                 .projectQuestions(committeeView.projectQuestions().stream()
                         .sorted(Comparator.comparing(projectQuestion -> projectQuestion.question()))
-                        .map(projectQuestion -> new ProjectQuestionResponse().question(projectQuestion.question()).required(projectQuestion.required()))
+                        .map(projectQuestion -> new ProjectQuestionResponse()
+                                .id(projectQuestion.id().value())
+                                .question(projectQuestion.question())
+                                .required(projectQuestion.required()))
                         .toList())
                 .sponsor(isNull(committeeView.sponsor()) ? null :
                         new SponsorLinkResponse().avatarUrl(committeeView.sponsor().logoUrl()).name(committeeView.sponsor().name()));
