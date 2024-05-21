@@ -299,3 +299,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000235_improve_perf.sql
   - include:
       file: db/changelog/changelogs/00000236_avoid_cancelled_contributions.sql
+  - include:
+      file: db/changelog/changelogs/00000237_add_missing_index.sql

@@ -23,7 +23,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 c.contributor_login,
                 c.contributor_html_url,
                 u.id IS NOT NULL as contributor_is_registered,
-                user_avatar_url(c.contributor_id, c.contributor_avatar_url) as contributor_avatar_url,
+                coalesce(contributor_upi.avatar_url, c.contributor_avatar_url) as contributor_avatar_url,
                 c.github_number,
                 c.github_status,
                 c.github_title,
@@ -32,7 +32,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 c.github_author_id,
                 c.github_author_login,
                 c.github_author_html_url,
-                user_avatar_url(c.github_author_id, c.github_author_avatar_url) as github_author_avatar_url,
+                coalesce(author_upi.avatar_url, c.github_author_avatar_url) as github_author_avatar_url,
                 p.id as project_id,
                 p.name as project_name,
                 p.slug as project_key,
@@ -54,6 +54,9 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
             INNER JOIN public.project_github_repos pgr on pgr.github_repo_id = gr.id
             INNER JOIN public.projects p on p.id = pgr.project_id
             LEFT JOIN iam.users u on u.github_user_id = c.contributor_id
+            LEFT JOIN user_profile_info contributor_upi on contributor_upi.id = u.id
+            LEFT JOIN iam.users author on author.github_user_id = c.github_author_id
+            LEFT JOIN user_profile_info author_upi on author_upi.id = author.id
             LEFT JOIN LATERAL (
                 SELECT array_agg(distinct peco.ecosystem_id) as ecosystem_ids
                 FROM projects_ecosystems peco
@@ -76,7 +79,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                         'github_author_id', i.author_id,
                         'github_author_login', i.author_login,
                         'github_author_html_url', i.author_html_url,
-                        'github_author_avatar_url', user_avatar_url(i.author_id, i.author_avatar_url),
+                        'github_author_avatar_url', coalesce(author_upi.avatar_url, i.author_avatar_url),
                         'is_mine', :callerGithubUserId = i.author_id,
                         'repo_id', i.repo_id,
                         'repo_owner', i.repo_owner_login,
@@ -84,16 +87,18 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                         'repo_html_url', i.repo_html_url
                     )
                 ) as links
-                FROM 
-                    indexer_exp.github_pull_requests_closing_issues pr_ci 
-                INNER JOIN indexer_exp.github_issues i ON i.id = pr_ci.issue_id
-                WHERE 
+                FROM
+                    indexer_exp.github_pull_requests_closing_issues pr_ci
+                    INNER JOIN indexer_exp.github_issues i ON i.id = pr_ci.issue_id
+                    LEFT JOIN iam.users author ON author.github_user_id = i.author_id
+                    LEFT JOIN user_profile_info author_upi ON author_upi.id = author.id
+                WHERE
                     pr_ci.pull_request_id = c.pull_request_id
-                GROUP BY 
+                GROUP BY
                     c.id
-            ) AS closing_issues ON TRUE
+            ) AS closing_issues ON c.pull_request_id IS NOT NULL
             LEFT JOIN LATERAL (
-                SELECT 
+                SELECT
                     jsonb_agg(jsonb_build_object(
                         'type', 'PULL_REQUEST',
                         'github_number', pr.number,
@@ -104,7 +109,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                         'github_author_id', pr.author_id,
                         'github_author_login', pr.author_login,
                         'github_author_html_url', pr.author_html_url,
-                        'github_author_avatar_url', user_avatar_url(pr.author_id, pr.author_avatar_url),
+                        'github_author_avatar_url', coalesce(author_upi.avatar_url, pr.author_avatar_url),
                         'is_mine', :callerGithubUserId = pr.author_id,
                         'repo_id', pr.repo_id,
                         'repo_owner', pr.repo_owner_login,
@@ -112,16 +117,18 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                         'repo_html_url', pr.repo_html_url
                     )
                 ) as links
-                FROM 
-                    indexer_exp.github_pull_requests_closing_issues pr_ci 
-                INNER JOIN indexer_exp.github_pull_requests pr ON pr.id = pr_ci.pull_request_id
-                WHERE 
+                FROM
+                    indexer_exp.github_pull_requests_closing_issues pr_ci
+                    INNER JOIN indexer_exp.github_pull_requests pr ON pr.id = pr_ci.pull_request_id
+                    LEFT JOIN iam.users author ON author.github_user_id = pr.author_id
+                    LEFT JOIN user_profile_info author_upi ON author_upi.id = author.id
+                WHERE
                     pr_ci.issue_id = c.issue_id
-                GROUP BY 
+                GROUP BY
                     c.id
-            ) AS closing_pull_requests ON TRUE
+            ) AS closing_pull_requests ON c.issue_id IS NOT NULL
             LEFT JOIN LATERAL (
-                SELECT 
+                SELECT
                     jsonb_agg(jsonb_build_object(
                         'type', 'PULL_REQUEST',
                         'github_number', pr.number,
@@ -132,7 +139,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                         'github_author_id', pr.author_id,
                         'github_author_login', pr.author_login,
                         'github_author_html_url', pr.author_html_url,
-                        'github_author_avatar_url', user_avatar_url(pr.author_id, pr.author_avatar_url),
+                        'github_author_avatar_url', coalesce(author_upi.avatar_url, pr.author_avatar_url),
                         'is_mine', :callerGithubUserId = pr.author_id,
                         'repo_id', pr.repo_id,
                         'repo_owner', pr.repo_owner_login,
@@ -141,18 +148,20 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                     )
                 ) as links
                 FROM indexer_exp.github_code_reviews cr
-                INNER JOIN indexer_exp.github_pull_requests pr on cr.pull_request_id = pr.id
-                WHERE 
+                    INNER JOIN indexer_exp.github_pull_requests pr on cr.pull_request_id = pr.id
+                    LEFT JOIN iam.users author ON author.github_user_id = pr.author_id
+                    LEFT JOIN user_profile_info author_upi ON author_upi.id = author.id
+                WHERE
                     cr.id = c.code_review_id
-                GROUP BY 
+                GROUP BY
                     c.id
-            ) AS reviewed_pull_requests ON TRUE
+            ) AS reviewed_pull_requests ON c.code_review_id IS NOT NULL
             LEFT JOIN LATERAL (
-                SELECT 
+                SELECT
                     jsonb_agg(r.id) as ids
                 FROM
                     rewards r
-                JOIN reward_items ri ON ri.reward_id = r.id 
+                JOIN reward_items ri ON ri.reward_id = r.id
                 WHERE
                     ri.id = COALESCE(CAST(c.pull_request_id AS TEXT), CAST(c.issue_id AS TEXT), c.code_review_id) AND
                     c.contributor_id = r.recipient_id AND
