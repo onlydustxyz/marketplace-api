@@ -22,19 +22,19 @@ public class Committee {
     @NonNull
     String name;
     @NonNull
-    ZonedDateTime startDate;
+    ZonedDateTime applicationStartDate;
     @NonNull
-    ZonedDateTime endDate;
+    ZonedDateTime applicationEndDate;
     @NonNull
     Status status;
     @NonNull
     List<ProjectQuestion> projectQuestions = new ArrayList<>();
     UUID sponsorId;
 
-    public Committee(@NonNull String name, @NonNull ZonedDateTime startDate, @NonNull ZonedDateTime endDate) {
+    public Committee(@NonNull String name, @NonNull ZonedDateTime applicationStartDate, @NonNull ZonedDateTime applicationEndDate) {
         this.name = name;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.applicationStartDate = applicationStartDate;
+        this.applicationEndDate = applicationEndDate;
         this.id = Id.random();
         this.status = Status.DRAFT;
         this.sponsorId = null;

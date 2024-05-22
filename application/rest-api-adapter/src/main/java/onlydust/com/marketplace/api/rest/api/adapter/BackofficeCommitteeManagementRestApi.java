@@ -49,8 +49,8 @@ public class BackofficeCommitteeManagementRestApi implements BackOfficeCommittee
 
     @Override
     public ResponseEntity<CommitteeResponse> createCommittee(CreateCommitteeRequest createCommitteeRequest) {
-        final Committee committee = committeeFacadePort.createCommittee(createCommitteeRequest.getName(), createCommitteeRequest.getStartDate(),
-                createCommitteeRequest.getEndDate());
+        final Committee committee = committeeFacadePort.createCommittee(createCommitteeRequest.getName(), createCommitteeRequest.getApplicationStartDate(),
+                createCommitteeRequest.getApplicationEndDate());
         return ResponseEntity.ok(toCommitteeResponse(committee));
     }
 

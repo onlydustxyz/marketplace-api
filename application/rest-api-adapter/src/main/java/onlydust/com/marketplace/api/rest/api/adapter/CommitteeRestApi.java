@@ -35,12 +35,12 @@ public class CommitteeRestApi implements CommitteesApi {
         if (committeeView.status() == Committee.Status.DRAFT) {
             throw OnlyDustException.notFound("Committee %s was not found".formatted(committeeId.toString()));
         }
-        
+
         return ResponseEntity.ok(new CommitteeResponse()
                 .id(committeeView.id().value())
                 .name(committeeView.name())
-                .applicationStartDate(committeeView.startDate())
-                .applicationEndDate(committeeView.endDate())
+                .applicationStartDate(committeeView.applicationStartDate())
+                .applicationEndDate(committeeView.applicationEndDate())
                 .status(CommitteeStatus.valueOf(committeeView.status().name()))
                 .sponsor(committeeView.sponsor() == null ? null : new SponsorResponse()
                         .id(committeeView.sponsor().id())

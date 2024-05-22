@@ -25,9 +25,9 @@ public class CommitteeEntity {
     @EqualsAndHashCode.Include
     UUID id;
     @NonNull
-    Date startDate;
+    Date applicationStartDate;
     @NonNull
-    Date endDate;
+    Date applicationEndDate;
     @NonNull
     String name;
     @NonNull
@@ -43,8 +43,8 @@ public class CommitteeEntity {
         return CommitteeEntity.builder()
                 .id(committee.id().value())
                 .name(committee.name())
-                .endDate(Date.from(committee.endDate().toInstant()))
-                .startDate(Date.from(committee.startDate().toInstant()))
+                .applicationEndDate(Date.from(committee.applicationEndDate().toInstant()))
+                .applicationStartDate(Date.from(committee.applicationStartDate().toInstant()))
                 .status(CommitteeStatusEntity.fromDomain(committee.status()))
                 .sponsorId(committee.sponsorId())
                 .build();
@@ -54,8 +54,8 @@ public class CommitteeEntity {
         return Committee.builder()
                 .id(Committee.Id.of(this.id))
                 .name(this.name)
-                .startDate(ZonedDateTime.ofInstant(startDate.toInstant(), ZoneOffset.UTC))
-                .endDate(ZonedDateTime.ofInstant(endDate.toInstant(), ZoneOffset.UTC))
+                .applicationStartDate(ZonedDateTime.ofInstant(applicationStartDate.toInstant(), ZoneOffset.UTC))
+                .applicationEndDate(ZonedDateTime.ofInstant(applicationEndDate.toInstant(), ZoneOffset.UTC))
                 .status(this.status.toDomain())
                 .build();
     }
@@ -64,8 +64,8 @@ public class CommitteeEntity {
         return CommitteeLinkView.builder()
                 .id(Committee.Id.of(this.id))
                 .name(this.name)
-                .startDate(ZonedDateTime.ofInstant(startDate.toInstant(), ZoneOffset.UTC))
-                .endDate(ZonedDateTime.ofInstant(endDate.toInstant(), ZoneOffset.UTC))
+                .startDate(ZonedDateTime.ofInstant(applicationStartDate.toInstant(), ZoneOffset.UTC))
+                .endDate(ZonedDateTime.ofInstant(applicationEndDate.toInstant(), ZoneOffset.UTC))
                 .status(this.status.toDomain())
                 .build();
     }

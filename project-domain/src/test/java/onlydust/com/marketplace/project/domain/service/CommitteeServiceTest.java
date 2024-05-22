@@ -46,19 +46,19 @@ public class CommitteeServiceTest {
     void should_create_a_committee() {
         // Given
         final String name = faker.rickAndMorty().character();
-        final ZonedDateTime startDate = faker.date().birthday().toInstant().atZone(ZoneId.systemDefault());
-        final ZonedDateTime endDate = faker.date().birthday().toInstant().atZone(ZoneId.systemDefault());
+        final ZonedDateTime applicationStartDate = faker.date().birthday().toInstant().atZone(ZoneId.systemDefault());
+        final ZonedDateTime applicationEndDate = faker.date().birthday().toInstant().atZone(ZoneId.systemDefault());
 
         // When
-        committeeService.createCommittee(name, startDate,
-                endDate);
+        committeeService.createCommittee(name, applicationStartDate,
+                applicationEndDate);
 
         // Then
         final ArgumentCaptor<Committee> committeeArgumentCaptor = ArgumentCaptor.forClass(Committee.class);
         verify(committeeStoragePort).save(committeeArgumentCaptor.capture());
         assertEquals(name, committeeArgumentCaptor.getValue().name());
-        assertEquals(endDate, committeeArgumentCaptor.getValue().endDate());
-        assertEquals(startDate, committeeArgumentCaptor.getValue().startDate());
+        assertEquals(applicationEndDate, committeeArgumentCaptor.getValue().applicationEndDate());
+        assertEquals(applicationStartDate, committeeArgumentCaptor.getValue().applicationStartDate());
         assertEquals(Committee.Status.DRAFT, committeeArgumentCaptor.getValue().status());
         assertNotNull(committeeArgumentCaptor.getValue().id());
     }
@@ -68,12 +68,12 @@ public class CommitteeServiceTest {
         // Given
         final Committee.Id committeeId = Committee.Id.random();
         final String name = faker.rickAndMorty().character();
-        final ZonedDateTime startDate = faker.date().birthday().toInstant().atZone(ZoneId.systemDefault());
-        final ZonedDateTime endDate = faker.date().birthday().toInstant().atZone(ZoneId.systemDefault());
+        final ZonedDateTime applicationStartDate = faker.date().birthday().toInstant().atZone(ZoneId.systemDefault());
+        final ZonedDateTime applicationEndDate = faker.date().birthday().toInstant().atZone(ZoneId.systemDefault());
         final CommitteeView committeeView = CommitteeView.builder()
                 .id(Committee.Id.random())
-                .endDate(endDate)
-                .startDate(startDate)
+                .applicationEndDate(applicationEndDate)
+                .applicationStartDate(applicationStartDate)
                 .name(name)
                 .status(Committee.Status.OPEN_TO_APPLICATIONS)
                 .build();
@@ -125,8 +125,8 @@ public class CommitteeServiceTest {
                     .name(faker.rickAndMorty().location())
                     .id(committeeId)
                     .status(Committee.Status.OPEN_TO_APPLICATIONS)
-                    .startDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
-                    .endDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .build()));
             when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(false);
 
@@ -149,8 +149,8 @@ public class CommitteeServiceTest {
                     .name(faker.rickAndMorty().location())
                     .id(committeeId)
                     .status(Committee.Status.OPEN_TO_APPLICATIONS)
-                    .startDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
-                    .endDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .build()));
             when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(true);
             when(projectStoragePort.exists(projectId)).thenReturn(false);
@@ -174,8 +174,8 @@ public class CommitteeServiceTest {
                     .name(faker.rickAndMorty().location())
                     .id(committeeId)
                     .status(Committee.Status.DRAFT)
-                    .startDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
-                    .endDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .build()));
             when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(true);
             when(projectStoragePort.exists(projectId)).thenReturn(true);
@@ -201,8 +201,8 @@ public class CommitteeServiceTest {
                     .name(faker.rickAndMorty().location())
                     .id(committeeId)
                     .status(Committee.Status.OPEN_TO_APPLICATIONS)
-                    .startDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
-                    .endDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .build()));
             when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(true);
             when(projectStoragePort.exists(projectId)).thenReturn(true);
@@ -232,8 +232,8 @@ public class CommitteeServiceTest {
                 .name(faker.rickAndMorty().location())
                 .id(committeeId)
                 .status(Committee.Status.OPEN_TO_APPLICATIONS)
-                .startDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
-                .endDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                 .projectQuestions(List.of(
                         q1,
                         q2
@@ -279,8 +279,8 @@ public class CommitteeServiceTest {
                 .name(faker.rickAndMorty().location())
                 .id(committeeId)
                 .status(Committee.Status.OPEN_TO_APPLICATIONS)
-                .startDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
-                .endDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                 .projectQuestions(List.of(
                         new ProjectQuestion("Q1", false),
                         new ProjectQuestion("Q2", true)
@@ -328,8 +328,8 @@ public class CommitteeServiceTest {
                 .name(faker.rickAndMorty().location())
                 .id(committeeId)
                 .status(Committee.Status.OPEN_TO_APPLICATIONS)
-                .startDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
-                .endDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                 .projectQuestions(List.of(
                         q1,
                         q2
@@ -365,8 +365,8 @@ public class CommitteeServiceTest {
                 .name(faker.rickAndMorty().location())
                 .id(committeeId)
                 .status(Committee.Status.DRAFT)
-                .startDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
-                .endDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                 .build();
         committee.projectQuestions().addAll(List.of(q1, q2));
 
@@ -389,8 +389,8 @@ public class CommitteeServiceTest {
                 .name(faker.rickAndMorty().location())
                 .id(committeeId)
                 .status(Committee.Status.OPEN_TO_APPLICATIONS)
-                .startDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
-                .endDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                 .build();
         committee.projectQuestions().addAll(List.of(q1, q2));
 

@@ -4244,8 +4244,8 @@ components:
         - id
         - name
         - projectCount
-        - startDate
-        - endDate
+        - applicationStartDate
+        - applicationEndDate
         - status
       properties:
         id:
@@ -4255,10 +4255,10 @@ components:
           type: string
         projectCount:
           type: integer
-        startDate:
+        applicationStartDate:
           type: string
           format: 'date-time'
-        endDate:
+        applicationEndDate:
           type: string
           format: 'date-time'
         status:
@@ -4276,15 +4276,15 @@ components:
       type: object
       required:
         - name
-        - startDate
-        - endDate
+        - applicationStartDate
+        - applicationEndDate
       properties:
         name:
           type: string
-        startDate:
+        applicationStartDate:
           type: string
           format: 'date-time'
-        endDate:
+        applicationEndDate:
           type: string
           format: 'date-time'
 
@@ -4297,8 +4297,8 @@ components:
       required:
         - id
         - name
-        - startDate
-        - endDate
+        - applicationStartDate
+        - applicationEndDate
         - status
       properties:
         id:
@@ -4306,10 +4306,10 @@ components:
           format: uuid
         name:
           type: string
-        startDate:
+        applicationStartDate:
           type: string
           format: 'date-time'
-        endDate:
+        applicationEndDate:
           type: string
           format: 'date-time'
         status:
@@ -4439,16 +4439,16 @@ components:
       type: object
       required:
         - name
-        - startDate
-        - endDate
+        - applicationStartDate
+        - applicationEndDate
         - status
       properties:
         name:
           type: string
-        startDate:
+        applicationStartDate:
           type: string
           format: 'date-time'
-        endDate:
+        applicationEndDate:
           type: string
           format: 'date-time'
         sponsorId:
