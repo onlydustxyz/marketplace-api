@@ -22,6 +22,7 @@ public interface BoCommitteeQueryRepository extends JpaRepository<BoCommitteeQue
                         ) project_questions,
                        s.id as sponsor_id,
                        s.name as sponsor_name,
+                       s.url as sponsor_url,
                        s.logo_url as sponsor_logo_url
                 from committees c
                 left join sponsors s on s.id = c.sponsor_id

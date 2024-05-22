@@ -17,11 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 
-import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -40,9 +39,9 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
     @Order(1)
     void should_get_not_existing_application() {
         // Given
-        Committee committee = committeeFacadePort.createCommittee(faker.rickAndMorty().character(),
-                faker.date().past(5, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()),
-                faker.date().future(5, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()));
+        Committee committee = committeeFacadePort.createCommittee("Mr. Needful",
+                ZonedDateTime.parse("2024-05-19T02:58:44.399Z"),
+                ZonedDateTime.parse("2024-05-25T20:06:27.482Z"));
         committeeId = committee.id();
         committee = committee.toBuilder().status(Committee.Status.DRAFT).build();
         final ProjectQuestion q1 = new ProjectQuestion("Q1", false);
@@ -56,8 +55,24 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                 )
         );
         committeeFacadePort.update(committee);
+
+        // Cannot get committee with status DRAFT
+        client.get()
+                .uri(getApiURI(COMMITTEES_BY_ID.formatted(committeeId)))
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+
         committeeFacadePort.updateStatus(committeeId, Committee.Status.OPEN_TO_APPLICATIONS);
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
+
+        // When
+        client.get()
+                .uri(getApiURI(COMMITTEES_APPLICATIONS.formatted(committeeId)))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isUnauthorized();
 
         // When
         final CommitteeApplicationResponse committeeApplicationResponse = client.get()
@@ -101,6 +116,16 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                 answerRequest1,
                 answerRequest2
         ));
+
+        // When
+        client.put()
+                .uri(getApiURI(PUT_COMMITTEES_APPLICATIONS.formatted(committeeId.value(), bretzel)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(committeeApplicationRequest))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isUnauthorized();
 
         // When
         client.put()
@@ -235,6 +260,33 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                                 "amountSentInUsd": 0.0
                               }
                             }
+                        }
+                        """);
+    }
+
+
+    @Test
+    @Order(4)
+    void should_get_committee() {
+        // Given
+        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
+        committeeFacadePort.updateStatus(committeeId, Committee.Status.OPEN_TO_VOTES);
+
+        // When
+        client.get()
+                .uri(getApiURI(COMMITTEES_BY_ID.formatted(committeeId)))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "name": "Mr. Needful",
+                          "applicationStartDate": "2024-05-19T02:58:44.399Z",
+                          "applicationEndDate": "2024-05-25T20:06:27.482Z",
+                          "status": "OPEN_TO_VOTES",
+                          "sponsor": null
                         }
                         """);
     }

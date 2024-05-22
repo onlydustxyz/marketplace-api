@@ -50,6 +50,7 @@ public class BoCommitteeQueryEntity {
     Set<ProjectQuestionJson> projectQuestions;
     UUID sponsorId;
     String sponsorName;
+    String sponsorUrl;
     String sponsorLogoUrl;
 
     public CommitteeView toView() {
@@ -63,7 +64,7 @@ public class BoCommitteeQueryEntity {
                         .map(projectQuestionEntity -> new ProjectQuestion(ProjectQuestion.Id.of(projectQuestionEntity.getId()),
                                 projectQuestionEntity.getQuestion(),
                                 projectQuestionEntity.getRequired())).toList())
-                .sponsor(isNull(this.sponsorName) ? null : new ShortSponsorView(this.sponsorId, this.sponsorName, this.sponsorLogoUrl))
+                .sponsor(isNull(this.sponsorName) ? null : new ShortSponsorView(this.sponsorId, this.sponsorName, this.sponsorUrl, this.sponsorLogoUrl))
                 .build();
     }
 
