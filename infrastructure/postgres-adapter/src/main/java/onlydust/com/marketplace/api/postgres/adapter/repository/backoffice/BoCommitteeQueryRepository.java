@@ -44,7 +44,7 @@ public interface BoCommitteeQueryRepository extends JpaRepository<BoCommitteeQue
                            left join projects p on p.id = a.project_id
                            left join iam.users u on u.id = a.user_id
                   where c.id = :committeeId
-                  group by c.id, c.name, c.status, c.start_date, c.end_date, s.id, s.name, s.url, s.logo_url, a.committee_id
+                  group by c.id, c.name, c.status, c.application_start_date, c.application_end_date, s.id, s.name, s.url, s.logo_url, a.committee_id
             """)
     Optional<BoCommitteeQueryEntity> findById(UUID committeeId);
 }

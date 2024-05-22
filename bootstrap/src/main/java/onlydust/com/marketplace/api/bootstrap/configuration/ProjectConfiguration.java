@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
+import com.onlydust.customer.io.adapter.CustomerIOAdapter;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.ERC20ProviderFactory;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
@@ -17,6 +18,7 @@ import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresRewardAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectMailEventEntity;
 import onlydust.com.marketplace.api.posthog.adapters.PosthogApiClientAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
@@ -279,7 +281,25 @@ public class ProjectConfiguration {
     @Bean
     public CommitteeService committeeService(final CommitteeStoragePort committeeStoragePort,
                                              final ProjectStoragePort projectStoragePort,
-                                             final PermissionService permissionService){
-        return new CommitteeService(committeeStoragePort, permissionService, projectStoragePort);
+                                             final PermissionService permissionService,
+                                             final CommitteeObserverPort committeeObserverPort) {
+        return new CommitteeService(committeeStoragePort, permissionService, projectStoragePort, committeeObserverPort);
+    }
+
+    @Bean
+    public CommitteeObserverPort committeeObserverPort(final OutboxPort projectMailOutbox, final ProjectStoragePort projectStoragePort,
+                                                       final UserStoragePort userStoragePort, final CommitteeStoragePort committeeStoragePort) {
+        return new ProjectMailNotifier(projectMailOutbox, projectStoragePort, userStoragePort, committeeStoragePort);
+    }
+
+    @Bean
+    public OutboxConsumerJob projectMailOutboxJob(final PostgresOutboxAdapter<ProjectMailEventEntity> projectMailOutbox,
+                                                  final OutboxConsumer projectMailOutboxConsumer) {
+        return new OutboxConsumerJob(projectMailOutbox, projectMailOutboxConsumer);
+    }
+
+    @Bean
+    public OutboxConsumer projectMailOutboxConsumer(final CustomerIOAdapter customerIOAdapter) {
+        return new RetriedOutboxConsumer(customerIOAdapter);
     }
 }

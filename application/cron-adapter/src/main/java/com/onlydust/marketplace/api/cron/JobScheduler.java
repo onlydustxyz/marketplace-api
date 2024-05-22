@@ -31,6 +31,7 @@ public class JobScheduler {
     private final BoostNodeGuardiansRewardsPort boostNodeGuardiansRewardsPort;
     private final NodeGuardiansBoostProperties nodeGuardiansBoostProperties;
     private final OutboxConsumerJob nodeGuardiansOutboxJob;
+    private final OutboxConsumerJob projectMailOutboxJob;
 
     @Scheduled(fixedDelayString = "${application.cron.indexer-sync-job-delay}")
     public void processPendingIndexerApiCalls() {
@@ -84,6 +85,7 @@ public class JobScheduler {
     public void sendEmails() {
         LOGGER.info("Sending emails");
         accountingMailOutboxJob.run();
+        projectMailOutboxJob.run();
     }
 
     @Scheduled(cron = "${application.cron.boost-rewards-cron-expression}")

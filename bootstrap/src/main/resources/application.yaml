@@ -179,6 +179,7 @@ infrastructure:
     new-reward-received-email-id: 13
     invoice-rejected-email-id: 10
     verification-failed-email-id: 15
+    new-committee-application-email-id: 14
   node-guardians:
     base-uri: ${NODE_GUARDIANS_BASE_URI}
     api-key: ${NODE_GUARDIANS_API_KEY}

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.*;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
+import onlydust.com.marketplace.project.domain.model.event.NewCommitteeApplication;
 
 @AllArgsConstructor
 @Slf4j
@@ -30,6 +31,8 @@ public class CustomerIOAdapter implements OutboxConsumer {
             sendEmail(MailDTO.fromVerificationFailed(customerIOProperties, billingProfileVerificationFailed));
         } else if (event instanceof RewardsPaid rewardsPaid) {
             sendEmail(MailDTO.fromRewardsPaid(customerIOProperties, rewardsPaid));
+        } else if (event instanceof NewCommitteeApplication newCommitteeApplication) {
+            sendEmail(MailDTO.fromNewCommitteeApplication(customerIOProperties, newCommitteeApplication));
         } else {
             LOGGER.warn("Event type {} not handle by CustomerIO to send mail", event.getClass());
         }
