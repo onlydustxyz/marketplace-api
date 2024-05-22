@@ -65,7 +65,8 @@ public class ReadUsersApiPostgresAdapter implements ReadUsersApi {
 
     @Override
     public ResponseEntity<UserProfileEcosystemPage> getUserProfileStatsPerEcosystems(Long githubId, Integer pageIndex, Integer pageSize) {
-        final var page = userProfileEcosystemPageItemEntityRepository.findByContributorId(githubId, PageRequest.of(pageIndex, pageSize, Sort.by("rank", "contribution_count", "total_earned_usd")));
+        final var page = userProfileEcosystemPageItemEntityRepository.findByContributorId(githubId, PageRequest.of(pageIndex, pageSize,
+                Sort.by(Sort.Direction.DESC, "contribution_count", "total_earned_usd")));
         return ok(new UserProfileEcosystemPage()
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
@@ -77,7 +78,8 @@ public class ReadUsersApiPostgresAdapter implements ReadUsersApi {
 
     @Override
     public ResponseEntity<UserProfileLanguagePage> getUserProfileStatsPerLanguages(Long githubId, Integer pageIndex, Integer pageSize) {
-        final var page = userProfileLanguagePageItemEntityRepository.findByContributorId(githubId, PageRequest.of(pageIndex, pageSize, Sort.by("rank", "contribution_count", "total_earned_usd")));
+        final var page = userProfileLanguagePageItemEntityRepository.findByContributorId(githubId, PageRequest.of(pageIndex, pageSize,
+                Sort.by(Sort.Direction.DESC, "contribution_count", "total_earned_usd")));
         return ok(new UserProfileLanguagePage()
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())

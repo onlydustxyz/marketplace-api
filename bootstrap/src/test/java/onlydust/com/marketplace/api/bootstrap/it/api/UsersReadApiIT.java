@@ -163,7 +163,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             }
                           ]
                         }
-                        """);
+                        """, true);
     }
 
     @Test
@@ -207,29 +207,6 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               }
                             },
                             {
-                              "rank": 1,
-                              "contributingStatus": "GREEN",
-                              "contributedProjectCount": 1,
-                              "contributionCount": 888,
-                              "rewardCount": 0,
-                              "totalEarnedUsd": 0,
-                              "projects": [
-                                {
-                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                                  "slug": "mooooooonlight",
-                                  "name": "Mooooooonlight",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
-                                }
-                              ],
-                              "ecosystem": {
-                                "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
-                                "name": "Aztec",
-                                "url": "https://aztec.network/",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg",
-                                "bannerUrl": null
-                              }
-                            },
-                            {
                               "rank": 8,
                               "contributingStatus": "GREEN",
                               "contributedProjectCount": 1,
@@ -251,10 +228,33 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png",
                                 "bannerUrl": null
                               }
+                            },
+                            {
+                              "rank": 1,
+                              "contributingStatus": "GREEN",
+                              "contributedProjectCount": 1,
+                              "contributionCount": 888,
+                              "rewardCount": 0,
+                              "totalEarnedUsd": 0,
+                              "projects": [
+                                {
+                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                  "slug": "mooooooonlight",
+                                  "name": "Mooooooonlight",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                }
+                              ],
+                              "ecosystem": {
+                                "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
+                                "name": "Aztec",
+                                "url": "https://aztec.network/",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg",
+                                "bannerUrl": null
+                              }
                             }
                           ]
                         }
-                        """);
+                        """, true);
 
         // When
         client.get()
