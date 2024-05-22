@@ -3203,6 +3203,34 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/committees/{committeeId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Committees
+      summary: Get committee
+      operationId: getCommittee
+      description: |
+        Get committee
+      parameters:
+        - in: path
+          name: committeeId
+          required: true
+          schema:
+            $ref: '#/components/schemas/CommitteeId'
+      responses:
+        "200":
+          description: 'Committee response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommitteeResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/committees/{committeeId}/projects/applications:
     get:
       security:
@@ -6931,6 +6959,32 @@ components:
       properties:
         name:
           type: string
+
+    CommitteeResponse:
+      type: object
+      required:
+        - id
+        - name
+        - applicationStartDate
+        - applicationEndDate
+        - status
+        - sponsor
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        applicationStartDate:
+          type: string
+          format: 'date-time'
+        applicationEndDate:
+          type: string
+          format: 'date-time'
+        status:
+          $ref: '#/components/schemas/CommitteeStatus'
+        sponsor:
+          $ref: '#/components/schemas/SponsorResponse'
 
     CommitteeApplicationResponse:
       type: object

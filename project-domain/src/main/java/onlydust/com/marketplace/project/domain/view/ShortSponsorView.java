@@ -7,5 +7,5 @@ import java.util.UUID;
 
 
 @Builder
-public record ShortSponsorView(@NonNull UUID id, @NonNull String name, @NonNull String logoUrl) {
+public record ShortSponsorView(@NonNull UUID id, @NonNull String name, @NonNull String url, @NonNull String logoUrl) {
 }

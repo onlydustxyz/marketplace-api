@@ -106,6 +106,7 @@ public class WebSecurityConfiguration {
                                 .requestMatchers(antMatcher("/api/v1/events/**")).hasAuthority(INTERNAL_SERVICE.name())
                                 .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/projects/**")).hasAuthority(USER.name())
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/users/search")).hasAuthority(USER.name())
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/committees/*")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/projects/**")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/users/**")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v2/users/**")).permitAll()
