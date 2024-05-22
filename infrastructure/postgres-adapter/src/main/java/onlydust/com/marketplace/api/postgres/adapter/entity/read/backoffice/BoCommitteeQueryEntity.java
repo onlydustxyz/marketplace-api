@@ -80,7 +80,7 @@ public class BoCommitteeQueryEntity {
                                         .build()
                                 )
                                 .applicant(ProjectLeaderLinkView.builder()
-                                        .avatarUrl(projectApplicationLinkJson.projectLogoUrl)
+                                        .avatarUrl(projectApplicationLinkJson.userAvatarUrl)
                                         .login(projectApplicationLinkJson.userGithubLogin)
                                         .githubUserId(projectApplicationLinkJson.userGithubId)
                                         .id(projectApplicationLinkJson.userId)
