@@ -6,10 +6,11 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.CommitteeStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
-import onlydust.com.marketplace.project.domain.view.CommitteeView;
-import onlydust.com.marketplace.project.domain.view.ShortSponsorView;
+import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
+import onlydust.com.marketplace.project.domain.view.*;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -52,6 +53,8 @@ public class BoCommitteeQueryEntity {
     String sponsorName;
     String sponsorUrl;
     String sponsorLogoUrl;
+    @JdbcTypeCode(SqlTypes.JSON)
+    Set<ProjectApplicationLinkJson> projectApplications;
 
     public CommitteeView toView() {
         return CommitteeView.builder()
@@ -65,14 +68,49 @@ public class BoCommitteeQueryEntity {
                                 projectQuestionEntity.getQuestion(),
                                 projectQuestionEntity.getRequired())).toList())
                 .sponsor(isNull(this.sponsorName) ? null : new ShortSponsorView(this.sponsorId, this.sponsorName, this.sponsorUrl, this.sponsorLogoUrl))
+                .committeeApplicationLinks(isNull(this.projectApplications) ? null : this.projectApplications.stream()
+                        .map(projectApplicationLinkJson -> CommitteeApplicationLinkView.builder()
+                                .projectShortView(ProjectShortView.builder()
+                                        .slug(projectApplicationLinkJson.projectSlug)
+                                        .shortDescription(projectApplicationLinkJson.projectShortDescription)
+                                        .logoUrl(projectApplicationLinkJson.projectLogoUrl)
+                                        .id(projectApplicationLinkJson.projectId)
+                                        .name(projectApplicationLinkJson.projectName)
+                                        .visibility(ProjectVisibility.valueOf(projectApplicationLinkJson.projectVisibility))
+                                        .build()
+                                )
+                                .applicant(ProjectLeaderLinkView.builder()
+                                        .avatarUrl(projectApplicationLinkJson.projectLogoUrl)
+                                        .login(projectApplicationLinkJson.userGithubLogin)
+                                        .githubUserId(projectApplicationLinkJson.userGithubId)
+                                        .id(projectApplicationLinkJson.userId)
+                                        .build())
+                                .build()).toList())
                 .build();
     }
 
     @Data
     public static class ProjectQuestionJson {
-        @NonNull UUID id;
-        @NonNull String question;
-        @NonNull Boolean required;
+        @NonNull
+        UUID id;
+        @NonNull
+        String question;
+        @NonNull
+        Boolean required;
+    }
+
+    @Data
+    public static class ProjectApplicationLinkJson {
+        UUID userId;
+        UUID projectId;
+        String projectName;
+        Long userGithubId;
+        String projectSlug;
+        String userAvatarUrl;
+        String userGithubLogin;
+        String projectLogoUrl;
+        String projectShortDescription;
+        String projectVisibility;
     }
 
 }

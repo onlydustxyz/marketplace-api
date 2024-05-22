@@ -5,7 +5,12 @@ import onlydust.com.marketplace.api.bootstrap.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.CommitteeStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
+import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
+import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +36,12 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
     private UUID haydenId = UUID.fromString("eaa1ddf3-fea5-4cef-825b-336f8e775e05");
     private UUID mehdiId = UUID.fromString("705e134d-e9e3-4ea3-85e2-a59a9628ecfc");
     private UUID cocaColax = UUID.fromString("44c6807c-48d1-4987-a0a6-ac63f958bdae");
+    private final UUID bretzel = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
+    static UUID committeeId;
+    static UUID projectQuestionId1;
+    static UUID projectQuestionId2;
+    private UUID pierreAppId = UUID.fromString("fc92397c-3431-4a84-8054-845376b630a0");
+
 
     @BeforeEach
     void setUp() {
@@ -130,11 +141,11 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
     @Order(3)
     void should_update_committee() {
         // Given
-        final UUID committeeId = committeeRepository.findAll().get(0).getId();
+        committeeId = committeeRepository.findAll().get(0).getId();
         final UpdateCommitteeRequest updateCommitteeRequest1 = new UpdateCommitteeRequest();
-        final ProjectQuestionRequest projectQuestionRequest1 = new ProjectQuestionRequest(faker.lorem().characters(), false);
-        final ProjectQuestionRequest projectQuestionRequest2 = new ProjectQuestionRequest(faker.lorem().paragraph(), true);
-        final ProjectQuestionRequest projectQuestionRequest3 = new ProjectQuestionRequest(faker.lorem().paragraph(), false);
+        final ProjectQuestionRequest projectQuestionRequest1 = new ProjectQuestionRequest("a" + faker.lorem().characters(), false);
+        final ProjectQuestionRequest projectQuestionRequest2 = new ProjectQuestionRequest("b" + faker.lorem().paragraph(), true);
+        final ProjectQuestionRequest projectQuestionRequest3 = new ProjectQuestionRequest("c" + faker.lorem().paragraph(), false);
         final JuryCriteriaRequest juryCriteriaRequest1 = new JuryCriteriaRequest(faker.lorem().characters());
         final JuryCriteriaRequest juryCriteriaRequest2 = new JuryCriteriaRequest(faker.lorem().paragraph());
         final JuryCriteriaRequest juryCriteriaRequest3 = new JuryCriteriaRequest(faker.pokemon().name());
@@ -239,10 +250,10 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
 
         assertEquals(2, committeeResponse1.getProjectQuestions().size());
         assertThat(committeeResponse2.getProjectQuestions()).allMatch(q -> q.getId() != null);
-        assertEquals(projectQuestionRequest3.getQuestion(), committeeResponse2.getProjectQuestions().get(0).getQuestion());
-        assertEquals(projectQuestionRequest3.getRequired(), committeeResponse2.getProjectQuestions().get(0).getRequired());
-        assertEquals(projectQuestionRequest2.getQuestion(), committeeResponse2.getProjectQuestions().get(1).getQuestion());
-        assertEquals(projectQuestionRequest2.getRequired(), committeeResponse2.getProjectQuestions().get(1).getRequired());
+        assertEquals(projectQuestionRequest2.getQuestion(), committeeResponse2.getProjectQuestions().get(0).getQuestion());
+        assertEquals(projectQuestionRequest2.getRequired(), committeeResponse2.getProjectQuestions().get(0).getRequired());
+        assertEquals(projectQuestionRequest3.getQuestion(), committeeResponse2.getProjectQuestions().get(1).getQuestion());
+        assertEquals(projectQuestionRequest3.getRequired(), committeeResponse2.getProjectQuestions().get(1).getRequired());
         assertEquals(updateCommitteeRequest2.getName(), committeeResponse2.getName());
         assertEquals(updateCommitteeRequest2.getStartDate().toInstant(), committeeResponse2.getStartDate().toInstant());
         assertEquals(updateCommitteeRequest2.getEndDate().toInstant(), committeeResponse2.getEndDate().toInstant());
@@ -250,10 +261,39 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
         assertEquals(cocaColax, committeeResponse2.getSponsor().getId());
         assertEquals("Coca Colax", committeeResponse2.getSponsor().getName());
         assertEquals("https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg", committeeResponse2.getSponsor().getAvatarUrl());
+        projectQuestionId1 = committeeResponse2.getProjectQuestions().get(0).getId();
     }
+
+    @Autowired
+    CommitteeFacadePort committeeFacadePort;
+    @Autowired
+    ProjectLeadRepository projectLeadRepository;
 
     @Test
     @Order(4)
+    void should_return_applications() {
+        // Given
+        final UUID committeeId = committeeRepository.findAll().get(0).getId();
+        projectLeadRepository.save(new ProjectLeadEntity(bretzel, pierreAppId));
+        final Committee.ProjectAnswer projectAnswer = new Committee.ProjectAnswer(ProjectQuestion.Id.of(projectQuestionId1), faker.lorem().paragraph());
+        committeeFacadePort.createUpdateApplicationForCommittee(Committee.Id.of(committeeId), new Committee.Application(pierreAppId, bretzel, List.of(
+                projectAnswer
+        )));
+
+        // When
+        client.get()
+                .uri(getApiURI(COMMITTEES_BY_ID.formatted(committeeId)))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("{}");
+    }
+
+    @Test
+    @Order(5)
     void should_update_committee_status() {
         // Given
         final CommitteeEntity committeeEntity = committeeRepository.findAll().get(1);

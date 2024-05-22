@@ -96,7 +96,7 @@ public class CommitteeService implements CommitteeFacadePort {
 
     private void checkApplicationPermission(final UUID projectId, final UUID userId) {
         if (!permissionService.isUserProjectLead(projectId, userId))
-            throw OnlyDustException.forbidden("Only project leads send new application to committee");
+            throw OnlyDustException.forbidden("Only project lead can send new application to committee");
         if (!projectStoragePort.exists(projectId))
             throw OnlyDustException.internalServerError("Project %s was not found".formatted(projectId));
     }
