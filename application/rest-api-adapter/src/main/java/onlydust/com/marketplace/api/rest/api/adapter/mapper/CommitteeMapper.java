@@ -32,8 +32,7 @@ public interface CommitteeMapper {
                         .id(projectAnswer.questionId().value())
                         .answer(projectAnswer.answer())
                 ).toList());
-        committeeApplicationResponse.hasStartedApplication(committeeApplicationView.answers().stream()
-                .map(ProjectAnswerView::answer).anyMatch(Objects::nonNull));
+        committeeApplicationResponse.hasStartedApplication(committeeApplicationView.hasStartedApplication());
         committeeApplicationResponse.setStatus(statusToResponse(committeeApplicationView.status()));
         committeeApplicationResponse.setProjectInfos(isNull(committeeApplicationView.projectInfosView()) ? null : new CommitteeProjectInfosResponse()
                 .id(committeeApplicationView.projectInfosView().projectId())

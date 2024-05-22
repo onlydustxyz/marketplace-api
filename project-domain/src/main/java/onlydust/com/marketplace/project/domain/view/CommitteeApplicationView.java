@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record CommitteeApplicationView(@NonNull Committee.Status status, @NonNull List<ProjectAnswerView> answers,
-                                       ProjectInfosView projectInfosView) {
+                                       ProjectInfosView projectInfosView, Boolean hasStartedApplication) {
 
     public record ProjectInfosView(@NonNull UUID projectId, @NonNull String name, @NonNull String slug, @NonNull URI logoUri,
                                    @NonNull String shortDescription, @NonNull String longDescription, @NonNull List<ProjectLeaderLinkView> projectLeads,

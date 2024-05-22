@@ -4,6 +4,7 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
+import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.view.CommitteeApplicationView;
@@ -33,13 +34,15 @@ public class CommitteeServiceTest {
     private CommitteeStoragePort committeeStoragePort;
     private ProjectStoragePort projectStoragePort;
     private PermissionService permissionService;
+    private CommitteeObserverPort committeeObserverPort;
 
     @BeforeEach
     void setUp() {
         committeeStoragePort = mock(CommitteeStoragePort.class);
         projectStoragePort = mock(ProjectStoragePort.class);
         permissionService = mock(PermissionService.class);
-        committeeService = new CommitteeService(committeeStoragePort, permissionService, projectStoragePort);
+        committeeObserverPort = mock(CommitteeObserverPort.class);
+        committeeService = new CommitteeService(committeeStoragePort, permissionService, projectStoragePort, committeeObserverPort);
     }
 
     @Test
@@ -188,7 +191,7 @@ public class CommitteeServiceTest {
         }
 
         @Test
-        void given_everything_ok() {
+        void given_new_application() {
             // Given
             final Committee.Id committeeId = Committee.Id.random();
             final UUID userId = UUID.randomUUID();
@@ -206,10 +209,39 @@ public class CommitteeServiceTest {
                     .build()));
             when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(true);
             when(projectStoragePort.exists(projectId)).thenReturn(true);
+            when(committeeStoragePort.hasStartedApplication(committeeId, application)).thenReturn(false);
             committeeService.createUpdateApplicationForCommittee(committeeId, application);
 
             // Then
             verify(committeeStoragePort).saveApplication(committeeId, application);
+            verify(committeeObserverPort).onNewApplication(committeeId, application.projectId(), application.userId());
+        }
+
+        @Test
+        void given_application_update() {
+            // Given
+            final Committee.Id committeeId = Committee.Id.random();
+            final UUID userId = UUID.randomUUID();
+            final UUID projectId = UUID.randomUUID();
+            final Committee.Application application = new Committee.Application(userId,
+                    projectId, List.of());
+
+            // When
+            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
+                    .name(faker.rickAndMorty().location())
+                    .id(committeeId)
+                    .status(Committee.Status.OPEN_TO_APPLICATIONS)
+                    .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .build()));
+            when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(true);
+            when(projectStoragePort.exists(projectId)).thenReturn(true);
+            when(committeeStoragePort.hasStartedApplication(committeeId, application)).thenReturn(true);
+            committeeService.createUpdateApplicationForCommittee(committeeId, application);
+
+            // Then
+            verify(committeeStoragePort).saveApplication(committeeId, application);
+            verifyNoInteractions(committeeObserverPort);
         }
 
 
@@ -262,6 +294,7 @@ public class CommitteeServiceTest {
         assertEquals(q2.id(), committeeApplication.answers().get(1).questionId());
         assertEquals(true, committeeApplication.answers().get(1).required());
         assertNull(committeeApplication.answers().get(1).answer());
+        assertFalse(committeeApplication.hasStartedApplication());
     }
 
     @Test
@@ -314,6 +347,7 @@ public class CommitteeServiceTest {
         assertEquals(false, committeeApplication.answers().get(1).required());
         assertEquals("A4", committeeApplication.answers().get(1).answer());
         assertEquals(a4.questionId(), committeeApplication.answers().get(1).questionId());
+        assertTrue(committeeApplication.hasStartedApplication());
     }
 
 

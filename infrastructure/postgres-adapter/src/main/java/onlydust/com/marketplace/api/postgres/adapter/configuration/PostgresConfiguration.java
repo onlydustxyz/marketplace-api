@@ -273,6 +273,11 @@ public class PostgresConfiguration {
     }
 
     @Bean
+    public PostgresOutboxAdapter<ProjectMailEventEntity> projectMailOutbox(final ProjectMailEventRepository projectMailEventRepository) {
+        return new PostgresOutboxAdapter<>(projectMailEventRepository);
+    }
+
+    @Bean
     public PostgresOutboxAdapter<BoostNodeGuardiansRewardsEventEntity> boostNodeGuardiansRewardsOutbox(final BoostNodeGuardiansRewardsRepository boostNodeGuardiansRewardsRepository) {
         return new PostgresOutboxAdapter<>(boostNodeGuardiansRewardsRepository);
     }
