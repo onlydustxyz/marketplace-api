@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CommitteeApiIT extends AbstractMarketplaceApiIT {
@@ -94,6 +94,7 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
         assertEquals(true, committeeApplicationResponse.getProjectQuestions().get(1).getRequired());
         assertEquals(null, committeeApplicationResponse.getProjectQuestions().get(1).getAnswer());
         assertEquals(q2.id().value(), committeeApplicationResponse.getProjectQuestions().get(1).getId());
+        assertFalse(committeeApplicationResponse.getHasStartedApplication());
     }
 
     @Autowired
@@ -154,7 +155,7 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
         assertEquals(answerRequest1.getAnswer(), committeeApplicationResponse.getProjectQuestions().get(0).getAnswer());
         assertEquals(answerRequest2.getQuestionId(), committeeApplicationResponse.getProjectQuestions().get(1).getId());
         assertEquals(answerRequest2.getAnswer(), committeeApplicationResponse.getProjectQuestions().get(1).getAnswer());
-
+        assertTrue(committeeApplicationResponse.getHasStartedApplication());
 
         client.get()
                 .uri(getApiURI(COMMITTEES_APPLICATIONS.formatted(committeeId), Map.of("projectId", bretzel.toString())))

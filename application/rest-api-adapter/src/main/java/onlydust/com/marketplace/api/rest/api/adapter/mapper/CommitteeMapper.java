@@ -7,10 +7,7 @@ import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.view.CommitteeApplicationView;
 import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static java.util.Objects.isNull;
 
@@ -35,6 +32,8 @@ public interface CommitteeMapper {
                         .id(projectAnswer.questionId().value())
                         .answer(projectAnswer.answer())
                 ).toList());
+        committeeApplicationResponse.hasStartedApplication(committeeApplicationView.answers().stream()
+                .map(ProjectAnswerView::answer).anyMatch(Objects::nonNull));
         committeeApplicationResponse.setStatus(statusToResponse(committeeApplicationView.status()));
         committeeApplicationResponse.setProjectInfos(isNull(committeeApplicationView.projectInfosView()) ? null : new CommitteeProjectInfosResponse()
                 .id(committeeApplicationView.projectInfosView().projectId())

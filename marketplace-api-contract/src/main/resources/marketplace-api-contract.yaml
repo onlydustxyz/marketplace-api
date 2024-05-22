@@ -6991,6 +6991,7 @@ components:
       required:
         - projectQuestions
         - status
+        - hasStartedApplication
       properties:
         projectQuestions:
           type: array
@@ -7000,6 +7001,8 @@ components:
           $ref: '#/components/schemas/CommitteeProjectInfosResponse'
         status:
           $ref: '#/components/schemas/CommitteeStatus'
+        hasStartedApplication:
+          type: boolean
 
     CommitteeStatus:
       type: string
