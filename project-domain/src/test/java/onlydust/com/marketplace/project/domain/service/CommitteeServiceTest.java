@@ -134,7 +134,7 @@ public class CommitteeServiceTest {
             Assertions.assertThatThrownBy(() -> committeeService.createUpdateApplicationForCommittee(committeeId, new Committee.Application(userId,
                             projectId, List.of())))
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("Only project leads send new application to committee");
+                    .hasMessage("Only project lead can send new application to committee");
         }
 
         @Test

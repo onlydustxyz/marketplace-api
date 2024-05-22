@@ -4588,7 +4588,9 @@ components:
         totalScore:
           type: number
         answers:
-          $ref: '#/components/schemas/AnswerResponse'
+          type: array
+          items:
+            $ref: '#/components/schemas/AnswerResponse'
 
     AnswerResponse:
       type: object

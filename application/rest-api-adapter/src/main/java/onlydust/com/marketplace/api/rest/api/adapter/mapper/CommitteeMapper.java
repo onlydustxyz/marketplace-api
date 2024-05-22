@@ -5,6 +5,7 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.view.CommitteeApplicationView;
+import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -27,7 +28,7 @@ public interface CommitteeMapper {
     static CommitteeApplicationResponse committeeApplicationViewToResponse(CommitteeApplicationView committeeApplicationView) {
         final CommitteeApplicationResponse committeeApplicationResponse = new CommitteeApplicationResponse();
         committeeApplicationResponse.setProjectQuestions(committeeApplicationView.answers().stream()
-                .sorted(Comparator.comparing(projectAnswer -> projectAnswer.question()))
+                .sorted(Comparator.comparing(ProjectAnswerView::question))
                 .map(projectAnswer -> new CommitteeProjectQuestionResponse()
                         .question(projectAnswer.question())
                         .required(projectAnswer.required())
