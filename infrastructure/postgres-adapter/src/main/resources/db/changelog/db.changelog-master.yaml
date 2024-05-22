@@ -301,3 +301,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000236_avoid_cancelled_contributions.sql
   - include:
       file: db/changelog/changelogs/00000237_add_missing_index.sql
+  - include:
+      file: db/changelog/changelogs/00000238_fix_rank_percentile.sql
