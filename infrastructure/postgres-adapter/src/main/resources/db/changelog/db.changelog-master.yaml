@@ -303,3 +303,7 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000237_add_missing_index.sql
   - include:
       file: db/changelog/changelogs/00000238_fix_rank_percentile.sql
+  - include:
+      file: db/changelog/changelogs/00000239_renaming_committee_dates.sql
+  - include:
+      file: db/changelog/changelogs/00000240_add_project_mail_outbox_events_table.sql

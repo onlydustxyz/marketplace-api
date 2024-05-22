@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.events.*;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
+import onlydust.com.marketplace.project.domain.model.event.NewCommitteeApplication;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +21,7 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                                    @NonNull String subject,
                                    @NonNull @JsonProperty("message_data") MessageData messageData
 ) {
+
     public record IdentifiersDTO(String id, String email) {
     }
 
@@ -68,7 +70,14 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
         return new MailDTO<>(customerIOProperties.getRewardsPaidEmailId().toString(), mapIdentifiers(rewardsPaid.recipientEmail(), rewardsPaid.recipientId()),
                 customerIOProperties.getOnlyDustAdminEmail(), rewardsPaid.recipientEmail(), "Your rewards are processed! 🥳",
                 RewardsPaidDTO.fromEvent(rewardsPaid));
+    }
 
+    public static MailDTO<NewCommitteeApplicationDTO> fromNewCommitteeApplication(@NonNull CustomerIOProperties customerIOProperties,
+                                                                                  @NonNull NewCommitteeApplication newCommitteeApplication) {
+        return new MailDTO<>(customerIOProperties.getNewCommitteeApplicationEmailId().toString(), mapIdentifiers(newCommitteeApplication.getEmail(),
+                newCommitteeApplication.getUserId()), customerIOProperties.getOnlyDustAdminEmail(), newCommitteeApplication.getEmail(),
+                "Your application to committee %s".formatted(newCommitteeApplication.getCommitteeName()),
+                NewCommitteeApplicationDTO.fromEvent(newCommitteeApplication));
     }
 
     private static IdentifiersDTO mapIdentifiers(@NonNull String email, UUID id) {

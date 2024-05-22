@@ -55,8 +55,8 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
         // Given
         final CreateCommitteeRequest createCommitteeRequest = new CreateCommitteeRequest();
         createCommitteeRequest.setName(faker.rickAndMorty().character());
-        createCommitteeRequest.setStartDate(faker.date().past(2, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()));
-        createCommitteeRequest.setEndDate(faker.date().future(3, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()));
+        createCommitteeRequest.setApplicationStartDate(faker.date().past(2, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()));
+        createCommitteeRequest.setApplicationEndDate(faker.date().future(3, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()));
 
         // When
         final CommitteeResponse committeeResponse = client.post()
@@ -72,8 +72,8 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .returnResult().getResponseBody();
 
         assertEquals(createCommitteeRequest.getName(), committeeResponse.getName());
-        assertEquals(createCommitteeRequest.getEndDate().toInstant(), committeeResponse.getEndDate().toInstant());
-        assertEquals(createCommitteeRequest.getStartDate().toInstant(), committeeResponse.getStartDate().toInstant());
+        assertEquals(createCommitteeRequest.getApplicationEndDate().toInstant(), committeeResponse.getApplicationEndDate().toInstant());
+        assertEquals(createCommitteeRequest.getApplicationStartDate().toInstant(), committeeResponse.getApplicationStartDate().toInstant());
         assertNotNull(committeeResponse.getId());
     }
 
@@ -90,14 +90,14 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 .id(UUID.randomUUID())
                                 .name(faker.gameOfThrones().character())
                                 .status(CommitteeStatusEntity.OPEN_TO_APPLICATIONS)
-                                .startDate(faker.date().past(5, TimeUnit.DAYS))
-                                .endDate(faker.date().future(5, TimeUnit.DAYS))
+                                .applicationStartDate(faker.date().past(5, TimeUnit.DAYS))
+                                .applicationEndDate(faker.date().future(5, TimeUnit.DAYS))
                                 .build(), CommitteeEntity.builder()
                                 .id(UUID.randomUUID())
                                 .name(faker.gameOfThrones().character())
                                 .status(CommitteeStatusEntity.OPEN_TO_APPLICATIONS)
-                                .startDate(faker.date().past(5, TimeUnit.DAYS))
-                                .endDate(faker.date().future(5, TimeUnit.DAYS))
+                                .applicationStartDate(faker.date().past(5, TimeUnit.DAYS))
+                                .applicationEndDate(faker.date().future(5, TimeUnit.DAYS))
                                 .build())
         );
         final List<CommitteeEntity> allCommittees = committeeRepository.findAll(Sort.by(Sort.Direction.DESC, "techCreatedAt"));
@@ -150,8 +150,8 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
         final JuryCriteriaRequest juryCriteriaRequest2 = new JuryCriteriaRequest(faker.lorem().paragraph());
         final JuryCriteriaRequest juryCriteriaRequest3 = new JuryCriteriaRequest(faker.pokemon().name());
         updateCommitteeRequest1.name(faker.rickAndMorty().location())
-                .startDate(faker.date().past(10, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()))
-                .endDate(faker.date().future(10, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()))
+                .applicationStartDate(faker.date().past(10, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()))
+                .applicationEndDate(faker.date().future(10, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()))
                 .allocationCurrencyId(CurrencyHelper.STRK.value())
                 .status(CommitteeStatus.DRAFT)
                 .maximumAllocationAmount(BigDecimal.valueOf(111.212))
@@ -197,15 +197,15 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
             assertTrue(List.of(projectQuestionRequest1.getQuestion(), projectQuestionRequest2.getQuestion()).contains(projectQuestion.getQuestion()));
         }
         assertEquals(updateCommitteeRequest1.getName(), committeeResponse1.getName());
-        assertEquals(updateCommitteeRequest1.getStartDate().toInstant(), committeeResponse1.getStartDate().toInstant());
-        assertEquals(updateCommitteeRequest1.getEndDate().toInstant(), committeeResponse1.getEndDate().toInstant());
+        assertEquals(updateCommitteeRequest1.getApplicationStartDate().toInstant(), committeeResponse1.getApplicationStartDate().toInstant());
+        assertEquals(updateCommitteeRequest1.getApplicationEndDate().toInstant(), committeeResponse1.getApplicationEndDate().toInstant());
         assertEquals(updateCommitteeRequest1.getStatus().name(), committeeResponse1.getStatus().name());
         assertNull(committeeResponse1.getSponsor());
 
 
         final UpdateCommitteeRequest updateCommitteeRequest2 = new UpdateCommitteeRequest().name(faker.rickAndMorty().location())
-                .startDate(faker.date().past(10, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()))
-                .endDate(faker.date().future(10, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()))
+                .applicationStartDate(faker.date().past(10, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()))
+                .applicationEndDate(faker.date().future(10, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()))
                 .allocationCurrencyId(CurrencyHelper.STRK.value())
                 .status(CommitteeStatus.DRAFT)
                 .maximumAllocationAmount(BigDecimal.valueOf(222.33))
@@ -255,8 +255,8 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
         assertEquals(projectQuestionRequest3.getQuestion(), committeeResponse2.getProjectQuestions().get(1).getQuestion());
         assertEquals(projectQuestionRequest3.getRequired(), committeeResponse2.getProjectQuestions().get(1).getRequired());
         assertEquals(updateCommitteeRequest2.getName(), committeeResponse2.getName());
-        assertEquals(updateCommitteeRequest2.getStartDate().toInstant(), committeeResponse2.getStartDate().toInstant());
-        assertEquals(updateCommitteeRequest2.getEndDate().toInstant(), committeeResponse2.getEndDate().toInstant());
+        assertEquals(updateCommitteeRequest2.getApplicationStartDate().toInstant(), committeeResponse2.getApplicationStartDate().toInstant());
+        assertEquals(updateCommitteeRequest2.getApplicationEndDate().toInstant(), committeeResponse2.getApplicationEndDate().toInstant());
         assertEquals(updateCommitteeRequest2.getStatus().name(), committeeResponse2.getStatus().name());
         assertEquals(cocaColax, committeeResponse2.getSponsor().getId());
         assertEquals("Coca Colax", committeeResponse2.getSponsor().getName());

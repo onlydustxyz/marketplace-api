@@ -6,6 +6,7 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
+import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.view.CommitteeApplicationView;
@@ -20,6 +21,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 @AllArgsConstructor
 public class CommitteeService implements CommitteeFacadePort {
@@ -27,6 +29,7 @@ public class CommitteeService implements CommitteeFacadePort {
     private final CommitteeStoragePort committeeStoragePort;
     private final PermissionService permissionService;
     private final ProjectStoragePort projectStoragePort;
+    private final CommitteeObserverPort committeeObserverPort;
 
     @Override
     public Committee createCommittee(@NonNull String name, @NonNull ZonedDateTime startDate, @NonNull ZonedDateTime endDate) {
@@ -67,7 +70,11 @@ public class CommitteeService implements CommitteeFacadePort {
             throw OnlyDustException.forbidden("Applications are not opened or are closed for committee %s".formatted(committeeId.value()));
 
         checkApplicationPermission(application.projectId(), application.userId());
+        final boolean hasStartedApplication = committeeStoragePort.hasStartedApplication(committeeId, application);
         committeeStoragePort.saveApplication(committeeId, application);
+        if (!hasStartedApplication) {
+            committeeObserverPort.onNewApplication(committeeId, application.projectId(), application.userId());
+        }
     }
 
     @Override
@@ -79,13 +86,14 @@ public class CommitteeService implements CommitteeFacadePort {
             final UUID projectId = optionalProjectId.get();
             checkApplicationPermission(projectId, userId);
             List<ProjectAnswerView> projectAnswers = committeeStoragePort.getApplicationAnswers(committeeId, projectId);
-            if (isNull(projectAnswers) || projectAnswers.isEmpty()) {
+            Boolean hasStartedApplication = nonNull(projectAnswers) && !projectAnswers.isEmpty();
+            if (!hasStartedApplication) {
                 projectAnswers = getCommitteeAnswersWithOnlyQuestions(committee);
             }
-            return new CommitteeApplicationView(committee.status(), projectAnswers, projectStoragePort.getProjectInfos(projectId));
+            return new CommitteeApplicationView(committee.status(), projectAnswers, projectStoragePort.getProjectInfos(projectId), hasStartedApplication);
         }
 
-        return new CommitteeApplicationView(committee.status(), getCommitteeAnswersWithOnlyQuestions(committee), null);
+        return new CommitteeApplicationView(committee.status(), getCommitteeAnswersWithOnlyQuestions(committee), null, false);
     }
 
 

@@ -23,4 +23,6 @@ public class CustomerIOProperties {
     Integer invoiceRejectedEmailId;
     @NonNull
     Integer verificationFailedEmailId;
+    @NonNull
+    Integer newCommitteeApplicationEmailId;
 }

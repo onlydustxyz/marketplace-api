@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.CommitteeApplicationRequest;
 import onlydust.com.marketplace.api.contract.model.CommitteeApplicationResponse;
@@ -22,7 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CommitteeApiIT extends AbstractMarketplaceApiIT {
@@ -94,10 +96,13 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
         assertEquals(true, committeeApplicationResponse.getProjectQuestions().get(1).getRequired());
         assertEquals(null, committeeApplicationResponse.getProjectQuestions().get(1).getAnswer());
         assertEquals(q2.id().value(), committeeApplicationResponse.getProjectQuestions().get(1).getId());
+        assertFalse(committeeApplicationResponse.getHasStartedApplication());
     }
 
     @Autowired
     ProjectLeadRepository projectLeadRepository;
+    @Autowired
+    CustomerIOProperties customerIOProperties;
 
     @Test
     @Order(2)
@@ -138,6 +143,22 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(204);
 
+        projectMailOutboxJob.run();
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id", equalTo(customerIOProperties.getNewCommitteeApplicationEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(pierre.user().getId().toString())))
+                        .withRequestBody(matchingJsonPath("$.message_data.projectName", equalTo("Bretzel")))
+                        .withRequestBody(matchingJsonPath("$.message_data.projectId", equalTo(bretzel.toString())))
+                        .withRequestBody(matchingJsonPath("$.message_data.committeeId", equalTo(committeeId.value().toString())))
+                        .withRequestBody(matchingJsonPath("$.message_data.committeeName", equalTo("Mr. Needful")))
+                        .withRequestBody(matchingJsonPath("$.message_data.username", equalTo("PierreOucif")))
+                        .withRequestBody(matchingJsonPath("$.to", equalTo(pierre.user().getGithubEmail())))
+                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo("Your application to committee %s".formatted("Mr. Needful")))));
+
         // When
         final CommitteeApplicationResponse committeeApplicationResponse = client.get()
                 .uri(getApiURI(COMMITTEES_APPLICATIONS.formatted(committeeId), Map.of("projectId", bretzel.toString())))
@@ -154,7 +175,7 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
         assertEquals(answerRequest1.getAnswer(), committeeApplicationResponse.getProjectQuestions().get(0).getAnswer());
         assertEquals(answerRequest2.getQuestionId(), committeeApplicationResponse.getProjectQuestions().get(1).getId());
         assertEquals(answerRequest2.getAnswer(), committeeApplicationResponse.getProjectQuestions().get(1).getAnswer());
-
+        assertTrue(committeeApplicationResponse.getHasStartedApplication());
 
         client.get()
                 .uri(getApiURI(COMMITTEES_APPLICATIONS.formatted(committeeId), Map.of("projectId", bretzel.toString())))

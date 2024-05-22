@@ -212,6 +212,9 @@ public class AbstractMarketplaceApiIT {
     OutboxConsumerJob billingProfileVerificationOutboxJob;
     @Autowired
     OutboxConsumerJob accountingMailOutboxJob;
+    @Autowired
+    OutboxConsumerJob projectMailOutboxJob;
+
 
     @Autowired
     RewardRepository rewardRepository;

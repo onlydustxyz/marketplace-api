@@ -27,4 +27,6 @@ public interface CommitteeStoragePort {
     void saveProjectQuestions(Committee.Id committeeId, List<ProjectQuestion> projectQuestions);
 
     void deleteAllProjectQuestions(Committee.Id committeeId);
+
+    boolean hasStartedApplication(Committee.Id committeeId, Committee.Application application);
 }

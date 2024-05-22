@@ -93,4 +93,10 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
                         committeeProjectAnswerView.getAnswer()))
                 .toList();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean hasStartedApplication(Committee.Id committeeId, Committee.Application application) {
+        return committeeApplicationRepository.existsByCommitteeIdAndProjectId(committeeId.value(), application.projectId());
+    }
 }

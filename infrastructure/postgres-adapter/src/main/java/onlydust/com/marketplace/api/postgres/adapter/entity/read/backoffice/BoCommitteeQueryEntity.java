@@ -37,9 +37,9 @@ public class BoCommitteeQueryEntity {
     @EqualsAndHashCode.Include
     UUID id;
     @NonNull
-    Date startDate;
+    Date applicationStartDate;
     @NonNull
-    Date endDate;
+    Date applicationEndDate;
     @NonNull
     String name;
     @NonNull
@@ -61,8 +61,8 @@ public class BoCommitteeQueryEntity {
                 .id(Committee.Id.of(this.id))
                 .name(this.name)
                 .status(this.status.toDomain())
-                .startDate(ZonedDateTime.ofInstant(startDate.toInstant(), ZoneOffset.UTC))
-                .endDate(ZonedDateTime.ofInstant(endDate.toInstant(), ZoneOffset.UTC))
+                .applicationStartDate(ZonedDateTime.ofInstant(applicationStartDate.toInstant(), ZoneOffset.UTC))
+                .applicationEndDate(ZonedDateTime.ofInstant(applicationEndDate.toInstant(), ZoneOffset.UTC))
                 .projectQuestions(isNull(this.projectQuestions) ? List.of() : this.projectQuestions.stream()
                         .map(projectQuestionEntity -> new ProjectQuestion(ProjectQuestion.Id.of(projectQuestionEntity.getId()),
                                 projectQuestionEntity.getQuestion(),

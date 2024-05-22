@@ -19,8 +19,8 @@ public interface BackOfficeCommitteeMapper {
         final CommitteeResponse committeeResponse = new CommitteeResponse();
         committeeResponse.setName(committee.name());
         committeeResponse.setId(committee.id().value());
-        committeeResponse.setStartDate(committee.startDate());
-        committeeResponse.setEndDate(committee.endDate());
+        committeeResponse.setApplicationStartDate(committee.applicationStartDate());
+        committeeResponse.setApplicationEndDate(committee.applicationEndDate());
         return committeeResponse;
     }
 
@@ -34,8 +34,8 @@ public interface BackOfficeCommitteeMapper {
             committeePageResponse.addCommitteesItem(new CommitteeLinkResponse()
                     .id(committeeLinkView.id().value())
                     .name(committeeLinkView.name())
-                    .startDate(committeeLinkView.startDate())
-                    .endDate(committeeLinkView.endDate())
+                    .applicationStartDate(committeeLinkView.startDate())
+                    .applicationEndDate(committeeLinkView.endDate())
                     .status(statusToResponse(committeeLinkView.status()))
             );
         }
@@ -65,8 +65,8 @@ public interface BackOfficeCommitteeMapper {
                 .id(Committee.Id.of(committeeId))
                 .status(statusToDomain(updateCommitteeRequest.getStatus()))
                 .name(updateCommitteeRequest.getName())
-                .startDate(updateCommitteeRequest.getStartDate())
-                .endDate(updateCommitteeRequest.getEndDate())
+                .applicationStartDate(updateCommitteeRequest.getApplicationStartDate())
+                .applicationEndDate(updateCommitteeRequest.getApplicationEndDate())
                 .sponsorId(updateCommitteeRequest.getSponsorId())
                 .build();
         committee.projectQuestions().addAll(updateCommitteeRequest.getProjectQuestions().stream()
@@ -86,8 +86,8 @@ public interface BackOfficeCommitteeMapper {
         return new CommitteeResponse()
                 .id(committeeView.id().value())
                 .name(committeeView.name())
-                .startDate(committeeView.startDate())
-                .endDate(committeeView.endDate())
+                .applicationStartDate(committeeView.applicationStartDate())
+                .applicationEndDate(committeeView.applicationEndDate())
                 .status(statusToResponse(committeeView.status()))
                 .projectQuestions(committeeView.projectQuestions().stream()
                         .sorted(Comparator.comparing(projectQuestion -> projectQuestion.question()))
