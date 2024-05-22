@@ -61,26 +61,31 @@ public class CommitteeService implements CommitteeFacadePort {
 
     @Override
     public void createUpdateApplicationForCommittee(Committee.Id committeeId, Committee.Application application) {
-        checkCommitteePermission(committeeId);
+        final var committee = committeeStoragePort.findById(committeeId)
+                .orElseThrow(() -> OnlyDustException.notFound("Committee %s was not found".formatted(committeeId.value().toString())));
+        if (committee.status() != Committee.Status.OPEN_TO_APPLICATIONS)
+            throw OnlyDustException.forbidden("Applications are not opened or are closed for committee %s".formatted(committeeId.value()));
+
         checkApplicationPermission(application.projectId(), application.userId());
         committeeStoragePort.saveApplication(committeeId, application);
     }
 
     @Override
     public CommitteeApplicationView getCommitteeApplication(Committee.Id committeeId, Optional<UUID> optionalProjectId, UUID userId) {
-        final CommitteeView committeeView = checkCommitteePermission(committeeId);
+        final var committee = committeeStoragePort.findById(committeeId)
+                .orElseThrow(() -> OnlyDustException.notFound("Committee %s was not found".formatted(committeeId.value().toString())));
+
         if (optionalProjectId.isPresent()) {
             final UUID projectId = optionalProjectId.get();
             checkApplicationPermission(projectId, userId);
             List<ProjectAnswerView> projectAnswers = committeeStoragePort.getApplicationAnswers(committeeId, projectId);
             if (isNull(projectAnswers) || projectAnswers.isEmpty()) {
-                projectAnswers = getCommitteeAnswersWithOnlyQuestions(committeeView);
-
+                projectAnswers = getCommitteeAnswersWithOnlyQuestions(committee);
             }
-            return new CommitteeApplicationView(committeeView.status(), projectAnswers, projectStoragePort.getProjectInfos(projectId));
-        } else {
-            return new CommitteeApplicationView(committeeView.status(), getCommitteeAnswersWithOnlyQuestions(committeeView), null);
+            return new CommitteeApplicationView(committee.status(), projectAnswers, projectStoragePort.getProjectInfos(projectId));
         }
+
+        return new CommitteeApplicationView(committee.status(), getCommitteeAnswersWithOnlyQuestions(committee), null);
     }
 
 
@@ -90,15 +95,10 @@ public class CommitteeService implements CommitteeFacadePort {
     }
 
     private void checkApplicationPermission(final UUID projectId, final UUID userId) {
-        if (!permissionService.isUserProjectLead(projectId, userId)) throw OnlyDustException.forbidden("Only project leads send new application to committee");
-        if (!projectStoragePort.exists(projectId)) throw OnlyDustException.internalServerError("Project %s was not found".formatted(projectId));
+        if (!permissionService.isUserProjectLead(projectId, userId))
+            throw OnlyDustException.forbidden("Only project leads send new application to committee");
+        if (!projectStoragePort.exists(projectId))
+            throw OnlyDustException.internalServerError("Project %s was not found".formatted(projectId));
     }
 
-    private CommitteeView checkCommitteePermission(final Committee.Id committeeId) {
-        final CommitteeView committeeView =
-                committeeStoragePort.findById(committeeId).orElseThrow(() -> OnlyDustException.notFound("Committee %s was not found".formatted(committeeId.value().toString())));
-        if (committeeView.status() != Committee.Status.OPEN_TO_APPLICATIONS)
-            throw OnlyDustException.forbidden("Applications are not opened or are closed for committee %s".formatted(committeeId.value()));
-        return committeeView;
-    }
 }
