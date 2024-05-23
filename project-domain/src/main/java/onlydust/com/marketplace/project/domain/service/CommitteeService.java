@@ -110,6 +110,11 @@ public class CommitteeService implements CommitteeFacadePort {
                         .formatted(committeeId.value(), projectId)));
     }
 
+    @Override
+    public CommitteeJuryVotesView getCommitteeJuryVotesForProject(UUID userId, Committee.Id committeeId, UUID projectId) {
+        return new CommitteeJuryVotesView(Committee.Status.OPEN_TO_VOTES, List.of(), projectStoragePort.getProjectInfos(projectId), false);
+    }
+
     private List<ProjectAnswerView> getCommitteeAnswersWithOnlyQuestions(CommitteeView committeeView) {
         return committeeView.projectQuestions().stream()
                 .map(projectQuestion -> new ProjectAnswerView(projectQuestion.id(), projectQuestion.question(), projectQuestion.required(), null)).toList();

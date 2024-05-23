@@ -3,10 +3,7 @@ package onlydust.com.marketplace.project.domain.port.input;
 import lombok.NonNull;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
-import onlydust.com.marketplace.project.domain.view.CommitteeApplicationDetailsView;
-import onlydust.com.marketplace.project.domain.view.CommitteeApplicationView;
-import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
-import onlydust.com.marketplace.project.domain.view.CommitteeView;
+import onlydust.com.marketplace.project.domain.view.*;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -30,4 +27,6 @@ public interface CommitteeFacadePort {
     CommitteeApplicationView getCommitteeApplication(Committee.Id committeeId, Optional<UUID> projectId, UUID userId);
 
     CommitteeApplicationDetailsView getCommitteeApplicationDetails(Committee.Id committeeId, UUID projectId);
+
+    CommitteeJuryVotesView getCommitteeJuryVotesForProject(UUID userId, Committee.Id committeeId, UUID projectId);
 }

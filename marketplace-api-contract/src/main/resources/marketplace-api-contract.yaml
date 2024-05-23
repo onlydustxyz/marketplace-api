@@ -694,6 +694,37 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /api/v1/me/committees/{committeeId}/projects/{projectId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Get my committee assignment on project
+      operationId: getCommitteeAssignmentOnProject
+      description: |
+        Get my committee assignment on project
+      parameters:
+        - in: path
+          name: committeeId
+          required: true
+          schema:
+            $ref: '#/components/schemas/CommitteeId'
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      responses:
+        "200":
+          description: 'Get my committee assignments.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyCommitteeAssignmentResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
     put:
       security:
         - bearerAuth: [ ]
@@ -7095,20 +7126,36 @@ components:
       type: object
       required:
         - projectAssignments
+        - name
+        - status
       properties:
+        name:
+          type: string
+        status:
+          $ref: '#/components/schemas/CommitteeStatus'
         projectAssignments:
           type: array
           items:
-            $ref: '#/components/schemas/CommitteeAssignmentResponse'
+            $ref: '#/components/schemas/CommitteeAssignmentLinkResponse'
 
-    CommitteeAssignmentResponse:
+    CommitteeAssignmentLinkResponse:
+      type: object
+      required:
+        - project
+      properties:
+        project:
+          $ref: '#/components/schemas/ProjectLinkResponse'
+        score:
+          type: number
+
+    MyCommitteeAssignmentResponse:
       type: object
       required:
         - project
         - answers
       properties:
         score:
-          type: integer
+          type: number
         project:
           $ref: '#/components/schemas/CommitteeProjectInfosResponse'
         answers:

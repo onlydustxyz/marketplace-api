@@ -4326,10 +4326,10 @@ components:
           type: integer
         totalAssignments:
           type: integer
-        juryMembers:
+        juryVotes:
           type: array
           items:
-            $ref: '#/components/schemas/JuryMemberResponse'
+            $ref: '#/components/schemas/JuryVoteResponse'
         applications:
           type: array
           items:
@@ -4354,21 +4354,17 @@ components:
           type: number
           format: int64
 
-    JuryMemberResponse:
+    JuryVoteResponse:
       type: object
       required:
         - user
       properties:
+        score:
+          type: number
         user:
           $ref: '#/components/schemas/UserLinkResponse'
         projectAssigned:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectLinkResponse'
-        completedAssignments:
-          type: integer
-        totalAssignments:
-          type: integer
+          $ref: '#/components/schemas/ProjectLinkResponse'
 
     ApplicationResponse:
       type: object
@@ -4559,10 +4555,10 @@ components:
           format: int64
         allocationCurrency:
           $ref: '#/components/schemas/ShortCurrencyResponse'
-        juryAnswers:
+        juryVotes:
           type: array
           items:
-            $ref: '#/components/schemas/JuryAnswerResponse'
+            $ref: '#/components/schemas/JuryProjectVoteResponse'
         projectQuestions:
           type: array
           items:
@@ -4581,7 +4577,7 @@ components:
         answer:
           type: string
 
-    JuryAnswerResponse:
+    JuryProjectVoteResponse:
       type: object
       required:
         - jury
@@ -4593,9 +4589,9 @@ components:
         answers:
           type: array
           items:
-            $ref: '#/components/schemas/AnswerResponse'
+            $ref: '#/components/schemas/ScoredAnswerResponse'
 
-    AnswerResponse:
+    ScoredAnswerResponse:
       type: object
       required:
         - criteria
@@ -4604,7 +4600,7 @@ components:
         criteria:
           type: string
         score:
-          type: number
+          type: integer
 
 
 

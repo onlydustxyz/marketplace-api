@@ -5,6 +5,7 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NonNull;
 import onlydust.com.marketplace.project.domain.view.CommitteeApplicationView;
+import onlydust.com.marketplace.project.domain.view.ProjectInfosView;
 import onlydust.com.marketplace.project.domain.view.ProjectLeaderLinkView;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -48,8 +49,8 @@ public class ProjectInfosQueryEntity {
     @NonNull
     String visibility;
 
-    public CommitteeApplicationView.ProjectInfosView toView() {
-        return new CommitteeApplicationView.ProjectInfosView(
+    public ProjectInfosView toView() {
+        return new ProjectInfosView(
                 id,
                 name,
                 slug,

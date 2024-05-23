@@ -354,7 +354,6 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                           },
                           "allocatedAmount": null,
                           "allocationCurrency": null,
-                          "juryAnswers": null,
                           "projectQuestions": [
                             {
                               "question": "%s",

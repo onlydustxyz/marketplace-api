@@ -529,7 +529,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     @Override
-    public CommitteeApplicationView.ProjectInfosView getProjectInfos(UUID projectId) {
+    public ProjectInfosView getProjectInfos(UUID projectId) {
         return projectInfosViewRepository.findByProjectId(projectId).toView();
     }
 }

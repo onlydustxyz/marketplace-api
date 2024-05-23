@@ -49,9 +49,10 @@ public class RestApiConfiguration {
                                final GithubAccountService githubAccountService,
                                final BillingProfileFacadePort billingProfileFacadePort,
                                final PayoutPreferenceFacadePort payoutPreferenceFacadePort,
-                               final HackathonFacadePort hackathonFacadePort) {
+                               final HackathonFacadePort hackathonFacadePort,
+                               final CommitteeFacadePort committeeFacadePort) {
         return new MeRestApi(authenticatedAppUserService, userFacadePort, contributorFacadePort,
-                githubAccountService, billingProfileFacadePort, payoutPreferenceFacadePort, hackathonFacadePort);
+                githubAccountService, billingProfileFacadePort, payoutPreferenceFacadePort, hackathonFacadePort, committeeFacadePort);
     }
 
     @Bean
