@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
-import lombok.NonNull;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.model.JuryCriteria;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.view.CommitteeApplicationDetailsView;
 import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
@@ -36,5 +36,9 @@ public interface CommitteeStoragePort {
 
     void deleteAllJuries(Committee.Id committeeId);
 
-    void saveJuries(Committee.Id committeeId, @NonNull List<UUID> juryIds);
+    void saveJuries(Committee.Id committeeId, List<UUID> juryIds);
+
+    void deleteAllJuryCriteria(Committee.Id committeeId);
+
+    void saveJuryCriteria(Committee.Id committeeId, List<JuryCriteria> juryCriteria);
 }

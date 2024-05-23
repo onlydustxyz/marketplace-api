@@ -195,7 +195,14 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
         assertEquals(2, committeeResponse1.getProjectQuestions().size());
         for (ProjectQuestionResponse projectQuestion : committeeResponse1.getProjectQuestions()) {
             assertTrue(List.of(projectQuestionRequest1.getQuestion(), projectQuestionRequest2.getQuestion()).contains(projectQuestion.getQuestion()));
+            assertNotNull(projectQuestion.getId());
         }
+        assertEquals(2, committeeResponse1.getJuryCriteria().size());
+        for (JuryCriteriaResponse juryCriteriaResponse : committeeResponse1.getJuryCriteria()) {
+            assertTrue(List.of(juryCriteriaRequest1.getCriteria(), juryCriteriaRequest2.getCriteria()).contains(juryCriteriaResponse.getCriteria()));
+            assertNotNull(juryCriteriaResponse.getId());
+        }
+
         assertEquals(updateCommitteeRequest1.getName(), committeeResponse1.getName());
         assertEquals(updateCommitteeRequest1.getApplicationStartDate().toInstant(), committeeResponse1.getApplicationStartDate().toInstant());
         assertEquals(updateCommitteeRequest1.getApplicationEndDate().toInstant(), committeeResponse1.getApplicationEndDate().toInstant());
@@ -257,6 +264,13 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
         assertEquals(projectQuestionRequest2.getRequired(), committeeResponse2.getProjectQuestions().get(0).getRequired());
         assertEquals(projectQuestionRequest3.getQuestion(), committeeResponse2.getProjectQuestions().get(1).getQuestion());
         assertEquals(projectQuestionRequest3.getRequired(), committeeResponse2.getProjectQuestions().get(1).getRequired());
+
+        assertEquals(2, committeeResponse1.getJuryCriteria().size());
+        for (JuryCriteriaResponse juryCriteriaResponse : committeeResponse2.getJuryCriteria()) {
+            assertTrue(List.of(juryCriteriaRequest1.getCriteria(), juryCriteriaRequest3.getCriteria()).contains(juryCriteriaResponse.getCriteria()));
+            assertNotNull(juryCriteriaResponse.getId());
+        }
+
         assertEquals(updateCommitteeRequest2.getName(), committeeResponse2.getName());
         assertEquals(updateCommitteeRequest2.getApplicationStartDate().toInstant(), committeeResponse2.getApplicationStartDate().toInstant());
         assertEquals(updateCommitteeRequest2.getApplicationEndDate().toInstant(), committeeResponse2.getApplicationEndDate().toInstant());

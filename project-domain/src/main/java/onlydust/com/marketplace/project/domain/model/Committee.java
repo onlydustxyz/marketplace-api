@@ -32,6 +32,8 @@ public class Committee {
     @NonNull
     List<UUID> juryIds = new ArrayList<>();
     UUID sponsorId;
+    @NonNull
+    List<JuryCriteria> juryCriteria = new ArrayList<>();
 
     public Committee(@NonNull String name, @NonNull ZonedDateTime applicationStartDate, @NonNull ZonedDateTime applicationEndDate) {
         this.name = name;

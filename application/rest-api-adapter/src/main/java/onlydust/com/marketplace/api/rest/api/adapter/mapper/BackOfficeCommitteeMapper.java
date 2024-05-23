@@ -4,6 +4,7 @@ import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.model.JuryCriteria;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.view.CommitteeApplicationDetailsView;
 import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
@@ -76,8 +77,14 @@ public interface BackOfficeCommitteeMapper {
         committee.projectQuestions().addAll(updateCommitteeRequest.getProjectQuestions().stream()
                 .map(BackOfficeCommitteeMapper::getProjectQuestion)
                 .toList());
+        committee.juryCriteria().addAll(updateCommitteeRequest.getJuryCriteria().stream().map(BackOfficeCommitteeMapper::getJuryCriteria).toList());
         committee.juryIds().addAll(updateCommitteeRequest.getJuryMemberIds());
         return committee;
+    }
+
+    private static JuryCriteria getJuryCriteria(final JuryCriteriaRequest juryCriteriaRequest) {
+        return isNull(juryCriteriaRequest.getId()) ? new JuryCriteria(juryCriteriaRequest.getCriteria()) :
+                new JuryCriteria(JuryCriteria.Id.of(juryCriteriaRequest.getId()), juryCriteriaRequest.getCriteria());
     }
 
     private static ProjectQuestion getProjectQuestion(ProjectQuestionRequest projectQuestionRequest) {
@@ -130,20 +137,9 @@ public interface BackOfficeCommitteeMapper {
                                 .userId(registeredContributorLinkView.getId())
                         ).toList())
                 // Mock
-                .juryCount(3)
-                .juryCriteria(
-                        List.of(
-                                new JuryCriteriaResponse()
-                                        .id(UUID.randomUUID())
-                                        .criteria("Criteria 1"),
-                                new JuryCriteriaResponse()
-                                        .id(UUID.randomUUID())
-                                        .criteria("Criteria 2"),
-                                new JuryCriteriaResponse()
-                                        .id(UUID.randomUUID())
-                                        .criteria("Criteria 3")
-                        )
-                )
+                .juryCount(isNull(committeeView.juries()) ? 0 : committeeView.juries().size())
+                .juryCriteria(isNull(committeeView.juryCriteria()) ? null : committeeView.juryCriteria().stream()
+                        .map(juryCriteria -> new JuryCriteriaResponse().criteria(juryCriteria.criteria()).id(juryCriteria.id().value())).toList())
                 .completedAssignments(3)
                 .totalAssignments(5)
                 .juryAssignments(List.of(

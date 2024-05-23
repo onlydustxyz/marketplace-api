@@ -4438,6 +4438,9 @@ components:
       required:
         - criteria
       properties:
+        id:
+          type: string
+          format: uuid
         criteria:
           type: string
 

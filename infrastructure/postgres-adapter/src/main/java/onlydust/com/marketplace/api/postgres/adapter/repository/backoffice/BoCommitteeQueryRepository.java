@@ -10,51 +10,56 @@ import java.util.UUID;
 public interface BoCommitteeQueryRepository extends JpaRepository<BoCommitteeQueryEntity, BoCommitteeQueryRepository> {
 
     @Query(nativeQuery = true, value = """
-                with applications as (select distinct cpa.user_id, cpa.project_id, cpa.committee_id
-                                        from committees c
-                                                 left join committee_project_answers cpa on cpa.committee_id = c.id)
-                  select c.id,
-                         c.name,
-                         c.status,
-                         c.application_start_date,
-                         c.application_end_date,
-                         juries.members juries,
-                         (select jsonb_agg(
-                                         jsonb_build_object('id', cpq.id, 'question', cpq.question, 'required', cpq.required)
-                                 )
-                          from committee_project_questions cpq
-                          where cpq.committee_id = c.id) project_questions,
-                         s.id       as                   sponsor_id,
-                         s.name     as                   sponsor_name,
-                         s.url      as                   sponsor_url,
-                         s.logo_url as                   sponsor_logo_url,
-                         case
-                             when a.committee_id is null then null
-                             else
-                                 jsonb_agg(
-                                         jsonb_build_object('projectId', p.id, 'projectName', p.name, 'projectLogoUrl', p.logo_url,
-                                                            'projectSlug',
-                                                            p.slug, 'projectShortDescription', p.short_description, 'projectVisibility',
-                                                            p.visibility,
-                                                            'userId', u.id, 'userAvatarUrl', u.github_avatar_url, 'userGithubLogin',
-                                                            u.github_login, 'userGithubId', u.github_user_id)
-                                 ) end                   project_applications
-                  from committees c
-                           left join sponsors s on s.id = c.sponsor_id
-                           left join applications a on a.committee_id = c.id
-                           left join projects p on p.id = a.project_id
-                           left join iam.users u on u.id = a.user_id
-                            left join (select jsonb_agg(
-                                                               jsonb_build_object(
-                                                                       'userId', j.id, 'userAvatarUrl', j.github_avatar_url, 'userGithubLogin',
-                                                                       j.github_login, 'userGithubId', j.github_user_id
-                                                               )
-                                                       ) members
-                                                from committee_juries cj
-                                                         join iam.users j on j.id = cj.user_id
-                                                where cj.committee_id = :committeeId ) juries on true
-                  where c.id = :committeeId
-                  group by c.id, c.name, c.status, c.application_start_date, c.application_end_date, s.id, s.name, s.url, s.logo_url, a.committee_id, juries.members
+            with a_ids as (select distinct cpa.user_id, cpa.project_id, cpa.committee_id
+                           from committees c
+                                    left join committee_project_answers cpa on cpa.committee_id = c.id)
+            select c.id,
+                   c.name,
+                   c.status,
+                   c.application_start_date,
+                   c.application_end_date,
+                   (select jsonb_agg(
+                                   jsonb_build_object('id', cpq.id, 'question', cpq.question, 'required', cpq.required)
+                           )
+                    from committee_project_questions cpq
+                    where cpq.committee_id = c.id) project_questions,
+                   s.id       as                   sponsor_id,
+                   s.name     as                   sponsor_name,
+                   s.url      as                   sponsor_url,
+                   s.logo_url as                   sponsor_logo_url,
+                   juries.members                  juries,
+                   applications.user_project       project_applications,
+                   (select jsonb_agg(
+                                   jsonb_build_object('id', cjc.id, 'criteria', cjc.criteria)
+                           )
+                    from committee_jury_criteria cjc
+                    where cjc.committee_id = c.id) jury_criteria
+            from committees c
+                     left join sponsors s on s.id = c.sponsor_id
+                     left join (select jsonb_agg(
+                                               jsonb_build_object(
+                                                       'userId', j.id, 'userAvatarUrl', j.github_avatar_url, 'userGithubLogin',
+                                                       j.github_login, 'userGithubId', j.github_user_id
+                                               )
+                                       ) members
+                                from committee_juries cj
+                                         join iam.users j on j.id = cj.user_id
+                                where cj.committee_id = :committeeId) juries on true
+                     left join (select jsonb_agg(
+                                               jsonb_build_object('projectId', p.id, 'projectName', p.name, 'projectLogoUrl',
+                                                                  p.logo_url,
+                                                                  'projectSlug',
+                                                                  p.slug, 'projectShortDescription', p.short_description,
+                                                                  'projectVisibility',
+                                                                  p.visibility,
+                                                                  'userId', u.id, 'userAvatarUrl', u.github_avatar_url,
+                                                                  'userGithubLogin',
+                                                                  u.github_login, 'userGithubId', u.github_user_id)) user_project
+                                from a_ids a
+                                         left join projects p on p.id = a.project_id
+                                         left join iam.users u on u.id = a.user_id
+                                where a.committee_id = :committeeId) applications on true
+            where c.id = :committeeId
             """)
     Optional<BoCommitteeQueryEntity> findById(UUID committeeId);
 }

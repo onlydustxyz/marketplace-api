@@ -51,6 +51,10 @@ public class CommitteeService implements CommitteeFacadePort {
             if (!committee.juryIds().isEmpty()) {
                 committeeStoragePort.saveJuries(committee.id(), committee.juryIds());
             }
+            committeeStoragePort.deleteAllJuryCriteria(committee.id());
+            if (!committee.juryCriteria().isEmpty()) {
+                committeeStoragePort.saveJuryCriteria(committee.id(), committee.juryCriteria());
+            }
         }
     }
 

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.CommitteeStatusEntity;
 import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.model.JuryCriteria;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.view.*;
@@ -56,6 +57,8 @@ public class BoCommitteeQueryEntity {
     Set<ProjectApplicationLinkJson> projectApplications;
     @JdbcTypeCode(SqlTypes.JSON)
     Set<JuryLinkJson> juries;
+    @JdbcTypeCode(SqlTypes.JSON)
+    Set<JuryCriteriaJson> juryCriteria;
 
     public CommitteeView toView() {
         return CommitteeView.builder()
@@ -95,6 +98,8 @@ public class BoCommitteeQueryEntity {
                                 .id(juryLinkJson.userId)
                                 .build()
                         ).toList())
+                .juryCriteria(isNull(this.juryCriteria) ? null : this.juryCriteria.stream()
+                        .map(juryCriteriaJson -> new JuryCriteria(JuryCriteria.Id.of(juryCriteriaJson.id), juryCriteriaJson.criteria)).toList())
                 .build();
     }
 
@@ -128,6 +133,14 @@ public class BoCommitteeQueryEntity {
         Long userGithubId;
         String userAvatarUrl;
         String userGithubLogin;
+    }
+
+    @Data
+    public static class JuryCriteriaJson {
+        @NonNull
+        UUID id;
+        @NonNull
+        String criteria;
     }
 
 }
