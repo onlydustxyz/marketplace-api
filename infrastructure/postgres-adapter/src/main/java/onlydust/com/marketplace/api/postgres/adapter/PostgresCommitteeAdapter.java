@@ -82,7 +82,7 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     @Override
     @Transactional
     public void updateStatus(Committee.Id committeeId, Committee.Status status) {
-        committeeRepository.updateStatus(committeeId.value(), CommitteeStatusEntity.fromDomain(status).name());
+        committeeRepository.updateStatus(committeeId.value(), status.name());
     }
 
     @Override

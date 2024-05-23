@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.api.bootstrap.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.enums.CommitteeStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeRepository;
@@ -89,13 +88,14 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                         CommitteeEntity.builder()
                                 .id(UUID.randomUUID())
                                 .name(faker.gameOfThrones().character())
-                                .status(CommitteeStatusEntity.OPEN_TO_APPLICATIONS)
+                                .status(Committee.Status.OPEN_TO_APPLICATIONS)
                                 .applicationStartDate(faker.date().past(5, TimeUnit.DAYS))
                                 .applicationEndDate(faker.date().future(5, TimeUnit.DAYS))
-                                .build(), CommitteeEntity.builder()
+                                .build(),
+                        CommitteeEntity.builder()
                                 .id(UUID.randomUUID())
                                 .name(faker.gameOfThrones().character())
-                                .status(CommitteeStatusEntity.OPEN_TO_APPLICATIONS)
+                                .status(Committee.Status.OPEN_TO_APPLICATIONS)
                                 .applicationStartDate(faker.date().past(5, TimeUnit.DAYS))
                                 .applicationEndDate(faker.date().future(5, TimeUnit.DAYS))
                                 .build())

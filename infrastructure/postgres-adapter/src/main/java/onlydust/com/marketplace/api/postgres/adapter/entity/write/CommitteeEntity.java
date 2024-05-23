@@ -2,8 +2,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import jakarta.persistence.*;
 import lombok.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.enums.CommitteeStatusEntity;
 import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
@@ -22,18 +22,15 @@ import java.util.UUID;
 public class CommitteeEntity {
     @Id
     @EqualsAndHashCode.Include
-    UUID id;
-    @NonNull
-    Date applicationStartDate;
-    @NonNull
-    Date applicationEndDate;
-    @NonNull
-    String name;
-    @NonNull
+    @NonNull UUID id;
+    @NonNull Date applicationStartDate;
+    @NonNull Date applicationEndDate;
+    @NonNull String name;
+
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    @Column(columnDefinition = "committee_status")
-    CommitteeStatusEntity status;
+    @NonNull Committee.Status status;
+
     @Column(insertable = false, updatable = false)
     Date techCreatedAt;
     UUID sponsorId;
@@ -45,7 +42,7 @@ public class CommitteeEntity {
                 .name(committee.name())
                 .applicationEndDate(Date.from(committee.applicationEndDate().toInstant()))
                 .applicationStartDate(Date.from(committee.applicationStartDate().toInstant()))
-                .status(CommitteeStatusEntity.fromDomain(committee.status()))
+                .status(committee.status())
                 .sponsorId(committee.sponsorId())
                 .votePerJury(committee.votePerJury())
                 .build();
@@ -53,12 +50,22 @@ public class CommitteeEntity {
 
     public Committee toDomain() {
         return Committee.builder()
-                .id(Committee.Id.of(this.id))
-                .name(this.name)
+                .id(Committee.Id.of(id))
+                .name(name)
                 .applicationStartDate(ZonedDateTime.ofInstant(applicationStartDate.toInstant(), ZoneOffset.UTC))
                 .applicationEndDate(ZonedDateTime.ofInstant(applicationEndDate.toInstant(), ZoneOffset.UTC))
-                .status(this.status.toDomain())
+                .status(status)
                 .votePerJury(this.votePerJury)
+                .build();
+    }
+
+    public CommitteeLinkView toLink() {
+        return CommitteeLinkView.builder()
+                .id(Committee.Id.of(id))
+                .name(name)
+                .startDate(ZonedDateTime.ofInstant(applicationStartDate.toInstant(), ZoneOffset.UTC))
+                .endDate(ZonedDateTime.ofInstant(applicationEndDate.toInstant(), ZoneOffset.UTC))
+                .status(status)
                 .build();
     }
 

@@ -1,11 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.api.postgres.adapter.entity.enums.CommitteeStatusEntity;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.JuryCriteria;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
@@ -18,9 +20,7 @@ import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicatio
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
 import onlydust.com.marketplace.project.domain.view.commitee.JuryAssignmentView;
 import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 
 import java.time.ZoneOffset;
@@ -47,9 +47,7 @@ public class BoCommitteeQueryEntity {
     String name;
     @NonNull
     @Enumerated(EnumType.STRING)
-    @JdbcType(PostgreSQLEnumJdbcType.class)
-    @Column(columnDefinition = "committee_status")
-    CommitteeStatusEntity status;
+    Committee.Status status;
     @JdbcTypeCode(SqlTypes.JSON)
     Set<ProjectQuestionJson> projectQuestions;
     UUID sponsorId;
@@ -68,17 +66,17 @@ public class BoCommitteeQueryEntity {
 
     public CommitteeView toView() {
         return CommitteeView.builder()
-                .id(Committee.Id.of(this.id))
-                .name(this.name)
-                .status(this.status.toDomain())
+                .id(Committee.Id.of(id))
+                .name(name)
+                .status(status)
                 .applicationStartDate(ZonedDateTime.ofInstant(applicationStartDate.toInstant(), ZoneOffset.UTC))
                 .applicationEndDate(ZonedDateTime.ofInstant(applicationEndDate.toInstant(), ZoneOffset.UTC))
-                .projectQuestions(isNull(this.projectQuestions) ? List.of() : this.projectQuestions.stream()
+                .projectQuestions(isNull(projectQuestions) ? List.of() : projectQuestions.stream()
                         .map(projectQuestionEntity -> new ProjectQuestion(ProjectQuestion.Id.of(projectQuestionEntity.getId()),
                                 projectQuestionEntity.getQuestion(),
                                 projectQuestionEntity.getRequired())).toList())
-                .sponsor(isNull(this.sponsorName) ? null : new ShortSponsorView(this.sponsorId, this.sponsorName, this.sponsorUrl, this.sponsorLogoUrl))
-                .committeeApplicationLinks(isNull(this.projectApplications) ? null : this.projectApplications.stream()
+                .sponsor(isNull(sponsorName) ? null : new ShortSponsorView(sponsorId, sponsorName, sponsorUrl, sponsorLogoUrl))
+                .committeeApplicationLinks(isNull(projectApplications) ? null : projectApplications.stream()
                         .map(projectApplicationLinkJson -> CommitteeApplicationLinkView.builder()
                                 .projectShortView(ProjectShortView.builder()
                                         .slug(projectApplicationLinkJson.projectSlug)
