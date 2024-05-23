@@ -75,7 +75,7 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
     public static MailDTO<NewCommitteeApplicationDTO> fromNewCommitteeApplication(@NonNull CustomerIOProperties customerIOProperties,
                                                                                   @NonNull NewCommitteeApplication newCommitteeApplication) {
         return new MailDTO<>(customerIOProperties.getNewCommitteeApplicationEmailId().toString(), mapIdentifiers(newCommitteeApplication.getEmail(),
-                newCommitteeApplication.getUserId()), customerIOProperties.getOnlyDustAdminEmail(), newCommitteeApplication.getEmail(),
+                newCommitteeApplication.getUserId()), customerIOProperties.getOnlyDustMarketingEmail(), newCommitteeApplication.getEmail(),
                 "Your application to committee %s".formatted(newCommitteeApplication.getCommitteeName()),
                 NewCommitteeApplicationDTO.fromEvent(newCommitteeApplication));
     }

@@ -158,7 +158,7 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                         .withRequestBody(matchingJsonPath("$.message_data.username", equalTo("PierreOucif")))
                         .withRequestBody(matchingJsonPath("$.message_data.applicationEndDate", containing(" UTC")))
                         .withRequestBody(matchingJsonPath("$.to", equalTo(pierre.user().getGithubEmail())))
-                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
+                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustMarketingEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("Your application to committee %s".formatted("Mr. Needful")))));
 
         // When
