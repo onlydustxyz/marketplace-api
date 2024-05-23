@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import lombok.Getter;
 import lombok.NonNull;
 import onlydust.com.marketplace.project.domain.view.CommitteeApplicationView;
 import onlydust.com.marketplace.project.domain.view.ProjectLeaderLinkView;
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 @Entity
 @Immutable
+@Getter
 public class ProjectInfosQueryEntity {
     @Id
     UUID id;
@@ -41,6 +43,8 @@ public class ProjectInfosQueryEntity {
     Integer newContributors;
     @NonNull
     Integer openIssue;
+    @NonNull
+    String visibility;
 
     public CommitteeApplicationView.ProjectInfosView toView() {
         return new CommitteeApplicationView.ProjectInfosView(

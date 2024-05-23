@@ -3,22 +3,20 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.CommitteeStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectInfosQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoCommitteeQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeProjectAnswerEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeProjectQuestionEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeApplicationRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeProjectAnswerViewRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeProjectQuestionRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoCommitteeQueryRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
+import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
-import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
-import onlydust.com.marketplace.project.domain.view.CommitteeView;
-import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
+import onlydust.com.marketplace.project.domain.view.*;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +33,7 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     private final CommitteeApplicationRepository committeeApplicationRepository;
     private final CommitteeProjectQuestionRepository committeeProjectQuestionRepository;
     private final CommitteeProjectAnswerViewRepository committeeProjectAnswerViewRepository;
+    private final ProjectInfosViewRepository projectInfosViewRepository;
 
     @Override
     @Transactional
@@ -87,6 +86,10 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     @Override
     @Transactional(readOnly = true)
     public List<ProjectAnswerView> getApplicationAnswers(Committee.Id committeeId, UUID projectId) {
+        return getProjectAnswerViews(committeeId, projectId);
+    }
+
+    private @NotNull List<ProjectAnswerView> getProjectAnswerViews(Committee.Id committeeId, UUID projectId) {
         return committeeProjectAnswerViewRepository.findByCommitteeIdAndAndProjectId(committeeId.value(), projectId).stream()
                 .map(committeeProjectAnswerView -> new ProjectAnswerView(ProjectQuestion.Id.of(committeeProjectAnswerView.getQuestionId()),
                         committeeProjectAnswerView.getProjectQuestion().getQuestion(), committeeProjectAnswerView.getProjectQuestion().getRequired(),
@@ -98,5 +101,22 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     @Transactional(readOnly = true)
     public boolean hasStartedApplication(Committee.Id committeeId, Committee.Application application) {
         return committeeApplicationRepository.existsByCommitteeIdAndProjectId(committeeId.value(), application.projectId());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<CommitteeApplicationDetailsView> findByCommitteeIdAndProjectId(Committee.Id committeeId, UUID projectId) {
+        final List<ProjectAnswerView> projectAnswerViews = getProjectAnswerViews(committeeId, projectId);
+        if (projectAnswerViews.isEmpty()) {
+            return Optional.empty();
+        } else {
+            final ProjectInfosQueryEntity projectInfos = projectInfosViewRepository.findByProjectIdWithoutMetrics(projectId);
+            return Optional.of(
+                    new CommitteeApplicationDetailsView(
+                            projectAnswerViews, new ProjectShortView(projectInfos.getId(), projectInfos.getSlug(), projectInfos.getName(),
+                            projectInfos.getLogoUrl(), projectInfos.getShortDescription(), ProjectVisibility.valueOf(projectInfos.getVisibility())), true
+                    )
+            );
+        }
     }
 }

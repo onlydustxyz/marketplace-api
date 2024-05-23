@@ -39,7 +39,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
     private final UUID bretzel = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
     static UUID committeeId;
     static UUID projectQuestionId1;
-    static UUID projectQuestionId2;
+    static String projectQuestion1;
     private UUID pierreAppId = UUID.fromString("fc92397c-3431-4a84-8054-845376b630a0");
 
 
@@ -262,6 +262,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
         assertEquals("Coca Colax", committeeResponse2.getSponsor().getName());
         assertEquals("https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg", committeeResponse2.getSponsor().getAvatarUrl());
         projectQuestionId1 = committeeResponse2.getProjectQuestions().get(0).getId();
+        projectQuestion1 = committeeResponse2.getProjectQuestions().get(0).getQuestion();
     }
 
     @Autowired
@@ -271,9 +272,30 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
 
     @Test
     @Order(4)
+    void should_update_committee_status() {
+        // When
+        client.patch()
+                .uri(getApiURI(COMMITTEES_STATUS.formatted(committeeId)))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                            {
+                              "status": "OPEN_TO_APPLICATIONS"
+                            }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(204);
+
+        final CommitteeEntity updatedCommitteeEntity = committeeRepository.findById(committeeId).orElseThrow();
+        assertEquals("OPEN_TO_APPLICATIONS", updatedCommitteeEntity.getStatus().name());
+    }
+
+    @Test
+    @Order(5)
     void should_return_applications() {
         // Given
-        final UUID committeeId = committeeRepository.findAll().get(0).getId();
         projectLeadRepository.save(new ProjectLeadEntity(bretzel, pierreAppId));
         final Committee.ProjectAnswer projectAnswer = new Committee.ProjectAnswer(ProjectQuestion.Id.of(projectQuestionId1), faker.lorem().paragraph());
         committeeFacadePort.createUpdateApplicationForCommittee(Committee.Id.of(committeeId), new Committee.Application(pierreAppId, bretzel, List.of(
@@ -289,31 +311,61 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .json("{}");
-    }
-
-    @Test
-    @Order(5)
-    void should_update_committee_status() {
-        // Given
-        final CommitteeEntity committeeEntity = committeeRepository.findAll().get(1);
+                .json("""
+                        {
+                          "applications": [
+                            {
+                              "project": {
+                                "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                                "slug": "bretzel",
+                                "name": "Bretzel",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                              },
+                              "applicant": {
+                                "githubUserId": 16590657,
+                                "userId": "fc92397c-3431-4a84-8054-845376b630a0",
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                              },
+                              "score": null,
+                              "allocatedBudget": null
+                            }
+                          ]
+                        }
+                        """)
+                .jsonPath("$.projectQuestions.size()").isEqualTo(2);
 
         // When
-        client.patch()
-                .uri(getApiURI(COMMITTEES_STATUS.formatted(committeeEntity.getId())))
+        client.get()
+                .uri(getApiURI(COMMITTEES_APPLICATIONS_BY_IDS.formatted(committeeId, bretzel)))
                 .header("Authorization", "Bearer " + pierre.jwt())
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                            {
-                              "status": "OPEN_TO_VOTES"
-                            }
-                        """)
                 // Then
                 .exchange()
                 .expectStatus()
-                .isEqualTo(204);
-
-        final CommitteeEntity updatedCommitteeEntity = committeeRepository.findById(committeeEntity.getId()).orElseThrow();
-        assertEquals("OPEN_TO_VOTES", updatedCommitteeEntity.getStatus().name());
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .json("""
+                        {
+                          "project": {
+                            "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                            "slug": "bretzel",
+                            "name": "Bretzel",
+                            "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                          },
+                          "allocatedAmount": null,
+                          "allocationCurrency": null,
+                          "juryAnswers": null,
+                          "projectQuestions": [
+                            {
+                              "question": "%s",
+                              "required": true,
+                              "answer": "%s"
+                            }
+                          ]
+                        }
+                        """.formatted(projectQuestion1, projectAnswer.answer()))
+                .jsonPath("$.projectQuestions.size()").isEqualTo(1);
     }
+
 }

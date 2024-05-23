@@ -5,6 +5,7 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
+import onlydust.com.marketplace.project.domain.view.CommitteeApplicationDetailsView;
 import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
 import onlydust.com.marketplace.project.domain.view.CommitteeView;
 
@@ -116,5 +117,24 @@ public interface BackOfficeCommitteeMapper {
                                 .id(committeeView.sponsor().id())
                                 .avatarUrl(committeeView.sponsor().logoUrl())
                                 .name(committeeView.sponsor().name()));
+    }
+
+    static CommitteeProjectApplicationResponse committeeApplicationDetailsToResponse(final CommitteeApplicationDetailsView view) {
+        final CommitteeProjectApplicationResponse committeeProjectApplicationResponse = new CommitteeProjectApplicationResponse();
+        committeeProjectApplicationResponse.setProject(new ProjectLinkResponse()
+                .id(view.projectShortView().id())
+                .slug(view.projectShortView().slug())
+                .name(view.projectShortView().name())
+                .logoUrl(view.projectShortView().logoUrl())
+        );
+        committeeProjectApplicationResponse.setProjectQuestions(view.answers().stream()
+                .map(answer -> new ProjectAnswerResponse()
+                        .answer(answer.answer())
+                        .question(answer.question())
+                        .required(answer.required())
+                )
+                .toList()
+        );
+        return committeeProjectApplicationResponse;
     }
 }

@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.port.output;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
+import onlydust.com.marketplace.project.domain.view.CommitteeApplicationDetailsView;
 import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
 import onlydust.com.marketplace.project.domain.view.CommitteeView;
 import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
@@ -29,4 +30,7 @@ public interface CommitteeStoragePort {
     void deleteAllProjectQuestions(Committee.Id committeeId);
 
     boolean hasStartedApplication(Committee.Id committeeId, Committee.Application application);
+
+    Optional<CommitteeApplicationDetailsView> findByCommitteeIdAndProjectId(Committee.Id committeeId, UUID projectId);
+
 }

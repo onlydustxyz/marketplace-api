@@ -15,6 +15,7 @@ public interface ProjectInfosViewRepository extends JpaRepository<ProjectInfosQu
                    p.logo_url,
                    p.short_description,
                    p.long_description,
+                   p.visibility,
                    (select jsonb_agg(jsonb_build_object('id', pl.user_id,
                                                         'login', u.github_login,
                                                         'githubId', u.github_user_id,
@@ -33,9 +34,6 @@ public interface ProjectInfosViewRepository extends JpaRepository<ProjectInfosQu
                    LEFT JOIN (SELECT project_id, jsonb_agg(user_id) user_ids
                                FROM project_leads pl
                                GROUP BY project_id) as leads ON leads.project_id = p.id
-                   LEFT JOIN (SELECT project_id, jsonb_agg(url) urls
-                               FROM project_more_infos pmi
-                               GROUP BY project_id) as more_infos ON more_infos.project_id = p.id
                    LEFT JOIN (SELECT project_id,
                                       COUNT(DISTINCT c.contributor_id) AS count_active_contributors
                                FROM indexer_exp.contributions c
@@ -86,4 +84,35 @@ public interface ProjectInfosViewRepository extends JpaRepository<ProjectInfosQu
             where p.id = :projectId
             """)
     ProjectInfosQueryEntity findByProjectId(UUID projectId);
+
+
+    @Query(nativeQuery = true, value = """
+            select p.id,
+                   p.slug,
+                   p.name,
+                   p.logo_url,
+                   p.short_description,
+                   p.long_description,
+                   p.visibility,
+                   (select jsonb_agg(jsonb_build_object('id', pl.user_id,
+                                                        'login', u.github_login,
+                                                        'githubId', u.github_user_id,
+                                                        'avatarUrl', u.github_avatar_url,
+                                                        'url', null))
+                           from project_leads pl
+                                    join iam.users u on u.id = pl.user_id
+                           where pl.project_id = p.id) project_leads,
+                   0                 active_contributors,
+                   0                 amount_sent_in_usd,
+                   0                 contributors_rewarded,
+                   0                 contributions_completed,
+                   0                 new_contributors,
+                   0                 open_issue
+                   from projects p
+                   LEFT JOIN (SELECT project_id, jsonb_agg(user_id) user_ids
+                               FROM project_leads pl
+                               GROUP BY project_id) as leads ON leads.project_id = p.id
+            where p.id = :projectId
+            """)
+    ProjectInfosQueryEntity findByProjectIdWithoutMetrics(UUID projectId);
 }

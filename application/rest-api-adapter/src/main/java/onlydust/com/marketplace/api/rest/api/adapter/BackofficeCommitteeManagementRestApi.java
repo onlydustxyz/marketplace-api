@@ -10,14 +10,13 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
+import onlydust.com.marketplace.project.domain.view.CommitteeApplicationDetailsView;
 import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
 import onlydust.com.marketplace.project.domain.view.CommitteeView;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
-import java.util.List;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeCommitteeMapper.toCommitteeResponse;
@@ -26,19 +25,6 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeCom
 @Tags(@Tag(name = "BackofficeCommitteeManagement"))
 @AllArgsConstructor
 public class BackofficeCommitteeManagementRestApi implements BackOfficeCommitteeManagementApi {
-
-
-    final ShortCurrencyResponse allocationCurrency = new ShortCurrencyResponse().id(UUID.randomUUID())
-            .code("STRK")
-            .name("Starknet token")
-            .logoUrl(URI.create("https://s2.coinmarketcap.com/static/img/coins/64x64/22691.png"))
-            .decimals(5);
-
-    final ProjectLinkResponse bretzel = new ProjectLinkResponse()
-            .id(UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"))
-            .name("Bretzel")
-            .logoUrl("Bretzel")
-            .slug("bretzel");
 
     private final CommitteeFacadePort committeeFacadePort;
 
@@ -78,11 +64,9 @@ public class BackofficeCommitteeManagementRestApi implements BackOfficeCommittee
 
     @Override
     public ResponseEntity<CommitteeProjectApplicationResponse> getProjectApplication(UUID committeeId, UUID projectId) {
-        final CommitteeProjectApplicationResponse committeeProjectApplicationResponse = new CommitteeProjectApplicationResponse();
-        committeeProjectApplicationResponse.setProject(bretzel);
-        committeeProjectApplicationResponse.setAllocationCurrency(allocationCurrency);
-        committeeProjectApplicationResponse.setProjectQuestions(getProjectAnswers());
-        return ResponseEntity.ok(committeeProjectApplicationResponse);
+        final CommitteeApplicationDetailsView committeeApplicationDetails = committeeFacadePort.getCommitteeApplicationDetails(Committee.Id.of(committeeId),
+                projectId);
+        return ResponseEntity.ok(BackOfficeCommitteeMapper.committeeApplicationDetailsToResponse(committeeApplicationDetails));
     }
 
     @Override
@@ -95,19 +79,5 @@ public class BackofficeCommitteeManagementRestApi implements BackOfficeCommittee
     public ResponseEntity<Void> updateCommitteeStatus(UUID committeeId, UpdateCommitteeStatusRequest updateCommitteeStatusRequest) {
         committeeFacadePort.updateStatus(Committee.Id.of(committeeId), BackOfficeCommitteeMapper.statusToDomain(updateCommitteeStatusRequest.getStatus()));
         return ResponseEntity.noContent().build();
-    }
-
-    private static List<ProjectAnswerResponse> getProjectAnswers() {
-        return List.of(
-                new ProjectAnswerResponse()
-                        .answer("Java")
-                        .question("Quel est le meilleur langage de programmation ?"),
-                new ProjectAnswerResponse()
-                        .answer("Qu'en pense Mehdi ?")
-                        .question("Mettons des merguez dans les couscous marocain ?"),
-                new ProjectAnswerResponse()
-                        .answer("Ca c'est une bonne blague !")
-                        .question("Trouves-tu les blagues de Grég drôles ?")
-        );
     }
 }

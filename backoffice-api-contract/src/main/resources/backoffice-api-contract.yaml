@@ -4572,9 +4572,12 @@ components:
       type: object
       required:
         - question
+        - required
       properties:
         question:
           type: string
+        required:
+          type: boolean
         answer:
           type: string
 
