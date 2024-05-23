@@ -24,15 +24,14 @@ public interface ProjectInfosViewRepository extends JpaRepository<ProjectInfosQu
                    COALESCE(nc.count_new_contributors, 0)      new_contributors,
                    COALESCE(poi.open_issues, 0)                open_issue
                    from projects p
-                   LEFT JOIN LATERAL (select pl.project_id,
-                                                      jsonb_agg(jsonb_build_object('id', pl.user_id,
-                                                                                   'login', u.github_login,
-                                                                                   'githubId', u.github_user_id,
-                                                                                   'avatarUrl', u.github_avatar_url,
-                                                                                   'url', null)) as pl_json
+                   LEFT JOIN LATERAL (select jsonb_agg(jsonb_build_object('id', pl.user_id,
+                                                                           'login', u.github_login,
+                                                                           'githubId', u.github_user_id,
+                                                                           'avatarUrl', u.github_avatar_url,
+                                                                           'url', null)) as pl_json
                                                from project_leads pl
                                                         join iam.users u on u.id = pl.user_id
-                                               group by pl.project_id) project_leads on project_leads.project_id = p.id
+                                               where pl.project_id = p.id) project_leads on true
                    LEFT JOIN (SELECT project_id, jsonb_agg(user_id) user_ids
                                FROM project_leads pl
                                GROUP BY project_id) as leads ON leads.project_id = p.id
@@ -104,15 +103,14 @@ public interface ProjectInfosViewRepository extends JpaRepository<ProjectInfosQu
                    0                 new_contributors,
                    0                 open_issue
                    from projects p
-                   LEFT JOIN LATERAL (select pl.project_id,
-                                                      jsonb_agg(jsonb_build_object('id', pl.user_id,
-                                                                                   'login', u.github_login,
-                                                                                   'githubId', u.github_user_id,
-                                                                                   'avatarUrl', u.github_avatar_url,
-                                                                                   'url', null)) as pl_json
+                   LEFT JOIN LATERAL (select jsonb_agg(jsonb_build_object('id', pl.user_id,
+                                                                           'login', u.github_login,
+                                                                           'githubId', u.github_user_id,
+                                                                           'avatarUrl', u.github_avatar_url,
+                                                                           'url', null)) as pl_json
                                                from project_leads pl
                                                         join iam.users u on u.id = pl.user_id
-                                               group by pl.project_id) project_leads on project_leads.project_id = p.id
+                                               where pl.project_id = p.id) project_leads on true
                    LEFT JOIN (SELECT project_id, jsonb_agg(user_id) user_ids
                                FROM project_leads pl
                                GROUP BY project_id) as leads ON leads.project_id = p.id
