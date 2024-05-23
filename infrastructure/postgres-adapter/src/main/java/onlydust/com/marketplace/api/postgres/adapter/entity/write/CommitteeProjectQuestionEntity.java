@@ -14,17 +14,15 @@ import java.util.UUID;
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
-@Builder
+@Builder(access = AccessLevel.PRIVATE)
 @Table(name = "committee_project_questions", schema = "public")
 public class CommitteeProjectQuestionEntity {
     @Id
-    UUID id;
-    @NonNull
-    String question;
-    @NonNull
-    Boolean required;
-    @NonNull
-    UUID committeeId;
+    @EqualsAndHashCode.Include
+    @NonNull UUID id;
+    @NonNull String question;
+    @NonNull Boolean required;
+    @NonNull UUID committeeId;
 
     public static CommitteeProjectQuestionEntity fromDomain(final Committee.Id committeeId, final ProjectQuestion projectQuestion) {
         return CommitteeProjectQuestionEntity.builder()
@@ -33,9 +31,5 @@ public class CommitteeProjectQuestionEntity {
                 .question(projectQuestion.question())
                 .required(projectQuestion.required())
                 .build();
-    }
-
-    public ProjectQuestion toDomain() {
-        return new ProjectQuestion(ProjectQuestion.Id.of(id), question, required);
     }
 }

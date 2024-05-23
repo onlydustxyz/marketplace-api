@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
 public class CommitteeService implements CommitteeFacadePort {
@@ -44,11 +46,18 @@ public class CommitteeService implements CommitteeFacadePort {
     @Override
     @Transactional
     public void update(Committee committee) {
+        final var existingCommittee = committeeStoragePort.findById(committee.id())
+                .orElseThrow(() -> notFound("Committee %s was not found".formatted(committee.id().value().toString())));
+
+        // TODO remove status from update request
+        if (existingCommittee.status() != committee.status())
+            throw forbidden("Status cannot be updated");
+
+        if (existingCommittee.status() != Committee.Status.DRAFT && !committee.projectQuestions().equals(existingCommittee.projectQuestions()))
+            throw forbidden("Project questions can only be updated for draft committees");
+
         committeeStoragePort.save(committee);
-        if (committee.status() == Committee.Status.DRAFT && !committee.projectQuestions().isEmpty()) {
-            committeeStoragePort.deleteAllProjectQuestions(committee.id());
-            committeeStoragePort.saveProjectQuestions(committee.id(), committee.projectQuestions());
-        }
+
         if (List.of(Committee.Status.DRAFT, Committee.Status.OPEN_TO_APPLICATIONS).contains(committee.status())) {
             committeeStoragePort.deleteAllJuries(committee.id());
             if (!committee.juryIds().isEmpty()) {
@@ -63,8 +72,8 @@ public class CommitteeService implements CommitteeFacadePort {
 
     @Override
     public CommitteeView getCommitteeById(Committee.Id committeeId) {
-        return committeeStoragePort.findById(committeeId)
-                .orElseThrow(() -> OnlyDustException.notFound("Committee %s was not found".formatted(committeeId.value().toString())));
+        return committeeStoragePort.findViewById(committeeId)
+                .orElseThrow(() -> notFound("Committee %s was not found".formatted(committeeId.value().toString())));
     }
 
     @Override
@@ -138,8 +147,8 @@ public class CommitteeService implements CommitteeFacadePort {
 
     @Override
     public void createUpdateApplicationForCommittee(Committee.Id committeeId, Committee.Application application) {
-        final var committee = committeeStoragePort.findById(committeeId)
-                .orElseThrow(() -> OnlyDustException.notFound("Committee %s was not found".formatted(committeeId.value().toString())));
+        final var committee = committeeStoragePort.findViewById(committeeId)
+                .orElseThrow(() -> notFound("Committee %s was not found".formatted(committeeId.value().toString())));
         checkCommitteePermission(application, committee);
         checkApplicationPermission(application.projectId(), application.userId());
         final boolean hasStartedApplication = committeeStoragePort.hasStartedApplication(committeeId, application);
@@ -161,8 +170,8 @@ public class CommitteeService implements CommitteeFacadePort {
 
     @Override
     public CommitteeApplicationView getCommitteeApplication(Committee.Id committeeId, Optional<UUID> optionalProjectId, UUID userId) {
-        final var committee = committeeStoragePort.findById(committeeId)
-                .orElseThrow(() -> OnlyDustException.notFound("Committee %s was not found".formatted(committeeId.value().toString())));
+        final var committee = committeeStoragePort.findViewById(committeeId)
+                .orElseThrow(() -> notFound("Committee %s was not found".formatted(committeeId.value().toString())));
 
         if (optionalProjectId.isPresent()) {
             final UUID projectId = optionalProjectId.get();

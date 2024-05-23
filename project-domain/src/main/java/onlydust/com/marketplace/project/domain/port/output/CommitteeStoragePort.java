@@ -19,17 +19,15 @@ public interface CommitteeStoragePort {
 
     Page<CommitteeLinkView> findAll(Integer pageIndex, Integer pageSize);
 
-    Optional<CommitteeView> findById(Committee.Id committeeId);
+    Optional<CommitteeView> findViewById(Committee.Id committeeId);
+
+    Optional<Committee> findById(Committee.Id committeeId);
 
     void updateStatus(Committee.Id committeeId, Committee.Status status);
 
     void saveApplication(Committee.Id committeeId, Committee.Application application);
 
     List<ProjectAnswerView> getApplicationAnswers(Committee.Id committeeId, UUID projectId);
-
-    void saveProjectQuestions(Committee.Id committeeId, List<ProjectQuestion> projectQuestions);
-
-    void deleteAllProjectQuestions(Committee.Id committeeId);
 
     boolean hasStartedApplication(Committee.Id committeeId, Committee.Application application);
 

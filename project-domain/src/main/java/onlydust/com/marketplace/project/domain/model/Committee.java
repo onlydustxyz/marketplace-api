@@ -16,19 +16,12 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Committee {
-
-    @NonNull
-    Id id;
-    @NonNull
-    String name;
-    @NonNull
-    ZonedDateTime applicationStartDate;
-    @NonNull
-    ZonedDateTime applicationEndDate;
-    @NonNull
-    Status status;
-    @NonNull
-    List<ProjectQuestion> projectQuestions = new ArrayList<>();
+    @NonNull Id id;
+    @NonNull String name;
+    @NonNull ZonedDateTime applicationStartDate;
+    @NonNull ZonedDateTime applicationEndDate;
+    @NonNull Status status;
+    @NonNull List<ProjectQuestion> projectQuestions;
     @NonNull
     List<UUID> juryIds = new ArrayList<>();
     UUID sponsorId;

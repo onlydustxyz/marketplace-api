@@ -10,10 +10,11 @@ import onlydust.com.marketplace.project.domain.view.*;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationLinkView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
@@ -25,11 +26,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class CommitteeServiceTest {
-
     private final Faker faker = new Faker();
     private CommitteeService committeeService;
     private CommitteeStoragePort committeeStoragePort;
@@ -83,7 +84,7 @@ public class CommitteeServiceTest {
                 .build();
 
         // When
-        when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(committeeView));
+        when(committeeStoragePort.findViewById(committeeId)).thenReturn(Optional.of(committeeView));
         final CommitteeView committeeById = committeeService.getCommitteeById(committeeId);
 
         // Then
@@ -93,7 +94,7 @@ public class CommitteeServiceTest {
     @Test
     void should_throw_not_found_given_a_committee_not_found_by_id() {
         // When
-        when(committeeStoragePort.findById(any())).thenReturn(Optional.empty());
+        when(committeeStoragePort.findViewById(any())).thenReturn(Optional.empty());
 
         // Then
         assertThrows(OnlyDustException.class, () -> committeeService.getCommitteeById(Committee.Id.random()));
@@ -108,11 +109,11 @@ public class CommitteeServiceTest {
             final Committee.Id committeeId = Committee.Id.random();
 
             // When
-            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.empty());
+            when(committeeStoragePort.findViewById(committeeId)).thenReturn(Optional.empty());
 
             // Then
-            Assertions.assertThatThrownBy(() -> committeeService.createUpdateApplicationForCommittee(committeeId, new Committee.Application(UUID.randomUUID(),
-                            UUID.randomUUID(), List.of())))
+            assertThatThrownBy(() -> committeeService.createUpdateApplicationForCommittee(committeeId, new Committee.Application(UUID.randomUUID(),
+                    UUID.randomUUID(), List.of())))
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Committee %s was not found".formatted(committeeId.value().toString()));
         }
@@ -125,7 +126,7 @@ public class CommitteeServiceTest {
             final UUID projectId = UUID.randomUUID();
 
             // When
-            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
+            when(committeeStoragePort.findViewById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
                     .name(faker.rickAndMorty().location())
                     .id(committeeId)
                     .status(Committee.Status.OPEN_TO_APPLICATIONS)
@@ -136,8 +137,8 @@ public class CommitteeServiceTest {
             when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(false);
 
             // Then
-            Assertions.assertThatThrownBy(() -> committeeService.createUpdateApplicationForCommittee(committeeId, new Committee.Application(userId,
-                            projectId, List.of())))
+            assertThatThrownBy(() -> committeeService.createUpdateApplicationForCommittee(committeeId, new Committee.Application(userId,
+                    projectId, List.of())))
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Only project lead can send new application to committee");
         }
@@ -150,7 +151,7 @@ public class CommitteeServiceTest {
             final UUID projectId = UUID.randomUUID();
 
             // When
-            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
+            when(committeeStoragePort.findViewById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
                     .name(faker.rickAndMorty().location())
                     .id(committeeId)
                     .status(Committee.Status.OPEN_TO_APPLICATIONS)
@@ -162,8 +163,8 @@ public class CommitteeServiceTest {
             when(projectStoragePort.exists(projectId)).thenReturn(false);
 
             // Then
-            Assertions.assertThatThrownBy(() -> committeeService.createUpdateApplicationForCommittee(committeeId, new Committee.Application(userId,
-                            projectId, List.of())))
+            assertThatThrownBy(() -> committeeService.createUpdateApplicationForCommittee(committeeId, new Committee.Application(userId,
+                    projectId, List.of())))
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Project %s was not found".formatted(projectId));
         }
@@ -176,7 +177,7 @@ public class CommitteeServiceTest {
             final UUID projectId = UUID.randomUUID();
 
             // When
-            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
+            when(committeeStoragePort.findViewById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
                     .name(faker.rickAndMorty().location())
                     .id(committeeId)
                     .status(Committee.Status.DRAFT)
@@ -187,8 +188,8 @@ public class CommitteeServiceTest {
             when(projectStoragePort.exists(projectId)).thenReturn(true);
 
             // Then
-            Assertions.assertThatThrownBy(() -> committeeService.createUpdateApplicationForCommittee(committeeId, new Committee.Application(userId,
-                            projectId, List.of())))
+            assertThatThrownBy(() -> committeeService.createUpdateApplicationForCommittee(committeeId, new Committee.Application(userId,
+                    projectId, List.of())))
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Applications are not opened or are closed for committee %s".formatted(committeeId.value()));
         }
@@ -200,7 +201,7 @@ public class CommitteeServiceTest {
             final UUID projectId = UUID.randomUUID();
 
             // When
-            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
+            when(committeeStoragePort.findViewById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
                     .name(faker.rickAndMorty().location())
                     .id(committeeId)
                     .status(Committee.Status.OPEN_TO_APPLICATIONS)
@@ -212,8 +213,8 @@ public class CommitteeServiceTest {
             when(projectStoragePort.exists(projectId)).thenReturn(true);
 
             // Then
-            Assertions.assertThatThrownBy(() -> committeeService.createUpdateApplicationForCommittee(committeeId, new Committee.Application(userId,
-                            projectId, List.of(new Committee.ProjectAnswer(ProjectQuestion.Id.random(), "a1")))))
+            assertThatThrownBy(() -> committeeService.createUpdateApplicationForCommittee(committeeId, new Committee.Application(userId,
+                    projectId, List.of(new Committee.ProjectAnswer(ProjectQuestion.Id.random(), "a1")))))
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("A project question is not linked to committee %s".formatted(committeeId.value()));
         }
@@ -229,7 +230,7 @@ public class CommitteeServiceTest {
                     projectId, List.of(new Committee.ProjectAnswer(projectQuestion, "A1")));
 
             // When
-            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
+            when(committeeStoragePort.findViewById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
                     .name(faker.rickAndMorty().location())
                     .id(committeeId)
                     .status(Committee.Status.OPEN_TO_APPLICATIONS)
@@ -257,7 +258,7 @@ public class CommitteeServiceTest {
                     projectId, List.of());
 
             // When
-            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
+            when(committeeStoragePort.findViewById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
                     .name(faker.rickAndMorty().location())
                     .id(committeeId)
                     .status(Committee.Status.OPEN_TO_APPLICATIONS)
@@ -304,7 +305,7 @@ public class CommitteeServiceTest {
                 .build();
 
         // When
-        when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(committeeView));
+        when(committeeStoragePort.findViewById(committeeId)).thenReturn(Optional.of(committeeView));
         when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(true);
         when(projectStoragePort.exists(projectId)).thenReturn(true);
         when(committeeStoragePort.getApplicationAnswers(committeeId, projectId))
@@ -352,7 +353,7 @@ public class CommitteeServiceTest {
                 .build();
 
         // When
-        when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(committeeView));
+        when(committeeStoragePort.findViewById(committeeId)).thenReturn(Optional.of(committeeView));
         when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(true);
         when(projectStoragePort.exists(projectId)).thenReturn(true);
         final ProjectAnswerView a3 = new ProjectAnswerView(ProjectQuestion.Id.random(), "Q3", true, "A3");
@@ -402,7 +403,7 @@ public class CommitteeServiceTest {
                 .build();
 
         // When
-        when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(committeeView));
+        when(committeeStoragePort.findViewById(committeeId)).thenReturn(Optional.of(committeeView));
         final CommitteeApplicationView committeeApplication = committeeService.getCommitteeApplication(committeeId, Optional.empty(), userId);
 
         // Then
@@ -420,52 +421,123 @@ public class CommitteeServiceTest {
         verifyNoInteractions(projectStoragePort);
     }
 
-    @Test
-    void should_update_given_a_draft_committee() {
+    @ParameterizedTest
+    @EnumSource(Committee.Status.class)
+    void should_update_committee(Committee.Status status) {
         // Given
-        final Committee.Id committeeId = Committee.Id.random();
-        final ProjectQuestion q1 = new ProjectQuestion("Q1", false);
-        final ProjectQuestion q2 = new ProjectQuestion("Q2", true);
-        final Committee committee = Committee.builder()
+        final var existingCommittee = Committee.builder()
+                .id(Committee.Id.random())
                 .name(faker.rickAndMorty().location())
-                .id(committeeId)
-                .status(Committee.Status.DRAFT)
+                .status(status)
+                .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .projectQuestions(List.of(
+                        new ProjectQuestion("Q1", false),
+                        new ProjectQuestion("Q2", true)))
+                .build();
+
+        final var committee = existingCommittee.toBuilder()
+                .name(faker.rickAndMorty().location())
                 .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                 .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                 .build();
-        committee.projectQuestions().addAll(List.of(q1, q2));
+
+        when(committeeStoragePort.findById(existingCommittee.id())).thenReturn(Optional.of(existingCommittee));
 
         // When
         committeeService.update(committee);
 
         // Then
         verify(committeeStoragePort).save(committee);
-        verify(committeeStoragePort).deleteAllProjectQuestions(committeeId);
-        verify(committeeStoragePort).saveProjectQuestions(committeeId, List.of(q1, q2));
     }
 
     @Test
-    void should_update_given_a_not_draft_committee() {
+    void should_update_project_questions() {
         // Given
-        final Committee.Id committeeId = Committee.Id.random();
-        final ProjectQuestion q1 = new ProjectQuestion("Q1", false);
-        final ProjectQuestion q2 = new ProjectQuestion("Q2", true);
-        final Committee committee = Committee.builder()
+        final var existingCommittee = Committee.builder()
+                .id(Committee.Id.random())
                 .name(faker.rickAndMorty().location())
-                .id(committeeId)
-                .status(Committee.Status.OPEN_TO_APPLICATIONS)
+                .status(Committee.Status.DRAFT)
                 .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                 .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .projectQuestions(List.of(
+                        new ProjectQuestion("Q1", false),
+                        new ProjectQuestion("Q2", true)))
                 .build();
-        committee.projectQuestions().addAll(List.of(q1, q2));
+
+        final var committee = existingCommittee.toBuilder()
+                .projectQuestions(List.of(
+                        new ProjectQuestion("Q2", false),
+                        new ProjectQuestion("Q3", false)))
+                .build();
+
+        when(committeeStoragePort.findById(existingCommittee.id())).thenReturn(Optional.of(existingCommittee));
 
         // When
         committeeService.update(committee);
 
         // Then
         verify(committeeStoragePort).save(committee);
-        verify(committeeStoragePort, times(0)).saveProjectQuestions(committeeId, List.of(q1, q2));
-        verify(committeeStoragePort, times(0)).deleteAllProjectQuestions(committeeId);
+    }
+
+    @Test
+    void should_prevent_committee_update_status() {
+        // Given
+        final var existingCommittee = Committee.builder()
+                .id(Committee.Id.random())
+                .name(faker.rickAndMorty().location())
+                .status(Committee.Status.OPEN_TO_APPLICATIONS)
+                .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .projectQuestions(List.of(
+                        new ProjectQuestion("Q1", false),
+                        new ProjectQuestion("Q2", true)))
+                .build();
+
+        final var committee = existingCommittee.toBuilder()
+                .status(Committee.Status.DRAFT)
+                .build();
+
+        when(committeeStoragePort.findById(existingCommittee.id())).thenReturn(Optional.of(existingCommittee));
+
+        // When
+        assertThatThrownBy(() -> committeeService.update(committee))
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Status cannot be updated");
+
+        // Then
+        verify(committeeStoragePort, never()).save(committee);
+    }
+
+    @Test
+    void should_prevent_project_question_update_if_not_draft() {
+        // Given
+        final var existingCommittee = Committee.builder()
+                .id(Committee.Id.random())
+                .name(faker.rickAndMorty().location())
+                .status(Committee.Status.OPEN_TO_APPLICATIONS)
+                .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .projectQuestions(List.of(
+                        new ProjectQuestion("Q1", false),
+                        new ProjectQuestion("Q2", true)))
+                .build();
+
+        final var committee = existingCommittee.toBuilder()
+                .projectQuestions(List.of(
+                        new ProjectQuestion("Q2", true),
+                        new ProjectQuestion("Q1", false)))
+                .build();
+
+        when(committeeStoragePort.findById(existingCommittee.id())).thenReturn(Optional.of(existingCommittee));
+
+        // When
+        assertThatThrownBy(() -> committeeService.update(committee))
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Project questions can only be updated for draft committees");
+
+        // Then
+        verify(committeeStoragePort, never()).save(committee);
     }
 
     @Nested
@@ -737,6 +809,4 @@ public class CommitteeServiceTest {
                     .build();
         }
     }
-
-
 }

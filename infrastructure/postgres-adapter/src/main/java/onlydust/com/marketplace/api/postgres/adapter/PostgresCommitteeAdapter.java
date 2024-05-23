@@ -2,12 +2,17 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.api.postgres.adapter.entity.enums.CommitteeStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeJuryVoteViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeLinkViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectInfosQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoCommitteeQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeProjectAnswerEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeApplicationRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeProjectAnswerViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeRepository;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeProjectQuestionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoCommitteeQueryRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -34,7 +39,6 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     private final CommitteeRepository committeeRepository;
     private final BoCommitteeQueryRepository boCommitteeQueryRepository;
     private final CommitteeApplicationRepository committeeApplicationRepository;
-    private final CommitteeProjectQuestionRepository committeeProjectQuestionRepository;
     private final CommitteeProjectAnswerViewRepository committeeProjectAnswerViewRepository;
     private final ProjectInfosViewRepository projectInfosViewRepository;
     private final CommitteeJuryRepository committeeJuryRepository;
@@ -50,19 +54,6 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     }
 
     @Override
-    @Transactional
-    public void saveProjectQuestions(Committee.Id committeeId, List<ProjectQuestion> projectQuestions) {
-        committeeProjectQuestionRepository.saveAll(projectQuestions.stream().map(projectQuestion -> CommitteeProjectQuestionEntity.fromDomain(committeeId,
-                projectQuestion)).toList());
-    }
-
-    @Override
-    @Transactional
-    public void deleteAllProjectQuestions(Committee.@NonNull Id committeeId) {
-        committeeProjectQuestionRepository.deleteAllByCommitteeId(committeeId.value());
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public Page<CommitteeLinkView> findAll(Integer pageIndex, Integer pageSize) {
         final var committees = committeeLinkViewRepository.findAllBy(PageRequest.of(pageIndex, pageSize));
@@ -75,8 +66,14 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<CommitteeView> findById(Committee.Id committeeId) {
+    public Optional<CommitteeView> findViewById(Committee.Id committeeId) {
         return boCommitteeQueryRepository.findById(committeeId.value()).map(BoCommitteeQueryEntity::toView);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Committee> findById(Committee.Id committeeId) {
+        return committeeRepository.findById(committeeId.value()).map(CommitteeEntity::toDomain);
     }
 
     @Override
