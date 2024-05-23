@@ -5,14 +5,12 @@ import lombok.NonNull;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.project.domain.view.CommitteeApplicationView;
-import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
-import onlydust.com.marketplace.project.domain.view.CommitteeView;
-import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
+import onlydust.com.marketplace.project.domain.view.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
@@ -20,7 +18,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @AllArgsConstructor
@@ -66,14 +63,22 @@ public class CommitteeService implements CommitteeFacadePort {
     public void createUpdateApplicationForCommittee(Committee.Id committeeId, Committee.Application application) {
         final var committee = committeeStoragePort.findById(committeeId)
                 .orElseThrow(() -> OnlyDustException.notFound("Committee %s was not found".formatted(committeeId.value().toString())));
-        if (committee.status() != Committee.Status.OPEN_TO_APPLICATIONS)
-            throw OnlyDustException.forbidden("Applications are not opened or are closed for committee %s".formatted(committeeId.value()));
-
+        checkCommitteePermission(application, committee);
         checkApplicationPermission(application.projectId(), application.userId());
         final boolean hasStartedApplication = committeeStoragePort.hasStartedApplication(committeeId, application);
         committeeStoragePort.saveApplication(committeeId, application);
         if (!hasStartedApplication) {
             committeeObserverPort.onNewApplication(committeeId, application.projectId(), application.userId());
+        }
+    }
+
+    private static void checkCommitteePermission(Committee.Application application, CommitteeView committee) {
+        if (committee.status() != Committee.Status.OPEN_TO_APPLICATIONS)
+            throw OnlyDustException.forbidden("Applications are not opened or are closed for committee %s".formatted(committee.id().value()));
+        final List<ProjectQuestion.Id> projectQuestionIds = committee.projectQuestions().stream().map(ProjectQuestion::id).toList();
+        if (application.answers().stream().map(Committee.ProjectAnswer::projectQuestionId)
+                .anyMatch(id -> !projectQuestionIds.contains(id))) {
+            throw OnlyDustException.internalServerError("A project question is not linked to committee %s".formatted(committee.id().value()));
         }
     }
 
@@ -96,6 +101,12 @@ public class CommitteeService implements CommitteeFacadePort {
         return new CommitteeApplicationView(committee.status(), getCommitteeAnswersWithOnlyQuestions(committee), null, false);
     }
 
+    @Override
+    public CommitteeApplicationDetailsView getCommitteeApplicationDetails(Committee.Id committeeId, UUID projectId) {
+        return committeeStoragePort.findByCommitteeIdAndProjectId(committeeId, projectId)
+                .orElseThrow(() -> OnlyDustException.internalServerError("Application on committee %s not found for project %s"
+                        .formatted(committeeId.value(), projectId)));
+    }
 
     private List<ProjectAnswerView> getCommitteeAnswersWithOnlyQuestions(CommitteeView committeeView) {
         return committeeView.projectQuestions().stream()

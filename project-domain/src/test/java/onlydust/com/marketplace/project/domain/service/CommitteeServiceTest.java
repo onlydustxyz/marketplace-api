@@ -130,6 +130,7 @@ public class CommitteeServiceTest {
                     .status(Committee.Status.OPEN_TO_APPLICATIONS)
                     .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .projectQuestions(List.of())
                     .build()));
             when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(false);
 
@@ -154,6 +155,7 @@ public class CommitteeServiceTest {
                     .status(Committee.Status.OPEN_TO_APPLICATIONS)
                     .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .projectQuestions(List.of())
                     .build()));
             when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(true);
             when(projectStoragePort.exists(projectId)).thenReturn(false);
@@ -191,13 +193,10 @@ public class CommitteeServiceTest {
         }
 
         @Test
-        void given_new_application() {
-            // Given
+        void given_a_question_not_linked_to_committee() {
             final Committee.Id committeeId = Committee.Id.random();
             final UUID userId = UUID.randomUUID();
             final UUID projectId = UUID.randomUUID();
-            final Committee.Application application = new Committee.Application(userId,
-                    projectId, List.of());
 
             // When
             when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
@@ -206,6 +205,36 @@ public class CommitteeServiceTest {
                     .status(Committee.Status.OPEN_TO_APPLICATIONS)
                     .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .projectQuestions(List.of(new ProjectQuestion(ProjectQuestion.Id.random(), "Q1", false)))
+                    .build()));
+            when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(true);
+            when(projectStoragePort.exists(projectId)).thenReturn(true);
+
+            // Then
+            Assertions.assertThatThrownBy(() -> committeeService.createUpdateApplicationForCommittee(committeeId, new Committee.Application(userId,
+                            projectId, List.of(new Committee.ProjectAnswer(ProjectQuestion.Id.random(), "a1")))))
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("A project question is not linked to committee %s".formatted(committeeId.value()));
+        }
+
+        @Test
+        void given_new_application() {
+            // Given
+            final Committee.Id committeeId = Committee.Id.random();
+            final UUID userId = UUID.randomUUID();
+            final UUID projectId = UUID.randomUUID();
+            final ProjectQuestion.Id projectQuestion = ProjectQuestion.Id.random();
+            final Committee.Application application = new Committee.Application(userId,
+                    projectId, List.of(new Committee.ProjectAnswer(projectQuestion, "A1")));
+
+            // When
+            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
+                    .name(faker.rickAndMorty().location())
+                    .id(committeeId)
+                    .status(Committee.Status.OPEN_TO_APPLICATIONS)
+                    .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .projectQuestions(List.of(new ProjectQuestion(projectQuestion, "Q1", false)))
                     .build()));
             when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(true);
             when(projectStoragePort.exists(projectId)).thenReturn(true);
@@ -233,6 +262,7 @@ public class CommitteeServiceTest {
                     .status(Committee.Status.OPEN_TO_APPLICATIONS)
                     .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .projectQuestions(List.of())
                     .build()));
             when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(true);
             when(projectStoragePort.exists(projectId)).thenReturn(true);

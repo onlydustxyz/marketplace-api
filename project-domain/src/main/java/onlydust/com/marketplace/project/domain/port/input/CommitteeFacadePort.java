@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.port.input;
 import lombok.NonNull;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.view.CommitteeApplicationDetailsView;
 import onlydust.com.marketplace.project.domain.view.CommitteeApplicationView;
 import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
 import onlydust.com.marketplace.project.domain.view.CommitteeView;
@@ -27,4 +28,6 @@ public interface CommitteeFacadePort {
     void createUpdateApplicationForCommittee(Committee.Id committeeId, Committee.Application application);
 
     CommitteeApplicationView getCommitteeApplication(Committee.Id committeeId, Optional<UUID> projectId, UUID userId);
+
+    CommitteeApplicationDetailsView getCommitteeApplicationDetails(Committee.Id committeeId, UUID projectId);
 }
