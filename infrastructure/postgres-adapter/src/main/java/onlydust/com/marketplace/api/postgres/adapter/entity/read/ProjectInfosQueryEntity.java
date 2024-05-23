@@ -15,6 +15,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
+
 @Entity
 @Immutable
 @Getter
@@ -23,7 +25,7 @@ public class ProjectInfosQueryEntity {
     UUID id;
     @NonNull String slug;
     @NonNull String name;
-    @NonNull String logoUrl;
+    String logoUrl;
     @NonNull
     String shortDescription;
     @NonNull
@@ -51,7 +53,7 @@ public class ProjectInfosQueryEntity {
                 id,
                 name,
                 slug,
-                URI.create(logoUrl),
+                isNull(logoUrl) ? null : URI.create(logoUrl),
                 shortDescription,
                 longDescription,
                 projectLeads.stream().map(projectLead -> ProjectLeaderLinkView.builder()
