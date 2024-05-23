@@ -344,7 +344,6 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .json("""
                         {
                           "project": {
@@ -355,7 +354,6 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                           },
                           "allocatedAmount": null,
                           "allocationCurrency": null,
-                          "juryAnswers": null,
                           "projectQuestions": [
                             {
                               "question": "%s",

@@ -9,7 +9,9 @@ import onlydust.com.marketplace.project.domain.view.CommitteeApplicationDetailsV
 import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
 import onlydust.com.marketplace.project.domain.view.CommitteeView;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -117,7 +119,77 @@ public interface BackOfficeCommitteeMapper {
                         new SponsorLinkResponse()
                                 .id(committeeView.sponsor().id())
                                 .avatarUrl(committeeView.sponsor().logoUrl())
-                                .name(committeeView.sponsor().name()));
+                                .name(committeeView.sponsor().name()))
+                // Mock
+                .juryCount(3)
+                .juryCriteria(
+                        List.of(
+                                new JuryCriteriaResponse()
+                                        .id(UUID.randomUUID())
+                                        .criteria("Criteria 1"),
+                                new JuryCriteriaResponse()
+                                        .id(UUID.randomUUID())
+                                        .criteria("Criteria 2"),
+                                new JuryCriteriaResponse()
+                                        .id(UUID.randomUUID())
+                                        .criteria("Criteria 3")
+                        )
+                )
+                .completedAssignments(3)
+                .totalAssignments(5)
+                .juryVotes(List.of(
+                        new JuryVoteResponse()
+                                .user(
+                                        new UserLinkResponse(
+                                                141839618L,
+                                                "Blumebee",
+                                                "https://avatars.githubusercontent.com/u/141839618?v=4"
+                                        )
+                                )
+                                .score(BigDecimal.valueOf(3.44))
+                                .projectAssigned(
+                                        new ProjectLinkResponse(
+                                                UUID.fromString("594ca5ca-48f7-49a8-9c26-84b949d4fdd9"),
+                                                "mooooooonlight",
+                                                "Mooooooonlight",
+                                                "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                        )),
+                        new JuryVoteResponse()
+                                .score(BigDecimal.valueOf(2))
+                                .user(
+                                        new UserLinkResponse(
+                                                141839618L,
+                                                "Blumebee",
+                                                "https://avatars.githubusercontent.com/u/141839618?v=4"
+                                        )
+                                )
+                                .projectAssigned(
+                                        new ProjectLinkResponse(
+                                                UUID.fromString("b58b40b8-1521-41cf-972c-9c08d58eaff8"),
+                                                "pineapple",
+                                                "Pineapple",
+                                                "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/3930283280174221329.jpg"
+                                        )
+                                ),
+                        new JuryVoteResponse()
+                                .user(
+                                        new UserLinkResponse(
+                                                5160414L,
+                                                "haydencleary",
+                                                "https://avatars.githubusercontent.com/u/5160414?v=4"
+                                        )
+                                )
+                                .score(BigDecimal.valueOf(2.34))
+                                .projectAssigned(new ProjectLinkResponse(
+                                                UUID.fromString("b58b40b8-1521-41cf-972c-9c08d58eaff8"),
+                                                "pineapple",
+                                                "Pineapple",
+                                                "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/3930283280174221329.jpg"
+                                        )
+                                )
+
+                ))
+                ;
     }
 
     static CommitteeProjectApplicationResponse committeeApplicationDetailsToResponse(final CommitteeApplicationDetailsView view) {
@@ -136,6 +208,44 @@ public interface BackOfficeCommitteeMapper {
                 )
                 .toList()
         );
+        // Mock
+
+        committeeProjectApplicationResponse.setJuryVotes(List.of(
+                new JuryProjectVoteResponse()
+                        .totalScore(BigDecimal.valueOf(3.21))
+                        .answers(
+                                List.of(
+                                        new ScoredAnswerResponse()
+                                                .score(2)
+                                                .criteria("Criteria 1"),
+                                        new ScoredAnswerResponse()
+                                                .score(3)
+                                                .criteria("Criteria 2")
+                                )
+                        )
+                        .jury(new UserLinkResponse(
+                                5160414L,
+                                "haydencleary",
+                                "https://avatars.githubusercontent.com/u/5160414?v=4"
+                        )),
+                new JuryProjectVoteResponse()
+                        .totalScore(BigDecimal.valueOf(4.5))
+                        .answers(
+                                List.of(
+                                        new ScoredAnswerResponse()
+                                                .score(4)
+                                                .criteria("Criteria 1"),
+                                        new ScoredAnswerResponse()
+                                                .score(5)
+                                                .criteria("Criteria 2")
+                                )
+                        )
+                        .jury(new UserLinkResponse(
+                                141839618L,
+                                "Blumebee",
+                                "https://avatars.githubusercontent.com/u/141839618?v=4"
+                        ))
+        ));
         return committeeProjectApplicationResponse;
     }
 }

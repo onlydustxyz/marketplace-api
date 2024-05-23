@@ -88,5 +88,5 @@ public interface ProjectStoragePort {
 
     boolean exists(UUID projectId);
 
-    CommitteeApplicationView.ProjectInfosView getProjectInfos(UUID projectId);
+    ProjectInfosView getProjectInfos(UUID projectId);
 }

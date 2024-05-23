@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import com.github.tomakehurst.wiremock.matching.StringValuePattern;
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.CommitteeApplicationRequest;

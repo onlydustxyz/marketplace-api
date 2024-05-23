@@ -10,6 +10,7 @@ import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.view.CommitteeApplicationView;
 import onlydust.com.marketplace.project.domain.view.CommitteeView;
 import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
+import onlydust.com.marketplace.project.domain.view.ProjectInfosView;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -283,7 +284,7 @@ public class CommitteeServiceTest {
         final Committee.Id committeeId = Committee.Id.random();
         final UUID userId = UUID.randomUUID();
         final UUID projectId = UUID.randomUUID();
-        final CommitteeApplicationView.ProjectInfosView projectInfosView = new CommitteeApplicationView.ProjectInfosView(
+        final ProjectInfosView projectInfosView = new ProjectInfosView(
                 UUID.randomUUID(), faker.lordOfTheRings().character(), faker.internet().slug(), URI.create(faker.internet().url()),
                 faker.rickAndMorty().character(),
                 faker.rickAndMorty().location(), List.of(), 1,
@@ -333,7 +334,7 @@ public class CommitteeServiceTest {
         final Committee.Id committeeId = Committee.Id.random();
         final UUID userId = UUID.randomUUID();
         final UUID projectId = UUID.randomUUID();
-        final CommitteeApplicationView.ProjectInfosView projectInfosView = new CommitteeApplicationView.ProjectInfosView(
+        final ProjectInfosView projectInfosView = new ProjectInfosView(
                 UUID.randomUUID(), faker.lordOfTheRings().character(), faker.internet().slug(), URI.create(faker.internet().url()),
                 faker.rickAndMorty().character(),
                 faker.rickAndMorty().location(), List.of(), 1,
