@@ -138,57 +138,51 @@ public interface BackOfficeCommitteeMapper {
                 )
                 .completedAssignments(3)
                 .totalAssignments(5)
-                .juryVotes(List.of(
-                        new JuryVoteResponse()
-                                .user(
-                                        new UserLinkResponse(
-                                                141839618L,
-                                                "Blumebee",
-                                                "https://avatars.githubusercontent.com/u/141839618?v=4"
-                                        )
-                                )
-                                .score(BigDecimal.valueOf(3.44))
-                                .projectAssigned(
+                .juryAssignments(List.of(
+                        new JuryAssignmentResponse()
+                                .completedAssignments(1)
+                                .user(new UserLinkResponse(
+                                        141839618L,
+                                        "Blumebee",
+                                        "https://avatars.githubusercontent.com/u/141839618?v=4"
+                                ))
+                                .totalAssignment(2)
+                                .projectsAssigned(List.of(
+                                        new ProjectLinkResponse(
+                                                UUID.fromString("b58b40b8-1521-41cf-972c-9c08d58eaff8"),
+                                                "pineapple",
+                                                "Pineapple",
+                                                "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/3930283280174221329.jpg"
+                                        ),
                                         new ProjectLinkResponse(
                                                 UUID.fromString("594ca5ca-48f7-49a8-9c26-84b949d4fdd9"),
                                                 "mooooooonlight",
                                                 "Mooooooonlight",
                                                 "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
-                                        )),
-                        new JuryVoteResponse()
-                                .score(BigDecimal.valueOf(2))
-                                .user(
-                                        new UserLinkResponse(
-                                                141839618L,
-                                                "Blumebee",
-                                                "https://avatars.githubusercontent.com/u/141839618?v=4"
                                         )
-                                )
-                                .projectAssigned(
+                                )),
+                        new JuryAssignmentResponse()
+                                .completedAssignments(1)
+                                .user(new UserLinkResponse(
+                                        5160414L,
+                                        "haydencleary",
+                                        "https://avatars.githubusercontent.com/u/5160414?v=4"
+                                ))
+                                .totalAssignment(2)
+                                .projectsAssigned(List.of(
                                         new ProjectLinkResponse(
                                                 UUID.fromString("b58b40b8-1521-41cf-972c-9c08d58eaff8"),
                                                 "pineapple",
                                                 "Pineapple",
                                                 "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/3930283280174221329.jpg"
+                                        ),
+                                        new ProjectLinkResponse(
+                                                UUID.fromString("594ca5ca-48f7-49a8-9c26-84b949d4fdd9"),
+                                                "mooooooonlight",
+                                                "Mooooooonlight",
+                                                "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
                                         )
-                                ),
-                        new JuryVoteResponse()
-                                .user(
-                                        new UserLinkResponse(
-                                                5160414L,
-                                                "haydencleary",
-                                                "https://avatars.githubusercontent.com/u/5160414?v=4"
-                                        )
-                                )
-                                .score(BigDecimal.valueOf(2.34))
-                                .projectAssigned(new ProjectLinkResponse(
-                                                UUID.fromString("b58b40b8-1521-41cf-972c-9c08d58eaff8"),
-                                                "pineapple",
-                                                "Pineapple",
-                                                "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/3930283280174221329.jpg"
-                                        )
-                                )
-
+                                ))
                 ))
                 ;
     }
@@ -212,7 +206,7 @@ public interface BackOfficeCommitteeMapper {
         // Mock
 
         committeeProjectApplicationResponse.setJuryVotes(List.of(
-                new JuryProjectVoteResponse()
+                new JuryVoteResponse()
                         .totalScore(BigDecimal.valueOf(3.21))
                         .answers(
                                 List.of(
@@ -229,7 +223,7 @@ public interface BackOfficeCommitteeMapper {
                                 "haydencleary",
                                 "https://avatars.githubusercontent.com/u/5160414?v=4"
                         )),
-                new JuryProjectVoteResponse()
+                new JuryVoteResponse()
                         .totalScore(BigDecimal.valueOf(4.5))
                         .answers(
                                 List.of(
@@ -247,6 +241,7 @@ public interface BackOfficeCommitteeMapper {
                                 "https://avatars.githubusercontent.com/u/141839618?v=4"
                         ))
         ));
+        committeeProjectApplicationResponse.setTotalScore(BigDecimal.valueOf(3.45));
         return committeeProjectApplicationResponse;
     }
 }
