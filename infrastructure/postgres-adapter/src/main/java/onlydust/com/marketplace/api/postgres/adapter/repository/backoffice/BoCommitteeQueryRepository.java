@@ -18,6 +18,7 @@ public interface BoCommitteeQueryRepository extends JpaRepository<BoCommitteeQue
                          c.status,
                          c.application_start_date,
                          c.application_end_date,
+                         juries.members juries,
                          (select jsonb_agg(
                                          jsonb_build_object('id', cpq.id, 'question', cpq.question, 'required', cpq.required)
                                  )
@@ -43,8 +44,17 @@ public interface BoCommitteeQueryRepository extends JpaRepository<BoCommitteeQue
                            left join applications a on a.committee_id = c.id
                            left join projects p on p.id = a.project_id
                            left join iam.users u on u.id = a.user_id
+                            left join (select jsonb_agg(
+                                                               jsonb_build_object(
+                                                                       'userId', j.id, 'userAvatarUrl', j.github_avatar_url, 'userGithubLogin',
+                                                                       j.github_login, 'userGithubId', j.github_user_id
+                                                               )
+                                                       ) members
+                                                from committee_juries cj
+                                                         join iam.users j on j.id = cj.user_id
+                                                where cj.committee_id = :committeeId ) juries on true
                   where c.id = :committeeId
-                  group by c.id, c.name, c.status, c.application_start_date, c.application_end_date, s.id, s.name, s.url, s.logo_url, a.committee_id
+                  group by c.id, c.name, c.status, c.application_start_date, c.application_end_date, s.id, s.name, s.url, s.logo_url, a.committee_id, juries.members
             """)
     Optional<BoCommitteeQueryEntity> findById(UUID committeeId);
 }

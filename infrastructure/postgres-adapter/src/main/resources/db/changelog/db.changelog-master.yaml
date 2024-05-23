@@ -307,3 +307,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000239_renaming_committee_dates.sql
   - include:
       file: db/changelog/changelogs/00000240_add_project_mail_outbox_events_table.sql
+  - include:
+      file: db/changelog/changelogs/00000241_add_committee_voting_tables.sql

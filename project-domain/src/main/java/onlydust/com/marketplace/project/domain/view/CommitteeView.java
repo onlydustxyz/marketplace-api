@@ -11,5 +11,5 @@ import java.util.List;
 @Builder
 public record CommitteeView(@NonNull Committee.Id id, @NonNull String name, @NonNull ZonedDateTime applicationStartDate, @NonNull ZonedDateTime applicationEndDate,
                             @NonNull Committee.Status status, ShortSponsorView sponsor, List<ProjectQuestion> projectQuestions,
-                            List<CommitteeApplicationLinkView> committeeApplicationLinks) {
+                            List<CommitteeApplicationLinkView> committeeApplicationLinks, List<RegisteredContributorLinkView> juries) {
 }

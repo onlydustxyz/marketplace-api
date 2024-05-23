@@ -29,6 +29,8 @@ public class Committee {
     Status status;
     @NonNull
     List<ProjectQuestion> projectQuestions = new ArrayList<>();
+    @NonNull
+    List<UUID> juryIds = new ArrayList<>();
     UUID sponsorId;
 
     public Committee(@NonNull String name, @NonNull ZonedDateTime applicationStartDate, @NonNull ZonedDateTime applicationEndDate) {

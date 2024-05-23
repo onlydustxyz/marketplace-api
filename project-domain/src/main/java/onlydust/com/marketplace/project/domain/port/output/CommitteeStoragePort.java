@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
+import lombok.NonNull;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
@@ -33,4 +34,7 @@ public interface CommitteeStoragePort {
 
     Optional<CommitteeApplicationDetailsView> findByCommitteeIdAndProjectId(Committee.Id committeeId, UUID projectId);
 
+    void deleteAllJuries(Committee.Id committeeId);
+
+    void saveJuries(Committee.Id committeeId, @NonNull List<UUID> juryIds);
 }

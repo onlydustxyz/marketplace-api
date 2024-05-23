@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.CommitteeStatusEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
@@ -55,6 +54,8 @@ public class BoCommitteeQueryEntity {
     String sponsorLogoUrl;
     @JdbcTypeCode(SqlTypes.JSON)
     Set<ProjectApplicationLinkJson> projectApplications;
+    @JdbcTypeCode(SqlTypes.JSON)
+    Set<JuryLinkJson> juries;
 
     public CommitteeView toView() {
         return CommitteeView.builder()
@@ -86,6 +87,14 @@ public class BoCommitteeQueryEntity {
                                         .id(projectApplicationLinkJson.userId)
                                         .build())
                                 .build()).toList())
+                .juries(isNull(this.juries) ? null : this.juries.stream()
+                        .map(juryLinkJson -> RegisteredContributorLinkView.builder()
+                                .avatarUrl(juryLinkJson.userAvatarUrl)
+                                .login(juryLinkJson.userGithubLogin)
+                                .githubUserId(juryLinkJson.userGithubId)
+                                .id(juryLinkJson.userId)
+                                .build()
+                        ).toList())
                 .build();
     }
 
@@ -111,6 +120,14 @@ public class BoCommitteeQueryEntity {
         String projectLogoUrl;
         String projectShortDescription;
         String projectVisibility;
+    }
+
+    @Data
+    public static class JuryLinkJson {
+        UUID userId;
+        Long userGithubId;
+        String userAvatarUrl;
+        String userGithubLogin;
     }
 
 }

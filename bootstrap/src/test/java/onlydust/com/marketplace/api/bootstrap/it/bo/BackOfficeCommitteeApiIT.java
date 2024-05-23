@@ -32,15 +32,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
     private UserAuthHelper.AuthenticatedBackofficeUser pierre;
-    private UUID anthoId = UUID.fromString("747e663f-4e68-4b42-965b-b5aebedcd4c4");
-    private UUID haydenId = UUID.fromString("eaa1ddf3-fea5-4cef-825b-336f8e775e05");
-    private UUID mehdiId = UUID.fromString("705e134d-e9e3-4ea3-85e2-a59a9628ecfc");
-    private UUID cocaColax = UUID.fromString("44c6807c-48d1-4987-a0a6-ac63f958bdae");
+    private final UUID anthoId = UUID.fromString("747e663f-4e68-4b42-965b-b5aebedcd4c4");
+    private final UUID olivierId = UUID.fromString("e461c019-ba23-4671-9b6c-3a5a18748af9");
+    private final UUID pacoId = UUID.fromString("f20e6812-8de8-432b-9c31-2920434fe7d0");
+    private final UUID cocaColax = UUID.fromString("44c6807c-48d1-4987-a0a6-ac63f958bdae");
     private final UUID bretzel = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
     static UUID committeeId;
     static UUID projectQuestionId1;
     static String projectQuestion1;
-    private UUID pierreAppId = UUID.fromString("fc92397c-3431-4a84-8054-845376b630a0");
+    private final UUID pierreAppId = UUID.fromString("fc92397c-3431-4a84-8054-845376b630a0");
 
 
     @BeforeEach
@@ -167,7 +167,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                         )
                 )
                 .juryMemberIds(
-                        List.of(anthoId, haydenId)
+                        List.of(anthoId, olivierId)
                 );
 
         // When
@@ -201,6 +201,9 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
         assertEquals(updateCommitteeRequest1.getApplicationEndDate().toInstant(), committeeResponse1.getApplicationEndDate().toInstant());
         assertEquals(updateCommitteeRequest1.getStatus().name(), committeeResponse1.getStatus().name());
         assertNull(committeeResponse1.getSponsor());
+        assertEquals(2, committeeResponse1.getJuries().size());
+        assertTrue(committeeResponse1.getJuries().stream().map(UserLinkResponse::getUserId).toList().contains(olivierId));
+        assertTrue(committeeResponse1.getJuries().stream().map(UserLinkResponse::getUserId).toList().contains(anthoId));
 
 
         final UpdateCommitteeRequest updateCommitteeRequest2 = new UpdateCommitteeRequest().name(faker.rickAndMorty().location())
@@ -222,7 +225,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                         )
                 )
                 .juryMemberIds(
-                        List.of(mehdiId, haydenId)
+                        List.of(pacoId, olivierId)
                 );
 
 
@@ -263,6 +266,9 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
         assertEquals("https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg", committeeResponse2.getSponsor().getAvatarUrl());
         projectQuestionId1 = committeeResponse2.getProjectQuestions().get(0).getId();
         projectQuestion1 = committeeResponse2.getProjectQuestions().get(0).getQuestion();
+        assertTrue(committeeResponse2.getJuries().stream().map(UserLinkResponse::getUserId).toList().contains(olivierId));
+        assertTrue(committeeResponse2.getJuries().stream().map(UserLinkResponse::getUserId).toList().contains(pacoId));
+        assertEquals(2, committeeResponse2.getJuries().size());
     }
 
     @Autowired

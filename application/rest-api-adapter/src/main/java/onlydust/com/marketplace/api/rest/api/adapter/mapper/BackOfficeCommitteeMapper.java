@@ -76,6 +76,7 @@ public interface BackOfficeCommitteeMapper {
         committee.projectQuestions().addAll(updateCommitteeRequest.getProjectQuestions().stream()
                 .map(BackOfficeCommitteeMapper::getProjectQuestion)
                 .toList());
+        committee.juryIds().addAll(updateCommitteeRequest.getJuryMemberIds());
         return committee;
     }
 
@@ -121,6 +122,13 @@ public interface BackOfficeCommitteeMapper {
                                 .id(committeeView.sponsor().id())
                                 .avatarUrl(committeeView.sponsor().logoUrl())
                                 .name(committeeView.sponsor().name()))
+                .juries(isNull(committeeView.juries()) ? null : committeeView.juries().stream()
+                        .map(registeredContributorLinkView -> new UserLinkResponse()
+                                .avatarUrl(registeredContributorLinkView.getAvatarUrl())
+                                .githubUserId(registeredContributorLinkView.getGithubUserId())
+                                .login(registeredContributorLinkView.getLogin())
+                                .userId(registeredContributorLinkView.getId())
+                        ).toList())
                 // Mock
                 .juryCount(3)
                 .juryCriteria(

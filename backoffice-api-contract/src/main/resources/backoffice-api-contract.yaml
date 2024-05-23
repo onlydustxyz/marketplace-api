@@ -4326,6 +4326,10 @@ components:
           type: integer
         totalAssignments:
           type: integer
+        juries:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserLinkResponse'
         juryAssignments:
           type: array
           items:
