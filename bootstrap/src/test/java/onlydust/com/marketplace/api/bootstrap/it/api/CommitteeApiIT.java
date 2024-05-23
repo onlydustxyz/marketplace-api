@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +90,10 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                 .returnResult().getResponseBody();
 
         assertEquals(Committee.Status.OPEN_TO_APPLICATIONS.name(), committeeApplicationResponse.getStatus().name());
+        assertEquals(committee.applicationStartDate().toInstant().atZone(ZoneId.systemDefault()),
+                committeeApplicationResponse.getApplicationStartDate().toInstant().atZone(ZoneId.systemDefault()));
+        assertEquals(committee.applicationEndDate().toInstant().atZone(ZoneId.systemDefault()),
+                committeeApplicationResponse.getApplicationEndDate().toInstant().atZone(ZoneId.systemDefault()));
         assertEquals("Q1", committeeApplicationResponse.getProjectQuestions().get(0).getQuestion());
         assertEquals(false, committeeApplicationResponse.getProjectQuestions().get(0).getRequired());
         assertEquals(null, committeeApplicationResponse.getProjectQuestions().get(0).getAnswer());
@@ -149,7 +154,8 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                 postRequestedFor(urlEqualTo("/send/email"))
                         .withHeader("Content-Type", equalTo("application/json"))
                         .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
-                        .withRequestBody(matchingJsonPath("$.transactional_message_id", equalTo(customerIOProperties.getNewCommitteeApplicationEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id",
+                                equalTo(customerIOProperties.getNewCommitteeApplicationEmailId().toString())))
                         .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(pierre.user().getId().toString())))
                         .withRequestBody(matchingJsonPath("$.message_data.projectName", equalTo("Bretzel")))
                         .withRequestBody(matchingJsonPath("$.message_data.projectId", equalTo(bretzel.toString())))
