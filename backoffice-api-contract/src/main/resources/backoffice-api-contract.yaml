@@ -4326,10 +4326,10 @@ components:
           type: integer
         totalAssignments:
           type: integer
-        juryVotes:
+        juryAssignments:
           type: array
           items:
-            $ref: '#/components/schemas/JuryVoteResponse'
+            $ref: '#/components/schemas/JuryAssignmentResponse'
         applications:
           type: array
           items:
@@ -4354,17 +4354,23 @@ components:
           type: number
           format: int64
 
-    JuryVoteResponse:
+    JuryAssignmentResponse:
       type: object
       required:
         - user
+        - completedAssignments
+        - totalAssignment
       properties:
-        score:
-          type: number
+        completedAssignments:
+          type: integer
+        totalAssignment:
+          type: integer
         user:
           $ref: '#/components/schemas/UserLinkResponse'
-        projectAssigned:
-          $ref: '#/components/schemas/ProjectLinkResponse'
+        projectsAssigned:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectLinkResponse'
 
     ApplicationResponse:
       type: object
@@ -4548,6 +4554,8 @@ components:
         - project
         - projectQuestions
       properties:
+        totalScore:
+          type: number
         project:
           $ref: '#/components/schemas/ProjectLinkResponse'
         allocatedAmount:
@@ -4558,7 +4566,7 @@ components:
         juryVotes:
           type: array
           items:
-            $ref: '#/components/schemas/JuryProjectVoteResponse'
+            $ref: '#/components/schemas/JuryVoteResponse'
         projectQuestions:
           type: array
           items:
@@ -4577,7 +4585,7 @@ components:
         answer:
           type: string
 
-    JuryProjectVoteResponse:
+    JuryVoteResponse:
       type: object
       required:
         - jury
