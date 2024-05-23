@@ -91,7 +91,7 @@ public interface BackOfficeCommitteeMapper {
                 .applicationEndDate(committeeView.applicationEndDate())
                 .status(statusToResponse(committeeView.status()))
                 .projectQuestions(committeeView.projectQuestions().stream()
-                        .sorted(Comparator.comparing(projectQuestion -> projectQuestion.question()))
+                        .sorted(Comparator.comparing(ProjectQuestion::question))
                         .map(projectQuestion -> new ProjectQuestionResponse()
                                 .id(projectQuestion.id().value())
                                 .question(projectQuestion.question())
@@ -109,7 +109,8 @@ public interface BackOfficeCommitteeMapper {
                                         .id(committeeApplicationLinkView.projectShortView().id())
                                         .slug(committeeApplicationLinkView.projectShortView().slug())
                                         .name(committeeApplicationLinkView.projectShortView().name())
-                                        .logoUrl(committeeApplicationLinkView.projectShortView().logoUrl())
+                                        .logoUrl(isNull(committeeApplicationLinkView.projectShortView().logoUrl()) ? null :
+                                                committeeApplicationLinkView.projectShortView().logoUrl())
                                 )
                         ).toList())
                 .sponsor(isNull(committeeView.sponsor()) ? null :
@@ -125,7 +126,7 @@ public interface BackOfficeCommitteeMapper {
                 .id(view.projectShortView().id())
                 .slug(view.projectShortView().slug())
                 .name(view.projectShortView().name())
-                .logoUrl(view.projectShortView().logoUrl())
+                .logoUrl(isNull(view.projectShortView().logoUrl()) ? null : view.projectShortView().logoUrl())
         );
         committeeProjectApplicationResponse.setProjectQuestions(view.answers().stream()
                 .map(answer -> new ProjectAnswerResponse()

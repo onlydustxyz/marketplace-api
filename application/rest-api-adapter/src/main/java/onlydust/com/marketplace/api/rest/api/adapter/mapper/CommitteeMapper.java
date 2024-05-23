@@ -38,7 +38,7 @@ public interface CommitteeMapper {
                 .id(committeeApplicationView.projectInfosView().projectId())
                 .name(committeeApplicationView.projectInfosView().name())
                 .slug(committeeApplicationView.projectInfosView().slug())
-                .logoUrl(committeeApplicationView.projectInfosView().logoUri().toString())
+                .logoUrl(isNull(committeeApplicationView.projectInfosView().logoUri()) ? null : committeeApplicationView.projectInfosView().logoUri().toString())
                 .shortDescription(committeeApplicationView.projectInfosView().shortDescription())
                 .projectLeads(committeeApplicationView.projectInfosView().projectLeads().stream()
                         .map(projectLeaderLinkView -> new RegisteredUserResponse()
