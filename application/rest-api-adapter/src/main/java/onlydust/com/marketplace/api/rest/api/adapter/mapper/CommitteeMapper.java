@@ -24,6 +24,8 @@ public interface CommitteeMapper {
 
     static CommitteeApplicationResponse committeeApplicationViewToResponse(CommitteeApplicationView committeeApplicationView) {
         final CommitteeApplicationResponse committeeApplicationResponse = new CommitteeApplicationResponse();
+        committeeApplicationResponse.setApplicationStartDate(committeeApplicationResponse.getApplicationStartDate());
+        committeeApplicationResponse.setApplicationEndDate(committeeApplicationResponse.getApplicationEndDate());
         committeeApplicationResponse.setProjectQuestions(committeeApplicationView.answers().stream()
                 .sorted(Comparator.comparing(ProjectAnswerView::question))
                 .map(projectAnswer -> new CommitteeProjectQuestionResponse()

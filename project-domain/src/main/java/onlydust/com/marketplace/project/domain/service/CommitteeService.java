@@ -95,10 +95,12 @@ public class CommitteeService implements CommitteeFacadePort {
             if (!hasStartedApplication) {
                 projectAnswers = getCommitteeAnswersWithOnlyQuestions(committee);
             }
-            return new CommitteeApplicationView(committee.status(), projectAnswers, projectStoragePort.getProjectInfos(projectId), hasStartedApplication);
+            return new CommitteeApplicationView(committee.status(), projectAnswers, projectStoragePort.getProjectInfos(projectId), hasStartedApplication,
+                    committee.applicationStartDate(), committee.applicationEndDate());
         }
 
-        return new CommitteeApplicationView(committee.status(), getCommitteeAnswersWithOnlyQuestions(committee), null, false);
+        return new CommitteeApplicationView(committee.status(), getCommitteeAnswersWithOnlyQuestions(committee), null, false,
+                committee.applicationStartDate(), committee.applicationEndDate());
     }
 
     @Override

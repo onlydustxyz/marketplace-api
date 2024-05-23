@@ -4,6 +4,7 @@ import lombok.*;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.EventType;
 
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Data
@@ -27,4 +28,6 @@ public class NewCommitteeApplication extends Event {
     String committeeName;
     @NonNull
     UUID committeeId;
+    @NonNull
+    ZonedDateTime applicationEndDate;
 }

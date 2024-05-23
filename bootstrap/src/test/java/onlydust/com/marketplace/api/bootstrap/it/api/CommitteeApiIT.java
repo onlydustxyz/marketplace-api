@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import com.github.tomakehurst.wiremock.matching.StringValuePattern;
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.CommitteeApplicationRequest;
@@ -155,6 +156,7 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                         .withRequestBody(matchingJsonPath("$.message_data.committeeId", equalTo(committeeId.value().toString())))
                         .withRequestBody(matchingJsonPath("$.message_data.committeeName", equalTo("Mr. Needful")))
                         .withRequestBody(matchingJsonPath("$.message_data.username", equalTo("PierreOucif")))
+                        .withRequestBody(matchingJsonPath("$.message_data.applicationEndDate", containing(" UTC")))
                         .withRequestBody(matchingJsonPath("$.to", equalTo(pierre.user().getGithubEmail())))
                         .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("Your application to committee %s".formatted("Mr. Needful")))));

@@ -6989,10 +6989,18 @@ components:
     CommitteeApplicationResponse:
       type: object
       required:
+        - applicationStartDate
+        - applicationEndDate
         - projectQuestions
         - status
         - hasStartedApplication
       properties:
+        applicationStartDate:
+          type: string
+          format: 'date-time'
+        applicationEndDate:
+          type: string
+          format: 'date-time'
         projectQuestions:
           type: array
           items:
