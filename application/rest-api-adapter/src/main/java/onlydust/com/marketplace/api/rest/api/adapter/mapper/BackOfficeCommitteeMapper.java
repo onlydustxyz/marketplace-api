@@ -40,6 +40,7 @@ public interface BackOfficeCommitteeMapper {
                     .applicationStartDate(committeeLinkView.startDate())
                     .applicationEndDate(committeeLinkView.endDate())
                     .status(statusToResponse(committeeLinkView.status()))
+                    .projectCount(committeeLinkView.projectCount())
             );
         }
         return committeePageResponse;
