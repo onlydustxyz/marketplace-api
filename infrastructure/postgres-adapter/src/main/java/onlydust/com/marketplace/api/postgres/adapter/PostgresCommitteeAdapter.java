@@ -10,16 +10,14 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoCommitteeQueryRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.project.domain.model.Committee;
-import onlydust.com.marketplace.project.domain.model.JuryCriteria;
-import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
-import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
+import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.view.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,6 +35,7 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     private final CommitteeJuryRepository committeeJuryRepository;
     private final CommitteeJuryCriteriaRepository committeeJuryCriteriaRepository;
     private final CommitteeLinkViewRepository committeeLinkViewRepository;
+    private final CommitteeJuryVoteRepository committeeJuryVoteRepository;
 
     @Override
     @Transactional
@@ -146,5 +145,20 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     public void saveJuryCriteria(Committee.Id committeeId, List<JuryCriteria> juryCriteria) {
         committeeJuryCriteriaRepository.saveAll(juryCriteria.stream().map(jc -> new CommitteeJuryCriteriaEntity(jc.id().value(), jc.criteria(),
                 committeeId.value())).collect(Collectors.toSet()));
+    }
+
+    @Override
+    @Transactional
+    public void saveJuryAssignments(List<JuryAssignment> juryAssignments) {
+        committeeJuryVoteRepository.saveAll(juryAssignments.stream()
+                .map(juryAssignment -> juryAssignment.getVotes().stream().map(juryVote -> CommitteeJuryVoteEntity.builder()
+                        .score(juryVote.getScore())
+                        .criteriaId(juryVote.getCriteriaId().value())
+                        .committeeId(juryAssignment.getCommitteeId().value())
+                        .projectId(juryAssignment.getProjectId())
+                        .build()
+                ).collect(Collectors.toSet()))
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet()));
     }
 }

@@ -38,6 +38,7 @@ public class CommitteeEntity {
     @Column(insertable = false, updatable = false)
     Date techCreatedAt;
     UUID sponsorId;
+    Integer votePerJury;
 
     public static CommitteeEntity fromDomain(final Committee committee) {
         return CommitteeEntity.builder()
@@ -47,6 +48,7 @@ public class CommitteeEntity {
                 .applicationStartDate(Date.from(committee.applicationStartDate().toInstant()))
                 .status(CommitteeStatusEntity.fromDomain(committee.status()))
                 .sponsorId(committee.sponsorId())
+                .votePerJury(committee.votePerJury())
                 .build();
     }
 
@@ -57,6 +59,7 @@ public class CommitteeEntity {
                 .applicationStartDate(ZonedDateTime.ofInstant(applicationStartDate.toInstant(), ZoneOffset.UTC))
                 .applicationEndDate(ZonedDateTime.ofInstant(applicationEndDate.toInstant(), ZoneOffset.UTC))
                 .status(this.status.toDomain())
+                .votePerJury(this.votePerJury)
                 .build();
     }
 

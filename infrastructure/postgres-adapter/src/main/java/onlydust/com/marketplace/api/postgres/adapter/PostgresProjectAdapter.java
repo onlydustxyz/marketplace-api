@@ -532,4 +532,14 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     public ProjectInfosView getProjectInfos(UUID projectId) {
         return projectInfosViewRepository.findByProjectId(projectId).toView();
     }
+
+    @Override
+    public List<UUID> getProjectLedIdsForUser(UUID userId) {
+        return projectRepository.getProjectLedIdsForUser(userId);
+    }
+
+    @Override
+    public List<UUID> getProjectContributedOnIdsForUser(UUID userId) {
+        return projectRepository.getProjectContributedOnIdsForUser(userId);
+    }
 }

@@ -1,11 +1,13 @@
 package onlydust.com.marketplace.project.domain.model;
 
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.List;
 import java.util.UUID;
 
+@Getter
 public class JuryAssignment {
     @NonNull
     UUID projectId;
@@ -24,6 +26,7 @@ public class JuryAssignment {
     }
 
     @Builder
+    @Getter
     public static class JuryVote {
         @NonNull
         JuryCriteria.Id criteriaId;

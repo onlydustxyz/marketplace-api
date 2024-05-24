@@ -18,6 +18,7 @@ public interface BoCommitteeQueryRepository extends JpaRepository<BoCommitteeQue
                    c.status,
                    c.application_start_date,
                    c.application_end_date,
+                   c.vote_per_jury,
                    (select jsonb_agg(
                                    jsonb_build_object('id', cpq.id, 'question', cpq.question, 'required', cpq.required)
                            )

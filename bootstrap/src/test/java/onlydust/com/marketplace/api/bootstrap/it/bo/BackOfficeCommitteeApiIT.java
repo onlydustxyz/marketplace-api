@@ -156,6 +156,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .status(CommitteeStatus.DRAFT)
                 .maximumAllocationAmount(BigDecimal.valueOf(111.212))
                 .minimumAllocationAmount(BigDecimal.valueOf(95.47))
+                .votePerJury(3)
                 .projectQuestions(
                         List.of(projectQuestionRequest1,
                                 projectQuestionRequest2)
@@ -218,6 +219,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .applicationEndDate(faker.date().future(10, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()))
                 .allocationCurrencyId(CurrencyHelper.STRK.value())
                 .status(CommitteeStatus.DRAFT)
+                .votePerJury(5)
                 .maximumAllocationAmount(BigDecimal.valueOf(222.33))
                 .minimumAllocationAmount(BigDecimal.valueOf(47.95))
                 .sponsorId(cocaColax)
@@ -386,4 +388,26 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .jsonPath("$.projectQuestions.size()").isEqualTo(1);
     }
 
+    @Test
+    @Order(6)
+    void should_assign_juries_to_projects() {
+        // Given
+
+        // When
+        client.patch()
+                .uri(getApiURI(COMMITTEES_STATUS.formatted(committeeId)))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                            {
+                              "status": "OPEN_TO_VOTES"
+                            }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(204);
+
+        // Then
+    }
 }

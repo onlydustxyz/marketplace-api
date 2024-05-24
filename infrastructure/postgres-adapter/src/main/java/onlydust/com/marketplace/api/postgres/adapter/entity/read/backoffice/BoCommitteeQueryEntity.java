@@ -59,6 +59,7 @@ public class BoCommitteeQueryEntity {
     Set<JuryLinkJson> juries;
     @JdbcTypeCode(SqlTypes.JSON)
     Set<JuryCriteriaJson> juryCriteria;
+    Integer votePerJury;
 
     public CommitteeView toView() {
         return CommitteeView.builder()
@@ -100,6 +101,7 @@ public class BoCommitteeQueryEntity {
                         ).toList())
                 .juryCriteria(isNull(this.juryCriteria) ? null : this.juryCriteria.stream()
                         .map(juryCriteriaJson -> new JuryCriteria(JuryCriteria.Id.of(juryCriteriaJson.id), juryCriteriaJson.criteria)).toList())
+                .votePerJury(this.votePerJury)
                 .build();
     }
 

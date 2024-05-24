@@ -18,6 +18,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @AllArgsConstructor
@@ -79,6 +80,9 @@ public class CommitteeService implements CommitteeFacadePort {
                 .map(committeeApplicationLinkView -> committeeApplicationLinkView.projectShortView().id()).collect(Collectors.toList());
         final Set<UUID> juryIds = committee.juries().stream().map(RegisteredContributorLinkView::getId).collect(Collectors.toSet());
 
+        if (isNull(committee.votePerJury())) {
+            throw OnlyDustException.forbidden("Number of vote per jury must filled to assign juries to projects");
+        }
         if (juryIds.isEmpty() || juryIds.size() * committee.votePerJury() < projectIds.size()) {
             throw OnlyDustException.forbidden("Not enough juries or vote per jury to cover all projects");
         }
@@ -95,13 +99,16 @@ public class CommitteeService implements CommitteeFacadePort {
 
         final int maxVoteNumber = Math.round((float) (juryIds.size() * committee.votePerJury()) / projectIds.size());
 
-        for (UUID projectId : projectIds) {
-            if (projectVoteCount.getOrDefault(projectId, 0) < maxVoteNumber) {
-                for (JuryAssignmentBuilder juryAssignmentBuilder : juryAssignmentBuilders) {
-                    if (juryAssignmentBuilder.canAssignProject(projectId)) {
-                        juryAssignmentBuilder.assignProject(projectId);
-                        projectVoteCount.put(projectId, projectVoteCount.getOrDefault(projectId, 0) + 1);
-                        break;
+        for (int i = 0; i < committee.votePerJury(); i++) {
+            Collections.shuffle(projectIds);
+            for (UUID projectId : projectIds) {
+                if (projectVoteCount.getOrDefault(projectId, 0) <= maxVoteNumber) {
+                    for (JuryAssignmentBuilder juryAssignmentBuilder : juryAssignmentBuilders) {
+                        if (juryAssignmentBuilder.canAssignProject(projectId)) {
+                            juryAssignmentBuilder.assignProject(projectId);
+                            projectVoteCount.put(projectId, projectVoteCount.getOrDefault(projectId, 0) + 1);
+                            break;
+                        }
                     }
                 }
             }
