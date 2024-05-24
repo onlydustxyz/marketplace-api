@@ -1,10 +1,14 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.write;
+package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.CommitteeStatusEntity;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
@@ -13,14 +17,14 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.UUID;
 
+@Immutable
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
-@Builder
 @Table(name = "committees", schema = "public")
-public class CommitteeEntity {
+public class CommitteeLinkViewEntity {
+
     @Id
     @EqualsAndHashCode.Include
     UUID id;
@@ -37,27 +41,17 @@ public class CommitteeEntity {
     CommitteeStatusEntity status;
     @Column(insertable = false, updatable = false)
     Date techCreatedAt;
-    UUID sponsorId;
+    Integer projectCount;
 
-    public static CommitteeEntity fromDomain(final Committee committee) {
-        return CommitteeEntity.builder()
-                .id(committee.id().value())
-                .name(committee.name())
-                .applicationEndDate(Date.from(committee.applicationEndDate().toInstant()))
-                .applicationStartDate(Date.from(committee.applicationStartDate().toInstant()))
-                .status(CommitteeStatusEntity.fromDomain(committee.status()))
-                .sponsorId(committee.sponsorId())
-                .build();
-    }
 
-    public Committee toDomain() {
-        return Committee.builder()
+    public CommitteeLinkView toLink() {
+        return CommitteeLinkView.builder()
                 .id(Committee.Id.of(this.id))
                 .name(this.name)
-                .applicationStartDate(ZonedDateTime.ofInstant(applicationStartDate.toInstant(), ZoneOffset.UTC))
-                .applicationEndDate(ZonedDateTime.ofInstant(applicationEndDate.toInstant(), ZoneOffset.UTC))
+                .startDate(ZonedDateTime.ofInstant(applicationStartDate.toInstant(), ZoneOffset.UTC))
+                .endDate(ZonedDateTime.ofInstant(applicationEndDate.toInstant(), ZoneOffset.UTC))
                 .status(this.status.toDomain())
+                .projectCount(this.projectCount)
                 .build();
     }
-
 }

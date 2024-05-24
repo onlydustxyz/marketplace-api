@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.CommitteeStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeLinkViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectInfosQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoCommitteeQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeEntity;
@@ -18,7 +19,6 @@ import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.view.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -34,6 +34,7 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     private final CommitteeProjectQuestionRepository committeeProjectQuestionRepository;
     private final CommitteeProjectAnswerViewRepository committeeProjectAnswerViewRepository;
     private final ProjectInfosViewRepository projectInfosViewRepository;
+    private final CommitteeLinkViewRepository committeeLinkViewRepository;
 
     @Override
     @Transactional
@@ -57,9 +58,9 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     @Override
     @Transactional(readOnly = true)
     public Page<CommitteeLinkView> findAll(Integer pageIndex, Integer pageSize) {
-        final var committees = committeeRepository.findAll(PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "techCreatedAt")));
+        final var committees = committeeLinkViewRepository.findAllBy(PageRequest.of(pageIndex, pageSize));
         return Page.<CommitteeLinkView>builder()
-                .content(committees.getContent().stream().map(CommitteeEntity::toLink).toList())
+                .content(committees.getContent().stream().map(CommitteeLinkViewEntity::toLink).toList())
                 .totalPageNumber(committees.getTotalPages())
                 .totalItemNumber((int) committees.getTotalElements())
                 .build();
