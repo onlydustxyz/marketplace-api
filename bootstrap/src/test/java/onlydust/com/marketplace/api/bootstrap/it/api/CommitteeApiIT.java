@@ -10,10 +10,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadR
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -318,6 +315,4 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                         }
                         """);
     }
-
-
 }

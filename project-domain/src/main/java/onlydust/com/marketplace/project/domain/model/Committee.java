@@ -34,6 +34,7 @@ public class Committee {
     UUID sponsorId;
     @NonNull
     List<JuryCriteria> juryCriteria = new ArrayList<>();
+    Integer votePerJury;
 
     public Committee(@NonNull String name, @NonNull ZonedDateTime applicationStartDate, @NonNull ZonedDateTime applicationEndDate) {
         this.name = name;
@@ -42,6 +43,7 @@ public class Committee {
         this.id = Id.random();
         this.status = Status.DRAFT;
         this.sponsorId = null;
+        this.votePerJury = null;
     }
 
     @NoArgsConstructor(staticName = "random")

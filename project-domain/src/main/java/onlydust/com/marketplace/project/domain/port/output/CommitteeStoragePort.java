@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.port.output;
 
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.model.JuryAssignment;
 import onlydust.com.marketplace.project.domain.model.JuryCriteria;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.view.CommitteeApplicationDetailsView;
@@ -41,4 +42,6 @@ public interface CommitteeStoragePort {
     void deleteAllJuryCriteria(Committee.Id committeeId);
 
     void saveJuryCriteria(Committee.Id committeeId, List<JuryCriteria> juryCriteria);
+
+    void saveJuryAssignments(List<JuryAssignment> juryAssignments);
 }

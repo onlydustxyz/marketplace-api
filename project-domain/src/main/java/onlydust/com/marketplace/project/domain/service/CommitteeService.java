@@ -5,6 +5,7 @@ import lombok.NonNull;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.model.JuryAssignmentBuilder;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
@@ -14,9 +15,8 @@ import onlydust.com.marketplace.project.domain.view.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 
@@ -65,8 +65,63 @@ public class CommitteeService implements CommitteeFacadePort {
     }
 
     @Override
+    @Transactional
     public void updateStatus(Committee.Id committeeId, Committee.Status status) {
         committeeStoragePort.updateStatus(committeeId, status);
+        if (status == Committee.Status.OPEN_TO_VOTES) {
+            assignProjectsToJuries(committeeId);
+        }
+    }
+
+    private void assignProjectsToJuries(Committee.Id committeeId) {
+        final CommitteeView committee = getCommitteeById(committeeId);
+        List<UUID> projectIds = committee.committeeApplicationLinks().stream()
+                .map(committeeApplicationLinkView -> committeeApplicationLinkView.projectShortView().id()).collect(Collectors.toList());
+        final Set<UUID> juryIds = committee.juries().stream().map(RegisteredContributorLinkView::getId).collect(Collectors.toSet());
+
+        if (juryIds.isEmpty() || juryIds.size() * committee.votePerJury() < projectIds.size()) {
+            throw OnlyDustException.forbidden("Not enough juries or vote per jury to cover all projects");
+        }
+        if (committee.juryCriteria().isEmpty()) {
+            throw OnlyDustException.forbidden("Cannot assign juries to project given empty jury criteria");
+        }
+
+        final Map<UUID, Integer> projectVoteCount = new HashMap<>();
+
+        final Set<JuryAssignmentBuilder> juryAssignmentBuilders = juryIds.stream().map(juryId -> new JuryAssignmentBuilder(committeeId, juryId,
+                        committee.votePerJury(), projectStoragePort.getProjectLedIdsForUser(juryId),
+                        projectStoragePort.getProjectContributedOnIdsForUser(juryId)))
+                .collect(Collectors.toSet());
+
+        final int maxVoteNumber = Math.round((float) (juryIds.size() * committee.votePerJury()) / projectIds.size());
+
+        for (UUID projectId : projectIds) {
+            if (projectVoteCount.getOrDefault(projectId, 0) < maxVoteNumber) {
+                for (JuryAssignmentBuilder juryAssignmentBuilder : juryAssignmentBuilders) {
+                    if (juryAssignmentBuilder.canAssignProject(projectId)) {
+                        juryAssignmentBuilder.assignProject(projectId);
+                        projectVoteCount.put(projectId, projectVoteCount.getOrDefault(projectId, 0) + 1);
+                        break;
+                    }
+                }
+            }
+        }
+
+        final Set<UUID> assignedProjectIds = juryAssignmentBuilders.stream()
+                .map(JuryAssignmentBuilder::getAssignedOnProjectIds)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
+
+        if (!assignedProjectIds.containsAll(projectIds)) {
+            throw OnlyDustException.internalServerError("Not enough juries or vote per jury to cover all projects given some" +
+                                                        " juries are project lead or contributor on application project");
+        }
+
+        committeeStoragePort.saveJuryAssignments(
+                juryAssignmentBuilders.stream()
+                        .map(juryAssignmentBuilder -> juryAssignmentBuilder.buildForCriteria(committee.juryCriteria()))
+                        .flatMap(Collection::stream)
+                        .toList());
     }
 
     @Override

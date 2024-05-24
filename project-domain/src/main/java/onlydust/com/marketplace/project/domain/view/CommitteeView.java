@@ -14,5 +14,5 @@ public record CommitteeView(@NonNull Committee.Id id, @NonNull String name, @Non
                             @NonNull ZonedDateTime applicationEndDate,
                             @NonNull Committee.Status status, ShortSponsorView sponsor, List<ProjectQuestion> projectQuestions,
                             List<CommitteeApplicationLinkView> committeeApplicationLinks, List<RegisteredContributorLinkView> juries,
-                            List<JuryCriteria> juryCriteria) {
+                            List<JuryCriteria> juryCriteria, Integer votePerJury) {
 }
