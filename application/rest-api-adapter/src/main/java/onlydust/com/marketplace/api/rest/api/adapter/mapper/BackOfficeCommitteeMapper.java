@@ -12,7 +12,6 @@ import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
 import onlydust.com.marketplace.project.domain.view.commitee.ProjectJuryVoteView;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -104,7 +103,6 @@ public interface BackOfficeCommitteeMapper {
                 .applicationEndDate(committeeView.applicationEndDate())
                 .status(statusToResponse(committeeView.status()))
                 .projectQuestions(committeeView.projectQuestions().stream()
-                        .sorted(Comparator.comparing(ProjectQuestion::question))
                         .map(projectQuestion -> new ProjectQuestionResponse()
                                 .id(projectQuestion.id().value())
                                 .question(projectQuestion.question())
