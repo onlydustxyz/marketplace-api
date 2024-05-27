@@ -60,7 +60,16 @@ public class CommitteeService implements CommitteeFacadePort {
         if (existingCommittee.areJuriesFixed() && !committee.juryIds().equals(existingCommittee.juryIds()))
             throw forbidden("Juries cannot be updated");
 
-        committeeStoragePort.save(committee);
+        committeeStoragePort.save(existingCommittee.toBuilder()
+                .name(committee.name())
+                .applicationStartDate(committee.applicationStartDate())
+                .applicationEndDate(committee.applicationEndDate())
+                .sponsorId(committee.sponsorId())
+                .votePerJury(committee.votePerJury())
+                .juryIds(committee.juryIds())
+                .juryCriteria(committee.juryCriteria())
+                .projectQuestions(committee.projectQuestions())
+                .build());
     }
 
     @Override
