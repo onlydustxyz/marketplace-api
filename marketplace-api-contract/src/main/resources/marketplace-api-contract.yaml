@@ -670,7 +670,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Me
+        - ReadCommittees
       summary: Get my committee assignments
       operationId: getCommitteeAssignments
       description: |

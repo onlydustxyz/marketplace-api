@@ -1,12 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeJuryVoteEntity;
 import onlydust.com.marketplace.project.domain.view.RegisteredContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.commitee.ProjectJuryVoteView;
 import onlydust.com.marketplace.project.domain.view.commitee.VoteView;
@@ -53,6 +49,10 @@ public class CommitteeJuryVoteViewEntity {
     Integer score;
     @NonNull
     String criteria;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "projectId", referencedColumnName = "id", insertable = false, updatable = false)
+    ProjectLinkViewEntity project;
 
     @EqualsAndHashCode
     @AllArgsConstructor
