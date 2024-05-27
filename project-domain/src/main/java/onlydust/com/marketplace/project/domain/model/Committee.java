@@ -21,7 +21,8 @@ public class Committee {
     @NonNull ZonedDateTime applicationStartDate;
     @NonNull ZonedDateTime applicationEndDate;
     @NonNull Status status;
-    @NonNull List<ProjectQuestion> projectQuestions;
+    @Builder.Default
+    @NonNull List<ProjectQuestion> projectQuestions = new ArrayList<>();
     @NonNull
     List<UUID> juryIds = new ArrayList<>();
     UUID sponsorId;
@@ -29,14 +30,14 @@ public class Committee {
     List<JuryCriteria> juryCriteria = new ArrayList<>();
     Integer votePerJury;
 
-    public Committee(@NonNull String name, @NonNull ZonedDateTime applicationStartDate, @NonNull ZonedDateTime applicationEndDate) {
-        this.name = name;
-        this.applicationStartDate = applicationStartDate;
-        this.applicationEndDate = applicationEndDate;
-        this.id = Id.random();
-        this.status = Status.DRAFT;
-        this.sponsorId = null;
-        this.votePerJury = null;
+    public static Committee create(@NonNull String name, @NonNull ZonedDateTime applicationStartDate, @NonNull ZonedDateTime applicationEndDate) {
+        return Committee.builder()
+                .id(Id.random())
+                .status(Status.DRAFT)
+                .name(name)
+                .applicationStartDate(applicationStartDate)
+                .applicationEndDate(applicationEndDate)
+                .build();
     }
 
     @NoArgsConstructor(staticName = "random")

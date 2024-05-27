@@ -35,7 +35,7 @@ public class CommitteeService implements CommitteeFacadePort {
 
     @Override
     public Committee createCommittee(@NonNull String name, @NonNull ZonedDateTime startDate, @NonNull ZonedDateTime endDate) {
-        return committeeStoragePort.save(new Committee(name, startDate, endDate));
+        return committeeStoragePort.save(Committee.create(name, startDate, endDate));
     }
 
     @Override

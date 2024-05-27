@@ -9,8 +9,9 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
+
+import static java.util.stream.Collectors.toList;
 
 @Entity
 @AllArgsConstructor
@@ -36,8 +37,11 @@ public class CommitteeEntity {
     UUID sponsorId;
     Integer votePerJury;
 
+    @OneToMany(mappedBy = "committee", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<CommitteeProjectQuestionEntity> projectQuestions;
+
     public static CommitteeEntity fromDomain(final Committee committee) {
-        return CommitteeEntity.builder()
+        final var entity = CommitteeEntity.builder()
                 .id(committee.id().value())
                 .name(committee.name())
                 .applicationEndDate(Date.from(committee.applicationEndDate().toInstant()))
@@ -45,7 +49,13 @@ public class CommitteeEntity {
                 .status(committee.status())
                 .sponsorId(committee.sponsorId())
                 .votePerJury(committee.votePerJury())
+                .projectQuestions(new HashSet<>())
                 .build();
+
+        committee.projectQuestions()
+                .forEach(projectQuestion -> entity.projectQuestions.add(CommitteeProjectQuestionEntity.fromDomain(entity, projectQuestion)));
+
+        return entity;
     }
 
     public Committee toDomain() {
@@ -56,16 +66,6 @@ public class CommitteeEntity {
                 .applicationEndDate(ZonedDateTime.ofInstant(applicationEndDate.toInstant(), ZoneOffset.UTC))
                 .status(status)
                 .votePerJury(this.votePerJury)
-                .build();
-    }
-
-    public CommitteeLinkView toLink() {
-        return CommitteeLinkView.builder()
-                .id(Committee.Id.of(id))
-                .name(name)
-                .startDate(ZonedDateTime.ofInstant(applicationStartDate.toInstant(), ZoneOffset.UTC))
-                .endDate(ZonedDateTime.ofInstant(applicationEndDate.toInstant(), ZoneOffset.UTC))
-                .status(status)
                 .build();
     }
 

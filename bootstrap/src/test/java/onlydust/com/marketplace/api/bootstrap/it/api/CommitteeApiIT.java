@@ -48,12 +48,7 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
         final ProjectQuestion q2 = new ProjectQuestion("Q2", true);
         projectQuestionId1 = q1.id();
         projectQuestionId2 = q2.id();
-        committee.projectQuestions().addAll(
-                List.of(
-                        q1,
-                        q2
-                )
-        );
+        committee.projectQuestions().addAll(List.of(q1, q2));
         committeeFacadePort.update(committee);
 
         // Cannot get committee with status DRAFT

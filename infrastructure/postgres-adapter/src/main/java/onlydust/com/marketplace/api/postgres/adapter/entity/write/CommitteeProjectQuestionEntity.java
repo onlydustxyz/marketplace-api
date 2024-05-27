@@ -1,10 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
-import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 
 import java.util.UUID;
@@ -22,14 +19,25 @@ public class CommitteeProjectQuestionEntity {
     @NonNull UUID id;
     @NonNull String question;
     @NonNull Boolean required;
-    @NonNull UUID committeeId;
 
-    public static CommitteeProjectQuestionEntity fromDomain(final Committee.Id committeeId, final ProjectQuestion projectQuestion) {
+    @ManyToOne
+    @JoinColumn(name = "committeeId")
+    @NonNull CommitteeEntity committee;
+
+    public static CommitteeProjectQuestionEntity fromDomain(final CommitteeEntity committee, final ProjectQuestion projectQuestion) {
         return CommitteeProjectQuestionEntity.builder()
+                .committee(committee)
                 .id(projectQuestion.id().value())
-                .committeeId(committeeId.value())
                 .question(projectQuestion.question())
                 .required(projectQuestion.required())
+                .build();
+    }
+
+    public ProjectQuestion toDomain() {
+        return ProjectQuestion.builder()
+                .id(ProjectQuestion.Id.of(id))
+                .question(question)
+                .required(required)
                 .build();
     }
 }
