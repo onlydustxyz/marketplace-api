@@ -120,7 +120,8 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
             return Optional.of(
                     new CommitteeApplicationDetailsView(
                             projectAnswerViews, new ProjectShortView(projectInfos.getId(), projectInfos.getSlug(), projectInfos.getName(),
-                            projectInfos.getLogoUrl(), projectInfos.getShortDescription(), ProjectVisibility.valueOf(projectInfos.getVisibility())), true
+                            projectInfos.getLogoUrl(), projectInfos.getShortDescription(), ProjectVisibility.valueOf(projectInfos.getVisibility())), true,
+                            List.of()
                     )
             );
         }

@@ -1,10 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
-
-import jakarta.persistence.*;
 
 import java.time.Instant;
 import java.util.HashSet;
@@ -24,7 +23,7 @@ public class SponsorAccountEntity {
     @NonNull
     UUID id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @NonNull
     CurrencyEntity currency;
 
@@ -32,12 +31,11 @@ public class SponsorAccountEntity {
 
     Instant lockedUntil;
 
-    @OneToMany(mappedBy = "accountId", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "accountId", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     Set<SponsorAccountTransactionsEntity> transactions = new HashSet<>();
 
-
-    @OneToMany(mappedBy = "accountId", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "accountId", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     Set<SponsorAccountAllowanceTransactionsEntity> allowanceTransactions = new HashSet<>();
 

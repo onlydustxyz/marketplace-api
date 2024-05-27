@@ -308,4 +308,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelogs/00000240_add_project_mail_outbox_events_table.sql
   - include:
-      file: db/changelog/changelogs/00000241_add_committee_voting_tables.sql
+      file: db/changelog/changelogs/00000241_pennylane_migration_recovery.sql
+  - include:
+      file: db/changelog/changelogs/00000242_add_committee_voting_tables.sql

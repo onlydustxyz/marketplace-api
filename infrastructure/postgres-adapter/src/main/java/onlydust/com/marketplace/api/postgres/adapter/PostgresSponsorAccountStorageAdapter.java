@@ -13,6 +13,7 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -28,6 +29,7 @@ public class PostgresSponsorAccountStorageAdapter implements SponsorAccountStora
     private final SponsorAccountTransactionViewRepository sponsorAccountTransactionViewRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<SponsorAccount> get(SponsorAccount.Id id) {
         return sponsorAccountRepository.findById(id.value()).map(SponsorAccountEntity::toDomain);
     }
@@ -38,6 +40,7 @@ public class PostgresSponsorAccountStorageAdapter implements SponsorAccountStora
     }
 
     @Override
+    @Transactional
     public void delete(SponsorAccount.Id sponsorAccountId, SponsorAccount.Transaction.Id transactionId) {
         final var sponsorAccount = sponsorAccountRepository.findById(sponsorAccountId.value())
                 .orElseThrow(() -> OnlyDustException.notFound("Sponsor account %s not found".formatted(sponsorAccountId)));
@@ -47,6 +50,7 @@ public class PostgresSponsorAccountStorageAdapter implements SponsorAccountStora
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<SponsorAccount> getSponsorAccounts(SponsorId sponsorId) {
         return sponsorAccountRepository.findAllBySponsorId(sponsorId.value()).stream()
                 .map(SponsorAccountEntity::toDomain)
