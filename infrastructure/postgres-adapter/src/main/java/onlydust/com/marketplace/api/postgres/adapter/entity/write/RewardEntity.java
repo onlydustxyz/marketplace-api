@@ -39,6 +39,9 @@ public class RewardEntity {
     @OneToMany(mappedBy = "rewardId", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @NonNull
     List<RewardItemEntity> rewardItems;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "currencyId", insertable = false, updatable = false)
+    CurrencyEntity currency;
 
     @Column(name = "billingProfileId", insertable = false, updatable = false)
     UUID billingProfileId;

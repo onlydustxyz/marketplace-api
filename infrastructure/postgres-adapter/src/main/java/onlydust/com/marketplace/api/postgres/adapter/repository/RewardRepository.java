@@ -68,4 +68,14 @@ public interface RewardRepository extends JpaRepository<RewardEntity, UUID> {
             where rr.id = s.reward_id
             """)
     void updateBillingProfileFromRecipientPayoutPreferences(UUID rewardId);
+
+    @Query(value = """
+            select r
+            from RewardEntity r
+            join fetch r.status
+            join fetch r.currency
+            join fetch r.receipts
+            where r.status.status = 'COMPLETE'
+            """)
+    List<RewardEntity> findAllComplete();
 }
