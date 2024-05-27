@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
@@ -20,14 +17,16 @@ import java.util.UUID;
 public class CommitteeJuryEntity {
 
     @Id
-    @NonNull
     @EqualsAndHashCode.Include
-    UUID committeeId;
-    @Id
-    @NonNull
-    @EqualsAndHashCode.Include
-    UUID userId;
+    @NonNull UUID committeeId;
 
+    @Id
+    @EqualsAndHashCode.Include
+    @NonNull UUID userId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "committeeId", insertable = false, updatable = false)
+    private CommitteeEntity committee;
 
     @EqualsAndHashCode
     @AllArgsConstructor
@@ -36,5 +35,13 @@ public class CommitteeJuryEntity {
     public static class PrimaryKey implements Serializable {
         UUID committeeId;
         UUID userId;
+    }
+
+    public static CommitteeJuryEntity fromDomain(final CommitteeEntity committee, final UUID userId) {
+        return CommitteeJuryEntity.builder()
+                .committeeId(committee.id)
+                .userId(userId)
+                .committee(committee)
+                .build();
     }
 }

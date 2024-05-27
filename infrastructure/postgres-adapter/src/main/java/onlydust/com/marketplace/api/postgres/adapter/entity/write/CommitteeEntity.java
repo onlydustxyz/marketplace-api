@@ -43,6 +43,12 @@ public class CommitteeEntity {
     @OneToMany(mappedBy = "committee", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     Set<CommitteeProjectAnswerEntity> projectAnswers;
 
+    @OneToMany(mappedBy = "committee", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<CommitteeJuryEntity> juries;
+
+    @OneToMany(mappedBy = "committee", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<CommitteeJuryCriteriaEntity> juryCriterias;
+
     public static CommitteeEntity fromDomain(final Committee committee) {
         final var entity = CommitteeEntity.builder()
                 .id(committee.id().value())
@@ -54,6 +60,8 @@ public class CommitteeEntity {
                 .votePerJury(committee.votePerJury())
                 .projectQuestions(new HashSet<>())
                 .projectAnswers(new HashSet<>())
+                .juries(new HashSet<>())
+                .juryCriterias(new HashSet<>())
                 .build();
 
         committee.projectQuestions()
@@ -61,6 +69,12 @@ public class CommitteeEntity {
 
         committee.projectApplications()
                 .forEach((projectId, application) -> entity.projectAnswers.addAll(CommitteeProjectAnswerEntity.fromDomain(entity, application)));
+
+        committee.juryIds()
+                .forEach(jury -> entity.juries.add(CommitteeJuryEntity.fromDomain(entity, jury)));
+
+        committee.juryCriteria()
+                .forEach(juryCriterion -> entity.juryCriterias.add(CommitteeJuryCriteriaEntity.fromDomain(entity, juryCriterion)));
 
         return entity;
     }
@@ -81,6 +95,12 @@ public class CommitteeEntity {
                         .collect(groupingBy(CommitteeProjectAnswerEntity::getProjectId,
                                 mapping(CommitteeProjectAnswerEntity::toApplication,
                                         reducing(null, this::merge)))))
+                .juryIds(Optional.ofNullable(juries).orElse(Set.of()).stream()
+                        .map(CommitteeJuryEntity::getUserId)
+                        .collect(toList()))
+                .juryCriteria(Optional.ofNullable(juryCriterias).orElse(Set.of()).stream()
+                        .map(CommitteeJuryCriteriaEntity::toDomain)
+                        .collect(toList()))
                 .build();
     }
 

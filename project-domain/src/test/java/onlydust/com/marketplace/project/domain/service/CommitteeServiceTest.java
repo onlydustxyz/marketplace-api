@@ -552,6 +552,63 @@ public class CommitteeServiceTest {
         verify(committeeStoragePort, never()).save(committee);
     }
 
+
+    @ParameterizedTest
+    @EnumSource(value = Committee.Status.class, names = {"DRAFT", "OPEN_TO_APPLICATIONS"}, mode = EnumSource.Mode.EXCLUDE)
+    void should_prevent_jury_update_if_not_draft_or_open_to_application(Committee.Status status) {
+        // Given
+        final var existingCommittee = Committee.builder()
+                .id(Committee.Id.random())
+                .name(faker.rickAndMorty().location())
+                .status(status)
+                .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .juryIds(List.of(UUID.randomUUID(), UUID.randomUUID()))
+                .build();
+
+        final var committee = existingCommittee.toBuilder()
+                .juryIds(List.of(UUID.randomUUID(), UUID.randomUUID()))
+                .build();
+
+        when(committeeStoragePort.findById(existingCommittee.id())).thenReturn(Optional.of(existingCommittee));
+
+        // When
+        assertThatThrownBy(() -> committeeService.update(committee))
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Juries can only be updated for draft or open to applications committees");
+
+        // Then
+        verify(committeeStoragePort, never()).save(committee);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = Committee.Status.class, names = {"DRAFT", "OPEN_TO_APPLICATIONS"}, mode = EnumSource.Mode.EXCLUDE)
+    void should_prevent_jury_criteria_update_if_not_draft_or_open_to_application(Committee.Status status) {
+        // Given
+        final var existingCommittee = Committee.builder()
+                .id(Committee.Id.random())
+                .name(faker.rickAndMorty().location())
+                .status(status)
+                .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .juryCriteria(List.of(new JuryCriteria(JuryCriteria.Id.random(), faker.pokemon().name())))
+                .build();
+
+        final var committee = existingCommittee.toBuilder()
+                .juryCriteria(List.of(new JuryCriteria(JuryCriteria.Id.random(), faker.pokemon().name())))
+                .build();
+
+        when(committeeStoragePort.findById(existingCommittee.id())).thenReturn(Optional.of(existingCommittee));
+
+        // When
+        assertThatThrownBy(() -> committeeService.update(committee))
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Jury criteria can only be updated for draft or open to applications committees");
+
+        // Then
+        verify(committeeStoragePort, never()).save(committee);
+    }
+
     @Nested
     public class ShouldAssignProjectsToJuries {
 

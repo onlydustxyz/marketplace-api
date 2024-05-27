@@ -54,18 +54,14 @@ public class CommitteeService implements CommitteeFacadePort {
         if (existingCommittee.status() != Committee.Status.DRAFT && !committee.projectQuestions().equals(existingCommittee.projectQuestions()))
             throw forbidden("Project questions can only be updated for draft committees");
 
-        committeeStoragePort.save(committee);
-
-        if (List.of(Committee.Status.DRAFT, Committee.Status.OPEN_TO_APPLICATIONS).contains(committee.status())) {
-            committeeStoragePort.deleteAllJuries(committee.id());
-            if (!committee.juryIds().isEmpty()) {
-                committeeStoragePort.saveJuries(committee.id(), committee.juryIds());
-            }
-            committeeStoragePort.deleteAllJuryCriteria(committee.id());
-            if (!committee.juryCriteria().isEmpty()) {
-                committeeStoragePort.saveJuryCriteria(committee.id(), committee.juryCriteria());
-            }
+        if (!List.of(Committee.Status.DRAFT, Committee.Status.OPEN_TO_APPLICATIONS).contains(existingCommittee.status())) {
+            if (!committee.juryIds().equals(existingCommittee.juryIds()))
+                throw forbidden("Juries can only be updated for draft or open to applications committees");
+            if (!committee.juryCriteria().equals(existingCommittee.juryCriteria()))
+                throw forbidden("Jury criteria can only be updated for draft or open to applications committees");
         }
+
+        committeeStoragePort.save(committee);
     }
 
     @Override
@@ -101,7 +97,6 @@ public class CommitteeService implements CommitteeFacadePort {
 
         if (committee.juryCriteria().isEmpty())
             throw forbidden("Cannot assign juries to project given empty jury criteria");
-
 
         final Map<UUID, Integer> projectVoteCount = new HashMap<>();
 
