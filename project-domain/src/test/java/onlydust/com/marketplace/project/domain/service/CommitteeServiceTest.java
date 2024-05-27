@@ -24,6 +24,7 @@ import java.net.URI;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.IntStream;
@@ -437,21 +438,34 @@ public class CommitteeServiceTest {
     @EnumSource(Committee.Status.class)
     void should_update_committee(Committee.Status status) {
         // Given
+        final var projectQuestions = List.of(
+                new ProjectQuestion("Q1", false),
+                new ProjectQuestion("Q2", true));
+
         final var existingCommittee = Committee.builder()
                 .id(Committee.Id.random())
                 .name(faker.rickAndMorty().location())
                 .status(status)
                 .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                 .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
-                .projectQuestions(List.of(
-                        new ProjectQuestion("Q1", false),
-                        new ProjectQuestion("Q2", true)))
+                .projectQuestions(projectQuestions)
+                .votePerJury(1)
+                .sponsorId(UUID.randomUUID())
+                .projectApplications(Map.of(
+                        UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of()),
+                        UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of())
+                ))
                 .build();
 
-        final var committee = existingCommittee.toBuilder()
+        final var committee = Committee.builder()
+                .id(existingCommittee.id())
                 .name(faker.rickAndMorty().location())
+                .status(status)
                 .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                 .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                .projectQuestions(projectQuestions)
+                .votePerJury(2)
+                .sponsorId(UUID.randomUUID())
                 .build();
 
         when(committeeStoragePort.findById(existingCommittee.id())).thenReturn(Optional.of(existingCommittee));
@@ -460,7 +474,18 @@ public class CommitteeServiceTest {
         committeeService.update(committee);
 
         // Then
-        verify(committeeStoragePort).save(committee);
+        final var committeeCaptor = ArgumentCaptor.forClass(Committee.class);
+        verify(committeeStoragePort).save(committeeCaptor.capture());
+        final var updatedCommittee = committeeCaptor.getValue();
+        assertThat(updatedCommittee.id()).isEqualTo(existingCommittee.id());
+        assertThat(updatedCommittee.name()).isEqualTo(committee.name());
+        assertThat(updatedCommittee.status()).isEqualTo(existingCommittee.status());
+        assertThat(updatedCommittee.applicationStartDate()).isEqualTo(committee.applicationStartDate());
+        assertThat(updatedCommittee.applicationEndDate()).isEqualTo(committee.applicationEndDate());
+        assertThat(updatedCommittee.sponsorId()).isEqualTo(committee.sponsorId());
+        assertThat(updatedCommittee.juryIds()).isEqualTo(committee.juryIds());
+        assertThat(updatedCommittee.votePerJury()).isEqualTo(committee.votePerJury());
+        assertThat(updatedCommittee.projectApplications()).isEqualTo(existingCommittee.projectApplications());
     }
 
     @Test
