@@ -29,20 +29,10 @@ public class BackofficeCommitteeManagementRestApi implements BackOfficeCommittee
     private final CommitteeFacadePort committeeFacadePort;
 
     @Override
-    public ResponseEntity<Void> allocateBudget(UUID committeeId, CommitteeBudgetAllocationsRequest committeeBudgetAllocationsRequest) {
-        return ResponseEntity.noContent().build();
-    }
-
-    @Override
     public ResponseEntity<CommitteeResponse> createCommittee(CreateCommitteeRequest createCommitteeRequest) {
         final Committee committee = committeeFacadePort.createCommittee(createCommitteeRequest.getName(), createCommitteeRequest.getApplicationStartDate(),
                 createCommitteeRequest.getApplicationEndDate());
         return ResponseEntity.ok(toCommitteeResponse(committee));
-    }
-
-    @Override
-    public ResponseEntity<CommitteeBudgetAllocationsResponse> getBudgetAllocations(UUID committeeId) {
-        return BackOfficeCommitteeManagementApi.super.getBudgetAllocations(committeeId);
     }
 
     @Override
