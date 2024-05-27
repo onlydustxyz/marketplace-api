@@ -105,7 +105,7 @@ public class CommitteeEntity {
     }
 
     private Committee.Application merge(final Committee.Application left, final @NonNull Committee.Application right) {
-        return left == null ? right : new Committee.Application(left.projectId(), left.userId(), concat(left.answers(), right.answers()));
+        return left == null ? right : new Committee.Application(left.userId(), left.projectId(), concat(left.answers(), right.answers()));
     }
 
     private List<Committee.ProjectAnswer> concat(final @NonNull List<Committee.ProjectAnswer> left, final @NonNull List<Committee.ProjectAnswer> right) {
