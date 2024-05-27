@@ -45,6 +45,18 @@ public class Committee {
                 .build();
     }
 
+    public boolean areProjectQuestionsFixed() {
+        return status.ordinal() >= Status.OPEN_TO_APPLICATIONS.ordinal();
+    }
+
+    public boolean areJuriesFixed() {
+        return status.ordinal() >= Status.OPEN_TO_VOTES.ordinal();
+    }
+
+    public boolean areJuryCriteriaFixed() {
+        return status.ordinal() >= Status.OPEN_TO_VOTES.ordinal();
+    }
+
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)
     @SuperBuilder
@@ -60,7 +72,7 @@ public class Committee {
 
 
     public enum Status {
-        DRAFT, OPEN_TO_APPLICATIONS, OPEN_TO_VOTES, CLOSED
+        DRAFT, OPEN_TO_APPLICATIONS, OPEN_TO_VOTES, CLOSED;
     }
 
 

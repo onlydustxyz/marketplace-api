@@ -546,7 +546,7 @@ public class CommitteeServiceTest {
         // When
         assertThatThrownBy(() -> committeeService.update(committee))
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("Project questions can only be updated for draft committees");
+                .hasMessage("Project questions cannot be updated");
 
         // Then
         verify(committeeStoragePort, never()).save(committee);
@@ -575,7 +575,7 @@ public class CommitteeServiceTest {
         // When
         assertThatThrownBy(() -> committeeService.update(committee))
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("Juries can only be updated for draft or open to applications committees");
+                .hasMessage("Juries cannot be updated");
 
         // Then
         verify(committeeStoragePort, never()).save(committee);
@@ -603,7 +603,7 @@ public class CommitteeServiceTest {
         // When
         assertThatThrownBy(() -> committeeService.update(committee))
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("Jury criteria can only be updated for draft or open to applications committees");
+                .hasMessage("Jury criteria cannot be updated");
 
         // Then
         verify(committeeStoragePort, never()).save(committee);
