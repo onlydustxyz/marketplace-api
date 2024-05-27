@@ -4318,7 +4318,7 @@ components:
           $ref: '#/components/schemas/SponsorLinkResponse'
         juryCount:
           type: integer
-        voteCount:
+        votePerJury:
           type: integer
         projectCount:
           type: integer

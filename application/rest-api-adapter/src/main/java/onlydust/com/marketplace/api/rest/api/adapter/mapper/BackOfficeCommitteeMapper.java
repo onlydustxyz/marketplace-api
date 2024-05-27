@@ -6,10 +6,7 @@ import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.JuryCriteria;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
-import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationDetailsView;
-import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
-import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
-import onlydust.com.marketplace.project.domain.view.commitee.ProjectJuryVoteView;
+import onlydust.com.marketplace.project.domain.view.commitee.*;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -136,12 +133,14 @@ public interface BackOfficeCommitteeMapper {
                                 .login(registeredContributorLinkView.getLogin())
                                 .userId(registeredContributorLinkView.getId())
                         ).toList())
-                // Mock
                 .juryCount(isNull(committeeView.juries()) ? 0 : committeeView.juries().size())
                 .juryCriteria(isNull(committeeView.juryCriteria()) ? null : committeeView.juryCriteria().stream()
                         .map(juryCriteria -> new JuryCriteriaResponse().criteria(juryCriteria.criteria()).id(juryCriteria.id().value())).toList())
-                .completedAssignments(3)
-                .totalAssignments(5)
+                .votePerJury(committeeView.votePerJury())
+                .completedAssignments(isNull(committeeView.juryAssignments()) ? 0 :
+                        committeeView.juryAssignments().stream().map(JuryAssignmentView::completedAssigment).reduce(Integer::sum).orElse(0))
+                .totalAssignments(isNull(committeeView.juryAssignments()) ? 0 : committeeView.juryAssignments().stream()
+                        .map(JuryAssignmentView::totalAssigned).reduce(Integer::sum).orElse(0))
                 .juryAssignments(isNull(committeeView.juryAssignments()) ? null : committeeView.juryAssignments().stream()
                         .map(juryAssignmentView -> new JuryAssignmentResponse()
                                 .completedAssignments(juryAssignmentView.completedAssigment())
