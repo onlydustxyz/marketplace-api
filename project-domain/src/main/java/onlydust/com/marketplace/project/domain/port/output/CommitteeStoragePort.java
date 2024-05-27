@@ -25,11 +25,7 @@ public interface CommitteeStoragePort {
 
     void updateStatus(Committee.Id committeeId, Committee.Status status);
 
-    void saveApplication(Committee.Id committeeId, Committee.Application application);
-
     List<ProjectAnswerView> getApplicationAnswers(Committee.Id committeeId, UUID projectId);
-
-    boolean hasStartedApplication(Committee.Id committeeId, Committee.Application application);
 
     Optional<CommitteeApplicationDetailsView> findByCommitteeIdAndProjectId(Committee.Id committeeId, UUID projectId);
 

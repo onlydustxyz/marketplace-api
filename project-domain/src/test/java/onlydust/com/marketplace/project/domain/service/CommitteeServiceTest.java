@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -126,7 +127,7 @@ public class CommitteeServiceTest {
             final UUID projectId = UUID.randomUUID();
 
             // When
-            when(committeeStoragePort.findViewById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
+            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(Committee.builder()
                     .name(faker.rickAndMorty().location())
                     .id(committeeId)
                     .status(Committee.Status.OPEN_TO_APPLICATIONS)
@@ -151,7 +152,7 @@ public class CommitteeServiceTest {
             final UUID projectId = UUID.randomUUID();
 
             // When
-            when(committeeStoragePort.findViewById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
+            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(Committee.builder()
                     .name(faker.rickAndMorty().location())
                     .id(committeeId)
                     .status(Committee.Status.OPEN_TO_APPLICATIONS)
@@ -177,7 +178,7 @@ public class CommitteeServiceTest {
             final UUID projectId = UUID.randomUUID();
 
             // When
-            when(committeeStoragePort.findViewById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
+            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(Committee.builder()
                     .name(faker.rickAndMorty().location())
                     .id(committeeId)
                     .status(Committee.Status.DRAFT)
@@ -201,7 +202,7 @@ public class CommitteeServiceTest {
             final UUID projectId = UUID.randomUUID();
 
             // When
-            when(committeeStoragePort.findViewById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
+            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(Committee.builder()
                     .name(faker.rickAndMorty().location())
                     .id(committeeId)
                     .status(Committee.Status.OPEN_TO_APPLICATIONS)
@@ -230,7 +231,7 @@ public class CommitteeServiceTest {
                     projectId, List.of(new Committee.ProjectAnswer(projectQuestion, "A1")));
 
             // When
-            when(committeeStoragePort.findViewById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
+            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(Committee.builder()
                     .name(faker.rickAndMorty().location())
                     .id(committeeId)
                     .status(Committee.Status.OPEN_TO_APPLICATIONS)
@@ -240,11 +241,14 @@ public class CommitteeServiceTest {
                     .build()));
             when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(true);
             when(projectStoragePort.exists(projectId)).thenReturn(true);
-            when(committeeStoragePort.hasStartedApplication(committeeId, application)).thenReturn(false);
             committeeService.createUpdateApplicationForCommittee(committeeId, application);
 
             // Then
-            verify(committeeStoragePort).saveApplication(committeeId, application);
+            final var committeeCaptor = ArgumentCaptor.forClass(Committee.class);
+            verify(committeeStoragePort).save(committeeCaptor.capture());
+            final var committee = committeeCaptor.getValue();
+            assertThat(committee.projectApplications()).containsKey(projectId);
+
             verify(committeeObserverPort).onNewApplication(committeeId, application.projectId(), application.userId());
         }
 
@@ -256,27 +260,32 @@ public class CommitteeServiceTest {
             final UUID projectId = UUID.randomUUID();
             final Committee.Application application = new Committee.Application(userId,
                     projectId, List.of());
-
-            // When
-            when(committeeStoragePort.findViewById(committeeId)).thenReturn(Optional.of(CommitteeView.builder()
-                    .name(faker.rickAndMorty().location())
+            final Committee.Application oldApplication = new Committee.Application(userId,
+                    projectId, List.of());
+            final var existingCommittee = Committee.builder()
                     .id(committeeId)
+                    .name(faker.rickAndMorty().location())
                     .status(Committee.Status.OPEN_TO_APPLICATIONS)
                     .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .projectQuestions(List.of())
-                    .build()));
+                    .build();
+            existingCommittee.projectApplications().put(projectId, oldApplication);
+
+            // When
+            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(existingCommittee));
             when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(true);
             when(projectStoragePort.exists(projectId)).thenReturn(true);
-            when(committeeStoragePort.hasStartedApplication(committeeId, application)).thenReturn(true);
             committeeService.createUpdateApplicationForCommittee(committeeId, application);
 
             // Then
-            verify(committeeStoragePort).saveApplication(committeeId, application);
+            final var committeeCaptor = ArgumentCaptor.forClass(Committee.class);
+            verify(committeeStoragePort).save(committeeCaptor.capture());
+            final var committee = committeeCaptor.getValue();
+            assertThat(committee.projectApplications()).containsKey(projectId);
+
             verifyNoInteractions(committeeObserverPort);
         }
-
-
     }
 
     @Test

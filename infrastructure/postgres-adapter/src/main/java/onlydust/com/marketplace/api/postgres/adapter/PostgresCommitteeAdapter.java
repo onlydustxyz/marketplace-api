@@ -1,18 +1,14 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeJuryVoteViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeLinkViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectInfosQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoCommitteeQueryEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeProjectAnswerEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeApplicationRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeProjectAnswerViewRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeRepository;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeProjectQuestionEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeJuryCriteriaEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeJuryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeJuryVoteEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoCommitteeQueryRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -38,7 +34,6 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
 
     private final CommitteeRepository committeeRepository;
     private final BoCommitteeQueryRepository boCommitteeQueryRepository;
-    private final CommitteeApplicationRepository committeeApplicationRepository;
     private final CommitteeProjectAnswerViewRepository committeeProjectAnswerViewRepository;
     private final ProjectInfosViewRepository projectInfosViewRepository;
     private final CommitteeJuryRepository committeeJuryRepository;
@@ -83,12 +78,6 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     }
 
     @Override
-    @Transactional
-    public void saveApplication(Committee.Id committeeId, Committee.Application application) {
-        committeeApplicationRepository.saveAll(CommitteeProjectAnswerEntity.fromDomain(committeeId, application));
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public List<ProjectAnswerView> getApplicationAnswers(Committee.Id committeeId, UUID projectId) {
         return getProjectAnswerViews(committeeId, projectId);
@@ -100,12 +89,6 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
                         committeeProjectAnswerView.getProjectQuestion().getQuestion(), committeeProjectAnswerView.getProjectQuestion().getRequired(),
                         committeeProjectAnswerView.getAnswer()))
                 .toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public boolean hasStartedApplication(Committee.Id committeeId, Committee.Application application) {
-        return committeeApplicationRepository.existsByCommitteeIdAndProjectId(committeeId.value(), application.projectId());
     }
 
     @Override

@@ -6,9 +6,7 @@ import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Value
 @Accessors(fluent = true)
@@ -23,6 +21,8 @@ public class Committee {
     @NonNull Status status;
     @Builder.Default
     @NonNull List<ProjectQuestion> projectQuestions = new ArrayList<>();
+    @Builder.Default
+    @NonNull Map<UUID, Application> projectApplications = new HashMap<>();
     @NonNull
     List<UUID> juryIds = new ArrayList<>();
     UUID sponsorId;

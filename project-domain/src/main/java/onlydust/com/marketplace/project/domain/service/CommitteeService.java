@@ -2,7 +2,6 @@ package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.JuryAssignmentBuilder;
@@ -22,8 +21,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 
 @AllArgsConstructor
 public class CommitteeService implements CommitteeFacadePort {
@@ -147,25 +145,29 @@ public class CommitteeService implements CommitteeFacadePort {
 
     @Override
     public void createUpdateApplicationForCommittee(Committee.Id committeeId, Committee.Application application) {
-        final var committee = committeeStoragePort.findViewById(committeeId)
+        final var committee = committeeStoragePort.findById(committeeId)
                 .orElseThrow(() -> notFound("Committee %s was not found".formatted(committeeId.value().toString())));
+
         checkCommitteePermission(application, committee);
         checkApplicationPermission(application.projectId(), application.userId());
-        final boolean hasStartedApplication = committeeStoragePort.hasStartedApplication(committeeId, application);
-        committeeStoragePort.saveApplication(committeeId, application);
-        if (!hasStartedApplication) {
+
+        final var hasStartedApplication = committee.projectApplications().containsKey(application.projectId());
+        committee.projectApplications().put(application.projectId(), application);
+        committeeStoragePort.save(committee);
+
+        if (!hasStartedApplication)
             committeeObserverPort.onNewApplication(committeeId, application.projectId(), application.userId());
-        }
     }
 
-    private static void checkCommitteePermission(Committee.Application application, CommitteeView committee) {
+    private static void checkCommitteePermission(Committee.Application application, Committee committee) {
         if (committee.status() != Committee.Status.OPEN_TO_APPLICATIONS)
-            throw OnlyDustException.forbidden("Applications are not opened or are closed for committee %s".formatted(committee.id().value()));
-        final List<ProjectQuestion.Id> projectQuestionIds = committee.projectQuestions().stream().map(ProjectQuestion::id).toList();
-        if (application.answers().stream().map(Committee.ProjectAnswer::projectQuestionId)
-                .anyMatch(id -> !projectQuestionIds.contains(id))) {
-            throw OnlyDustException.internalServerError("A project question is not linked to committee %s".formatted(committee.id().value()));
-        }
+            throw forbidden("Applications are not opened or are closed for committee %s".formatted(committee.id().value()));
+
+        final var projectQuestionIds = committee.projectQuestions().stream().map(ProjectQuestion::id).toList();
+
+        if (application.answers().stream().map(Committee.ProjectAnswer::projectQuestionId).anyMatch(id -> !projectQuestionIds.contains(id)))
+            throw internalServerError("A project question is not linked to committee %s".formatted(committee.id().value()));
+
     }
 
     @Override
@@ -192,7 +194,7 @@ public class CommitteeService implements CommitteeFacadePort {
     @Override
     public CommitteeApplicationDetailsView getCommitteeApplicationDetails(Committee.Id committeeId, UUID projectId) {
         return committeeStoragePort.findByCommitteeIdAndProjectId(committeeId, projectId)
-                .orElseThrow(() -> OnlyDustException.internalServerError("Application on committee %s not found for project %s"
+                .orElseThrow(() -> internalServerError("Application on committee %s not found for project %s"
                         .formatted(committeeId.value(), projectId)));
     }
 
@@ -208,9 +210,9 @@ public class CommitteeService implements CommitteeFacadePort {
 
     private void checkApplicationPermission(final UUID projectId, final UUID userId) {
         if (!permissionService.isUserProjectLead(projectId, userId))
-            throw OnlyDustException.forbidden("Only project lead can send new application to committee");
+            throw forbidden("Only project lead can send new application to committee");
         if (!projectStoragePort.exists(projectId))
-            throw OnlyDustException.internalServerError("Project %s was not found".formatted(projectId));
+            throw internalServerError("Project %s was not found".formatted(projectId));
     }
 
 }

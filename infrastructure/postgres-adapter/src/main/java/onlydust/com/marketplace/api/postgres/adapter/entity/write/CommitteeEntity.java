@@ -10,8 +10,9 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 
 @Entity
 @AllArgsConstructor
@@ -40,6 +41,9 @@ public class CommitteeEntity {
     @OneToMany(mappedBy = "committee", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     Set<CommitteeProjectQuestionEntity> projectQuestions;
 
+    @OneToMany(mappedBy = "committee", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<CommitteeProjectAnswerEntity> projectAnswers;
+
     public static CommitteeEntity fromDomain(final Committee committee) {
         final var entity = CommitteeEntity.builder()
                 .id(committee.id().value())
@@ -50,10 +54,14 @@ public class CommitteeEntity {
                 .sponsorId(committee.sponsorId())
                 .votePerJury(committee.votePerJury())
                 .projectQuestions(new HashSet<>())
+                .projectAnswers(new HashSet<>())
                 .build();
 
         committee.projectQuestions()
                 .forEach(projectQuestion -> entity.projectQuestions.add(CommitteeProjectQuestionEntity.fromDomain(entity, projectQuestion)));
+
+        committee.projectApplications()
+                .forEach((projectId, application) -> entity.projectAnswers.addAll(CommitteeProjectAnswerEntity.fromDomain(entity, application)));
 
         return entity;
     }
@@ -66,7 +74,18 @@ public class CommitteeEntity {
                 .applicationEndDate(ZonedDateTime.ofInstant(applicationEndDate.toInstant(), ZoneOffset.UTC))
                 .status(status)
                 .votePerJury(this.votePerJury)
+                .projectApplications(Optional.ofNullable(projectAnswers).orElse(Set.of()).stream()
+                        .collect(groupingBy(CommitteeProjectAnswerEntity::getProjectId,
+                                mapping(CommitteeProjectAnswerEntity::toApplication,
+                                        reducing(null, this::merge)))))
                 .build();
     }
 
+    private Committee.Application merge(final Committee.Application left, final @NonNull Committee.Application right) {
+        return left == null ? right : new Committee.Application(left.projectId(), left.userId(), concat(left.answers(), right.answers()));
+    }
+
+    private List<Committee.ProjectAnswer> concat(final @NonNull List<Committee.ProjectAnswer> left, final @NonNull List<Committee.ProjectAnswer> right) {
+        return Stream.concat(left.stream(), right.stream()).collect(toList());
+    }
 }

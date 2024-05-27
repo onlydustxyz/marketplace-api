@@ -424,7 +424,6 @@ public class PostgresConfiguration {
     @Bean
     PostgresCommitteeAdapter postgresCommitteeAdapter(final CommitteeRepository committeeRepository,
                                                       final BoCommitteeQueryRepository boCommitteeQueryRepository,
-                                                      final CommitteeApplicationRepository committeeApplicationRepository,
                                                       final CommitteeProjectAnswerViewRepository committeeProjectAnswerViewRepository,
                                                       final ProjectInfosViewRepository projectInfosViewRepository,
                                                       final CommitteeJuryCriteriaRepository committeeJuryCriteriaRepository,
@@ -432,7 +431,7 @@ public class PostgresConfiguration {
                                                       final CommitteeLinkViewRepository committeeLinkViewRepository,
                                                       final CommitteeJuryVoteRepository committeeJuryVoteRepository,
                                                       final CommitteeJuryVoteViewRepository committeeJuryVoteViewRepository) {
-        return new PostgresCommitteeAdapter(committeeRepository, boCommitteeQueryRepository, committeeApplicationRepository,
+        return new PostgresCommitteeAdapter(committeeRepository, boCommitteeQueryRepository,
                 committeeProjectAnswerViewRepository, projectInfosViewRepository, committeeJuryRepository,
                 committeeJuryCriteriaRepository, committeeLinkViewRepository, committeeJuryVoteRepository, committeeJuryVoteViewRepository);
     }
