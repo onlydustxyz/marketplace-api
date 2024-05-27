@@ -4326,6 +4326,10 @@ components:
           type: integer
         totalAssignments:
           type: integer
+        juries:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserLinkResponse'
         juryAssignments:
           type: array
           items:
@@ -4434,6 +4438,9 @@ components:
       required:
         - criteria
       properties:
+        id:
+          type: string
+          format: uuid
         criteria:
           type: string
 
@@ -4455,7 +4462,7 @@ components:
           format: 'date-time'
         sponsorId:
           $ref: '#/components/schemas/SponsorId'
-        voteCount:
+        votePerJury:
           type: integer
         juryMemberIds:
           type: array

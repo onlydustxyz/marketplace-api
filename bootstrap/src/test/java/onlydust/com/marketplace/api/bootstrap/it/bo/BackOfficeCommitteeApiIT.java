@@ -32,15 +32,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
     private UserAuthHelper.AuthenticatedBackofficeUser pierre;
-    private UUID anthoId = UUID.fromString("747e663f-4e68-4b42-965b-b5aebedcd4c4");
-    private UUID haydenId = UUID.fromString("eaa1ddf3-fea5-4cef-825b-336f8e775e05");
-    private UUID mehdiId = UUID.fromString("705e134d-e9e3-4ea3-85e2-a59a9628ecfc");
-    private UUID cocaColax = UUID.fromString("44c6807c-48d1-4987-a0a6-ac63f958bdae");
+    private final UUID anthoId = UUID.fromString("747e663f-4e68-4b42-965b-b5aebedcd4c4");
+    private final UUID olivierId = UUID.fromString("e461c019-ba23-4671-9b6c-3a5a18748af9");
+    private final UUID pacoId = UUID.fromString("f20e6812-8de8-432b-9c31-2920434fe7d0");
+    private final UUID cocaColax = UUID.fromString("44c6807c-48d1-4987-a0a6-ac63f958bdae");
     private final UUID bretzel = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
     static UUID committeeId;
     static UUID projectQuestionId1;
     static String projectQuestion1;
-    private UUID pierreAppId = UUID.fromString("fc92397c-3431-4a84-8054-845376b630a0");
+    private final UUID pierreAppId = UUID.fromString("fc92397c-3431-4a84-8054-845376b630a0");
 
 
     @BeforeEach
@@ -156,6 +156,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .status(CommitteeStatus.DRAFT)
                 .maximumAllocationAmount(BigDecimal.valueOf(111.212))
                 .minimumAllocationAmount(BigDecimal.valueOf(95.47))
+                .votePerJury(3)
                 .projectQuestions(
                         List.of(projectQuestionRequest1,
                                 projectQuestionRequest2)
@@ -167,7 +168,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                         )
                 )
                 .juryMemberIds(
-                        List.of(anthoId, haydenId)
+                        List.of(anthoId, olivierId)
                 );
 
         // When
@@ -195,12 +196,22 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
         assertEquals(2, committeeResponse1.getProjectQuestions().size());
         for (ProjectQuestionResponse projectQuestion : committeeResponse1.getProjectQuestions()) {
             assertTrue(List.of(projectQuestionRequest1.getQuestion(), projectQuestionRequest2.getQuestion()).contains(projectQuestion.getQuestion()));
+            assertNotNull(projectQuestion.getId());
         }
+        assertEquals(2, committeeResponse1.getJuryCriteria().size());
+        for (JuryCriteriaResponse juryCriteriaResponse : committeeResponse1.getJuryCriteria()) {
+            assertTrue(List.of(juryCriteriaRequest1.getCriteria(), juryCriteriaRequest2.getCriteria()).contains(juryCriteriaResponse.getCriteria()));
+            assertNotNull(juryCriteriaResponse.getId());
+        }
+
         assertEquals(updateCommitteeRequest1.getName(), committeeResponse1.getName());
         assertEquals(updateCommitteeRequest1.getApplicationStartDate().toInstant(), committeeResponse1.getApplicationStartDate().toInstant());
         assertEquals(updateCommitteeRequest1.getApplicationEndDate().toInstant(), committeeResponse1.getApplicationEndDate().toInstant());
         assertEquals(updateCommitteeRequest1.getStatus().name(), committeeResponse1.getStatus().name());
         assertNull(committeeResponse1.getSponsor());
+        assertEquals(2, committeeResponse1.getJuries().size());
+        assertTrue(committeeResponse1.getJuries().stream().map(UserLinkResponse::getUserId).toList().contains(olivierId));
+        assertTrue(committeeResponse1.getJuries().stream().map(UserLinkResponse::getUserId).toList().contains(anthoId));
 
 
         final UpdateCommitteeRequest updateCommitteeRequest2 = new UpdateCommitteeRequest().name(faker.rickAndMorty().location())
@@ -208,6 +219,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .applicationEndDate(faker.date().future(10, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()))
                 .allocationCurrencyId(CurrencyHelper.STRK.value())
                 .status(CommitteeStatus.DRAFT)
+                .votePerJury(5)
                 .maximumAllocationAmount(BigDecimal.valueOf(222.33))
                 .minimumAllocationAmount(BigDecimal.valueOf(47.95))
                 .sponsorId(cocaColax)
@@ -222,7 +234,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                         )
                 )
                 .juryMemberIds(
-                        List.of(mehdiId, haydenId)
+                        List.of(pacoId, olivierId)
                 );
 
 
@@ -254,6 +266,13 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
         assertEquals(projectQuestionRequest2.getRequired(), committeeResponse2.getProjectQuestions().get(0).getRequired());
         assertEquals(projectQuestionRequest3.getQuestion(), committeeResponse2.getProjectQuestions().get(1).getQuestion());
         assertEquals(projectQuestionRequest3.getRequired(), committeeResponse2.getProjectQuestions().get(1).getRequired());
+
+        assertEquals(2, committeeResponse1.getJuryCriteria().size());
+        for (JuryCriteriaResponse juryCriteriaResponse : committeeResponse2.getJuryCriteria()) {
+            assertTrue(List.of(juryCriteriaRequest1.getCriteria(), juryCriteriaRequest3.getCriteria()).contains(juryCriteriaResponse.getCriteria()));
+            assertNotNull(juryCriteriaResponse.getId());
+        }
+
         assertEquals(updateCommitteeRequest2.getName(), committeeResponse2.getName());
         assertEquals(updateCommitteeRequest2.getApplicationStartDate().toInstant(), committeeResponse2.getApplicationStartDate().toInstant());
         assertEquals(updateCommitteeRequest2.getApplicationEndDate().toInstant(), committeeResponse2.getApplicationEndDate().toInstant());
@@ -263,6 +282,9 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
         assertEquals("https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg", committeeResponse2.getSponsor().getAvatarUrl());
         projectQuestionId1 = committeeResponse2.getProjectQuestions().get(0).getId();
         projectQuestion1 = committeeResponse2.getProjectQuestions().get(0).getQuestion();
+        assertTrue(committeeResponse2.getJuries().stream().map(UserLinkResponse::getUserId).toList().contains(olivierId));
+        assertTrue(committeeResponse2.getJuries().stream().map(UserLinkResponse::getUserId).toList().contains(pacoId));
+        assertEquals(2, committeeResponse2.getJuries().size());
     }
 
     @Autowired
@@ -366,4 +388,87 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .jsonPath("$.projectQuestions.size()").isEqualTo(1);
     }
 
+    @Test
+    @Order(6)
+    void should_assign_juries_to_projects() {
+        // Given
+
+        // When
+        client.patch()
+                .uri(getApiURI(COMMITTEES_STATUS.formatted(committeeId)))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                            {
+                              "status": "OPEN_TO_VOTES"
+                            }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(204);
+
+        // When
+        client.get()
+                .uri(getApiURI(COMMITTEES_BY_ID.formatted(committeeId)))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .json("""
+                        {
+                          "applications": [
+                            {
+                              "project": {
+                                "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                                "slug": "bretzel",
+                                "name": "Bretzel",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                              },
+                              "applicant": {
+                                "githubUserId": 16590657,
+                                "userId": "fc92397c-3431-4a84-8054-845376b630a0",
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                              },
+                              "score": null,
+                              "allocatedBudget": null
+                            }
+                          ]
+                        }
+                        """)
+                .jsonPath("$.projectQuestions.size()").isEqualTo(2)
+                .jsonPath("$.juryAssignments").isNotEmpty();
+    }
+
+    @Test
+    @Order(7)
+    void should_return_application_with_jury_votes() {
+        // When
+        client.get()
+                .uri(getApiURI(COMMITTEES_APPLICATIONS_BY_IDS.formatted(committeeId, bretzel)))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "project": {
+                            "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                            "slug": "bretzel",
+                            "name": "Bretzel",
+                            "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                          },
+                          "allocatedAmount": null,
+                          "allocationCurrency": null
+                        }
+                        """)
+                .jsonPath("$.projectQuestions.size()").isEqualTo(1)
+                .jsonPath("$.juryVotes").isNotEmpty();
+    }
 }

@@ -89,4 +89,8 @@ public interface ProjectStoragePort {
     boolean exists(UUID projectId);
 
     ProjectInfosView getProjectInfos(UUID projectId);
+
+    List<UUID> getProjectLedIdsForUser(UUID userId);
+
+    List<UUID> getProjectContributedOnIdsForUser(UUID userId);
 }

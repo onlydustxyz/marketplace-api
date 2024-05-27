@@ -3,7 +3,7 @@ package onlydust.com.marketplace.project.domain.port.input;
 import lombok.NonNull;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
-import onlydust.com.marketplace.project.domain.view.*;
+import onlydust.com.marketplace.project.domain.view.commitee.*;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;

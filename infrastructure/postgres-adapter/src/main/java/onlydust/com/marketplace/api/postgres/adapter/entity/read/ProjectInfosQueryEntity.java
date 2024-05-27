@@ -4,7 +4,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NonNull;
-import onlydust.com.marketplace.project.domain.view.CommitteeApplicationView;
 import onlydust.com.marketplace.project.domain.view.ProjectInfosView;
 import onlydust.com.marketplace.project.domain.view.ProjectLeaderLinkView;
 import org.hibernate.annotations.Immutable;

@@ -4,14 +4,13 @@ import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.model.JuryCriteria;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
-import onlydust.com.marketplace.project.domain.view.CommitteeApplicationDetailsView;
-import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
-import onlydust.com.marketplace.project.domain.view.CommitteeView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationDetailsView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
 
-import java.math.BigDecimal;
 import java.util.Comparator;
-import java.util.List;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -72,11 +71,19 @@ public interface BackOfficeCommitteeMapper {
                 .applicationStartDate(updateCommitteeRequest.getApplicationStartDate())
                 .applicationEndDate(updateCommitteeRequest.getApplicationEndDate())
                 .sponsorId(updateCommitteeRequest.getSponsorId())
+                .votePerJury(updateCommitteeRequest.getVotePerJury())
                 .build();
         committee.projectQuestions().addAll(updateCommitteeRequest.getProjectQuestions().stream()
                 .map(BackOfficeCommitteeMapper::getProjectQuestion)
                 .toList());
+        committee.juryCriteria().addAll(updateCommitteeRequest.getJuryCriteria().stream().map(BackOfficeCommitteeMapper::getJuryCriteria).toList());
+        committee.juryIds().addAll(updateCommitteeRequest.getJuryMemberIds());
         return committee;
+    }
+
+    private static JuryCriteria getJuryCriteria(final JuryCriteriaRequest juryCriteriaRequest) {
+        return isNull(juryCriteriaRequest.getId()) ? new JuryCriteria(juryCriteriaRequest.getCriteria()) :
+                new JuryCriteria(JuryCriteria.Id.of(juryCriteriaRequest.getId()), juryCriteriaRequest.getCriteria());
     }
 
     private static ProjectQuestion getProjectQuestion(ProjectQuestionRequest projectQuestionRequest) {
@@ -121,69 +128,40 @@ public interface BackOfficeCommitteeMapper {
                                 .id(committeeView.sponsor().id())
                                 .avatarUrl(committeeView.sponsor().logoUrl())
                                 .name(committeeView.sponsor().name()))
+                .juries(isNull(committeeView.juries()) ? null : committeeView.juries().stream()
+                        .map(registeredContributorLinkView -> new UserLinkResponse()
+                                .avatarUrl(registeredContributorLinkView.getAvatarUrl())
+                                .githubUserId(registeredContributorLinkView.getGithubUserId())
+                                .login(registeredContributorLinkView.getLogin())
+                                .userId(registeredContributorLinkView.getId())
+                        ).toList())
                 // Mock
-                .juryCount(3)
-                .juryCriteria(
-                        List.of(
-                                new JuryCriteriaResponse()
-                                        .id(UUID.randomUUID())
-                                        .criteria("Criteria 1"),
-                                new JuryCriteriaResponse()
-                                        .id(UUID.randomUUID())
-                                        .criteria("Criteria 2"),
-                                new JuryCriteriaResponse()
-                                        .id(UUID.randomUUID())
-                                        .criteria("Criteria 3")
-                        )
-                )
+                .juryCount(isNull(committeeView.juries()) ? 0 : committeeView.juries().size())
+                .juryCriteria(isNull(committeeView.juryCriteria()) ? null : committeeView.juryCriteria().stream()
+                        .map(juryCriteria -> new JuryCriteriaResponse().criteria(juryCriteria.criteria()).id(juryCriteria.id().value())).toList())
                 .completedAssignments(3)
                 .totalAssignments(5)
-                .juryAssignments(List.of(
-                        new JuryAssignmentResponse()
-                                .completedAssignments(1)
-                                .user(new UserLinkResponse(
-                                        141839618L,
-                                        "Blumebee",
-                                        "https://avatars.githubusercontent.com/u/141839618?v=4"
-                                ))
-                                .totalAssignment(2)
-                                .projectsAssigned(List.of(
-                                        new ProjectLinkResponse(
-                                                UUID.fromString("b58b40b8-1521-41cf-972c-9c08d58eaff8"),
-                                                "pineapple",
-                                                "Pineapple",
-                                                "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/3930283280174221329.jpg"
-                                        ),
-                                        new ProjectLinkResponse(
-                                                UUID.fromString("594ca5ca-48f7-49a8-9c26-84b949d4fdd9"),
-                                                "mooooooonlight",
-                                                "Mooooooonlight",
-                                                "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
-                                        )
-                                )),
-                        new JuryAssignmentResponse()
-                                .completedAssignments(1)
-                                .user(new UserLinkResponse(
-                                        5160414L,
-                                        "haydencleary",
-                                        "https://avatars.githubusercontent.com/u/5160414?v=4"
-                                ))
-                                .totalAssignment(2)
-                                .projectsAssigned(List.of(
-                                        new ProjectLinkResponse(
-                                                UUID.fromString("b58b40b8-1521-41cf-972c-9c08d58eaff8"),
-                                                "pineapple",
-                                                "Pineapple",
-                                                "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/3930283280174221329.jpg"
-                                        ),
-                                        new ProjectLinkResponse(
-                                                UUID.fromString("594ca5ca-48f7-49a8-9c26-84b949d4fdd9"),
-                                                "mooooooonlight",
-                                                "Mooooooonlight",
-                                                "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
-                                        )
-                                ))
-                ))
+                .juryAssignments(isNull(committeeView.juryAssignments()) ? null : committeeView.juryAssignments().stream()
+                        .map(juryAssignmentView -> new JuryAssignmentResponse()
+                                .completedAssignments(juryAssignmentView.completedAssigment())
+                                .totalAssignment(juryAssignmentView.totalAssigned())
+                                .user(new UserLinkResponse()
+                                        .githubUserId(juryAssignmentView.user().getGithubUserId())
+                                        .userId(juryAssignmentView.user().getId())
+                                        .login(juryAssignmentView.user().getLogin())
+                                        .avatarUrl(juryAssignmentView.user().getAvatarUrl())
+                                )
+                                .projectsAssigned(
+                                        juryAssignmentView.projectsAssigned().stream()
+                                                .map(projectShortView -> new ProjectLinkResponse()
+                                                        .id(projectShortView.id())
+                                                        .slug(projectShortView.slug())
+                                                        .name(projectShortView.name())
+                                                        .logoUrl(isNull(projectShortView.logoUrl()) ? null : projectShortView.logoUrl()))
+                                                .toList()
+                                )
+                        )
+                        .toList())
                 ;
     }
 
@@ -203,45 +181,6 @@ public interface BackOfficeCommitteeMapper {
                 )
                 .toList()
         );
-        // Mock
-
-        committeeProjectApplicationResponse.setJuryVotes(List.of(
-                new JuryVoteResponse()
-                        .totalScore(BigDecimal.valueOf(3.21))
-                        .answers(
-                                List.of(
-                                        new ScoredAnswerResponse()
-                                                .score(2)
-                                                .criteria("Criteria 1"),
-                                        new ScoredAnswerResponse()
-                                                .score(3)
-                                                .criteria("Criteria 2")
-                                )
-                        )
-                        .jury(new UserLinkResponse(
-                                5160414L,
-                                "haydencleary",
-                                "https://avatars.githubusercontent.com/u/5160414?v=4"
-                        )),
-                new JuryVoteResponse()
-                        .totalScore(BigDecimal.valueOf(4.5))
-                        .answers(
-                                List.of(
-                                        new ScoredAnswerResponse()
-                                                .score(4)
-                                                .criteria("Criteria 1"),
-                                        new ScoredAnswerResponse()
-                                                .score(5)
-                                                .criteria("Criteria 2")
-                                )
-                        )
-                        .jury(new UserLinkResponse(
-                                141839618L,
-                                "Blumebee",
-                                "https://avatars.githubusercontent.com/u/141839618?v=4"
-                        ))
-        ));
-        committeeProjectApplicationResponse.setTotalScore(BigDecimal.valueOf(3.45));
         return committeeProjectApplicationResponse;
     }
 }
