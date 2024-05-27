@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.CommitteeStatusEntity;
 import onlydust.com.marketplace.project.domain.model.Committee;
-import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 

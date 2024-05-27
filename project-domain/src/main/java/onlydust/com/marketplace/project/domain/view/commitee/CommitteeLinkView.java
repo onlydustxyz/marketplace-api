@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.project.domain.view;
+package onlydust.com.marketplace.project.domain.view.commitee;
 
 import lombok.Builder;
 import lombok.NonNull;

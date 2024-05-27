@@ -24,6 +24,7 @@ import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.view.*;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeJuryVotesView;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

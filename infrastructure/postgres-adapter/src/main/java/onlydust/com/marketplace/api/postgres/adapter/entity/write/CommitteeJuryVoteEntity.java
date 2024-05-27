@@ -30,6 +30,10 @@ public class CommitteeJuryVoteEntity {
     @EqualsAndHashCode.Include
     @NonNull
     UUID committeeId;
+    @Id
+    @EqualsAndHashCode.Include
+    @NonNull
+    UUID userId;
     Integer score;
 
 
@@ -41,5 +45,6 @@ public class CommitteeJuryVoteEntity {
         UUID projectId;
         UUID committeeId;
         UUID criteriaId;
+        UUID userId;
     }
 }

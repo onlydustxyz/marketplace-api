@@ -408,6 +408,67 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .expectStatus()
                 .isEqualTo(204);
 
-        // Then
+        // When
+        client.get()
+                .uri(getApiURI(COMMITTEES_BY_ID.formatted(committeeId)))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .json("""
+                        {
+                          "applications": [
+                            {
+                              "project": {
+                                "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                                "slug": "bretzel",
+                                "name": "Bretzel",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                              },
+                              "applicant": {
+                                "githubUserId": 16590657,
+                                "userId": "fc92397c-3431-4a84-8054-845376b630a0",
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                              },
+                              "score": null,
+                              "allocatedBudget": null
+                            }
+                          ]
+                        }
+                        """)
+                .jsonPath("$.projectQuestions.size()").isEqualTo(2)
+                .jsonPath("$.juryAssignments").isNotEmpty();
+    }
+
+    @Test
+    @Order(7)
+    void should_return_application_with_jury_votes() {
+        // When
+        client.get()
+                .uri(getApiURI(COMMITTEES_APPLICATIONS_BY_IDS.formatted(committeeId, bretzel)))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "project": {
+                            "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                            "slug": "bretzel",
+                            "name": "Bretzel",
+                            "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                          },
+                          "allocatedAmount": null,
+                          "allocationCurrency": null
+                        }
+                        """)
+                .jsonPath("$.projectQuestions.size()").isEqualTo(1)
+                .jsonPath("$.juryVotes").isNotEmpty();
     }
 }

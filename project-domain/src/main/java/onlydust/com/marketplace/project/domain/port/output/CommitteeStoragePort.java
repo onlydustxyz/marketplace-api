@@ -5,9 +5,9 @@ import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.JuryAssignment;
 import onlydust.com.marketplace.project.domain.model.JuryCriteria;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
-import onlydust.com.marketplace.project.domain.view.CommitteeApplicationDetailsView;
-import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
-import onlydust.com.marketplace.project.domain.view.CommitteeView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationDetailsView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
 import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
 
 import java.util.List;

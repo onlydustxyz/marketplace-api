@@ -1,9 +1,10 @@
-package onlydust.com.marketplace.project.domain.view;
+package onlydust.com.marketplace.project.domain.view.commitee;
 
 import lombok.Builder;
-import lombok.Data;
 import lombok.NonNull;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.project.domain.view.ProjectLeaderLinkView;
+import onlydust.com.marketplace.project.domain.view.ProjectShortView;
 
 import java.math.BigDecimal;
 

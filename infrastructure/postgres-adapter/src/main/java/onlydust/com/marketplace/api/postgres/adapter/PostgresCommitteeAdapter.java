@@ -12,7 +12,11 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoCom
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
-import onlydust.com.marketplace.project.domain.view.*;
+import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
+import onlydust.com.marketplace.project.domain.view.ProjectShortView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationDetailsView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -156,6 +160,7 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
                         .criteriaId(juryVote.getCriteriaId().value())
                         .committeeId(juryAssignment.getCommitteeId().value())
                         .projectId(juryAssignment.getProjectId())
+                        .userId(juryAssignment.getJuryId())
                         .build()
                 ).collect(Collectors.toSet()))
                 .flatMap(Collection::stream)

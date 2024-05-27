@@ -7,6 +7,9 @@ import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.view.*;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationLinkView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -488,7 +491,7 @@ public class CommitteeServiceTest {
             final CommitteeView committeeView = new CommitteeView(
                     committeeId, faker.rickAndMorty().character(), faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()),
                     faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()), Committee.Status.OPEN_TO_VOTES, null, List.of(),
-                    committeeApplicationLinks, juries, juryCriteria, votePerJury
+                    committeeApplicationLinks, juries, juryCriteria, votePerJury, null
             );
 
             // When
@@ -525,7 +528,7 @@ public class CommitteeServiceTest {
             final CommitteeView committeeView = new CommitteeView(
                     committeeId, faker.rickAndMorty().character(), faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()),
                     faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()), Committee.Status.OPEN_TO_VOTES, null, List.of(),
-                    committeeApplicationLinks, juries, juryCriteria, votePerJury
+                    committeeApplicationLinks, juries, juryCriteria, votePerJury, null
             );
 
             // When
@@ -562,7 +565,7 @@ public class CommitteeServiceTest {
             final CommitteeView committeeView = new CommitteeView(
                     committeeId, faker.rickAndMorty().character(), faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()),
                     faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()), Committee.Status.OPEN_TO_VOTES, null, List.of(),
-                    committeeApplicationLinks, juries, juryCriteria, votePerJury
+                    committeeApplicationLinks, juries, juryCriteria, votePerJury, null
             );
 
             // When
@@ -600,7 +603,7 @@ public class CommitteeServiceTest {
             final CommitteeView committeeView = new CommitteeView(
                     committeeId, faker.rickAndMorty().character(), faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()),
                     faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()), Committee.Status.OPEN_TO_VOTES, null, List.of(),
-                    committeeApplicationLinks, juries, juryCriteria, votePerJury
+                    committeeApplicationLinks, juries, juryCriteria, votePerJury, null
             );
 
             // When
@@ -641,7 +644,7 @@ public class CommitteeServiceTest {
             final CommitteeView committeeView = new CommitteeView(
                     committeeId, faker.rickAndMorty().character(), faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()),
                     faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()), Committee.Status.OPEN_TO_VOTES, null, List.of(),
-                    committeeApplicationLinks, juries, juryCriteria, votePerJury
+                    committeeApplicationLinks, juries, juryCriteria, votePerJury, null
             );
 
             // When
@@ -688,7 +691,7 @@ public class CommitteeServiceTest {
             final CommitteeView committeeView = new CommitteeView(
                     committeeId, faker.rickAndMorty().character(), faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()),
                     faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()), Committee.Status.OPEN_TO_VOTES, null, List.of(),
-                    committeeApplicationLinks, juries, juryCriteria, votePerJury
+                    committeeApplicationLinks, juries, juryCriteria, votePerJury, null
             );
 
             // When

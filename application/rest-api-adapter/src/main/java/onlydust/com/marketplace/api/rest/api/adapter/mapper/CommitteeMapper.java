@@ -4,7 +4,7 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
-import onlydust.com.marketplace.project.domain.view.CommitteeApplicationView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationView;
 import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
 
 import java.util.*;

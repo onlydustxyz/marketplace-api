@@ -11,8 +11,8 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
-import onlydust.com.marketplace.project.domain.view.CommitteeApplicationView;
-import onlydust.com.marketplace.project.domain.view.CommitteeView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 

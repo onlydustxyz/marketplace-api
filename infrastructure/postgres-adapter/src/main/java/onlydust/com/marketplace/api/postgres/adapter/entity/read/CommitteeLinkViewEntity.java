@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.CommitteeStatusEntity;
 import onlydust.com.marketplace.project.domain.model.Committee;
-import onlydust.com.marketplace.project.domain.view.CommitteeLinkView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;

@@ -10,7 +10,13 @@ import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.JuryCriteria;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
-import onlydust.com.marketplace.project.domain.view.*;
+import onlydust.com.marketplace.project.domain.view.ProjectLeaderLinkView;
+import onlydust.com.marketplace.project.domain.view.ProjectShortView;
+import onlydust.com.marketplace.project.domain.view.RegisteredContributorLinkView;
+import onlydust.com.marketplace.project.domain.view.ShortSponsorView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationLinkView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
+import onlydust.com.marketplace.project.domain.view.commitee.JuryAssignmentView;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -19,10 +25,7 @@ import org.hibernate.type.SqlTypes;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static java.util.Objects.isNull;
 
@@ -60,6 +63,8 @@ public class BoCommitteeQueryEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     Set<JuryCriteriaJson> juryCriteria;
     Integer votePerJury;
+    @JdbcTypeCode(SqlTypes.JSON)
+    Set<JuryAssignmentVoteJson> juryAssignmentVotes;
 
     public CommitteeView toView() {
         return CommitteeView.builder()
@@ -102,8 +107,50 @@ public class BoCommitteeQueryEntity {
                 .juryCriteria(isNull(this.juryCriteria) ? null : this.juryCriteria.stream()
                         .map(juryCriteriaJson -> new JuryCriteria(JuryCriteria.Id.of(juryCriteriaJson.id), juryCriteriaJson.criteria)).toList())
                 .votePerJury(this.votePerJury)
+                .juryAssignments(this.toJuryAssignments())
                 .build();
     }
+
+    private List<JuryAssignmentView> toJuryAssignments() {
+        if (isNull(this.juryAssignmentVotes) || this.juryAssignmentVotes.isEmpty()) {
+            return List.of();
+        }
+        Map<UUID, List<JuryAssignmentVoteJson>> juryVotes = new HashMap<>();
+        for (JuryAssignmentVoteJson juryAssignmentVote : this.juryAssignmentVotes) {
+            if (juryVotes.containsKey(juryAssignmentVote.userId)) {
+                juryVotes.get(juryAssignmentVote.userId).add(juryAssignmentVote);
+            } else {
+                final List<JuryAssignmentVoteJson> juryAssignmentVoteJsons = new ArrayList<>();
+                juryAssignmentVoteJsons.add(juryAssignmentVote);
+                juryVotes.put(juryAssignmentVote.userId, juryAssignmentVoteJsons);
+            }
+        }
+        final List<JuryAssignmentView> juryAssignmentViews = new ArrayList<>();
+        for (Map.Entry<UUID, List<JuryAssignmentVoteJson>> uuidListEntry : juryVotes.entrySet()) {
+            final List<JuryAssignmentVoteJson> votes = uuidListEntry.getValue();
+            juryAssignmentViews.add(new JuryAssignmentView(
+                    votes.size(),
+                    (int) votes.stream().map(JuryAssignmentVoteJson::getScore).filter(Objects::nonNull).count(),
+                    RegisteredContributorLinkView.builder()
+                            .githubUserId(votes.get(0).userGithubId)
+                            .login(votes.get(0).userGithubLogin)
+                            .avatarUrl(votes.get(0).userAvatarUrl)
+                            .id(votes.get(0).userId)
+                            .build(),
+                    votes.stream().map(juryAssignmentVoteJson -> ProjectShortView.builder()
+                            .slug(juryAssignmentVoteJson.projectSlug)
+                            .id(juryAssignmentVoteJson.projectId)
+                            .logoUrl(juryAssignmentVoteJson.projectLogoUrl)
+                            .name(juryAssignmentVoteJson.projectName)
+                            .shortDescription(juryAssignmentVoteJson.projectShortDescription)
+                            .visibility(ProjectVisibility.valueOf(juryAssignmentVoteJson.projectVisibility))
+                            .build()
+                    ).toList()
+            ));
+        }
+        return juryAssignmentViews;
+    }
+
 
     @Data
     public static class ProjectQuestionJson {
@@ -145,4 +192,18 @@ public class BoCommitteeQueryEntity {
         String criteria;
     }
 
+    @Data
+    public static class JuryAssignmentVoteJson {
+        UUID userId;
+        UUID projectId;
+        String projectName;
+        Long userGithubId;
+        String projectSlug;
+        String userAvatarUrl;
+        String userGithubLogin;
+        String projectLogoUrl;
+        String projectShortDescription;
+        String projectVisibility;
+        Integer score;
+    }
 }

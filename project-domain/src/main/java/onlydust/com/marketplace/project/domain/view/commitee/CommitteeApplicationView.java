@@ -1,7 +1,9 @@
-package onlydust.com.marketplace.project.domain.view;
+package onlydust.com.marketplace.project.domain.view.commitee;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
+import onlydust.com.marketplace.project.domain.view.ProjectInfosView;
 
 import java.time.ZonedDateTime;
 import java.util.List;
