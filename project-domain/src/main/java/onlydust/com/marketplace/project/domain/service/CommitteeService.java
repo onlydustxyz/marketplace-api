@@ -76,6 +76,9 @@ public class CommitteeService implements CommitteeFacadePort {
 
     private void assignProjectsToJuries(Committee.Id committeeId) {
         final CommitteeView committee = getCommitteeById(committeeId);
+        if (isNull(committee.juries()) || committee.juries().isEmpty()) {
+            throw OnlyDustException.forbidden("Committee %s must have some juries to assign them to project".formatted(committeeId.value()));
+        }
         List<UUID> projectIds = committee.committeeApplicationLinks().stream()
                 .map(committeeApplicationLinkView -> committeeApplicationLinkView.projectShortView().id()).collect(Collectors.toList());
         final Set<UUID> juryIds = committee.juries().stream().map(RegisteredContributorLinkView::getId).collect(Collectors.toSet());

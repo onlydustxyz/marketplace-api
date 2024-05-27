@@ -236,7 +236,7 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
     void should_get_application_no_matter_the_status() {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
-        committeeFacadePort.updateStatus(committeeId, Committee.Status.OPEN_TO_VOTES);
+        committeeFacadePort.updateStatus(committeeId, Committee.Status.CLOSED);
 
         // When
         client.get()
@@ -295,7 +295,7 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
     void should_get_committee() {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
-        committeeFacadePort.updateStatus(committeeId, Committee.Status.OPEN_TO_VOTES);
+        committeeFacadePort.updateStatus(committeeId, Committee.Status.CLOSED);
 
         // When
         client.get()
@@ -310,7 +310,7 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                           "name": "Mr. Needful",
                           "applicationStartDate": "2024-05-19T02:58:44.399Z",
                           "applicationEndDate": "2024-05-25T20:06:27.482Z",
-                          "status": "OPEN_TO_VOTES",
+                          "status": "CLOSED",
                           "sponsor": null
                         }
                         """);
