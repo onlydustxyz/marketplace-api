@@ -5,8 +5,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 import lombok.*;
+import onlydust.com.marketplace.project.domain.view.commitee.ProjectJuryVoteView;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
