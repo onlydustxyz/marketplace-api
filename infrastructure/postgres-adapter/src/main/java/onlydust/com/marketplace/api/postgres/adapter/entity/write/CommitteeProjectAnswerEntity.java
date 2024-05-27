@@ -20,20 +20,25 @@ import java.util.UUID;
 public class CommitteeProjectAnswerEntity {
     @Id
     @EqualsAndHashCode.Include
-    @NonNull UUID committeeId;
+    @NonNull
+    UUID committeeId;
     @Id
     @EqualsAndHashCode.Include
-    @NonNull UUID projectId;
+    @NonNull
+    UUID projectId;
     @Id
     @EqualsAndHashCode.Include
-    @NonNull UUID questionId;
+    @NonNull
+    UUID questionId;
 
-    @NonNull UUID userId;
+    @NonNull
+    UUID userId;
     String answer;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "committeeId", insertable = false, updatable = false)
-    @NonNull CommitteeEntity committee;
+    @NonNull
+    CommitteeEntity committee;
 
     public static List<CommitteeProjectAnswerEntity> fromDomain(final CommitteeEntity committee, final Committee.Application application) {
         return application.answers().stream()
@@ -48,7 +53,7 @@ public class CommitteeProjectAnswerEntity {
     }
 
     public Committee.Application toApplication() {
-        return new Committee.Application(projectId, userId, List.of(new Committee.ProjectAnswer(ProjectQuestion.Id.of(questionId), answer)));
+        return new Committee.Application(userId, projectId, List.of(new Committee.ProjectAnswer(ProjectQuestion.Id.of(questionId), answer)));
     }
 
     @EqualsAndHashCode
