@@ -143,9 +143,9 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
         // Given
         committeeId = committeeRepository.findAll().get(0).getId();
         final UpdateCommitteeRequest updateCommitteeRequest1 = new UpdateCommitteeRequest();
-        final ProjectQuestionRequest projectQuestionRequest1 = new ProjectQuestionRequest("a" + faker.lorem().characters(), false);
-        final ProjectQuestionRequest projectQuestionRequest2 = new ProjectQuestionRequest("b" + faker.lorem().paragraph(), true);
-        final ProjectQuestionRequest projectQuestionRequest3 = new ProjectQuestionRequest("c" + faker.lorem().paragraph(), false);
+        final ProjectQuestionRequest projectQuestionRequest1 = new ProjectQuestionRequest(faker.lorem().characters(), false);
+        final ProjectQuestionRequest projectQuestionRequest2 = new ProjectQuestionRequest(faker.lorem().paragraph(), true);
+        final ProjectQuestionRequest projectQuestionRequest3 = new ProjectQuestionRequest(faker.lorem().paragraph(), false);
         final JuryCriteriaRequest juryCriteriaRequest1 = new JuryCriteriaRequest(faker.lorem().characters());
         final JuryCriteriaRequest juryCriteriaRequest2 = new JuryCriteriaRequest(faker.lorem().paragraph());
         final JuryCriteriaRequest juryCriteriaRequest3 = new JuryCriteriaRequest(faker.pokemon().name());
@@ -194,15 +194,22 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .returnResult().getResponseBody();
 
         assertEquals(2, committeeResponse1.getProjectQuestions().size());
-        for (ProjectQuestionResponse projectQuestion : committeeResponse1.getProjectQuestions()) {
-            assertTrue(List.of(projectQuestionRequest1.getQuestion(), projectQuestionRequest2.getQuestion()).contains(projectQuestion.getQuestion()));
-            assertNotNull(projectQuestion.getId());
-        }
+
+        assertThat(committeeResponse1.getProjectQuestions().get(0).getId()).isNotNull();
+        assertThat(committeeResponse1.getProjectQuestions().get(0).getQuestion()).isEqualTo(projectQuestionRequest1.getQuestion());
+        assertThat(committeeResponse1.getProjectQuestions().get(0).getRequired()).isEqualTo(projectQuestionRequest1.getRequired());
+
+        assertThat(committeeResponse1.getProjectQuestions().get(1).getId()).isNotNull();
+        assertThat(committeeResponse1.getProjectQuestions().get(1).getQuestion()).isEqualTo(projectQuestionRequest2.getQuestion());
+        assertThat(committeeResponse1.getProjectQuestions().get(1).getRequired()).isEqualTo(projectQuestionRequest2.getRequired());
+
         assertEquals(2, committeeResponse1.getJuryCriteria().size());
-        for (JuryCriteriaResponse juryCriteriaResponse : committeeResponse1.getJuryCriteria()) {
-            assertTrue(List.of(juryCriteriaRequest1.getCriteria(), juryCriteriaRequest2.getCriteria()).contains(juryCriteriaResponse.getCriteria()));
-            assertNotNull(juryCriteriaResponse.getId());
-        }
+
+        assertThat(committeeResponse1.getJuryCriteria().get(0).getId()).isNotNull();
+        assertThat(committeeResponse1.getJuryCriteria().get(0).getCriteria()).isEqualTo(juryCriteriaRequest1.getCriteria());
+
+        assertThat(committeeResponse1.getJuryCriteria().get(1).getId()).isNotNull();
+        assertThat(committeeResponse1.getJuryCriteria().get(1).getCriteria()).isEqualTo(juryCriteriaRequest2.getCriteria());
 
         assertEquals(updateCommitteeRequest1.getName(), committeeResponse1.getName());
         assertEquals(updateCommitteeRequest1.getApplicationStartDate().toInstant(), committeeResponse1.getApplicationStartDate().toInstant());
@@ -262,16 +269,15 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
 
         assertEquals(2, committeeResponse1.getProjectQuestions().size());
         assertThat(committeeResponse2.getProjectQuestions()).allMatch(q -> q.getId() != null);
-        assertEquals(projectQuestionRequest2.getQuestion(), committeeResponse2.getProjectQuestions().get(0).getQuestion());
-        assertEquals(projectQuestionRequest2.getRequired(), committeeResponse2.getProjectQuestions().get(0).getRequired());
-        assertEquals(projectQuestionRequest3.getQuestion(), committeeResponse2.getProjectQuestions().get(1).getQuestion());
-        assertEquals(projectQuestionRequest3.getRequired(), committeeResponse2.getProjectQuestions().get(1).getRequired());
+        assertEquals(projectQuestionRequest3.getQuestion(), committeeResponse2.getProjectQuestions().get(0).getQuestion());
+        assertEquals(projectQuestionRequest3.getRequired(), committeeResponse2.getProjectQuestions().get(0).getRequired());
+        assertEquals(projectQuestionRequest2.getQuestion(), committeeResponse2.getProjectQuestions().get(1).getQuestion());
+        assertEquals(projectQuestionRequest2.getRequired(), committeeResponse2.getProjectQuestions().get(1).getRequired());
 
         assertEquals(2, committeeResponse1.getJuryCriteria().size());
-        for (JuryCriteriaResponse juryCriteriaResponse : committeeResponse2.getJuryCriteria()) {
-            assertTrue(List.of(juryCriteriaRequest1.getCriteria(), juryCriteriaRequest3.getCriteria()).contains(juryCriteriaResponse.getCriteria()));
-            assertNotNull(juryCriteriaResponse.getId());
-        }
+        assertThat(committeeResponse2.getJuryCriteria()).allMatch(c -> c.getId() != null);
+        assertEquals(juryCriteriaRequest1.getCriteria(), committeeResponse2.getJuryCriteria().get(0).getCriteria());
+        assertEquals(juryCriteriaRequest3.getCriteria(), committeeResponse2.getJuryCriteria().get(1).getCriteria());
 
         assertEquals(updateCommitteeRequest2.getName(), committeeResponse2.getName());
         assertEquals(updateCommitteeRequest2.getApplicationStartDate().toInstant(), committeeResponse2.getApplicationStartDate().toInstant());
@@ -280,8 +286,8 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
         assertEquals(cocaColax, committeeResponse2.getSponsor().getId());
         assertEquals("Coca Colax", committeeResponse2.getSponsor().getName());
         assertEquals("https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg", committeeResponse2.getSponsor().getAvatarUrl());
-        projectQuestionId1 = committeeResponse2.getProjectQuestions().get(0).getId();
-        projectQuestion1 = committeeResponse2.getProjectQuestions().get(0).getQuestion();
+        projectQuestionId1 = committeeResponse2.getProjectQuestions().get(1).getId();
+        projectQuestion1 = committeeResponse2.getProjectQuestions().get(1).getQuestion();
         assertTrue(committeeResponse2.getJuries().stream().map(UserLinkResponse::getUserId).toList().contains(olivierId));
         assertTrue(committeeResponse2.getJuries().stream().map(UserLinkResponse::getUserId).toList().contains(pacoId));
         assertEquals(2, committeeResponse2.getJuries().size());

@@ -49,7 +49,7 @@ public class BoCommitteeQueryEntity {
     @Enumerated(EnumType.STRING)
     Committee.Status status;
     @JdbcTypeCode(SqlTypes.JSON)
-    Set<ProjectQuestionJson> projectQuestions;
+    List<ProjectQuestionJson> projectQuestions;
     UUID sponsorId;
     String sponsorName;
     String sponsorUrl;
@@ -59,7 +59,7 @@ public class BoCommitteeQueryEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     Set<JuryLinkJson> juries;
     @JdbcTypeCode(SqlTypes.JSON)
-    Set<JuryCriteriaJson> juryCriteria;
+    List<JuryCriteriaJson> juryCriteria;
     Integer votePerJury;
     @JdbcTypeCode(SqlTypes.JSON)
     Set<JuryAssignmentVoteJson> juryAssignmentVotes;

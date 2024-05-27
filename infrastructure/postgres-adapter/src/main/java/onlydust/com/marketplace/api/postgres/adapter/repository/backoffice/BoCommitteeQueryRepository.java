@@ -21,6 +21,7 @@ public interface BoCommitteeQueryRepository extends JpaRepository<BoCommitteeQue
                    c.vote_per_jury,
                    (select jsonb_agg(
                                    jsonb_build_object('id', cpq.id, 'question', cpq.question, 'required', cpq.required)
+                                   order by rank
                            )
                     from committee_project_questions cpq
                     where cpq.committee_id = c.id) project_questions,
@@ -32,6 +33,7 @@ public interface BoCommitteeQueryRepository extends JpaRepository<BoCommitteeQue
                    applications.user_project       project_applications,
                    (select jsonb_agg(
                                    jsonb_build_object('id', cjc.id, 'criteria', cjc.criteria)
+                                   order by rank
                            )
                     from committee_jury_criteria cjc
                     where cjc.committee_id = c.id) jury_criteria,

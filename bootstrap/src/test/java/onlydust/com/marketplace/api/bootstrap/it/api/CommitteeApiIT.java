@@ -47,8 +47,8 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                 ZonedDateTime.parse("2024-05-25T20:06:27.482Z"));
         committeeId = committee.id();
         committee = committee.toBuilder().status(Committee.Status.DRAFT).build();
-        final ProjectQuestion q1 = new ProjectQuestion("Q1", false);
-        final ProjectQuestion q2 = new ProjectQuestion("Q2", true);
+        final ProjectQuestion q1 = new ProjectQuestion("Question", false);
+        final ProjectQuestion q2 = new ProjectQuestion("Another question", true);
         projectQuestionId1 = q1.id();
         projectQuestionId2 = q2.id();
         committee.projectQuestions().addAll(List.of(q1, q2));
@@ -88,11 +88,11 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                 committeeApplicationResponse.getApplicationStartDate().toInstant().atZone(ZoneId.systemDefault()));
         assertEquals(committee.applicationEndDate().toInstant().atZone(ZoneId.systemDefault()),
                 committeeApplicationResponse.getApplicationEndDate().toInstant().atZone(ZoneId.systemDefault()));
-        assertEquals("Q1", committeeApplicationResponse.getProjectQuestions().get(0).getQuestion());
+        assertEquals("Question", committeeApplicationResponse.getProjectQuestions().get(0).getQuestion());
         assertEquals(false, committeeApplicationResponse.getProjectQuestions().get(0).getRequired());
         assertEquals(null, committeeApplicationResponse.getProjectQuestions().get(0).getAnswer());
         assertEquals(q1.id().value(), committeeApplicationResponse.getProjectQuestions().get(0).getId());
-        assertEquals("Q2", committeeApplicationResponse.getProjectQuestions().get(1).getQuestion());
+        assertEquals("Another question", committeeApplicationResponse.getProjectQuestions().get(1).getQuestion());
         assertEquals(true, committeeApplicationResponse.getProjectQuestions().get(1).getRequired());
         assertEquals(null, committeeApplicationResponse.getProjectQuestions().get(1).getAnswer());
         assertEquals(q2.id().value(), committeeApplicationResponse.getProjectQuestions().get(1).getId());
@@ -110,7 +110,7 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         projectLeadRepository.save(new ProjectLeadEntity(bretzel, pierre.user().getId()));
-        
+
         final var answerRequest1 = new CommitteeProjectAnswerRequest()
                 .answer(faker.pokemon().name())
                 .questionId(projectQuestionId1.value());
@@ -285,12 +285,10 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                         """);
     }
 
-
     @Test
     @Order(4)
     void should_get_committee() {
         // Given
-        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         committeeFacadePort.updateStatus(committeeId, Committee.Status.CLOSED);
 
         // When

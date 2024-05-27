@@ -38,7 +38,8 @@ public class CommitteeEntity {
     Integer votePerJury;
 
     @OneToMany(mappedBy = "committee", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<CommitteeProjectQuestionEntity> projectQuestions;
+    @OrderColumn(name = "rank", nullable = false)
+    List<CommitteeProjectQuestionEntity> projectQuestions;
 
     @OneToMany(mappedBy = "committee", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     Set<CommitteeProjectAnswerEntity> projectAnswers;
@@ -47,7 +48,8 @@ public class CommitteeEntity {
     Set<CommitteeJuryEntity> juries;
 
     @OneToMany(mappedBy = "committee", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<CommitteeJuryCriteriaEntity> juryCriterias;
+    @OrderColumn(name = "rank", nullable = false)
+    List<CommitteeJuryCriteriaEntity> juryCriterias;
 
     public static CommitteeEntity fromDomain(final Committee committee) {
         final var entity = CommitteeEntity.builder()
@@ -58,10 +60,10 @@ public class CommitteeEntity {
                 .status(committee.status())
                 .sponsorId(committee.sponsorId())
                 .votePerJury(committee.votePerJury())
-                .projectQuestions(new HashSet<>())
+                .projectQuestions(new ArrayList<>())
                 .projectAnswers(new HashSet<>())
                 .juries(new HashSet<>())
-                .juryCriterias(new HashSet<>())
+                .juryCriterias(new ArrayList<>())
                 .build();
 
         committee.projectQuestions()
@@ -88,7 +90,7 @@ public class CommitteeEntity {
                 .status(status)
                 .votePerJury(this.votePerJury)
                 .sponsorId(sponsorId)
-                .projectQuestions(Optional.ofNullable(projectQuestions).orElse(Set.of()).stream()
+                .projectQuestions(Optional.ofNullable(projectQuestions).orElse(List.of()).stream()
                         .map(CommitteeProjectQuestionEntity::toDomain)
                         .collect(toList()))
                 .projectApplications(Optional.ofNullable(projectAnswers).orElse(Set.of()).stream()
@@ -98,7 +100,7 @@ public class CommitteeEntity {
                 .juryIds(Optional.ofNullable(juries).orElse(Set.of()).stream()
                         .map(CommitteeJuryEntity::getUserId)
                         .collect(toList()))
-                .juryCriteria(Optional.ofNullable(juryCriterias).orElse(Set.of()).stream()
+                .juryCriteria(Optional.ofNullable(juryCriterias).orElse(List.of()).stream()
                         .map(CommitteeJuryCriteriaEntity::toDomain)
                         .collect(toList()))
                 .build();
