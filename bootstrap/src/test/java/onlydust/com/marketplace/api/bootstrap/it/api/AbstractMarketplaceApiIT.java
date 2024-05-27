@@ -156,6 +156,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String PUT_COMMITTEES_APPLICATIONS = "/api/v1/committees/%s/projects/%s/applications";
     protected static final String COMMITTEES_APPLICATIONS = "/api/v1/committees/%s/projects/applications";
     protected static final String COMMITTEES_BY_ID = "/api/v1/committees/%s";
+    protected static final String ME_COMMITTEE_ASSIGNEMENTS = "/api/v1/me/committees/%s";
 
     private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
             .withDatabaseName("marketplace_db")

@@ -1,5 +1,9 @@
 package onlydust.com.marketplace.bff.read;
 
+import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeJuryVoteViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeLinkViewRepository;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
+import onlydust.com.marketplace.bff.read.adapters.ReadCommitteesApiPostgresAdapter;
 import onlydust.com.marketplace.bff.read.adapters.ReadUsersApiPostgresAdapter;
 import onlydust.com.marketplace.bff.read.repositories.*;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -33,5 +37,17 @@ public class ReadApiConfiguration {
                 userProfileProjectEarningsEntityRepository,
                 userWorkDistributionEntityRepository,
                 userWeeklyStatsEntityRepository);
+    }
+
+    @Bean
+    public ReadCommitteesApiPostgresAdapter readCommitteesApiPostgresAdapter(
+            final AuthenticatedAppUserService authenticatedAppUserService,
+            final CommitteeLinkViewRepository committeeLinkViewRepository,
+            final CommitteeJuryVoteViewRepository committeeJuryVoteViewRepository) {
+        return new ReadCommitteesApiPostgresAdapter(
+                authenticatedAppUserService,
+                committeeLinkViewRepository,
+                committeeJuryVoteViewRepository
+        );
     }
 }

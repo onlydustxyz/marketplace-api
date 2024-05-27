@@ -4,7 +4,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
-import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import org.hibernate.annotations.Immutable;
 
@@ -27,15 +26,7 @@ public class CommitteeProjectQuestionViewEntity {
     Boolean required;
     @NonNull
     UUID committeeId;
-
-    public static CommitteeProjectQuestionViewEntity fromDomain(final Committee.Id committeeId, final ProjectQuestion projectQuestion) {
-        return CommitteeProjectQuestionViewEntity.builder()
-                .id(projectQuestion.id().value())
-                .committeeId(committeeId.value())
-                .question(projectQuestion.question())
-                .required(projectQuestion.required())
-                .build();
-    }
+    Integer rank;
 
     public ProjectQuestion toDomain() {
         return new ProjectQuestion(ProjectQuestion.Id.of(id), question, required);

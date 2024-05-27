@@ -308,33 +308,6 @@ public class MeRestApi implements MeApi {
         return ResponseEntity.noContent().build();
     }
 
-    @Override
-    public ResponseEntity<MyCommitteeAssignmentsResponse> getCommitteeAssignments(UUID committeeId) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final MyCommitteeAssignmentsResponse myCommitteeAssignmentsResponse = new MyCommitteeAssignmentsResponse();
-        myCommitteeAssignmentsResponse.setName("Committee 1 - June 2024");
-        myCommitteeAssignmentsResponse.setStatus(CommitteeStatus.OPEN_TO_VOTES);
-        myCommitteeAssignmentsResponse.setProjectAssignments(
-                List.of(new CommitteeAssignmentLinkResponse(
-                                new ProjectLinkResponse(
-                                        UUID.fromString("594ca5ca-48f7-49a8-9c26-84b949d4fdd9"),
-                                        "mooooooonlight",
-                                        "Mooooooonlight",
-                                        "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
-                                )
-                        ).score(BigDecimal.valueOf(3.4)),
-                        new CommitteeAssignmentLinkResponse(
-                                new ProjectLinkResponse(
-                                        UUID.fromString("594ca5ca-48f7-49a8-9c26-84b949d4fdd9"),
-                                        "bretzel",
-                                        "Bretzel",
-                                        "https://staging-onlydust-app-images.s3.eu-west-1.amazonaws.com/4e53ae9457d9d0ae336ee7cbc183f8a3.png"
-                                )
-                        ).score(BigDecimal.valueOf(1.3))
-                )
-        );
-        return ResponseEntity.ok(myCommitteeAssignmentsResponse);
-    }
 
     @Override
     public ResponseEntity<MyCommitteeAssignmentResponse> getCommitteeAssignmentOnProject(UUID committeeId, UUID projectId) {

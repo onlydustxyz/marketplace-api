@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.JuryAssignmentBuilder;
@@ -93,6 +94,9 @@ public class CommitteeService implements CommitteeFacadePort {
 
         if (isNull(committee.juryIds()) || committee.juryIds().isEmpty())
             throw forbidden("Committee %s must have some juries to assign them to project".formatted(committeeId.value()));
+
+        if (isNull(committee.projectApplications()) || committee.projectApplications().isEmpty())
+            throw OnlyDustException.forbidden("Committee %s must have some project applications to assign juries to them".formatted(committeeId.value()));
 
         final var projectIds = committee.projectApplications().keySet().stream().collect(toList());
         final var juryIds = committee.juryIds();
