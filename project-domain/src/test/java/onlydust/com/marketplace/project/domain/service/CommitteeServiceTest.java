@@ -24,6 +24,7 @@ import java.net.URI;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.IntStream;
@@ -623,15 +624,16 @@ public class CommitteeServiceTest {
                     .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .status(Committee.Status.OPEN_TO_VOTES)
                     .votePerJury(1)
+                    .projectApplications(Map.of(UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of())))
                     .build();
 
             // When
             when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(committee));
 
             // Then
-            assertThrowsExactly(OnlyDustException.class,
-                    () -> committeeService.updateStatus(committeeId, Committee.Status.OPEN_TO_VOTES),
-                    "Not enough juries or vote per jury to cover all projects");
+            assertThatThrownBy(() -> committeeService.updateStatus(committeeId, Committee.Status.OPEN_TO_VOTES))
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Committee %s must have some juries to assign them to project".formatted(committeeId));
         }
 
         @Test
@@ -646,15 +648,20 @@ public class CommitteeServiceTest {
                     .status(Committee.Status.OPEN_TO_VOTES)
                     .votePerJury(1)
                     .juryIds(List.of(userStub().getId()))
+                    .juryCriteria(List.of(new JuryCriteria(JuryCriteria.Id.random(), faker.pokemon().name())))
+                    .projectApplications(Map.of(UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of()),
+                            UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of()),
+                            UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of()),
+                            UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of())))
                     .build();
 
             // When
             when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(committee));
 
             // Then
-            assertThrowsExactly(OnlyDustException.class,
-                    () -> committeeService.updateStatus(committeeId, Committee.Status.OPEN_TO_VOTES),
-                    "Not enough juries or vote per jury to cover all projects");
+            assertThatThrownBy(() -> committeeService.updateStatus(committeeId, Committee.Status.OPEN_TO_VOTES))
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Not enough juries or vote per jury to cover all projects");
         }
 
         @Test
@@ -668,15 +675,40 @@ public class CommitteeServiceTest {
                     .status(Committee.Status.OPEN_TO_VOTES)
                     .votePerJury(2)
                     .juryIds(List.of(userStub().getId()))
+                    .projectApplications(Map.of(UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of())))
                     .build();
 
             // When
             when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(committee));
 
             // Then
-            assertThrowsExactly(OnlyDustException.class,
-                    () -> committeeService.updateStatus(committeeId, Committee.Status.OPEN_TO_VOTES),
-                    "Cannot assign juries to project given empty jury criteria");
+            assertThatThrownBy(() -> committeeService.updateStatus(committeeId, Committee.Status.OPEN_TO_VOTES))
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Cannot assign juries to project given empty jury criteria");
+        }
+
+        @Test
+        void given_no_application() {
+            final Committee.Id committeeId = Committee.Id.random();
+            final var jury1 = userStub();
+            final var committee = Committee.builder()
+                    .id(committeeId)
+                    .name(faker.rickAndMorty().character())
+                    .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .status(Committee.Status.OPEN_TO_APPLICATIONS)
+                    .votePerJury(2)
+                    .juryIds(List.of(jury1.getId()))
+                    .juryCriteria(List.of(new JuryCriteria(JuryCriteria.Id.random(), faker.pokemon().name())))
+                    .build();
+
+            // When
+            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(committee));
+            when(projectStoragePort.getProjectLedIdsForUser(jury1.getId())).thenReturn(List.of());
+            when(projectStoragePort.getProjectContributedOnIdsForUser(jury1.getId())).thenReturn(List.of());
+            assertThatThrownBy(() -> committeeService.updateStatus(committeeId, Committee.Status.OPEN_TO_VOTES))
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Committee %s must have some project applications to assign juries to them".formatted(committeeId));
         }
 
         @Test
@@ -688,10 +720,11 @@ public class CommitteeServiceTest {
                     .name(faker.rickAndMorty().character())
                     .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
-                    .status(Committee.Status.OPEN_TO_VOTES)
+                    .status(Committee.Status.OPEN_TO_APPLICATIONS)
                     .votePerJury(2)
                     .juryIds(List.of(jury1.getId()))
                     .juryCriteria(List.of(new JuryCriteria(JuryCriteria.Id.random(), faker.pokemon().name())))
+                    .projectApplications(Map.of(UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of())))
                     .build();
 
             // When
@@ -734,9 +767,9 @@ public class CommitteeServiceTest {
             when(projectStoragePort.getProjectContributedOnIdsForUser(jury2.getId())).thenReturn(List.of(projectIds.get(4), projectIds.get(0)));
 
             // Then
-            assertThrowsExactly(OnlyDustException.class,
-                    () -> committeeService.updateStatus(committeeId, Committee.Status.OPEN_TO_VOTES),
-                    "Not enough juries or vote per jury to cover all projects given some juries are project lead or contributor on application project");
+            assertThatThrownBy(() -> committeeService.updateStatus(committeeId, Committee.Status.OPEN_TO_VOTES))
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Not enough juries or vote per jury to cover all projects given some juries are project lead or contributor on application project");
         }
 
 
