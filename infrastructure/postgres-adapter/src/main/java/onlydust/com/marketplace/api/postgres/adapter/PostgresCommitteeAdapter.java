@@ -1,17 +1,19 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
-import onlydust.com.marketplace.api.postgres.adapter.entity.enums.CommitteeStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeJuryVoteViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeLinkViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectInfosQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoCommitteeQueryEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeJuryVoteEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoCommitteeQueryRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.model.JuryAssignment;
+import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
+import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
 import onlydust.com.marketplace.project.domain.view.ProjectShortView;
@@ -33,12 +35,8 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
 
     private final CommitteeRepository committeeRepository;
     private final BoCommitteeQueryRepository boCommitteeQueryRepository;
-    private final CommitteeApplicationRepository committeeApplicationRepository;
-    private final CommitteeProjectQuestionRepository committeeProjectQuestionRepository;
     private final CommitteeProjectAnswerViewRepository committeeProjectAnswerViewRepository;
     private final ProjectInfosViewRepository projectInfosViewRepository;
-    private final CommitteeJuryRepository committeeJuryRepository;
-    private final CommitteeJuryCriteriaRepository committeeJuryCriteriaRepository;
     private final CommitteeLinkViewRepository committeeLinkViewRepository;
     private final CommitteeJuryVoteRepository committeeJuryVoteRepository;
     private final CommitteeJuryVoteViewRepository committeeJuryVoteViewRepository;
@@ -47,19 +45,6 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     @Transactional
     public Committee save(Committee committee) {
         return committeeRepository.save(CommitteeEntity.fromDomain(committee)).toDomain();
-    }
-
-    @Override
-    @Transactional
-    public void saveProjectQuestions(Committee.Id committeeId, List<ProjectQuestion> projectQuestions) {
-        committeeProjectQuestionRepository.saveAll(projectQuestions.stream().map(projectQuestion -> CommitteeProjectQuestionEntity.fromDomain(committeeId,
-                projectQuestion)).toList());
-    }
-
-    @Override
-    @Transactional
-    public void deleteAllProjectQuestions(Committee.@NonNull Id committeeId) {
-        committeeProjectQuestionRepository.deleteAllByCommitteeId(committeeId.value());
     }
 
     @Override
@@ -75,20 +60,20 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<CommitteeView> findById(Committee.Id committeeId) {
+    public Optional<CommitteeView> findViewById(Committee.Id committeeId) {
         return boCommitteeQueryRepository.findById(committeeId.value()).map(BoCommitteeQueryEntity::toView);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Committee> findById(Committee.Id committeeId) {
+        return committeeRepository.findById(committeeId.value()).map(CommitteeEntity::toDomain);
     }
 
     @Override
     @Transactional
     public void updateStatus(Committee.Id committeeId, Committee.Status status) {
-        committeeRepository.updateStatus(committeeId.value(), CommitteeStatusEntity.fromDomain(status).name());
-    }
-
-    @Override
-    @Transactional
-    public void saveApplication(Committee.Id committeeId, Committee.Application application) {
-        committeeApplicationRepository.saveAll(CommitteeProjectAnswerEntity.fromDomain(committeeId, application));
+        committeeRepository.updateStatus(committeeId.value(), status.name());
     }
 
     @Override
@@ -103,12 +88,6 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
                         committeeProjectAnswerView.getProjectQuestion().getQuestion(), committeeProjectAnswerView.getProjectQuestion().getRequired(),
                         committeeProjectAnswerView.getAnswer()))
                 .toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public boolean hasStartedApplication(Committee.Id committeeId, Committee.Application application) {
-        return committeeApplicationRepository.existsByCommitteeIdAndProjectId(committeeId.value(), application.projectId());
     }
 
     @Override
@@ -128,31 +107,6 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
                     )
             );
         }
-    }
-
-    @Override
-    @Transactional
-    public void deleteAllJuries(Committee.Id committeeId) {
-        committeeJuryRepository.deleteAllByCommitteeId(committeeId.value());
-    }
-
-    @Override
-    @Transactional
-    public void saveJuries(Committee.Id committeeId, List<UUID> juryIds) {
-        committeeJuryRepository.saveAll(juryIds.stream().map(juryId -> new CommitteeJuryEntity(committeeId.value(), juryId)).collect(Collectors.toSet()));
-    }
-
-    @Override
-    @Transactional
-    public void deleteAllJuryCriteria(Committee.Id committeeId) {
-        committeeJuryCriteriaRepository.deleteAllByCommitteeId(committeeId.value());
-    }
-
-    @Override
-    @Transactional
-    public void saveJuryCriteria(Committee.Id committeeId, List<JuryCriteria> juryCriteria) {
-        committeeJuryCriteriaRepository.saveAll(juryCriteria.stream().map(jc -> new CommitteeJuryCriteriaEntity(jc.id().value(), jc.criteria(),
-                committeeId.value())).collect(Collectors.toSet()));
     }
 
     @Override

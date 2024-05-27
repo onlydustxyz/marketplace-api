@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 
 import java.io.Serializable;
 import java.util.List;
@@ -17,29 +18,37 @@ import java.util.UUID;
 @Table(name = "committee_project_answers", schema = "public")
 @IdClass(CommitteeProjectAnswerEntity.PrimaryKey.class)
 public class CommitteeProjectAnswerEntity {
+    @Id
+    @EqualsAndHashCode.Include
+    @NonNull UUID committeeId;
+    @Id
+    @EqualsAndHashCode.Include
+    @NonNull UUID projectId;
+    @Id
+    @EqualsAndHashCode.Include
+    @NonNull UUID questionId;
 
-    @Id
-    @NonNull
-    UUID committeeId;
-    @Id
-    @NonNull
-    UUID projectId;
-    @Id
-    @NonNull
-    UUID questionId;
-    @NonNull
-    UUID userId;
+    @NonNull UUID userId;
     String answer;
 
-    public static List<CommitteeProjectAnswerEntity> fromDomain(final Committee.Id committeeId, final Committee.Application application) {
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "committeeId", insertable = false, updatable = false)
+    @NonNull CommitteeEntity committee;
+
+    public static List<CommitteeProjectAnswerEntity> fromDomain(final CommitteeEntity committee, final Committee.Application application) {
         return application.answers().stream()
                 .map(projectAnswer -> CommitteeProjectAnswerEntity.builder()
-                        .committeeId(committeeId.value())
+                        .committeeId(committee.id)
                         .projectId(application.projectId())
                         .userId(application.userId())
                         .questionId(projectAnswer.projectQuestionId().value())
                         .answer(projectAnswer.answer())
+                        .committee(committee)
                         .build()).toList();
+    }
+
+    public Committee.Application toApplication() {
+        return new Committee.Application(projectId, userId, List.of(new Committee.ProjectAnswer(ProjectQuestion.Id.of(questionId), answer)));
     }
 
     @EqualsAndHashCode

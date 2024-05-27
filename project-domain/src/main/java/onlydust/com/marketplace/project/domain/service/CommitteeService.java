@@ -2,7 +2,6 @@ package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.JuryAssignmentBuilder;
@@ -12,7 +11,6 @@ import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
-import onlydust.com.marketplace.project.domain.view.RegisteredContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.commitee.*;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +20,8 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 
 @AllArgsConstructor
 public class CommitteeService implements CommitteeFacadePort {
@@ -33,7 +33,7 @@ public class CommitteeService implements CommitteeFacadePort {
 
     @Override
     public Committee createCommittee(@NonNull String name, @NonNull ZonedDateTime startDate, @NonNull ZonedDateTime endDate) {
-        return committeeStoragePort.save(new Committee(name, startDate, endDate));
+        return committeeStoragePort.save(Committee.create(name, startDate, endDate));
     }
 
     @Override
@@ -44,27 +44,30 @@ public class CommitteeService implements CommitteeFacadePort {
     @Override
     @Transactional
     public void update(Committee committee) {
+        final var existingCommittee = committeeStoragePort.findById(committee.id())
+                .orElseThrow(() -> notFound("Committee %s was not found".formatted(committee.id().value().toString())));
+
+        // TODO remove status from update request
+        if (existingCommittee.status() != committee.status())
+            throw forbidden("Status cannot be updated");
+
+        if (existingCommittee.status() != Committee.Status.DRAFT && !committee.projectQuestions().equals(existingCommittee.projectQuestions()))
+            throw forbidden("Project questions can only be updated for draft committees");
+
+        if (!List.of(Committee.Status.DRAFT, Committee.Status.OPEN_TO_APPLICATIONS).contains(existingCommittee.status())) {
+            if (!committee.juryIds().equals(existingCommittee.juryIds()))
+                throw forbidden("Juries can only be updated for draft or open to applications committees");
+            if (!committee.juryCriteria().equals(existingCommittee.juryCriteria()))
+                throw forbidden("Jury criteria can only be updated for draft or open to applications committees");
+        }
+
         committeeStoragePort.save(committee);
-        if (committee.status() == Committee.Status.DRAFT && !committee.projectQuestions().isEmpty()) {
-            committeeStoragePort.deleteAllProjectQuestions(committee.id());
-            committeeStoragePort.saveProjectQuestions(committee.id(), committee.projectQuestions());
-        }
-        if (List.of(Committee.Status.DRAFT, Committee.Status.OPEN_TO_APPLICATIONS).contains(committee.status())) {
-            committeeStoragePort.deleteAllJuries(committee.id());
-            if (!committee.juryIds().isEmpty()) {
-                committeeStoragePort.saveJuries(committee.id(), committee.juryIds());
-            }
-            committeeStoragePort.deleteAllJuryCriteria(committee.id());
-            if (!committee.juryCriteria().isEmpty()) {
-                committeeStoragePort.saveJuryCriteria(committee.id(), committee.juryCriteria());
-            }
-        }
     }
 
     @Override
     public CommitteeView getCommitteeById(Committee.Id committeeId) {
-        return committeeStoragePort.findById(committeeId)
-                .orElseThrow(() -> OnlyDustException.notFound("Committee %s was not found".formatted(committeeId.value().toString())));
+        return committeeStoragePort.findViewById(committeeId)
+                .orElseThrow(() -> notFound("Committee %s was not found".formatted(committeeId.value().toString())));
     }
 
     @Override
@@ -77,23 +80,23 @@ public class CommitteeService implements CommitteeFacadePort {
     }
 
     private void assignProjectsToJuries(Committee.Id committeeId) {
-        final CommitteeView committee = getCommitteeById(committeeId);
-        if (isNull(committee.juries()) || committee.juries().isEmpty()) {
-            throw OnlyDustException.forbidden("Committee %s must have some juries to assign them to project".formatted(committeeId.value()));
-        }
-        List<UUID> projectIds = committee.committeeApplicationLinks().stream()
-                .map(committeeApplicationLinkView -> committeeApplicationLinkView.projectShortView().id()).collect(Collectors.toList());
-        final Set<UUID> juryIds = committee.juries().stream().map(RegisteredContributorLinkView::getId).collect(Collectors.toSet());
+        final var committee = committeeStoragePort.findById(committeeId)
+                .orElseThrow(() -> notFound("Committee %s was not found".formatted(committeeId.value().toString())));
 
-        if (isNull(committee.votePerJury())) {
-            throw OnlyDustException.forbidden("Number of vote per jury must filled to assign juries to projects");
-        }
-        if (juryIds.isEmpty() || juryIds.size() * committee.votePerJury() < projectIds.size()) {
-            throw OnlyDustException.forbidden("Not enough juries or vote per jury to cover all projects");
-        }
-        if (committee.juryCriteria().isEmpty()) {
-            throw OnlyDustException.forbidden("Cannot assign juries to project given empty jury criteria");
-        }
+        if (isNull(committee.juryIds()) || committee.juryIds().isEmpty())
+            throw forbidden("Committee %s must have some juries to assign them to project".formatted(committeeId.value()));
+
+        final var projectIds = committee.projectApplications().keySet().stream().collect(toList());
+        final var juryIds = committee.juryIds();
+
+        if (isNull(committee.votePerJury()))
+            throw forbidden("Number of vote per jury must filled to assign juries to projects");
+
+        if (juryIds.isEmpty() || juryIds.size() * committee.votePerJury() < projectIds.size())
+            throw forbidden("Not enough juries or vote per jury to cover all projects");
+
+        if (committee.juryCriteria().isEmpty())
+            throw forbidden("Cannot assign juries to project given empty jury criteria");
 
         final Map<UUID, Integer> projectVoteCount = new HashMap<>();
 
@@ -125,8 +128,8 @@ public class CommitteeService implements CommitteeFacadePort {
                 .collect(Collectors.toSet());
 
         if (!assignedProjectIds.containsAll(projectIds)) {
-            throw OnlyDustException.internalServerError("Not enough juries or vote per jury to cover all projects given some" +
-                                                        " juries are project lead or contributor on application project");
+            throw internalServerError("Not enough juries or vote per jury to cover all projects given some" +
+                                      " juries are project lead or contributor on application project");
         }
 
         committeeStoragePort.saveJuryAssignments(
@@ -139,30 +142,33 @@ public class CommitteeService implements CommitteeFacadePort {
     @Override
     public void createUpdateApplicationForCommittee(Committee.Id committeeId, Committee.Application application) {
         final var committee = committeeStoragePort.findById(committeeId)
-                .orElseThrow(() -> OnlyDustException.notFound("Committee %s was not found".formatted(committeeId.value().toString())));
+                .orElseThrow(() -> notFound("Committee %s was not found".formatted(committeeId.value().toString())));
+
         checkCommitteePermission(application, committee);
         checkApplicationPermission(application.projectId(), application.userId());
-        final boolean hasStartedApplication = committeeStoragePort.hasStartedApplication(committeeId, application);
-        committeeStoragePort.saveApplication(committeeId, application);
-        if (!hasStartedApplication) {
+
+        final var hasStartedApplication = committee.projectApplications().containsKey(application.projectId());
+        committee.projectApplications().put(application.projectId(), application);
+        committeeStoragePort.save(committee);
+
+        if (!hasStartedApplication)
             committeeObserverPort.onNewApplication(committeeId, application.projectId(), application.userId());
-        }
     }
 
-    private static void checkCommitteePermission(Committee.Application application, CommitteeView committee) {
+    private static void checkCommitteePermission(Committee.Application application, Committee committee) {
         if (committee.status() != Committee.Status.OPEN_TO_APPLICATIONS)
-            throw OnlyDustException.forbidden("Applications are not opened or are closed for committee %s".formatted(committee.id().value()));
-        final List<ProjectQuestion.Id> projectQuestionIds = committee.projectQuestions().stream().map(ProjectQuestion::id).toList();
-        if (application.answers().stream().map(Committee.ProjectAnswer::projectQuestionId)
-                .anyMatch(id -> !projectQuestionIds.contains(id))) {
-            throw OnlyDustException.internalServerError("A project question is not linked to committee %s".formatted(committee.id().value()));
-        }
+            throw forbidden("Applications are not opened or are closed for committee %s".formatted(committee.id().value()));
+
+        final var projectQuestionIds = committee.projectQuestions().stream().map(ProjectQuestion::id).toList();
+
+        if (application.answers().stream().map(Committee.ProjectAnswer::projectQuestionId).anyMatch(id -> !projectQuestionIds.contains(id)))
+            throw internalServerError("A project question is not linked to committee %s".formatted(committee.id().value()));
     }
 
     @Override
     public CommitteeApplicationView getCommitteeApplication(Committee.Id committeeId, Optional<UUID> optionalProjectId, UUID userId) {
-        final var committee = committeeStoragePort.findById(committeeId)
-                .orElseThrow(() -> OnlyDustException.notFound("Committee %s was not found".formatted(committeeId.value().toString())));
+        final var committee = committeeStoragePort.findViewById(committeeId)
+                .orElseThrow(() -> notFound("Committee %s was not found".formatted(committeeId.value().toString())));
 
         if (optionalProjectId.isPresent()) {
             final UUID projectId = optionalProjectId.get();
@@ -183,7 +189,7 @@ public class CommitteeService implements CommitteeFacadePort {
     @Override
     public CommitteeApplicationDetailsView getCommitteeApplicationDetails(Committee.Id committeeId, UUID projectId) {
         return committeeStoragePort.findByCommitteeIdAndProjectId(committeeId, projectId)
-                .orElseThrow(() -> OnlyDustException.internalServerError("Application on committee %s not found for project %s"
+                .orElseThrow(() -> internalServerError("Application on committee %s not found for project %s"
                         .formatted(committeeId.value(), projectId)));
     }
 
@@ -199,9 +205,9 @@ public class CommitteeService implements CommitteeFacadePort {
 
     private void checkApplicationPermission(final UUID projectId, final UUID userId) {
         if (!permissionService.isUserProjectLead(projectId, userId))
-            throw OnlyDustException.forbidden("Only project lead can send new application to committee");
+            throw forbidden("Only project lead can send new application to committee");
         if (!projectStoragePort.exists(projectId))
-            throw OnlyDustException.internalServerError("Project %s was not found".formatted(projectId));
+            throw internalServerError("Project %s was not found".formatted(projectId));
     }
 
 }

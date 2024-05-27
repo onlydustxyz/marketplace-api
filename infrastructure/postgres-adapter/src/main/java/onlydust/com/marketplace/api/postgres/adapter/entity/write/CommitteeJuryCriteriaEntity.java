@@ -1,8 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.project.domain.model.JuryCriteria;
 
@@ -23,6 +21,19 @@ public class CommitteeJuryCriteriaEntity {
     String criteria;
     @NonNull
     UUID committeeId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "committeeId", insertable = false, updatable = false)
+    private CommitteeEntity committee;
+
+    public static CommitteeJuryCriteriaEntity fromDomain(CommitteeEntity entity, JuryCriteria juryCriterion) {
+        return CommitteeJuryCriteriaEntity.builder()
+                .id(juryCriterion.id().value())
+                .criteria(juryCriterion.criteria())
+                .committeeId(entity.getId())
+                .committee(entity)
+                .build();
+    }
 
     public JuryCriteria toDomain() {
         return JuryCriteria.builder()

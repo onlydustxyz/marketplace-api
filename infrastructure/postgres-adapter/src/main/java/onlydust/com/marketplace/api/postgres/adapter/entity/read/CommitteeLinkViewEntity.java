@@ -5,12 +5,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.api.postgres.adapter.entity.enums.CommitteeStatusEntity;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
 import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.JdbcType;
-import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -36,9 +33,7 @@ public class CommitteeLinkViewEntity {
     String name;
     @NonNull
     @Enumerated(EnumType.STRING)
-    @JdbcType(PostgreSQLEnumJdbcType.class)
-    @Column(columnDefinition = "committee_status")
-    CommitteeStatusEntity status;
+    Committee.Status status;
     @Column(insertable = false, updatable = false)
     Date techCreatedAt;
     Integer projectCount;
@@ -50,7 +45,7 @@ public class CommitteeLinkViewEntity {
                 .name(this.name)
                 .startDate(ZonedDateTime.ofInstant(applicationStartDate.toInstant(), ZoneOffset.UTC))
                 .endDate(ZonedDateTime.ofInstant(applicationEndDate.toInstant(), ZoneOffset.UTC))
-                .status(this.status.toDomain())
+                .status(this.status)
                 .projectCount(this.projectCount)
                 .build();
     }

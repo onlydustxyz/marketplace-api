@@ -10,7 +10,10 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadR
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -48,12 +51,7 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
         final ProjectQuestion q2 = new ProjectQuestion("Q2", true);
         projectQuestionId1 = q1.id();
         projectQuestionId2 = q2.id();
-        committee.projectQuestions().addAll(
-                List.of(
-                        q1,
-                        q2
-                )
-        );
+        committee.projectQuestions().addAll(List.of(q1, q2));
         committeeFacadePort.update(committee);
 
         // Cannot get committee with status DRAFT
@@ -112,17 +110,15 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         projectLeadRepository.save(new ProjectLeadEntity(bretzel, pierre.user().getId()));
-        final CommitteeApplicationRequest committeeApplicationRequest = new CommitteeApplicationRequest();
-        final CommitteeProjectAnswerRequest answerRequest1 = new CommitteeProjectAnswerRequest()
+        
+        final var answerRequest1 = new CommitteeProjectAnswerRequest()
                 .answer(faker.pokemon().name())
                 .questionId(projectQuestionId1.value());
-        final CommitteeProjectAnswerRequest answerRequest2 = new CommitteeProjectAnswerRequest()
+        final var answerRequest2 = new CommitteeProjectAnswerRequest()
                 .answer(faker.pokemon().name())
                 .questionId(projectQuestionId2.value());
-        committeeApplicationRequest.setAnswers(List.of(
-                answerRequest1,
-                answerRequest2
-        ));
+        final var committeeApplicationRequest = new CommitteeApplicationRequest()
+                .answers(List.of(answerRequest1, answerRequest2));
 
         // When
         client.put()

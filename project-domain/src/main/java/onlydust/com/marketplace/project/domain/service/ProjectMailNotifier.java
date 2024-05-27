@@ -26,7 +26,7 @@ public class ProjectMailNotifier implements CommitteeObserverPort {
 
     @Override
     public void onNewApplication(Committee.@NonNull Id committeeId, @NonNull UUID projectId, @NonNull UUID userId) {
-        final CommitteeView committee = committeeStoragePort.findById(committeeId)
+        final CommitteeView committee = committeeStoragePort.findViewById(committeeId)
                 .orElseThrow(() -> OnlyDustException.internalServerError("Committee %s not found".formatted(committeeId.value())));
         final User user = userStoragePort.getUserById(userId).orElseThrow(() -> OnlyDustException.internalServerError("User %s not found".formatted(userId)));
         final ProjectInfosView projectInfos = projectStoragePort.getProjectInfos(projectId);

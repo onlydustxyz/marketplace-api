@@ -1,10 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
-import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 
 import java.util.UUID;
@@ -14,28 +11,33 @@ import java.util.UUID;
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
-@Builder
+@Builder(access = AccessLevel.PRIVATE)
 @Table(name = "committee_project_questions", schema = "public")
 public class CommitteeProjectQuestionEntity {
     @Id
-    UUID id;
-    @NonNull
-    String question;
-    @NonNull
-    Boolean required;
-    @NonNull
-    UUID committeeId;
+    @EqualsAndHashCode.Include
+    @NonNull UUID id;
+    @NonNull String question;
+    @NonNull Boolean required;
 
-    public static CommitteeProjectQuestionEntity fromDomain(final Committee.Id committeeId, final ProjectQuestion projectQuestion) {
+    @ManyToOne
+    @JoinColumn(name = "committeeId")
+    @NonNull CommitteeEntity committee;
+
+    public static CommitteeProjectQuestionEntity fromDomain(final CommitteeEntity committee, final ProjectQuestion projectQuestion) {
         return CommitteeProjectQuestionEntity.builder()
+                .committee(committee)
                 .id(projectQuestion.id().value())
-                .committeeId(committeeId.value())
                 .question(projectQuestion.question())
                 .required(projectQuestion.required())
                 .build();
     }
 
     public ProjectQuestion toDomain() {
-        return new ProjectQuestion(ProjectQuestion.Id.of(id), question, required);
+        return ProjectQuestion.builder()
+                .id(ProjectQuestion.Id.of(id))
+                .question(question)
+                .required(required)
+                .build();
     }
 }

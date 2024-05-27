@@ -424,17 +424,16 @@ public class PostgresConfiguration {
     @Bean
     PostgresCommitteeAdapter postgresCommitteeAdapter(final CommitteeRepository committeeRepository,
                                                       final BoCommitteeQueryRepository boCommitteeQueryRepository,
-                                                      final CommitteeApplicationRepository committeeApplicationRepository,
-                                                      final CommitteeProjectQuestionRepository committeeProjectQuestionRepository,
                                                       final CommitteeProjectAnswerViewRepository committeeProjectAnswerViewRepository,
                                                       final ProjectInfosViewRepository projectInfosViewRepository,
-                                                      final CommitteeJuryCriteriaRepository committeeJuryCriteriaRepository,
-                                                      final CommitteeJuryRepository committeeJuryRepository,
                                                       final CommitteeLinkViewRepository committeeLinkViewRepository,
                                                       final CommitteeJuryVoteRepository committeeJuryVoteRepository,
                                                       final CommitteeJuryVoteViewRepository committeeJuryVoteViewRepository) {
-        return new PostgresCommitteeAdapter(committeeRepository, boCommitteeQueryRepository, committeeApplicationRepository,
-                committeeProjectQuestionRepository, committeeProjectAnswerViewRepository, projectInfosViewRepository, committeeJuryRepository,
-                committeeJuryCriteriaRepository, committeeLinkViewRepository, committeeJuryVoteRepository, committeeJuryVoteViewRepository);
+        return new PostgresCommitteeAdapter(committeeRepository,
+                boCommitteeQueryRepository,
+                committeeProjectAnswerViewRepository,
+                projectInfosViewRepository,
+                committeeLinkViewRepository,
+                committeeJuryVoteRepository, committeeJuryVoteViewRepository);
     }
 }
