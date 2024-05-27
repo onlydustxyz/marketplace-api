@@ -5,9 +5,10 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationView;
-import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import static java.util.Objects.isNull;
 
@@ -27,7 +28,6 @@ public interface CommitteeMapper {
         committeeApplicationResponse.setApplicationStartDate(committeeApplicationView.applicationStartDate());
         committeeApplicationResponse.setApplicationEndDate(committeeApplicationView.applicationEndDate());
         committeeApplicationResponse.setProjectQuestions(committeeApplicationView.answers().stream()
-                .sorted(Comparator.comparing(ProjectAnswerView::question))
                 .map(projectAnswer -> new CommitteeProjectQuestionResponse()
                         .question(projectAnswer.question())
                         .required(projectAnswer.required())
@@ -40,7 +40,8 @@ public interface CommitteeMapper {
                 .id(committeeApplicationView.projectInfosView().projectId())
                 .name(committeeApplicationView.projectInfosView().name())
                 .slug(committeeApplicationView.projectInfosView().slug())
-                .logoUrl(isNull(committeeApplicationView.projectInfosView().logoUri()) ? null : committeeApplicationView.projectInfosView().logoUri().toString())
+                .logoUrl(isNull(committeeApplicationView.projectInfosView().logoUri()) ? null :
+                        committeeApplicationView.projectInfosView().logoUri().toString())
                 .shortDescription(committeeApplicationView.projectInfosView().shortDescription())
                 .projectLeads(committeeApplicationView.projectInfosView().projectLeads().stream()
                         .map(projectLeaderLinkView -> new RegisteredUserResponse()

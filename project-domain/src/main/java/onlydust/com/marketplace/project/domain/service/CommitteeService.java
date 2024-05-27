@@ -51,15 +51,14 @@ public class CommitteeService implements CommitteeFacadePort {
         if (existingCommittee.status() != committee.status())
             throw forbidden("Status cannot be updated");
 
-        if (existingCommittee.status() != Committee.Status.DRAFT && !committee.projectQuestions().equals(existingCommittee.projectQuestions()))
-            throw forbidden("Project questions can only be updated for draft committees");
+        if (existingCommittee.areProjectQuestionsFixed() && !committee.projectQuestions().equals(existingCommittee.projectQuestions()))
+            throw forbidden("Project questions cannot be updated");
 
-        if (!List.of(Committee.Status.DRAFT, Committee.Status.OPEN_TO_APPLICATIONS).contains(existingCommittee.status())) {
-            if (!committee.juryIds().equals(existingCommittee.juryIds()))
-                throw forbidden("Juries can only be updated for draft or open to applications committees");
-            if (!committee.juryCriteria().equals(existingCommittee.juryCriteria()))
-                throw forbidden("Jury criteria can only be updated for draft or open to applications committees");
-        }
+        if (existingCommittee.areJuryCriteriaFixed() && !committee.juryCriteria().equals(existingCommittee.juryCriteria()))
+            throw forbidden("Jury criteria cannot be updated");
+
+        if (existingCommittee.areJuriesFixed() && !committee.juryIds().equals(existingCommittee.juryIds()))
+            throw forbidden("Juries cannot be updated");
 
         committeeStoragePort.save(committee);
     }

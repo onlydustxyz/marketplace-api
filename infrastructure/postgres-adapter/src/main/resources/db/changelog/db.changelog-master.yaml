@@ -311,3 +311,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000241_pennylane_migration_recovery.sql
   - include:
       file: db/changelog/changelogs/00000242_add_committee_voting_tables.sql
+  - include:
+      file: db/changelog/changelogs/00000243_add_questions_and_criteria_ranks.sql
