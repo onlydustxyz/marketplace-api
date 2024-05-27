@@ -6,8 +6,10 @@ import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.project.domain.view.*;
-import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationLinkView;
+import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
+import onlydust.com.marketplace.project.domain.view.ProjectInfosView;
+import onlydust.com.marketplace.project.domain.view.ProjectShortView;
+import onlydust.com.marketplace.project.domain.view.RegisteredContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,11 +23,13 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
@@ -56,8 +60,7 @@ public class CommitteeServiceTest {
         final ZonedDateTime applicationEndDate = faker.date().birthday().toInstant().atZone(ZoneId.systemDefault());
 
         // When
-        committeeService.createCommittee(name, applicationStartDate,
-                applicationEndDate);
+        committeeService.createCommittee(name, applicationStartDate, applicationEndDate);
 
         // Then
         final ArgumentCaptor<Committee> committeeArgumentCaptor = ArgumentCaptor.forClass(Committee.class);
@@ -555,32 +558,18 @@ public class CommitteeServiceTest {
         @Test
         void given_no_jury() {
             // Given
-            final Committee.Id committeeId = Committee.Id.random();
-            final List<CommitteeApplicationLinkView> committeeApplicationLinks = List.of(
-                    CommitteeApplicationLinkView.builder()
-                            .applicant(ProjectLeaderLinkView.builder().build())
-                            .projectShortView(projectStub())
-                            .build(),
-                    CommitteeApplicationLinkView.builder()
-                            .applicant(ProjectLeaderLinkView.builder().build())
-                            .projectShortView(projectStub())
-                            .build()
-            );
-            final int votePerJury = 1;
-            final List<RegisteredContributorLinkView> juries = List.of();
-            final List<JuryCriteria> juryCriteria = List.of();
-            final CommitteeView committeeView = new CommitteeView(
-                    committeeId, faker.rickAndMorty().character(), faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()),
-                    faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()), Committee.Status.OPEN_TO_VOTES, null, List.of(),
-                    committeeApplicationLinks, juries, juryCriteria, votePerJury, null
-            );
+            final var committeeId = Committee.Id.random();
+            final var committee = Committee.builder()
+                    .id(committeeId)
+                    .name(faker.rickAndMorty().character())
+                    .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .status(Committee.Status.OPEN_TO_VOTES)
+                    .votePerJury(1)
+                    .build();
 
             // When
-            when(committeeStoragePort.findById(committeeId))
-                    .thenReturn(Optional.of(
-                            committeeView
-                    ));
-
+            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(committee));
 
             // Then
             assertThrowsExactly(OnlyDustException.class,
@@ -592,32 +581,18 @@ public class CommitteeServiceTest {
         void given_not_enough_juries_compared_to_projects() {
             // Given
             final Committee.Id committeeId = Committee.Id.random();
-            final List<CommitteeApplicationLinkView> committeeApplicationLinks = List.of(
-                    CommitteeApplicationLinkView.builder()
-                            .applicant(ProjectLeaderLinkView.builder().build())
-                            .projectShortView(projectStub())
-                            .build(),
-                    CommitteeApplicationLinkView.builder()
-                            .applicant(ProjectLeaderLinkView.builder().build())
-                            .projectShortView(projectStub())
-                            .build()
-            );
-            final int votePerJury = 1;
-            final List<RegisteredContributorLinkView> juries = List.of(
-                    userStub());
-            final List<JuryCriteria> juryCriteria = List.of();
-            final CommitteeView committeeView = new CommitteeView(
-                    committeeId, faker.rickAndMorty().character(), faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()),
-                    faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()), Committee.Status.OPEN_TO_VOTES, null, List.of(),
-                    committeeApplicationLinks, juries, juryCriteria, votePerJury, null
-            );
+            final var committee = Committee.builder()
+                    .id(committeeId)
+                    .name(faker.rickAndMorty().character())
+                    .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .status(Committee.Status.OPEN_TO_VOTES)
+                    .votePerJury(1)
+                    .juryIds(List.of(userStub().getId()))
+                    .build();
 
             // When
-            when(committeeStoragePort.findById(committeeId))
-                    .thenReturn(Optional.of(
-                            committeeView
-                    ));
-
+            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(committee));
 
             // Then
             assertThrowsExactly(OnlyDustException.class,
@@ -628,32 +603,18 @@ public class CommitteeServiceTest {
         @Test
         void given_no_jury_criteria() {
             final Committee.Id committeeId = Committee.Id.random();
-            final List<CommitteeApplicationLinkView> committeeApplicationLinks = List.of(
-                    CommitteeApplicationLinkView.builder()
-                            .applicant(ProjectLeaderLinkView.builder().build())
-                            .projectShortView(projectStub())
-                            .build(),
-                    CommitteeApplicationLinkView.builder()
-                            .applicant(ProjectLeaderLinkView.builder().build())
-                            .projectShortView(projectStub())
-                            .build()
-            );
-            final int votePerJury = 2;
-            final RegisteredContributorLinkView jury1 = userStub();
-            final List<RegisteredContributorLinkView> juries = List.of(
-                    jury1);
-            final List<JuryCriteria> juryCriteria = List.of();
-            final CommitteeView committeeView = new CommitteeView(
-                    committeeId, faker.rickAndMorty().character(), faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()),
-                    faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()), Committee.Status.OPEN_TO_VOTES, null, List.of(),
-                    committeeApplicationLinks, juries, juryCriteria, votePerJury, null
-            );
+            final var committee = Committee.builder()
+                    .id(committeeId)
+                    .name(faker.rickAndMorty().character())
+                    .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .status(Committee.Status.OPEN_TO_VOTES)
+                    .votePerJury(2)
+                    .juryIds(List.of(userStub().getId()))
+                    .build();
 
             // When
-            when(committeeStoragePort.findById(committeeId))
-                    .thenReturn(Optional.of(
-                            committeeView
-                    ));
+            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(committee));
 
             // Then
             assertThrowsExactly(OnlyDustException.class,
@@ -664,34 +625,20 @@ public class CommitteeServiceTest {
         @Test
         void given_1_jury_with_2_votes_for_2_projects() {
             final Committee.Id committeeId = Committee.Id.random();
-            final List<CommitteeApplicationLinkView> committeeApplicationLinks = List.of(
-                    CommitteeApplicationLinkView.builder()
-                            .applicant(ProjectLeaderLinkView.builder().build())
-                            .projectShortView(projectStub())
-                            .build(),
-                    CommitteeApplicationLinkView.builder()
-                            .applicant(ProjectLeaderLinkView.builder().build())
-                            .projectShortView(projectStub())
-                            .build()
-            );
-            final int votePerJury = 2;
-            final RegisteredContributorLinkView jury1 = userStub();
-            final List<RegisteredContributorLinkView> juries = List.of(
-                    jury1);
-            final List<JuryCriteria> juryCriteria = List.of(
-                    new JuryCriteria(JuryCriteria.Id.random(), faker.pokemon().name())
-            );
-            final CommitteeView committeeView = new CommitteeView(
-                    committeeId, faker.rickAndMorty().character(), faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()),
-                    faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()), Committee.Status.OPEN_TO_VOTES, null, List.of(),
-                    committeeApplicationLinks, juries, juryCriteria, votePerJury, null
-            );
+            final var jury1 = userStub();
+            final var committee = Committee.builder()
+                    .id(committeeId)
+                    .name(faker.rickAndMorty().character())
+                    .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .status(Committee.Status.OPEN_TO_VOTES)
+                    .votePerJury(2)
+                    .juryIds(List.of(jury1.getId()))
+                    .juryCriteria(List.of(new JuryCriteria(JuryCriteria.Id.random(), faker.pokemon().name())))
+                    .build();
 
             // When
-            when(committeeStoragePort.findById(committeeId))
-                    .thenReturn(Optional.of(
-                            committeeView
-                    ));
+            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(committee));
             when(projectStoragePort.getProjectLedIdsForUser(jury1.getId())).thenReturn(List.of());
             when(projectStoragePort.getProjectContributedOnIdsForUser(jury1.getId())).thenReturn(List.of());
             committeeService.updateStatus(committeeId, Committee.Status.OPEN_TO_VOTES);
@@ -704,35 +651,24 @@ public class CommitteeServiceTest {
         @Test
         void given_juries_as_project_lead_and_contributor() {
             final Committee.Id committeeId = Committee.Id.random();
-            final List<CommitteeApplicationLinkView> committeeApplicationLinks = new ArrayList<>();
-            for (int i = 0; i < 10; i++) {
-                committeeApplicationLinks.add(CommitteeApplicationLinkView.builder()
-                        .applicant(ProjectLeaderLinkView.builder().build())
-                        .projectShortView(projectStub())
-                        .build());
-            }
-            final List<UUID> projectIds =
-                    committeeApplicationLinks.stream().map(committeeApplicationLinkView -> committeeApplicationLinkView.projectShortView().id())
-                            .toList();
-            final int votePerJury = 5;
-            final RegisteredContributorLinkView jury1 = userStub();
-            final RegisteredContributorLinkView jury2 = userStub();
-            final List<RegisteredContributorLinkView> juries = List.of(
-                    jury1, jury2);
-            final List<JuryCriteria> juryCriteria = List.of(
-                    new JuryCriteria(JuryCriteria.Id.random(), faker.pokemon().name())
-            );
-            final CommitteeView committeeView = new CommitteeView(
-                    committeeId, faker.rickAndMorty().character(), faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()),
-                    faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()), Committee.Status.OPEN_TO_VOTES, null, List.of(),
-                    committeeApplicationLinks, juries, juryCriteria, votePerJury, null
-            );
+            final var projectIds = IntStream.range(0, 10).mapToObj(i -> UUID.randomUUID()).toList();
+            final var jury1 = userStub();
+            final var jury2 = userStub();
+
+            final var committee = Committee.builder()
+                    .id(committeeId)
+                    .name(faker.rickAndMorty().character())
+                    .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .status(Committee.Status.OPEN_TO_VOTES)
+                    .votePerJury(5)
+                    .juryIds(List.of(jury1.getId(), jury2.getId()))
+                    .juryCriteria(List.of(new JuryCriteria(JuryCriteria.Id.random(), faker.pokemon().name())))
+                    .projectApplications(projectIds.stream().collect(toMap(identity(), p -> new Committee.Application(UUID.randomUUID(), p, List.of()))))
+                    .build();
 
             // When
-            when(committeeStoragePort.findById(committeeId))
-                    .thenReturn(Optional.of(
-                            committeeView
-                    ));
+            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(committee));
 
             when(projectStoragePort.getProjectLedIdsForUser(jury1.getId())).thenReturn(List.of(projectIds.get(0)));
             when(projectStoragePort.getProjectContributedOnIdsForUser(jury1.getId())).thenReturn(List.of(projectIds.get(1), projectIds.get(2)));
@@ -749,37 +685,29 @@ public class CommitteeServiceTest {
 
         @Test
         void given_enough_juries() {
-            final Committee.Id committeeId = Committee.Id.random();
-            final List<CommitteeApplicationLinkView> committeeApplicationLinks = new ArrayList<>();
-            for (int i = 0; i < 10; i++) {
-                committeeApplicationLinks.add(CommitteeApplicationLinkView.builder()
-                        .applicant(ProjectLeaderLinkView.builder().build())
-                        .projectShortView(projectStub())
-                        .build());
-            }
-            final List<UUID> projectIds = committeeApplicationLinks.stream()
-                    .map(committeeApplicationLinkView -> committeeApplicationLinkView.projectShortView().id())
-                    .toList();
+            final var committeeId = Committee.Id.random();
+            final var projectIds = IntStream.range(0, 10).mapToObj(i -> UUID.randomUUID()).toList();
             final int votePerJury = 5;
-            final RegisteredContributorLinkView jury1 = userStub();
-            final RegisteredContributorLinkView jury2 = userStub();
-            final RegisteredContributorLinkView jury3 = userStub();
-            final List<RegisteredContributorLinkView> juries = List.of(
-                    jury1, jury2, jury3);
-            final List<JuryCriteria> juryCriteria = List.of(
-                    new JuryCriteria(JuryCriteria.Id.random(), faker.pokemon().name())
-            );
-            final CommitteeView committeeView = new CommitteeView(
-                    committeeId, faker.rickAndMorty().character(), faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()),
-                    faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()), Committee.Status.OPEN_TO_VOTES, null, List.of(),
-                    committeeApplicationLinks, juries, juryCriteria, votePerJury, null
-            );
+            final var jury1 = userStub();
+            final var jury2 = userStub();
+            final var jury3 = userStub();
+            final var juries = List.of(jury1.getId(), jury2.getId(), jury3.getId());
+            final var juryCriteria = List.of(new JuryCriteria(JuryCriteria.Id.random(), faker.pokemon().name()));
+
+            final var committee = Committee.builder()
+                    .id(committeeId)
+                    .name(faker.rickAndMorty().character())
+                    .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
+                    .status(Committee.Status.OPEN_TO_VOTES)
+                    .votePerJury(votePerJury)
+                    .juryIds(juries)
+                    .juryCriteria(juryCriteria)
+                    .projectApplications(projectIds.stream().collect(toMap(identity(), p -> new Committee.Application(UUID.randomUUID(), p, List.of()))))
+                    .build();
 
             // When
-            when(committeeStoragePort.findById(committeeId))
-                    .thenReturn(Optional.of(
-                            committeeView
-                    ));
+            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(committee));
 
             when(projectStoragePort.getProjectLedIdsForUser(jury1.getId())).thenReturn(List.of(projectIds.get(0)));
             when(projectStoragePort.getProjectContributedOnIdsForUser(jury1.getId())).thenReturn(List.of(projectIds.get(1), projectIds.get(2)));
@@ -795,7 +723,7 @@ public class CommitteeServiceTest {
             final ArgumentCaptor<List<JuryAssignment>> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
             verify(committeeStoragePort).saveJuryAssignments(listArgumentCaptor.capture());
             final List<JuryAssignment> assignments = listArgumentCaptor.getValue();
-            assertEquals(votePerJury * juries.size() * committeeView.juryCriteria().size(), assignments.size());
+            assertEquals(votePerJury * juries.size() * juryCriteria.size(), assignments.size());
         }
 
         private RegisteredContributorLinkView userStub() {

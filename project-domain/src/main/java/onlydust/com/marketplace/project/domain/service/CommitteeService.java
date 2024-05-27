@@ -11,7 +11,6 @@ import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
-import onlydust.com.marketplace.project.domain.view.RegisteredContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.commitee.*;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +20,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 
 @AllArgsConstructor
@@ -84,23 +84,24 @@ public class CommitteeService implements CommitteeFacadePort {
     }
 
     private void assignProjectsToJuries(Committee.Id committeeId) {
-        final CommitteeView committee = getCommitteeById(committeeId);
-        if (isNull(committee.juries()) || committee.juries().isEmpty()) {
-            throw OnlyDustException.forbidden("Committee %s must have some juries to assign them to project".formatted(committeeId.value()));
-        }
-        List<UUID> projectIds = committee.committeeApplicationLinks().stream()
-                .map(committeeApplicationLinkView -> committeeApplicationLinkView.projectShortView().id()).collect(Collectors.toList());
-        final Set<UUID> juryIds = committee.juries().stream().map(RegisteredContributorLinkView::getId).collect(Collectors.toSet());
+        final var committee = committeeStoragePort.findById(committeeId)
+                .orElseThrow(() -> notFound("Committee %s was not found".formatted(committeeId.value().toString())));
 
-        if (isNull(committee.votePerJury())) {
-            throw OnlyDustException.forbidden("Number of vote per jury must filled to assign juries to projects");
-        }
-        if (juryIds.isEmpty() || juryIds.size() * committee.votePerJury() < projectIds.size()) {
-            throw OnlyDustException.forbidden("Not enough juries or vote per jury to cover all projects");
-        }
-        if (committee.juryCriteria().isEmpty()) {
-            throw OnlyDustException.forbidden("Cannot assign juries to project given empty jury criteria");
-        }
+        if (isNull(committee.juryIds()) || committee.juryIds().isEmpty())
+            throw forbidden("Committee %s must have some juries to assign them to project".formatted(committeeId.value()));
+
+        final var projectIds = committee.projectApplications().keySet().stream().collect(toList());
+        final var juryIds = committee.juryIds();
+
+        if (isNull(committee.votePerJury()))
+            throw forbidden("Number of vote per jury must filled to assign juries to projects");
+
+        if (juryIds.isEmpty() || juryIds.size() * committee.votePerJury() < projectIds.size())
+            throw forbidden("Not enough juries or vote per jury to cover all projects");
+
+        if (committee.juryCriteria().isEmpty())
+            throw forbidden("Cannot assign juries to project given empty jury criteria");
+
 
         final Map<UUID, Integer> projectVoteCount = new HashMap<>();
 
@@ -132,8 +133,8 @@ public class CommitteeService implements CommitteeFacadePort {
                 .collect(Collectors.toSet());
 
         if (!assignedProjectIds.containsAll(projectIds)) {
-            throw OnlyDustException.internalServerError("Not enough juries or vote per jury to cover all projects given some" +
-                                                        " juries are project lead or contributor on application project");
+            throw internalServerError("Not enough juries or vote per jury to cover all projects given some" +
+                                      " juries are project lead or contributor on application project");
         }
 
         committeeStoragePort.saveJuryAssignments(
@@ -167,7 +168,6 @@ public class CommitteeService implements CommitteeFacadePort {
 
         if (application.answers().stream().map(Committee.ProjectAnswer::projectQuestionId).anyMatch(id -> !projectQuestionIds.contains(id)))
             throw internalServerError("A project question is not linked to committee %s".formatted(committee.id().value()));
-
     }
 
     @Override

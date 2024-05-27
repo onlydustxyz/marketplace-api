@@ -19,15 +19,20 @@ public class Committee {
     @NonNull ZonedDateTime applicationStartDate;
     @NonNull ZonedDateTime applicationEndDate;
     @NonNull Status status;
+    UUID sponsorId;
+
     @Builder.Default
     @NonNull List<ProjectQuestion> projectQuestions = new ArrayList<>();
+
     @Builder.Default
     @NonNull Map<UUID, Application> projectApplications = new HashMap<>();
-    @NonNull
-    List<UUID> juryIds = new ArrayList<>();
-    UUID sponsorId;
-    @NonNull
-    List<JuryCriteria> juryCriteria = new ArrayList<>();
+
+    @Builder.Default
+    @NonNull List<UUID> juryIds = new ArrayList<>();
+
+    @Builder.Default
+    @NonNull List<JuryCriteria> juryCriteria = new ArrayList<>();
+
     Integer votePerJury;
 
     public static Committee create(@NonNull String name, @NonNull ZonedDateTime applicationStartDate, @NonNull ZonedDateTime applicationEndDate) {

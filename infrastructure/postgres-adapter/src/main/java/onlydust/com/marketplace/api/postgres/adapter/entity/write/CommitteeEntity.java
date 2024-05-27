@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.project.domain.model.Committee;
-import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
@@ -74,6 +73,10 @@ public class CommitteeEntity {
                 .applicationEndDate(ZonedDateTime.ofInstant(applicationEndDate.toInstant(), ZoneOffset.UTC))
                 .status(status)
                 .votePerJury(this.votePerJury)
+                .sponsorId(sponsorId)
+                .projectQuestions(Optional.ofNullable(projectQuestions).orElse(Set.of()).stream()
+                        .map(CommitteeProjectQuestionEntity::toDomain)
+                        .collect(toList()))
                 .projectApplications(Optional.ofNullable(projectAnswers).orElse(Set.of()).stream()
                         .collect(groupingBy(CommitteeProjectAnswerEntity::getProjectId,
                                 mapping(CommitteeProjectAnswerEntity::toApplication,
