@@ -9,7 +9,6 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRe
 import onlydust.com.marketplace.api.postgres.adapter.repository.WalletRepository;
 import onlydust.com.marketplace.cli.AccountBookDisplay;
 import onlydust.com.marketplace.cli.EvmWalletSanitizer;
-import onlydust.com.marketplace.cli.PennylaneMigrationRecovery;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -28,12 +27,4 @@ public class CliConfiguration {
         return new EvmWalletSanitizer(walletRepository);
     }
 
-    @Bean
-    public PennylaneMigrationRecovery pennylaneMigrationRecovery(
-            final RewardRepository rewardRepository,
-            final SponsorAccountRepository sponsorAccountRepository,
-            final CachedAccountBookProvider accountBookProvider
-    ) {
-        return new PennylaneMigrationRecovery(rewardRepository, sponsorAccountRepository, accountBookProvider);
-    }
 }

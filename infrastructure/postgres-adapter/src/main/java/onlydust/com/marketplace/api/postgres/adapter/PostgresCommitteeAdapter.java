@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.CommitteeStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeJuryVoteViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeLinkViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectInfosQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoCommitteeQueryEntity;
@@ -40,6 +41,7 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     private final CommitteeJuryCriteriaRepository committeeJuryCriteriaRepository;
     private final CommitteeLinkViewRepository committeeLinkViewRepository;
     private final CommitteeJuryVoteRepository committeeJuryVoteRepository;
+    private final CommitteeJuryVoteViewRepository committeeJuryVoteViewRepository;
 
     @Override
     @Transactional
@@ -121,7 +123,8 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
                     new CommitteeApplicationDetailsView(
                             projectAnswerViews, new ProjectShortView(projectInfos.getId(), projectInfos.getSlug(), projectInfos.getName(),
                             projectInfos.getLogoUrl(), projectInfos.getShortDescription(), ProjectVisibility.valueOf(projectInfos.getVisibility())), true,
-                            List.of()
+                            CommitteeJuryVoteViewEntity.toDomain(committeeJuryVoteViewRepository.findAllByCommitteeIdAndProjectId(committeeId.value(),
+                                    projectId))
                     )
             );
         }

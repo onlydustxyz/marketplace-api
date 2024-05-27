@@ -9,11 +9,14 @@ import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationDetailsView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
+import onlydust.com.marketplace.project.domain.view.commitee.ProjectJuryVoteView;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 public interface BackOfficeCommitteeMapper {
 
@@ -181,6 +184,28 @@ public interface BackOfficeCommitteeMapper {
                 )
                 .toList()
         );
+        committeeProjectApplicationResponse.setTotalScore(isNull(view.projectJuryVoteViews()) || view.projectJuryVoteViews().isEmpty() ? null :
+                view.projectJuryVoteViews().stream()
+                        .filter(projectJuryVoteView -> nonNull(projectJuryVoteView.getTotalScore()))
+                        .map(ProjectJuryVoteView::getTotalScore)
+                        .reduce(BigDecimal::add).map(bigDecimal -> bigDecimal.divide(BigDecimal.valueOf(view.projectJuryVoteViews().stream()
+                                .filter(projectJuryVoteView -> nonNull(projectJuryVoteView.getTotalScore()))
+                                .count()))).orElse(null));
+        committeeProjectApplicationResponse.setJuryVotes(view.projectJuryVoteViews().stream().map(projectJuryVoteView ->
+                new JuryVoteResponse()
+                        .totalScore(projectJuryVoteView.getTotalScore())
+                        .jury(new UserLinkResponse()
+                                .userId(projectJuryVoteView.user().getId())
+                                .login(projectJuryVoteView.user().getLogin())
+                                .githubUserId(projectJuryVoteView.user().getGithubUserId())
+                                .avatarUrl(projectJuryVoteView.user().getAvatarUrl())
+                        )
+                        .answers(projectJuryVoteView.voteViews().stream()
+                                .map(voteView -> new ScoredAnswerResponse()
+                                        .criteria(voteView.criteria())
+                                        .score(voteView.score())
+                                ).toList())
+        ).toList());
         return committeeProjectApplicationResponse;
     }
 }
