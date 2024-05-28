@@ -174,7 +174,7 @@ public class BackofficeUserApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "id": "50d8ae0d-1981-435b-90c5-09fc32b7d7d6",
                               "subject": "Anthony BUISSET",
                               "type": "INDIVIDUAL",
-                              "verificationStatus": "VERIFIED",
+                              "verificationStatus": "NOT_STARTED",
                               "kyb": null,
                               "kyc": {
                                 "firstName": "Anthony",
@@ -248,7 +248,7 @@ public class BackofficeUserApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "id": "50d8ae0d-1981-435b-90c5-09fc32b7d7d6",
                               "subject": "Anthony BUISSET",
                               "type": "INDIVIDUAL",
-                              "verificationStatus": "VERIFIED",
+                              "verificationStatus": "NOT_STARTED",
                               "kyb": null,
                               "kyc": {
                                 "firstName": "Anthony",
@@ -268,7 +268,7 @@ public class BackofficeUserApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "subject": null,
                               "type": "COMPANY",
-                              "verificationStatus": "VERIFIED",
+                              "verificationStatus": "NOT_STARTED",
                               "kyb": {
                                 "name": null,
                                 "registrationNumber": null,
@@ -286,7 +286,7 @@ public class BackofficeUserApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             {
                               "subject": null,
                               "type": "SELF_EMPLOYED",
-                              "verificationStatus": "VERIFIED",
+                              "verificationStatus": "NOT_STARTED",
                               "kyb": {
                                 "name": null,
                                 "registrationNumber": null,
