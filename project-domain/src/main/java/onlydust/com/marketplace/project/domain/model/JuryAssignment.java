@@ -30,11 +30,4 @@ public class JuryAssignment {
                 juryCriteria.stream().collect(Collectors.toMap(JuryCriteria::id, c -> Optional.empty()))
         );
     }
-
-    public static JuryAssignment withVotes(@NonNull UUID juryId, @NonNull Committee.Id committeeId, @NonNull UUID projectId, @NonNull Map<JuryCriteria.Id, Integer> votes) {
-        return new JuryAssignment(juryId,
-                committeeId,
-                projectId,
-                votes.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> Optional.ofNullable(e.getValue()))));
-    }
 }

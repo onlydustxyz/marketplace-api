@@ -4,7 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.model.JuryAssignmentBuilder;
+import onlydust.com.marketplace.project.domain.model.JuryCriteria;
+import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
@@ -217,7 +220,7 @@ public class CommitteeService implements CommitteeFacadePort {
         if (!committee.juryIds().contains(juryId))
             throw forbidden("Jury %s is not assigned to committee %s".formatted(juryId, committee.id()));
 
-        committeeStoragePort.saveJuryAssignment(JuryAssignment.withVotes(juryId, committeeId, projectId, scores));
+        committeeStoragePort.saveJuryVotes(juryId, committeeId, projectId, scores);
     }
 
     private List<ProjectAnswerView> getCommitteeAnswersWithOnlyQuestions(CommitteeView committeeView) {
