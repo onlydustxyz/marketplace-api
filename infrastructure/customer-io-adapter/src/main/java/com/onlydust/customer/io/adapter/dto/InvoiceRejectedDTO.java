@@ -23,7 +23,7 @@ public record InvoiceRejectedDTO(@NonNull String rewardsDetails,
                 invoiceRejected.billingProfileAdminGithubLogin(), invoiceRejected.invoiceName(),
                 invoiceRejected.rewards().stream()
                         .map(ShortReward::getDollarsEquivalent)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(1, RoundingMode.HALF_UP).toString());
+                        .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(3, RoundingMode.HALF_UP).toString());
     }
 
 }
