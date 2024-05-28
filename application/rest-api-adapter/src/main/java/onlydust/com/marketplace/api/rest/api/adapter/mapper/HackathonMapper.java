@@ -4,7 +4,7 @@ import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.api.contract.model.HackathonsDetailsResponseMe;
 import onlydust.com.marketplace.api.contract.model.HackathonsListItemResponse;
 import onlydust.com.marketplace.api.contract.model.HackathonsListResponse;
-import onlydust.com.marketplace.api.contract.model.ShortProjectResponse;
+import onlydust.com.marketplace.api.contract.model.ProjectShortResponse;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
@@ -46,7 +46,7 @@ public interface HackathonMapper {
                         .subtitle(track.subtitle())
                         .description(track.description())
                         .iconSlug(track.iconSlug())
-                        .projects(track.projects().stream().map(project -> new ShortProjectResponse()
+                        .projects(track.projects().stream().map(project -> new ProjectShortResponse()
                                 .id(project.id())
                                 .slug(project.slug())
                                 .name(project.name())

@@ -53,7 +53,7 @@ public class ReadCommitteesApiPostgresAdapter implements ReadCommitteesApi {
                 .projectAssignments(votesMappedToProjectId.keySet()
                         .stream()
                         .map(projectId -> new CommitteeAssignmentLinkResponse()
-                                .project(ProjectMapper.map(votesMappedToProjectId.get(projectId).get(0).getProject()))
+                                .project(ProjectMapper.projectToResponse(votesMappedToProjectId.get(projectId).get(0).getProject()))
                                 .score(Optional.ofNullable(averageScorePerProjects.get(projectId)).map(BigDecimal::valueOf).orElse(null))).toList()));
     }
 }

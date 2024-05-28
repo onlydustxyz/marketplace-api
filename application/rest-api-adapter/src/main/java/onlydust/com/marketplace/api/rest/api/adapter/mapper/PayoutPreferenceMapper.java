@@ -4,8 +4,8 @@ import onlydust.com.marketplace.accounting.domain.view.PayoutPreferenceView;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.contract.model.PayoutPreferencesItemResponse;
+import onlydust.com.marketplace.api.contract.model.ProjectShortResponse;
 import onlydust.com.marketplace.api.contract.model.ShortBillingProfileResponse;
-import onlydust.com.marketplace.api.contract.model.ShortProjectResponse;
 
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BillingProfileMapper.mapRole;
@@ -37,8 +37,8 @@ public interface PayoutPreferenceMapper {
     }
 
 
-    private static ShortProjectResponse projectToResponse(final ProjectShortView view) {
-        return new ShortProjectResponse()
+    private static ProjectShortResponse projectToResponse(final ProjectShortView view) {
+        return new ProjectShortResponse()
                 .id(view.id().value())
                 .logoUrl(view.logoUrl())
                 .shortDescription(view.shortDescription())
