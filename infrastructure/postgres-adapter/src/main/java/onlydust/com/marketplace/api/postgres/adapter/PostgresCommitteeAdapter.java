@@ -10,10 +10,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeJuryV
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoCommitteeQueryRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.project.domain.model.Committee;
-import onlydust.com.marketplace.project.domain.model.JuryAssignment;
-import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
-import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
+import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
 import onlydust.com.marketplace.project.domain.view.ProjectShortView;
@@ -24,11 +21,10 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
 public class PostgresCommitteeAdapter implements CommitteeStoragePort {
@@ -97,11 +93,12 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
         if (projectAnswerViews.isEmpty()) {
             return Optional.empty();
         } else {
-            final ProjectInfosQueryEntity projectInfos = projectInfosViewRepository.findByProjectIdWithoutMetrics(projectId);
+            final ProjectInfosQueryEntity projectInfos = projectInfosViewRepository.findByProjectIdWithoutMetrics(projectId)
+                    .orElseThrow(() -> notFound("Project %s not found".formatted(projectId)));
             return Optional.of(
                     new CommitteeApplicationDetailsView(
-                            projectAnswerViews, new ProjectShortView(projectInfos.getId(), projectInfos.getSlug(), projectInfos.getName(),
-                            projectInfos.getLogoUrl(), projectInfos.getShortDescription(), ProjectVisibility.valueOf(projectInfos.getVisibility())), true,
+                            projectAnswerViews, new ProjectShortView(projectInfos.id(), projectInfos.slug(), projectInfos.name(),
+                            projectInfos.logoUrl(), projectInfos.shortDescription(), ProjectVisibility.valueOf(projectInfos.visibility())), true,
                             CommitteeJuryVoteViewEntity.toDomain(committeeJuryVoteViewRepository.findAllByCommitteeIdAndProjectId(committeeId.value(),
                                     projectId))
                     )
@@ -113,15 +110,29 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     @Transactional
     public void saveJuryAssignments(List<JuryAssignment> juryAssignments) {
         committeeJuryVoteRepository.saveAll(juryAssignments.stream()
-                .map(juryAssignment -> juryAssignment.getVotes().stream().map(juryVote -> CommitteeJuryVoteEntity.builder()
-                        .score(juryVote.getScore())
-                        .criteriaId(juryVote.getCriteriaId().value())
+                .map(juryAssignment -> juryAssignment.getVotes().entrySet().stream().map(juryVote -> CommitteeJuryVoteEntity.builder()
+                        .criteriaId(juryVote.getKey().value())
+                        .score(juryVote.getValue().orElse(null))
                         .committeeId(juryAssignment.getCommitteeId().value())
                         .projectId(juryAssignment.getProjectId())
                         .userId(juryAssignment.getJuryId())
                         .build()
                 ).collect(Collectors.toSet()))
                 .flatMap(Collection::stream)
+                .collect(Collectors.toSet()));
+    }
+
+    @Override
+    public void saveJuryVotes(UUID juryId, Committee.Id committeeId, UUID projectId, Map<JuryCriteria.Id, Integer> votes) {
+        committeeJuryVoteRepository.saveAll(votes.entrySet().stream()
+                .map(juryVote -> CommitteeJuryVoteEntity.builder()
+                        .criteriaId(juryVote.getKey().value())
+                        .score(juryVote.getValue())
+                        .committeeId(committeeId.value())
+                        .projectId(projectId)
+                        .userId(juryId)
+                        .build()
+                )
                 .collect(Collectors.toSet()));
     }
 }

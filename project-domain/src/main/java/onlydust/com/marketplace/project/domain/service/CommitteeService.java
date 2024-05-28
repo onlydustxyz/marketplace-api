@@ -6,13 +6,17 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.JuryAssignmentBuilder;
+import onlydust.com.marketplace.project.domain.model.JuryCriteria;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
-import onlydust.com.marketplace.project.domain.view.commitee.*;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationDetailsView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
@@ -141,7 +145,7 @@ public class CommitteeService implements CommitteeFacadePort {
 
         if (!assignedProjectIds.containsAll(projectIds)) {
             throw internalServerError("Not enough juries or vote per jury to cover all projects given some" +
-                                      " juries are project lead or contributor on application project");
+                    " juries are project lead or contributor on application project");
         }
 
         committeeStoragePort.saveJuryAssignments(
@@ -206,8 +210,15 @@ public class CommitteeService implements CommitteeFacadePort {
     }
 
     @Override
-    public CommitteeJuryVotesView getCommitteeJuryVotesForProject(UUID userId, Committee.Id committeeId, UUID projectId) {
-        return new CommitteeJuryVotesView(Committee.Status.OPEN_TO_VOTES, List.of(), projectStoragePort.getProjectInfos(projectId), false);
+    public void vote(UUID juryId, Committee.Id committeeId, UUID projectId, Map<JuryCriteria.Id, Integer> scores) {
+        final var committee = committeeStoragePort.findById(committeeId)
+                .orElseThrow(() -> notFound("Committee %s was not found".formatted(committeeId)));
+        if (committee.status() != Committee.Status.OPEN_TO_VOTES)
+            throw forbidden("Votes are not opened for committee %s".formatted(committee.id()));
+        if (!committee.juryIds().contains(juryId))
+            throw forbidden("Jury %s is not assigned to committee %s".formatted(juryId, committee.id()));
+
+        committeeStoragePort.saveJuryVotes(juryId, committeeId, projectId, scores);
     }
 
     private List<ProjectAnswerView> getCommitteeAnswersWithOnlyQuestions(CommitteeView committeeView) {

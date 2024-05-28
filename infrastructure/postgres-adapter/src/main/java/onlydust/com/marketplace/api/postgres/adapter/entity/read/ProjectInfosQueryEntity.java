@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.project.domain.view.ProjectInfosView;
 import onlydust.com.marketplace.project.domain.view.ProjectLeaderLinkView;
 import org.hibernate.annotations.Immutable;
@@ -20,6 +21,7 @@ import static java.util.Objects.isNull;
 @Entity
 @Immutable
 @Getter
+@Accessors(fluent = true)
 public class ProjectInfosQueryEntity {
     @Id
     UUID id;
