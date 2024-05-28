@@ -62,6 +62,21 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
 
     @Test
     void should_get_budget_allocations() {
+        client.get()
+                .uri(getApiURI(COMMITTEE_BUDGET_ALLOCATIONS.formatted(committeeId)))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "currency": null,
+                          "totalAllocationAmount": 0,
+                          "projectAllocations": []
+                        }
+                        """);
     }
 
     private Committee fakeCommittee() {
