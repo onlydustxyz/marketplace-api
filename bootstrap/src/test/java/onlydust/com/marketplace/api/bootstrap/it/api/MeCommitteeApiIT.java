@@ -32,6 +32,8 @@ public class MeCommitteeApiIT extends AbstractMarketplaceApiIT {
     static Committee committee;
     static JuryCriteria c1 = new JuryCriteria(JuryCriteria.Id.random(), "c1");
     static JuryCriteria c2 = new JuryCriteria(JuryCriteria.Id.random(), "c2");
+    static ProjectQuestion q1 = new ProjectQuestion("Q1", false);
+    static ProjectQuestion q2 = new ProjectQuestion("Q2", true);
 
     @Test
     @Order(1)
@@ -60,14 +62,11 @@ public class MeCommitteeApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     @Order(2)
-    void should_get_my_committee_assignements() {
+    void should_not_vote_when_not_open_for_votes() {
         // Given
-        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         final UserAuthHelper.AuthenticatedUser olivier = userAuthHelper.authenticateOlivier();
         final UserAuthHelper.AuthenticatedUser antho = userAuthHelper.authenticateAnthony();
 
-        final ProjectQuestion q1 = new ProjectQuestion("Q1", false);
-        final ProjectQuestion q2 = new ProjectQuestion("Q2", true);
         committee.projectQuestions().addAll(List.of(q1, q2));
         committee.juryIds().addAll(List.of(
                 olivier.user().getId(),
@@ -76,6 +75,33 @@ public class MeCommitteeApiIT extends AbstractMarketplaceApiIT {
         committee.juryCriteria().addAll(List.of(c1, c2));
         committeeFacadePort.update(committee);
         committeeFacadePort.updateStatus(committee.id(), Committee.Status.OPEN_TO_APPLICATIONS);
+
+
+        client.put()
+                .uri(getApiURI(ME_COMMITTEE_PROJECTS.formatted(committee.id(), bretzel)))
+                .header("Authorization", "Bearer " + olivier.jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "votes": [
+                            {
+                              "criteriaId": "%s",
+                              "vote": 2
+                            }
+                          ]
+                        }
+                        """.formatted(c1.id()))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isForbidden();
+    }
+
+    @Test
+    @Order(3)
+    void should_get_my_committee_assignements() {
+        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
+        final UserAuthHelper.AuthenticatedUser olivier = userAuthHelper.authenticateOlivier();
 
         projectLeadRepository.save(new ProjectLeadEntity(bretzel, pierre.user().getId()));
         projectLeadRepository.save(new ProjectLeadEntity(apibara, pierre.user().getId()));
@@ -261,5 +287,30 @@ public class MeCommitteeApiIT extends AbstractMarketplaceApiIT {
                           ]
                         }
                         """);
+    }
+
+    @Test
+    @Order(20)
+    void should_not_vote_when_not_a_jury() {
+        final UserAuthHelper.AuthenticatedUser hayden = userAuthHelper.authenticateHayden();
+
+        client.put()
+                .uri(getApiURI(ME_COMMITTEE_PROJECTS.formatted(committee.id(), bretzel)))
+                .header("Authorization", "Bearer " + hayden.jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "votes": [
+                            {
+                              "criteriaId": "%s",
+                              "vote": 2
+                            }
+                          ]
+                        }
+                        """.formatted(c1.id()))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isForbidden();
     }
 }
