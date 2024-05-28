@@ -188,10 +188,10 @@ public interface BackOfficeCommitteeMapper {
                         .map(ProjectJuryVoteView::getTotalScore)
                         .reduce(BigDecimal::add).map(bigDecimal -> bigDecimal.divide(BigDecimal.valueOf(view.projectJuryVoteViews().stream()
                                 .filter(projectJuryVoteView -> nonNull(projectJuryVoteView.getTotalScore()))
-                                .count()),1, RoundingMode.HALF_UP)).orElse(null));
+                                .count()), 1, RoundingMode.HALF_UP)).orElse(null));
         committeeProjectApplicationResponse.setJuryVotes(view.projectJuryVoteViews().stream().map(projectJuryVoteView ->
                 new JuryVoteResponse()
-                        .totalScore(projectJuryVoteView.getTotalScore())
+                        .totalScore(isNull(projectJuryVoteView.getTotalScore()) ? null : projectJuryVoteView.getTotalScore().setScale(1, RoundingMode.HALF_UP))
                         .jury(new UserLinkResponse()
                                 .userId(projectJuryVoteView.user().getId())
                                 .login(projectJuryVoteView.user().getLogin())
