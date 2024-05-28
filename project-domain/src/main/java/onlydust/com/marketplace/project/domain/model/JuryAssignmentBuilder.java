@@ -29,7 +29,7 @@ public class JuryAssignmentBuilder {
 
     public boolean canAssignProject(UUID projectId) {
         return this.assignedOnProjectIds.size() < this.votePerJury && !this.assignedOnProjectIds.contains(projectId)
-               && !this.projectLeadOnProjectIds.contains(projectId) && !this.contributorOnProjectIds.contains(projectId);
+                && !this.projectLeadOnProjectIds.contains(projectId) && !this.contributorOnProjectIds.contains(projectId);
     }
 
     public void assignProject(UUID projectId) {
@@ -38,7 +38,7 @@ public class JuryAssignmentBuilder {
 
     public List<JuryAssignment> buildForCriteria(final List<JuryCriteria> juryCriteria) {
         return this.assignedOnProjectIds.stream()
-                .map(projectId -> new JuryAssignment(projectId, this.committeeId, this.juryId, juryCriteria))
+                .map(projectId -> JuryAssignment.virgin(this.juryId, this.committeeId, projectId, juryCriteria))
                 .toList();
     }
 }
