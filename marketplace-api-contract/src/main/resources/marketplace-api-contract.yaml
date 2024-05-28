@@ -698,7 +698,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Me
+        - ReadCommittees
       summary: Get my committee assignment on project
       operationId: getCommitteeAssignmentOnProject
       description: |

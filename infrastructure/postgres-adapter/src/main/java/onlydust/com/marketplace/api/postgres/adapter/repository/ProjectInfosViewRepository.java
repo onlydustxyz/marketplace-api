@@ -4,6 +4,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectInfosQue
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ProjectInfosViewRepository extends JpaRepository<ProjectInfosQueryEntity, UUID> {
@@ -84,7 +85,7 @@ public interface ProjectInfosViewRepository extends JpaRepository<ProjectInfosQu
                                GROUP BY r.project_id) das ON p.id = das.project_id
             where p.id = :projectId
             """)
-    ProjectInfosQueryEntity findByProjectId(UUID projectId);
+    Optional<ProjectInfosQueryEntity> findByProjectId(UUID projectId);
 
 
     @Query(nativeQuery = true, value = """
@@ -116,5 +117,5 @@ public interface ProjectInfosViewRepository extends JpaRepository<ProjectInfosQu
                                GROUP BY project_id) as leads ON leads.project_id = p.id
             where p.id = :projectId
             """)
-    ProjectInfosQueryEntity findByProjectIdWithoutMetrics(UUID projectId);
+    Optional<ProjectInfosQueryEntity> findByProjectIdWithoutMetrics(UUID projectId);
 }
