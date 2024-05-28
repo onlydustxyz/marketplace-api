@@ -335,8 +335,8 @@ public interface ProjectMapper {
         };
     }
 
-    static ShortProjectResponse mapShortProjectResponse(Project project) {
-        return new ShortProjectResponse()
+    static ProjectShortResponse mapShortProjectResponse(Project project) {
+        return new ProjectShortResponse()
                 .id(project.getId())
                 .name(project.getName())
                 .logoUrl(project.getLogoUrl())

@@ -4653,7 +4653,7 @@ components:
         logoUrl:
           type: string
 
-    ShortProjectResponse:
+    ProjectShortResponse:
       allOf:
         - $ref: '#/components/schemas/ProjectLinkResponse'
         - type: object
@@ -5220,7 +5220,7 @@ components:
         projects:
           type: array
           items:
-            $ref: '#/components/schemas/ShortProjectResponse'
+            $ref: '#/components/schemas/ProjectShortResponse'
 
     ContributedReposResponse:
       type: object
@@ -5271,7 +5271,7 @@ components:
               items:
                 $ref: '#/components/schemas/RewardId'
             project:
-              $ref: '#/components/schemas/ShortProjectResponse'
+              $ref: '#/components/schemas/ProjectShortResponse'
             contributor:
               $ref: '#/components/schemas/ContributorResponse'
             links:
@@ -5359,7 +5359,7 @@ components:
             status:
               $ref: '#/components/schemas/ContributionStatus'
             project:
-              $ref: '#/components/schemas/ShortProjectResponse'
+              $ref: '#/components/schemas/ProjectShortResponse'
             repo:
               $ref: '#/components/schemas/ShortGithubRepoResponse'
             commentsCount:
@@ -5827,7 +5827,7 @@ components:
             billingProfileId:
               $ref: '#/components/schemas/BillingProfileId'
             project:
-              $ref: '#/components/schemas/ShortProjectResponse'
+              $ref: '#/components/schemas/ProjectShortResponse'
             receipt:
               $ref: '#/components/schemas/ReceiptResponse'
 
@@ -6505,7 +6505,7 @@ components:
         - project
       properties:
         project:
-          $ref: '#/components/schemas/ShortProjectResponse'
+          $ref: '#/components/schemas/ProjectShortResponse'
         billingProfile:
           $ref: '#/components/schemas/ShortBillingProfileResponse'
 
@@ -6920,7 +6920,7 @@ components:
         projects:
           type: array
           items:
-            $ref: '#/components/schemas/ShortProjectResponse'
+            $ref: '#/components/schemas/ProjectShortResponse'
 
     HackathonsDetailsResponse:
       type: object
@@ -7144,7 +7144,7 @@ components:
         - project
       properties:
         project:
-          $ref: '#/components/schemas/ProjectLinkResponse'
+          $ref: '#/components/schemas/ProjectShortResponse'
         score:
           type: number
 

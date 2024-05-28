@@ -52,7 +52,7 @@ public class CommitteeJuryVoteViewEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "projectId", referencedColumnName = "id", insertable = false, updatable = false)
-    ProjectLinkViewEntity project;
+    ProjectShortViewEntity project;
 
     @EqualsAndHashCode
     @AllArgsConstructor
