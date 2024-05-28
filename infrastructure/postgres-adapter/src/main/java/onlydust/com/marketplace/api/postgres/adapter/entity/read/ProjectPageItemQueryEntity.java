@@ -3,6 +3,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
@@ -129,6 +131,8 @@ public class ProjectPageItemQueryEntity {
     }
 
     @EqualsAndHashCode
+    @Getter
+    @Accessors(fluent = true)
     public static class ProjectLead {
 
         @JsonProperty("id")

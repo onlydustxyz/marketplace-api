@@ -21,7 +21,6 @@ import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.view.*;
-import onlydust.com.marketplace.project.domain.view.commitee.CommitteeJuryVotesView;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
@@ -304,68 +302,6 @@ public class MeRestApi implements MeApi {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         hackathonFacadePort.registerToHackathon(authenticatedUser.getId(), Hackathon.Id.of(hackathonId));
         return ResponseEntity.noContent().build();
-    }
-
-
-    @Override
-    public ResponseEntity<MyCommitteeAssignmentResponse> getCommitteeAssignmentOnProject(UUID committeeId, UUID projectId) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final CommitteeJuryVotesView view = committeeFacadePort.getCommitteeJuryVotesForProject(authenticatedUser.getId(), Committee.Id.of(committeeId),
-                projectId);
-        final MyCommitteeAssignmentResponse myCommitteeAssignmentResponse = new MyCommitteeAssignmentResponse();
-        myCommitteeAssignmentResponse.setProject(
-                new CommitteeProjectInfosResponse()
-                        .id(view.projectInfosView().projectId())
-                        .name(view.projectInfosView().name())
-                        .slug(view.projectInfosView().slug())
-                        .logoUrl(isNull(view.projectInfosView().logoUri()) ? null : view.projectInfosView().logoUri().toString())
-                        .shortDescription(view.projectInfosView().shortDescription())
-                        .projectLeads(view.projectInfosView().projectLeads().stream()
-                                .map(projectLeaderLinkView -> new RegisteredUserResponse()
-                                        .id(projectLeaderLinkView.getId())
-                                        .githubUserId(projectLeaderLinkView.getGithubUserId())
-                                        .avatarUrl(projectLeaderLinkView.getAvatarUrl())
-                                        .login(projectLeaderLinkView.getLogin())
-                                ).toList())
-                        .longDescription(view.projectInfosView().longDescription())
-                        .last3monthsMetrics(
-                                new ProjectLast3MonthsMetricsResponse()
-                                        .activeContributors(view.projectInfosView().activeContributors())
-                                        .amountSentInUsd(view.projectInfosView().amountSentInUsd())
-                                        .contributorsRewarded(view.projectInfosView().contributorsRewarded())
-                                        .contributionsCompleted(view.projectInfosView().contributionsCompleted())
-                                        .newContributors(view.projectInfosView().newContributors())
-                                        .openIssues(view.projectInfosView().openIssue())
-                        )
-        );
-        myCommitteeAssignmentResponse.setAnswers(List.of(
-                new CommitteeProjectQuestionResponse()
-                        .answer("Answer 1")
-                        .id(UUID.randomUUID())
-                        .question("Question 1")
-                        .required(true),
-                new CommitteeProjectQuestionResponse()
-                        .answer("Answer 2")
-                        .id(UUID.randomUUID())
-                        .question("Question 2")
-                        .required(false)
-        ));
-        myCommitteeAssignmentResponse.setScore(BigDecimal.valueOf(3.53));
-        myCommitteeAssignmentResponse.setVotes(List.of(
-                new CommitteeJuryVoteResponse()
-                        .vote(3)
-                        .criteria("Criteria 1")
-                        .criteriaId(UUID.randomUUID()),
-                new CommitteeJuryVoteResponse()
-                        .vote(4)
-                        .criteria("Criteria 2")
-                        .criteriaId(UUID.randomUUID()),
-                new CommitteeJuryVoteResponse()
-                        .vote(5)
-                        .criteria("Criteria 3")
-                        .criteriaId(UUID.randomUUID())
-        ));
-        return ResponseEntity.ok(myCommitteeAssignmentResponse);
     }
 
     @Override

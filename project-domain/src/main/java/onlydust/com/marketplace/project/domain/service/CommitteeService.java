@@ -13,7 +13,10 @@ import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
-import onlydust.com.marketplace.project.domain.view.commitee.*;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationDetailsView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
@@ -204,11 +207,6 @@ public class CommitteeService implements CommitteeFacadePort {
         return committeeStoragePort.findByCommitteeIdAndProjectId(committeeId, projectId)
                 .orElseThrow(() -> internalServerError("Application on committee %s not found for project %s"
                         .formatted(committeeId.value(), projectId)));
-    }
-
-    @Override
-    public CommitteeJuryVotesView getCommitteeJuryVotesForProject(UUID userId, Committee.Id committeeId, UUID projectId) {
-        return new CommitteeJuryVotesView(Committee.Status.OPEN_TO_VOTES, List.of(), projectStoragePort.getProjectInfos(projectId), false);
     }
 
     @Override

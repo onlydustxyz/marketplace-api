@@ -2,6 +2,8 @@ package onlydust.com.marketplace.bff.read;
 
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeJuryVoteViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeLinkViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeProjectAnswerViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectInfosViewRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.bff.read.adapters.ReadCommitteesApiPostgresAdapter;
 import onlydust.com.marketplace.bff.read.adapters.ReadUsersApiPostgresAdapter;
@@ -43,11 +45,15 @@ public class ReadApiConfiguration {
     public ReadCommitteesApiPostgresAdapter readCommitteesApiPostgresAdapter(
             final AuthenticatedAppUserService authenticatedAppUserService,
             final CommitteeLinkViewRepository committeeLinkViewRepository,
-            final CommitteeJuryVoteViewRepository committeeJuryVoteViewRepository) {
+            final CommitteeJuryVoteViewRepository committeeJuryVoteViewRepository,
+            final ProjectInfosViewRepository projectInfosViewRepository,
+            final CommitteeProjectAnswerViewRepository committeeProjectAnswerViewRepository) {
         return new ReadCommitteesApiPostgresAdapter(
                 authenticatedAppUserService,
                 committeeLinkViewRepository,
-                committeeJuryVoteViewRepository
+                committeeJuryVoteViewRepository,
+                projectInfosViewRepository,
+                committeeProjectAnswerViewRepository
         );
     }
 }
