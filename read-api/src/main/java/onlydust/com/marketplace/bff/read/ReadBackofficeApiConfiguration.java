@@ -1,8 +1,10 @@
 package onlydust.com.marketplace.bff.read;
 
+import onlydust.com.marketplace.bff.read.adapters.BackofficeCommitteesReadApiPostgresAdapter;
 import onlydust.com.marketplace.bff.read.adapters.BackOfficeCommitteeReadApiPostgresAdapter;
 import onlydust.com.marketplace.bff.read.adapters.BackofficeHackathonsReadApiPostgresAdapter;
 import onlydust.com.marketplace.bff.read.adapters.BackofficeUsersReadApiPostgresAdapter;
+import onlydust.com.marketplace.bff.read.repositories.CommitteeReadRepository;
 import onlydust.com.marketplace.bff.read.repositories.CommitteeBudgetAllocationsResponseEntityRepository;
 import onlydust.com.marketplace.bff.read.repositories.UserShortRepository;
 import org.springframework.context.annotation.Bean;
@@ -27,5 +29,10 @@ public class ReadBackofficeApiConfiguration {
     public BackOfficeCommitteeReadApiPostgresAdapter backOfficeCommitteeReadApiPostgresAdapter(
             final CommitteeBudgetAllocationsResponseEntityRepository committeeBudgetAllocationsResponseEntityRepository) {
         return new BackOfficeCommitteeReadApiPostgresAdapter(committeeBudgetAllocationsResponseEntityRepository);
+    }
+
+    @Bean
+    public BackofficeCommitteesReadApiPostgresAdapter backofficeCommitteesReadApiPostgresAdapter(final CommitteeReadRepository committeeReadRepository) {
+        return new BackofficeCommitteesReadApiPostgresAdapter(committeeReadRepository);
     }
 }

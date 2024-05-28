@@ -36,7 +36,7 @@ public class PublicUserProfileResponseV2Entity {
     Long githubUserId;
 
     @OneToOne
-    @JoinColumn(name = "githubUserId", insertable = false, updatable = false)
+    @JoinColumn(name = "githubUserId", referencedColumnName = "userId", insertable = false, updatable = false)
     @NonNull
     AllUserViewEntity user;
 

@@ -2077,7 +2077,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - BackOfficeCommitteeManagement
+        - BackofficeCommitteesRead
       summary: Get a committee by id
       operationId: getCommittee
       description: |
@@ -4456,7 +4456,7 @@ components:
         applicant:
           $ref: '#/components/schemas/UserLinkResponse'
         score:
-          type: integer
+          type: number
         allocatedBudget:
           type: number
           format: int64

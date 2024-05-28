@@ -35,7 +35,7 @@ public class SponsorViewEntity {
     @OneToMany(mappedBy = "sponsorId", fetch = FetchType.LAZY)
     Set<ProjectSponsorViewEntity> projects = Set.of();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "sponsors_users",
             joinColumns = @JoinColumn(name = "sponsor_id"),

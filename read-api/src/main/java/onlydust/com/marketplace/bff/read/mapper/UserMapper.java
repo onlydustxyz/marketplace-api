@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.bff.read.mapper;
 
+import onlydust.com.backoffice.api.contract.model.UserLinkResponse;
 import onlydust.com.backoffice.api.contract.model.UserPage;
 import onlydust.com.backoffice.api.contract.model.UserPageItemResponse;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.AllUserViewEntity;
 import onlydust.com.marketplace.bff.read.entities.UserShortEntity;
 import org.springframework.data.domain.Page;
 
@@ -27,5 +29,21 @@ public interface UserMapper {
                 .totalItemNumber((int) userShortEntityPage.getTotalElements())
                 .hasMore(hasMore(pageIndex, userShortEntityPage.getTotalPages()))
                 .nextPageIndex(nextPageIndex(pageIndex, userShortEntityPage.getTotalPages()));
+    }
+
+    static UserLinkResponse map(final UserShortEntity user) {
+        return new UserLinkResponse()
+                .userId(user.getId())
+                .githubUserId(user.getGithubUserId())
+                .login(user.getLogin())
+                .avatarUrl(user.getAvatarUrl());
+    }
+
+    static UserLinkResponse map(final AllUserViewEntity user) {
+        return new UserLinkResponse()
+                .userId(user.userId())
+                .githubUserId(user.githubUserId())
+                .login(user.login())
+                .avatarUrl(user.avatarUrl());
     }
 }
