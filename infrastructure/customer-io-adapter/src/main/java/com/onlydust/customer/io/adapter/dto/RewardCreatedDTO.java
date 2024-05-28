@@ -12,7 +12,7 @@ public record RewardCreatedDTO(@NonNull String username, @NonNull String project
     public static RewardCreatedDTO fromEvent(RewardCreated rewardCreated) {
         return new RewardCreatedDTO(
                 rewardCreated.recipientGithubLogin(), rewardCreated.shortReward().getProjectName(),
-                rewardCreated.shortReward().getCurrencyCode(), rewardCreated.shortReward().getAmount().setScale(2, RoundingMode.HALF_UP).toString(),
+                rewardCreated.shortReward().getCurrencyCode(), rewardCreated.shortReward().getAmount().setScale(3, RoundingMode.HALF_UP).toString(),
                 rewardCreated.contributionsNumber().toString(), rewardCreated.sentByGithubLogin()
         );
     }

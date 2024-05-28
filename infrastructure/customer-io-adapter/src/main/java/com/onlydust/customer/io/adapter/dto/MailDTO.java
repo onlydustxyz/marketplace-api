@@ -8,6 +8,7 @@ import onlydust.com.marketplace.accounting.domain.events.*;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.project.domain.model.event.NewCommitteeApplication;
 
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.UUID;
 
@@ -86,7 +87,8 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
 
     public static String getRewardNames(List<ShortReward> rewards) {
         return String.join("<br>", rewards.stream()
-                .map(r -> String.join(" - ", r.getId().pretty(), r.getProjectName(), r.getCurrencyCode(), r.getAmount().toString()))
+                .map(r -> String.join(" - ", r.getId().pretty(), r.getProjectName(), r.getCurrencyCode(),
+                        r.getAmount().setScale(3, RoundingMode.HALF_UP).toString()))
                 .toList());
     }
 }
