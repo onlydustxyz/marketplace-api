@@ -447,7 +447,7 @@ public interface BackOfficeMapper {
                 .id(billingProfileView.getId().value())
                 .type(map(billingProfileView.getType()))
                 .subject(billingProfileView.subject())
-                .verificationStatus(VerificationStatus.VERIFIED)
+                .verificationStatus(map(billingProfileView.getVerificationStatus()))
                 .kyc(isNull(billingProfileView.getKyc()) ? null : mapKyc(billingProfileView.getKyc()))
                 .kyb(isNull(billingProfileView.getKyb()) ? null : mapKyb(billingProfileView.getKyb()));
     }
@@ -824,7 +824,7 @@ public interface BackOfficeMapper {
     }
 
     static VerificationStatus map(onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus status) {
-        return switch (status) {
+        return isNull(status) ? null : switch (status) {
             case NOT_STARTED -> VerificationStatus.NOT_STARTED;
             case STARTED -> VerificationStatus.STARTED;
             case UNDER_REVIEW -> VerificationStatus.UNDER_REVIEW;
