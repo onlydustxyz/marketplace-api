@@ -28,4 +28,6 @@ public interface CommitteeStoragePort {
     Optional<CommitteeApplicationDetailsView> findByCommitteeIdAndProjectId(Committee.Id committeeId, UUID projectId);
 
     void saveJuryAssignments(List<JuryAssignment> juryAssignments);
+
+    void saveJuryAssignment(JuryAssignment juryAssignment);
 }

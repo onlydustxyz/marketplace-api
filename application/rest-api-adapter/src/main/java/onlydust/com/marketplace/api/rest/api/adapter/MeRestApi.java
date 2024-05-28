@@ -18,10 +18,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
-import onlydust.com.marketplace.project.domain.model.Committee;
-import onlydust.com.marketplace.project.domain.model.GithubAccount;
-import onlydust.com.marketplace.project.domain.model.Hackathon;
-import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.view.*;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeJuryVotesView;
@@ -37,6 +34,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
@@ -373,6 +371,11 @@ public class MeRestApi implements MeApi {
     @Override
     public ResponseEntity<Void> voteForCommitteeAssignment(UUID committeeId, UUID projectId,
                                                            VoteForCommitteeAssignmentRequest voteForCommitteeAssignmentRequest) {
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        committeeFacadePort.vote(authenticatedUser.getId(), Committee.Id.of(committeeId), projectId,
+                voteForCommitteeAssignmentRequest.getVotes().stream()
+                        .collect(Collectors.toMap(v -> JuryCriteria.Id.of(v.getCriteriaId()), v -> v.getVote())));
+
         return ResponseEntity.noContent().build();
     }
 }

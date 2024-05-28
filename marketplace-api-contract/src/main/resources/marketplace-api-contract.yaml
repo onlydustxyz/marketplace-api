@@ -7183,10 +7183,17 @@ components:
     VoteForCommitteeAssignmentRequest:
       type: object
       required:
-        - criteriaId
-        - vote
+        - votes
       properties:
-        criteriaId:
-          $ref: '#/components/schemas/CommitteeCriteriaId'
-        vote:
-          type: integer
+        votes:
+          type: array
+          items:
+            type: object
+            required:
+              - criteriaId
+              - vote
+            properties:
+              criteriaId:
+                $ref: '#/components/schemas/CommitteeCriteriaId'
+              vote:
+                type: integer

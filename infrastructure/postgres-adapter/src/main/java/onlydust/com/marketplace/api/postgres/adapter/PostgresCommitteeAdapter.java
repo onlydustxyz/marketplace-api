@@ -113,9 +113,9 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     @Transactional
     public void saveJuryAssignments(List<JuryAssignment> juryAssignments) {
         committeeJuryVoteRepository.saveAll(juryAssignments.stream()
-                .map(juryAssignment -> juryAssignment.getVotes().stream().map(juryVote -> CommitteeJuryVoteEntity.builder()
-                        .score(juryVote.getScore())
-                        .criteriaId(juryVote.getCriteriaId().value())
+                .map(juryAssignment -> juryAssignment.getVotes().entrySet().stream().map(juryVote -> CommitteeJuryVoteEntity.builder()
+                        .criteriaId(juryVote.getKey().value())
+                        .score(juryVote.getValue().orElse(null))
                         .committeeId(juryAssignment.getCommitteeId().value())
                         .projectId(juryAssignment.getProjectId())
                         .userId(juryAssignment.getJuryId())
@@ -123,5 +123,11 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
                 ).collect(Collectors.toSet()))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet()));
+    }
+
+    @Override
+    @Transactional
+    public void saveJuryAssignment(JuryAssignment juryAssignment) {
+        saveJuryAssignments(List.of(juryAssignment));
     }
 }
