@@ -27,7 +27,7 @@ public interface CommitteeMapper {
                 .mapToInt(CommitteeJuryVoteViewEntity::getScore)
                 .average().stream()
                 .mapToObj(BigDecimal::valueOf)
-                .map(bigDecimal -> bigDecimal.setScale(2, RoundingMode.HALF_UP))
+                .map(bigDecimal -> bigDecimal.setScale(1, RoundingMode.HALF_UP))
                 .findFirst();
     }
 }
