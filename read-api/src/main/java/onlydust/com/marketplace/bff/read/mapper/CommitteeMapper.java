@@ -7,6 +7,7 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.Committee;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +27,7 @@ public interface CommitteeMapper {
                 .mapToInt(CommitteeJuryVoteViewEntity::getScore)
                 .average().stream()
                 .mapToObj(BigDecimal::valueOf)
+                .map(bigDecimal -> bigDecimal.setScale(2, RoundingMode.HALF_UP))
                 .findFirst();
     }
 }

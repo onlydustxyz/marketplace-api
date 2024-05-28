@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -60,7 +61,9 @@ public class ReadCommitteesApiPostgresAdapter implements ReadCommitteesApi {
                         .stream()
                         .map(projectId -> new CommitteeAssignmentLinkResponse()
                                 .project(ProjectMapper.projectToResponse(votesMappedToProjectId.get(projectId).get(0).getProject()))
-                                .score(Optional.ofNullable(averageScorePerProjects.get(projectId)).map(BigDecimal::valueOf).orElse(null))).toList()));
+                                .score(Optional.ofNullable(averageScorePerProjects.get(projectId)).map(BigDecimal::valueOf)
+                                        .map(bigDecimal -> bigDecimal.setScale(2, RoundingMode.HALF_UP))
+                                        .orElse(null))).toList()));
     }
 
 
