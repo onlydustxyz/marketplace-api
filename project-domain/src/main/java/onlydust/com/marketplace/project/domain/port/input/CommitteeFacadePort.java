@@ -37,4 +37,6 @@ public interface CommitteeFacadePort {
     void vote(UUID juryId, Committee.Id committeeId, UUID projectId, Map<JuryCriteria.Id, Integer> scores);
 
     void allocate(Committee.Id committeeId, UUID currencyId, BigDecimal totalAmount, BigDecimal minAllocation, BigDecimal maxAllocation);
+
+    void saveAllocations(Committee.Id committeeId, UUID currencyId, Map<UUID, BigDecimal> projectAllocations);
 }

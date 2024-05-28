@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+import static java.util.stream.Collectors.toMap;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeCommitteeMapper.toCommitteeResponse;
 import static org.springframework.http.ResponseEntity.*;
 
@@ -79,6 +80,15 @@ public class BackofficeCommitteeManagementRestApi implements BackOfficeCommittee
     @Override
     public ResponseEntity<Void> updateCommitteeStatus(UUID committeeId, UpdateCommitteeStatusRequest updateCommitteeStatusRequest) {
         committeeFacadePort.updateStatus(Committee.Id.of(committeeId), BackOfficeCommitteeMapper.statusToDomain(updateCommitteeStatusRequest.getStatus()));
+        return noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> updateProjectAllocations(UUID committeeId, CommitteeBudgetAllocationsUpdateRequest request) {
+        committeeFacadePort.saveAllocations(Committee.Id.of(committeeId), request.getCurrencyId(),
+                request.getAllocations().stream().collect(toMap(
+                        CommitteeProjectAllocationRequest::getProjectId,
+                        CommitteeProjectAllocationRequest::getAmount)));
         return noContent().build();
     }
 }

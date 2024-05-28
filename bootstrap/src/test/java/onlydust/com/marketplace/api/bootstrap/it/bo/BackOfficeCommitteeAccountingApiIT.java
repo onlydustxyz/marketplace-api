@@ -3,6 +3,8 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 import com.github.javafaker.Faker;
 import lombok.NonNull;
 import onlydust.com.backoffice.api.contract.model.CommitteeBudgetAllocationsCreateRequest;
+import onlydust.com.backoffice.api.contract.model.CommitteeBudgetAllocationsUpdateRequest;
+import onlydust.com.backoffice.api.contract.model.CommitteeProjectAllocationRequest;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeJuryVoteRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
@@ -132,6 +134,85 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                               },
                               "score": null,
                               "allocation": 4166.6666650
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
+    void should_override_budget_allocations() {
+        final var request = new CommitteeBudgetAllocationsUpdateRequest()
+                .currencyId(STRK)
+                .allocations(List.of(
+                        new CommitteeProjectAllocationRequest()
+                                .projectId(cairoFoundryId)
+                                .amount(BigDecimal.valueOf(1000)),
+                        new CommitteeProjectAllocationRequest()
+                                .projectId(delugeId)
+                                .amount(BigDecimal.valueOf(2000)),
+                        new CommitteeProjectAllocationRequest()
+                                .projectId(starklingsId)
+                                .amount(BigDecimal.valueOf(3000))
+                ));
+
+        client.put()
+                .uri(getApiURI(COMMITTEE_BUDGET_ALLOCATIONS.formatted(committeeId)))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                .body(fromValue(request))
+                .exchange()
+                // Then
+                .expectStatus()
+                .isNoContent();
+
+        client.get()
+                .uri(getApiURI(COMMITTEE_BUDGET_ALLOCATIONS.formatted(committeeId)))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "currency": {
+                            "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                            "code": "STRK",
+                            "name": "StarkNet Token",
+                            "logoUrl": null,
+                            "decimals": 18
+                          },
+                          "totalAllocationAmount": 6000,
+                          "projectAllocations": [
+                            {
+                              "project": {
+                                "id": "8156fc5f-cec5-4f70-a0de-c368772edcd4",
+                                "slug": "cairo-foundry",
+                                "name": "Cairo foundry",
+                                "logoUrl": null
+                              },
+                              "score": null,
+                              "allocation": 1000
+                            },
+                            {
+                              "project": {
+                                "id": "ade75c25-b39f-4fdf-a03a-e2391c1bc371",
+                                "slug": "deluge",
+                                "name": "Deluge",
+                                "logoUrl": null
+                              },
+                              "score": null,
+                              "allocation": 2000
+                            },
+                            {
+                              "project": {
+                                "id": "6239cb20-eece-466a-80a0-742c1071dd3c",
+                                "slug": "starklings",
+                                "name": "Starklings",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
+                              },
+                              "score": null,
+                              "allocation": 3000
                             }
                           ]
                         }

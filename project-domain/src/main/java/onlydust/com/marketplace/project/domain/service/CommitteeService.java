@@ -253,6 +253,11 @@ public class CommitteeService implements CommitteeFacadePort {
         committeeStoragePort.saveAllocations(committeeId, currencyId, projectAllocations);
     }
 
+    @Override
+    public void saveAllocations(Committee.Id committeeId, UUID currencyId, Map<UUID, BigDecimal> projectAllocations) {
+        committeeStoragePort.saveAllocations(committeeId, currencyId, projectAllocations);
+    }
+
     private List<ProjectAnswerView> getCommitteeAnswersWithOnlyQuestions(CommitteeView committeeView) {
         return committeeView.projectQuestions().stream()
                 .map(projectQuestion -> new ProjectAnswerView(projectQuestion.id(), projectQuestion.question(), projectQuestion.required(), null)).toList();
