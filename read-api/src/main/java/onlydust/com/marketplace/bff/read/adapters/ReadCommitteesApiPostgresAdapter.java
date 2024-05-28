@@ -5,7 +5,6 @@ import onlydust.com.marketplace.api.contract.ReadCommitteesApi;
 import onlydust.com.marketplace.api.contract.model.CommitteeAssignmentLinkResponse;
 import onlydust.com.marketplace.api.contract.model.MyCommitteeAssignmentsResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeJuryVoteViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLinkViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeJuryVoteViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeLinkViewRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
@@ -17,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -40,17 +40,20 @@ public class ReadCommitteesApiPostgresAdapter implements ReadCommitteesApi {
         final var committee = committeeLinkViewRepository.findById(committeeId)
                 .orElseThrow(() -> OnlyDustException.notFound("Committee %s not found".formatted(committeeId)));
 
-        final Map<ProjectLinkViewEntity, Double> averageScorePerProjects = userVotesForCommittee.stream()
+        final Map<UUID, Double> averageScorePerProjects = userVotesForCommittee.stream()
                 .filter(vote -> vote.getScore() != null)
-                .collect(Collectors.groupingBy(CommitteeJuryVoteViewEntity::getProject, Collectors.averagingInt(CommitteeJuryVoteViewEntity::getScore)));
+                .collect(Collectors.groupingBy(CommitteeJuryVoteViewEntity::getProjectId, Collectors.averagingInt(CommitteeJuryVoteViewEntity::getScore)));
+
+        final Map<UUID, List<CommitteeJuryVoteViewEntity>> votesMappedToProjectId = userVotesForCommittee.stream()
+                .collect(Collectors.groupingBy(CommitteeJuryVoteViewEntity::getProjectId));
 
         return ResponseEntity.ok(new MyCommitteeAssignmentsResponse()
                 .name(committee.getName())
                 .status(CommitteeMapper.map(committee.getStatus()))
-                .projectAssignments(userVotesForCommittee.stream()
-                        .map(vote -> new CommitteeAssignmentLinkResponse()
-                                .project(ProjectMapper.map(vote.getProject()))
-                                .score(Optional.ofNullable(averageScorePerProjects.get(vote.getProject())).map(BigDecimal::valueOf).orElse(null)))
-                        .toList()));
+                .projectAssignments(votesMappedToProjectId.keySet()
+                        .stream()
+                        .map(projectId -> new CommitteeAssignmentLinkResponse()
+                                .project(ProjectMapper.map(votesMappedToProjectId.get(projectId).get(0).getProject()))
+                                .score(Optional.ofNullable(averageScorePerProjects.get(projectId)).map(BigDecimal::valueOf).orElse(null))).toList()));
     }
 }
