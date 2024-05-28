@@ -10,7 +10,6 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoCommitteeQueryRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoEcosystemRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoUserShortViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.project.domain.port.input.TechnologyStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
@@ -244,11 +243,10 @@ public class PostgresConfiguration {
     @Bean
     public PostgresBackofficeAdapter postgresBackofficeAdapter(final SponsorRepository sponsorRepository,
                                                                final SponsorViewRepository sponsorViewRepository,
-                                                               final BoUserShortViewRepository boUserShortViewRepository,
                                                                final BoEcosystemRepository boEcosystemRepository,
                                                                final EcosystemRepository ecosystemRepository,
                                                                final ProjectRepository projectRepository) {
-        return new PostgresBackofficeAdapter(sponsorRepository, sponsorViewRepository, boUserShortViewRepository, boEcosystemRepository, ecosystemRepository,
+        return new PostgresBackofficeAdapter(sponsorRepository, sponsorViewRepository, boEcosystemRepository, ecosystemRepository,
                 projectRepository);
     }
 
@@ -408,12 +406,11 @@ public class PostgresConfiguration {
     public PostgresHackathonAdapter postgresHackathonAdapter(final HackathonRepository hackathonRepository,
                                                              final HackathonDetailsViewRepository hackathonDetailsViewRepository,
                                                              final HackathonShortViewRepository hackathonShortViewRepository,
-                                                             final HackathonRegistrationRepository hackathonRegistrationRepository,
-                                                             final BoUserShortViewRepository boUserShortViewRepository) {
+                                                             final HackathonRegistrationRepository hackathonRegistrationRepository) {
         return new PostgresHackathonAdapter(hackathonRepository,
                 hackathonDetailsViewRepository,
                 hackathonShortViewRepository,
-                hackathonRegistrationRepository, boUserShortViewRepository);
+                hackathonRegistrationRepository);
     }
 
     @Bean

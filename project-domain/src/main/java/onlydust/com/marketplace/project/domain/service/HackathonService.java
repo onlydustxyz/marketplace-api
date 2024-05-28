@@ -85,8 +85,4 @@ public class HackathonService implements HackathonFacadePort {
         return hackathonStoragePort.isRegisteredToHackathon(userId, hackathonId);
     }
 
-    @Override
-    public Page<UserShortView> listRegisteredUsers(Hackathon.Id hackahtonId, int pageIndex, int pageSize, UserShortView.Filters filters) {
-        return hackathonStoragePort.listRegisteredUsers(hackahtonId, pageIndex, pageSize, filters);
-    }
 }

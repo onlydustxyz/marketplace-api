@@ -100,10 +100,9 @@ public class BackofficeConfiguration {
     }
 
     @Bean
-    public BackofficeUserRestApi backofficeUserRestApi(final BackofficeFacadePort backofficeFacadePort,
-                                                       final UserFacadePort userFacadePort,
+    public BackofficeUserRestApi backofficeUserRestApi(final UserFacadePort userFacadePort,
                                                        final BillingProfileFacadePort billingProfileFacadePort) {
-        return new BackofficeUserRestApi(backofficeFacadePort, userFacadePort, billingProfileFacadePort);
+        return new BackofficeUserRestApi(userFacadePort, billingProfileFacadePort);
     }
 
     @Bean
@@ -118,7 +117,7 @@ public class BackofficeConfiguration {
     }
 
     @Bean
-    public BackofficeCommitteeManagementRestApi backofficeCommitteeManagementRestApi(final CommitteeFacadePort committeeFacadePort){
+    public BackofficeCommitteeManagementRestApi backofficeCommitteeManagementRestApi(final CommitteeFacadePort committeeFacadePort) {
         return new BackofficeCommitteeManagementRestApi(committeeFacadePort);
     }
 }

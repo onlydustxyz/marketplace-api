@@ -1,7 +1,7 @@
-package onlydust.com.marketplace.api.postgres.adapter.repository.backoffice;
+package onlydust.com.marketplace.bff.read.repositories;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoUserShortQueryEntity;
+import onlydust.com.marketplace.bff.read.entities.UserShortEntity;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.UUID;
 
-public interface BoUserShortViewRepository extends JpaRepository<BoUserShortQueryEntity, UUID> {
+public interface UserShortRepository extends JpaRepository<UserShortEntity, UUID> {
 
     @Query(value = """
             SELECT
@@ -30,7 +30,7 @@ public interface BoUserShortViewRepository extends JpaRepository<BoUserShortQuer
             """,
             nativeQuery = true)
     @NotNull
-    Page<BoUserShortQueryEntity> findAll(final String login, final @NotNull Pageable pageable);
+    Page<UserShortEntity> findAll(final String login, final @NotNull Pageable pageable);
 
 
     @Query(value = """
@@ -51,8 +51,7 @@ public interface BoUserShortViewRepository extends JpaRepository<BoUserShortQuer
             """,
             nativeQuery = true)
     @NotNull
-    Page<BoUserShortQueryEntity> findAllRegisteredOnHackathon(final String login, @NonNull UUID hackathonId, final @NotNull Pageable pageable);
-
+    Page<UserShortEntity> findAllRegisteredOnHackathon(final String login, @NonNull UUID hackathonId, final @NotNull Pageable pageable);
 
 
 }

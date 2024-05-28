@@ -1293,7 +1293,7 @@ paths:
         - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
-        - BackofficeUser
+        - BackofficeUsersRead
       summary: Get user page
       operationId: getUserPage
       description: |
@@ -1958,7 +1958,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - BackofficeHackathonManagement
+        - BackofficeHackathonsRead
       summary: Get hackathon registered user page
       operationId: getRegisteredUserPage
       description: |

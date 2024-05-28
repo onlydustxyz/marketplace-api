@@ -3,15 +3,14 @@ package onlydust.com.marketplace.project.domain.port.output;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
-import onlydust.com.marketplace.project.domain.view.backoffice.*;
+import onlydust.com.marketplace.project.domain.view.backoffice.BoSponsorView;
+import onlydust.com.marketplace.project.domain.view.backoffice.EcosystemView;
+import onlydust.com.marketplace.project.domain.view.backoffice.ProjectView;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface BackofficeStoragePort {
-
-    Page<UserShortView> listUsers(int pageIndex, int pageSize, UserShortView.Filters filters);
 
     Page<ProjectView> searchProjects(int pageIndex, int pageSize, String search);
 

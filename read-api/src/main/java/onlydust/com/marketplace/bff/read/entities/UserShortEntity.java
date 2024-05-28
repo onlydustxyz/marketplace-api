@@ -1,12 +1,11 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice;
+package onlydust.com.marketplace.bff.read.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import onlydust.com.marketplace.project.domain.view.backoffice.UserShortView;
+import onlydust.com.backoffice.api.contract.model.UserPageItemResponse;
 import org.hibernate.annotations.Immutable;
 
 import java.time.ZoneOffset;
@@ -19,7 +18,7 @@ import java.util.UUID;
 @Data
 @Entity
 @Immutable
-public class BoUserShortQueryEntity {
+public class UserShortEntity {
     @Id
     UUID id;
     Long githubUserId;
@@ -29,15 +28,14 @@ public class BoUserShortQueryEntity {
     Date lastSeenAt;
     Date createdAt;
 
-    public UserShortView toDomain() {
-        return UserShortView.builder()
+    public UserPageItemResponse toDomain() {
+        return new UserPageItemResponse()
                 .id(id)
                 .githubUserId(githubUserId)
                 .login(login)
                 .avatarUrl(avatarUrl)
                 .email(email)
                 .lastSeenAt(ZonedDateTime.ofInstant(lastSeenAt.toInstant(), ZoneOffset.UTC))
-                .signedUpAt(ZonedDateTime.ofInstant(createdAt.toInstant(), ZoneOffset.UTC))
-                .build();
+                .signedUpAt(ZonedDateTime.ofInstant(createdAt.toInstant(), ZoneOffset.UTC));
     }
 }
