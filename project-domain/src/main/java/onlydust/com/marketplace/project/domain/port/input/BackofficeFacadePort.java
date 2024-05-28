@@ -11,8 +11,6 @@ import java.util.UUID;
 
 public interface BackofficeFacadePort {
 
-    Page<UserShortView> listUsers(int pageIndex, int pageSize, UserShortView.Filters filters);
-
     Page<EcosystemView> listEcosystems(int pageIndex, int pageSize, EcosystemView.Filters filters);
 
     Page<ProjectView> searchProjects(int pageIndex, int pageSize, String search);

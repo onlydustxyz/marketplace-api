@@ -28,4 +28,5 @@ public interface HackathonStoragePort {
     void registerUser(UUID userId, Hackathon.Id hackathonId);
 
     boolean isRegisteredToHackathon(UUID userId, Hackathon.Id hackathonId);
+
 }

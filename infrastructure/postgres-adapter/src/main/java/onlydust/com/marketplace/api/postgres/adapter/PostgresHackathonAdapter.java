@@ -83,4 +83,5 @@ public class PostgresHackathonAdapter implements HackathonStoragePort {
     public boolean isRegisteredToHackathon(UUID userId, Hackathon.Id hackathonId) {
         return hackathonRegistrationRepository.existsById(new HackathonRegistrationEntity.PrimaryKey(hackathonId.value(), userId));
     }
+
 }

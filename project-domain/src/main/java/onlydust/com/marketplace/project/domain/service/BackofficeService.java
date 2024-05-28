@@ -26,11 +26,6 @@ public class BackofficeService implements BackofficeFacadePort {
     }
 
     @Override
-    public Page<UserShortView> listUsers(int pageIndex, int pageSize, UserShortView.Filters filters) {
-        return backofficeStoragePort.listUsers(pageIndex, pageSize, filters);
-    }
-
-    @Override
     public Page<ProjectView> searchProjects(int pageIndex, int pageSize, String search) {
         return backofficeStoragePort.searchProjects(pageIndex, pageSize, search);
     }
