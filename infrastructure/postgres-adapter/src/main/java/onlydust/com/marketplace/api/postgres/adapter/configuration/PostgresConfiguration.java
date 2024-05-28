@@ -408,11 +408,12 @@ public class PostgresConfiguration {
     public PostgresHackathonAdapter postgresHackathonAdapter(final HackathonRepository hackathonRepository,
                                                              final HackathonDetailsViewRepository hackathonDetailsViewRepository,
                                                              final HackathonShortViewRepository hackathonShortViewRepository,
-                                                             final HackathonRegistrationRepository hackathonRegistrationRepository) {
+                                                             final HackathonRegistrationRepository hackathonRegistrationRepository,
+                                                             final BoUserShortViewRepository boUserShortViewRepository) {
         return new PostgresHackathonAdapter(hackathonRepository,
                 hackathonDetailsViewRepository,
                 hackathonShortViewRepository,
-                hackathonRegistrationRepository);
+                hackathonRegistrationRepository, boUserShortViewRepository);
     }
 
     @Bean

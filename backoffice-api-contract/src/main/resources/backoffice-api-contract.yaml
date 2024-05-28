@@ -1953,6 +1953,48 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/hackathons/{hackathonId}/users:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeHackathonManagement
+      summary: Get hackathon registered user page
+      operationId: getRegisteredUserPage
+      description: |
+        Get hackathon registered user page
+      parameters:
+        - in: path
+          name: hackathonId
+          required: true
+          schema:
+            $ref: '#/components/schemas/HackathonId'
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: login
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 'User page'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPage'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
   # BackofficeDebug ===============================================================
   /bo/v1/debug/accounting/check-events:

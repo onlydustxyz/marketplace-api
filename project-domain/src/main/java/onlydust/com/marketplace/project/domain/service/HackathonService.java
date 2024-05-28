@@ -9,6 +9,7 @@ import onlydust.com.marketplace.project.domain.port.input.HackathonObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 import onlydust.com.marketplace.project.domain.view.HackathonDetailsView;
 import onlydust.com.marketplace.project.domain.view.HackathonShortView;
+import onlydust.com.marketplace.project.domain.view.backoffice.UserShortView;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -82,5 +83,10 @@ public class HackathonService implements HackathonFacadePort {
     @Override
     public boolean isRegisteredToHackathon(UUID userId, Hackathon.Id hackathonId) {
         return hackathonStoragePort.isRegisteredToHackathon(userId, hackathonId);
+    }
+
+    @Override
+    public Page<UserShortView> listRegisteredUsers(Hackathon.Id hackahtonId, int pageIndex, int pageSize, UserShortView.Filters filters) {
+        return hackathonStoragePort.listRegisteredUsers(hackahtonId, pageIndex, pageSize, filters);
     }
 }

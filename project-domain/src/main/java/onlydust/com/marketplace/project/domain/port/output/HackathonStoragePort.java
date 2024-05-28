@@ -5,6 +5,7 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.view.HackathonDetailsView;
 import onlydust.com.marketplace.project.domain.view.HackathonShortView;
+import onlydust.com.marketplace.project.domain.view.backoffice.UserShortView;
 
 import java.util.Optional;
 import java.util.Set;
@@ -28,4 +29,6 @@ public interface HackathonStoragePort {
     void registerUser(UUID userId, Hackathon.Id hackathonId);
 
     boolean isRegisteredToHackathon(UUID userId, Hackathon.Id hackathonId);
+
+    Page<UserShortView> listRegisteredUsers(Hackathon.Id hackahtonId, int pageIndex, int pageSize, UserShortView.Filters filters);
 }

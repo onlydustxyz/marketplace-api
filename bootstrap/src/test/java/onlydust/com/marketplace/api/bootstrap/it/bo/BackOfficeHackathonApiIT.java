@@ -779,6 +779,54 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
     }
 
     @Test
+    @Order(50)
+    void should_get_registered_users() {
+        // Given
+        hackathonStoragePort.registerUser(UUID.fromString("dd0ab03c-5875-424b-96db-a35522eab365"), Hackathon.Id.of(hackathonId1.getValue()));
+        hackathonStoragePort.registerUser(UUID.fromString("fc92397c-3431-4a84-8054-845376b630a0"), Hackathon.Id.of(hackathonId1.getValue()));
+        hackathonStoragePort.registerUser(UUID.fromString("747e663f-4e68-4b42-965b-b5aebedcd4c4"), Hackathon.Id.of(hackathonId1.getValue()));
+
+        // When
+        client.get()
+                .uri(getApiURI(HACKATHONS_BY_ID_USERS.formatted(hackathonId1.getValue()), Map.of("pageIndex", "0", "pageSize", "2")))
+                .header("Authorization", "Bearer " + emilie.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 2,
+                          "totalItemNumber": 3,
+                          "hasMore": true,
+                          "nextPageIndex": 1,
+                          "users": [
+                            {
+                              "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                              "githubUserId": 43467246,
+                              "login": "AnthonyBuisset",
+                              "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                              "email": "abuisset@gmail.com",
+                              "lastSeenAt": "2023-10-05T19:06:50.034Z",
+                              "signedUpAt": "2022-12-12T09:51:58.48559Z"
+                            },
+                            {
+                              "id": "dd0ab03c-5875-424b-96db-a35522eab365",
+                              "githubUserId": 21149076,
+                              "login": "oscarwroche",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
+                              "email": "oscar.w.roche@gmail.com",
+                              "lastSeenAt": "2023-06-27T09:11:30.869Z",
+                              "signedUpAt": "2022-12-15T08:18:40.237388Z"
+                            }
+                          ]
+                        }
+                        
+                        """);
+    }
+
+    @Test
     @Order(100)
     void should_delete_hackathon() {
         // When
