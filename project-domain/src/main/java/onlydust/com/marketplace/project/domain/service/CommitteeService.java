@@ -106,7 +106,7 @@ public class CommitteeService implements CommitteeFacadePort {
         final var juryIds = committee.juryIds();
 
         if (isNull(committee.votePerJury()))
-            throw forbidden("Number of vote per jury must filled to assign juries to projects");
+            throw forbidden("Number of vote per jury must be filled to assign juries to projects");
 
         if (juryIds.isEmpty() || juryIds.size() * committee.votePerJury() < projectIds.size())
             throw forbidden("Not enough juries or vote per jury to cover all projects");
