@@ -9,6 +9,7 @@ import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.view.commitee.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -187,7 +188,7 @@ public interface BackOfficeCommitteeMapper {
                         .map(ProjectJuryVoteView::getTotalScore)
                         .reduce(BigDecimal::add).map(bigDecimal -> bigDecimal.divide(BigDecimal.valueOf(view.projectJuryVoteViews().stream()
                                 .filter(projectJuryVoteView -> nonNull(projectJuryVoteView.getTotalScore()))
-                                .count()))).orElse(null));
+                                .count()),2, RoundingMode.HALF_UP)).orElse(null));
         committeeProjectApplicationResponse.setJuryVotes(view.projectJuryVoteViews().stream().map(projectJuryVoteView ->
                 new JuryVoteResponse()
                         .totalScore(projectJuryVoteView.getTotalScore())
