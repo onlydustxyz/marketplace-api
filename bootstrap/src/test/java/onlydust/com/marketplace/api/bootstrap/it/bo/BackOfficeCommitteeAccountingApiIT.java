@@ -37,7 +37,7 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
 
     // Projects
     private static final UUID apibaraId = UUID.fromString("2073b3b2-60f4-488c-8a0a-ab7121ed850c");
-    private static final UUID bretzelId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
+    private static final UUID bretzelId = UUID.fromString("247ac542-762d-44cb-b8d4-4d6199c916be");
     private static final UUID cairoFoundryId = UUID.fromString("8156fc5f-cec5-4f70-a0de-c368772edcd4");
     private static final UUID delugeId = UUID.fromString("ade75c25-b39f-4fdf-a03a-e2391c1bc371");
     private static final UUID starklingsId = UUID.fromString("6239cb20-eece-466a-80a0-742c1071dd3c");
@@ -83,10 +83,7 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                 // Then
                 .expectStatus()
                 .isNoContent();
-    }
 
-    @Test
-    void should_get_budget_allocations() {
         client.get()
                 .uri(getApiURI(COMMITTEE_BUDGET_ALLOCATIONS.formatted(committeeId)))
                 .header("Authorization", "Bearer " + pierre.jwt())
@@ -97,9 +94,46 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                 .expectBody()
                 .json("""
                         {
-                          "currency": null,
-                          "totalAllocationAmount": 0,
-                          "projectAllocations": []
+                          "currency": {
+                            "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                            "code": "STRK",
+                            "name": "StarkNet Token",
+                            "logoUrl": null,
+                            "decimals": 18
+                          },
+                          "totalAllocationAmount": 9999.9999960,
+                          "projectAllocations": [
+                            {
+                              "project": {
+                                "id": "8156fc5f-cec5-4f70-a0de-c368772edcd4",
+                                "slug": "cairo-foundry",
+                                "name": "Cairo foundry",
+                                "logoUrl": null
+                              },
+                              "score": null,
+                              "allocation": 2499.9999990
+                            },
+                            {
+                              "project": {
+                                "id": "ade75c25-b39f-4fdf-a03a-e2391c1bc371",
+                                "slug": "deluge",
+                                "name": "Deluge",
+                                "logoUrl": null
+                              },
+                              "score": null,
+                              "allocation": 3333.3333320
+                            },
+                            {
+                              "project": {
+                                "id": "6239cb20-eece-466a-80a0-742c1071dd3c",
+                                "slug": "starklings",
+                                "name": "Starklings",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
+                              },
+                              "score": null,
+                              "allocation": 4166.6666650
+                            }
+                          ]
                         }
                         """);
     }
