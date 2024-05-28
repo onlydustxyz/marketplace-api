@@ -24,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.*;
+
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
@@ -134,5 +136,18 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
                         .build()
                 )
                 .collect(Collectors.toSet()));
+    }
+
+    @Override
+    public List<JuryAssignment> findJuryAssignments(Committee.Id committeeId) {
+        return committeeJuryVoteRepository.findAllByCommitteeId(committeeId.value()).stream()
+                .collect(groupingBy(CommitteeJuryVoteEntity::getProjectId,
+                        groupingBy(CommitteeJuryVoteEntity::getUserId,
+                                groupingBy(vote -> JuryCriteria.Id.of(vote.getCriteriaId()),
+                                        mapping(CommitteeJuryVoteEntity::getScore, summingInt(Integer::intValue))))))
+                .entrySet().stream()
+                .flatMap(byProject -> byProject.getValue().entrySet().stream()
+                        .map(byJury -> JuryAssignment.withVotes(byJury.getKey(), committeeId, byProject.getKey(), byJury.getValue()))
+                ).toList();
     }
 }

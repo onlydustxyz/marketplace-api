@@ -1,14 +1,17 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import com.github.javafaker.Faker;
+import lombok.NonNull;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.model.JuryAssignment;
+import onlydust.com.marketplace.project.domain.model.JuryCriteria;
+import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
 import onlydust.com.marketplace.project.domain.view.ProjectInfosView;
-import onlydust.com.marketplace.project.domain.view.ProjectShortView;
 import onlydust.com.marketplace.project.domain.view.RegisteredContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
@@ -22,11 +25,13 @@ import org.mockito.ArgumentCaptor;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import static java.util.function.Function.identity;
@@ -793,7 +798,8 @@ public class CommitteeServiceTest {
             // Then
             assertThatThrownBy(() -> committeeService.updateStatus(committeeId, Committee.Status.OPEN_TO_VOTES))
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("Not enough juries or vote per jury to cover all projects given some juries are project lead or contributor on application project");
+                    .hasMessage("Not enough juries or vote per jury to cover all projects given some juries are project lead or contributor on application " +
+                                "project");
         }
 
 
@@ -848,16 +854,140 @@ public class CommitteeServiceTest {
                     .githubUserId(faker.number().randomNumber())
                     .build();
         }
+    }
 
-        private ProjectShortView projectStub() {
-            return ProjectShortView.builder()
-                    .id(UUID.randomUUID())
-                    .logoUrl(faker.internet().url())
-                    .shortDescription(faker.rickAndMorty().location())
-                    .name(faker.lordOfTheRings().character())
-                    .visibility(ProjectVisibility.PUBLIC)
-                    .slug(faker.gameOfThrones().character())
-                    .build();
+    @Nested
+    public class ShouldAllocateBudgets {
+        private final Committee committee = Committee.builder()
+                .id(Committee.Id.random())
+                .name(faker.rickAndMorty().character())
+                .applicationStartDate(faker.date().past(5, 2, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC))
+                .applicationEndDate(faker.date().past(2, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC))
+                .status(Committee.Status.CLOSED)
+                .build();
+        private final UUID STRK = UUID.randomUUID();
+
+
+        @Test
+        void given_a_non_existing_committee() {
+            // Given
+            when(committeeStoragePort.findById(committee.id())).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> committeeService.allocate(committee.id(), STRK, BigDecimal.TEN, BigDecimal.ONE, BigDecimal.TEN))
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Committee %s was not found".formatted(committee.id()));
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = Committee.Status.class, names = {"CLOSED"}, mode = EnumSource.Mode.EXCLUDE)
+        void given_an_open_committee(Committee.Status status) {
+            // Given
+            when(committeeStoragePort.findById(committee.id())).thenReturn(Optional.of(committee.toBuilder().status(status).build()));
+
+            // When
+            assertThatThrownBy(() -> committeeService.allocate(committee.id(), STRK, BigDecimal.TEN, BigDecimal.ONE, BigDecimal.TEN))
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Committee %s must be closed to allocate budgets".formatted(committee.id()));
+        }
+
+        @Test
+        void given_a_project_with_missing_score() {
+            // Given
+            when(committeeStoragePort.findById(committee.id())).thenReturn(Optional.of(committee));
+            when(committeeStoragePort.findJuryAssignments(committee.id())).thenReturn(List.of(
+                    JuryAssignment.virgin(UUID.randomUUID(), committee.id(), UUID.randomUUID(), List.of(fakeCriteria(), fakeCriteria(), fakeCriteria())),
+                    JuryAssignment.virgin(UUID.randomUUID(), committee.id(), UUID.randomUUID(), List.of(fakeCriteria(), fakeCriteria(), fakeCriteria())),
+                    JuryAssignment.virgin(UUID.randomUUID(), committee.id(), UUID.randomUUID(), List.of(fakeCriteria(), fakeCriteria(), fakeCriteria()))
+            ));
+
+            // When
+            assertThatThrownBy(() -> committeeService.allocate(committee.id(), STRK, BigDecimal.TEN, BigDecimal.ONE, BigDecimal.TEN))
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Cannot compute score for project");
+        }
+
+        @Test
+        void given_min_greater_than_max() {
+            // Given
+            when(committeeStoragePort.findById(committee.id())).thenReturn(Optional.of(committee));
+            when(committeeStoragePort.findJuryAssignments(committee.id())).thenReturn(List.of(
+                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), UUID.randomUUID(), Map.of(JuryCriteria.Id.random(), 1)),
+                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), UUID.randomUUID(), Map.of(JuryCriteria.Id.random(), 2)),
+                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), UUID.randomUUID(), Map.of(JuryCriteria.Id.random(), 3))
+            ));
+
+            // When
+            assertThatThrownBy(() -> committeeService.allocate(committee.id(), STRK, BigDecimal.valueOf(1000), BigDecimal.TEN, BigDecimal.ONE))
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Min allocation is greater than max allocation");
+        }
+
+        @Test
+        void given_correct_inputs() {
+            // Given
+            final var project1 = UUID.fromString("00000000-0000-0000-0000-000000000001");
+            final var project2 = UUID.fromString("00000000-0000-0000-0000-000000000002");
+            final var project3 = UUID.fromString("00000000-0000-0000-0000-000000000003");
+            final var project4 = UUID.fromString("00000000-0000-0000-0000-000000000004");
+            final var project5 = UUID.fromString("00000000-0000-0000-0000-000000000005");
+
+            when(committeeStoragePort.findById(committee.id())).thenReturn(Optional.of(committee));
+            when(committeeStoragePort.findJuryAssignments(committee.id())).thenReturn(List.of(
+                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), project1, Map.of(JuryCriteria.Id.random(), 1)),
+                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), project2, Map.of(JuryCriteria.Id.random(), 2)),
+                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), project3, Map.of(JuryCriteria.Id.random(), 3)),
+                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), project4, Map.of(JuryCriteria.Id.random(), 4)),
+                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), project5, Map.of(JuryCriteria.Id.random(), 5))
+            ));
+
+            // When
+            committeeService.allocate(committee.id(), STRK, BigDecimal.valueOf(15), BigDecimal.valueOf(1), BigDecimal.valueOf(5));
+
+            // Then
+            final var allocationsCaptor = ArgumentCaptor.forClass(Map.class);
+            verify(committeeStoragePort).saveAllocations(eq(committee.id()), eq(STRK), allocationsCaptor.capture());
+            final Map<UUID, BigDecimal> allocations = allocationsCaptor.getValue();
+            assertThat(allocations).hasSize(3);
+            assertThat(allocations.get(project3)).isEqualByComparingTo(BigDecimal.valueOf(3.75));
+            assertThat(allocations.get(project4)).isEqualByComparingTo(BigDecimal.valueOf(5));
+            assertThat(allocations.get(project5)).isEqualByComparingTo(BigDecimal.valueOf(6.25));
+        }
+
+        @Test
+        void given_more_complex_inputs() {
+            // Given
+            final var project1 = UUID.fromString("00000000-0000-0000-0000-000000000001");
+            final var project2 = UUID.fromString("00000000-0000-0000-0000-000000000002");
+            final var project3 = UUID.fromString("00000000-0000-0000-0000-000000000003");
+            final var project4 = UUID.fromString("00000000-0000-0000-0000-000000000004");
+            final var project5 = UUID.fromString("00000000-0000-0000-0000-000000000005");
+
+            when(committeeStoragePort.findById(committee.id())).thenReturn(Optional.of(committee));
+            when(committeeStoragePort.findJuryAssignments(committee.id())).thenReturn(List.of(
+                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), project1, Map.of(JuryCriteria.Id.random(), 1)),
+                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), project2, Map.of(JuryCriteria.Id.random(), 2)),
+                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), project3, Map.of(JuryCriteria.Id.random(), 2)),
+                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), project4, Map.of(JuryCriteria.Id.random(), 3)),
+                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), project5, Map.of(JuryCriteria.Id.random(), 4))
+            ));
+
+            // When
+            committeeService.allocate(committee.id(), STRK, BigDecimal.valueOf(15), BigDecimal.valueOf(1), BigDecimal.valueOf(10));
+
+            // Then
+            final var allocationsCaptor = ArgumentCaptor.forClass(Map.class);
+            verify(committeeStoragePort).saveAllocations(eq(committee.id()), eq(STRK), allocationsCaptor.capture());
+            final Map<UUID, BigDecimal> allocations = allocationsCaptor.getValue();
+            assertThat(allocations).hasSize(2);
+            assertThat(allocations.get(project4)).isEqualByComparingTo(BigDecimal.valueOf(6.428571));
+            assertThat(allocations.get(project5)).isEqualByComparingTo(BigDecimal.valueOf(8.571428));
+        }
+
+        @NonNull
+        private JuryCriteria fakeCriteria() {
+            return new JuryCriteria(JuryCriteria.Id.random(),
+                    faker.pokemon().name());
         }
     }
 }

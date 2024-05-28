@@ -8,4 +8,6 @@ import java.util.UUID;
 
 public interface CommitteeJuryVoteRepository extends JpaRepository<CommitteeJuryVoteEntity, CommitteeJuryVoteEntity.PrimaryKey> {
     List<CommitteeJuryVoteEntity> findAllByCommitteeIdAndProjectId(UUID committeeId, UUID projectId);
+
+    List<CommitteeJuryVoteEntity> findAllByCommitteeId(UUID value);
 }

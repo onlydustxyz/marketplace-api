@@ -9,6 +9,7 @@ import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicatio
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Optional;
@@ -34,4 +35,6 @@ public interface CommitteeFacadePort {
     CommitteeApplicationDetailsView getCommitteeApplicationDetails(Committee.Id committeeId, UUID projectId);
 
     void vote(UUID juryId, Committee.Id committeeId, UUID projectId, Map<JuryCriteria.Id, Integer> scores);
+
+    void allocate(Committee.Id committeeId, UUID currencyId, BigDecimal totalAmount, BigDecimal minAllocation, BigDecimal maxAllocation);
 }

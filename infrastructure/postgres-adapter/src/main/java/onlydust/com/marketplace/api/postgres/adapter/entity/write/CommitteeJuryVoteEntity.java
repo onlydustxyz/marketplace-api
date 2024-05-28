@@ -5,10 +5,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 import lombok.*;
-import onlydust.com.marketplace.project.domain.view.commitee.ProjectJuryVoteView;
+import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.model.JuryAssignment;
+import onlydust.com.marketplace.project.domain.model.JuryCriteria;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Entity
@@ -38,6 +40,9 @@ public class CommitteeJuryVoteEntity {
     UUID userId;
     Integer score;
 
+    public JuryAssignment toDomain() {
+        return JuryAssignment.withVotes(userId, Committee.Id.of(committeeId), projectId, Map.of(JuryCriteria.Id.of(criteriaId), score));
+    }
 
     @EqualsAndHashCode
     @AllArgsConstructor

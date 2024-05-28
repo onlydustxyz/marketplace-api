@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import com.github.javafaker.Faker;
 import lombok.NonNull;
+import onlydust.com.backoffice.api.contract.model.CommitteeBudgetAllocationsCreateRequest;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeJuryVoteRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
@@ -17,10 +18,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.IntStream;
+
+import static org.springframework.web.reactive.function.BodyInserters.fromValue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackOfficeApiIT {
@@ -40,6 +44,9 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
 
     // Sponsors
     private static final UUID cocaColax = UUID.fromString("44c6807c-48d1-4987-a0a6-ac63f958bdae");
+
+    // Currencies
+    private static final UUID STRK = UUID.fromString("81b7e948-954f-4718-bad3-b70a0edd27e1");
 
     private static final Faker faker = new Faker();
     private UUID committeeId;
@@ -61,6 +68,24 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
     }
 
     @Test
+    void should_add_budget_to_committee() {
+        final var request = new CommitteeBudgetAllocationsCreateRequest()
+                .amount(BigDecimal.valueOf(10000))
+                .currencyId(STRK)
+                .minAllocation(BigDecimal.valueOf(100))
+                .maxAllocation(BigDecimal.valueOf(5000));
+
+        client.post()
+                .uri(getApiURI(COMMITTEE_BUDGET_ALLOCATIONS.formatted(committeeId)))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                .body(fromValue(request))
+                .exchange()
+                // Then
+                .expectStatus()
+                .isNoContent();
+    }
+
+    @Test
     void should_get_budget_allocations() {
         client.get()
                 .uri(getApiURI(COMMITTEE_BUDGET_ALLOCATIONS.formatted(committeeId)))
@@ -78,6 +103,7 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                         }
                         """);
     }
+
 
     private Committee fakeCommittee() {
         var committee = committeeFacadePort.createCommittee("My committee", ZonedDateTime.now().plusDays(1), ZonedDateTime.now().plusDays(2));

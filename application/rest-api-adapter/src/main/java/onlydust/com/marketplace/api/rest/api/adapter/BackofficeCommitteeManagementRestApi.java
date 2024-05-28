@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeCommitteeMapper.toCommitteeResponse;
+import static org.springframework.http.ResponseEntity.*;
 
 @RestController
 @Tags(@Tag(name = "BackofficeCommitteeManagement"))
@@ -32,13 +33,23 @@ public class BackofficeCommitteeManagementRestApi implements BackOfficeCommittee
     public ResponseEntity<CommitteeResponse> createCommittee(CreateCommitteeRequest createCommitteeRequest) {
         final Committee committee = committeeFacadePort.createCommittee(createCommitteeRequest.getName(), createCommitteeRequest.getApplicationStartDate(),
                 createCommitteeRequest.getApplicationEndDate());
-        return ResponseEntity.ok(toCommitteeResponse(committee));
+        return ok(toCommitteeResponse(committee));
+    }
+
+    @Override
+    public ResponseEntity<Void> createProjectAllocations(UUID committeeId, CommitteeBudgetAllocationsCreateRequest request) {
+        committeeFacadePort.allocate(Committee.Id.of(committeeId),
+                request.getCurrencyId(),
+                request.getAmount(),
+                request.getMinAllocation(),
+                request.getMaxAllocation());
+        return noContent().build();
     }
 
     @Override
     public ResponseEntity<CommitteeResponse> getCommittee(UUID committeeId) {
         final CommitteeView committeeView = committeeFacadePort.getCommitteeById(Committee.Id.of(committeeId));
-        return ResponseEntity.ok(BackOfficeCommitteeMapper.toCommitteeResponse(committeeView));
+        return ok(BackOfficeCommitteeMapper.toCommitteeResponse(committeeView));
     }
 
     @Override
@@ -48,26 +59,26 @@ public class BackofficeCommitteeManagementRestApi implements BackOfficeCommittee
         final Page<CommitteeLinkView> page = committeeFacadePort.getCommittees(sanitizePageIndex, sanitizePageSize);
         final CommitteePageResponse committeePageResponse = BackOfficeCommitteeMapper.toCommitteePageResponse(page, sanitizePageIndex);
         return committeePageResponse.getTotalPageNumber() > 1 ?
-                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(committeePageResponse) :
-                ResponseEntity.ok(committeePageResponse);
+                status(HttpStatus.PARTIAL_CONTENT).body(committeePageResponse) :
+                ok(committeePageResponse);
     }
 
     @Override
     public ResponseEntity<CommitteeProjectApplicationResponse> getProjectApplication(UUID committeeId, UUID projectId) {
         final CommitteeApplicationDetailsView committeeApplicationDetails = committeeFacadePort.getCommitteeApplicationDetails(Committee.Id.of(committeeId),
                 projectId);
-        return ResponseEntity.ok(BackOfficeCommitteeMapper.committeeApplicationDetailsToResponse(committeeApplicationDetails));
+        return ok(BackOfficeCommitteeMapper.committeeApplicationDetailsToResponse(committeeApplicationDetails));
     }
 
     @Override
     public ResponseEntity<Void> updateCommittee(UUID committeeId, UpdateCommitteeRequest updateCommitteeRequest) {
         committeeFacadePort.update(BackOfficeCommitteeMapper.updateCommitteeRequestToDomain(committeeId, updateCommitteeRequest));
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> updateCommitteeStatus(UUID committeeId, UpdateCommitteeStatusRequest updateCommitteeStatusRequest) {
         committeeFacadePort.updateStatus(Committee.Id.of(committeeId), BackOfficeCommitteeMapper.statusToDomain(updateCommitteeStatusRequest.getStatus()));
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 }
