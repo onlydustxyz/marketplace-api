@@ -314,4 +314,4 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelogs/00000243_add_questions_and_criteria_ranks.sql
   - include:
-      file: db/changelog/changelogs/00000244_create_accounting_committee_tables.sql
+      file: db/changelog/changelogs/00000244_create_committee_budget_allocations.sql
