@@ -21,7 +21,7 @@ public interface CommitteeLinkViewRepository extends JpaRepository<CommitteeLink
                    coalesce(pc.count,0) project_count
                    from committees c
                    left join (
-                    select cpa.committee_id, count(cpa.project_id) count
+                    select cpa.committee_id, count(distinct cpa.project_id) count
                        from committee_project_answers cpa
                        group by cpa.committee_id
                    ) pc on pc.committee_id = c.id
@@ -39,7 +39,7 @@ public interface CommitteeLinkViewRepository extends JpaRepository<CommitteeLink
                    coalesce(pc.count,0) project_count
                    from committees c
                    left join (
-                    select cpa.committee_id, count(cpa.project_id) count
+                    select cpa.committee_id, count(distinct cpa.project_id) count
                        from committee_project_answers cpa
                        group by cpa.committee_id
                    ) pc on pc.committee_id = c.id
