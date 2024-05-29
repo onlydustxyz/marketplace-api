@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
@@ -21,10 +22,12 @@ import static java.util.Objects.isNull;
 @Table(name = "all_users", schema = "iam")
 @NoArgsConstructor(force = true)
 @Accessors(fluent = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Immutable
 public class AllUserViewEntity {
     @Id
     @NonNull
+    @EqualsAndHashCode.Include
     Long githubUserId;
     UUID userId;
     @NonNull
@@ -35,16 +38,16 @@ public class AllUserViewEntity {
     String email;
 
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", insertable = false, updatable = false)
     UserViewEntity registered;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "githubUserId", insertable = false, updatable = false)
     @NonNull
     GithubAccountViewEntity github;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", insertable = false, updatable = false)
     UserProfileInfoViewEntity profile;
 

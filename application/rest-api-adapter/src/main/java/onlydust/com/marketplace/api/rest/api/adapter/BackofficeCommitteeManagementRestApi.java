@@ -12,7 +12,6 @@ import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationDetailsView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
-import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,12 +44,6 @@ public class BackofficeCommitteeManagementRestApi implements BackOfficeCommittee
                 request.getMinAllocation(),
                 request.getMaxAllocation());
         return noContent().build();
-    }
-
-    @Override
-    public ResponseEntity<CommitteeResponse> getCommittee(UUID committeeId) {
-        final CommitteeView committeeView = committeeFacadePort.getCommitteeById(Committee.Id.of(committeeId));
-        return ok(BackOfficeCommitteeMapper.toCommitteeResponse(committeeView));
     }
 
     @Override
