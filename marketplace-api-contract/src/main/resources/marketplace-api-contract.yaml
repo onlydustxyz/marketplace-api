@@ -2955,6 +2955,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+
   /api/v1/ecosystems:
     get:
       security:
@@ -2983,6 +2984,103 @@ paths:
                 $ref: '#/components/schemas/EcosystemPage'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v2/ecosystems:
+    get:
+      security:
+        - { }
+      tags:
+        - ReadEcosystems
+      summary: Get ecosystems page
+      operationId: getEcosystemsPage
+      parameters:
+        - in: query
+          name: featured
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - in: query
+          name: pageIndex
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: pageSize
+          required: false
+          schema:
+            type: integer
+            default: 5
+      responses:
+        "200":
+          description: 'Page of ecosystem'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EcosystemPageV2'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/ecosystems/slug/{slug}:
+    get:
+      security:
+        - { }
+      tags:
+        - ReadEcosystems
+      summary: Get ecosystem details by slug
+      operationId: getEcosystemBySlug
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            $ref: '#/components/schemas/EcosystemSlug'
+      responses:
+        "200":
+          description: 'Ecosystem details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EcosystemDetailsResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/ecosystems/{ecosystemId}/languages:
+    get:
+      security:
+        - { }
+      tags:
+        - ReadEcosystems
+      summary: Get ecosystem languages page
+      operationId: getEcosystemLanguages
+      parameters:
+        - in: path
+          name: ecosystemId
+          required: true
+          schema:
+            $ref: '#/components/schemas/EcosystemId'
+        - in: query
+          name: pageIndex
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: pageSize
+          required: false
+          schema:
+            type: integer
+            default: 5
+      responses:
+        "200":
+          description: 'Ecosystem details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EcosystemLanguagesPageResponse'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -4435,6 +4533,127 @@ components:
           format: url
           description: Direct URL to ecosystem's banner image
           example: 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png'
+
+    EcosystemShortResponse:
+      type: object
+      required:
+        - id
+        - slug
+        - name
+        - description
+        - topProjects
+        - banners
+      properties:
+        id:
+          $ref: '#/components/schemas/EcosystemId'
+        slug:
+          $ref: '#/components/schemas/EcosystemSlug'
+        name:
+          type: string
+          description: Ecosystem name
+          example: Ethereum Foundation
+        description:
+          type: string
+          description: Ecosystem description
+          example: A short ecosystem description
+        banners:
+          type: object
+          required:
+            - xl
+            - md
+          properties:
+            xl:
+              $ref: '#/components/schemas/EcosystemBanner'
+            md:
+              $ref: '#/components/schemas/EcosystemBanner'
+
+    EcosystemBanner:
+      type: object
+      required:
+        - url
+        - fontColor
+      properties:
+        url:
+          type: string
+          format: uri
+        fontColor:
+          type: string
+          format: color
+          enum:
+            - DARK
+            - LIGHT
+
+    EcosystemPageItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/EcosystemShortResponse'
+        - type: object
+          required:
+            - projectCount
+          properties:
+            topProjects:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectLinkResponse'
+            projectCount:
+              type: integer
+              description: Number of projects within the ecosystem
+              example: 2
+
+    EcosystemDetailsResponse:
+      allOf:
+        - $ref: '#/components/schemas/EcosystemShortResponse'
+        - type: object
+          properties:
+            relatedArticles:
+              type: array
+              items:
+                $ref: '#/components/schemas/EcosystemArticle'
+
+    EcosystemArticle:
+      type: object
+      required:
+        - title
+        - url
+        - imageUrl
+        - description
+      properties:
+        title:
+          type: string
+          example: The title of the article
+        url:
+          type: string
+          format: uri
+          example: 'https://onlydust.com/article'
+        imageUrl:
+          type: string
+          format: uri
+          example: 'https://onlydust.com/article-image.jpg'
+        description:
+          type: string
+          example: A short description of the article
+
+    EcosystemLanguagesPageResponse:
+      type: object
+      required:
+        - languages
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageResponse'
 
     LanguageResponse:
       type: object
@@ -6824,6 +7043,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EcosystemResponse'
+
+    EcosystemPageV2:
+      type: object
+      required:
+        - ecosystems
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        ecosystems:
+          type: array
+          items:
+            $ref: '#/components/schemas/EcosystemPageItemResponse'
 
     InvoiceMandateRequest:
       type: object
