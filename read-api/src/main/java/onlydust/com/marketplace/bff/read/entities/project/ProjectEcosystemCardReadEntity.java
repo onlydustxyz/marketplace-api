@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.bff.read.entities.project;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -29,6 +30,7 @@ public class ProjectEcosystemCardReadEntity {
     String slug;
     @NonNull
     String shortDescription;
+    @Column(name = "logo_url")
     String logoUrl;
 
 
