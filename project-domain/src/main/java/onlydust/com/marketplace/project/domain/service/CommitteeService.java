@@ -223,17 +223,12 @@ public class CommitteeService implements CommitteeFacadePort {
     @Override
     public void allocate(final Committee.Id committeeId,
                          final UUID currencyId,
-                         final BigDecimal budget,
-                         final BigDecimal minAllocation,
-                         final BigDecimal maxAllocation) {
+                         final BigDecimal budget) {
         final var committee = committeeStoragePort.findById(committeeId)
                 .orElseThrow(() -> notFound("Committee %s was not found".formatted(committeeId.value().toString())));
 
         if (committee.status() != Committee.Status.CLOSED)
             throw forbidden("Committee %s must be closed to allocate budgets".formatted(committeeId.value()));
-
-        if (minAllocation.compareTo(maxAllocation) > 0)
-            throw forbidden("Min allocation is greater than max allocation");
 
         final var projectScores = committeeStoragePort.findJuryAssignments(committee.id())
                 .stream()

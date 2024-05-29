@@ -4604,18 +4604,10 @@ components:
       required:
         - currencyId
         - amount
-        - minAllocation
-        - maxAllocation
       properties:
         currencyId:
           $ref: '#/components/schemas/CurrencyId'
         amount:
-          type: number
-          format: int64
-        minAllocation:
-          type: number
-          format: int64
-        maxAllocation:
           type: number
           format: int64
 

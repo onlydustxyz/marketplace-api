@@ -73,9 +73,7 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
     void should_add_budget_to_committee() {
         final var request = new CommitteeBudgetAllocationsCreateRequest()
                 .amount(BigDecimal.valueOf(10000))
-                .currencyId(STRK)
-                .minAllocation(BigDecimal.valueOf(100))
-                .maxAllocation(BigDecimal.valueOf(5000));
+                .currencyId(STRK);
 
         client.post()
                 .uri(getApiURI(COMMITTEE_BUDGET_ALLOCATIONS.formatted(committeeId)))
