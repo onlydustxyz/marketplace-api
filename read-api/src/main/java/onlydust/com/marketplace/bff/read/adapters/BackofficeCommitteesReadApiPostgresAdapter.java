@@ -9,6 +9,7 @@ import onlydust.com.marketplace.bff.read.entities.CommitteeBudgetAllocationViewE
 import onlydust.com.marketplace.bff.read.entities.CommitteeJuryVoteReadEntity;
 import onlydust.com.marketplace.bff.read.entities.CommitteeProjectAnswerReadEntity;
 import onlydust.com.marketplace.bff.read.entities.ShortCurrencyResponseEntity;
+import onlydust.com.marketplace.bff.read.mapper.CommitteeMapper;
 import onlydust.com.marketplace.bff.read.mapper.ProjectMapper;
 import onlydust.com.marketplace.bff.read.mapper.SponsorMapper;
 import onlydust.com.marketplace.bff.read.mapper.UserMapper;
@@ -58,7 +59,7 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
                 .map(a -> new ApplicationResponse()
                         .project(ProjectMapper.mapBO(a.project()))
                         .applicant(UserMapper.map(a.user()))
-                        .score(Optional.ofNullable(averageVotePerProjects.get(a.projectId())).map(BigDecimal::valueOf).orElse(null))
+                        .score(Optional.ofNullable(averageVotePerProjects.get(a.projectId())).map(BigDecimal::valueOf).map(CommitteeMapper::roundScore).orElse(null))
                         .allocatedBudget(null))// TODO: implement
                 .toList();
 
@@ -82,7 +83,7 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
                 .applicationStartDate(DateMapper.ofNullable(committee.applicationStartDate()))
                 .applicationEndDate(DateMapper.ofNullable(committee.applicationEndDate()))
                 .status(statusToResponse(committee.status()))
-                .sponsor(SponsorMapper.mapNullable(committee.sponsor()))
+                .sponsor(SponsorMapper.mapNullableBO(committee.sponsor()))
                 .votePerJury(committee.votePerJury())
                 .projectCount(projectApplications.size())
                 .applications(projectApplications)

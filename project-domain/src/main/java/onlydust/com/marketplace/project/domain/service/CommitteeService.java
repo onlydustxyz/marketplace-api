@@ -9,11 +9,8 @@ import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationDetailsView;
-import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
-import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -23,7 +20,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 
@@ -74,12 +70,6 @@ public class CommitteeService implements CommitteeFacadePort {
                 .juryCriteria(committee.juryCriteria())
                 .projectQuestions(committee.projectQuestions())
                 .build());
-    }
-
-    @Override
-    public CommitteeView getCommitteeById(Committee.Id committeeId) {
-        return committeeStoragePort.findViewById(committeeId)
-                .orElseThrow(() -> notFound("Committee %s was not found".formatted(committeeId.value().toString())));
     }
 
     @Override
@@ -144,7 +134,7 @@ public class CommitteeService implements CommitteeFacadePort {
 
         if (!assignedProjectIds.containsAll(projectIds)) {
             throw internalServerError("Not enough juries or vote per jury to cover all projects given some" +
-                                      " juries are project lead or contributor on application project");
+                    " juries are project lead or contributor on application project");
         }
 
         committeeStoragePort.saveJuryAssignments(
@@ -178,27 +168,6 @@ public class CommitteeService implements CommitteeFacadePort {
 
         if (application.answers().stream().map(Committee.ProjectAnswer::projectQuestionId).anyMatch(id -> !projectQuestionIds.contains(id)))
             throw internalServerError("A project question is not linked to committee %s".formatted(committee.id().value()));
-    }
-
-    @Override
-    public CommitteeApplicationView getCommitteeApplication(Committee.Id committeeId, Optional<UUID> optionalProjectId, UUID userId) {
-        final var committee = committeeStoragePort.findViewById(committeeId)
-                .orElseThrow(() -> notFound("Committee %s was not found".formatted(committeeId.value().toString())));
-
-        if (optionalProjectId.isPresent()) {
-            final UUID projectId = optionalProjectId.get();
-            checkApplicationPermission(projectId, userId);
-            List<ProjectAnswerView> projectAnswers = committeeStoragePort.getApplicationAnswers(committeeId, projectId);
-            Boolean hasStartedApplication = nonNull(projectAnswers) && !projectAnswers.isEmpty();
-            if (!hasStartedApplication) {
-                projectAnswers = getCommitteeAnswersWithOnlyQuestions(committee);
-            }
-            return new CommitteeApplicationView(committee.status(), projectAnswers, projectStoragePort.getProjectInfos(projectId), hasStartedApplication,
-                    committee.applicationStartDate(), committee.applicationEndDate());
-        }
-
-        return new CommitteeApplicationView(committee.status(), getCommitteeAnswersWithOnlyQuestions(committee), null, false,
-                committee.applicationStartDate(), committee.applicationEndDate());
     }
 
     @Override
@@ -251,11 +220,6 @@ public class CommitteeService implements CommitteeFacadePort {
     @Override
     public void saveAllocations(Committee.Id committeeId, UUID currencyId, Map<UUID, BigDecimal> projectAllocations) {
         committeeStoragePort.saveAllocations(committeeId, currencyId, projectAllocations);
-    }
-
-    private List<ProjectAnswerView> getCommitteeAnswersWithOnlyQuestions(CommitteeView committeeView) {
-        return committeeView.projectQuestions().stream()
-                .map(projectQuestion -> new ProjectAnswerView(projectQuestion.id(), projectQuestion.question(), projectQuestion.required(), null)).toList();
     }
 
     private void checkApplicationPermission(final UUID projectId, final UUID userId) {

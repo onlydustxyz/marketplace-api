@@ -11,7 +11,6 @@ import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
-import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
 import onlydust.com.marketplace.project.domain.view.ProjectInfosView;
 
 import java.util.UUID;
@@ -26,7 +25,7 @@ public class ProjectMailNotifier implements CommitteeObserverPort {
 
     @Override
     public void onNewApplication(Committee.@NonNull Id committeeId, @NonNull UUID projectId, @NonNull UUID userId) {
-        final CommitteeView committee = committeeStoragePort.findViewById(committeeId)
+        final var committee = committeeStoragePort.findById(committeeId)
                 .orElseThrow(() -> OnlyDustException.internalServerError("Committee %s not found".formatted(committeeId.value())));
         final User user = userStoragePort.getUserById(userId).orElseThrow(() -> OnlyDustException.internalServerError("User %s not found".formatted(userId)));
         final ProjectInfosView projectInfos = projectStoragePort.getProjectInfos(projectId);

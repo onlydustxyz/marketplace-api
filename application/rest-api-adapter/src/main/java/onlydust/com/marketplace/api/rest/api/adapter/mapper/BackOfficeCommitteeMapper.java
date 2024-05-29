@@ -6,7 +6,9 @@ import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.JuryCriteria;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
-import onlydust.com.marketplace.project.domain.view.commitee.*;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationDetailsView;
+import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
+import onlydust.com.marketplace.project.domain.view.commitee.ProjectJuryVoteView;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -91,79 +93,6 @@ public interface BackOfficeCommitteeMapper {
                 projectQuestionRequest.getRequired()) : new ProjectQuestion(ProjectQuestion.Id.of(projectQuestionRequest.getId()),
                 projectQuestionRequest.getQuestion(),
                 projectQuestionRequest.getRequired());
-    }
-
-    static CommitteeResponse toCommitteeResponse(final CommitteeView committeeView) {
-        return new CommitteeResponse()
-                .id(committeeView.id().value())
-                .name(committeeView.name())
-                .applicationStartDate(committeeView.applicationStartDate())
-                .applicationEndDate(committeeView.applicationEndDate())
-                .status(statusToResponse(committeeView.status()))
-                .projectQuestions(committeeView.projectQuestions().stream()
-                        .map(projectQuestion -> new ProjectQuestionResponse()
-                                .id(projectQuestion.id().value())
-                                .question(projectQuestion.question())
-                                .required(projectQuestion.required()))
-                        .toList())
-                .applications(isNull(committeeView.committeeApplicationLinks()) ? null : committeeView.committeeApplicationLinks().stream()
-                        .map(committeeApplicationLinkView -> new ApplicationResponse()
-                                .applicant(new UserLinkResponse()
-                                        .avatarUrl(committeeApplicationLinkView.applicant().getAvatarUrl())
-                                        .login(committeeApplicationLinkView.applicant().getLogin())
-                                        .userId(committeeApplicationLinkView.applicant().getId())
-                                        .githubUserId(committeeApplicationLinkView.applicant().getGithubUserId())
-                                )
-                                .project(new ProjectLinkResponse()
-                                        .id(committeeApplicationLinkView.projectShortView().id())
-                                        .slug(committeeApplicationLinkView.projectShortView().slug())
-                                        .name(committeeApplicationLinkView.projectShortView().name())
-                                        .logoUrl(isNull(committeeApplicationLinkView.projectShortView().logoUrl()) ? null :
-                                                committeeApplicationLinkView.projectShortView().logoUrl())
-                                )
-                        ).toList())
-                .sponsor(isNull(committeeView.sponsor()) ? null :
-                        new SponsorLinkResponse()
-                                .id(committeeView.sponsor().id())
-                                .avatarUrl(committeeView.sponsor().logoUrl())
-                                .name(committeeView.sponsor().name()))
-                .juries(isNull(committeeView.juries()) ? null : committeeView.juries().stream()
-                        .map(registeredContributorLinkView -> new UserLinkResponse()
-                                .avatarUrl(registeredContributorLinkView.getAvatarUrl())
-                                .githubUserId(registeredContributorLinkView.getGithubUserId())
-                                .login(registeredContributorLinkView.getLogin())
-                                .userId(registeredContributorLinkView.getId())
-                        ).toList())
-                .juryCount(isNull(committeeView.juries()) ? 0 : committeeView.juries().size())
-                .juryCriteria(isNull(committeeView.juryCriteria()) ? null : committeeView.juryCriteria().stream()
-                        .map(juryCriteria -> new JuryCriteriaResponse().criteria(juryCriteria.criteria()).id(juryCriteria.id().value())).toList())
-                .votePerJury(committeeView.votePerJury())
-                .completedAssignments(isNull(committeeView.juryAssignments()) ? 0 :
-                        committeeView.juryAssignments().stream().map(JuryAssignmentView::completedAssigment).reduce(Integer::sum).orElse(0))
-                .totalAssignments(isNull(committeeView.juryAssignments()) ? 0 : committeeView.juryAssignments().stream()
-                        .map(JuryAssignmentView::totalAssigned).reduce(Integer::sum).orElse(0))
-                .juryAssignments(isNull(committeeView.juryAssignments()) ? null : committeeView.juryAssignments().stream()
-                        .map(juryAssignmentView -> new JuryAssignmentResponse()
-                                .completedAssignments(juryAssignmentView.completedAssigment())
-                                .totalAssignment(juryAssignmentView.totalAssigned())
-                                .user(new UserLinkResponse()
-                                        .githubUserId(juryAssignmentView.user().getGithubUserId())
-                                        .userId(juryAssignmentView.user().getId())
-                                        .login(juryAssignmentView.user().getLogin())
-                                        .avatarUrl(juryAssignmentView.user().getAvatarUrl())
-                                )
-                                .projectsAssigned(
-                                        juryAssignmentView.projectsAssigned().stream()
-                                                .map(projectShortView -> new ProjectLinkResponse()
-                                                        .id(projectShortView.id())
-                                                        .slug(projectShortView.slug())
-                                                        .name(projectShortView.name())
-                                                        .logoUrl(isNull(projectShortView.logoUrl()) ? null : projectShortView.logoUrl()))
-                                                .toList()
-                                )
-                        )
-                        .toList())
-                ;
     }
 
     static CommitteeProjectApplicationResponse committeeApplicationDetailsToResponse(final CommitteeApplicationDetailsView view) {
