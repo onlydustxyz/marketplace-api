@@ -90,4 +90,160 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is4xxClientError();
     }
+
+    @Test
+    void should_return_ecosystem_contributors_by_contribution_count() {
+        // When
+        client.get()
+                .uri(getApiURI(GET_ECOSYSTEM_CONTRIBUTORS.formatted("Starknet"),
+                        Map.of("pageIndex", "0", "pageSize", "5")))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 206,
+                          "totalItemNumber": 1027,
+                          "hasMore": true,
+                          "nextPageIndex": 1,
+                          "contributors": [
+                            {
+                              "githubUserId": 8019099,
+                              "login": "PeerRich",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/8019099?v=4",
+                              "dynamicRank": 1019,
+                              "globalRank": 20,
+                              "globalRankCategory": "A",
+                              "contributionCount": 2878,
+                              "rewardCount": 0,
+                              "totalEarnedUsd": 0
+                            },
+                            {
+                              "githubUserId": 3504472,
+                              "login": "zomars",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/3504472?v=4",
+                              "dynamicRank": 1018,
+                              "globalRank": 22,
+                              "globalRankCategory": "A",
+                              "contributionCount": 2280,
+                              "rewardCount": 0,
+                              "totalEarnedUsd": 0
+                            },
+                            {
+                              "githubUserId": 1046695,
+                              "login": "emrysal",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/1046695?v=4",
+                              "dynamicRank": 1017,
+                              "globalRank": 22,
+                              "globalRankCategory": "A",
+                              "contributionCount": 1733,
+                              "rewardCount": 0,
+                              "totalEarnedUsd": 0
+                            },
+                            {
+                              "githubUserId": 481465,
+                              "login": "frangio",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/481465?v=4",
+                              "dynamicRank": 1016,
+                              "globalRank": 19,
+                              "globalRankCategory": "A",
+                              "contributionCount": 1456,
+                              "rewardCount": 0,
+                              "totalEarnedUsd": 0
+                            },
+                            {
+                              "githubUserId": 1780212,
+                              "login": "hariombalhara",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/1780212?v=4",
+                              "dynamicRank": 1015,
+                              "globalRank": 26,
+                              "globalRankCategory": "A",
+                              "contributionCount": 1352,
+                              "rewardCount": 0,
+                              "totalEarnedUsd": 0
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
+    void should_return_ecosystem_contributors_by_total_earned() {
+        // When
+        client.get()
+                .uri(getApiURI(GET_ECOSYSTEM_CONTRIBUTORS.formatted("Starknet"),
+                        Map.of("pageIndex", "0", "pageSize", "5", "sort", "TOTAL_EARNED")))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 206,
+                          "totalItemNumber": 1027,
+                          "hasMore": true,
+                          "nextPageIndex": 1,
+                          "contributors": [
+                            {
+                              "githubUserId": 8019099,
+                              "login": "PeerRich",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/8019099?v=4",
+                              "dynamicRank": 1019,
+                              "globalRank": 20,
+                              "globalRankCategory": "A",
+                              "contributionCount": 2878,
+                              "rewardCount": 0,
+                              "totalEarnedUsd": 0
+                            },
+                            {
+                              "githubUserId": 3504472,
+                              "login": "zomars",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/3504472?v=4",
+                              "dynamicRank": 1018,
+                              "globalRank": 22,
+                              "globalRankCategory": "A",
+                              "contributionCount": 2280,
+                              "rewardCount": 0,
+                              "totalEarnedUsd": 0
+                            },
+                            {
+                              "githubUserId": 1046695,
+                              "login": "emrysal",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/1046695?v=4",
+                              "dynamicRank": 1017,
+                              "globalRank": 22,
+                              "globalRankCategory": "A",
+                              "contributionCount": 1733,
+                              "rewardCount": 0,
+                              "totalEarnedUsd": 0
+                            },
+                            {
+                              "githubUserId": 481465,
+                              "login": "frangio",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/481465?v=4",
+                              "dynamicRank": 1016,
+                              "globalRank": 19,
+                              "globalRankCategory": "A",
+                              "contributionCount": 1456,
+                              "rewardCount": 0,
+                              "totalEarnedUsd": 0
+                            },
+                            {
+                              "githubUserId": 1780212,
+                              "login": "hariombalhara",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/1780212?v=4",
+                              "dynamicRank": 1015,
+                              "globalRank": 26,
+                              "globalRankCategory": "A",
+                              "contributionCount": 1352,
+                              "rewardCount": 0,
+                              "totalEarnedUsd": 0
+                            }
+                          ]
+                        }
+                        """);
+    }
 }
