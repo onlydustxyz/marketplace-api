@@ -38,11 +38,7 @@ public class BackofficeCommitteeManagementRestApi implements BackOfficeCommittee
 
     @Override
     public ResponseEntity<Void> createProjectAllocations(UUID committeeId, CommitteeBudgetAllocationsCreateRequest request) {
-        committeeFacadePort.allocate(Committee.Id.of(committeeId),
-                request.getCurrencyId(),
-                request.getAmount(),
-                request.getMinAllocation(),
-                request.getMaxAllocation());
+        committeeFacadePort.allocate(Committee.Id.of(committeeId), request.getCurrencyId(), request.getAmount());
         return noContent().build();
     }
 

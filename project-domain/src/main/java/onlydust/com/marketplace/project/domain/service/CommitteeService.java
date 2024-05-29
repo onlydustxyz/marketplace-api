@@ -223,31 +223,26 @@ public class CommitteeService implements CommitteeFacadePort {
     @Override
     public void allocate(final Committee.Id committeeId,
                          final UUID currencyId,
-                         final BigDecimal budget,
-                         final BigDecimal minAllocation,
-                         final BigDecimal maxAllocation) {
+                         final BigDecimal budget) {
         final var committee = committeeStoragePort.findById(committeeId)
                 .orElseThrow(() -> notFound("Committee %s was not found".formatted(committeeId.value().toString())));
 
         if (committee.status() != Committee.Status.CLOSED)
             throw forbidden("Committee %s must be closed to allocate budgets".formatted(committeeId.value()));
 
-        if (minAllocation.compareTo(maxAllocation) > 0)
-            throw forbidden("Min allocation is greater than max allocation");
-
         final var projectScores = committeeStoragePort.findJuryAssignments(committee.id())
                 .stream()
                 .collect(filtering(a -> a.getScore() >= 3,
                         groupingBy(JuryAssignment::getProjectId,
                                 mapping(JuryAssignment::getScore,
-                                        averagingDouble(Double::doubleValue)))));
+                                        averagingDouble(s -> (s.doubleValue() - 3) * 2 + 1)))));
 
         final var totalShares = projectScores.values().stream().map(BigDecimal::valueOf).reduce(BigDecimal.ZERO, BigDecimal::add);
-        final var perShareAllocation = budget.divide(totalShares, 6, RoundingMode.HALF_EVEN);
+        final var perShareAllocation = budget.divide(totalShares, 6, RoundingMode.DOWN);
 
         final var projectAllocations = projectScores.entrySet().stream().collect(toMap(
                 Map.Entry::getKey,
-                e -> perShareAllocation.multiply(BigDecimal.valueOf(e.getValue()))
+                e -> perShareAllocation.multiply(BigDecimal.valueOf(e.getValue())).setScale(5, RoundingMode.HALF_EVEN)
         ));
 
         committeeStoragePort.saveAllocations(committeeId, currencyId, projectAllocations);
