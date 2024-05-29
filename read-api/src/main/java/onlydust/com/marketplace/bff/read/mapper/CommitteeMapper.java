@@ -33,8 +33,12 @@ public interface CommitteeMapper {
                 .mapToInt(CommitteeJuryVoteViewEntity::getScore)
                 .average().stream()
                 .mapToObj(BigDecimal::valueOf)
-                .map(bigDecimal -> bigDecimal.setScale(1, RoundingMode.HALF_UP))
+                .map(CommitteeMapper::roundScore)
                 .findFirst();
+    }
+
+    static BigDecimal roundScore(final BigDecimal score) {
+        return score.setScale(1, RoundingMode.HALF_UP);
     }
 
     static CommitteeProjectInfosResponse map(final @NonNull ProjectInfosQueryEntity project) {
