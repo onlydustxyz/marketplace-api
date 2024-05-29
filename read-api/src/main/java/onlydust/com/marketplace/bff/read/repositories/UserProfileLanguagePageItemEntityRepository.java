@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.bff.read.repositories;
 
-import onlydust.com.marketplace.bff.read.entities.UserProfileLanguagePageItemEntity;
+import onlydust.com.marketplace.bff.read.entities.user.UserProfileLanguagePageItemEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;

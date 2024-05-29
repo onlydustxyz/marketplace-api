@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeProject
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectInfosViewRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.bff.read.adapters.ReadCommitteesApiPostgresAdapter;
+import onlydust.com.marketplace.bff.read.adapters.ReadEcosystemsApiPostgresAdapter;
 import onlydust.com.marketplace.bff.read.adapters.ReadUsersApiPostgresAdapter;
 import onlydust.com.marketplace.bff.read.repositories.*;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
@@ -52,5 +53,10 @@ public class ReadMarketplaceApiConfiguration {
                 committeeProjectAnswerViewRepository,
                 committeeReadRepository
         );
+    }
+
+    @Bean
+    public ReadEcosystemsApiPostgresAdapter readEcosystemsApiPostgresAdapter() {
+        return new ReadEcosystemsApiPostgresAdapter();
     }
 }

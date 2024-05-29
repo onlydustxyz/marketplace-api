@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.bff.read.repositories;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.bff.read.entities.UserShortEntity;
+import onlydust.com.marketplace.bff.read.entities.user.UserShortEntity;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

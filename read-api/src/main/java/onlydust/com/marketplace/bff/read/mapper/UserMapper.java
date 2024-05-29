@@ -4,7 +4,7 @@ import onlydust.com.backoffice.api.contract.model.UserLinkResponse;
 import onlydust.com.backoffice.api.contract.model.UserPage;
 import onlydust.com.backoffice.api.contract.model.UserPageItemResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.AllUserViewEntity;
-import onlydust.com.marketplace.bff.read.entities.UserShortEntity;
+import onlydust.com.marketplace.bff.read.entities.user.UserShortEntity;
 import org.springframework.data.domain.Page;
 
 import java.time.ZoneId;

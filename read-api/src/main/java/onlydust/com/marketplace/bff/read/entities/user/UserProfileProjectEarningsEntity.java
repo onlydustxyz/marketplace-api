@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.bff.read.entities;
+package onlydust.com.marketplace.bff.read.entities.user;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

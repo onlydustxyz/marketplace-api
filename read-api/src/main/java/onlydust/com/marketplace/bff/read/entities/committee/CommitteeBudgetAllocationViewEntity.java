@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.bff.read.entities;
+package onlydust.com.marketplace.bff.read.entities.committee;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 import onlydust.com.backoffice.api.contract.model.CommitteeProjectAllocationLinkResponse;
 import onlydust.com.backoffice.api.contract.model.ProjectLinkResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
+import onlydust.com.marketplace.bff.read.entities.ShortCurrencyResponseEntity;
 import org.hibernate.annotations.Immutable;
 
 import java.io.Serializable;
