@@ -8,7 +8,6 @@ import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoCommitteeQueryRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoEcosystemRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.project.domain.port.input.TechnologyStoragePort;
@@ -421,7 +420,6 @@ public class PostgresConfiguration {
 
     @Bean
     PostgresCommitteeAdapter postgresCommitteeAdapter(final CommitteeRepository committeeRepository,
-                                                      final BoCommitteeQueryRepository boCommitteeQueryRepository,
                                                       final CommitteeProjectAnswerViewRepository committeeProjectAnswerViewRepository,
                                                       final ProjectInfosViewRepository projectInfosViewRepository,
                                                       final CommitteeLinkViewRepository committeeLinkViewRepository,
@@ -429,7 +427,6 @@ public class PostgresConfiguration {
                                                       final CommitteeJuryVoteViewRepository committeeJuryVoteViewRepository,
                                                       final CommitteeBudgetAllocationRepository committeeBudgetAllocationRepository) {
         return new PostgresCommitteeAdapter(committeeRepository,
-                boCommitteeQueryRepository,
                 committeeProjectAnswerViewRepository,
                 projectInfosViewRepository,
                 committeeLinkViewRepository,

@@ -9,10 +9,8 @@ import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationDetailsView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
-import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -227,11 +225,6 @@ public class CommitteeService implements CommitteeFacadePort {
     @Override
     public void saveAllocations(Committee.Id committeeId, UUID currencyId, Map<UUID, BigDecimal> projectAllocations) {
         committeeStoragePort.saveAllocations(committeeId, currencyId, projectAllocations);
-    }
-
-    private List<ProjectAnswerView> getCommitteeAnswersWithOnlyQuestions(CommitteeView committeeView) {
-        return committeeView.projectQuestions().stream()
-                .map(projectQuestion -> new ProjectAnswerView(projectQuestion.id(), projectQuestion.question(), projectQuestion.required(), null)).toList();
     }
 
     private void checkApplicationPermission(final UUID projectId, final UUID userId) {

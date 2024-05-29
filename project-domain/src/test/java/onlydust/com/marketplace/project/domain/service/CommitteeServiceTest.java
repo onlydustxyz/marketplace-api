@@ -83,7 +83,7 @@ public class CommitteeServiceTest {
             final Committee.Id committeeId = Committee.Id.random();
 
             // When
-            when(committeeStoragePort.findViewById(committeeId)).thenReturn(Optional.empty());
+            when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.empty());
 
             // Then
             assertThatThrownBy(() -> committeeService.createUpdateApplicationForCommittee(committeeId, new Committee.Application(UUID.randomUUID(),
