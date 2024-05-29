@@ -149,6 +149,12 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
                 .mapToDouble(BigDecimal::doubleValue)
                 .average();
 
+        final var allocation = committee.budgetAllocations().stream()
+                .filter(a -> a.projectId().equals(projectId))
+                .map(a -> new MoneyResponse(a.amount(), a.currency().toDto()))
+                .reduce((left, right) -> new MoneyResponse(left.getAmount().add(right.getAmount()), left.getCurrency()))
+                .orElse(null);
+
         final var response = new CommitteeProjectApplicationResponse()
                 .project(new ProjectLinkResponse()
                         .id(project.id())
@@ -165,7 +171,8 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
                         .toList()
                 )
                 .totalScore(totalScore == null ? null : roundScore(totalScore))
-                .juryVotes(juryVotes);
+                .juryVotes(juryVotes)
+                .allocation(allocation);
 
         return ok(response);
     }

@@ -262,7 +262,16 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                 .json("""
                         {
                           "totalScore": 5.0,
-                          "allocation": null
+                          "allocation": {
+                            "amount": 5555.55556,
+                            "currency": {
+                              "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                              "code": "STRK",
+                              "name": "StarkNet Token",
+                              "logoUrl": null,
+                              "decimals": 18
+                            }
+                          }
                         }
                         """);
     }
