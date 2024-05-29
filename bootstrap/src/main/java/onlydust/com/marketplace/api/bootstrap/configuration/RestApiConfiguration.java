@@ -38,8 +38,9 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public UsersRestApi usersRestApi(final ContributorFacadePort contributorFacadePort) {
-        return new UsersRestApi(contributorFacadePort);
+    public UsersRestApi usersRestApi(final AuthenticatedAppUserService authenticatedAppUserService,
+                                     final ContributorFacadePort contributorFacadePort) {
+        return new UsersRestApi(authenticatedAppUserService, contributorFacadePort);
     }
 
     @Bean
@@ -87,7 +88,7 @@ public class RestApiConfiguration {
 
     @Bean
     public CommitteeRestApi committeeRestApi(final AuthenticatedAppUserService authenticatedAppUserService,
-                                             final CommitteeFacadePort committeeFacadePort){
+                                             final CommitteeFacadePort committeeFacadePort) {
         return new CommitteeRestApi(authenticatedAppUserService, committeeFacadePort);
     }
 }

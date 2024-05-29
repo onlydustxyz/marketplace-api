@@ -10,6 +10,7 @@ import onlydust.com.marketplace.project.domain.view.ContributionView;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -19,7 +20,7 @@ public interface ContributorFacadePort {
                                                                   int maxInternalContributorCountToReturn,
                                                                   boolean externalSearchOnly);
 
-    Page<ContributionView> contributions(Long contributorId,
+    Page<ContributionView> contributions(Optional<Long> callerGithubUserId,
                                          ContributionView.Filters filters,
                                          ContributionView.Sort sort,
                                          SortDirection direction,
