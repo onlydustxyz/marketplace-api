@@ -2160,7 +2160,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - BackOfficeCommitteeRead
+        - BackofficeCommitteesRead
       summary: Get committee budget allocations
       operationId: getBudgetAllocations
       description: |

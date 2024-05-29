@@ -5,11 +5,14 @@ import onlydust.com.backoffice.api.contract.BackofficeCommitteesReadApi;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.AllUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLinkViewEntity;
+import onlydust.com.marketplace.bff.read.entities.CommitteeBudgetAllocationViewEntity;
 import onlydust.com.marketplace.bff.read.entities.CommitteeJuryVoteReadEntity;
 import onlydust.com.marketplace.bff.read.entities.CommitteeProjectAnswerReadEntity;
+import onlydust.com.marketplace.bff.read.entities.ShortCurrencyResponseEntity;
 import onlydust.com.marketplace.bff.read.mapper.ProjectMapper;
 import onlydust.com.marketplace.bff.read.mapper.SponsorMapper;
 import onlydust.com.marketplace.bff.read.mapper.UserMapper;
+import onlydust.com.marketplace.bff.read.repositories.CommitteeBudgetAllocationsResponseEntityRepository;
 import onlydust.com.marketplace.bff.read.repositories.CommitteeReadRepository;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +34,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCommitteesReadApi {
 
     private final CommitteeReadRepository committeeReadRepository;
+    private final CommitteeBudgetAllocationsResponseEntityRepository committeeBudgetAllocationsResponseEntityRepository;
 
     @Override
     public ResponseEntity<CommitteeResponse> getCommittee(UUID committeeId) {
@@ -93,5 +97,20 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
                 .completedAssignments(juryAssignments.stream().mapToInt(JuryAssignmentResponse::getCompletedAssignments).sum());
 
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<CommitteeBudgetAllocationsResponse> getBudgetAllocations(UUID committeeId) {
+        final var committeeBudgetAllocations = committeeBudgetAllocationsResponseEntityRepository.findAllByCommitteeId(committeeId);
+        return ResponseEntity.ok(new CommitteeBudgetAllocationsResponse()
+                .totalAllocationAmount(committeeBudgetAllocations.stream()
+                        .map(CommitteeBudgetAllocationViewEntity::amount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add))
+                .currency(committeeBudgetAllocations.stream().findFirst()
+                        .map(CommitteeBudgetAllocationViewEntity::currency).map(ShortCurrencyResponseEntity::toDto)
+                        .orElse(null))
+                .projectAllocations(committeeBudgetAllocations.stream()
+                        .map(CommitteeBudgetAllocationViewEntity::toDto)
+                        .toList()));
     }
 }
