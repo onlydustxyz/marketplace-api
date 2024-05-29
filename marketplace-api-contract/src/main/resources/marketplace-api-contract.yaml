@@ -3329,6 +3329,49 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/ecosystems/{ecosystemId}/projects:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadEcosystems
+      summary: Get all projects
+      operationId: getEcosystemProjects
+      description: |
+        Get the (soon to be paginated) list of all public projects on the platform.
+      parameters:
+        - in: path
+          name: ecosystemId
+          description: Ecosystem id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: hasGoodFirstIssues
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'List of ecosystem projects'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EcosystemProjectPageResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -7197,3 +7240,59 @@ components:
                 $ref: '#/components/schemas/CommitteeCriteriaId'
               vote:
                 type: integer
+
+    EcosystemProjectPageResponse:
+      type: object
+      required:
+        - hasMore
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - projects
+      properties:
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/EcosystemProjectPageItemResponse'
+        hasMore:
+          type: boolean
+          example: true
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+    EcosystemProjectPageItemResponse:
+      type: object
+      required:
+        - id
+        - slug
+        - name
+        - shortDescription
+        - logoUrl
+        - leaders
+        - technologies
+      properties:
+        id:
+          $ref: '#/components/schemas/ProjectId'
+        slug:
+          $ref: '#/components/schemas/ProjectSlug'
+        name:
+          type: string
+          example: Verkle Tries
+        shortDescription:
+          type: string
+          example: A short project description
+        logoUrl:
+          type: string
+          format: url
+          description: Direct URL to project's logo image
+          example: 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2529199823275297272.jpg'
+        leaders:
+          type: array
+          items:
+            $ref: '#/components/schemas/RegisteredUserResponse'
+        technologies:
+          $ref: '#/components/schemas/Technologies'
