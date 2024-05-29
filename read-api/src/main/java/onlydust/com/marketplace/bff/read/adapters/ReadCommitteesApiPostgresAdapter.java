@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadCommitteesApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeJuryVoteViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeProjectAnswerViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeJuryVoteViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeLinkViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeProjectAnswerViewRepository;
@@ -29,7 +30,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @RestController
@@ -58,6 +59,52 @@ public class ReadCommitteesApiPostgresAdapter implements ReadCommitteesApi {
                 .applicationEndDate(DateMapper.ofNullable(committee.applicationEndDate()))
                 .status(CommitteeStatus.valueOf(committee.status().name()))
                 .sponsor(SponsorMapper.mapNullabled(committee.sponsor()))
+        );
+    }
+
+    @Override
+    public ResponseEntity<CommitteeApplicationResponse> getApplication(UUID committeeId, UUID projectId) {
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        //TODO permissions!
+        final var committee = committeeReadRepository.findById(committeeId)
+                .orElseThrow(() -> notFound("Committee %s not found".formatted(committeeId)));
+
+        if (projectId == null) {
+            return ResponseEntity.ok(new CommitteeApplicationResponse()
+                    .status(CommitteeMapper.map(committee.status()))
+                    .projectQuestions(committee.projectQuestions().stream()
+                            .map(question -> new CommitteeProjectQuestionResponse()
+                                    .id(question.id())
+                                    .question(question.question())
+                                    .required(question.required())
+                            ).toList())
+                    .projectInfos(null)
+                    .hasStartedApplication(false)
+                    .applicationStartDate(DateMapper.ofNullable(committee.applicationStartDate()))
+                    .applicationEndDate(DateMapper.ofNullable(committee.applicationEndDate()))
+            );
+        }
+
+        final var project = projectInfosViewRepository.findByProjectId(projectId)
+                .orElseThrow(() -> notFound("Project %s not found".formatted(projectId)));
+        final var projectAnswers = committeeProjectAnswerViewRepository.findByCommitteeIdAndAndProjectId(committeeId, projectId);
+        final Map<UUID, CommitteeProjectAnswerViewEntity> answersByQuestionId = projectAnswers.stream()
+                .collect(Collectors.toMap(CommitteeProjectAnswerViewEntity::getQuestionId, a -> a));
+
+        return ResponseEntity.ok(new CommitteeApplicationResponse()
+                .status(CommitteeMapper.map(committee.status()))
+                .projectQuestions(committee.projectQuestions().stream()
+                        .map(q -> new CommitteeProjectQuestionResponse()
+                                .id(q.id())
+                                .question(q.question())
+                                .answer(Optional.ofNullable(answersByQuestionId.get(q.id())).map(CommitteeProjectAnswerViewEntity::getAnswer).orElse(null))
+                                .required(q.required())
+
+                        ).toList())
+                .projectInfos(CommitteeMapper.map(project))
+                .hasStartedApplication(nonNull(projectAnswers) && !projectAnswers.isEmpty())
+                .applicationStartDate(DateMapper.ofNullable(committee.applicationStartDate()))
+                .applicationEndDate(DateMapper.ofNullable(committee.applicationEndDate()))
         );
     }
 
@@ -103,31 +150,7 @@ public class ReadCommitteesApiPostgresAdapter implements ReadCommitteesApi {
         final var projectAnswers = committeeProjectAnswerViewRepository.findByCommitteeIdAndAndProjectId(committeeId, projectId);
 
         final MyCommitteeAssignmentResponse myCommitteeAssignmentResponse = new MyCommitteeAssignmentResponse();
-        myCommitteeAssignmentResponse.setProject(
-                new CommitteeProjectInfosResponse()
-                        .id(project.id())
-                        .name(project.name())
-                        .slug(project.slug())
-                        .logoUrl(isNull(project.logoUrl()) ? null : project.logoUrl().toString())
-                        .shortDescription(project.shortDescription())
-                        .projectLeads(project.projectLeads().stream()
-                                .map(projectLead -> new RegisteredUserResponse()
-                                        .id(projectLead.id())
-                                        .githubUserId(projectLead.githubId())
-                                        .avatarUrl(projectLead.avatarUrl())
-                                        .login(projectLead.login())
-                                ).toList())
-                        .longDescription(project.longDescription())
-                        .last3monthsMetrics(
-                                new ProjectLast3MonthsMetricsResponse()
-                                        .activeContributors(project.activeContributors())
-                                        .amountSentInUsd(project.amountSentInUsd())
-                                        .contributorsRewarded(project.contributorsRewarded())
-                                        .contributionsCompleted(project.contributionsCompleted())
-                                        .newContributors(project.newContributors())
-                                        .openIssues(project.openIssue())
-                        )
-        );
+        myCommitteeAssignmentResponse.setProject(CommitteeMapper.map(project));
         myCommitteeAssignmentResponse.setAnswers(
                 projectAnswers.stream()
                         .map(answer -> new CommitteeProjectQuestionResponse()
