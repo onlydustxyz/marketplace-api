@@ -87,13 +87,9 @@ spring:
     scheduling:
       pool:
         size: 1
-#  jpa:
-#    properties:
-#      hibernate:
-#        format_sql: true
-#    show-sql: true
-#logging:
-#  level:
-#    org:
-#      hibernate:
-#        type: trace
+decorator:
+  datasource:
+    datasource-proxy:
+      query:
+        log-level: INFO
+        enable-logging: false # Comment this line to enable SQL query logging
