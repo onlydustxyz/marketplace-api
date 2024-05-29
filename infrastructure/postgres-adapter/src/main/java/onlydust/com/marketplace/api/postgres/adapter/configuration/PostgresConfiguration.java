@@ -426,12 +426,15 @@ public class PostgresConfiguration {
                                                       final ProjectInfosViewRepository projectInfosViewRepository,
                                                       final CommitteeLinkViewRepository committeeLinkViewRepository,
                                                       final CommitteeJuryVoteRepository committeeJuryVoteRepository,
-                                                      final CommitteeJuryVoteViewRepository committeeJuryVoteViewRepository) {
+                                                      final CommitteeJuryVoteViewRepository committeeJuryVoteViewRepository,
+                                                      final CommitteeBudgetAllocationRepository committeeBudgetAllocationRepository) {
         return new PostgresCommitteeAdapter(committeeRepository,
                 boCommitteeQueryRepository,
                 committeeProjectAnswerViewRepository,
                 projectInfosViewRepository,
                 committeeLinkViewRepository,
-                committeeJuryVoteRepository, committeeJuryVoteViewRepository);
+                committeeJuryVoteRepository,
+                committeeJuryVoteViewRepository,
+                committeeBudgetAllocationRepository);
     }
 }

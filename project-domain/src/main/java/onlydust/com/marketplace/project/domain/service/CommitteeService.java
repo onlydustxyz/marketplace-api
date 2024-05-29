@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.project.domain.model.Committee;
-import onlydust.com.marketplace.project.domain.model.JuryAssignmentBuilder;
-import onlydust.com.marketplace.project.domain.model.JuryCriteria;
-import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
+import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
@@ -19,13 +16,15 @@ import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 
 @AllArgsConstructor
@@ -106,7 +105,7 @@ public class CommitteeService implements CommitteeFacadePort {
         final var juryIds = committee.juryIds();
 
         if (isNull(committee.votePerJury()))
-            throw forbidden("Number of vote per jury must filled to assign juries to projects");
+            throw forbidden("Number of vote per jury must be filled to assign juries to projects");
 
         if (juryIds.isEmpty() || juryIds.size() * committee.votePerJury() < projectIds.size())
             throw forbidden("Not enough juries or vote per jury to cover all projects");
@@ -145,7 +144,7 @@ public class CommitteeService implements CommitteeFacadePort {
 
         if (!assignedProjectIds.containsAll(projectIds)) {
             throw internalServerError("Not enough juries or vote per jury to cover all projects given some" +
-                    " juries are project lead or contributor on application project");
+                                      " juries are project lead or contributor on application project");
         }
 
         committeeStoragePort.saveJuryAssignments(
@@ -219,6 +218,44 @@ public class CommitteeService implements CommitteeFacadePort {
             throw forbidden("Jury %s is not assigned to committee %s".formatted(juryId, committee.id()));
 
         committeeStoragePort.saveJuryVotes(juryId, committeeId, projectId, scores);
+    }
+
+    @Override
+    public void allocate(final Committee.Id committeeId,
+                         final UUID currencyId,
+                         final BigDecimal budget,
+                         final BigDecimal minAllocation,
+                         final BigDecimal maxAllocation) {
+        final var committee = committeeStoragePort.findById(committeeId)
+                .orElseThrow(() -> notFound("Committee %s was not found".formatted(committeeId.value().toString())));
+
+        if (committee.status() != Committee.Status.CLOSED)
+            throw forbidden("Committee %s must be closed to allocate budgets".formatted(committeeId.value()));
+
+        if (minAllocation.compareTo(maxAllocation) > 0)
+            throw forbidden("Min allocation is greater than max allocation");
+
+        final var projectScores = committeeStoragePort.findJuryAssignments(committee.id())
+                .stream()
+                .collect(filtering(a -> a.getScore() >= 3,
+                        groupingBy(JuryAssignment::getProjectId,
+                                mapping(JuryAssignment::getScore,
+                                        averagingDouble(Double::doubleValue)))));
+
+        final var totalShares = projectScores.values().stream().map(BigDecimal::valueOf).reduce(BigDecimal.ZERO, BigDecimal::add);
+        final var perShareAllocation = budget.divide(totalShares, 6, RoundingMode.HALF_EVEN);
+
+        final var projectAllocations = projectScores.entrySet().stream().collect(toMap(
+                Map.Entry::getKey,
+                e -> perShareAllocation.multiply(BigDecimal.valueOf(e.getValue()))
+        ));
+
+        committeeStoragePort.saveAllocations(committeeId, currencyId, projectAllocations);
+    }
+
+    @Override
+    public void saveAllocations(Committee.Id committeeId, UUID currencyId, Map<UUID, BigDecimal> projectAllocations) {
+        committeeStoragePort.saveAllocations(committeeId, currencyId, projectAllocations);
     }
 
     private List<ProjectAnswerView> getCommitteeAnswersWithOnlyQuestions(CommitteeView committeeView) {

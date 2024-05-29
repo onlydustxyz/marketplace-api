@@ -6,11 +6,9 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 import lombok.*;
 import onlydust.com.marketplace.project.domain.model.Committee;
-import onlydust.com.marketplace.project.domain.model.JuryAssignment;
-import onlydust.com.marketplace.project.domain.model.JuryCriteria;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -18,18 +16,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
-@Builder
-@Table(name = "committee_jury_votes", schema = "public")
-@IdClass(CommitteeJuryVoteEntity.PrimaryKey.class)
-public class CommitteeJuryVoteEntity {
-    @Id
-    @EqualsAndHashCode.Include
-    @NonNull
-    UUID projectId;
-    @Id
-    @EqualsAndHashCode.Include
-    @NonNull
-    UUID criteriaId;
+@Builder(access = AccessLevel.PRIVATE)
+@Table(name = "committee_budget_allocations", schema = "public")
+@IdClass(CommitteeBudgetAllocationEntity.PrimaryKey.class)
+public class CommitteeBudgetAllocationEntity {
     @Id
     @EqualsAndHashCode.Include
     @NonNull
@@ -37,11 +27,21 @@ public class CommitteeJuryVoteEntity {
     @Id
     @EqualsAndHashCode.Include
     @NonNull
-    UUID userId;
-    Integer score;
+    UUID projectId;
+    @Id
+    @EqualsAndHashCode.Include
+    @NonNull
+    UUID currencyId;
 
-    public JuryAssignment toDomain() {
-        return JuryAssignment.withVotes(userId, Committee.Id.of(committeeId), projectId, Map.of(JuryCriteria.Id.of(criteriaId), score));
+    BigDecimal amount;
+
+    public static CommitteeBudgetAllocationEntity fromDomain(Committee.Id committeeId, UUID currencyId, UUID projectId, BigDecimal amount) {
+        return CommitteeBudgetAllocationEntity.builder()
+                .committeeId(committeeId.value())
+                .currencyId(currencyId)
+                .projectId(projectId)
+                .amount(amount)
+                .build();
     }
 
     @EqualsAndHashCode
@@ -49,9 +49,8 @@ public class CommitteeJuryVoteEntity {
     @Data
     @NoArgsConstructor(force = true)
     public static class PrimaryKey implements Serializable {
-        UUID projectId;
         UUID committeeId;
-        UUID criteriaId;
-        UUID userId;
+        UUID projectId;
+        UUID currencyId;
     }
 }

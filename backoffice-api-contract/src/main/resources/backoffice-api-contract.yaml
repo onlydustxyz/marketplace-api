@@ -2160,7 +2160,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - BackOfficeCommitteeManagement
+        - BackOfficeCommitteeRead
       summary: Get committee budget allocations
       operationId: getBudgetAllocations
       description: |
@@ -2188,9 +2188,9 @@ paths:
       tags:
         - BackOfficeCommitteeManagement
       summary: Allocate budget to projects
-      operationId: allocateBudget
+      operationId: createProjectAllocations
       description: |
-        Allocate budget to committee
+        Allocate budget to projects
       parameters:
         - in: path
           name: committeeId
@@ -2201,7 +2201,34 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CommitteeBudgetAllocationsRequest'
+              $ref: '#/components/schemas/CommitteeBudgetAllocationsCreateRequest'
+      responses:
+        "204":
+          description: 'Budget allocated to committee projects'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackOfficeCommitteeManagement
+      summary: Update project allocations
+      operationId: updateProjectAllocations
+      description: |
+        Manually update budget allocations for projects
+      parameters:
+        - in: path
+          name: committeeId
+          required: true
+          schema:
+            $ref: '#/components/schemas/CommitteeId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommitteeBudgetAllocationsUpdateRequest'
       responses:
         "204":
           description: 'Budget allocated to committee projects'
@@ -4572,7 +4599,27 @@ components:
           type: number
           format: int64
 
-    CommitteeBudgetAllocationsRequest:
+    CommitteeBudgetAllocationsCreateRequest:
+      type: object
+      required:
+        - currencyId
+        - amount
+        - minAllocation
+        - maxAllocation
+      properties:
+        currencyId:
+          $ref: '#/components/schemas/CurrencyId'
+        amount:
+          type: number
+          format: int64
+        minAllocation:
+          type: number
+          format: int64
+        maxAllocation:
+          type: number
+          format: int64
+
+    CommitteeBudgetAllocationsUpdateRequest:
       type: object
       required:
         - currencyId

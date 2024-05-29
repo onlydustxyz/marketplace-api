@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeJuryVo
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeLinkViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectInfosQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoCommitteeQueryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeBudgetAllocationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeJuryVoteEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
@@ -21,8 +22,11 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -36,6 +40,7 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     private final CommitteeLinkViewRepository committeeLinkViewRepository;
     private final CommitteeJuryVoteRepository committeeJuryVoteRepository;
     private final CommitteeJuryVoteViewRepository committeeJuryVoteViewRepository;
+    private final CommitteeBudgetAllocationRepository committeeBudgetAllocationRepository;
 
     @Override
     @Transactional
@@ -134,5 +139,25 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
                         .build()
                 )
                 .collect(Collectors.toSet()));
+    }
+
+    @Override
+    public List<JuryAssignment> findJuryAssignments(Committee.Id committeeId) {
+        return committeeJuryVoteRepository.findAllByCommitteeId(committeeId.value()).stream()
+                .collect(groupingBy(CommitteeJuryVoteEntity::getProjectId,
+                        groupingBy(CommitteeJuryVoteEntity::getUserId,
+                                groupingBy(vote -> JuryCriteria.Id.of(vote.getCriteriaId()),
+                                        mapping(CommitteeJuryVoteEntity::getScore, summingInt(Integer::intValue))))))
+                .entrySet().stream()
+                .flatMap(byProject -> byProject.getValue().entrySet().stream()
+                        .map(byJury -> JuryAssignment.withVotes(byJury.getKey(), committeeId, byProject.getKey(), byJury.getValue()))
+                ).toList();
+    }
+
+    @Override
+    public void saveAllocations(Committee.Id committeeId, UUID currencyId, Map<UUID, BigDecimal> projectAllocations) {
+        committeeBudgetAllocationRepository.saveAll(projectAllocations.entrySet().stream()
+                .map(entry -> CommitteeBudgetAllocationEntity.fromDomain(committeeId, currencyId, entry.getKey(), entry.getValue()))
+                .collect(toList()));
     }
 }
