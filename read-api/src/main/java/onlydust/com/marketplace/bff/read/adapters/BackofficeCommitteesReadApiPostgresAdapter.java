@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeCommitteeMapper.statusToResponse;
@@ -85,6 +86,7 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
                 .status(statusToResponse(committee.status()))
                 .sponsor(SponsorMapper.mapNullableBO(committee.sponsor()))
                 .votePerJury(committee.votePerJury())
+                .juryCount(isNull(committee.juries()) ? null : committee.juries().size())
                 .projectCount(projectApplications.size())
                 .applications(projectApplications)
                 .projectQuestions(committee.projectQuestions().stream()
