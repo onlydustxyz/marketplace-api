@@ -8,6 +8,9 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLinkView
 import onlydust.com.marketplace.bff.read.entities.committee.CommitteeBudgetAllocationViewEntity;
 import onlydust.com.marketplace.bff.read.entities.committee.CommitteeJuryVoteReadEntity;
 import onlydust.com.marketplace.bff.read.entities.committee.CommitteeProjectAnswerReadEntity;
+import onlydust.com.marketplace.bff.read.entities.CommitteeBudgetAllocationReadEntity;
+import onlydust.com.marketplace.bff.read.entities.CommitteeJuryVoteReadEntity;
+import onlydust.com.marketplace.bff.read.entities.CommitteeProjectAnswerReadEntity;
 import onlydust.com.marketplace.bff.read.entities.ShortCurrencyResponseEntity;
 import onlydust.com.marketplace.bff.read.mapper.CommitteeMapper;
 import onlydust.com.marketplace.bff.read.mapper.ProjectMapper;
@@ -27,6 +30,7 @@ import java.util.stream.Collectors;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeCommitteeMapper.statusToResponse;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -55,13 +59,16 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
                                 .max(Comparator.comparing(CommitteeProjectAnswerReadEntity::techUpdatedAt))
                                 .orElseThrow())));
 
+        final Map<UUID, MoneyResponse> projectAllocations = committee.budgetAllocations().stream()
+                .collect(toMap(CommitteeBudgetAllocationReadEntity::projectId, a -> new MoneyResponse(a.amount(), a.currency().toDto())));
+
         final List<ApplicationResponse> projectApplications = mostRecentAnswerPerProject.entrySet().stream()
                 .map(Map.Entry::getValue)
                 .map(a -> new ApplicationResponse()
                         .project(ProjectMapper.mapBO(a.project()))
                         .applicant(UserMapper.map(a.user()))
                         .score(Optional.ofNullable(averageVotePerProjects.get(a.projectId())).map(BigDecimal::valueOf).map(CommitteeMapper::roundScore).orElse(null))
-                        .allocatedBudget(null))// TODO: implement
+                        .allocation(projectAllocations.get(a.projectId())))
                 .toList();
 
         final Map<AllUserViewEntity, Map<ProjectLinkViewEntity, List<CommitteeJuryVoteReadEntity>>> votesPerUserPerProject = committee.juryVotes().stream()
@@ -97,7 +104,10 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
                         .map(j -> UserMapper.map(j.user())).toList())
                 .juryAssignments(juryAssignments)
                 .totalAssignments(juryAssignments.stream().mapToInt(JuryAssignmentResponse::getTotalAssignment).sum())
-                .completedAssignments(juryAssignments.stream().mapToInt(JuryAssignmentResponse::getCompletedAssignments).sum());
+                .completedAssignments(juryAssignments.stream().mapToInt(JuryAssignmentResponse::getCompletedAssignments).sum())
+                .allocation(projectAllocations.values().stream()
+                        .reduce((left, right) -> new MoneyResponse(left.getAmount().add(right.getAmount()), left.getCurrency()))
+                        .orElse(null));
 
         return ResponseEntity.ok(response);
     }
@@ -107,13 +117,13 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
         final var committeeBudgetAllocations = committeeBudgetAllocationsResponseEntityRepository.findAllByCommitteeId(committeeId);
         return ResponseEntity.ok(new CommitteeBudgetAllocationsResponse()
                 .totalAllocationAmount(committeeBudgetAllocations.stream()
-                        .map(CommitteeBudgetAllocationViewEntity::amount)
+                        .map(CommitteeBudgetAllocationReadEntity::amount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add))
                 .currency(committeeBudgetAllocations.stream().findFirst()
-                        .map(CommitteeBudgetAllocationViewEntity::currency).map(ShortCurrencyResponseEntity::toDto)
+                        .map(CommitteeBudgetAllocationReadEntity::currency).map(ShortCurrencyResponseEntity::toDto)
                         .orElse(null))
                 .projectAllocations(committeeBudgetAllocations.stream()
-                        .map(CommitteeBudgetAllocationViewEntity::toDto)
+                        .map(CommitteeBudgetAllocationReadEntity::toDto)
                         .toList()));
     }
 }

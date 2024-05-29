@@ -1,12 +1,12 @@
 package onlydust.com.marketplace.bff.read.repositories;
 
-import onlydust.com.marketplace.bff.read.entities.committee.CommitteeBudgetAllocationViewEntity;
+import onlydust.com.marketplace.bff.read.entities.CommitteeBudgetAllocationReadEntity;
 import org.springframework.data.repository.Repository;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface CommitteeBudgetAllocationsResponseEntityRepository extends Repository<CommitteeBudgetAllocationViewEntity,
-        CommitteeBudgetAllocationViewEntity.PrimaryKey> {
-    List<CommitteeBudgetAllocationViewEntity> findAllByCommitteeId(UUID committeeId);
+public interface CommitteeBudgetAllocationsResponseEntityRepository extends Repository<CommitteeBudgetAllocationReadEntity,
+        CommitteeBudgetAllocationReadEntity.PrimaryKey> {
+    List<CommitteeBudgetAllocationReadEntity> findAllByCommitteeId(UUID committeeId);
 }

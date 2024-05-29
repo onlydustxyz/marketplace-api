@@ -111,7 +111,16 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                                 "logoUrl": null
                               },
                               "score": null,
-                              "allocation": 1111.11111
+                              "allocation": {
+                                "amount": 1111.11111,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                }
+                              }
                             },
                             {
                               "project": {
@@ -121,7 +130,16 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                                 "logoUrl": null
                               },
                               "score": null,
-                              "allocation": 3333.33333
+                              "allocation": {
+                                "amount": 3333.33333,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                }
+                              }
                             },
                             {
                               "project": {
@@ -131,9 +149,120 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
                               },
                               "score": null,
-                              "allocation": 5555.55556
+                              "allocation": {
+                                "amount": 5555.55556,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                }
+                              }
                             }
                           ]
+                        }
+                        """);
+
+        client.get()
+                .uri(getApiURI(COMMITTEES_BY_ID.formatted(committeeId)))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "applications": [
+                            {
+                              "project": {
+                                "slug": "cairo-foundry"
+                              },
+                              "score": 3.0,
+                              "allocation": {
+                                "amount": 1111.11111,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                }
+                              }
+                            },
+                            {
+                              "project": {
+                                "slug": "apibara"
+                              },
+                              "score": 1.0,
+                              "allocation": null
+                            },
+                            {
+                              "project": {
+                                "slug": "deluge"
+                              },
+                              "score": 4.0,
+                              "allocation": {
+                                "amount": 3333.33333,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                }
+                              }
+                            },
+                            {
+                              "project": {
+                                "slug": "bretzel-196"
+                              },
+                              "score": 2.0,
+                              "allocation": null
+                            },
+                            {
+                              "project": {
+                                "slug": "starklings"
+                              },
+                              "score": 5.0,
+                              "allocation": {
+                                "amount": 5555.55556,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                }
+                              }
+                            }
+                          ],
+                          "allocation": {
+                            "amount": 10000.00000,
+                            "currency": {
+                              "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                              "code": "STRK",
+                              "name": "StarkNet Token",
+                              "logoUrl": null,
+                              "decimals": 18
+                            }
+                          }
+                        }
+                        """);
+
+        client.get()
+                .uri(getApiURI(COMMITTEES_APPLICATIONS_BY_IDS.formatted(committeeId, starklingsId)))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalScore": 5.0,
+                          "allocation": null
                         }
                         """);
     }
@@ -190,7 +319,16 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                                 "logoUrl": null
                               },
                               "score": null,
-                              "allocation": 1000
+                              "allocation": {
+                                "amount": 1000,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                }
+                              }
                             },
                             {
                               "project": {
@@ -200,7 +338,16 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                                 "logoUrl": null
                               },
                               "score": null,
-                              "allocation": 2000
+                              "allocation": {
+                                "amount": 2000,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                }
+                              }
                             },
                             {
                               "project": {
@@ -210,7 +357,16 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
                               },
                               "score": null,
-                              "allocation": 3000
+                              "allocation": {
+                                "amount": 3000,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                }
+                              }
                             }
                           ]
                         }

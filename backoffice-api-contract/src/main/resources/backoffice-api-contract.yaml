@@ -4415,17 +4415,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JuryCriteriaResponse'
-        allocationCurrency:
-          $ref: '#/components/schemas/ShortCurrencyResponse'
-        totalAllocationAmount:
-          type: number
-          format: int64
-        minimumAllocationAmount:
-          type: number
-          format: int64
-        maximumAllocationAmount:
-          type: number
-          format: int64
+        allocation:
+          $ref: '#/components/schemas/MoneyResponse'
 
     JuryAssignmentResponse:
       type: object
@@ -4457,9 +4448,8 @@ components:
           $ref: '#/components/schemas/UserLinkResponse'
         score:
           type: number
-        allocatedBudget:
-          type: number
-          format: int64
+        allocation:
+          $ref: '#/components/schemas/MoneyResponse'
 
     ProjectQuestionResponse:
       type: object
@@ -4545,17 +4535,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JuryCriteriaRequest'
-        allocationCurrencyId:
-          $ref: '#/components/schemas/CurrencyId'
-        totalAllocationAmount:
-          type: number
-          format: int64
-        minimumAllocationAmount:
-          type: number
-          format: int64
-        maximumAllocationAmount:
-          type: number
-          format: int64
         status:
           $ref: '#/components/schemas/CommitteeStatus'
 
@@ -4596,8 +4575,7 @@ components:
         score:
           type: number
         allocation:
-          type: number
-          format: int64
+          $ref: '#/components/schemas/MoneyResponse'
 
     CommitteeBudgetAllocationsCreateRequest:
       type: object
@@ -4646,11 +4624,8 @@ components:
           type: number
         project:
           $ref: '#/components/schemas/ProjectLinkResponse'
-        allocatedAmount:
-          type: number
-          format: int64
-        allocationCurrency:
-          $ref: '#/components/schemas/ShortCurrencyResponse'
+        allocation:
+          $ref: '#/components/schemas/MoneyResponse'
         juryVotes:
           type: array
           items:
