@@ -82,7 +82,7 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
                 .applicationStartDate(DateMapper.ofNullable(committee.applicationStartDate()))
                 .applicationEndDate(DateMapper.ofNullable(committee.applicationEndDate()))
                 .status(statusToResponse(committee.status()))
-                .sponsor(SponsorMapper.mapNullable(committee.sponsor()))
+                .sponsor(SponsorMapper.mapNullableBO(committee.sponsor()))
                 .votePerJury(committee.votePerJury())
                 .projectCount(projectApplications.size())
                 .applications(projectApplications)

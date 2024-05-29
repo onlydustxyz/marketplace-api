@@ -11,6 +11,11 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectInfosView
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.bff.read.mapper.CommitteeMapper;
 import onlydust.com.marketplace.bff.read.mapper.ProjectMapper;
+import onlydust.com.marketplace.bff.read.mapper.SponsorMapper;
+import onlydust.com.marketplace.bff.read.repositories.CommitteeReadRepository;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.mapper.DateMapper;
+import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +41,25 @@ public class ReadCommitteesApiPostgresAdapter implements ReadCommitteesApi {
     private final CommitteeJuryVoteViewRepository committeeJuryVoteViewRepository;
     private final ProjectInfosViewRepository projectInfosViewRepository;
     private final CommitteeProjectAnswerViewRepository committeeProjectAnswerViewRepository;
+    private final CommitteeReadRepository committeeReadRepository;
+
+    @Override
+    public ResponseEntity<CommitteeResponse> getCommittee(UUID committeeId) {
+        final var committee = committeeReadRepository.findById(committeeId)
+                .orElseThrow(() -> notFound("Committee %s not found".formatted(committeeId)));
+        if (committee.status() == Committee.Status.DRAFT) {
+            throw OnlyDustException.notFound("Committee %s was not found".formatted(committeeId.toString()));
+        }
+
+        return ResponseEntity.ok(new CommitteeResponse()
+                .id(committee.id())
+                .name(committee.name())
+                .applicationStartDate(DateMapper.ofNullable(committee.applicationStartDate()))
+                .applicationEndDate(DateMapper.ofNullable(committee.applicationEndDate()))
+                .status(CommitteeStatus.valueOf(committee.status().name()))
+                .sponsor(SponsorMapper.mapNullabled(committee.sponsor()))
+        );
+    }
 
     @Override
     public ResponseEntity<MyCommitteeAssignmentsResponse> getCommitteeAssignments(UUID committeeId) {

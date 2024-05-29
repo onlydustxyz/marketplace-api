@@ -7,7 +7,6 @@ import onlydust.com.marketplace.project.domain.model.JuryCriteria;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationDetailsView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
-import onlydust.com.marketplace.project.domain.view.commitee.CommitteeView;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -23,8 +22,6 @@ public interface CommitteeFacadePort {
     Page<CommitteeLinkView> getCommittees(Integer pageIndex, Integer pageSize);
 
     void update(Committee committee);
-
-    CommitteeView getCommitteeById(Committee.Id committeeId);
 
     void updateStatus(Committee.Id committeeId, Committee.Status status);
 

@@ -37,13 +37,15 @@ public class ReadMarketplaceApiConfiguration {
             final CommitteeLinkViewRepository committeeLinkViewRepository,
             final CommitteeJuryVoteViewRepository committeeJuryVoteViewRepository,
             final ProjectInfosViewRepository projectInfosViewRepository,
-            final CommitteeProjectAnswerViewRepository committeeProjectAnswerViewRepository) {
+            final CommitteeProjectAnswerViewRepository committeeProjectAnswerViewRepository,
+            final CommitteeReadRepository committeeReadRepository) {
         return new ReadCommitteesApiPostgresAdapter(
                 authenticatedAppUserService,
                 committeeLinkViewRepository,
                 committeeJuryVoteViewRepository,
                 projectInfosViewRepository,
-                committeeProjectAnswerViewRepository
+                committeeProjectAnswerViewRepository,
+                committeeReadRepository
         );
     }
 }

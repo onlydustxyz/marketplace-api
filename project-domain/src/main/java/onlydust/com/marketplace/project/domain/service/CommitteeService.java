@@ -77,12 +77,6 @@ public class CommitteeService implements CommitteeFacadePort {
     }
 
     @Override
-    public CommitteeView getCommitteeById(Committee.Id committeeId) {
-        return committeeStoragePort.findViewById(committeeId)
-                .orElseThrow(() -> notFound("Committee %s was not found".formatted(committeeId.value().toString())));
-    }
-
-    @Override
     @Transactional
     public void updateStatus(Committee.Id committeeId, Committee.Status status) {
         committeeStoragePort.updateStatus(committeeId, status);
@@ -144,7 +138,7 @@ public class CommitteeService implements CommitteeFacadePort {
 
         if (!assignedProjectIds.containsAll(projectIds)) {
             throw internalServerError("Not enough juries or vote per jury to cover all projects given some" +
-                                      " juries are project lead or contributor on application project");
+                    " juries are project lead or contributor on application project");
         }
 
         committeeStoragePort.saveJuryAssignments(

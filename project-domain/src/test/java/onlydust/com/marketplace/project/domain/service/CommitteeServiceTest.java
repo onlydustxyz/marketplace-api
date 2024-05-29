@@ -78,38 +78,6 @@ public class CommitteeServiceTest {
         assertNotNull(committeeArgumentCaptor.getValue().id());
     }
 
-    @Test
-    void should_get_committee_by_id() {
-        // Given
-        final Committee.Id committeeId = Committee.Id.random();
-        final String name = faker.rickAndMorty().character();
-        final ZonedDateTime applicationStartDate = faker.date().birthday().toInstant().atZone(ZoneId.systemDefault());
-        final ZonedDateTime applicationEndDate = faker.date().birthday().toInstant().atZone(ZoneId.systemDefault());
-        final CommitteeView committeeView = CommitteeView.builder()
-                .id(Committee.Id.random())
-                .applicationEndDate(applicationEndDate)
-                .applicationStartDate(applicationStartDate)
-                .name(name)
-                .status(Committee.Status.OPEN_TO_APPLICATIONS)
-                .build();
-
-        // When
-        when(committeeStoragePort.findViewById(committeeId)).thenReturn(Optional.of(committeeView));
-        final CommitteeView committeeById = committeeService.getCommitteeById(committeeId);
-
-        // Then
-        assertEquals(committeeView, committeeById);
-    }
-
-    @Test
-    void should_throw_not_found_given_a_committee_not_found_by_id() {
-        // When
-        when(committeeStoragePort.findViewById(any())).thenReturn(Optional.empty());
-
-        // Then
-        assertThrows(OnlyDustException.class, () -> committeeService.getCommitteeById(Committee.Id.random()));
-    }
-
     @Nested
     public class ShouldCreateUpdateApplication {
 
@@ -799,7 +767,7 @@ public class CommitteeServiceTest {
             assertThatThrownBy(() -> committeeService.updateStatus(committeeId, Committee.Status.OPEN_TO_VOTES))
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Not enough juries or vote per jury to cover all projects given some juries are project lead or contributor on application " +
-                                "project");
+                            "project");
         }
 
 
