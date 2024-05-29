@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.bff.read.repositories;
 
-import onlydust.com.marketplace.bff.read.entities.PublicUserProfileResponseV2Entity;
+import onlydust.com.marketplace.bff.read.entities.user.PublicUserProfileResponseV2Entity;
 import org.intellij.lang.annotations.Language;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;

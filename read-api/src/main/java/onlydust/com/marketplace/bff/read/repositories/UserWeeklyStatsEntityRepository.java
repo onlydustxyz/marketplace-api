@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.bff.read.repositories;
 
-import onlydust.com.marketplace.bff.read.entities.UserWeeklyStatsEntity;
+import onlydust.com.marketplace.bff.read.entities.user.UserWeeklyStatsEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 

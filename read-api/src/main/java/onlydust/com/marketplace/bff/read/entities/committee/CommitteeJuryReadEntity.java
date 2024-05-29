@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.bff.read.entities;
+package onlydust.com.marketplace.bff.read.entities.committee;
 
 import jakarta.persistence.*;
 import lombok.*;

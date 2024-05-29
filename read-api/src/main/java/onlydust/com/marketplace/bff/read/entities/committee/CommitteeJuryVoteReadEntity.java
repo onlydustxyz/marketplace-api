@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.bff.read.entities;
+package onlydust.com.marketplace.bff.read.entities.committee;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,7 +8,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLinkView
 import org.hibernate.annotations.Immutable;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -16,14 +15,10 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Immutable
-@Table(name = "committee_project_answers", schema = "public")
-@IdClass(CommitteeProjectAnswerReadEntity.PrimaryKey.class)
+@Table(name = "committee_jury_votes", schema = "public")
+@IdClass(CommitteeJuryVoteReadEntity.PrimaryKey.class)
 @Accessors(fluent = true)
-public class CommitteeProjectAnswerReadEntity {
-    @Id
-    @EqualsAndHashCode.Include
-    @NonNull
-    UUID committeeId;
+public class CommitteeJuryVoteReadEntity {
     @Id
     @EqualsAndHashCode.Include
     @NonNull
@@ -31,33 +26,32 @@ public class CommitteeProjectAnswerReadEntity {
     @Id
     @EqualsAndHashCode.Include
     @NonNull
-    UUID questionId;
-
+    UUID criteriaId;
+    @Id
+    @EqualsAndHashCode.Include
+    @NonNull
+    UUID committeeId;
+    @Id
+    @EqualsAndHashCode.Include
     @NonNull
     UUID userId;
-    String answer;
+    Integer score;
 
-    Date techUpdatedAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "criteriaId", insertable = false, updatable = false)
+    CommitteeJuryCriteriaReadEntity criteria;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "projectId", insertable = false, updatable = false)
-    @NonNull
-    ProjectLinkViewEntity project;
-
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", referencedColumnName = "userId", insertable = false, updatable = false)
-    @NonNull
     AllUserViewEntity user;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "committeeId", insertable = false, updatable = false)
-    @NonNull
-    CommitteeReadEntity committee;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "projectId", insertable = false, updatable = false)
+    ProjectLinkViewEntity project;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "questionId", insertable = false, updatable = false)
-    @NonNull
-    CommitteeProjectQuestionReadEntity question;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "committeeId", insertable = false, updatable = false)
+    CommitteeReadEntity committee;
 
     @EqualsAndHashCode
     @AllArgsConstructor
@@ -66,6 +60,7 @@ public class CommitteeProjectAnswerReadEntity {
     public static class PrimaryKey implements Serializable {
         UUID projectId;
         UUID committeeId;
-        UUID questionId;
+        UUID criteriaId;
+        UUID userId;
     }
 }

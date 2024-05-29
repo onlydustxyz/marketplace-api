@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.bff.read.entities;
 
+import onlydust.com.marketplace.bff.read.entities.user.PublicUserProfileResponseV2Entity;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
