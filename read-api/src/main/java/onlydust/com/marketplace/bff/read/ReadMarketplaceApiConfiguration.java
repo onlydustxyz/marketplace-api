@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.bff.read;
 
-import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeJuryVoteViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeLinkViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeProjectAnswerViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectInfosViewRepository;

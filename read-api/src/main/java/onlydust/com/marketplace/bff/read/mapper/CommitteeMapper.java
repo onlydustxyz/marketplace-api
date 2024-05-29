@@ -5,8 +5,8 @@ import onlydust.com.marketplace.api.contract.model.CommitteeProjectInfosResponse
 import onlydust.com.marketplace.api.contract.model.CommitteeStatus;
 import onlydust.com.marketplace.api.contract.model.ProjectLast3MonthsMetricsResponse;
 import onlydust.com.marketplace.api.contract.model.RegisteredUserResponse;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeJuryVoteViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectInfosQueryEntity;
+import onlydust.com.marketplace.bff.read.entities.CommitteeJuryVoteViewEntity;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.Committee;
 
