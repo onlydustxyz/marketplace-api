@@ -3329,7 +3329,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/ecosystems/{ecosystemId}/projects:
+  /api/v1/ecosystems/{ecosystemSlug}/projects:
     get:
       security:
         - bearerAuth: [ ]
@@ -3341,12 +3341,11 @@ paths:
         Get the (soon to be paginated) list of all public projects on the platform.
       parameters:
         - in: path
-          name: ecosystemId
-          description: Ecosystem id
+          name: ecosystemSlug
+          description: Ecosystem slug
           required: true
           schema:
-            type: string
-            format: uuid
+            $ref: '#/components/schemas/EcosystemSlug'
         - in: query
           name: hasGoodFirstIssues
           required: false
@@ -3590,6 +3589,12 @@ components:
       type: string
       format: uuid
       description: OnlyDust committee criteria ID
+
+    EcosystemSlug:
+      type: string
+      description: OnlyDust ecosystem pretty ID that is computed from its name. This ID CAN change over time.
+      example: zama
+
 
     Money:
       type: object
@@ -7271,7 +7276,6 @@ components:
         - slug
         - name
         - shortDescription
-        - logoUrl
         - leaders
         - technologies
       properties:

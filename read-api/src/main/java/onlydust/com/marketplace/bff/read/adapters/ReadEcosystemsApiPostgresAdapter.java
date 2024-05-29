@@ -7,16 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.UUID;
-
 @RestController
 @AllArgsConstructor
 @Transactional(readOnly = true)
 public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
-
     @Override
-    public ResponseEntity<EcosystemProjectPageResponse> getEcosystemProjects(UUID ecosystemId, Integer pageIndex, Integer pageSize,
-                                                                             Boolean hasGoodFirstIssues) {
-        return ReadEcosystemsApi.super.getEcosystemProjects(ecosystemId, pageIndex, pageSize, hasGoodFirstIssues);
+    public ResponseEntity<EcosystemProjectPageResponse> getEcosystemProjects(String ecosystemSlug, Integer pageIndex, Integer pageSize, Boolean hasGoodFirstIssues) {
+        return ReadEcosystemsApi.super.getEcosystemProjects(ecosystemSlug, pageIndex, pageSize, hasGoodFirstIssues);
     }
 }
