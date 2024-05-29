@@ -29,12 +29,10 @@ public class ProjectEcosystemCardReadEntity {
     @NonNull
     String slug;
     @NonNull
+    @Column(name = "short_description")
     String shortDescription;
     @Column(name = "logo_url")
     String logoUrl;
-
-
-
 
 
 }
