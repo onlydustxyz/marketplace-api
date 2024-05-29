@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.bff.read.repositories;
 
-import onlydust.com.marketplace.bff.read.entities.CommitteeBudgetAllocationReadEntity;
+import onlydust.com.marketplace.bff.read.entities.committee.CommitteeBudgetAllocationReadEntity;
 import org.springframework.data.repository.Repository;
 
 import java.util.List;
