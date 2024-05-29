@@ -6,16 +6,11 @@ import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.JuryCriteria;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
-import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationDetailsView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
-import onlydust.com.marketplace.project.domain.view.commitee.ProjectJuryVoteView;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 
 public interface BackOfficeCommitteeMapper {
 
@@ -93,46 +88,5 @@ public interface BackOfficeCommitteeMapper {
                 projectQuestionRequest.getRequired()) : new ProjectQuestion(ProjectQuestion.Id.of(projectQuestionRequest.getId()),
                 projectQuestionRequest.getQuestion(),
                 projectQuestionRequest.getRequired());
-    }
-
-    static CommitteeProjectApplicationResponse committeeApplicationDetailsToResponse(final CommitteeApplicationDetailsView view) {
-        final CommitteeProjectApplicationResponse committeeProjectApplicationResponse = new CommitteeProjectApplicationResponse();
-        committeeProjectApplicationResponse.setProject(new ProjectLinkResponse()
-                .id(view.projectShortView().id())
-                .slug(view.projectShortView().slug())
-                .name(view.projectShortView().name())
-                .logoUrl(isNull(view.projectShortView().logoUrl()) ? null : view.projectShortView().logoUrl())
-        );
-        committeeProjectApplicationResponse.setProjectQuestions(view.answers().stream()
-                .map(answer -> new ProjectAnswerResponse()
-                        .answer(answer.answer())
-                        .question(answer.question())
-                        .required(answer.required())
-                )
-                .toList()
-        );
-        committeeProjectApplicationResponse.setTotalScore(isNull(view.projectJuryVoteViews()) || view.projectJuryVoteViews().isEmpty() ? null :
-                view.projectJuryVoteViews().stream()
-                        .filter(projectJuryVoteView -> nonNull(projectJuryVoteView.getTotalScore()))
-                        .map(ProjectJuryVoteView::getTotalScore)
-                        .reduce(BigDecimal::add).map(bigDecimal -> bigDecimal.divide(BigDecimal.valueOf(view.projectJuryVoteViews().stream()
-                                .filter(projectJuryVoteView -> nonNull(projectJuryVoteView.getTotalScore()))
-                                .count()), 1, RoundingMode.HALF_UP)).orElse(null));
-        committeeProjectApplicationResponse.setJuryVotes(view.projectJuryVoteViews().stream().map(projectJuryVoteView ->
-                new JuryVoteResponse()
-                        .totalScore(isNull(projectJuryVoteView.getTotalScore()) ? null : projectJuryVoteView.getTotalScore().setScale(1, RoundingMode.HALF_UP))
-                        .jury(new UserLinkResponse()
-                                .userId(projectJuryVoteView.user().getId())
-                                .login(projectJuryVoteView.user().getLogin())
-                                .githubUserId(projectJuryVoteView.user().getGithubUserId())
-                                .avatarUrl(projectJuryVoteView.user().getAvatarUrl())
-                        )
-                        .answers(projectJuryVoteView.voteViews().stream()
-                                .map(voteView -> new ScoredAnswerResponse()
-                                        .criteria(voteView.criteria())
-                                        .score(voteView.score())
-                                ).toList())
-        ).toList());
-        return committeeProjectApplicationResponse;
     }
 }

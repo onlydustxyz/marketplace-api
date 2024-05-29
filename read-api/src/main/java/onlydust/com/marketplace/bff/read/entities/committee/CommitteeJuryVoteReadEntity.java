@@ -11,9 +11,9 @@ import java.io.Serializable;
 import java.util.UUID;
 
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Data
+@Value
 @Immutable
 @Table(name = "committee_jury_votes", schema = "public")
 @IdClass(CommitteeJuryVoteReadEntity.PrimaryKey.class)

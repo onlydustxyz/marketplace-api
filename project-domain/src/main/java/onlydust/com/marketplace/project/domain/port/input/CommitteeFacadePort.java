@@ -4,7 +4,6 @@ import lombok.NonNull;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.JuryCriteria;
-import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationDetailsView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
 
 import java.math.BigDecimal;
@@ -24,8 +23,6 @@ public interface CommitteeFacadePort {
     void updateStatus(Committee.Id committeeId, Committee.Status status);
 
     void createUpdateApplicationForCommittee(Committee.Id committeeId, Committee.Application application);
-
-    CommitteeApplicationDetailsView getCommitteeApplicationDetails(Committee.Id committeeId, UUID projectId);
 
     void vote(UUID juryId, Committee.Id committeeId, UUID projectId, Map<JuryCriteria.Id, Integer> scores);
 

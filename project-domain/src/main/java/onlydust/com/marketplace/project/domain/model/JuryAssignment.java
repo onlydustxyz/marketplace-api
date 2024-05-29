@@ -43,7 +43,7 @@ public class JuryAssignment {
         return new JuryAssignment(juryId,
                 committeeId,
                 projectId,
-                votes.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> Optional.of(e.getValue())))
+                votes.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> Optional.ofNullable(e.getValue())))
         );
     }
 

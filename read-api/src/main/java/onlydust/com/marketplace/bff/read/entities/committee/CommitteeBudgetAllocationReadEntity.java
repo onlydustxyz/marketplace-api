@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.backoffice.api.contract.model.CommitteeProjectAllocationLinkResponse;
+import onlydust.com.backoffice.api.contract.model.MoneyResponse;
 import onlydust.com.backoffice.api.contract.model.ProjectLinkResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 import onlydust.com.marketplace.bff.read.entities.ShortCurrencyResponseEntity;
@@ -20,9 +21,9 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(force = true)
 @Accessors(fluent = true)
-@IdClass(CommitteeBudgetAllocationViewEntity.PrimaryKey.class)
+@IdClass(CommitteeBudgetAllocationReadEntity.PrimaryKey.class)
 @Table(name = "committee_budget_allocations", schema = "public")
-public class CommitteeBudgetAllocationViewEntity {
+public class CommitteeBudgetAllocationReadEntity {
     @Id
     @EqualsAndHashCode.Include
     private @NonNull UUID committeeId;
@@ -32,6 +33,10 @@ public class CommitteeBudgetAllocationViewEntity {
     @Id
     @EqualsAndHashCode.Include
     private @NonNull UUID projectId;
+
+    @ManyToOne
+    @JoinColumn(name = "committeeId", insertable = false, updatable = false)
+    private @NonNull CommitteeReadEntity committee;
 
     @ManyToOne
     @JoinColumn(name = "currencyId", insertable = false, updatable = false)
@@ -50,7 +55,9 @@ public class CommitteeBudgetAllocationViewEntity {
                         .name(project.getName())
                         .slug(project.getSlug())
                         .logoUrl(project.getLogoUrl()))
-                .allocation(amount);
+                .allocation(new MoneyResponse()
+                        .amount(amount)
+                        .currency(currency.toDto()));
     }
 
     @EqualsAndHashCode
