@@ -931,6 +931,7 @@ public class CommitteeServiceTest {
             final var project3 = UUID.fromString("00000000-0000-0000-0000-000000000003");
             final var project4 = UUID.fromString("00000000-0000-0000-0000-000000000004");
             final var project5 = UUID.fromString("00000000-0000-0000-0000-000000000005");
+            final var budget = BigDecimal.valueOf(15);
 
             when(committeeStoragePort.findById(committee.id())).thenReturn(Optional.of(committee));
             when(committeeStoragePort.findJuryAssignments(committee.id())).thenReturn(List.of(
@@ -942,16 +943,17 @@ public class CommitteeServiceTest {
             ));
 
             // When
-            committeeService.allocate(committee.id(), STRK, BigDecimal.valueOf(15), BigDecimal.valueOf(1), BigDecimal.valueOf(5));
+            committeeService.allocate(committee.id(), STRK, budget, BigDecimal.valueOf(1), BigDecimal.valueOf(5));
 
             // Then
             final var allocationsCaptor = ArgumentCaptor.forClass(Map.class);
             verify(committeeStoragePort).saveAllocations(eq(committee.id()), eq(STRK), allocationsCaptor.capture());
             final Map<UUID, BigDecimal> allocations = allocationsCaptor.getValue();
             assertThat(allocations).hasSize(3);
-            assertThat(allocations.get(project3)).isEqualByComparingTo(BigDecimal.valueOf(3.75));
+            assertThat(allocations.get(project3)).isEqualByComparingTo(BigDecimal.valueOf(1.66667));
             assertThat(allocations.get(project4)).isEqualByComparingTo(BigDecimal.valueOf(5));
-            assertThat(allocations.get(project5)).isEqualByComparingTo(BigDecimal.valueOf(6.25));
+            assertThat(allocations.get(project5)).isEqualByComparingTo(BigDecimal.valueOf(8.33333));
+            assertThat(allocations.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add)).isEqualByComparingTo(budget);
         }
 
         @Test
@@ -962,6 +964,7 @@ public class CommitteeServiceTest {
             final var project3 = UUID.fromString("00000000-0000-0000-0000-000000000003");
             final var project4 = UUID.fromString("00000000-0000-0000-0000-000000000004");
             final var project5 = UUID.fromString("00000000-0000-0000-0000-000000000005");
+            final var budget = BigDecimal.valueOf(15);
 
             when(committeeStoragePort.findById(committee.id())).thenReturn(Optional.of(committee));
             when(committeeStoragePort.findJuryAssignments(committee.id())).thenReturn(List.of(
@@ -973,15 +976,16 @@ public class CommitteeServiceTest {
             ));
 
             // When
-            committeeService.allocate(committee.id(), STRK, BigDecimal.valueOf(15), BigDecimal.valueOf(1), BigDecimal.valueOf(10));
+            committeeService.allocate(committee.id(), STRK, budget, BigDecimal.valueOf(1), BigDecimal.valueOf(10));
 
             // Then
             final var allocationsCaptor = ArgumentCaptor.forClass(Map.class);
             verify(committeeStoragePort).saveAllocations(eq(committee.id()), eq(STRK), allocationsCaptor.capture());
             final Map<UUID, BigDecimal> allocations = allocationsCaptor.getValue();
             assertThat(allocations).hasSize(2);
-            assertThat(allocations.get(project4)).isEqualByComparingTo(BigDecimal.valueOf(6.428571));
-            assertThat(allocations.get(project5)).isEqualByComparingTo(BigDecimal.valueOf(8.571428));
+            assertThat(allocations.get(project4)).isEqualByComparingTo(BigDecimal.valueOf(3.75));
+            assertThat(allocations.get(project5)).isEqualByComparingTo(BigDecimal.valueOf(11.25));
+            assertThat(allocations.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add)).isEqualByComparingTo(budget);
         }
 
         @NonNull

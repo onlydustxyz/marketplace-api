@@ -103,7 +103,7 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                             "logoUrl": null,
                             "decimals": 18
                           },
-                          "totalAllocationAmount": 9999.9999960,
+                          "totalAllocationAmount": 10000.00000,
                           "projectAllocations": [
                             {
                               "project": {
@@ -113,7 +113,7 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                                 "logoUrl": null
                               },
                               "score": null,
-                              "allocation": 2499.9999990
+                              "allocation": 1111.11111
                             },
                             {
                               "project": {
@@ -123,7 +123,7 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                                 "logoUrl": null
                               },
                               "score": null,
-                              "allocation": 3333.3333320
+                              "allocation": 3333.33333
                             },
                             {
                               "project": {
@@ -133,7 +133,7 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
                               },
                               "score": null,
-                              "allocation": 4166.6666650
+                              "allocation": 5555.55556
                             }
                           ]
                         }
