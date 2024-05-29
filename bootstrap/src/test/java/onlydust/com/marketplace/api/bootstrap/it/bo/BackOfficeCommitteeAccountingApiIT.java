@@ -418,7 +418,7 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
     @NonNull
     private void vote(Committee committee, final UUID projectId, int score) {
         final var votes = committeeJuryVoteRepository.findAllByCommitteeIdAndProjectId(committee.id().value(), projectId);
-        votes.forEach(v -> v.setScore(score));
+        votes.stream().skip(1).forEach(v -> v.setScore(score));
         committeeJuryVoteRepository.saveAll(votes);
     }
 

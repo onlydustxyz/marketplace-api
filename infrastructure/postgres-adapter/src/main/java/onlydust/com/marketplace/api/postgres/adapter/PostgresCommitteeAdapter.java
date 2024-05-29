@@ -130,7 +130,8 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
                 .collect(groupingBy(CommitteeJuryVoteEntity::getProjectId,
                         groupingBy(CommitteeJuryVoteEntity::getUserId,
                                 groupingBy(vote -> JuryCriteria.Id.of(vote.getCriteriaId()),
-                                        mapping(CommitteeJuryVoteEntity::getScore, summingInt(Integer::intValue))))))
+                                        mapping(CommitteeJuryVoteEntity::getScore,
+                                                reducing(null, (a, b) -> b))))))
                 .entrySet().stream()
                 .flatMap(byProject -> byProject.getValue().entrySet().stream()
                         .map(byJury -> JuryAssignment.withVotes(byJury.getKey(), committeeId, byProject.getKey(), byJury.getValue()))
