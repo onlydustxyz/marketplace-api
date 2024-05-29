@@ -18,6 +18,7 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.project.domain.service.PermissionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,6 +31,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @RestController
@@ -37,6 +39,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 @Transactional(readOnly = true)
 public class ReadCommitteesApiPostgresAdapter implements ReadCommitteesApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
+    private final PermissionService permissionService;
     private final CommitteeLinkViewRepository committeeLinkViewRepository;
     private final CommitteeJuryVoteViewRepository committeeJuryVoteViewRepository;
     private final ProjectInfosViewRepository projectInfosViewRepository;
@@ -64,7 +67,6 @@ public class ReadCommitteesApiPostgresAdapter implements ReadCommitteesApi {
     @Override
     public ResponseEntity<CommitteeApplicationResponse> getApplication(UUID committeeId, UUID projectId) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        //TODO permissions!
         final var committee = committeeReadRepository.findById(committeeId)
                 .orElseThrow(() -> notFound("Committee %s not found".formatted(committeeId)));
 
@@ -83,6 +85,9 @@ public class ReadCommitteesApiPostgresAdapter implements ReadCommitteesApi {
                     .applicationEndDate(DateMapper.ofNullable(committee.applicationEndDate()))
             );
         }
+
+        if (!permissionService.isUserProjectLead(projectId, authenticatedUser.getId()))
+            throw forbidden("Only project lead can get committee application");
 
         final var project = projectInfosViewRepository.findByProjectId(projectId)
                 .orElseThrow(() -> notFound("Project %s not found".formatted(projectId)));

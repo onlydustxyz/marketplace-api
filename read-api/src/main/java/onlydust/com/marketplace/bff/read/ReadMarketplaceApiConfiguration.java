@@ -8,13 +8,16 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.Authenticate
 import onlydust.com.marketplace.bff.read.adapters.ReadCommitteesApiPostgresAdapter;
 import onlydust.com.marketplace.bff.read.adapters.ReadUsersApiPostgresAdapter;
 import onlydust.com.marketplace.bff.read.repositories.*;
+import onlydust.com.marketplace.project.domain.service.PermissionService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+
 @Configuration
 @Profile("api")
 public class ReadMarketplaceApiConfiguration {
+
     @Bean
     public ReadUsersApiPostgresAdapter bffReadUsersApiPostgresAdapter(final UserProfileLanguagePageItemEntityRepository userProfileLanguagePageItemEntityRepository,
                                                                       final UserProfileEcosystemPageItemEntityRepository userProfileEcosystemPageItemEntityRepository,
@@ -33,6 +36,7 @@ public class ReadMarketplaceApiConfiguration {
 
     @Bean
     public ReadCommitteesApiPostgresAdapter readCommitteesApiPostgresAdapter(
+            final PermissionService permissionService,
             final AuthenticatedAppUserService authenticatedAppUserService,
             final CommitteeLinkViewRepository committeeLinkViewRepository,
             final CommitteeJuryVoteViewRepository committeeJuryVoteViewRepository,
@@ -41,6 +45,7 @@ public class ReadMarketplaceApiConfiguration {
             final CommitteeReadRepository committeeReadRepository) {
         return new ReadCommitteesApiPostgresAdapter(
                 authenticatedAppUserService,
+                permissionService,
                 committeeLinkViewRepository,
                 committeeJuryVoteViewRepository,
                 projectInfosViewRepository,
