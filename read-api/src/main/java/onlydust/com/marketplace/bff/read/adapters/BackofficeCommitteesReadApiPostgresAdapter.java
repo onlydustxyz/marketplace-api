@@ -8,6 +8,8 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLinkView
 import onlydust.com.marketplace.bff.read.entities.committee.CommitteeBudgetAllocationViewEntity;
 import onlydust.com.marketplace.bff.read.entities.committee.CommitteeJuryVoteReadEntity;
 import onlydust.com.marketplace.bff.read.entities.committee.CommitteeProjectAnswerReadEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeProjectAnswerViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectInfosViewRepository;
 import onlydust.com.marketplace.bff.read.entities.CommitteeBudgetAllocationReadEntity;
 import onlydust.com.marketplace.bff.read.entities.CommitteeJuryVoteReadEntity;
 import onlydust.com.marketplace.bff.read.entities.CommitteeProjectAnswerReadEntity;
@@ -28,11 +30,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeCommitteeMapper.statusToResponse;
+import static onlydust.com.marketplace.bff.read.mapper.CommitteeMapper.roundScore;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @AllArgsConstructor
@@ -41,6 +43,8 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
 
     private final CommitteeReadRepository committeeReadRepository;
     private final CommitteeBudgetAllocationsResponseEntityRepository committeeBudgetAllocationsResponseEntityRepository;
+    private final ProjectInfosViewRepository projectInfosViewRepository;
+    private final CommitteeProjectAnswerViewRepository committeeProjectAnswerViewRepository;
 
     @Override
     public ResponseEntity<CommitteeResponse> getCommittee(UUID committeeId) {
@@ -109,13 +113,67 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
                         .reduce((left, right) -> new MoneyResponse(left.getAmount().add(right.getAmount()), left.getCurrency()))
                         .orElse(null));
 
-        return ResponseEntity.ok(response);
+        return ok(response);
+    }
+
+    @Override
+    public ResponseEntity<CommitteeProjectApplicationResponse> getProjectApplication(UUID committeeId, UUID projectId) {
+        final var committee = committeeReadRepository.findById(committeeId)
+                .orElseThrow(() -> notFound("Committee %s not found".formatted(committeeId)));
+
+        final var project = projectInfosViewRepository.findByProjectId(projectId)
+                .orElseThrow(() -> notFound("Project %s not found".formatted(projectId)));
+
+        final var projectAnswers = committeeProjectAnswerViewRepository.findByCommitteeIdAndAndProjectId(committeeId, projectId);
+
+        final List<JuryVoteResponse> juryVotes = committee.juryVotes().stream()
+                .filter(v -> v.projectId().equals(projectId))
+                .collect(groupingBy(CommitteeJuryVoteReadEntity::user, toList()))
+                .entrySet().stream()
+                .map(e -> new JuryVoteResponse()
+                        .totalScore(roundScore(e.getValue().stream()
+                                .filter(v -> v.score() != null)
+                                .mapToInt(CommitteeJuryVoteReadEntity::score)
+                                .average()))
+                        .jury(UserMapper.map(e.getKey()))
+                        .answers(e.getValue().stream()
+                                .map(a -> new ScoredAnswerResponse()
+                                        .criteria(a.criteria().criteria())
+                                        .score(a.score()))
+                                .toList()))
+                .toList();
+
+        final var totalScore = juryVotes.stream()
+                .map(v -> v.getTotalScore())
+                .filter(Objects::nonNull)
+                .mapToDouble(BigDecimal::doubleValue)
+                .average();
+
+        final var response = new CommitteeProjectApplicationResponse()
+                .project(new ProjectLinkResponse()
+                        .id(project.id())
+                        .slug(project.slug())
+                        .name(project.name())
+                        .logoUrl(isNull(project.logoUrl()) ? null : project.logoUrl())
+                )
+                .projectQuestions(projectAnswers.stream()
+                        .map(answer -> new ProjectAnswerResponse()
+                                .answer(answer.getAnswer())
+                                .question(answer.getProjectQuestion().getQuestion())
+                                .required(answer.getProjectQuestion().getRequired())
+                        )
+                        .toList()
+                )
+                .totalScore(totalScore == null ? null : roundScore(totalScore))
+                .juryVotes(juryVotes);
+
+        return ok(response);
     }
 
     @Override
     public ResponseEntity<CommitteeBudgetAllocationsResponse> getBudgetAllocations(UUID committeeId) {
         final var committeeBudgetAllocations = committeeBudgetAllocationsResponseEntityRepository.findAllByCommitteeId(committeeId);
-        return ResponseEntity.ok(new CommitteeBudgetAllocationsResponse()
+        return ok(new CommitteeBudgetAllocationsResponse()
                 .totalAllocationAmount(committeeBudgetAllocations.stream()
                         .map(CommitteeBudgetAllocationReadEntity::amount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add))

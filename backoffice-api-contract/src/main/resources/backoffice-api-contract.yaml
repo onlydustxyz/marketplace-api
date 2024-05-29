@@ -2242,7 +2242,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - BackOfficeCommitteeManagement
+        - BackofficeCommitteesRead
       summary: Get project application for committee
       operationId: getProjectApplication
       description: |

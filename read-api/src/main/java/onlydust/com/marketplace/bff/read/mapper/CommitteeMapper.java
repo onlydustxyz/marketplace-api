@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
 
 import static java.util.Objects.isNull;
 
@@ -39,6 +40,10 @@ public interface CommitteeMapper {
 
     static BigDecimal roundScore(final BigDecimal score) {
         return score.setScale(1, RoundingMode.HALF_UP);
+    }
+
+    static BigDecimal roundScore(OptionalDouble average) {
+        return average.isPresent() ? roundScore(BigDecimal.valueOf(average.getAsDouble())) : null;
     }
 
     static CommitteeProjectInfosResponse map(final @NonNull ProjectInfosQueryEntity project) {
