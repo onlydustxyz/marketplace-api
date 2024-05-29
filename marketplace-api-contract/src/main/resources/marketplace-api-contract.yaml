@@ -7294,9 +7294,9 @@ components:
           format: url
           description: Direct URL to project's logo image
           example: 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2529199823275297272.jpg'
-        leaders:
+        contributors:
           type: array
           items:
-            $ref: '#/components/schemas/RegisteredUserResponse'
-        technologies:
-          $ref: '#/components/schemas/Technologies'
+            $ref: '#/components/schemas/GithubUserResponse'
+        languages:
+          $ref: '#/components/schemas/LanguageResponse'
